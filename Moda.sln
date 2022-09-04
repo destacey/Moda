@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32825.248
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{021967B9-A7A9-45FE-BBC4-1CA398EAD887}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A87EF719-403E-4B11-BD53-9872A595721B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D457373C-E534-404C-B382-3C63AD45E2BD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{E0C3D2FE-C67A-406A-B550-76FB6DC1567C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{E0983C64-FCD9-4C22-BC48-7C21BF9139D7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{E332D61C-B5D8-47DF-802A-2CE966DF4DAB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{2CFB3090-A634-4B7A-A835-0BA123D7C71A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{8B1C39C5-0EF1-46C1-B9C0-CB0627D81E5D}"
+EndProject
+Global
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E0C3D2FE-C67A-406A-B550-76FB6DC1567C} = {A87EF719-403E-4B11-BD53-9872A595721B}
+		{E0983C64-FCD9-4C22-BC48-7C21BF9139D7} = {A87EF719-403E-4B11-BD53-9872A595721B}
+		{E332D61C-B5D8-47DF-802A-2CE966DF4DAB} = {A87EF719-403E-4B11-BD53-9872A595721B}
+		{2CFB3090-A634-4B7A-A835-0BA123D7C71A} = {A87EF719-403E-4B11-BD53-9872A595721B}
+		{8B1C39C5-0EF1-46C1-B9C0-CB0627D81E5D} = {A87EF719-403E-4B11-BD53-9872A595721B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A287E480-E0D5-4A33-9958-D4A8F7DC3F31}
+	EndGlobalSection
+EndGlobal
