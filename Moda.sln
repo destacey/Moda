@@ -31,7 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{85FB8F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Common.Tests", "tests\Common\Moda.Common.Tests\Moda.Common.Tests.csproj", "{4C127D19-611C-43B3-8CA5-2049D6E743EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Application.Common", "src\Application\Moda.Application.Common\Moda.Application.Common.csproj", "{942E075C-8548-4A2A-A482-8DE11DAEF3EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Application.Common", "src\Application\Moda.Application.Common\Moda.Application.Common.csproj", "{942E075C-8548-4A2A-A482-8DE11DAEF3EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
