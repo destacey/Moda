@@ -9,10 +9,12 @@ namespace Moda.Work.Domain.Models;
 
 public class WorkStatus : BaseAuditableEntity<Guid>
 {
+    private WorkStatus() { }
+
     public WorkStatus(string name, string? description)
     {
         Name = name.Trim();
-        Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        Description = description?.Trim();
     }
 
     /// <summary>

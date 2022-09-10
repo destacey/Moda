@@ -1,8 +1,10 @@
-﻿namespace Moda.Common.Domain.Interfaces;
+﻿using CSharpFunctionalExtensions;
+
+namespace Moda.Common.Domain.Interfaces;
 
 public interface IActivatable
 {
     bool IsActive { get; }
-    void Activate();
-    void Deactivate();
+    Result Activate();
+    Result Deactivate();
 }
