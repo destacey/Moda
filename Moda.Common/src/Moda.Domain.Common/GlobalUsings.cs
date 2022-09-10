@@ -1,0 +1,1 @@
+﻿global using Moda.Common.Domain.Data;
