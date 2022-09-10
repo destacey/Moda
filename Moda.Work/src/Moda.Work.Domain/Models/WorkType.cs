@@ -2,10 +2,12 @@
 
 public class WorkType : BaseAuditableEntity<Guid>
 {
+    private WorkType() { }
+
     public WorkType(string name, string? description)
     {
         Name = name.Trim();
-        Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        Description = description?.Trim();
     }
 
     /// <summary>

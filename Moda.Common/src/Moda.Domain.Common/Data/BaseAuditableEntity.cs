@@ -11,9 +11,15 @@ public abstract class BaseAuditableEntity<TId> : Entity<TId>, IAudited, IDeletio
     public Instant LastModified { get; set; }
 
     public string? LastModifiedBy { get; set; }
-    
+
+    /// <summary>
+    /// The date and time the record was deleted.
+    /// </summary>
     public Instant Deleted { get; set; }
 
+    /// <summary>
+    /// The employee that deleted this record.
+    /// </summary>
     public string? DeletedBy { get; set; }
 
     /// <summary>
