@@ -20,7 +20,7 @@ public class WorkStatus : BaseAuditableEntity<Guid>
     /// <summary>
     /// The name of the work status.
     /// </summary>
-    public string Name { get; }
+    public string Name { get; } = null!;
 
     /// <summary>
     /// The description of the work status.

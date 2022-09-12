@@ -13,7 +13,7 @@ public class WorkType : BaseAuditableEntity<Guid>
     /// <summary>
     /// The name of the work type.
     /// </summary>
-    public string Name { get; }
+    public string Name { get; } = null!;
 
     /// <summary>
     /// The description of the work type.
