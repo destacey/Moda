@@ -5,5 +5,5 @@ namespace Moda.Common.Domain.Events;
 
 public abstract record DomainEvent : INotification, IHasCreationDateTime
 {
-    public Instant Created { get; }
+    public Instant Created { get; init; }
 }
