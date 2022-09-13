@@ -11,8 +11,8 @@
 - [Backlog Level](#backlog-level)
 - [Workflow](#workflow)
 - [Workflow Configurtion](#workflow-configuration)
-- [Work Status](#work-status)
-- [Work Status Category](#work-status-category)
+- [Work State](#work-state)
+- [Work State Category](#work-state-category)
 
 ## Workspace
 A workspace is a container for work items. A workspace lives within a single [organization](Organization.md).
@@ -50,21 +50,21 @@ Represents the type of work item.  Examples:
 Allows the work types to be defined in a hierarchy that is normalized across the organization.
 
 ## Workflow
-A workflow is a set of work statuses that define the different stages a work item must go through to be considered done.
+A workflow is a set of work states that define the different stages a work item must go through to be considered done.
 
 ### Business Rules
-- A workflow requires at least three work statuses be configured.
-- Each of the work status categories must be represented in a workflow for it to be valid.
-- A work status can only be defined once within a workflow.
-- The order of work status categories within the workflow configuration must be grouped.  To Do items are always at the beginning of the workflow and Done items are always at the end.
-  - Valid Example (Order, Work Status, Work Status Category)
+- A workflow requires at least three work states be configured.
+- Each of the work state categories must be represented in a workflow for it to be valid.
+- A work state can only be defined once within a workflow.
+- The order of work state categories within the workflow configuration must be grouped.  To Do items are always at the beginning of the workflow and Done items are always at the end.
+  - Valid Example (Order, Work State, Work State Category)
     - 1, New, To Do
     - 2, In Progress, In Progress
     - 3, In Review, In Progress
     - 4, Completed, Done
-  - Invalid Example (Order, Work Status, Work Status Category)
+  - Invalid Example (Order, Work State, Work State Category)
     - 1, New, To Do
-    - 2, In Progress, In Progress   <-- An In Progress work status category can not be configured in between configs with To Do work status categories
+    - 2, In Progress, In Progress   <-- An In Progress work state category can not be configured in between configs with To Do work state categories
     - 3, Ready, To Do
     - 4, Completed, Done
 
@@ -73,16 +73,17 @@ A workflow is a set of work statuses that define the different stages a work ite
 - [ ] How should we handle changes?  I think workflows should be immutable if are or ever have been assigned.
 
 ## Workflow Configuration
-The workflow configuration links work statuses, work status categories, and the order to the workflow.
+The workflow configuration links work states, work state categories, and the order to the workflow.
 
-## Work Status
-The name of the stage within the workflow.  Each work status can be used in many workflows.
+## Work State
+The name of the stage within the workflow.  Each work state can be used in many workflows.
 
-## Work Status Category
-The work status category is an enum that helps sort and normalize work statuses across workflows.  The order and available values are:
-1. To Do - Execution of the work item has not started.  This is also useful for workflows that have additional work statuses used to collect requirements, but don't want to consider those as started or in progress.
+## Work State Category
+The work state category is an enum that helps sort and normalize work states across workflows.  The order and available values are:
+1. To Do - Execution of the work item has not started.  This is also useful for workflows that have additional work states used to collect requirements, but don't want to consider those as started or in progress.
 2. In Progress - The work or execution has started.
-3. Done - The work or execution has been completed or cancelled.
+3. Done - The work or execution has been completed.
+4. Removed - The work or execution has been removed or cancelled.
 
 # ERD
 ```mermaid
@@ -103,6 +104,6 @@ erDiagram
     WorkProcessConfiguration ||--o{ WorkItem : "is assigned to"
 
     Workflow ||--o{ WorkflowConfiguration : owns
-    WorkflowConfiguration }o--|| WorkStatus : "is associated to"
-    WorkflowConfiguration }o--|| WorkStatusCategory : "is associated to"
+    WorkflowConfiguration }o--|| WorkState : "is associated to"
+    WorkflowConfiguration }o--|| WorkStateCategory : "is associated to"
 ```
