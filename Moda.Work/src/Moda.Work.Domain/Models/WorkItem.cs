@@ -11,7 +11,6 @@ public class WorkItem : BaseAuditableEntity<Guid>
     /// </summary>
     public int Number { get; set; }
 
-
     public string Title { get; set; } = null!;
 
     public Guid WorkspaceId { get; private set; }
@@ -22,11 +21,14 @@ public class WorkItem : BaseAuditableEntity<Guid>
 
     public WorkType WorkType { get; private set; } = null!;
 
-    public Guid WorkStatusId { get; private set; }
+    public Guid WorkStateId { get; private set; }
 
-    public WorkStatus WorkStatus { get; private set; } = null!;
+    public WorkState WorkState { get; private set; } = null!;
 
-    public string? StatusReason { get; set; }
+    /// <summary>
+    /// The reason the work item is in its current state.
+    /// </summary>
+    public string? StateReason { get; set; }
 
     public int Priority { get; set; }
 

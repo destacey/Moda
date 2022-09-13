@@ -2,7 +2,7 @@
 
 namespace Moda.Work.Domain.Enums;
 
-public enum WorkStatusCategory
+public enum WorkStateCategory
 {
     [Display(Name = "To Do")]
     ToDo = 0,
@@ -11,5 +11,8 @@ public enum WorkStatusCategory
     InProgress = 1,
 
     [Display(Name = "Done")]
-    Done = 2
+    Done = 2,
+
+    [Display(Name = "Removed")]
+    Removed = 3
 }
