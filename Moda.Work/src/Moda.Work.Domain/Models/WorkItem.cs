@@ -17,13 +17,21 @@ public class WorkItem : BaseAuditableEntity<Guid>
 
     public Workspace Workspace { get; private set; } = null!;
 
-    public Guid WorkTypeId { get; private set; }
+    public Guid TypeId { get; private set; }
 
-    public WorkType WorkType { get; private set; } = null!;
+    public WorkType Type { get; private set; } = null!;
 
-    public Guid WorkStateId { get; private set; }
+    public Guid StateId { get; private set; }
 
-    public WorkState WorkState { get; private set; } = null!;
+    public WorkState State { get; private set; } = null!;
+
+    public Guid BacklogLevelId { get; private set; }
+
+    public BacklogLevel BacklogLevel { get; private set; } = null!;
+
+    public Guid WorkProcessConfigurationId { get; private set; }
+
+    public WorkProcessConfiguration WorkProcessConfiguration { get; private set; } = null!;
 
     /// <summary>
     /// The reason the work item is in its current state.

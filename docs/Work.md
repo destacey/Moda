@@ -98,12 +98,20 @@ erDiagram
     WorkProcess ||--o{ WorkProcessConfiguration : owns
 
     WorkProcessConfiguration }o--|| WorkType : "is associated to"
-    WorkProcessConfiguration }o--|| Workflow : "is associated to"
     WorkProcessConfiguration }o--|| BacklogLevel : "is associated to"
+    WorkProcessConfiguration }o--|| Workflow : "is associated to"
 
     WorkProcessConfiguration ||--o{ WorkItem : "is assigned to"
+
+    WorkType ||--o{ WorkItem : "is assigned to"
+
+    BacklogLevel ||--o{ WorkItem : "is assigned to"
 
     Workflow ||--o{ WorkflowConfiguration : owns
     WorkflowConfiguration }o--|| WorkState : "is associated to"
     WorkflowConfiguration }o--|| WorkStateCategory : "is associated to"
+
+    WorkState ||--o{ WorkItem : "is assigned to"
+
+    WorkStateCategory ||--o{ WorkItem : "is assigned to"
 ```
