@@ -8,7 +8,7 @@ namespace Moda.Work.Domain.Models;
 /// </summary>
 public class WorkProcess : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
-    private readonly List<WorkProcessConfiguration> _workProcessConfigurations = new();
+    private readonly List<WorkProcessConfiguration> _configurations = new();
     private readonly List<Workspace> _workspaces = new();
 
     private WorkProcess() { }
@@ -41,7 +41,7 @@ public class WorkProcess : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatab
     /// </summary>
     public bool IsActive { get; private set; } = false;
 
-    public IReadOnlyCollection<WorkProcessConfiguration> WorkProcessConfiguration => _workProcessConfigurations.AsReadOnly();
+    public IReadOnlyCollection<WorkProcessConfiguration> Configurations => _configurations.AsReadOnly();
 
     public IReadOnlyCollection<Workspace> Workspaces => _workspaces.AsReadOnly();
 

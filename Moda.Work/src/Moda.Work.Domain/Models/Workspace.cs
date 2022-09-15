@@ -5,7 +5,7 @@ namespace Moda.Work.Domain.Models;
 /// <summary>
 /// A workspace is a container for work items.
 /// </summary>
-public class Workspace : BaseAuditableEntity<Guid>, IAggregateRoot
+public class Workspace : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private readonly List<WorkItem> _workItems = new();
 

@@ -1,6 +1,8 @@
-﻿namespace Moda.Work.Domain.Models;
+﻿using CSharpFunctionalExtensions;
 
-public class WorkType : BaseAuditableEntity<Guid>
+namespace Moda.Work.Domain.Models;
+
+public class WorkType : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private WorkType() { }
 
@@ -18,5 +20,17 @@ public class WorkType : BaseAuditableEntity<Guid>
     /// <summary>
     /// The description of the work type.
     /// </summary>
-    public string? Description { get; }
+    public string? Description { get; private set; }
+
+    public bool IsActive { get; private set; } = true;
+
+    public Result Activate()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Result Deactivate()
+    {
+        throw new NotImplementedException();
+    }
 }
