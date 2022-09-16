@@ -6,13 +6,14 @@ public class Workflow : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private readonly List<WorkflowConfiguration> _configurations = new();
 
-    public Workflow(string name, string? description)
+    private Workflow() { }
+
+    public Workflow(string name, string? description, Ownership ownership)
     {
         Name = name.Trim();
         Description = description?.Trim();
+        Ownership = ownership;
     }
-
-    private Workflow() { }
 
     /// <summary>
     /// The name of the workflow.
@@ -23,6 +24,11 @@ public class Workflow : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
     /// The description of the workflow.
     /// </summary>
     public string? Description { get; private set; }
+
+    /// <summary>
+    /// Indicates whether the workflow is owned by Moda or a third party system.  This value should not change.
+    /// </summary>
+    public Ownership Ownership { get; }
 
     /// <summary>
     /// Indicates whether the workflow is active or not.  Only active workflows can be assigned 
