@@ -27,7 +27,7 @@ public class ConnectionStringSecurer : IConnectionStringSecurer
         return dbProvider?.ToLower() switch
         {
             DbProviderKeys.SqlServer => MakeSecureSqlConnectionString(connectionString),
-            DbProviderKeys.Npgsql => MakeSecureNpgsqlConnectionString(connectionString),
+            //DbProviderKeys.Npgsql => MakeSecureNpgsqlConnectionString(connectionString),
             _ => connectionString
         };
     }
@@ -49,20 +49,20 @@ public class ConnectionStringSecurer : IConnectionStringSecurer
         return builder.ToString();
     }
 
-    private string MakeSecureNpgsqlConnectionString(string connectionString)
-    {
-        var builder = new NpgsqlConnectionStringBuilder(connectionString);
+    //private string MakeSecureNpgsqlConnectionString(string connectionString)
+    //{
+    //    var builder = new NpgsqlConnectionStringBuilder(connectionString);
 
-        if (!string.IsNullOrEmpty(builder.Password) || !builder.IntegratedSecurity)
-        {
-            builder.Password = HiddenValueDefault;
-        }
+    //    if (!string.IsNullOrEmpty(builder.Password) || !builder.IntegratedSecurity)
+    //    {
+    //        builder.Password = HiddenValueDefault;
+    //    }
 
-        if (!string.IsNullOrEmpty(builder.Username) || !builder.IntegratedSecurity)
-        {
-            builder.Username = HiddenValueDefault;
-        }
+    //    if (!string.IsNullOrEmpty(builder.Username) || !builder.IntegratedSecurity)
+    //    {
+    //        builder.Username = HiddenValueDefault;
+    //    }
 
-        return builder.ToString();
-    }
+    //    return builder.ToString();
+    //}
 }

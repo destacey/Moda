@@ -51,13 +51,13 @@ internal static class ConfigureServices
                 return builder.UseSqlServer(connectionString, e =>
                      e.MigrationsAssembly("Moda.Infrastructure.Migrators.MSSQL"));
 
-            case DbProviderKeys.Npgsql:
-                AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-                return builder.UseNpgsql(connectionString, options =>
-                {
-                    options.MigrationsAssembly("Moda.Infrastructure.Migrators.PostgreSQL");
-                    options.UseNodaTime();
-                });
+            //case DbProviderKeys.Npgsql:
+            //    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            //    return builder.UseNpgsql(connectionString, options =>
+            //    {
+            //        options.MigrationsAssembly("Moda.Infrastructure.Migrators.PostgreSQL");
+            //        options.UseNodaTime();
+            //    });
 
             default:
                 throw new InvalidOperationException($"DB Provider {dbProvider} is not supported.");

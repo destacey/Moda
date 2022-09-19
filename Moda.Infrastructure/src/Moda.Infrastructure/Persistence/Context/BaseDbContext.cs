@@ -109,7 +109,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
             .Where(e => e.State is EntityState.Added or EntityState.Deleted or EntityState.Modified)
             .ToList())
         {
-            var trailEntry = new AuditTrail(entry, _serializer)
+            var trailEntry = new AuditTrail(entry, _serializer, _dateTimeService)
             {
                 TableName = entry.Entity.GetType().Name,
                 UserId = userId
