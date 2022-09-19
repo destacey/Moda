@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ardalis.Specification" Version="6.1.0" />
+    <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="6.1.0" />
+    <PackageReference Include="Hangfire" Version="1.7.31" />
+    <PackageReference Include="Hangfire.Console" Version="1.4.2" />
+    <PackageReference Include="Hangfire.Console.Extensions" Version="1.0.5" />
+    <PackageReference Include="Hangfire.Dashboard.Basic.Authentication" Version="5.0.0" />
+    <PackageReference Include="Hangfire.PostgreSql" Version="1.9.9" />
+    <PackageReference Include="Mapster" Version="7.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.0-rc.1.22427.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.0-rc.1.22427.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.0-rc.1.22427.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0-rc.1.22426.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.0-rc.1.22426.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.0-rc.1.22426.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0-rc.1.22426.10" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.0-rc.1.22427.2" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="1.25.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="NodaTime" Version="3.1.2" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0-rc.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="7.0.0-rc.1" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.17.0" />
+    <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
+    <PackageReference Include="Serilog.Expressions" Version="3.4.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
+    <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="5.7.1" />
+    <PackageReference Include="ZymLabs.NSwag.FluentValidation.AspNetCore" Version="0.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
+    <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Moda.Core\src\Moda.Core.Application\Moda.Core.Application.csproj" />
+    <ProjectReference Include="..\..\..\Moda.Work\src\Moda.Work.Domain\Moda.Work.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
