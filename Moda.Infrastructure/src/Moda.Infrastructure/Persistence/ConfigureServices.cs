@@ -48,8 +48,11 @@ internal static class ConfigureServices
         switch (dbProvider.ToLowerInvariant())
         {
             case DbProviderKeys.SqlServer:
-                return builder.UseSqlServer(connectionString, e =>
-                     e.MigrationsAssembly("Moda.Infrastructure.Migrators.MSSQL"));
+                return builder.UseSqlServer(connectionString, options =>
+                {
+                    options.MigrationsAssembly("Moda.Infrastructure.Migrators.MSSQL");
+                    options.UseNodaTime();
+                });
 
             //case DbProviderKeys.Npgsql:
             //    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
