@@ -1,0 +1,10 @@
+{
+  "SwaggerSettings": {
+    "Enable": true,
+    "Title": "Moda API",
+    "Version": "v1",
+    "License": true,
+    "LicenseName": "MIT License",
+    "LicenseUrl": "https://github.com/destacey/Moda/blob/main/LICENSE.md"
+  }
+}

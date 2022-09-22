@@ -20,9 +20,6 @@ public static class ClaimsPrincipalExtensions
     public static string? GetUserId(this ClaimsPrincipal principal)
        => principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
-    public static string? GetImageUrl(this ClaimsPrincipal principal)
-       => principal.FindFirstValue(ApplicationClaims.ImageUrl);
-
     public static DateTimeOffset GetExpiration(this ClaimsPrincipal principal) =>
         DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(
             principal.FindFirstValue(ApplicationClaims.Expiration)));

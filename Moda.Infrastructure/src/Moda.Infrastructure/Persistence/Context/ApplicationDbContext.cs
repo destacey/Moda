@@ -10,7 +10,7 @@ public class ApplicationDbContext : BaseDbContext
     {
     }
 
-    public DbSet<Workspace> Products => Set<Workspace>();
+    //public DbSet<Workspace> Workspaces => Set<Workspace>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

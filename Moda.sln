@@ -55,6 +55,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Core.Application", "Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Infrastructure.Migrators.MSSQL", "Moda.Infrastructure\src\Moda.Infrastructure.Migrators.MSSQL\Moda.Infrastructure.Migrators.MSSQL.csproj", "{B1768FB8-09C9-4064-9EE8-D7828A7417B3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Web.Api", "Moda.Web\src\Moda.Web.Api\Moda.Web.Api.csproj", "{C9710991-70C2-4444-8A12-FCC888960DBF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{B1768FB8-09C9-4064-9EE8-D7828A7417B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1768FB8-09C9-4064-9EE8-D7828A7417B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1768FB8-09C9-4064-9EE8-D7828A7417B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9710991-70C2-4444-8A12-FCC888960DBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9710991-70C2-4444-8A12-FCC888960DBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9710991-70C2-4444-8A12-FCC888960DBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9710991-70C2-4444-8A12-FCC888960DBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -116,6 +122,7 @@ Global
 		{94A4BF1B-76DC-4781-A280-14ECCBBAE5E4} = {64A68D62-3FE6-48A3-8F96-B670273EE7F6}
 		{F0808093-43DE-44E5-BB09-3E765B9F3478} = {AF1F230A-0534-4316-B458-2F1E9F040110}
 		{B1768FB8-09C9-4064-9EE8-D7828A7417B3} = {D6652BF1-5A0C-4679-8C54-F1BE7A5F0103}
+		{C9710991-70C2-4444-8A12-FCC888960DBF} = {D7318832-400B-4E4B-9948-7E4E26E6CE7E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A287E480-E0D5-4A33-9958-D4A8F7DC3F31}

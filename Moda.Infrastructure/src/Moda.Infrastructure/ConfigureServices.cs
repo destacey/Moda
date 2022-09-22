@@ -58,6 +58,7 @@ public static class ConfigureServices
             .UseStaticFiles()
             .UseSecurityHeaders(config)
             .UseExceptionMiddleware()
+            .UseHttpsRedirection()
             .UseRouting()
             .UseCorsPolicy()
             .UseAuthentication()

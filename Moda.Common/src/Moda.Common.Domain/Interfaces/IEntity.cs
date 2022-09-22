@@ -1,6 +1,4 @@
-﻿using Moda.Common.Domain.Events;
-
-namespace Moda.Common.Domain.Interfaces;
+﻿namespace Moda.Common.Domain.Interfaces;
 
 public interface IEntity
 {

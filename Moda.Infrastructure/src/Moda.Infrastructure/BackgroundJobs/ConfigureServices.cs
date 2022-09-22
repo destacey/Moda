@@ -44,8 +44,8 @@ internal static class ConfigureServices
         {
             DbProviderKeys.SqlServer =>
                 hangfireConfig.UseSqlServerStorage(connectionString, config.GetSection("HangfireSettings:Storage:Options").Get<SqlServerStorageOptions>()),
-            DbProviderKeys.Npgsql =>
-                hangfireConfig.UsePostgreSqlStorage(connectionString, config.GetSection("HangfireSettings:Storage:Options").Get<PostgreSqlStorageOptions>()),
+            //DbProviderKeys.Npgsql =>
+            //    hangfireConfig.UsePostgreSqlStorage(connectionString, config.GetSection("HangfireSettings:Storage:Options").Get<PostgreSqlStorageOptions>()),
             _ => throw new Exception($"Hangfire Storage Provider {dbProvider} is not supported.")
         };
 

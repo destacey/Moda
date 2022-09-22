@@ -72,15 +72,15 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
 
     private List<AuditTrail> HandleAuditingBeforeSaveChanges(Guid userId)
     {
-        var timestamp = _dateTimeService.Now;
-
         foreach (var entry in ChangeTracker.Entries<IAuditable>().ToList())
         {
+            var timestamp = _dateTimeService.Now;
+
             switch (entry.State)
             {
                 case EntityState.Added:
                     entry.Entity.CreatedBy = userId;
-                    // TODO add created date here
+                    entry.Entity.Created = timestamp;
                     entry.Entity.LastModifiedBy = userId;
                     entry.Entity.LastModified = timestamp;
                     break;

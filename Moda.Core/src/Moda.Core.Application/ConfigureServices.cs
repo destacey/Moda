@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Moda.Core.Application;
 public static class ConfigureServices
 {
-    public static IServiceCollection AddApplicationCommonServices(this IServiceCollection services)
+    public static IServiceCollection AddCoreApplication(this IServiceCollection services)
     {
         var assembly = Assembly.GetExecutingAssembly();
 

@@ -3,23 +3,28 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using NodaTime;
 
 namespace Moda.Infrastructure.Identity;
 
 internal class TokenService : ITokenService
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IDateTimeService _dateTimeService;
     private readonly SecuritySettings _securitySettings;
     private readonly JwtSettings _jwtSettings;
 
     public TokenService(
         UserManager<ApplicationUser> userManager,
         IOptions<JwtSettings> jwtSettings,
-        IOptions<SecuritySettings> securitySettings)
+        IOptions<SecuritySettings> securitySettings,
+        IDateTimeService dateTimeService)
     {
         _userManager = userManager;
+        _dateTimeService = dateTimeService;
         _jwtSettings = jwtSettings.Value;
         _securitySettings = securitySettings.Value;
     }
@@ -65,7 +70,7 @@ internal class TokenService : ITokenService
             throw new UnauthorizedException("auth.failed");
         }
 
-        if (user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        if (user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= _dateTimeService.Now)
         {
             throw new UnauthorizedException("identity.invalidrefreshtoken");
         }
@@ -78,7 +83,7 @@ internal class TokenService : ITokenService
         string token = GenerateJwt(user, ipAddress);
 
         user.RefreshToken = GenerateRefreshToken();
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationInDays);
+        user.RefreshTokenExpiryTime = _dateTimeService.Now.PlusDays(_jwtSettings.RefreshTokenExpirationInDays);
 
         await _userManager.UpdateAsync(user);
 
@@ -97,7 +102,6 @@ internal class TokenService : ITokenService
             new(ClaimTypes.Name, user.FirstName ?? string.Empty),
             new(ClaimTypes.Surname, user.LastName ?? string.Empty),
             new(ApplicationClaims.IpAddress, ipAddress),
-            new(ApplicationClaims.ImageUrl, user.ImageUrl ?? string.Empty),
             new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty)
         };
 

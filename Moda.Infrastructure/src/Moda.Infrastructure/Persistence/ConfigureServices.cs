@@ -29,7 +29,7 @@ internal static class ConfigureServices
         return services
             .Configure<DatabaseSettings>(config.GetSection(nameof(DatabaseSettings)))
 
-            .AddDbContextPool<ApplicationDbContext>(m => m.UseDatabase(dbProvider, rootConnectionString))
+            .AddDbContext<ApplicationDbContext>(m => m.UseDatabase(dbProvider, rootConnectionString))
 
             .AddTransient<IDatabaseInitializer, DatabaseInitializer>()
             .AddTransient<ApplicationDbInitializer>()
