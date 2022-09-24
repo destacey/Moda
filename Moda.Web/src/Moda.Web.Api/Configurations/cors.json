@@ -1,5 +1,5 @@
 {
   "CorsSettings": {
-    "React": "http://localhost:3000"
+    "WebClient": "http://localhost:3000"
   }
 }

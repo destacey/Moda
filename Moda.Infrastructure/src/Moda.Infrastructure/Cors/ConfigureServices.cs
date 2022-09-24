@@ -13,8 +13,8 @@ internal static class ConfigureServices
         var corsSettings = config.GetSection(nameof(CorsSettings)).Get<CorsSettings>();
         var origins = new List<string>();
 
-        if (corsSettings?.React is not null)
-            origins.AddRange(corsSettings.React.Split(';', StringSplitOptions.RemoveEmptyEntries));
+        if (corsSettings?.WebClient is not null)
+            origins.AddRange(corsSettings.WebClient.Split(';', StringSplitOptions.RemoveEmptyEntries));
 
         return services.AddCors(opt =>
             opt.AddPolicy(CorsPolicy, policy =>

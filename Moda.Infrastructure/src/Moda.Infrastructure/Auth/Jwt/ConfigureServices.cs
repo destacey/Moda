@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Moda.Infrastructure.Auth.Jwt;
 
-internal static class Startup
+internal static class ConfigureServices
 {
     internal static IServiceCollection AddJwtAuth(this IServiceCollection services, IConfiguration config)
     {

@@ -6,7 +6,7 @@ using Serilog;
 
 namespace Moda.Infrastructure.Auth.AzureAd;
 
-internal static class Startup
+internal static class ConfigureServices
 {
     internal static IServiceCollection AddAzureAdAuth(this IServiceCollection services, IConfiguration config)
     {
