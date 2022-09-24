@@ -26,13 +26,13 @@ internal static class ConfigureServices
                 {
                     doc.Info.Title = settings.Title;
                     doc.Info.Version = settings.Version;
-                    doc.Info.Description = settings.Description;
-                    doc.Info.Contact = new()
-                    {
-                        Name = settings.ContactName,
-                        Email = settings.ContactEmail,
-                        Url = settings.ContactUrl
-                    };
+                    //doc.Info.Description = settings.Description;
+                    //doc.Info.Contact = new()
+                    //{
+                    //    Name = settings.ContactName,
+                    //    Email = settings.ContactEmail,
+                    //    Url = settings.ContactUrl
+                    //};
                     doc.Info.License = new()
                     {
                         Name = settings.LicenseName,
@@ -120,6 +120,7 @@ internal static class ConfigureServices
                     {
                         AppName = "Moda API Client",
                         ClientId = config["SecuritySettings:Swagger:OpenIdClientId"],
+                        ClientSecret = null,
                         UsePkceWithAuthorizationCodeGrant = true,
                         ScopeSeparator = " "
                     };

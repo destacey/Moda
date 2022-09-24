@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Moda.Web.Api.Configurations;
 
 internal static class ConfigureServices
@@ -26,6 +28,7 @@ internal static class ConfigureServices
                 .AddJsonFile($"{configurationsDirectory}/openapi.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"{configurationsDirectory}/securityheaders.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"{configurationsDirectory}/securityheaders.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                .AddUserSecrets(Assembly.GetExecutingAssembly())
                 .AddEnvironmentVariables();
         });
         return host;
