@@ -4,6 +4,7 @@ using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Graph;
 
 namespace Moda.Infrastructure.Identity;
 
@@ -16,6 +17,7 @@ internal partial class UserService : IUserService
     private readonly IJobService _jobService;
     private readonly SecuritySettings _securitySettings;
     private readonly IEventPublisher _events;
+    private readonly GraphServiceClient _graphServiceClient;
 
     public UserService(
         SignInManager<ApplicationUser> signInManager,
@@ -24,7 +26,8 @@ internal partial class UserService : IUserService
         ApplicationDbContext db,
         IJobService jobService,
         IEventPublisher events,
-        IOptions<SecuritySettings> securitySettings)
+        IOptions<SecuritySettings> securitySettings,
+        GraphServiceClient graphServiceClient)
     {
         _signInManager = signInManager;
         _userManager = userManager;
@@ -33,6 +36,7 @@ internal partial class UserService : IUserService
         _jobService = jobService;
         _events = events;
         _securitySettings = securitySettings.Value;
+        _graphServiceClient = graphServiceClient;
     }
 
     public async Task<PaginationResponse<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)

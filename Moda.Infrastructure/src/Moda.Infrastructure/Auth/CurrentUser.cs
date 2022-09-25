@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.Identity.Web;
 
 namespace Moda.Infrastructure.Auth;
 
@@ -12,7 +13,7 @@ public class CurrentUser : ICurrentUser, ICurrentUserInitializer
 
     public Guid GetUserId() =>
         IsAuthenticated()
-            ? Guid.Parse(_user?.GetUserId() ?? Guid.Empty.ToString())
+            ? Guid.Parse(_user?.GetObjectId() ?? Guid.Empty.ToString())
             : _userId;
 
     public string? GetUserEmail() =>

@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -37,8 +38,10 @@ internal partial class UserService
 
     private async Task<ApplicationUser> CreateOrUpdateFromPrincipalAsync(ClaimsPrincipal principal)
     {
-        string? email = principal.FindFirstValue(ClaimTypes.Email);
-        string? username = principal.GetDisplayName();
+        var adUser = await _graphServiceClient.Users[principal.GetObjectId()].Request().GetAsync();
+        string? email = principal.FindFirstValue(ClaimTypes.Upn) ?? adUser.Mail;
+        string? username = principal.GetDisplayName() ?? adUser.GivenName;
+        
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(username))
         {
             throw new InternalServerException(string.Format("Username or Email not valid."));
