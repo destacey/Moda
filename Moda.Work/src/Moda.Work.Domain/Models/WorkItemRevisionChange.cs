@@ -5,7 +5,7 @@ namespace Moda.Work.Domain.Models;
 /// <summary>
 /// A specific field change within a work item revision.
 /// </summary>
-public class WorkItemRevisionChange : Entity<Guid>, IDeletionAudited
+public class WorkItemRevisionChange : BaseEntity<Guid>, ISoftDelete
 {
     private WorkItemRevisionChange() { }
 
@@ -47,7 +47,7 @@ public class WorkItemRevisionChange : Entity<Guid>, IDeletionAudited
     /// <summary>
     /// The employee that deleted this record.
     /// </summary>
-    public string? DeletedBy { get; set; }
+    public Guid DeletedBy { get; set; }
 
     /// <summary>
     /// Flag to determine if the entity is deleted.

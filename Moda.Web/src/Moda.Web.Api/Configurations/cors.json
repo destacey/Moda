@@ -1,0 +1,5 @@
+{
+  "CorsSettings": {
+    "WebClient": "http://localhost:3000"
+  }
+}

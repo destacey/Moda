@@ -1,0 +1,10 @@
+﻿global using Moda.Common.Application.Models;
+global using Moda.Common.Domain.Authorization;
+global using Moda.Core.Application.Auditing;
+global using Moda.Core.Application.Identity.Users;
+global using Moda.Core.Application.Identity.Roles;
+global using Moda.Infrastructure.Auth.Permissions;
+global using Moda.Infrastructure.Middleware;
+global using Moda.Infrastructure.OpenApi;
+global using Microsoft.AspNetCore.Mvc;
+global using NSwag.Annotations;
