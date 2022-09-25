@@ -29,13 +29,5 @@ public class CreateUserRequestValidator : CustomValidator<CreateUserRequest>
 
         RuleFor(p => p.LastName).Cascade(CascadeMode.Stop)
             .NotEmpty();
-
-        RuleFor(p => p.Password).Cascade(CascadeMode.Stop)
-            .NotEmpty()
-            .MinimumLength(6);
-
-        RuleFor(p => p.ConfirmPassword).Cascade(CascadeMode.Stop)
-            .NotEmpty()
-            .Equal(p => p.Password);
     }
 }

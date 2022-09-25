@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -96,51 +95,6 @@ internal partial class UserService
         }
 
         return user;
-    }
-
-    public async Task<string> CreateAsync(CreateUserRequest request, string origin)
-    {
-        var user = new ApplicationUser
-        {
-            Email = request.Email,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            UserName = request.UserName,
-            PhoneNumber = request.PhoneNumber,
-            IsActive = true
-        };
-
-        var result = await _userManager.CreateAsync(user, request.Password);
-        if (!result.Succeeded)
-        {
-            throw new InternalServerException("Validation Errors Occurred.");
-        }
-
-        await _userManager.AddToRoleAsync(user, ApplicationRoles.Basic);
-
-        var messages = new List<string> { string.Format("User {0} Registered.", user.UserName) };
-
-        //if (_securitySettings.RequireConfirmedAccount && !string.IsNullOrEmpty(user.Email))
-        //{
-        //    // send verification email
-        //    string emailVerificationUri = await GetEmailVerificationUriAsync(user, origin);
-        //    RegisterUserEmailModel eMailModel = new RegisterUserEmailModel()
-        //    {
-        //        Email = user.Email,
-        //        UserName = user.UserName,
-        //        Url = emailVerificationUri
-        //    };
-        //    var mailRequest = new MailRequest(
-        //        new List<string> { user.Email },
-        //        "Confirm Registration",
-        //        _templateService.GenerateEmailTemplate("email-confirmation", eMailModel));
-        //    _jobService.Enqueue(() => _mailService.SendAsync(mailRequest));
-        //    messages.Add($"Please check {user.Email} to verify your account!");
-        //}
-
-        await _events.PublishAsync(new ApplicationUserCreatedEvent(user.Id));
-
-        return string.Join(Environment.NewLine, messages);
     }
 
     public async Task UpdateAsync(UpdateUserRequest request, string userId)

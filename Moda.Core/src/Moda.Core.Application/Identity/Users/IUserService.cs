@@ -25,6 +25,5 @@ public interface IUserService : ITransientService
     Task ToggleStatusAsync(ToggleUserStatusRequest request, CancellationToken cancellationToken);
 
     Task<string> GetOrCreateFromPrincipalAsync(ClaimsPrincipal principal);
-    Task<string> CreateAsync(CreateUserRequest request, string origin);
     Task UpdateAsync(UpdateUserRequest request, string userId);
 }
