@@ -12,7 +12,6 @@ global using Moda.Common.Domain.Interfaces;
 global using Moda.Core.Application.Auditing;
 global using Moda.Core.Application.Identity.Roles;
 global using Moda.Core.Application.Identity.Users;
-global using Moda.Core.Application.Identity.Users.Password;
 global using Moda.Infrastructure.Auditing;
 global using Moda.Infrastructure.Auth;
 global using Moda.Infrastructure.BackgroundJobs;
