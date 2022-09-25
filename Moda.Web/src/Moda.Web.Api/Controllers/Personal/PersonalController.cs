@@ -1,7 +1,5 @@
 using System.Security.Claims;
 using MediatR;
-using Moda.Core.Application.Auditing;
-using Moda.Core.Application.Identity.Users;
 
 namespace Moda.Web.Api.Controllers.Identity;
 

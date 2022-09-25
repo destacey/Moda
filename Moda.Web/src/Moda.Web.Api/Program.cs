@@ -15,7 +15,7 @@ try
     builder.Host.UseSerilog((_, config) =>
     {
         config.WriteTo.Console()
-        .ReadFrom.Configuration(builder.Configuration);
+            .ReadFrom.Configuration(builder.Configuration);
     });
 
     builder.Services.AddControllers();

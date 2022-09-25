@@ -1,6 +1,5 @@
 using System.Net;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Localization;
 using Serilog;
 using Serilog.Context;
 

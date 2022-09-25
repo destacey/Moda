@@ -15,7 +15,7 @@ internal static class ConfigureServices
 {
     internal static IServiceCollection AddOpenApiDocumentation(this IServiceCollection services, IConfiguration config)
     {
-        var settings = config.GetSection(nameof(SwaggerSettings)).Get<SwaggerSettings>();
+        var settings = config.GetSection(nameof(SwaggerSettings)).Get<SwaggerSettings>()!;
         if (settings.Enable)
         {
             services.AddVersionedApiExplorer(o => o.SubstituteApiVersionInUrl = true);
@@ -53,7 +53,7 @@ internal static class ConfigureServices
                             TokenUrl = config["SecuritySettings:Swagger:TokenUrl"],
                             Scopes = new Dictionary<string, string>
                             {
-                                { config["SecuritySettings:Swagger:ApiScope"], "access the api" }
+                                { config["SecuritySettings:Swagger:ApiScope"]!, "access the api" }
                             }
                         }
                     }

@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Reflection;
+using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MediatR;
 using NodaTime;
 
 namespace Moda.Infrastructure;
@@ -16,7 +16,6 @@ public static class ConfigureServices
         MapsterSettings.Configure();
 
         services.AddSingleton<IClock>(SystemClock.Instance);
-        services.AddTransient<IDateTimeService, DateTimeService>();
 
         return services
             .AddApiVersioning()

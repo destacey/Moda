@@ -3,7 +3,6 @@ using Ardalis.Specification.EntityFrameworkCore;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 
 namespace Moda.Infrastructure.Identity;
@@ -15,7 +14,6 @@ internal partial class UserService : IUserService
     private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly ApplicationDbContext _db;
     private readonly IJobService _jobService;
-    private readonly SecuritySettings _securitySettings;
     private readonly IEventPublisher _events;
     private readonly GraphServiceClient _graphServiceClient;
 
@@ -26,7 +24,6 @@ internal partial class UserService : IUserService
         ApplicationDbContext db,
         IJobService jobService,
         IEventPublisher events,
-        IOptions<SecuritySettings> securitySettings,
         GraphServiceClient graphServiceClient)
     {
         _signInManager = signInManager;
@@ -35,7 +32,6 @@ internal partial class UserService : IUserService
         _db = db;
         _jobService = jobService;
         _events = events;
-        _securitySettings = securitySettings.Value;
         _graphServiceClient = graphServiceClient;
     }
 

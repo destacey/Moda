@@ -1,5 +1,4 @@
-﻿using Moda.Infrastructure.Middleware;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
+﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace Moda.Web.Api.Controllers;
 

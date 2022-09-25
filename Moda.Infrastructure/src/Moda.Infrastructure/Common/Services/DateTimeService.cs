@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Moda.Infrastructure.Services;
+namespace Moda.Infrastructure.Common.Services;
 public class DateTimeService : IDateTimeService
 {
     private readonly IClock _clock;

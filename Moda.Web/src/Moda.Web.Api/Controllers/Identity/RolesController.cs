@@ -1,5 +1,3 @@
-using Moda.Core.Application.Identity.Roles;
-
 namespace Moda.Web.Api.Controllers.Identity;
 
 public class RolesController : VersionNeutralApiController

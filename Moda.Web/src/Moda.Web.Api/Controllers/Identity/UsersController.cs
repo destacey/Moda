@@ -1,5 +1,3 @@
-using Moda.Core.Application.Identity.Users;
-
 namespace Moda.Web.Api.Controllers.Identity;
 
 public class UsersController : VersionNeutralApiController

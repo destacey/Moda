@@ -29,4 +29,3 @@ global using Moda.Infrastructure.Persistence.Context;
 global using Moda.Infrastructure.Persistence.Initialization;
 global using Moda.Infrastructure.Persistence.Repository;
 global using Moda.Infrastructure.SecurityHeaders;
-global using Moda.Infrastructure.Services;
