@@ -74,8 +74,8 @@ internal partial class UserService
             user = new ApplicationUser
             {
                 ObjectId = principal.GetObjectId(),
-                FirstName = principal.FindFirstValue(ClaimTypes.GivenName),
-                LastName = principal.FindFirstValue(ClaimTypes.Surname),
+                FirstName = principal.FindFirstValue(ClaimTypes.GivenName) ?? adUser.GivenName,
+                LastName = principal.FindFirstValue(ClaimTypes.Surname) ?? adUser.Surname,
                 Email = email,
                 NormalizedEmail = email.ToUpperInvariant(),
                 UserName = username,
