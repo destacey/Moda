@@ -37,7 +37,7 @@ internal partial class UserService
 
     private async Task<ApplicationUser> CreateOrUpdateFromPrincipalAsync(ClaimsPrincipal principal)
     {
-        string? email = principal.FindFirstValue(ClaimTypes.Upn);
+        string? email = principal.FindFirstValue(ClaimTypes.Email);
         string? username = principal.GetDisplayName();
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(username))
         {
