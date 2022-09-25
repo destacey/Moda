@@ -11,16 +11,13 @@ internal static class ConfigureServices
 {
     internal static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration config)
     {
-        services
+        return services
             .AddCurrentUser()
             .AddPermissions()
 
             // Must add identity before adding auth!
-            .AddIdentity();
-        services.Configure<SecuritySettings>(config.GetSection(nameof(SecuritySettings)));
-        return config["SecuritySettings:Provider"].Equals("AzureAd", StringComparison.OrdinalIgnoreCase)
-            ? services.AddAzureAdAuth(config)
-            : services.AddJwtAuth(config);
+            .AddIdentity()
+            .AddAzureAdAuth(config);
     }
 
     internal static IApplicationBuilder UseCurrentUser(this IApplicationBuilder app) =>
