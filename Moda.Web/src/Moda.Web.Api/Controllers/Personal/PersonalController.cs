@@ -2,7 +2,6 @@ using System.Security.Claims;
 using MediatR;
 using Moda.Core.Application.Auditing;
 using Moda.Core.Application.Identity.Users;
-using Moda.Core.Application.Identity.Users.Password;
 
 namespace Moda.Web.Api.Controllers.Identity;
 
@@ -36,20 +35,6 @@ public class PersonalController : VersionNeutralApiController
         }
 
         await _userService.UpdateAsync(request, userId);
-        return Ok();
-    }
-
-    [HttpPut("change-password")]
-    [OpenApiOperation("Change password of currently logged in user.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Register))]
-    public async Task<ActionResult> ChangePasswordAsync(ChangePasswordRequest model)
-    {
-        if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized();
-        }
-
-        await _userService.ChangePasswordAsync(model, userId);
         return Ok();
     }
 
