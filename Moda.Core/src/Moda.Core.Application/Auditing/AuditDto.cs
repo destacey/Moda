@@ -2,7 +2,7 @@ using NodaTime;
 
 namespace Moda.Core.Application.Auditing;
 
-public class AuditDto
+public record AuditDto
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }

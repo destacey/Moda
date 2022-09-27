@@ -1,6 +1,6 @@
 namespace Moda.Core.Application.Identity.Users;
 
-public class UserRoleDto
+public record UserRoleDto
 {
     public string? RoleId { get; set; }
     public string? RoleName { get; set; }

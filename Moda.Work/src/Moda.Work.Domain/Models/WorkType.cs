@@ -2,7 +2,7 @@
 
 namespace Moda.Work.Domain.Models;
 
-public class WorkType : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
+public sealed class WorkType : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private WorkType() { }
 

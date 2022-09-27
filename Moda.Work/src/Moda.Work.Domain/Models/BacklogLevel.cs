@@ -5,7 +5,7 @@ namespace Moda.Work.Domain.Models;
 /// <summary>
 /// A backlog level helps abstract work types
 /// </summary>
-public class BacklogLevel : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
+public sealed class BacklogLevel : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private BacklogLevel() { }
 

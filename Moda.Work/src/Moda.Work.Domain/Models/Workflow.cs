@@ -2,7 +2,7 @@
 
 namespace Moda.Work.Domain.Models;
 
-public class Workflow : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
+public sealed class Workflow : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private readonly List<WorkflowConfiguration> _configurations = new();
 

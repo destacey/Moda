@@ -1,6 +1,6 @@
 namespace Moda.Core.Application.Identity.Users;
 
-public class UserRolesRequest
+public sealed class UserRolesRequest
 {
     public List<UserRoleDto> UserRoles { get; set; } = new();
 }

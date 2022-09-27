@@ -49,6 +49,6 @@ public class PersonalController : VersionNeutralApiController
     [OpenApiOperation("Get audit logs of currently logged in user.", "")]
     public Task<List<AuditDto>> GetLogsAsync()
     {
-        return _mediator.Send(new GetMyAuditLogsRequest());
+        return _mediator.Send(new GetMyAuditLogsQuery());
     }
 }

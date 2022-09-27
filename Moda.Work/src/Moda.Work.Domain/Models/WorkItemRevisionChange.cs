@@ -5,7 +5,7 @@ namespace Moda.Work.Domain.Models;
 /// <summary>
 /// A specific field change within a work item revision.
 /// </summary>
-public class WorkItemRevisionChange : BaseEntity<Guid>, ISoftDelete
+public sealed class WorkItemRevisionChange : BaseEntity<Guid>, ISoftDelete
 {
     private WorkItemRevisionChange() { }
 

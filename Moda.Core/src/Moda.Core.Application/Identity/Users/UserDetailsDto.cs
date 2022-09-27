@@ -1,6 +1,6 @@
 namespace Moda.Core.Application.Identity.Users;
 
-public class UserDetailsDto
+public record UserDetailsDto
 {
     public Guid Id { get; set; }
 

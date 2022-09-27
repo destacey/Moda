@@ -2,7 +2,7 @@
 
 namespace Moda.Work.Domain.Models;
 
-public class WorkState : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
+public sealed class WorkState : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private WorkState() { }
 

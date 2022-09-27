@@ -6,7 +6,7 @@ namespace Moda.Work.Domain.Models;
 /// The work process defines a set of work process configurations that can be used 
 /// within a workspace. A work process can be used in many workspaces.
 /// </summary>
-public class WorkProcess : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
+public sealed class WorkProcess : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private readonly List<WorkProcessConfiguration> _configurations = new();
     private readonly List<Workspace> _workspaces = new();

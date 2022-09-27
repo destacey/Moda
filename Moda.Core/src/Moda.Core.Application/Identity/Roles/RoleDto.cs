@@ -1,6 +1,6 @@
 namespace Moda.Core.Application.Identity.Roles;
 
-public class RoleDto
+public record RoleDto
 {
     public string Id { get; set; } = default!;
     public string Name { get; set; } = default!;

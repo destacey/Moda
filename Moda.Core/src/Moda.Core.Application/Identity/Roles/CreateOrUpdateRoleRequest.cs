@@ -2,14 +2,14 @@ using FluentValidation;
 
 namespace Moda.Core.Application.Identity.Roles;
 
-public class CreateOrUpdateRoleRequest
+public sealed class CreateOrUpdateRoleRequest
 {
     public string? Id { get; set; }
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
 }
 
-public class CreateOrUpdateRoleRequestValidator : CustomValidator<CreateOrUpdateRoleRequest>
+public sealed class CreateOrUpdateRoleRequestValidator : CustomValidator<CreateOrUpdateRoleRequest>
 {
     public CreateOrUpdateRoleRequestValidator(IRoleService roleService) =>
         RuleFor(r => r.Name)
