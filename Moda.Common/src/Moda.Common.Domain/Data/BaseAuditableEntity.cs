@@ -6,11 +6,11 @@ public abstract class BaseAuditableEntity<TId> : BaseEntity<TId>, IAuditable, IS
 {
     public Instant Created { get; set; }
 
-    public Guid CreatedBy { get; set; }
+    public Guid? CreatedBy { get; set; }
 
     public Instant LastModified { get; set; }
 
-    public Guid LastModifiedBy { get; set; }
+    public Guid? LastModifiedBy { get; set; }
 
     /// <summary>
     /// The date and time the record was deleted.
@@ -20,7 +20,7 @@ public abstract class BaseAuditableEntity<TId> : BaseEntity<TId>, IAuditable, IS
     /// <summary>
     /// The employee that deleted this record.
     /// </summary>
-    public Guid DeletedBy { get; set; }
+    public Guid? DeletedBy { get; set; }
 
     /// <summary>
     /// Flag to determine if the entity is deleted.
