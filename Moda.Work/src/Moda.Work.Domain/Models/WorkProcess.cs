@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
@@ -49,27 +50,38 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IAggregateRoot, IAc
     /// The process for activating a work process.  A work process can only be activated if the configuration
     /// is valid.
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    public Result Activate()
+    /// <param name="activatedOn"></param>
+    /// <returns>Result that indicates success or a list of errors</returns>
+    public Result Activate(Instant activatedOn)
     {
-        throw new NotImplementedException();
+        if (!IsActive)
+        {
+            // TODO is there logic that would prevent activation?
+            IsActive = true;
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, activatedOn));
+        }
+
+        return Result.Success();
     }
 
     /// <summary>
     /// The process for deactivating a work process.  Only work processes without assignments can be deactivated.
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    public Result Deactivate()
+    /// <param name="deactivatedOn"></param>
+    /// <returns>Result that indicates success or a list of errors</returns>
+    public Result Deactivate(Instant deactivatedOn)
     {
         // TODO what is need to deactive a managed work process
 
-        if (!IsActive)
-            return Result.Success();
+        if (IsActive)
+        {
+            if (Workspaces.Any())
+                return Result.Failure("Unable to deactive with assigned workspaces.");
 
-        if (Workspaces.Any())
-            return Result.Failure("Unable to deactive with assigned workspaces.");
+            IsActive = false;
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));
+        }
 
-        IsActive = false;
-        return Result.Success();            
+        return Result.Success();
     }
 }

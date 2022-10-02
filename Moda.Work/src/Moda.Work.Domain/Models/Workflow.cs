@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
@@ -38,13 +39,37 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IAggregateRoot, IActiv
 
     public IReadOnlyCollection<WorkflowConfiguration> Configurations => _configurations.AsReadOnly();
 
-    public Result Activate()
+    /// <summary>
+    /// The process for activating a workflow.
+    /// </summary>
+    /// <param name="activatedOn"></param>
+    /// <returns>Result that indicates success or a list of errors</returns>
+    public Result Activate(Instant activatedOn)
     {
-        throw new NotImplementedException();
+        if (!IsActive)
+        {
+            // TODO is there logic that would prevent activation?
+            IsActive = true;
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, activatedOn));
+        }
+
+        return Result.Success();
     }
 
-    public Result Deactivate()
+    /// <summary>
+    /// The process for deactivating a workflow.
+    /// </summary>
+    /// <param name="deactivatedOn"></param>
+    /// <returns>Result that indicates success or a list of errors</returns>
+    public Result Deactivate(Instant deactivatedOn)
     {
-        throw new NotImplementedException();
+        if (IsActive)
+        {
+            // TODO is there logic that would prevent deactivation?
+            IsActive = false;
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));
+        }
+
+        return Result.Success();
     }
 }

@@ -57,7 +57,7 @@ public sealed class WorkItemRevision : BaseEntity<Guid>, ISoftDelete
     /// <summary>
     /// The employee that deleted this record.
     /// </summary>
-    public Guid DeletedBy { get; set; }
+    public Guid? DeletedBy { get; set; }
 
     /// <summary>
     /// Flag to determine if the entity is deleted.
