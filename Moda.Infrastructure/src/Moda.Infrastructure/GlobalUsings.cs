@@ -9,9 +9,13 @@ global using Moda.Common.Domain.Data;
 global using Moda.Common.Domain.Events;
 global using Moda.Common.Domain.Identity;
 global using Moda.Common.Domain.Interfaces;
+
 global using Moda.Core.Application.Auditing;
 global using Moda.Core.Application.Identity.Roles;
 global using Moda.Core.Application.Identity.Users;
+
+global using Moda.Organization.Domain.Models;
+
 global using Moda.Infrastructure.Auditing;
 global using Moda.Infrastructure.Auth;
 global using Moda.Infrastructure.BackgroundJobs;
