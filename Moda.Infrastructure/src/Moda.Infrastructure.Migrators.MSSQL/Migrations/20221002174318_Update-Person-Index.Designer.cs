@@ -11,7 +11,7 @@ using Moda.Infrastructure.Persistence.Context;
 
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(ModaDbContext))]
     [Migration("20221002174318_Update-Person-Index")]
     partial class UpdatePersonIndex
     {

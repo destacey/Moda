@@ -20,10 +20,10 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IAggregateRoot, IActiv
         ManagerId = managerId;
     }
 
-    public PersonName Name { get; set; } = null!;
+    public PersonName Name { get; set; } = default!;
     public string? EmployeeId { get; set; }
     public LocalDate? HireDate { get; set; }
-    public EmailAddress Email { get; set; } = null!;
+    public EmailAddress Email { get; set; } = default!;
     public string? JobTitle { get; set; }
     public string? Department { get; set; }
     public Guid? ManagerId { get; set; }

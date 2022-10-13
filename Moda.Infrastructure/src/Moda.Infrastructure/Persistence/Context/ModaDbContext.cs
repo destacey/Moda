@@ -3,14 +3,14 @@ using Microsoft.Extensions.Options;
 
 namespace Moda.Infrastructure.Persistence.Context;
 
-public class ApplicationDbContext : BaseDbContext
+public class ModaDbContext : BaseDbContext
 {
-    public ApplicationDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeService dateTimeService, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
+    public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeService dateTimeService, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
         : base(options, currentUser, dateTimeService, serializer, dbSettings, events)
     {
     }
 
-    //public DbSet<Workspace> Workspaces => Set<Workspace>();
+    public DbSet<Person> People => Set<Person>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

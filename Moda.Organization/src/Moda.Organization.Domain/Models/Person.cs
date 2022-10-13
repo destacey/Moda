@@ -1,5 +1,5 @@
 ﻿namespace Moda.Organization.Domain.Models;
-public class Person : BaseEntity<Guid>
+public class Person : BaseEntity<Guid>, IAggregateRoot
 {
     private Person() { }
 
@@ -11,5 +11,5 @@ public class Person : BaseEntity<Guid>
         Key = key;
     }
 
-    public string Key { get; } = null!;
+    public string Key { get; } = default!;
 }

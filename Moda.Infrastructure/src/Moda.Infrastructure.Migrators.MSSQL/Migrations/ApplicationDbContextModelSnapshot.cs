@@ -10,7 +10,7 @@ using Moda.Infrastructure.Persistence.Context;
 
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(ModaDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

@@ -76,11 +76,6 @@ public class EventAddingRepositoryDecorator<T> : IRepositoryWithEvents<T>
         _decorated.GetByIdAsync(id, cancellationToken);
 
     [Obsolete]
-    public Task<T?> GetBySpecAsync<TSpec>(TSpec specification, CancellationToken cancellationToken = default)
-        where TSpec : ISingleResultSpecification, ISpecification<T> =>
-        _decorated.GetBySpecAsync(specification, cancellationToken);
-
-    [Obsolete]
     public Task<T?> GetBySpecAsync(ISpecification<T> specification, CancellationToken cancellationToken = default) =>
         _decorated.GetBySpecAsync(specification, cancellationToken);
 

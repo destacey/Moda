@@ -40,7 +40,7 @@
     <PackageReference Include="NSwag.AspNetCore" Version="13.17.0" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
-    <PackageReference Include="Serilog.Expressions" Version="3.4.0" />
+    <PackageReference Include="Serilog.Expressions" Version="3.4.1" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
@@ -57,6 +57,7 @@
     <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
     <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
     <ProjectReference Include="..\..\..\Moda.Core\src\Moda.Core.Application\Moda.Core.Application.csproj" />
+    <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
     <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Domain\Moda.Organization.Domain.csproj" />
     <ProjectReference Include="..\..\..\Moda.Work\src\Moda.Work.Domain\Moda.Work.Domain.csproj" />
   </ItemGroup>

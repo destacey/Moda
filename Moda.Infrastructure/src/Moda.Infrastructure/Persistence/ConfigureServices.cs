@@ -29,7 +29,7 @@ internal static class ConfigureServices
         return services
             .Configure<DatabaseSettings>(config.GetSection(nameof(DatabaseSettings)))
 
-            .AddDbContext<ApplicationDbContext>(m => m.UseDatabase(dbProvider, rootConnectionString))
+            .AddDbContext<ModaDbContext>(m => m.UseDatabase(dbProvider, rootConnectionString))
 
             .AddTransient<IDatabaseInitializer, DatabaseInitializer>()
             .AddTransient<ApplicationDbInitializer>()
@@ -70,7 +70,7 @@ internal static class ConfigureServices
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         // Add Repositories
-        services.AddScoped(typeof(IRepository<>), typeof(ApplicationDbRepository<>));
+        services.AddScoped(typeof(IRepository<>), typeof(ModaDbRepository<>));
 
         foreach (var aggregateRootType in
             typeof(IAggregateRoot).Assembly.GetExportedTypes()

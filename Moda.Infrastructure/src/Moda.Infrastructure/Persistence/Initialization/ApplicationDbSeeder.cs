@@ -19,14 +19,14 @@ internal class ApplicationDbSeeder
         _logger = logger;
     }
 
-    public async Task SeedDatabaseAsync(ApplicationDbContext dbContext, CancellationToken cancellationToken)
+    public async Task SeedDatabaseAsync(ModaDbContext dbContext, CancellationToken cancellationToken)
     {
         await SeedRolesAsync(dbContext);
         //await SeedAdminUserAsync();
         await _seederRunner.RunSeedersAsync(cancellationToken);
     }
 
-    private async Task SeedRolesAsync(ApplicationDbContext dbContext)
+    private async Task SeedRolesAsync(ModaDbContext dbContext)
     {
         foreach (string roleName in ApplicationRoles.DefaultRoles)
         {
@@ -51,7 +51,7 @@ internal class ApplicationDbSeeder
         }
     }
 
-    private async Task AssignPermissionsToRoleAsync(ApplicationDbContext dbContext, IReadOnlyList<ApplicationPermission> permissions, ApplicationRole role)
+    private async Task AssignPermissionsToRoleAsync(ModaDbContext dbContext, IReadOnlyList<ApplicationPermission> permissions, ApplicationRole role)
     {
         var currentClaims = await _roleManager.GetClaimsAsync(role);
         foreach (var permission in permissions)

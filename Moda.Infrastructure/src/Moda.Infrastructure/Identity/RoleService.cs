@@ -8,14 +8,14 @@ internal class RoleService : IRoleService
 {
     private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ApplicationDbContext _db;
+    private readonly ModaDbContext _db;
     private readonly ICurrentUser _currentUser;
     private readonly IEventPublisher _events;
 
     public RoleService(
         RoleManager<ApplicationRole> roleManager,
         UserManager<ApplicationUser> userManager,
-        ApplicationDbContext db,
+        ModaDbContext db,
         ICurrentUser currentUser,
         IEventPublisher events)
     {

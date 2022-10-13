@@ -5,11 +5,11 @@ namespace Moda.Infrastructure.Persistence.Initialization;
 
 internal class ApplicationDbInitializer
 {
-    private readonly ApplicationDbContext _dbContext;
+    private readonly ModaDbContext _dbContext;
     private readonly ApplicationDbSeeder _dbSeeder;
     private readonly ILogger<ApplicationDbInitializer> _logger;
 
-    public ApplicationDbInitializer(ApplicationDbContext dbContext, ApplicationDbSeeder dbSeeder, ILogger<ApplicationDbInitializer> logger)
+    public ApplicationDbInitializer(ModaDbContext dbContext, ApplicationDbSeeder dbSeeder, ILogger<ApplicationDbInitializer> logger)
     {
         _dbContext = dbContext;
         _dbSeeder = dbSeeder;

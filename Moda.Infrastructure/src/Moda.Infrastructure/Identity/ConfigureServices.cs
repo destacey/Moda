@@ -18,7 +18,7 @@ internal static class ConfigureServices
                     options.User.RequireUniqueEmail = true;
                     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+#";
                 })
-            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddEntityFrameworkStores<ModaDbContext>()
             .AddDefaultTokenProviders()
             .Services;
 }

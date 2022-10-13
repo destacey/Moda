@@ -1,6 +1,7 @@
 using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
 using Mapster;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph;
@@ -12,19 +13,21 @@ internal partial class UserService : IUserService
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
-    private readonly ApplicationDbContext _db;
+    private readonly ModaDbContext _db;
     private readonly IJobService _jobService;
     private readonly IEventPublisher _events;
     private readonly GraphServiceClient _graphServiceClient;
+    private readonly ISender _sender;
 
     public UserService(
         SignInManager<ApplicationUser> signInManager,
         UserManager<ApplicationUser> userManager,
         RoleManager<ApplicationRole> roleManager,
-        ApplicationDbContext db,
+        ModaDbContext db,
         IJobService jobService,
         IEventPublisher events,
-        GraphServiceClient graphServiceClient)
+        GraphServiceClient graphServiceClient,
+        ISender sender)
     {
         _signInManager = signInManager;
         _userManager = userManager;
@@ -33,6 +36,7 @@ internal partial class UserService : IUserService
         _jobService = jobService;
         _events = events;
         _graphServiceClient = graphServiceClient;
+        _sender = sender;
     }
 
     public async Task<PaginationResponse<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)

@@ -5,10 +5,10 @@ using Mapster;
 namespace Moda.Infrastructure.Persistence.Repository;
 
 // Inherited from Ardalis.Specification's RepositoryBase<T>
-public class ApplicationDbRepository<T> : RepositoryBase<T>, IReadRepository<T>, IRepository<T>
+public class ModaDbRepository<T> : RepositoryBase<T>, IReadRepository<T>, IRepository<T>
     where T : class, IAggregateRoot
 {
-    public ApplicationDbRepository(ApplicationDbContext dbContext)
+    public ModaDbRepository(ModaDbContext dbContext)
         : base(dbContext)
     {
     }

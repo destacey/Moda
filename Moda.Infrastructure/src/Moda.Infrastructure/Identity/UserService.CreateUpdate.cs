@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
+using Moda.Organization.Application.People.Commands.CreatePerson;
+using Moda.Organization.Application.People.Queries.GetPersonByKey;
+using Moda.Organization.Application.People.Queries.PersonExistsByKey;
 
 namespace Moda.Infrastructure.Identity;
 
@@ -37,7 +40,9 @@ internal partial class UserService
 
     private async Task<ApplicationUser> CreateOrUpdateFromPrincipalAsync(ClaimsPrincipal principal)
     {
-        var adUser = await _graphServiceClient.Users[principal.GetObjectId()].Request().GetAsync();
+        string principalObjectId = principal.GetObjectId() ?? throw new InternalServerException(string.Format("Principal ObjectId is missing or null."));
+
+        var adUser = await _graphServiceClient.Users[principalObjectId].Request().GetAsync();
         string? email = principal.FindFirstValue(ClaimTypes.Upn) ?? adUser.Mail;
         string? username = principal.GetDisplayName() ?? adUser.GivenName;
         
@@ -52,12 +57,28 @@ internal partial class UserService
             throw new InternalServerException(string.Format("Username {0} is already taken.", username));
         }
 
+        Guid? personId = null;
         if (user is null)
         {
             user = await _userManager.FindByEmailAsync(email);
             if (user is not null && !string.IsNullOrWhiteSpace(user.ObjectId))
             {
                 throw new InternalServerException(string.Format("Email {0} is already taken.", email));
+            }            
+            else if (user is null && principalObjectId is not null)
+            {
+                // get the Person Id and if not null verify no existing user with that Id
+                var personIdResult = await _sender.Send(new GetPersonIdByKeyQuery(principalObjectId));
+                if (personIdResult.Value is not null)
+                {
+                    var existingUser = await _userManager.FindByIdAsync(personIdResult.Value.ToString()!);
+                    if (existingUser is not null) 
+                    {
+                        throw new InternalServerException(string.Format("Person with key {0} already exists.", principalObjectId));
+                    }
+                }
+
+                personId = personIdResult.Value;
             }
         }
 
@@ -73,7 +94,8 @@ internal partial class UserService
         {
             user = new ApplicationUser
             {
-                ObjectId = principal.GetObjectId(),
+                Id = personId?.ToString() ?? (await _sender.Send(new CreatePersonCommand(principalObjectId))).ToString(),
+                ObjectId = principalObjectId,
                 FirstName = principal.FindFirstValue(ClaimTypes.GivenName) ?? adUser.GivenName,
                 LastName = principal.FindFirstValue(ClaimTypes.Surname) ?? adUser.Surname,
                 Email = email,

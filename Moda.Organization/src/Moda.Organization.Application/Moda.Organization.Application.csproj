@@ -7,11 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="People\Commands\" />
+    <Folder Include="People\EventHandlers\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
+    <ProjectReference Include="..\Moda.Organization.Domain\Moda.Organization.Domain.csproj" />
   </ItemGroup>
 
 </Project>
