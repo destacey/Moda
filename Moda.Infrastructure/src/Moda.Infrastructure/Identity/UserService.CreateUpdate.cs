@@ -69,16 +69,16 @@ internal partial class UserService
             {
                 // get the Person Id and if not null verify no existing user with that Id
                 var personIdResult = await _sender.Send(new GetPersonIdByKeyQuery(principalObjectId));
-                if (personIdResult.Value is not null)
+                if (personIdResult is not null)
                 {
-                    var existingUser = await _userManager.FindByIdAsync(personIdResult.Value.ToString()!);
+                    var existingUser = await _userManager.FindByIdAsync(personIdResult.ToString()!);
                     if (existingUser is not null) 
                     {
                         throw new InternalServerException(string.Format("Person with key {0} already exists.", principalObjectId));
                     }
                 }
 
-                personId = personIdResult.Value;
+                personId = personIdResult;
             }
         }
 
@@ -94,7 +94,7 @@ internal partial class UserService
         {
             user = new ApplicationUser
             {
-                Id = personId?.ToString() ?? (await _sender.Send(new CreatePersonCommand(principalObjectId))).ToString(),
+                Id = personId?.ToString() ?? (await _sender.Send(new CreatePersonCommand(principalObjectId!))).ToString(),
                 ObjectId = principalObjectId,
                 FirstName = principal.FindFirstValue(ClaimTypes.GivenName) ?? adUser.GivenName,
                 LastName = principal.FindFirstValue(ClaimTypes.Surname) ?? adUser.Surname,

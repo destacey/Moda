@@ -2,6 +2,7 @@ using FluentValidation.AspNetCore;
 using Moda.Core.Application;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
+using Moda.Organization.Application;
 using Moda.Web.Api.Configurations;
 using Serilog;
 
@@ -24,6 +25,7 @@ try
 
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddCoreApplication();
+    builder.Services.AddOrganizationApplication();
 
     var app = builder.Build();
 

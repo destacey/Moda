@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -73,10 +74,14 @@ internal static class ConfigureServices
         services.AddScoped(typeof(IRepository<>), typeof(ModaDbRepository<>));
 
         foreach (var aggregateRootType in
-            typeof(IAggregateRoot).Assembly.GetExportedTypes()
+            AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => !a.IsDynamic)
+                .SelectMany(a => a.GetTypes())
                 .Where(t => typeof(IAggregateRoot).IsAssignableFrom(t) && t.IsClass)
-                .ToList())
+                .ToArray())
         {
+            _logger.Information($"AddRepositories for aggregate root: {aggregateRootType}");
+
             // Add ReadRepositories.
             services.AddScoped(typeof(IReadRepository<>).MakeGenericType(aggregateRootType), sp =>
                 sp.GetRequiredService(typeof(IRepository<>).MakeGenericType(aggregateRootType)));

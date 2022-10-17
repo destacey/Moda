@@ -1,9 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using MediatR;
 
 namespace Moda.Organization.Application.People.Queries.GetPersonByKey;
 
-public sealed record GetPersonIdByKeyQuery : IQuery<Guid?>
+public sealed record GetPersonIdByKeyQuery : IRequest<Guid?>
 {
     public GetPersonIdByKeyQuery(string key)
     {
@@ -21,7 +22,7 @@ public sealed class GetPersonIdByKeyQueryValidator : CustomValidator<GetPersonId
     }
 }
 
-public sealed class GetPersonIdByKeyQueryHandler : IQueryHandler<GetPersonIdByKeyQuery, Guid?>
+public sealed class GetPersonIdByKeyQueryHandler : IRequestHandler<GetPersonIdByKeyQuery, Guid?>
 {
     private readonly IReadRepository<Person> _readRepository;
 
@@ -30,8 +31,10 @@ public sealed class GetPersonIdByKeyQueryHandler : IQueryHandler<GetPersonIdByKe
         _readRepository = readRepository;
     }
 
-    public async Task<Result<Guid?>> Handle(GetPersonIdByKeyQuery request, CancellationToken cancellationToken)
+    public async Task<Guid?> Handle(GetPersonIdByKeyQuery request, CancellationToken cancellationToken)
     {
-        return await _readRepository.SingleOrDefaultAsync(new PersonIdByKeySpec(request.Key), cancellationToken);
+        var personId = await _readRepository.SingleOrDefaultAsync(new PersonIdByKeySpec(request.Key), cancellationToken);
+
+        return personId;
     }
 }

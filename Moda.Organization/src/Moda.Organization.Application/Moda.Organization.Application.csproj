@@ -6,9 +6,11 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="People\EventHandlers\" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.2.2" />
+        <PackageReference Include="MediatR" Version="11.0.0" />
+        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
