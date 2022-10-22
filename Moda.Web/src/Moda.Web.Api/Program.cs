@@ -29,7 +29,7 @@ try
 
     var app = builder.Build();
 
-    await app.Services.InitializeDatabasesAsync();
+    await app.Services.InitializeDatabases();
 
     app.UseInfrastructure(builder.Configuration);
     app.MapEndpoints();

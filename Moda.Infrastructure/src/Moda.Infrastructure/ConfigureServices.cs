@@ -43,13 +43,13 @@ public static class ConfigureServices
     private static IServiceCollection AddHealthCheck(this IServiceCollection services) =>
         services.AddHealthChecks().Services;
 
-    public static async Task InitializeDatabasesAsync(this IServiceProvider services, CancellationToken cancellationToken = default)
+    public static async Task InitializeDatabases(this IServiceProvider services, CancellationToken cancellationToken = default)
     {
         // Create a new scope to retrieve scoped services
         using var scope = services.CreateScope();
 
         await scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>()
-            .InitializeDatabasesAsync(cancellationToken);
+            .InitializeDatabase(cancellationToken);
     }
 
     public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder builder, IConfiguration config) =>

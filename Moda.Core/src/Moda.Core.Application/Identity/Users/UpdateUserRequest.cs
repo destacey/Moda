@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Moda.Core.Application.Identity.Users;
 
-public sealed class UpdateUserRequest
+public sealed record UpdateUserRequest
 {
     public string Id { get; set; } = default!;
     public string? FirstName { get; set; }

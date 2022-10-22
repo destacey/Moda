@@ -16,6 +16,7 @@ internal partial class UserService : IUserService
     private readonly IEventPublisher _events;
     private readonly GraphServiceClient _graphServiceClient;
     private readonly ISender _sender;
+    private readonly IDateTimeService _dateTimeService;
 
     public UserService(
         SignInManager<ApplicationUser> signInManager,
@@ -25,7 +26,8 @@ internal partial class UserService : IUserService
         IJobService jobService,
         IEventPublisher events,
         GraphServiceClient graphServiceClient,
-        ISender sender)
+        ISender sender,
+        IDateTimeService dateTimeService)
     {
         _signInManager = signInManager;
         _userManager = userManager;
@@ -35,6 +37,7 @@ internal partial class UserService : IUserService
         _events = events;
         _graphServiceClient = graphServiceClient;
         _sender = sender;
+        _dateTimeService = dateTimeService;
     }
 
     public async Task<IReadOnlyList<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)
@@ -99,6 +102,6 @@ internal partial class UserService : IUserService
 
         await _userManager.UpdateAsync(user);
 
-        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeService.Now));
     }
 }

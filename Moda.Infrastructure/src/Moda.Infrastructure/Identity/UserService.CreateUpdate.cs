@@ -32,6 +32,7 @@ internal partial class UserService
             !await _userManager.IsInRoleAsync(user, role))
         {
             await _userManager.AddToRoleAsync(user, role);
+            await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeService.Now, true));
         }
 
         return user.Id;
@@ -69,7 +70,7 @@ internal partial class UserService
             user.ObjectId = principal.GetObjectId();
             result = await _userManager.UpdateAsync(user);
 
-            await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
+            await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeService.Now));
         }
         else
         {
@@ -90,7 +91,7 @@ internal partial class UserService
             };
             result = await _userManager.CreateAsync(user);
 
-            await _events.PublishAsync(new ApplicationUserCreatedEvent(user.Id));
+            await _events.PublishAsync(new ApplicationUserCreatedEvent(user.Id, _dateTimeService.Now));
         }
 
         return result.Succeeded 
@@ -116,7 +117,7 @@ internal partial class UserService
 
         await _signInManager.RefreshSignInAsync(user);
 
-        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeService.Now));
 
         if (!result.Succeeded)
             throw new InternalServerException("Update profile failed");

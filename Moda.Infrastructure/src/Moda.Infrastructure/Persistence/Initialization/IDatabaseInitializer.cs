@@ -2,5 +2,5 @@
 
 internal interface IDatabaseInitializer
 {
-    Task InitializeDatabasesAsync(CancellationToken cancellationToken);
+    Task InitializeDatabase(CancellationToken cancellationToken);
 }

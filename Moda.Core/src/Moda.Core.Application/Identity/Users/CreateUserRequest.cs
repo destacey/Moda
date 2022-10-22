@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Moda.Core.Application.Identity.Users;
 
-public sealed class CreateUserRequest
+public sealed record CreateUserRequest
 {
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;

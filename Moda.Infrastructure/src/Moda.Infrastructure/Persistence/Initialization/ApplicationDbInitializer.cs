@@ -16,7 +16,7 @@ internal class ApplicationDbInitializer
         _logger = logger;
     }
 
-    public async Task InitializeAsync(CancellationToken cancellationToken)
+    public async Task Initialize(CancellationToken cancellationToken)
     {
         if (_dbContext.Database.GetMigrations().Any())
         {
@@ -30,7 +30,7 @@ internal class ApplicationDbInitializer
             {
                 _logger.LogInformation("Connection to Database Succeeded.");
 
-                await _dbSeeder.SeedDatabaseAsync(_dbContext, cancellationToken);
+                await _dbSeeder.SeedDatabase(_dbContext, cancellationToken);
             }
         }
     }
