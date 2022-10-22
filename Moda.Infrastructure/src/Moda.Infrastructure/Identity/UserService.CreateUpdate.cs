@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Moda.Organization.Application.People.Commands.CreatePerson;
 using Moda.Organization.Application.People.Queries.GetPersonByKey;
-using Moda.Organization.Application.People.Queries.PersonExistsByKey;
 
 namespace Moda.Infrastructure.Identity;
 
@@ -57,29 +56,11 @@ internal partial class UserService
             throw new InternalServerException(string.Format("Username {0} is already taken.", username));
         }
 
-        Guid? personId = null;
         if (user is null)
         {
             user = await _userManager.FindByEmailAsync(email);
             if (user is not null && !string.IsNullOrWhiteSpace(user.ObjectId))
-            {
                 throw new InternalServerException(string.Format("Email {0} is already taken.", email));
-            }            
-            else if (user is null && principalObjectId is not null)
-            {
-                // get the Person Id and if not null verify no existing user with that Id
-                var personIdResult = await _sender.Send(new GetPersonIdByKeyQuery(principalObjectId));
-                if (personIdResult is not null)
-                {
-                    var existingUser = await _userManager.FindByIdAsync(personIdResult.ToString()!);
-                    if (existingUser is not null) 
-                    {
-                        throw new InternalServerException(string.Format("Person with key {0} already exists.", principalObjectId));
-                    }
-                }
-
-                personId = personIdResult;
-            }
         }
 
         IdentityResult? result;
@@ -92,9 +73,10 @@ internal partial class UserService
         }
         else
         {
+            Guid newUserId = await GetOrCreatePersonId(principalObjectId);
             user = new ApplicationUser
             {
-                Id = personId?.ToString() ?? (await _sender.Send(new CreatePersonCommand(principalObjectId!))).ToString(),
+                Id = newUserId.ToString(),
                 ObjectId = principalObjectId,
                 FirstName = principal.FindFirstValue(ClaimTypes.GivenName) ?? adUser.GivenName,
                 LastName = principal.FindFirstValue(ClaimTypes.Surname) ?? adUser.Surname,
@@ -111,12 +93,9 @@ internal partial class UserService
             await _events.PublishAsync(new ApplicationUserCreatedEvent(user.Id));
         }
 
-        if (!result.Succeeded)
-        {
-            throw new InternalServerException("Validation Errors Occurred.");
-        }
-
-        return user;
+        return result.Succeeded 
+            ? user
+            : throw new InternalServerException("Validation Errors Occurred.");
     }
 
     public async Task UpdateAsync(UpdateUserRequest request, string userId)
@@ -128,11 +107,10 @@ internal partial class UserService
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
         user.PhoneNumber = request.PhoneNumber;
+
         string? phoneNumber = await _userManager.GetPhoneNumberAsync(user);
         if (request.PhoneNumber != phoneNumber)
-        {
             await _userManager.SetPhoneNumberAsync(user, request.PhoneNumber);
-        }
 
         var result = await _userManager.UpdateAsync(user);
 
@@ -141,8 +119,27 @@ internal partial class UserService
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
 
         if (!result.Succeeded)
-        {
             throw new InternalServerException("Update profile failed");
+    }
+
+    private async Task<Guid> GetOrCreatePersonId(string principalObjectId)
+    {
+        // get the Person Id and if not null verify no existing user with that Id
+        var personIdResult = await _sender.Send(new GetPersonIdByKeyQuery(principalObjectId));
+        if (personIdResult.IsSuccess)
+        {
+            var existingUser = await _userManager.FindByIdAsync(personIdResult.Value.ToString()!);
+
+            return existingUser is not null
+                ? throw new InternalServerException(string.Format("Person with key {0} already exists.", principalObjectId))
+                : personIdResult.Value;
         }
+
+        // else, create new person
+        var result = await _sender.Send(new CreatePersonCommand(principalObjectId!));
+
+        return result.IsSuccess 
+            ? result.Value 
+            : throw new InternalServerException("Create Person failed");
     }
 }

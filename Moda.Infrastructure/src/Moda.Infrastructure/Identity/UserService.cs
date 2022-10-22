@@ -1,5 +1,3 @@
-using Ardalis.Specification;
-using Ardalis.Specification.EntityFrameworkCore;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -39,18 +37,14 @@ internal partial class UserService : IUserService
         _sender = sender;
     }
 
-    public async Task<PaginationResponse<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)
     {
-        var spec = new EntitiesByPaginationFilterSpec<ApplicationUser>(filter);
-
         var users = await _userManager.Users
-            .WithSpecification(spec)
+            .Where(u => u.IsActive == filter.IsActive)
             .ProjectToType<UserDetailsDto>()
             .ToListAsync(cancellationToken);
-        int count = await _userManager.Users
-            .CountAsync(cancellationToken);
 
-        return new PaginationResponse<UserDetailsDto>(users, count, filter.PageNumber, filter.PageSize);
+        return users;
     }
 
     public async Task<bool> ExistsWithNameAsync(string name)

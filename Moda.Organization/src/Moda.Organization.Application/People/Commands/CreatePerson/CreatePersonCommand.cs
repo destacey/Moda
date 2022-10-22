@@ -1,6 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
-using Moda.Organization.Application.People.Queries.GetPersonByKey;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moda.Organization.Application.Persistence;
 
 namespace Moda.Organization.Application.People.Commands.CreatePerson;
 public sealed record class CreatePersonCommand : ICommand<Guid>
@@ -14,11 +16,11 @@ public sealed record class CreatePersonCommand : ICommand<Guid>
 
 public sealed class CreatePersonCommandValidator : CustomValidator<CreatePersonCommand>
 {
-    private readonly IReadRepository<Person> _readRepository;
+    private readonly IOrganizationDbContext _organizationDbContext;
 
-    public CreatePersonCommandValidator(IReadRepository<Person> readRepository)
+    public CreatePersonCommandValidator(IOrganizationDbContext organizationDbContext)
     {
-        _readRepository = readRepository;
+        _organizationDbContext = organizationDbContext;
 
         RuleFor(q => q.Key)
             .NotEmpty()
@@ -28,26 +30,42 @@ public sealed class CreatePersonCommandValidator : CustomValidator<CreatePersonC
 
     public async Task<bool> BeUniqueKey(string key, CancellationToken cancellationToken)
     {
-        return await _readRepository.AnyAsync(new PersonByKeySpec(key), cancellationToken);
+        return await _organizationDbContext.People.AnyAsync(x => x.Key == key, cancellationToken);
     }
 }
 
-public sealed class CreatePersonCommandHandler : ICommandHandler<CreatePersonCommand, Guid>
+internal sealed class CreatePersonCommandHandler : ICommandHandler<CreatePersonCommand, Guid>
 {
-    private readonly IRepositoryWithEvents<Person> _repository;
+    private readonly IOrganizationDbContext _organizationDbContext;
+    private readonly IDateTimeService _dateTimeService;
+    private readonly ILogger<CreatePersonCommandHandler> _logger;
 
-    public CreatePersonCommandHandler(IRepositoryWithEvents<Person> repository)
+    public CreatePersonCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeService dateTimeService, ILogger<CreatePersonCommandHandler> logger)
     {
-        _repository = repository;
+        _organizationDbContext = organizationDbContext;
+        _dateTimeService = dateTimeService;
+        _logger = logger;
     }
 
     public async Task<Result<Guid>> Handle(CreatePersonCommand request, CancellationToken cancellationToken)
     {
-        var person = new Person(request.Key);
+        try
+        {
+            var person = Person.Create(request.Key, _dateTimeService.Now);
 
-        await _repository.AddAsync(person, cancellationToken);
-        await _repository.SaveChangesAsync(cancellationToken);
+            await _organizationDbContext.People.AddAsync(person, cancellationToken);
 
-        return person.Id;
+            await _organizationDbContext.SaveChangesAsync(cancellationToken);
+
+            return Result.Success(person.Id);
+        }
+        catch (Exception ex)
+        {
+            var requestName = typeof(CreatePersonCommand).Name;
+
+            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
+
+            return Result.Failure<Guid>(ex.Message);
+        }
     }
 }

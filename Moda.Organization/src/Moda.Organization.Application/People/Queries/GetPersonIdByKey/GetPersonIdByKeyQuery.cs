@@ -1,10 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
-using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Moda.Organization.Application.Persistence;
 
 namespace Moda.Organization.Application.People.Queries.GetPersonByKey;
 
-public sealed record GetPersonIdByKeyQuery : IRequest<Guid?>
+public sealed record GetPersonIdByKeyQuery : IQuery<Guid>
 {
     public GetPersonIdByKeyQuery(string key)
     {
@@ -22,19 +23,24 @@ public sealed class GetPersonIdByKeyQueryValidator : CustomValidator<GetPersonId
     }
 }
 
-public sealed class GetPersonIdByKeyQueryHandler : IRequestHandler<GetPersonIdByKeyQuery, Guid?>
+internal sealed class GetPersonIdByKeyQueryHandler : IQueryHandler<GetPersonIdByKeyQuery, Guid>
 {
-    private readonly IReadRepository<Person> _readRepository;
+    private readonly IOrganizationDbContext _organizationDbContext;
 
-    public GetPersonIdByKeyQueryHandler(IReadRepository<Person> readRepository)
+    public GetPersonIdByKeyQueryHandler(IOrganizationDbContext organizationDbContext)
     {
-        _readRepository = readRepository;
+        _organizationDbContext = organizationDbContext;
     }
 
-    public async Task<Guid?> Handle(GetPersonIdByKeyQuery request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(GetPersonIdByKeyQuery request, CancellationToken cancellationToken)
     {
-        var personId = await _readRepository.SingleOrDefaultAsync(new PersonIdByKeySpec(request.Key), cancellationToken);
+        Guid? personId = await _organizationDbContext.People
+            .Where(p => p.Key == request.Key)
+            .Select(p => (Guid?)p.Id)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        return personId;
+        return personId is null 
+            ? Result.Failure<Guid>($"Unable to find a Person with Key {request.Key}") 
+            : Result.Success(personId.Value);
     }
 }

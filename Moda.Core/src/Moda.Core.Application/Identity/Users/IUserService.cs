@@ -4,7 +4,7 @@ namespace Moda.Core.Application.Identity.Users;
 
 public interface IUserService : ITransientService
 {
-    Task<PaginationResponse<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken);
+    Task<IReadOnlyList<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken);
 
     Task<bool> ExistsWithNameAsync(string name);
     Task<bool> ExistsWithEmailAsync(string email, string? exceptId = null);

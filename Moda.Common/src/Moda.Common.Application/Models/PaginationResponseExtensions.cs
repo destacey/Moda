@@ -1,17 +1,16 @@
-using Ardalis.Specification;
+using Microsoft.EntityFrameworkCore;
 
 namespace Moda.Common.Application.Models;
 
 public static class PaginationResponseExtensions
 {
-    public static async Task<PaginationResponse<TDestination>> PaginatedListAsync<T, TDestination>(
-        this IReadRepositoryBase<T> repository, ISpecification<T, TDestination> spec, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public static async Task<PaginationResponse<T>> PaginatedListAsync<T>(
+        this IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         where T : class
-        where TDestination : class, IDto
     {
-        var list = await repository.ListAsync(spec, cancellationToken);
-        int count = await repository.CountAsync(spec, cancellationToken);
+        List<T> list = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+        int count = await source.CountAsync(cancellationToken);
 
-        return new PaginationResponse<TDestination>(list, count, pageNumber, pageSize);
+        return new PaginationResponse<T>(list, count, pageNumber, pageSize);
     }
 }

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using CSharpFunctionalExtensions;
+using MediatR;
 
 namespace Moda.Common.Application.Behaviors;
 

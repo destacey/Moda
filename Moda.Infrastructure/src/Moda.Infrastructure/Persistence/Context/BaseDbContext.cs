@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -76,29 +77,23 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         {
             var timestamp = _dateTimeService.Now;
 
-            switch (entry.State)
+            if (entry.State == EntityState.Added)
             {
-                case EntityState.Added:
-                    entry.Entity.CreatedBy = userId;
-                    entry.Entity.Created = timestamp;
-                    entry.Entity.LastModifiedBy = userId;
-                    entry.Entity.LastModified = timestamp;
-                    break;
+                entry.Entity.CreatedBy = userId;
+                entry.Entity.Created = timestamp;
+            }
 
-                case EntityState.Modified:
-                    entry.Entity.LastModified = timestamp;
-                    entry.Entity.LastModifiedBy = userId;
-                    break;
+            if (entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.HasChangedOwnedEntities())
+            {
+                entry.Entity.LastModifiedBy = userId;
+                entry.Entity.LastModified = timestamp;
+            }
 
-                case EntityState.Deleted:
-                    if (entry.Entity is ISoftDelete softDelete)
-                    {
-                        softDelete.DeletedBy = userId;
-                        softDelete.Deleted = timestamp;
-                        entry.State = EntityState.Modified;
-                    }
-
-                    break;
+            if (entry.State == EntityState.Deleted && entry.Entity is ISoftDelete softDelete)
+            {
+                softDelete.DeletedBy = userId;
+                softDelete.Deleted = timestamp;
+                entry.State = EntityState.Modified;
             }
         }
 
@@ -106,7 +101,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
 
         var trailEntries = new List<AuditTrail>();
         foreach (var entry in ChangeTracker.Entries<IAuditable>()
-            .Where(e => e.State is EntityState.Added or EntityState.Deleted or EntityState.Modified)
+            .Where(e => e.State is EntityState.Added or EntityState.Deleted or EntityState.Modified || e.HasChangedOwnedEntities())
             .ToList())
         {
             var trailEntry = new AuditTrail(entry, _serializer, _dateTimeService)

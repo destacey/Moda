@@ -1,5 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using Moda.Organization.Application.Persistence;
 
 namespace Moda.Organization.Application.People.Queries.PersonExistsByKey;
 
@@ -21,17 +23,17 @@ public sealed class PersonExistsByKeyQueryValidator : CustomValidator<PersonExis
     }
 }
 
-public sealed class PersonExistsByKeyQueryHandler : IQueryHandler<PersonExistsByKeyQuery, bool>
+internal sealed class PersonExistsByKeyQueryHandler : IQueryHandler<PersonExistsByKeyQuery, bool>
 {
-    private readonly IReadRepository<Person> _readRepository;
+    private readonly IOrganizationDbContext _organizationDbContext;
 
-    public PersonExistsByKeyQueryHandler(IReadRepository<Person> readRepository)
+    public PersonExistsByKeyQueryHandler(IOrganizationDbContext organizationDbContext)
     {
-        _readRepository = readRepository;
+        _organizationDbContext = organizationDbContext;
     }
 
     public async Task<Result<bool>> Handle(PersonExistsByKeyQuery request, CancellationToken cancellationToken)
     {
-        return await _readRepository.AnyAsync(new PersonByKeySpec(request.Key), cancellationToken);
+        return await _organizationDbContext.People.AnyAsync(p => p.Key == request.Key, cancellationToken);
     }
 }
