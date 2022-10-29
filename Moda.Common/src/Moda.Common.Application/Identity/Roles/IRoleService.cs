@@ -1,4 +1,4 @@
-namespace Moda.Core.Application.Identity.Roles;
+namespace Moda.Common.Application.Identity.Roles;
 
 public interface IRoleService : ITransientService
 {

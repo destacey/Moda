@@ -59,12 +59,23 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
         identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId));
 
         // And the email claim for the email.
-        var upnClaim = principal.FindFirst(ClaimTypes.Upn);
-        if (upnClaim is not null)
+        var emailClaim = principal.FindFirst(ClaimTypes.Email);
+        if (emailClaim is null)
         {
-            var emailClaim = principal.FindFirst(ClaimTypes.Email);
-            identity.TryRemoveClaim(emailClaim);
-            identity.AddClaim(new Claim(ClaimTypes.Email, upnClaim.Value));
+            var upnClaim = principal.FindFirst(ClaimTypes.Upn);
+            if (upnClaim is not null)
+            {
+                identity.AddClaim(new Claim(ClaimTypes.Email, upnClaim.Value));
+            }
+            else
+            {
+                var email = await context.HttpContext.RequestServices.GetRequiredService<IUserService>()
+                    .GetEmailAsync(userId);
+                if (!string.IsNullOrWhiteSpace(email))
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.Email, email));
+                }
+            }
         }
 
         _logger.TokenValidationSucceeded(objectId, issuer);

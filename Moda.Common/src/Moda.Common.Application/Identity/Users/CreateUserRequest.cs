@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Moda.Core.Application.Identity.Users;
+namespace Moda.Common.Application.Identity.Users;
 
 public sealed record CreateUserRequest
 {

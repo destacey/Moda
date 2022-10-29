@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Moda.Core.Application.Identity.Users;
+namespace Moda.Common.Application.Identity.Users;
 
 public interface IUserService : ITransientService
 {
@@ -16,6 +16,8 @@ public interface IUserService : ITransientService
 
     Task<UserDetailsDto> GetAsync(string userId, CancellationToken cancellationToken);
 
+    Task<string?> GetEmailAsync(string userId);
+
     Task<List<UserRoleDto>> GetRolesAsync(string userId, CancellationToken cancellationToken);
     Task<string> AssignRolesAsync(string userId, UserRolesRequest request, CancellationToken cancellationToken);
 
@@ -26,4 +28,5 @@ public interface IUserService : ITransientService
 
     Task<string> GetOrCreateFromPrincipalAsync(ClaimsPrincipal principal);
     Task UpdateAsync(UpdateUserRequest request, string userId);
+
 }

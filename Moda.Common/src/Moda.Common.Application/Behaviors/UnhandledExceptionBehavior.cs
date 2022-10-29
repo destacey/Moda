@@ -1,9 +1,9 @@
-﻿using CSharpFunctionalExtensions;
-using MediatR;
+﻿using MediatR;
 
 namespace Moda.Common.Application.Behaviors;
 
-public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull, IRequest<TResponse>
+public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> 
+    where TRequest : notnull, IRequest<TResponse>  
 {
     private readonly ILogger<TRequest> _logger;
 
@@ -22,7 +22,23 @@ public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior
         {
             var requestName = typeof(TRequest).Name;
 
-            _logger.LogError(ex, "Moda Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
+            var requestsWithResults = new[] { typeof(IQuery<>), typeof(ICommand), typeof(ICommand<>) };
+            var requestType = request.GetType().GetInterfaces().FirstOrDefault(i => i.IsGenericType && requestsWithResults.Contains(i.GetGenericTypeDefinition()));
+            if (requestType is not null)
+            {
+                _logger.LogError(ex, "Moda Request: Unhandled Exception for Request {Name} {@Request}. Request Type: {RequestTypeName}", requestName, request, requestType.Name);
+
+                var errorMessage = $"Moda Request: Unhandled Exception for Request {requestName} {request}";
+
+                //return requestType == typeof(ICommand)
+                //    ? Result.Failure(errorMessage)
+                //    : Result.Failure<TResponse>(errorMessage);
+
+            }
+            else
+            {
+                _logger.LogError(ex, "Moda Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
+            }
 
             throw;
         }

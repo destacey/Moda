@@ -1,6 +1,7 @@
 using FluentValidation;
 
-namespace Moda.Core.Application.Identity.Roles;
+
+namespace Moda.Common.Application.Identity.Roles;
 
 public sealed class CreateOrUpdateRoleRequest
 {

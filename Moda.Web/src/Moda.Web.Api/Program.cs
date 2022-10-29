@@ -1,4 +1,4 @@
-using Moda.Core.Application;
+using Moda.Common.Application;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
 using Moda.Organization.Application;
@@ -24,8 +24,8 @@ try
     //builder.Services.AddFluentValidationAutoValidation();
     //builder.Services.AddFluentValidationClientsideAdapters();
 
+    builder.Services.AddCommonApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
-    builder.Services.AddCoreApplication();
     builder.Services.AddOrganizationApplication();
 
     var app = builder.Build();

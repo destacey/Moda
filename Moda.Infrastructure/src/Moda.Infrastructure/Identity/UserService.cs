@@ -86,6 +86,17 @@ internal partial class UserService : IUserService
         return user.Adapt<UserDetailsDto>();
     }
 
+    public async Task<string?> GetEmailAsync(string userId)
+    {
+        var user = await _userManager.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        _ = user ?? throw new NotFoundException("User Not Found.");
+
+        return user.Email;
+    }
+
     public async Task ToggleStatusAsync(ToggleUserStatusRequest request, CancellationToken cancellationToken)
     {
         var user = await _userManager.Users.Where(u => u.Id == request.UserId).FirstOrDefaultAsync(cancellationToken);

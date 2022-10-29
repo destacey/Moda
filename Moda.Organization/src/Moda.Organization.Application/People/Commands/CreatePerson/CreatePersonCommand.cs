@@ -30,7 +30,7 @@ public sealed class CreatePersonCommandValidator : CustomValidator<CreatePersonC
 
     public async Task<bool> BeUniqueKey(string key, CancellationToken cancellationToken)
     {
-        return await _organizationDbContext.People.AnyAsync(x => x.Key == key, cancellationToken);
+        return await _organizationDbContext.People.AllAsync(x => x.Key != key, cancellationToken);
     }
 }
 
@@ -65,7 +65,7 @@ internal sealed class CreatePersonCommandHandler : ICommandHandler<CreatePersonC
 
             _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
 
-            return Result.Failure<Guid>(ex.Message);
+            return Result.Failure<Guid>($"Moda Request: Exception for Request {requestName} {request}");
         }
     }
 }

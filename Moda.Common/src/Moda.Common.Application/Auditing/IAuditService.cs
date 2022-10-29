@@ -1,4 +1,4 @@
-namespace Moda.Core.Application.Auditing;
+namespace Moda.Common.Application.Auditing;
 
 public interface IAuditService : ITransientService
 {

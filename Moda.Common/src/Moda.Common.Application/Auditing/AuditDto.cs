@@ -1,6 +1,6 @@
 using NodaTime;
 
-namespace Moda.Core.Application.Auditing;
+namespace Moda.Common.Application.Auditing;
 
 public record AuditDto
 {
