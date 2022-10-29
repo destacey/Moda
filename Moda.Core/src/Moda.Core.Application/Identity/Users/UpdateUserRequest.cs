@@ -26,7 +26,7 @@ public sealed class UpdateUserRequestValidator : CustomValidator<UpdateUserReque
             .NotEmpty()
             .MaximumLength(75);
 
-        RuleFor(p => p.Email)
+        RuleFor(p => p.Email).Cascade(CascadeMode.Stop)
             .NotEmpty()
             .EmailAddress()
                 .WithMessage("Invalid Email Address.")

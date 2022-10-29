@@ -12,7 +12,7 @@ public sealed class CreateOrUpdateRoleRequest
 public sealed class CreateOrUpdateRoleRequestValidator : CustomValidator<CreateOrUpdateRoleRequest>
 {
     public CreateOrUpdateRoleRequestValidator(IRoleService roleService) =>
-        RuleFor(r => r.Name)
+        RuleFor(r => r.Name).Cascade(CascadeMode.Stop)
             .NotEmpty()
             .MustAsync(async (role, name, _) => !await roleService.ExistsAsync(name, role.Id))
                 .WithMessage("Similar Role already exists.");

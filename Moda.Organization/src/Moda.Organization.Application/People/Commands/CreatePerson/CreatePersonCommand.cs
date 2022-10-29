@@ -22,7 +22,7 @@ public sealed class CreatePersonCommandValidator : CustomValidator<CreatePersonC
     {
         _organizationDbContext = organizationDbContext;
 
-        RuleFor(q => q.Key)
+        RuleFor(q => q.Key).Cascade(CascadeMode.Stop)
             .NotEmpty()
             .MaximumLength(256)
             .MustAsync(BeUniqueKey).WithMessage("The Key already exists.");

@@ -33,10 +33,10 @@ public sealed class CreateUserRequestValidator : CustomValidator<CreateUserReque
                 .WithMessage((_, phone) => string.Format("Phone number {0} is already registered.", phone))
                 .Unless(u => string.IsNullOrWhiteSpace(u.PhoneNumber));
 
-        RuleFor(p => p.FirstName).Cascade(CascadeMode.Stop)
+        RuleFor(p => p.FirstName)
             .NotEmpty();
 
-        RuleFor(p => p.LastName).Cascade(CascadeMode.Stop)
+        RuleFor(p => p.LastName)
             .NotEmpty();
     }
 }
