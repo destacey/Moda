@@ -7,26 +7,23 @@ namespace Moda.Infrastructure.Persistence.Initialization;
 internal class ApplicationDbSeeder
 {
     private readonly RoleManager<ApplicationRole> _roleManager;
-    private readonly UserManager<ApplicationUser> _userManager;
     private readonly CustomSeederRunner _seederRunner;
     private readonly ILogger<ApplicationDbSeeder> _logger;
 
-    public ApplicationDbSeeder(RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager, CustomSeederRunner seederRunner, ILogger<ApplicationDbSeeder> logger)
+    public ApplicationDbSeeder(RoleManager<ApplicationRole> roleManager, CustomSeederRunner seederRunner, ILogger<ApplicationDbSeeder> logger)
     {
         _roleManager = roleManager;
-        _userManager = userManager;
         _seederRunner = seederRunner;
         _logger = logger;
     }
 
-    public async Task SeedDatabaseAsync(ApplicationDbContext dbContext, CancellationToken cancellationToken)
+    public async Task SeedDatabase(ModaDbContext dbContext, CancellationToken cancellationToken)
     {
-        await SeedRolesAsync(dbContext);
-        //await SeedAdminUserAsync();
-        await _seederRunner.RunSeedersAsync(cancellationToken);
+        await SeedRoles(dbContext);
+        await _seederRunner.RunSeeders(cancellationToken);
     }
 
-    private async Task SeedRolesAsync(ApplicationDbContext dbContext)
+    private async Task SeedRoles(ModaDbContext dbContext)
     {
         foreach (string roleName in ApplicationRoles.DefaultRoles)
         {
@@ -42,16 +39,16 @@ internal class ApplicationDbSeeder
             // Assign permissions
             if (roleName == ApplicationRoles.Basic)
             {
-                await AssignPermissionsToRoleAsync(dbContext, ApplicationPermissions.Basic, role);
+                await AssignPermissionsToRole(dbContext, ApplicationPermissions.Basic, role);
             }
             else if (roleName == ApplicationRoles.Admin)
             {
-                await AssignPermissionsToRoleAsync(dbContext, ApplicationPermissions.Admin, role);
+                await AssignPermissionsToRole(dbContext, ApplicationPermissions.Admin, role);
             }
         }
     }
 
-    private async Task AssignPermissionsToRoleAsync(ApplicationDbContext dbContext, IReadOnlyList<ApplicationPermission> permissions, ApplicationRole role)
+    private async Task AssignPermissionsToRole(ModaDbContext dbContext, IReadOnlyList<ApplicationPermission> permissions, ApplicationRole role)
     {
         var currentClaims = await _roleManager.GetClaimsAsync(role);
         foreach (var permission in permissions)
@@ -70,37 +67,4 @@ internal class ApplicationDbSeeder
             }
         }
     }
-
-    //private async Task SeedAdminUserAsync()
-    //{
-    //    if (await _userManager.Users.FirstOrDefaultAsync(u => u.Email == _currentTenant.AdminEmail)
-    //        is not ApplicationUser adminUser)
-    //    {
-    //        string adminUserName = $"{_currentTenant.Id.Trim()}.{ApplicationRoles.Admin}".ToLowerInvariant();
-    //        adminUser = new ApplicationUser
-    //        {
-    //            FirstName = _currentTenant.Id.Trim().ToLowerInvariant(),
-    //            LastName = ApplicationRoles.Admin,
-    //            Email = _currentTenant.AdminEmail,
-    //            UserName = adminUserName,
-    //            EmailConfirmed = true,
-    //            PhoneNumberConfirmed = true,
-    //            NormalizedEmail = _currentTenant.AdminEmail?.ToUpperInvariant(),
-    //            NormalizedUserName = adminUserName.ToUpperInvariant(),
-    //            IsActive = true
-    //        };
-
-    //        _logger.LogInformation("Seeding Default Admin User.");
-    //        var password = new PasswordHasher<ApplicationUser>();
-    //        adminUser.PasswordHash = password.HashPassword(adminUser, MultitenancyConstants.DefaultPassword);
-    //        await _userManager.CreateAsync(adminUser);
-    //    }
-
-    //    // Assign role to user
-    //    if (!await _userManager.IsInRoleAsync(adminUser, ApplicationRoles.Admin))
-    //    {
-    //        _logger.LogInformation("Assigning Admin Role to Admin User.");
-    //        await _userManager.AddToRoleAsync(adminUser, ApplicationRoles.Admin);
-    //    }
-    //}
 }

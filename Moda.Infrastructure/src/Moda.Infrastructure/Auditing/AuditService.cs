@@ -5,9 +5,9 @@ namespace Moda.Infrastructure.Auditing;
 
 public class AuditService : IAuditService
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ModaDbContext _context;
 
-    public AuditService(ApplicationDbContext context) => _context = context;
+    public AuditService(ModaDbContext context) => _context = context;
 
     public async Task<List<AuditDto>> GetUserTrailsAsync(Guid userId)
     {

@@ -5,18 +5,18 @@ namespace Moda.Infrastructure.Persistence.Initialization;
 
 internal class ApplicationDbInitializer
 {
-    private readonly ApplicationDbContext _dbContext;
+    private readonly ModaDbContext _dbContext;
     private readonly ApplicationDbSeeder _dbSeeder;
     private readonly ILogger<ApplicationDbInitializer> _logger;
 
-    public ApplicationDbInitializer(ApplicationDbContext dbContext, ApplicationDbSeeder dbSeeder, ILogger<ApplicationDbInitializer> logger)
+    public ApplicationDbInitializer(ModaDbContext dbContext, ApplicationDbSeeder dbSeeder, ILogger<ApplicationDbInitializer> logger)
     {
         _dbContext = dbContext;
         _dbSeeder = dbSeeder;
         _logger = logger;
     }
 
-    public async Task InitializeAsync(CancellationToken cancellationToken)
+    public async Task Initialize(CancellationToken cancellationToken)
     {
         if (_dbContext.Database.GetMigrations().Any())
         {
@@ -30,7 +30,7 @@ internal class ApplicationDbInitializer
             {
                 _logger.LogInformation("Connection to Database Succeeded.");
 
-                await _dbSeeder.SeedDatabaseAsync(_dbContext, cancellationToken);
+                await _dbSeeder.SeedDatabase(_dbContext, cancellationToken);
             }
         }
     }

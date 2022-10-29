@@ -13,7 +13,7 @@ public class CurrentUser : ICurrentUser, ICurrentUserInitializer
 
     public Guid GetUserId() =>
         IsAuthenticated()
-            ? Guid.Parse(_user?.GetObjectId() ?? Guid.Empty.ToString())
+            ? Guid.Parse(_user?.GetUserId() ?? Guid.Empty.ToString())
             : _userId;
 
     public string? GetUserEmail() =>
@@ -26,6 +26,9 @@ public class CurrentUser : ICurrentUser, ICurrentUserInitializer
 
     public bool IsInRole(string role) =>
         _user?.IsInRole(role) is true;
+
+    public bool HasClaim(string type, string value) =>
+        _user?.HasClaim(type, value) is true;
 
     public IEnumerable<Claim>? GetUserClaims() =>
         _user?.Claims;

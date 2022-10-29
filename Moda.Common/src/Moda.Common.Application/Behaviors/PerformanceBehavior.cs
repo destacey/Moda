@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using MediatR;
+using Moda.Common.Application.Identity.Users;
 
 namespace Moda.Common.Application.Behaviors;
 
@@ -8,21 +9,18 @@ public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
     private readonly Stopwatch _timer;
     private readonly ILogger<TRequest> _logger;
     private readonly ICurrentUser _currentUser;
-    private readonly IIdentityService _identityService;
 
     public PerformanceBehavior(
         ILogger<TRequest> logger,
-        ICurrentUser currentUser,
-        IIdentityService identityService)
+        ICurrentUser currentUser)
     {
         _timer = new Stopwatch();
 
         _logger = logger;
         _currentUser = currentUser;
-        _identityService = identityService;
     }
 
-    public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         _timer.Start();
 
@@ -36,12 +34,7 @@ public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
         {
             var requestName = typeof(TRequest).Name;
             var userId = _currentUser.GetUserId().ToString();
-            var userName = string.Empty;
-
-            if (!string.IsNullOrEmpty(userId))
-            {
-                userName = await _identityService.GetUserNameAsync(userId);
-            }
+            var userName = _currentUser.GetUserEmail();
 
             _logger.LogWarning("Moda Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@UserName} {@Request}",
                 requestName, elapsedMilliseconds, userId, userName, request);

@@ -1,8 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
+using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-public class WorkType : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
+public sealed class WorkType : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private WorkType() { }
 
@@ -22,15 +23,42 @@ public class WorkType : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
     /// </summary>
     public string? Description { get; private set; }
 
+    /// <summary>
+    /// Indicates whether the work type is active or not.  
+    /// </summary>
     public bool IsActive { get; private set; } = true;
 
-    public Result Activate()
+    /// <summary>
+    /// The process for activating a work type.
+    /// </summary>
+    /// <param name="activatedOn"></param>
+    /// <returns>Result that indicates success or a list of errors</returns>
+    public Result Activate(Instant activatedOn)
     {
-        throw new NotImplementedException();
+        if (!IsActive)
+        {
+            // TODO is there logic that would prevent activation?
+            IsActive = true;
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, activatedOn));
+        }
+
+        return Result.Success();
     }
 
-    public Result Deactivate()
+    /// <summary>
+    /// The process for deactivating a work type.
+    /// </summary>
+    /// <param name="deactivatedOn"></param>
+    /// <returns>Result that indicates success or a list of errors</returns>
+    public Result Deactivate(Instant deactivatedOn)
     {
-        throw new NotImplementedException();
+        if (IsActive)
+        {
+            // TODO is there logic that would prevent deactivation?
+            IsActive = false;
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));
+        }
+
+        return Result.Success();
     }
 }

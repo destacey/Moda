@@ -1,11 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
+using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
 /// <summary>
 /// A workspace is a container for work items.
 /// </summary>
-public class Workspace : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
+public sealed class Workspace : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private readonly List<WorkItem> _workItems = new();
 
@@ -114,22 +115,33 @@ public class Workspace : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
     /// <summary>
     /// The process for activating a workspace.
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    public Result Activate()
+    /// <param name="activatedOn"></param>
+    /// <returns>Result that indicates success or a list of errors</returns>
+    public Result Activate(Instant activatedOn)
     {
-        throw new NotImplementedException();
+        if (!IsActive)
+        {
+            // TODO is there logic that would prevent activation?
+            IsActive = true;
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, activatedOn));
+        }
+
+        return Result.Success();
     }
 
     /// <summary>
-    /// The process for deactivating a workspace. 
+    /// The process for deactivating a workspace.
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    public Result Deactivate()
+    /// <param name="deactivatedOn"></param>
+    /// <returns>Result that indicates success or a list of errors</returns>
+    public Result Deactivate(Instant deactivatedOn)
     {
-        // TODO what is need to deactive a managed work process
-
         if (IsActive)
+        {
+            // TODO is there logic that would prevent deactivation?
             IsActive = false;
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));
+        }
 
         return Result.Success();
     }

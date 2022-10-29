@@ -5,7 +5,7 @@ namespace Moda.Work.Domain.Models;
 /// <summary>
 /// The work item revision is a change record for a work item.
 /// </summary>
-public class WorkItemRevision : BaseEntity<Guid>, ISoftDelete
+public sealed class WorkItemRevision : BaseEntity<Guid>, ISoftDelete
 {
     private readonly List<WorkItemRevisionChange> _changes = new();
 
@@ -57,7 +57,7 @@ public class WorkItemRevision : BaseEntity<Guid>, ISoftDelete
     /// <summary>
     /// The employee that deleted this record.
     /// </summary>
-    public Guid DeletedBy { get; set; }
+    public Guid? DeletedBy { get; set; }
 
     /// <summary>
     /// Flag to determine if the entity is deleted.

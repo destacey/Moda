@@ -1,7 +1,7 @@
-using FluentValidation.AspNetCore;
-using Moda.Core.Application;
+using Moda.Common.Application;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
+using Moda.Organization.Application;
 using Moda.Web.Api.Configurations;
 using Serilog;
 
@@ -19,15 +19,18 @@ try
     });
 
     builder.Services.AddControllers();
-    builder.Services.AddFluentValidationAutoValidation();
-    builder.Services.AddFluentValidationClientsideAdapters();
 
+    //// removing for now since auto validation is not asynchronous.  https://docs.fluentvalidation.net/en/latest/aspnet.html
+    //builder.Services.AddFluentValidationAutoValidation();
+    //builder.Services.AddFluentValidationClientsideAdapters();
+
+    builder.Services.AddCommonApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
-    builder.Services.AddCoreApplication();
+    builder.Services.AddOrganizationApplication();
 
     var app = builder.Build();
 
-    await app.Services.InitializeDatabasesAsync();
+    await app.Services.InitializeDatabases();
 
     app.UseInfrastructure(builder.Configuration);
     app.MapEndpoints();

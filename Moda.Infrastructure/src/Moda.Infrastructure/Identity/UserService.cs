@@ -1,6 +1,5 @@
-using Ardalis.Specification;
-using Ardalis.Specification.EntityFrameworkCore;
 using Mapster;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph;
@@ -12,19 +11,23 @@ internal partial class UserService : IUserService
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
-    private readonly ApplicationDbContext _db;
+    private readonly ModaDbContext _db;
     private readonly IJobService _jobService;
     private readonly IEventPublisher _events;
     private readonly GraphServiceClient _graphServiceClient;
+    private readonly ISender _sender;
+    private readonly IDateTimeService _dateTimeService;
 
     public UserService(
         SignInManager<ApplicationUser> signInManager,
         UserManager<ApplicationUser> userManager,
         RoleManager<ApplicationRole> roleManager,
-        ApplicationDbContext db,
+        ModaDbContext db,
         IJobService jobService,
         IEventPublisher events,
-        GraphServiceClient graphServiceClient)
+        GraphServiceClient graphServiceClient,
+        ISender sender,
+        IDateTimeService dateTimeService)
     {
         _signInManager = signInManager;
         _userManager = userManager;
@@ -33,20 +36,18 @@ internal partial class UserService : IUserService
         _jobService = jobService;
         _events = events;
         _graphServiceClient = graphServiceClient;
+        _sender = sender;
+        _dateTimeService = dateTimeService;
     }
 
-    public async Task<PaginationResponse<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)
     {
-        var spec = new EntitiesByPaginationFilterSpec<ApplicationUser>(filter);
-
         var users = await _userManager.Users
-            .WithSpecification(spec)
+            .Where(u => u.IsActive == filter.IsActive)
             .ProjectToType<UserDetailsDto>()
             .ToListAsync(cancellationToken);
-        int count = await _userManager.Users
-            .CountAsync(cancellationToken);
 
-        return new PaginationResponse<UserDetailsDto>(users, count, filter.PageNumber, filter.PageSize);
+        return users;
     }
 
     public async Task<bool> ExistsWithNameAsync(string name)
@@ -85,6 +86,17 @@ internal partial class UserService : IUserService
         return user.Adapt<UserDetailsDto>();
     }
 
+    public async Task<string?> GetEmailAsync(string userId)
+    {
+        var user = await _userManager.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        _ = user ?? throw new NotFoundException("User Not Found.");
+
+        return user.Email;
+    }
+
     public async Task ToggleStatusAsync(ToggleUserStatusRequest request, CancellationToken cancellationToken)
     {
         var user = await _userManager.Users.Where(u => u.Id == request.UserId).FirstOrDefaultAsync(cancellationToken);
@@ -101,6 +113,6 @@ internal partial class UserService : IUserService
 
         await _userManager.UpdateAsync(user);
 
-        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeService.Now));
     }
 }

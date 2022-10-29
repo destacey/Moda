@@ -9,11 +9,11 @@ internal class CustomSeederRunner
     public CustomSeederRunner(IServiceProvider serviceProvider) =>
         _seeders = serviceProvider.GetServices<ICustomSeeder>().ToArray();
 
-    public async Task RunSeedersAsync(CancellationToken cancellationToken)
+    public async Task RunSeeders(CancellationToken cancellationToken)
     {
         foreach (var seeder in _seeders)
         {
-            await seeder.InitializeAsync(cancellationToken);
+            await seeder.Initialize(cancellationToken);
         }
     }
 }

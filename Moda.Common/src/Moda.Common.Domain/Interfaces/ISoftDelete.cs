@@ -8,5 +8,5 @@ public interface ISoftDelete
 
     Instant Deleted { get; set; }
 
-    Guid DeletedBy { get; set; }
+    Guid? DeletedBy { get; set; }
 }

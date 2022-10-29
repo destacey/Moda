@@ -6,17 +6,19 @@ public class EmailAddress : ValueObject
 {
     private readonly string _nameOf = nameof(EmailAddress);
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public EmailAddress(string value)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
+        ArgumentException.ThrowIfNullOrEmpty(value, _nameOf);
+
+        value = value.Trim();
+
         if (ValidateEmailAddressFormat(value))
         {
             Value = value;
         }
     }
 
-    public string Value { get; }
+    public string Value { get; } = null!;
 
     protected override IEnumerable<object> GetEqualityComponents()
     {
@@ -26,15 +28,8 @@ public class EmailAddress : ValueObject
     // only validates that the format is correct
     private bool ValidateEmailAddressFormat(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new ArgumentNullException(_nameOf, $"{_nameOf} can not be null.");
-        }
-
         if (value.IsValidEmailAddressFormat())
-        {
             return true;
-        }
 
         throw new ArgumentException("The value submitted does not meet the required format.", _nameOf);
     }

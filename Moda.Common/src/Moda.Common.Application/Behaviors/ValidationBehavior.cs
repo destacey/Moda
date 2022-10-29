@@ -1,11 +1,13 @@
-﻿using FluentValidation;
+﻿using CSharpFunctionalExtensions;
+using FluentValidation;
 using MediatR;
 using ValidationException = Moda.Common.Application.Exceptions.ValidationException;
 
 namespace Moda.Common.Application.Behaviors;
 
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-     where TRequest : notnull, IRequest<TResponse>
+    where TRequest : notnull, IRequest<TResponse>
+    where TResponse : IResult
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -14,7 +16,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         _validators = validators;
     }
 
-    public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         if (_validators.Any())
         {
