@@ -1,4 +1,3 @@
-using FluentValidation.AspNetCore;
 using Moda.Core.Application;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
@@ -20,8 +19,10 @@ try
     });
 
     builder.Services.AddControllers();
-    builder.Services.AddFluentValidationAutoValidation();
-    builder.Services.AddFluentValidationClientsideAdapters();
+
+    //// removing for now since auto validation is not asynchronous.  https://docs.fluentvalidation.net/en/latest/aspnet.html
+    //builder.Services.AddFluentValidationAutoValidation();
+    //builder.Services.AddFluentValidationClientsideAdapters();
 
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddCoreApplication();

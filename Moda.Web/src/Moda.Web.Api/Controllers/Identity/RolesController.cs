@@ -1,3 +1,5 @@
+using FluentValidation.AspNetCore;
+
 namespace Moda.Web.Api.Controllers.Identity;
 
 public class RolesController : VersionNeutralApiController
@@ -38,6 +40,14 @@ public class RolesController : VersionNeutralApiController
     [OpenApiOperation("Update a role's permissions.", "")]
     public async Task<ActionResult<string>> UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request, CancellationToken cancellationToken)
     {
+        var validator = new UpdateRolePermissionsRequestValidator();
+        var result = await validator.ValidateAsync(request, cancellationToken);
+        if (!result.IsValid)
+        {
+            result.AddToModelState(ModelState);
+            return UnprocessableEntity(ModelState);
+        }
+
         if (id != request.RoleId)
         {
             return BadRequest();
@@ -49,9 +59,17 @@ public class RolesController : VersionNeutralApiController
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roles)]
     [OpenApiOperation("Create or update a role.", "")]
-    public Task<string> RegisterRoleAsync(CreateOrUpdateRoleRequest request)
+    public async Task<ActionResult<string>> RegisterRoleAsync(CreateOrUpdateRoleRequest request)
     {
-        return _roleService.CreateOrUpdateAsync(request);
+        var validator = new CreateOrUpdateRoleRequestValidator(_roleService);
+        var result = await validator.ValidateAsync(request);
+        if (!result.IsValid)
+        {
+            result.AddToModelState(ModelState);
+            return UnprocessableEntity(ModelState);
+        }
+
+        return await _roleService.CreateOrUpdateAsync(request);
     }
 
     [HttpDelete("{id}")]

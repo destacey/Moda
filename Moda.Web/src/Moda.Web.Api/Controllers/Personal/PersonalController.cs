@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using FluentValidation.AspNetCore;
 using MediatR;
 
 namespace Moda.Web.Api.Controllers.Identity;
@@ -27,10 +28,16 @@ public class PersonalController : VersionNeutralApiController
     [OpenApiOperation("Update profile details of currently logged in user.", "")]
     public async Task<ActionResult> UpdateProfileAsync(UpdateUserRequest request)
     {
-        if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+        var validator = new UpdateUserRequestValidator(_userService);
+        var result = await validator.ValidateAsync(request);
+        if (!result.IsValid)
         {
-            return Unauthorized();
+            result.AddToModelState(ModelState);
+            return UnprocessableEntity(ModelState);
         }
+
+        if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+            return Unauthorized();
 
         await _userService.UpdateAsync(request, userId);
         return Ok();
