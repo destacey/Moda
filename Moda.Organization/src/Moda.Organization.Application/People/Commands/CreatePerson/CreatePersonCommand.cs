@@ -51,7 +51,7 @@ internal sealed class CreatePersonCommandHandler : ICommandHandler<CreatePersonC
     {
         try
         {
-            var person = Person.Create(request.Key, _dateTimeService.Now);
+            var person = new Person(request.Key, _dateTimeService.Now);
 
             await _organizationDbContext.People.AddAsync(person, cancellationToken);
 

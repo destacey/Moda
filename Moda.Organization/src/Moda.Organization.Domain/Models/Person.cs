@@ -1,19 +1,17 @@
-﻿using NodaTime;
+﻿using Ardalis.GuardClauses;
+using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
 public class Person : BaseEntity<Guid>, IAggregateRoot
 {
     private Person() { }
 
-    public Person(string key)
+    internal Person(string key)
     {
-        if (string.IsNullOrWhiteSpace(key))
-            throw new ArgumentNullException(Constants.IsNullOrWhiteSpaceExceptionMessage, nameof(key));
-
-        Key = key;
+        Key = Guard.Against.NullOrWhiteSpace(key, nameof(key)).Trim();
     }
 
-    public string Key { get; } = default!;
+    public string Key { get; private set; } = default!;
 
     public static Person Create(string key, Instant timestamp)
     {
