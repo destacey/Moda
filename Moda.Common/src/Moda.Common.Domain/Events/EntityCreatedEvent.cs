@@ -8,7 +8,8 @@ public static class EntityCreatedEvent
         => new(entity, created);
 }
 
-public record EntityCreatedEvent<TEntity> : DomainEvent where TEntity : class, IEntity
+public record EntityCreatedEvent<TEntity> : DomainEvent, IGenericDomainEvent 
+    where TEntity : class, IEntity
 {
     internal EntityCreatedEvent(TEntity entity, Instant triggeredOn)
     {

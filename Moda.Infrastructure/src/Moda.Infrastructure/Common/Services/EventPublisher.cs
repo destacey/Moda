@@ -13,7 +13,14 @@ public class EventPublisher : IEventPublisher
 
     public Task PublishAsync(IEvent @event)
     {
-        _logger.LogInformation("Publishing Event : {event}", @event.GetType().Name);
+        if (@event.GetType().GetInterfaces().Any(i => i == typeof(IGenericDomainEvent)))
+        {
+            _logger.LogInformation("Publishing Event : {event}, {entity}", @event.GetType().Name, @event.GetType().GenericTypeArguments.FirstOrDefault()?.Name);
+        }
+        else
+        {
+            _logger.LogInformation("Publishing Event : {event}", @event.GetType().Name);
+        }
         return _mediator.Publish(CreateEventNotification(@event));
     }
 
