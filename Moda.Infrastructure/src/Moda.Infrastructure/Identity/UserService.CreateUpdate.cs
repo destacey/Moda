@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
-using Moda.Organization.Application.People.Commands.CreatePerson;
-using Moda.Organization.Application.People.Queries.GetPersonByKey;
 
 namespace Moda.Infrastructure.Identity;
 
@@ -126,14 +124,14 @@ internal partial class UserService
     private async Task<Guid> GetOrCreatePersonId(string principalObjectId)
     {
         // get the Person Id and if not null verify no existing user with that Id
-        var personIdResult = await _sender.Send(new GetPersonIdByKeyQuery(principalObjectId));
-        if (personIdResult.IsSuccess)
+        var personId = await _sender.Send(new GetPersonIdByKeyQuery(principalObjectId));
+        if (personId.HasValue)
         {
-            var existingUser = await _userManager.FindByIdAsync(personIdResult.Value.ToString()!);
+            var existingUser = await _userManager.FindByIdAsync(personId.Value.ToString());
 
             return existingUser is not null
                 ? throw new InternalServerException(string.Format("Person with key {0} already exists.", principalObjectId))
-                : personIdResult.Value;
+                : personId.Value;
         }
 
         // else, create new person

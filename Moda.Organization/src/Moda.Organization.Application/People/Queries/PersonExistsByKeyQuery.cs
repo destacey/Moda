@@ -1,9 +1,7 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Moda.Organization.Application.Persistence;
 
-namespace Moda.Organization.Application.People.Queries.PersonExistsByKey;
+namespace Moda.Organization.Application.People.Queries;
 
 public sealed record PersonExistsByKeyQuery : IQuery<bool>
 {
@@ -32,7 +30,7 @@ internal sealed class PersonExistsByKeyQueryHandler : IQueryHandler<PersonExists
         _organizationDbContext = organizationDbContext;
     }
 
-    public async Task<Result<bool>> Handle(PersonExistsByKeyQuery request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(PersonExistsByKeyQuery request, CancellationToken cancellationToken)
     {
         return await _organizationDbContext.People.AnyAsync(p => p.Key == request.Key, cancellationToken);
     }

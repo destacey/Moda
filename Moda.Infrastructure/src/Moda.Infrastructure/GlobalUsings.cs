@@ -27,3 +27,5 @@ global using Moda.Infrastructure.Persistence.Context;
 global using Moda.Infrastructure.Persistence.Initialization;
 global using Moda.Infrastructure.SecurityHeaders;
 global using Moda.Organization.Domain.Models;
+global using Moda.Organization.Application.People.Commands;
+global using Moda.Organization.Application.People.Queries;

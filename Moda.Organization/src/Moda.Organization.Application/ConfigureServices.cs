@@ -8,6 +8,8 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddOrganizationApplication(this IServiceCollection services)
     {
+        MapsterSettings.Configure();
+
         var assembly = Assembly.GetExecutingAssembly();
 
         services.AddValidatorsFromAssembly(assembly);

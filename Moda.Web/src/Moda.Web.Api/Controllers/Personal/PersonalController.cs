@@ -17,7 +17,7 @@ public class PersonalController : VersionNeutralApiController
 
     [HttpGet("profile")]
     [OpenApiOperation("Get profile details of currently logged in user.", "")]
-    public async Task<ActionResult<UserDetailsDto>> GetProfileAsync(CancellationToken cancellationToken)
+    public async Task<ActionResult<UserDetailsDto>> GetProfile(CancellationToken cancellationToken)
     {
         return User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId)
             ? Unauthorized()
@@ -26,7 +26,7 @@ public class PersonalController : VersionNeutralApiController
 
     [HttpPut("profile")]
     [OpenApiOperation("Update profile details of currently logged in user.", "")]
-    public async Task<ActionResult> UpdateProfileAsync(UpdateUserRequest request)
+    public async Task<ActionResult> UpdateProfile(UpdateUserRequest request)
     {
         var validator = new UpdateUserRequestValidator(_userService);
         var result = await validator.ValidateAsync(request);
@@ -45,7 +45,7 @@ public class PersonalController : VersionNeutralApiController
 
     [HttpGet("permissions")]
     [OpenApiOperation("Get permissions of currently logged in user.", "")]
-    public async Task<ActionResult<List<string>>> GetPermissionsAsync(CancellationToken cancellationToken)
+    public async Task<ActionResult<List<string>>> GetPermissions(CancellationToken cancellationToken)
     {
         return User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId)
             ? Unauthorized()
@@ -54,7 +54,7 @@ public class PersonalController : VersionNeutralApiController
 
     [HttpGet("logs")]
     [OpenApiOperation("Get audit logs of currently logged in user.", "")]
-    public Task<List<AuditDto>> GetLogsAsync()
+    public Task<List<AuditDto>> GetLogs()
     {
         return _mediator.Send(new GetMyAuditLogsQuery());
     }

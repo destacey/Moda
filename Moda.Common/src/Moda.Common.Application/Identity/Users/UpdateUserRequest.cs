@@ -20,11 +20,11 @@ public sealed class UpdateUserRequestValidator : CustomValidator<UpdateUserReque
 
         RuleFor(p => p.FirstName)
             .NotEmpty()
-            .MaximumLength(75);
+            .MaximumLength(100);
 
         RuleFor(p => p.LastName)
             .NotEmpty()
-            .MaximumLength(75);
+            .MaximumLength(100);
 
         RuleFor(p => p.Email).Cascade(CascadeMode.Stop)
             .NotEmpty()

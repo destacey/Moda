@@ -2,10 +2,9 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Moda.Organization.Application.Persistence;
 
-namespace Moda.Organization.Application.People.Commands.CreatePerson;
-public sealed record class CreatePersonCommand : ICommand<Guid>
+namespace Moda.Organization.Application.People.Commands;
+public sealed record CreatePersonCommand : ICommand<Guid>
 {
     public CreatePersonCommand(string key)
     {
@@ -61,7 +60,7 @@ internal sealed class CreatePersonCommandHandler : ICommandHandler<CreatePersonC
         }
         catch (Exception ex)
         {
-            var requestName = typeof(CreatePersonCommand).Name;
+            var requestName = request.GetType().Name;
 
             _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
 

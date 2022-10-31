@@ -1,7 +1,6 @@
-﻿using CSharpFunctionalExtensions;
-using MediatR;
+﻿using MediatR;
 
 namespace Moda.Common.Application.Interfaces;
-public interface IQuery<TResponse> : IRequest<Result<TResponse>>
+public interface IQuery<TResponse> : IRequest<TResponse>
 {
 }

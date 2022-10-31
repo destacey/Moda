@@ -9,11 +9,15 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
     {
         builder.ToTable("Employees", SchemaNames.Organization);
 
-        builder.HasKey(e => e.Id);
-        builder.HasIndex(e => e.IsDeleted);
-        builder.HasIndex(e => e.IsActive);
 
-        builder.Property(e => e.EmployeeId).HasMaxLength(50);
+        builder.HasKey(e => e.Id);
+        builder.HasIndex(e => e.EmployeeNumber)
+            .IsUnique()
+            .IncludeProperties(e => new { e.Id });
+        builder.HasIndex(e => e.IsActive);
+        builder.HasIndex(e => e.IsDeleted);
+
+        builder.Property(e => e.EmployeeNumber).IsRequired().HasMaxLength(256);
         builder.Property(e => e.HireDate);
 
         builder.Property(e => e.JobTitle).HasMaxLength(256);
@@ -23,6 +27,7 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
         //builder.Property(e => e.DirectReports).HasField("_directReports");
 
         // Value Objects
+        //// PersonName
         builder.OwnsOne(e => e.Name)
             .Property(e => e.FirstName).HasColumnName("FirstName").HasMaxLength(100).IsRequired();
 
@@ -38,8 +43,10 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
         builder.OwnsOne(e => e.Name)
             .Property(e => e.Title).HasColumnName("Title").HasMaxLength(50);
 
+        //// EmailAddress
         builder.OwnsOne(e => e.Email)
             .Property(e => e.Value).HasColumnName("Email").HasMaxLength(256);
+
 
         // Audit
         builder.Property(e => e.Created);

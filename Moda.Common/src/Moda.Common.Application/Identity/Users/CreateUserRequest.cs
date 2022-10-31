@@ -4,10 +4,10 @@ namespace Moda.Common.Application.Identity.Users;
 
 public sealed record CreateUserRequest
 {
-    public string FirstName { get; set; } = default!;
-    public string LastName { get; set; } = default!;
-    public string Email { get; set; } = default!;
-    public string UserName { get; set; } = default!;
+    public string FirstName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string UserName { get; set; } = null!;
     public string? PhoneNumber { get; set; }
 }
 
@@ -34,9 +34,11 @@ public sealed class CreateUserRequestValidator : CustomValidator<CreateUserReque
                 .Unless(u => string.IsNullOrWhiteSpace(u.PhoneNumber));
 
         RuleFor(p => p.FirstName)
-            .NotEmpty();
+            .NotEmpty()
+            .MaximumLength(100);
 
         RuleFor(p => p.LastName)
-            .NotEmpty();
+            .NotEmpty()
+            .MaximumLength(100);
     }
 }
