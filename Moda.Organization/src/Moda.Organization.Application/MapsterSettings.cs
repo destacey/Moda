@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using Moda.Organization.Application.Employees.Dtos;
 
 namespace Moda.Organization.Application;
 public class MapsterSettings

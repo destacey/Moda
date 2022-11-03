@@ -4,6 +4,8 @@ using Moda.Infrastructure.Common;
 using Moda.Organization.Application;
 using Moda.Web.Api.Configurations;
 using Serilog;
+using NodaTime.Serialization.SystemTextJson;
+using NodaTime;
 
 StaticLogger.EnsureInitialized();
 Log.Information("Server Booting Up...");
@@ -18,7 +20,8 @@ try
             .ReadFrom.Configuration(builder.Configuration);
     });
 
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+        .AddJsonOptions(options => options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb));
 
     //// removing for now since auto validation is not asynchronous.  https://docs.fluentvalidation.net/en/latest/aspnet.html
     //builder.Services.AddFluentValidationAutoValidation();

@@ -5,12 +5,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
+    /// <inheritdoc />
     public partial class Initial : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
                 name: "Auditing");
+
+            migrationBuilder.EnsureSchema(
+                name: "Organization");
 
             migrationBuilder.EnsureSchema(
                 name: "Identity");
@@ -36,6 +41,59 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Employees",
+                schema: "Organization",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LocalId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    MiddleName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Suffix = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    EmployeeNumber = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    HireDate = table.Column<DateTime>(type: "date", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    JobTitle = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Department = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ManagerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Deleted = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Employees", x => x.Id);
+                    table.UniqueConstraint("AK_Employees_LocalId", x => x.LocalId);
+                    table.ForeignKey(
+                        name: "FK_Employees_Employees_ManagerId",
+                        column: x => x.ManagerId,
+                        principalSchema: "Organization",
+                        principalTable: "Employees",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "People",
+                schema: "Organization",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Key = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_People", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 schema: "Identity",
                 columns: table => new
@@ -57,8 +115,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     ObjectId = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -69,7 +127,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -201,6 +259,40 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Employees_EmployeeNumber",
+                schema: "Organization",
+                table: "Employees",
+                column: "EmployeeNumber",
+                unique: true)
+                .Annotation("SqlServer:Include", new[] { "Id" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employees_IsActive",
+                schema: "Organization",
+                table: "Employees",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employees_IsDeleted",
+                schema: "Organization",
+                table: "Employees",
+                column: "IsDeleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employees_ManagerId",
+                schema: "Organization",
+                table: "Employees",
+                column: "ManagerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_People_Key",
+                schema: "Organization",
+                table: "People",
+                column: "Key",
+                unique: true)
+                .Annotation("SqlServer:Include", new[] { "Id" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
                 schema: "Identity",
                 table: "RoleClaims",
@@ -247,11 +339,20 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "AuditTrails",
                 schema: "Auditing");
+
+            migrationBuilder.DropTable(
+                name: "Employees",
+                schema: "Organization");
+
+            migrationBuilder.DropTable(
+                name: "People",
+                schema: "Organization");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims",

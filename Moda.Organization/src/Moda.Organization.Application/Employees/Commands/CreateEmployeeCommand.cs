@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using NodaTime;
 
 namespace Moda.Organization.Application.Employees.Commands;
-public sealed record CreateEmployeeCommand : ICommand<Guid>
+public sealed record CreateEmployeeCommand : ICommand<int>
 {
     public CreateEmployeeCommand(PersonName name, string employeeNumber, LocalDate? hireDate, EmailAddress email, string? jobTitle, string? department, Guid? managerId)
     {
@@ -62,12 +62,19 @@ public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmplo
             .SetValidator(new PersonNameValidator());
 
         RuleFor(e => e.EmployeeNumber)
+            .NotEmpty()
             .MaximumLength(256)
             .MustAsync(BeUniqueEmployeeId).WithMessage("The EmployeeId already exists.");
 
         RuleFor(e => e.Email)
             .NotNull()
             .SetValidator(new EmailAddressValidator());
+
+        RuleFor(e => e.JobTitle)
+            .MaximumLength(256);
+
+        RuleFor(e => e.Department)
+            .MaximumLength(256);
     }
 
     public async Task<bool> BeUniqueEmployeeId(string employeeNumber, CancellationToken cancellationToken)
@@ -76,7 +83,7 @@ public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmplo
     }
 }
 
-internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmployeeCommand, Guid>
+internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmployeeCommand, int>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
     private readonly IDateTimeService _dateTimeService;
@@ -89,7 +96,7 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
         _logger = logger;
     }
 
-    public async Task<Result<Guid>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -122,7 +129,7 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(employee.Id);
+            return Result.Success(employee.LocalId);
         }
         catch (Exception ex)
         {
@@ -130,7 +137,7 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
 
             _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
 
-            return Result.Failure<Guid>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
         }
     }
 }

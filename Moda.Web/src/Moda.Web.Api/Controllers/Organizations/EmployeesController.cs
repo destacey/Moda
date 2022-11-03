@@ -22,24 +22,33 @@ public class EmployeesController : VersionNeutralApiController
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
     [OpenApiOperation("Get a list of all employees.", "")]
+    //[ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Get))] // TODO not working
     public async Task<ActionResult<IReadOnlyList<EmployeeListDto>>> GetList(CancellationToken cancellationToken, bool includeDisabled = false)
     {
-        var employees = await _sender.Send(new GetEmployeesQuery(includeDisabled));
+        var employees = await _sender.Send(new GetEmployeesQuery(includeDisabled), cancellationToken);
         return Ok(employees.OrderBy(e => e.LastName));
     }
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
-    [OpenApiOperation("Get employee details.", "")]
-    public async Task<EmployeeDetailsDto?> GetById(Guid employeeId)
+    [OpenApiOperation("Get employee details using the localId.", "")]
+    //[ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Get))] // TODO not working
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<EmployeeDetailsDto>> GetById(int id)
     {
-        return await _sender.Send(new GetEmployeeQuery(employeeId));
+        var employee = await _sender.Send(new GetEmployeeQuery(id));
+
+        return employee is not null
+            ? Ok(employee)
+            : NotFound();
     }
 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Employees)]
     [OpenApiOperation("Create an employee.", "")]
-    public async Task<ActionResult<string>> CreateEmployee(CreateEmployeeRequest request)
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
+    public async Task<ActionResult> CreateEmployee(CreateEmployeeRequest request, CancellationToken cancellationToken)
     {
         var createCommand = request.ToCreateEmployeeCommand();
         var validator = new CreateEmployeeCommandValidator(_organizationDbContext);
@@ -50,9 +59,10 @@ public class EmployeesController : VersionNeutralApiController
             return UnprocessableEntity(ModelState);
         }
 
-        var result = await _sender.Send(createCommand);
+        var result = await _sender.Send(createCommand, cancellationToken);
+
         return result.IsSuccess
-            ? CreatedAtRoute(nameof(GetById), new { id = result.Value })
+            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
             : BadRequest(result.Error);
     }
 

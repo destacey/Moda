@@ -21,6 +21,10 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IAggregateRoot, IActiv
         ManagerId = managerId;
     }
 
+    /// <summary>Gets the local identifier.</summary>
+    /// <value>The local identifier.</value>
+    public int LocalId { get; private set; }
+
     /// <summary>Gets the employee name.</summary>
     /// <value>The employee name.</value>
     public PersonName Name { get; private set; } = null!;

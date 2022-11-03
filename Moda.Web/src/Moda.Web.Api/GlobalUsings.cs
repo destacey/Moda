@@ -2,6 +2,7 @@
 global using Moda.Common.Application.Auditing;
 global using Moda.Common.Application.Identity.Roles;
 global using Moda.Common.Application.Identity.Users;
+global using Moda.Common.Application.Validation;
 global using Moda.Common.Domain.Authorization;
 global using Moda.Common.Models;
 global using Moda.Infrastructure.Auth.Permissions;
