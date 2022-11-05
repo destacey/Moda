@@ -1,6 +1,7 @@
-﻿using NodaTime;
+﻿using FluentValidation;
+using NodaTime;
 
-namespace Moda.Web.Api.Models.Organization;
+namespace Moda.Web.Api.Models.Organizations.Employees;
 
 public sealed record CreateEmployeeRequest
 {
@@ -50,48 +51,48 @@ public sealed record CreateEmployeeRequest
 
     public CreateEmployeeCommand ToCreateEmployeeCommand()
     {
-        PersonName personName = new (FirstName, MiddleName, LastName, Suffix, Title);
-        EmailAddress emailAddress = new (Email);
+        PersonName personName = new(FirstName, MiddleName, LastName, Suffix, Title);
+        EmailAddress emailAddress = new(Email);
 
         return new CreateEmployeeCommand(personName, EmployeeNumber, HireDate, emailAddress, JobTitle, Department, ManagerId);
     }
 }
 
-//public sealed class CreateEmployeeRequestValidator : CustomValidator<CreateEmployeeRequest>
-//{
-//    public CreateEmployeeRequestValidator()
-//    {
-//        RuleLevelCascadeMode = CascadeMode.Stop;
+public sealed class CreateEmployeeRequestValidator : CustomValidator<CreateEmployeeRequest>
+{
+    public CreateEmployeeRequestValidator()
+    {
+        RuleLevelCascadeMode = CascadeMode.Stop;
 
-//        RuleFor(p => p.FirstName)
-//            .NotEmpty()
-//            .MaximumLength(100);
+        RuleFor(p => p.FirstName)
+            .NotEmpty()
+            .MaximumLength(100);
 
-//        RuleFor(p => p.MiddleName)
-//            .MaximumLength(100);
+        RuleFor(p => p.MiddleName)
+            .MaximumLength(100);
 
-//        RuleFor(p => p.LastName)
-//            .NotEmpty()
-//            .MaximumLength(100);
+        RuleFor(p => p.LastName)
+            .NotEmpty()
+            .MaximumLength(100);
 
-//        RuleFor(p => p.Suffix)
-//            .MaximumLength(50);
+        RuleFor(p => p.Suffix)
+            .MaximumLength(50);
 
-//        RuleFor(p => p.Title)
-//            .MaximumLength(50);
+        RuleFor(p => p.Title)
+            .MaximumLength(50);
 
-//        RuleFor(e => e.EmployeeNumber)
-//            .NotEmpty()
-//            .MaximumLength(256);
+        RuleFor(e => e.EmployeeNumber)
+            .NotEmpty()
+            .MaximumLength(256);
 
-//        RuleFor(e => e.Email)
-//            .NotEmpty()
-//            .MaximumLength(256);
+        RuleFor(e => e.Email)
+            .NotEmpty()
+            .MaximumLength(256);
 
-//        RuleFor(e => e.JobTitle)
-//            .MaximumLength(256);
+        RuleFor(e => e.JobTitle)
+            .MaximumLength(256);
 
-//        RuleFor(e => e.Department)
-//            .MaximumLength(256);
-//    }
-//}
+        RuleFor(e => e.Department)
+            .MaximumLength(256);
+    }
+}

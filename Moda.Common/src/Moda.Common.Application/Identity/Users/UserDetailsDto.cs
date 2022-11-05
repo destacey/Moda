@@ -2,7 +2,7 @@ namespace Moda.Common.Application.Identity.Users;
 
 public sealed record UserDetailsDto
 {
-    public Guid Id { get; set; }
+    public string Id { get; set; } = null!;
 
     public string? UserName { get; set; }
 
@@ -13,8 +13,6 @@ public sealed record UserDetailsDto
     public string? Email { get; set; }
 
     public bool IsActive { get; set; } = true;
-
-    public bool EmailConfirmed { get; set; }
 
     public string? PhoneNumber { get; set; }
 }

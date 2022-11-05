@@ -27,17 +27,17 @@ internal partial class UserService
         return userRoles;
     }
 
-    public async Task<string> AssignRolesAsync(string userId, UserRolesRequest request, CancellationToken cancellationToken)
+    public async Task<string> AssignRolesAsync(AssignUserRolesCommand command, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(request, nameof(request));
+        ArgumentNullException.ThrowIfNull(command, nameof(command));
 
-        var user = await _userManager.Users.Where(u => u.Id == userId).FirstOrDefaultAsync(cancellationToken);
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
 
         _ = user ?? throw new NotFoundException("User Not Found.");
 
         // Check if the user is an admin for which the admin role is getting disabled
         if (await _userManager.IsInRoleAsync(user, ApplicationRoles.Admin)
-            && request.UserRoles.Any(a => !a.Enabled && a.RoleName == ApplicationRoles.Admin))
+            && command.UserRoles.Any(a => !a.Enabled && a.RoleName == ApplicationRoles.Admin))
         {
             // Get count of users in Admin Role
             int adminCount = (await _userManager.GetUsersInRoleAsync(ApplicationRoles.Admin)).Count;
@@ -47,7 +47,7 @@ internal partial class UserService
             }
         }
 
-        foreach (var userRole in request.UserRoles)
+        foreach (var userRole in command.UserRoles)
         {
             // Check if Role Exists
             if (userRole.RoleName is not null && await _roleManager.FindByNameAsync(userRole.RoleName) is not null)

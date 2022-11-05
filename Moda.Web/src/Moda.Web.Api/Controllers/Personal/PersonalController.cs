@@ -26,9 +26,9 @@ public class PersonalController : VersionNeutralApiController
 
     [HttpPut("profile")]
     [OpenApiOperation("Update profile details of currently logged in user.", "")]
-    public async Task<ActionResult> UpdateProfile(UpdateUserRequest request)
+    public async Task<ActionResult> UpdateProfile(UpdateUserCommand request)
     {
-        var validator = new UpdateUserRequestValidator(_userService);
+        var validator = new UpdateUserCommandValidator(_userService);
         var result = await validator.ValidateAsync(request);
         if (!result.IsValid)
         {

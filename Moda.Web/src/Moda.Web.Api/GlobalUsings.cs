@@ -10,4 +10,7 @@ global using Moda.Infrastructure.Middleware;
 global using Moda.Organization.Application.Employees.Commands;
 global using Moda.Organization.Application.Employees.Dtos;
 global using Moda.Organization.Application.Employees.Queries;
+global using Moda.Web.Api.Models.Identity.Roles;
+global using Moda.Web.Api.Models.Identity.Users;
+global using Moda.Web.Api.Models.Organizations.Employees;
 global using NSwag.Annotations;

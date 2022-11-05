@@ -1,7 +1,6 @@
 ﻿using FluentValidation.AspNetCore;
 using MediatR;
 using Moda.Organization.Application.Persistence;
-using Moda.Web.Api.Models.Organization;
 
 namespace Moda.Web.Api.Controllers.Organizations;
 public class EmployeesController : VersionNeutralApiController
@@ -9,14 +8,10 @@ public class EmployeesController : VersionNeutralApiController
     private readonly ILogger<EmployeesController> _logger;
     private readonly ISender _sender;
 
-    // TODO can we remove this
-    private readonly IOrganizationDbContext _organizationDbContext;
-
-    public EmployeesController(ILogger<EmployeesController> logger, ISender sender, IOrganizationDbContext organizationDbContext)
+    public EmployeesController(ILogger<EmployeesController> logger, ISender sender)
     {
         _logger = logger;
         _sender = sender;
-        _organizationDbContext = organizationDbContext;
     }
 
     [HttpGet]
@@ -50,16 +45,7 @@ public class EmployeesController : VersionNeutralApiController
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
     public async Task<ActionResult> CreateEmployee(CreateEmployeeRequest request, CancellationToken cancellationToken)
     {
-        var createCommand = request.ToCreateEmployeeCommand();
-        var validator = new CreateEmployeeCommandValidator(_organizationDbContext);
-        var validationResult = await validator.ValidateAsync(createCommand);
-        if (!validationResult.IsValid)
-        {
-            validationResult.AddToModelState(ModelState);
-            return UnprocessableEntity(ModelState);
-        }
-
-        var result = await _sender.Send(createCommand, cancellationToken);
+        var result = await _sender.Send(request.ToCreateEmployeeCommand(), cancellationToken);
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)

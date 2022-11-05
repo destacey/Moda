@@ -97,19 +97,19 @@ internal partial class UserService
             : throw new InternalServerException("Validation Errors Occurred.");
     }
 
-    public async Task UpdateAsync(UpdateUserRequest request, string userId)
+    public async Task UpdateAsync(UpdateUserCommand command, string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
 
         _ = user ?? throw new NotFoundException("User Not Found.");
 
-        user.FirstName = request.FirstName;
-        user.LastName = request.LastName;
-        user.PhoneNumber = request.PhoneNumber;
+        user.FirstName = command.FirstName;
+        user.LastName = command.LastName;
+        user.PhoneNumber = command.PhoneNumber;
 
         string? phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-        if (request.PhoneNumber != phoneNumber)
-            await _userManager.SetPhoneNumberAsync(user, request.PhoneNumber);
+        if (command.PhoneNumber != phoneNumber)
+            await _userManager.SetPhoneNumberAsync(user, command.PhoneNumber);
 
         var result = await _userManager.UpdateAsync(user);
 

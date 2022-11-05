@@ -1,5 +1,3 @@
-using FluentValidation.AspNetCore;
-
 namespace Moda.Web.Api.Controllers.Identity;
 
 public class RolesController : VersionNeutralApiController
@@ -40,20 +38,9 @@ public class RolesController : VersionNeutralApiController
     [OpenApiOperation("Update a role's permissions.", "")]
     public async Task<ActionResult<string>> UpdatePermissions(string id, UpdateRolePermissionsRequest request, CancellationToken cancellationToken)
     {
-        var validator = new UpdateRolePermissionsRequestValidator();
-        var result = await validator.ValidateAsync(request, cancellationToken);
-        if (!result.IsValid)
-        {
-            result.AddToModelState(ModelState);
-            return UnprocessableEntity(ModelState);
-        }
-
-        if (id != request.RoleId)
-        {
-            return BadRequest();
-        }
-
-        return Ok(await _roleService.UpdatePermissionsAsync(request, cancellationToken));
+        return id != request.RoleId 
+            ? (ActionResult<string>)BadRequest() 
+            : Ok(await _roleService.UpdatePermissionsAsync(request.ToUpdateRolePermissionsCommand(), cancellationToken));
     }
 
     [HttpPost]
@@ -61,15 +48,7 @@ public class RolesController : VersionNeutralApiController
     [OpenApiOperation("Create or update a role.", "")]
     public async Task<ActionResult<string>> RegisterRole(CreateOrUpdateRoleRequest request)
     {
-        var validator = new CreateOrUpdateRoleRequestValidator(_roleService);
-        var result = await validator.ValidateAsync(request);
-        if (!result.IsValid)
-        {
-            result.AddToModelState(ModelState);
-            return UnprocessableEntity(ModelState);
-        }
-
-        return await _roleService.CreateOrUpdateAsync(request);
+        return await _roleService.CreateOrUpdateAsync(request.ToCreateOrUpdateRoleCommand());
     }
 
     [HttpDelete("{id}")]
