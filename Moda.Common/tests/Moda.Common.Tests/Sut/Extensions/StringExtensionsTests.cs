@@ -1,6 +1,4 @@
-﻿using Moda.Common.Extensions;
-
-namespace Moda.Common.Tests.Sut.Extensions;
+﻿namespace Moda.Common.Tests.Sut.Extensions;
 public class StringExtensionsTests
 {
     [Theory]
