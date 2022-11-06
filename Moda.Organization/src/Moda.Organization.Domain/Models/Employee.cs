@@ -13,12 +13,12 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IAggregateRoot, IActiv
     {
         Id = Guard.Against.Default(personId);
         Name = Guard.Against.Null(personName);
-        EmployeeNumber = employeeNumber;
+        EmployeeNumber = Guard.Against.Null(employeeNumber).Trim();
         HireDate = hireDate;
         Email = email;
-        JobTitle = jobTitle;
-        Department = department;
-        ManagerId = managerId;
+        JobTitle = jobTitle?.Trim();
+        Department = department?.Trim();
+        ManagerId = managerId.HasValue ? Guard.Against.Default(managerId) : null;
     }
 
     /// <summary>Gets the local identifier.</summary>
@@ -98,6 +98,63 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IAggregateRoot, IActiv
         }
 
         return Result.Success();
+    }
+
+    /// <summary>Updates the current employee.</summary>
+    /// <param name="name">The employee's name.</param>
+    /// <param name="employeeNumber">The employee number.</param>
+    /// <param name="hireDate">The hire date.</param>
+    /// <param name="email">The email.</param>
+    /// <param name="jobTitle">The job title.</param>
+    /// <param name="department">The department.</param>
+    /// <param name="managerId">The manager identifier.</param>
+    /// <param name="timestamp">The timestamp for the event.</param>
+    /// <returns>Result</returns>
+    public Result Update(
+        PersonName name,
+        string employeeNumber,
+        LocalDate? hireDate,
+        EmailAddress email,
+        string? jobTitle,
+        string? department,
+        Guid? managerId,
+        bool isActive,
+        Instant timestamp
+        )
+    {
+        try
+        {
+            if (Name != name) Name = name;
+            if (Email != email) Email = email;
+
+            EmployeeNumber = Guard.Against.Null(employeeNumber).Trim();
+            HireDate = hireDate;
+            JobTitle = jobTitle?.Trim();
+            Department = department?.Trim();
+
+            if (ManagerId != managerId)
+            {
+                ManagerId = managerId.HasValue ? Guard.Against.Default(managerId) : null;
+                Manager = null;
+            }
+
+            if (IsActive != isActive) 
+            {
+                var result = IsActive ? Activate(timestamp) : Deactivate(timestamp);
+                if (result.IsFailure)
+                {
+                    return Result.Failure(result.Error);
+                }
+            }
+
+            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
     }
 
     /// <summary>Creates an Employee and adds a domain event with the timestamp.</summary>

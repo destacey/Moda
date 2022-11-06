@@ -1,6 +1,4 @@
-﻿using FluentValidation.AspNetCore;
-using MediatR;
-using Moda.Organization.Application.Persistence;
+﻿using MediatR;
 
 namespace Moda.Web.Api.Controllers.Organizations;
 public class EmployeesController : VersionNeutralApiController
@@ -49,6 +47,23 @@ public class EmployeesController : VersionNeutralApiController
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
+            : BadRequest(result.Error);
+    }
+
+    [HttpPut("{id}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Employees)]
+    [OpenApiOperation("Update an employee.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdateEmployee(Guid id, UpdateEmployeeRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToUpdateEmployeeCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
             : BadRequest(result.Error);
     }
 

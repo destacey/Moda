@@ -55,6 +55,10 @@ public sealed record EmployeeDetailsDto
     /// <value>The manager identifier.</value>
     public Guid? ManagerId { get; private set; }
 
+    /// <summary>Gets the local identifier.</summary>
+    /// <value>The local identifier.</value>
+    public int? ManagerLocalId { get; private set; }
+
     /// <summary>Gets the manager.</summary>
     /// <value>The manager.</value>
     public string? ManagerName { get; private set; }

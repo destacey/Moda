@@ -1,16 +1,13 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 
 namespace Moda.Common.Models;
 
 public class EmailAddress : ValueObject
 {
-    private readonly string _nameOf = nameof(EmailAddress);
-
     public EmailAddress(string value)
     {
-        ArgumentException.ThrowIfNullOrEmpty(value, _nameOf);
-
-        value = value.Trim();
+        value = Guard.Against.NullOrWhiteSpace(value).Trim();
 
         if (ValidateEmailAddressFormat(value))
         {
@@ -28,10 +25,9 @@ public class EmailAddress : ValueObject
     // only validates that the format is correct
     private bool ValidateEmailAddressFormat(string value)
     {
-        if (value.IsValidEmailAddressFormat())
-            return true;
-
-        throw new ArgumentException("The value submitted does not meet the required format.", _nameOf);
+        return value.IsValidEmailAddressFormat()
+            ? true
+            : throw new ArgumentException("The value submitted does not meet the required format.", nameof(EmailAddress));
     }
 
     public override string ToString()
