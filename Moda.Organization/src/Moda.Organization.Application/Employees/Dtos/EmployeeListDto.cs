@@ -1,5 +1,7 @@
-﻿namespace Moda.Organization.Application.Employees.Dtos;
-public sealed record EmployeeListDto
+﻿using Mapster;
+
+namespace Moda.Organization.Application.Employees.Dtos;
+public sealed record EmployeeListDto : IRegister
 {
     /// <summary>Gets the identifier.</summary>
     /// <value>The identifier.</value>
@@ -61,4 +63,17 @@ public sealed record EmployeeListDto
     /// Indicates whether the employee is active or not.  
     /// </summary>
     public bool IsActive { get; private set; }
+
+    public void Register(TypeAdapterConfig config)
+    {
+        config.NewConfig<Employee, EmployeeListDto>()
+            .Map(dest => dest.FirstName, src => src.Name.FirstName)
+            .Map(dest => dest.MiddleName, src => src.Name.MiddleName)
+            .Map(dest => dest.LastName, src => src.Name.LastName)
+            .Map(dest => dest.Suffix, src => src.Name.Suffix)
+            .Map(dest => dest.Title, src => src.Name.Title)
+            .Map(dest => dest.Email, src => src.Email.Value)
+            .Map(dest => dest.ManagerLocalId, src => src.Manager!.LocalId)
+            .Map(dest => dest.ManagerName, src => $"{src.Manager!.Name.FirstName} {src.Manager!.Name.LastName}", srcCond => srcCond.ManagerId.HasValue);
+    }
 }

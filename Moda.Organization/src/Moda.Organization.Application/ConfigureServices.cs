@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using FluentValidation;
+using Mapster;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,12 +9,12 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddOrganizationApplication(this IServiceCollection services)
     {
-        MapsterSettings.Configure();
-
         var assembly = Assembly.GetExecutingAssembly();
 
         services.AddValidatorsFromAssembly(assembly);
         services.AddMediatR(assembly);
+
+        TypeAdapterConfig.GlobalSettings.Scan(assembly);
 
         return services;
     }

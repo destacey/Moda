@@ -12,9 +12,11 @@ public class RolesController : VersionNeutralApiController
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Roles)]
     [OpenApiOperation("Get a list of all roles.", "")]
-    public async Task<List<RoleDto>> GetList(CancellationToken cancellationToken)
+    public async Task<IEnumerable<RoleListDto>> GetList(CancellationToken cancellationToken)
     {
-        return await _roleService.GetListAsync(cancellationToken);
+        var roles = await _roleService.GetListAsync(cancellationToken);
+
+        return roles.OrderBy(r => r.Name);
     }
 
     [HttpGet("{id}")]
@@ -39,7 +41,7 @@ public class RolesController : VersionNeutralApiController
     public async Task<ActionResult<string>> UpdatePermissions(string id, UpdateRolePermissionsRequest request, CancellationToken cancellationToken)
     {
         return id != request.RoleId 
-            ? (ActionResult<string>)BadRequest() 
+            ? BadRequest() 
             : Ok(await _roleService.UpdatePermissionsAsync(request.ToUpdateRolePermissionsCommand(), cancellationToken));
     }
 

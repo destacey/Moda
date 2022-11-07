@@ -2,7 +2,7 @@ namespace Moda.Common.Application.Identity.Roles;
 
 public interface IRoleService : ITransientService
 {
-    Task<List<RoleDto>> GetListAsync(CancellationToken cancellationToken);
+    Task<List<RoleListDto>> GetListAsync(CancellationToken cancellationToken);
 
     Task<int> GetCountAsync(CancellationToken cancellationToken);
 

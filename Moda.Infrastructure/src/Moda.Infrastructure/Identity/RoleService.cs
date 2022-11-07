@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -29,9 +30,8 @@ internal class RoleService : IRoleService
         _dateTimeService = dateTimeService;
     }
 
-    public async Task<List<RoleDto>> GetListAsync(CancellationToken cancellationToken) =>
-        (await _roleManager.Roles.ToListAsync(cancellationToken))
-            .Adapt<List<RoleDto>>();
+    public async Task<List<RoleListDto>> GetListAsync(CancellationToken cancellationToken)
+        => await _roleManager.Roles.ProjectToType<RoleListDto>().ToListAsync(cancellationToken);
 
     public async Task<int> GetCountAsync(CancellationToken cancellationToken) =>
         await _roleManager.Roles.CountAsync(cancellationToken);
