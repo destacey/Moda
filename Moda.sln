@@ -61,6 +61,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Organization.Domain", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Organization.Application", "Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj", "{4D6C1603-B600-4931-8CFE-592B46B9203C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Integrations", "Moda.Integrations", "{409DFB83-5547-4E01-8AC9-BFE3793FDA19}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6C24DE92-24DD-45E7-941F-AC3434EF447F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{76EDC9D4-594A-4061-ACB2-E34704E55D6C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Integrations.AzureDevOps", "Moda.Integrations\src\Moda.Integrations.AzureDevOps\Moda.Integrations.AzureDevOps.csproj", "{597DBAFF-559D-4161-BA12-23926DF7367C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,6 +115,10 @@ Global
 		{4D6C1603-B600-4931-8CFE-592B46B9203C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D6C1603-B600-4931-8CFE-592B46B9203C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D6C1603-B600-4931-8CFE-592B46B9203C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{597DBAFF-559D-4161-BA12-23926DF7367C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{597DBAFF-559D-4161-BA12-23926DF7367C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{597DBAFF-559D-4161-BA12-23926DF7367C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{597DBAFF-559D-4161-BA12-23926DF7367C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -134,6 +146,9 @@ Global
 		{F83D8FD2-2D7D-422D-B20C-821B701DFBE7} = {D4DE971F-FA6B-4B0F-B4CF-4A3072A7A749}
 		{A479EC5B-EA3A-4A89-98AD-077998E3C728} = {86D48B56-16A1-407E-A7A4-B04B8B38F215}
 		{4D6C1603-B600-4931-8CFE-592B46B9203C} = {86D48B56-16A1-407E-A7A4-B04B8B38F215}
+		{6C24DE92-24DD-45E7-941F-AC3434EF447F} = {409DFB83-5547-4E01-8AC9-BFE3793FDA19}
+		{76EDC9D4-594A-4061-ACB2-E34704E55D6C} = {409DFB83-5547-4E01-8AC9-BFE3793FDA19}
+		{597DBAFF-559D-4161-BA12-23926DF7367C} = {6C24DE92-24DD-45E7-941F-AC3434EF447F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A287E480-E0D5-4A33-9958-D4A8F7DC3F31}
