@@ -8,12 +8,13 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
 {
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
-        builder
-            .ToTable("Users", SchemaNames.Identity);
+        builder.ToTable("Users", SchemaNames.Identity);
 
-        builder
-            .Property(u => u.ObjectId)
-                .HasMaxLength(256);
+        builder.Property(u => u.ObjectId).HasMaxLength(256);
+
+        builder.Property(u => u.FirstName).HasMaxLength(100);
+        builder.Property(u => u.LastName).HasMaxLength(100);
+        builder.Property(u => u.PhoneNumber).HasMaxLength(20);
     }
 }
 

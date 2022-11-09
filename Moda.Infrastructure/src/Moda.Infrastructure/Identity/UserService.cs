@@ -74,16 +74,12 @@ internal partial class UserService : IUserService
     public Task<int> GetCountAsync(CancellationToken cancellationToken) =>
         _userManager.Users.AsNoTracking().CountAsync(cancellationToken);
 
-    public async Task<UserDetailsDto> GetAsync(string userId, CancellationToken cancellationToken)
+    public async Task<UserDetailsDto?> GetAsync(string userId, CancellationToken cancellationToken)
     {
-        var user = await _userManager.Users
+        return await _userManager.Users
             .AsNoTracking()
-            .Where(u => u.Id == userId)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        _ = user ?? throw new NotFoundException("User Not Found.");
-
-        return user.Adapt<UserDetailsDto>();
+            .ProjectToType<UserDetailsDto>()
+            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 
     public async Task<string?> GetEmailAsync(string userId)
@@ -97,19 +93,17 @@ internal partial class UserService : IUserService
         return user.Email;
     }
 
-    public async Task ToggleStatusAsync(ToggleUserStatusRequest request, CancellationToken cancellationToken)
+    public async Task ToggleStatusAsync(ToggleUserStatusCommand command, CancellationToken cancellationToken)
     {
-        var user = await _userManager.Users.Where(u => u.Id == request.UserId).FirstOrDefaultAsync(cancellationToken);
+        var user = await _userManager.Users.Where(u => u.Id == command.UserId).FirstOrDefaultAsync(cancellationToken);
 
         _ = user ?? throw new NotFoundException("User Not Found.");
 
         bool isAdmin = await _userManager.IsInRoleAsync(user, ApplicationRoles.Admin);
         if (isAdmin)
-        {
             throw new ConflictException("Administrators Profile's Status cannot be toggled");
-        }
 
-        user.IsActive = request.ActivateUser;
+        user.IsActive = command.ActivateUser;
 
         await _userManager.UpdateAsync(user);
 

@@ -13,7 +13,7 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
-        MapsterSettings.Configure();
+        //MapsterSettings.Configure();
 
         services.AddSingleton<IClock>(SystemClock.Instance);
 

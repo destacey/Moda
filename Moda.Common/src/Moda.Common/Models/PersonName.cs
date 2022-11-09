@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 
 namespace Moda.Common.Models;
 
@@ -6,15 +7,9 @@ public class PersonName : ValueObject
 {
     public PersonName(string firstName, string? middleName, string lastName, string? suffix = null, string? title = null)
     {
-        if (string.IsNullOrWhiteSpace(firstName))
-            throw new ArgumentException(Constants.IsNullOrWhiteSpaceExceptionMessage, nameof(firstName));
-
-        if (string.IsNullOrWhiteSpace(lastName))
-            throw new ArgumentException(Constants.IsNullOrWhiteSpaceExceptionMessage, nameof(lastName));
-
-        FirstName = firstName.Trim();
+        FirstName = Guard.Against.NullOrWhiteSpace(firstName).Trim();
         MiddleName = string.IsNullOrWhiteSpace(middleName) ? null : middleName.Trim();
-        LastName = lastName.Trim();
+        LastName = Guard.Against.NullOrWhiteSpace(lastName).Trim();
         Suffix = string.IsNullOrWhiteSpace(suffix) ? null : suffix.Trim();
         Title = string.IsNullOrWhiteSpace(title) ? null : title.Trim();
     }

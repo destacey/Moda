@@ -14,19 +14,19 @@ public interface IUserService : ITransientService
 
     Task<int> GetCountAsync(CancellationToken cancellationToken);
 
-    Task<UserDetailsDto> GetAsync(string userId, CancellationToken cancellationToken);
+    Task<UserDetailsDto?> GetAsync(string userId, CancellationToken cancellationToken);
 
     Task<string?> GetEmailAsync(string userId);
 
     Task<List<UserRoleDto>> GetRolesAsync(string userId, CancellationToken cancellationToken);
-    Task<string> AssignRolesAsync(string userId, UserRolesRequest request, CancellationToken cancellationToken);
+    Task<string> AssignRolesAsync(AssignUserRolesCommand command, CancellationToken cancellationToken);
 
     Task<List<string>> GetPermissionsAsync(string userId, CancellationToken cancellationToken);
     Task<bool> HasPermissionAsync(string userId, string permission, CancellationToken cancellationToken = default);
 
-    Task ToggleStatusAsync(ToggleUserStatusRequest request, CancellationToken cancellationToken);
+    Task ToggleStatusAsync(ToggleUserStatusCommand command, CancellationToken cancellationToken);
 
     Task<string> GetOrCreateFromPrincipalAsync(ClaimsPrincipal principal);
-    Task UpdateAsync(UpdateUserRequest request, string userId);
+    Task UpdateAsync(UpdateUserCommand command, string userId);
 
 }

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using FluentValidation;
+using Mapster;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,8 @@ public static class ConfigureServices
 
         services.AddValidatorsFromAssembly(assembly);
         services.AddMediatR(assembly);
+
+        TypeAdapterConfig.GlobalSettings.Scan(assembly);
 
         return services;
     }

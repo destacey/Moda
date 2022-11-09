@@ -22,18 +22,20 @@ public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior
         {
             var requestName = typeof(TRequest).Name;
 
-            var requestsWithResults = new[] { typeof(IQuery<>), typeof(ICommand), typeof(ICommand<>) };
-            var requestType = request.GetType().GetInterfaces().FirstOrDefault(i => i.IsGenericType && requestsWithResults.Contains(i.GetGenericTypeDefinition()));
+            var customRequestTypes = new[] { typeof(IQuery<>), typeof(ICommand), typeof(ICommand<>) };
+            var requestType = request.GetType().GetInterfaces().FirstOrDefault(i => i.IsGenericType && customRequestTypes.Contains(i.GetGenericTypeDefinition()));
             if (requestType is not null)
             {
                 _logger.LogError(ex, "Moda Request: Unhandled Exception for Request {Name} {@Request}. Request Type: {RequestTypeName}", requestName, request, requestType.Name);
 
                 var errorMessage = $"Moda Request: Unhandled Exception for Request {requestName} {request}";
 
-                //return requestType == typeof(ICommand)
-                //    ? Result.Failure(errorMessage)
-                //    : Result.Failure<TResponse>(errorMessage);
-
+                //if (requestType == typeof(ICommand) || requestType == typeof(ICommand<>))
+                //{
+                //    return requestType == typeof(ICommand)
+                //        ? Result.Failure(errorMessage)
+                //        : Result.Failure<TResponse>(errorMessage);
+                //}
             }
             else
             {

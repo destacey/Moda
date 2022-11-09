@@ -12,49 +12,56 @@ public class UsersController : VersionNeutralApiController
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Users)]
     [OpenApiOperation("Get list of all users.", "")]
-    public Task<List<UserDetailsDto>> GetListAsync(CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<List<UserDetailsDto>> GetList(CancellationToken cancellationToken)
     {
-        return _userService.GetListAsync(cancellationToken);
+        return await _userService.GetListAsync(cancellationToken);
     }
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Users)]
     [OpenApiOperation("Get a user's details.", "")]
-    public Task<UserDetailsDto> GetByIdAsync(string id, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<UserDetailsDto>> GetById(string id, CancellationToken cancellationToken)
     {
-        return _userService.GetAsync(id, cancellationToken);
+        var user = await _userService.GetAsync(id, cancellationToken);
+
+        return user is null
+            ? NotFound()
+            : user;
     }
 
     [HttpGet("{id}/roles")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.UserRoles)]
     [OpenApiOperation("Get a user's roles.", "")]
-    public Task<List<UserRoleDto>> GetRolesAsync(string id, CancellationToken cancellationToken)
+    public async Task<List<UserRoleDto>> GetRoles(string id, CancellationToken cancellationToken)
     {
-        return _userService.GetRolesAsync(id, cancellationToken);
+        return await _userService.GetRolesAsync(id, cancellationToken);
     }
 
     [HttpPost("{id}/roles")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Register))]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.UserRoles)]
     [OpenApiOperation("Update a user's assigned roles.", "")]
-    public Task<string> AssignRolesAsync(string id, UserRolesRequest request, CancellationToken cancellationToken)
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Register))]
+    public async Task<ActionResult<string>> AssignRoles(string id, AssignUserRolesRequest request, CancellationToken cancellationToken)
     {
-        return _userService.AssignRolesAsync(id, request, cancellationToken);
+        return id != request.UserId
+            ? BadRequest()
+            : await _userService.AssignRolesAsync(request.ToAssignUserRolesRequest(), cancellationToken);
     }
 
     [HttpPost("{id}/toggle-status")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Register))]
     [OpenApiOperation("Toggle a user's active status.", "")]
-    public async Task<ActionResult> ToggleStatusAsync(string id, ToggleUserStatusRequest request, CancellationToken cancellationToken)
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Toggle))]
+    public async Task<ActionResult> ToggleStatus(string id, ToggleUserStatusRequest request, CancellationToken cancellationToken)
     {
         if (id != request.UserId)
-        {
             return BadRequest();
-        }
 
-        await _userService.ToggleStatusAsync(request, cancellationToken);
-        return Ok();
+        await _userService.ToggleStatusAsync(request.ToToggleUserStatusCommand(), cancellationToken);
+        return NoContent();
     }
 
     private string GetOriginFromRequest() => $"{Request.Scheme}://{Request.Host.Value}{Request.PathBase.Value}";

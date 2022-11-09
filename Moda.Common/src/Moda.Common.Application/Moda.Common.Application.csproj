@@ -7,9 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CSharpFunctionalExtensions" Version="2.35.1" />
+        <PackageReference Include="CSharpFunctionalExtensions" Version="2.36.1" />
         <PackageReference Include="FluentValidation" Version="11.2.2" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.2.2" />
+        <PackageReference Include="Mapster" Version="7.3.0" />
         <PackageReference Include="MediatR" Version="11.0.0" />
         <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
         <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="7.0.0-rc.2.22472.3" />

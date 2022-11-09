@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -29,9 +30,8 @@ internal class RoleService : IRoleService
         _dateTimeService = dateTimeService;
     }
 
-    public async Task<List<RoleDto>> GetListAsync(CancellationToken cancellationToken) =>
-        (await _roleManager.Roles.ToListAsync(cancellationToken))
-            .Adapt<List<RoleDto>>();
+    public async Task<List<RoleListDto>> GetListAsync(CancellationToken cancellationToken)
+        => await _roleManager.Roles.ProjectToType<RoleListDto>().ToListAsync(cancellationToken);
 
     public async Task<int> GetCountAsync(CancellationToken cancellationToken) =>
         await _roleManager.Roles.CountAsync(cancellationToken);
@@ -58,7 +58,7 @@ internal class RoleService : IRoleService
         return role;
     }
 
-    public async Task<string> CreateOrUpdateAsync(CreateOrUpdateRoleRequest request)
+    public async Task<string> CreateOrUpdateAsync(CreateOrUpdateRoleCommand request)
     {
         if (string.IsNullOrEmpty(request.Id))
         {
@@ -103,7 +103,7 @@ internal class RoleService : IRoleService
         }
     }
 
-    public async Task<string> UpdatePermissionsAsync(UpdateRolePermissionsRequest request, CancellationToken cancellationToken)
+    public async Task<string> UpdatePermissionsAsync(UpdateRolePermissionsCommand request, CancellationToken cancellationToken)
     {
         var role = await _roleManager.FindByIdAsync(request.RoleId);
         _ = role ?? throw new NotFoundException("Role Not Found");

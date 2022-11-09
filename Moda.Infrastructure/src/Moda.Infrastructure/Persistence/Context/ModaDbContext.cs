@@ -11,7 +11,12 @@ public class ModaDbContext : BaseDbContext, IOrganizationDbContext
     {
     }
 
+    #region IOrganization
+    
+    public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<Person> People => Set<Person>();
+    
+    #endregion IOrganization
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

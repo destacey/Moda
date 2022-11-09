@@ -42,7 +42,7 @@ public sealed class WorkItemRevisionChange : BaseEntity<Guid>, ISoftDelete
     /// <summary>
     /// The date and time the record was deleted.
     /// </summary>
-    public Instant Deleted { get; set; }
+    public Instant? Deleted { get; set; }
 
     /// <summary>
     /// The employee that deleted this record.

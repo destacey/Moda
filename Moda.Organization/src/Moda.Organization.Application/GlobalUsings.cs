@@ -1,4 +1,11 @@
-﻿global using Moda.Common.Application.Interfaces;
+﻿global using Moda.Common.Application.Events;
+global using Moda.Common.Application.Exceptions;
+global using Moda.Common.Application.Interfaces;
 global using Moda.Common.Application.Persistence;
 global using Moda.Common.Application.Validation;
+global using Moda.Common.Domain.Events;
+global using Moda.Common.Models;
+global using Moda.Organization.Application.Employees.Dtos;
+global using Moda.Organization.Application.Persistence;
+global using Moda.Organization.Application.Validators;
 global using Moda.Organization.Domain.Models;
