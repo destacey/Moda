@@ -1,47 +1,49 @@
 ﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Microsoft.VisualStudio.Services.WebApi;
+using Moda.Common.Extensions;
 
 namespace Moda.Integrations.AzureDevOps.Services;
 internal sealed class AreaService
 {
     private readonly WorkItemTrackingHttpClient _witClient;
-    private readonly string _projectName;
     private readonly ILogger<AreaService> _logger;
 
-    internal AreaService(WorkItemTrackingHttpClient witClient, string projectName, ILogger<AreaService> logger)
+    public AreaService(VssConnection connection, ILogger<AreaService> logger)
     {
-        _witClient = Guard.Against.Null(witClient);
-        _projectName = Guard.Against.NullOrWhiteSpace(projectName);
+        _witClient = Guard.Against.Null(connection.GetClient<WorkItemTrackingHttpClient>());
         _logger = logger;
     }
 
-    internal async Task<IReadOnlyList<WorkItemClassificationNode>> GetAreas(CancellationToken cancellationToken)
+    public async Task<Result<List<WorkItemClassificationNode>>> GetAreas(Guid projectId, CancellationToken cancellationToken)
     {
-        // TODO handle paging
-        var rootNodes = await _witClient.GetRootNodesAsync(_projectName, cancellationToken: cancellationToken);
-
-        if (rootNodes is null)
+        try
         {
-            _logger.LogWarning("No root nodes found for project {ProjectName}", _projectName);
-            return Array.Empty<WorkItemClassificationNode>();
+            var rootArea = await _witClient.GetClassificationNodeAsync(projectId, TreeStructureGroup.Areas, depth: 100, cancellationToken: cancellationToken);
+            if (rootArea is null)
+            {
+                _logger.LogWarning("No area node found for project {ProjectId}", projectId);
+                var result = Result.Failure<List<WorkItemClassificationNode>>($"No area node found for project {projectId}");
+                return result;
+            }
+
+            var areas = rootArea.FlattenHierarchy(a => a.Children).ToList();
+            foreach (var item in areas)
+            {
+                item.Children = null;
+            }
+
+            _logger.LogDebug("{AreaCount} areas found for project {ProjectId}", areas.Count, projectId);
+
+            return Result.Success(areas);
         }
-
-        // expect only one root node for the area path
-        var rootAreaNode = rootNodes.Where(n => n.StructureType == TreeNodeStructureType.Area).FirstOrDefault();
-
-        if (rootAreaNode is null)
+        catch (Exception ex)
         {
-            _logger.LogWarning("No area node found for project {ProjectName}", _projectName);
-            return Array.Empty<WorkItemClassificationNode>();
+            _logger.LogError(ex, "Error getting areas for project {ProjectId} from Azure DevOps", projectId);
+            return Result.Failure<List<WorkItemClassificationNode>>(ex.ToString());
         }
-
-        // TODO handle paging
-        var areas = await _witClient.GetClassificationNodesAsync(_projectName, new int[] { rootAreaNode.Id }, cancellationToken: cancellationToken);
-        
-        _logger.LogDebug("{AreaCount} areas found for project {ProjectName}", areas.Count, _projectName);
-
-        return areas;
     }
 }

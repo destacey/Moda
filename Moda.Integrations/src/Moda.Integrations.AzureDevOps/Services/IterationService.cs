@@ -1,47 +1,49 @@
 ﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Microsoft.VisualStudio.Services.WebApi;
+using Moda.Common.Extensions;
 
 namespace Moda.Integrations.AzureDevOps.Services;
 internal sealed class IterationService
 {
     private readonly WorkItemTrackingHttpClient _witClient;
-    private readonly string _projectName;
     private readonly ILogger<IterationService> _logger;
 
-    internal IterationService(WorkItemTrackingHttpClient witClient, string projectName, ILogger<IterationService> logger)
+    public IterationService(VssConnection connection, ILogger<IterationService> logger)
     {
-        _witClient = Guard.Against.Null(witClient);
-        _projectName = Guard.Against.NullOrWhiteSpace(projectName);
+        _witClient = Guard.Against.Null(connection.GetClient<WorkItemTrackingHttpClient>());
         _logger = logger;
     }
 
-    internal async Task<IReadOnlyList<WorkItemClassificationNode>> GetIterations(CancellationToken cancellationToken)
+    public async Task<Result<List<WorkItemClassificationNode>>> GetIterations(Guid projectId, CancellationToken cancellationToken)
     {
-        // TODO handle paging
-        var rootNodes = await _witClient.GetRootNodesAsync(_projectName, cancellationToken: cancellationToken);
-
-        if (rootNodes is null)
+        try
         {
-            _logger.LogWarning("No root nodes found for project {ProjectName}", _projectName);
-            return Array.Empty<WorkItemClassificationNode>();
+            var rootIteration = await _witClient.GetClassificationNodeAsync(projectId, TreeStructureGroup.Iterations, depth: 100, cancellationToken: cancellationToken);
+            if (rootIteration is null)
+            {
+                _logger.LogWarning("No iteration node found for project {ProjectId}", projectId);
+                var result = Result.Failure<List<WorkItemClassificationNode>>($"No iteration node found for project {projectId}");
+                return result;
+            }
+
+            var iterations = rootIteration.FlattenHierarchy(a => a.Children).ToList();
+            foreach (var item in iterations)
+            {
+                item.Children = null;
+            }
+
+            _logger.LogDebug("{IterationCount} iterations found for project {ProjectId}", iterations.Count, projectId);
+
+            return Result.Success(iterations);
         }
-
-        // expect only one root node for the iteration path
-        var rootIterationNode = rootNodes.Where(n => n.StructureType == TreeNodeStructureType.Iteration).FirstOrDefault();
-
-        if (rootIterationNode is null)
+        catch (Exception ex)
         {
-            _logger.LogWarning("No iteration node found for project {ProjectName}", _projectName);
-            return Array.Empty<WorkItemClassificationNode>();
+            _logger.LogError(ex, "Error getting iterations for project {ProjectId} from Azure DevOps", projectId);
+            return Result.Failure<List<WorkItemClassificationNode>>(ex.ToString());
         }
-
-        // TODO handle paging
-        var iterations = await _witClient.GetClassificationNodesAsync(_projectName, new int[] { rootIterationNode.Id }, cancellationToken: cancellationToken);
-        
-        _logger.LogDebug("{IterationCount} iterations found for project {ProjectName}", iterations.Count, _projectName);
-
-        return iterations;
     }
 }
