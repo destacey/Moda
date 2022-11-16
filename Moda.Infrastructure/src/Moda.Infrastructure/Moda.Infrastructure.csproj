@@ -31,8 +31,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0-rc.2.22472.3" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.0-rc.2.22476.2" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="1.25.5" />
-    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.25.5" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="1.25.6" />
+    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.25.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NodaTime" Version="3.1.5" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.17.0" />
