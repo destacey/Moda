@@ -5,13 +5,13 @@ namespace Moda.Common.Models;
 
 public class EmailAddress : ValueObject
 {
-    public EmailAddress(string emailAddress)
+    public EmailAddress(string value)
     {
-        emailAddress = Guard.Against.NullOrWhiteSpace(emailAddress).Trim();
+        value = Guard.Against.NullOrWhiteSpace(value, nameof(EmailAddress)).Trim();
 
-        if (ValidateEmailAddressFormat(emailAddress))
+        if (ValidateEmailAddressFormat(value))
         {
-            Value = emailAddress;
+            Value = value;
         }
     }
 
