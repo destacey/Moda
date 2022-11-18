@@ -7,7 +7,7 @@ public class EmailAddress : ValueObject
 {
     public EmailAddress(string value)
     {
-        value = Guard.Against.NullOrWhiteSpace(value).Trim();
+        value = Guard.Against.NullOrWhiteSpace(value, nameof(EmailAddress)).Trim();
 
         if (ValidateEmailAddressFormat(value))
         {

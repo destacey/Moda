@@ -24,27 +24,47 @@ public class PersonNameTests
 
 
     [Theory]
-    [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
     public void New_InvalidFirstNameInput_ThrowsException(string firstName)
     {
-        var expectedExceptionMessage = $"{Constants.IsNullOrWhiteSpaceExceptionMessage} (Parameter 'firstName')";
+        var expectedExceptionMessage = $"Required input firstName was empty. (Parameter 'firstName')";
 
         var exception = Assert.Throws<ArgumentException>(() => new PersonName(firstName, null, "Test"));
 
         Assert.Equal(expectedExceptionMessage, exception.Message);
     }
 
+    [Fact]
+    public void New_NullFirstNameInput_ThrowsException()
+    {
+        var expectedExceptionMessage = $"Value cannot be null. (Parameter 'firstName')";
+        string? firstName = null;
+
+        var exception = Assert.Throws<ArgumentNullException>(() => new PersonName(firstName!, null, "Smith"));
+
+        Assert.Equal(expectedExceptionMessage, exception.Message);
+    }
+
     [Theory]
-    [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
     public void New_InvalidLastNameInput_ThrowsException(string lastName)
     {
-        var expectedExceptionMessage = $"{Constants.IsNullOrWhiteSpaceExceptionMessage} (Parameter 'lastName')";
+        var expectedExceptionMessage = $"Required input lastName was empty. (Parameter 'lastName')";
 
         var exception = Assert.Throws<ArgumentException>(() => new PersonName("John", null, lastName));
+
+        Assert.Equal(expectedExceptionMessage, exception.Message);
+    }
+
+    [Fact]
+    public void New_NullLastNameInput_ThrowsException()
+    {
+        var expectedExceptionMessage = $"Value cannot be null. (Parameter 'lastName')";
+        string? lastName = null;
+
+        var exception = Assert.Throws<ArgumentNullException>(() => new PersonName("John", null, lastName!));
 
         Assert.Equal(expectedExceptionMessage, exception.Message);
     }
@@ -70,7 +90,7 @@ public class PersonNameTests
 
         // ACT
         var result = personName.DisplayName;
-        
+
         // Assert
         Assert.Equal(expected, result);
     }

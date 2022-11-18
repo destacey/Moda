@@ -18,9 +18,19 @@ public class EmailAddressTests
     [Fact]
     public void New_EmptyInput_ThrowsException()
     {
-        var expectedExceptionMessage = $"The value cannot be an empty string. (Parameter 'EmailAddress')";
+        var expectedExceptionMessage = $"Required input EmailAddress was empty. (Parameter 'EmailAddress')";
 
         var exception = Assert.Throws<ArgumentException>(() => new EmailAddress(""));
+
+        Assert.Equal(expectedExceptionMessage, exception.Message);
+    }
+
+    [Fact]
+    public void New_WhitespaceInput_ThrowsException()
+    {
+        var expectedExceptionMessage = $"Required input EmailAddress was empty. (Parameter 'EmailAddress')";
+
+        var exception = Assert.Throws<ArgumentException>(() => new EmailAddress(" "));
 
         Assert.Equal(expectedExceptionMessage, exception.Message);
     }
@@ -44,7 +54,6 @@ public class EmailAddressTests
     [InlineData("test..test@test.com")]
     [InlineData("test.test@-test.com")]
     [InlineData("test.test@test..com")]
-    [InlineData(" ")]
     public void New_InvalidFormat_ThrowsException(string input)
     {
         var expectedExceptionMessage = "The value submitted does not meet the required format. (Parameter 'EmailAddress')";
