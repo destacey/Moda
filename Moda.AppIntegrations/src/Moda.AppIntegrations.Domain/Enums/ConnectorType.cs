@@ -3,6 +3,6 @@
 namespace Moda.AppIntegrations.Domain.Enums;
 public enum ConnectorType
 {
-    [Display(Name = "Azure DevOps")]
-    AzureDevOps = 0
+    [Display(Name = "Azure DevOps Boards")]
+    AzureDevOpsBoards = 0
 }

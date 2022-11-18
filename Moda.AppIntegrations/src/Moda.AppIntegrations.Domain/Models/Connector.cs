@@ -1,16 +1,17 @@
 ﻿namespace Moda.AppIntegrations.Domain.Models;
-public class Connector : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
+public abstract class Connector<T> : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private string _name = null!;
-    private string? _description;    
-    
-    private Connector() { }
-    
-    public Connector(string name, string? description, ConnectorType type)
+    private string? _description;
+
+    protected Connector() { }
+
+    public Connector(string name, string? description, ConnectorType type, T configuration)
     {
         Name = name;
         Description = description;
         Type = type;
+        Configuration = configuration;
     }
 
 
@@ -19,35 +20,30 @@ public class Connector : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
     public string Name
     {
         get => _name;
-        set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+        protected set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
     }
 
     /// <summary>Gets or sets the description.</summary>
     /// <value>The connector description.</value>
     public string? Description 
     { 
-        get => _description; 
-        set => _description = value?.Trim(); 
+        get => _description;
+        protected set => _description = value?.Trim(); 
     }
 
     /// <summary>Gets the type of connector.  This value cannot change.</summary>
     /// <value>The type of connector.</value>
     public ConnectorType Type { get; }
-    
+
     // TODO string ConfigurationObject - should there be a class for each type?
+    public T? Configuration { get; protected set; }
 
     /// <summary>
     /// Indicates whether the connector is active or not.  Inactive connectors are not included in the synchronization process.
     /// </summary>
-    public bool IsActive { get; private set; } = true;
+    public bool IsActive { get; protected set; } = true;
 
-    public Result Update(string name, string? description)
-    {
-        Name = name;
-        Description = description;
-
-        return Result.Success();
-    }
+    public bool IsValidConfiguration { get; protected set; }
 
     /// <summary>
     /// The process for activating a connector.
@@ -82,4 +78,6 @@ public class Connector : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 
         return Result.Success();
     }
+
+    public abstract void ValidateConfiguration();
 }
