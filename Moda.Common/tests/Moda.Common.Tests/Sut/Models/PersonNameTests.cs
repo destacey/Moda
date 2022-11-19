@@ -90,7 +90,7 @@ public class PersonNameTests
 
         // ACT
         var result = personName.DisplayName;
-        
+
         // Assert
         Assert.Equal(expected, result);
     }

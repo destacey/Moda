@@ -18,7 +18,7 @@ public class EmailAddressTests
     [Fact]
     public void New_EmptyInput_ThrowsException()
     {
-        var expectedExceptionMessage = $"Required input emailAddress was empty. (Parameter 'emailAddress')";
+        var expectedExceptionMessage = $"Required input EmailAddress was empty. (Parameter 'EmailAddress')";
 
         var exception = Assert.Throws<ArgumentException>(() => new EmailAddress(""));
 
@@ -28,7 +28,7 @@ public class EmailAddressTests
     [Fact]
     public void New_WhitespaceInput_ThrowsException()
     {
-        var expectedExceptionMessage = $"Required input emailAddress was empty. (Parameter 'emailAddress')";
+        var expectedExceptionMessage = $"Required input EmailAddress was empty. (Parameter 'EmailAddress')";
 
         var exception = Assert.Throws<ArgumentException>(() => new EmailAddress(" "));
 
@@ -38,7 +38,7 @@ public class EmailAddressTests
     [Fact]
     public void New_NullInput_ThrowsException()
     {
-        var expectedExceptionMessage = "Value cannot be null. (Parameter 'emailAddress')";
+        var expectedExceptionMessage = "Value cannot be null. (Parameter 'EmailAddress')";
 
         var exception = Assert.Throws<ArgumentNullException>(() => new EmailAddress(null!));
 
