@@ -75,7 +75,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B9A56ED1-5AB
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AF4E9F52-9637-4300-AA04-DFB05160085F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.AppIntegrations.Domain", "Moda.AppIntegrations\src\Moda.AppIntegrations.Domain\Moda.AppIntegrations.Domain.csproj", "{022242B9-8F52-4263-88E3-85DC0B42C71E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.AppIntegrations.Domain", "Moda.AppIntegrations\src\Moda.AppIntegrations.Domain\Moda.AppIntegrations.Domain.csproj", "{022242B9-8F52-4263-88E3-85DC0B42C71E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
