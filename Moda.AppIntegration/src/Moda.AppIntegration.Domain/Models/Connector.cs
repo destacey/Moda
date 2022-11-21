@@ -1,19 +1,10 @@
-﻿namespace Moda.AppIntegrations.Domain.Models;
-public abstract class Connector<T> : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
+﻿using System.Text.Json;
+
+namespace Moda.AppIntegration.Domain.Models;
+public abstract class Connector : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private string _name = null!;
     private string? _description;
-
-    protected Connector() { }
-
-    public Connector(string name, string? description, ConnectorType type, T configuration)
-    {
-        Name = name;
-        Description = description;
-        Type = type;
-        Configuration = configuration;
-    }
-
 
     /// <summary>Gets or sets the name of the connector.</summary>
     /// <value>The name of the connector.</value>
@@ -33,28 +24,35 @@ public abstract class Connector<T> : BaseAuditableEntity<Guid>, IAggregateRoot, 
 
     /// <summary>Gets the type of connector.  This value cannot change.</summary>
     /// <value>The type of connector.</value>
-    public ConnectorType Type { get; }
+    public ConnectorType Type { get; protected set; }
 
-    // TODO string ConfigurationObject - should there be a class for each type?
-    public T? Configuration { get; protected set; }
+    public string? ConfigurationString { get; protected set; }
 
     /// <summary>
     /// Indicates whether the connector is active or not.  Inactive connectors are not included in the synchronization process.
     /// </summary>
+    /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; protected set; } = true;
 
-    public bool IsValidConfiguration { get; protected set; }
+    /// <summary>
+    /// Gets or sets a value indicating whether this instance has a valid configuration.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if this instance is valid configuration; otherwise, <c>false</c>.
+    /// </value>
+    public bool IsValidConfiguration { get; protected set; } = false;
 
     /// <summary>
     /// The process for activating a connector.
     /// </summary>
     /// <param name="activatedOn"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Activate(Instant activatedOn)
+    public virtual Result Activate(Instant activatedOn)
     {
         if (!IsActive)
         {
-            // TODO is there logic that would prevent activation?
+            // Rules
+            // AzDO Organization uniqueness is currently enforced by the command
             IsActive = true;
             AddDomainEvent(EntityActivatedEvent.WithEntity(this, activatedOn));
         }
@@ -67,11 +65,10 @@ public abstract class Connector<T> : BaseAuditableEntity<Guid>, IAggregateRoot, 
     /// </summary>
     /// <param name="deactivatedOn"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Deactivate(Instant deactivatedOn)
+    public virtual Result Deactivate(Instant deactivatedOn)
     {
         if (IsActive)
         {
-            // TODO is there logic that would prevent deactivation?
             IsActive = false;
             AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));
         }
@@ -80,4 +77,13 @@ public abstract class Connector<T> : BaseAuditableEntity<Guid>, IAggregateRoot, 
     }
 
     public abstract void ValidateConfiguration();
+}
+
+public abstract class Connector<T> : Connector
+{
+    public T? Configuration 
+    { 
+        get => ConfigurationString is null ? default : JsonSerializer.Deserialize<T>(ConfigurationString);
+        protected set => ConfigurationString = JsonSerializer.Serialize(value); 
+    }
 }

@@ -26,3 +26,25 @@ erDiagram
 The following diagram shows the high-level architecture:
 
 ![architecture](./app-integration-architecture.drawio.svg)
+
+# Available Connectors
+- [Azure DevOps Boards](#azure-devops-boards)
+
+## Azure DevOps Boards
+The Azure DevOps Boards connector enables Moda to connect and retrieve data for the areas below and sychronize the it.  This sychronization is one-way.
+- Projects
+- Areas
+- Iterations
+- Work Items
+- Work Item Types
+
+### Configuration
+The information required to configure the connector is:
+- Organization - this is the Azure DevOps Organization name.
+- PersonalAccessToken - this is the token that enables Moda to connect into an instance of Azure DevOps and read work item data.
+  - The required access for the token within Azure DevOps is
+    | Scope | Access |
+    |--|--|
+    | Work Items | Read |
+
+A tenant may have multiple Azure DevOps Boards connectors, but each connector must have a unique Organization.  Put differently, each Azure DevOps Organization can only be linked by one connector.

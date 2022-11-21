@@ -24,6 +24,8 @@ public static class ApplicationResource
     public const string Roles = nameof(Roles);
     public const string RoleClaims = nameof(RoleClaims);
 
+    public const string Connectors = nameof(Connectors);
+
     public const string Employees = nameof(Employees);
 
     public const string Workspaces = nameof(Workspaces);
@@ -56,6 +58,14 @@ public static class ApplicationPermissions
         new("Update RoleClaims", ApplicationAction.Update, ApplicationResource.RoleClaims)
     };
 
+    private static readonly ApplicationPermission[] _appIntegration = new ApplicationPermission[]
+    {
+        new("View Connectors", ApplicationAction.View, ApplicationResource.Connectors),
+        new("Create Connectors", ApplicationAction.Create, ApplicationResource.Connectors),
+        new("Update Connectors", ApplicationAction.Update, ApplicationResource.Connectors),
+        new("Delete Connectors", ApplicationAction.Delete, ApplicationResource.Connectors),
+    };
+
     private static readonly ApplicationPermission[] _organization = new ApplicationPermission[]
     {
         new("View Employees", ApplicationAction.View, ApplicationResource.Employees),
@@ -81,6 +91,7 @@ public static class ApplicationPermissions
 
     private static readonly ApplicationPermission[] _all = _common
         .Union(_identity)
+        .Union(_appIntegration)
         .Union(_organization)
         .Union(_work)
         .ToArray();

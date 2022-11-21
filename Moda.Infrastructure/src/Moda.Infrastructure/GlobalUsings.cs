@@ -1,4 +1,6 @@
-﻿global using Moda.Common.Application.Auditing;
+﻿global using Moda.AppIntegration.Application.Persistence;
+global using Moda.AppIntegration.Domain.Models;
+global using Moda.Common.Application.Auditing;
 global using Moda.Common.Application.Events;
 global using Moda.Common.Application.Exceptions;
 global using Moda.Common.Application.Identity.Roles;
@@ -27,4 +29,5 @@ global using Moda.Infrastructure.Persistence.Initialization;
 global using Moda.Infrastructure.SecurityHeaders;
 global using Moda.Organization.Application.People.Commands;
 global using Moda.Organization.Application.People.Queries;
+global using Moda.Organization.Application.Persistence;
 global using Moda.Organization.Domain.Models;

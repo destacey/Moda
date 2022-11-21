@@ -1,6 +1,7 @@
 using System.Reflection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Moda.AppIntegration.Application;
 using Moda.Common.Application;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
@@ -33,6 +34,7 @@ try
     builder.Services.AddCommonApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddOrganizationApplication();
+    builder.Services.AddAppIntegrationApplication();
 
     var app = builder.Build();
 
