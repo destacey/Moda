@@ -93,7 +93,7 @@ internal sealed class UpdateAzureDevOpsBoardsConnectorConfigurationCommandHandle
                 var requestName = request.GetType().Name;
                 _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
                 return Result.Failure<Guid>(updateResult.Error);
-            };
+            }
 
             await _appIntegrationDbContext.SaveChangesAsync(cancellationToken);
 
