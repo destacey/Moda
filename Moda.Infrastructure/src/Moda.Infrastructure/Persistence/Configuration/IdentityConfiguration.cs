@@ -9,6 +9,8 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
         builder.ToTable("Users", SchemaNames.Identity);
+        
+        builder.HasIndex(u => u.Id);
 
         builder.Property(u => u.ObjectId).HasMaxLength(256);
 

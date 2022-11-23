@@ -13,7 +13,9 @@ public class LoggingBehavior<TRequest> : IRequestPreProcessor<TRequest> where TR
         _currentUser = currentUser;
     }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     public async Task Process(TRequest request, CancellationToken cancellationToken)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     {
         var requestName = typeof(TRequest).Name;
         var userId = _currentUser.GetUserId().ToString();

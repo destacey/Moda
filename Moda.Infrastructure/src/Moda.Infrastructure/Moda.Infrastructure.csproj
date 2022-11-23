@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hangfire" Version="1.7.31" />
+    <PackageReference Include="Hangfire" Version="1.7.32" />
     <PackageReference Include="Hangfire.Console" Version="1.4.2" />
     <PackageReference Include="Hangfire.Console.Extensions" Version="1.0.5" />
     <PackageReference Include="Hangfire.Dashboard.Basic.Authentication" Version="5.0.0" />
@@ -31,8 +31,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="1.25.6" />
-    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.25.6" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="1.25.8" />
+    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.25.8" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NodaTime" Version="3.1.5" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.18.0" />
@@ -52,6 +52,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Moda.AppIntegration\src\Moda.AppIntegration.Application\Moda.AppIntegration.Application.csproj" />
+    <ProjectReference Include="..\..\..\Moda.AppIntegration\src\Moda.AppIntegration.Domain\Moda.AppIntegration.Domain.csproj" />
     <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
     <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
     <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />

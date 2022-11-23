@@ -7,19 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CSharpFunctionalExtensions" Version="2.37.0" />
-        <PackageReference Include="FluentValidation" Version="11.3.0" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.3.0" />
         <PackageReference Include="Mapster" Version="7.3.0" />
         <PackageReference Include="MediatR" Version="11.1.0" />
         <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="7.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
-        <PackageReference Include="NodaTime" Version="3.1.5" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Moda.Common.Domain\Moda.Common.Domain.csproj" />
+        <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
+        <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
+        <ProjectReference Include="..\Moda.AppIntegration.Domain\Moda.AppIntegration.Domain.csproj" />
     </ItemGroup>
 
 </Project>

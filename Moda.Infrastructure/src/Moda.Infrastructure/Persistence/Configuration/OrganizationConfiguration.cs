@@ -8,11 +8,11 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
     public void Configure(EntityTypeBuilder<Employee> builder)
     {
         builder.ToTable("Employees", SchemaNames.Organization);
-
-
+        
         builder.HasKey(e => e.Id);
         builder.HasAlternateKey(e => e.LocalId);
-
+        
+        builder.HasIndex(e => e.Id);
         builder.HasIndex(e => e.EmployeeNumber)
             .IsUnique()
             .IncludeProperties(e => new { e.Id });
