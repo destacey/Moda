@@ -17,7 +17,7 @@ public class ConnectorsController : VersionNeutralApiController
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Connectors)]
     [OpenApiOperation("Get a list of all connectors.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IReadOnlyList<ConnectionListDto>>> GetList(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ConnectorListDto>>> GetList(CancellationToken cancellationToken)
     {
         var connectors = await _sender.Send(new GetConnectorsQuery(), cancellationToken);
         return Ok(connectors.OrderBy(c => c.Name));
