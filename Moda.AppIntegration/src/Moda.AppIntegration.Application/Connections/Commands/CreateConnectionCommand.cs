@@ -3,14 +3,14 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
-namespace Moda.AppIntegration.Application.Connectors.Commands;
-public sealed record CreateConnectorCommand : ICommand<Guid>
+namespace Moda.AppIntegration.Application.Connections.Commands;
+public sealed record CreateConnectionCommand : ICommand<Guid>
 {
-    public CreateConnectorCommand(string name, string? description, ConnectorType type)
+    public CreateConnectionCommand(string name, string? description, Connector connector)
     {
         Name = name;
         Description = description;
-        Type = type;
+        Connector = connector;
     }
 
     /// <summary>Gets or sets the name of the connector.</summary>
@@ -23,12 +23,12 @@ public sealed record CreateConnectorCommand : ICommand<Guid>
 
     /// <summary>Gets the type of connector.  This value cannot change.</summary>
     /// <value>The type of connector.</value>
-    public ConnectorType Type { get; }
+    public Connector Connector { get; }
 }
 
-public sealed class CreateConnectorCommandValidator : CustomValidator<CreateConnectorCommand>
+public sealed class CreateConnectionCommandValidator : CustomValidator<CreateConnectionCommand>
 {
-    public CreateConnectorCommandValidator()
+    public CreateConnectionCommandValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -41,40 +41,40 @@ public sealed class CreateConnectorCommandValidator : CustomValidator<CreateConn
     }
 }
 
-internal sealed class CreateConnectorCommandHandler : ICommandHandler<CreateConnectorCommand, Guid>
+internal sealed class CreateConnectionCommandHandler : ICommandHandler<CreateConnectionCommand, Guid>
 {
     private readonly IAppIntegrationDbContext _appIntegrationDbContext;
     private readonly IDateTimeService _dateTimeService;
-    private readonly ILogger<CreateConnectorCommandHandler> _logger;
+    private readonly ILogger<CreateConnectionCommandHandler> _logger;
 
-    public CreateConnectorCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeService dateTimeService, ILogger<CreateConnectorCommandHandler> logger)
+    public CreateConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeService dateTimeService, ILogger<CreateConnectionCommandHandler> logger)
     {
         _appIntegrationDbContext = appIntegrationDbContext;
         _dateTimeService = dateTimeService;
         _logger = logger;
     }
 
-    public async Task<Result<Guid>> Handle(CreateConnectorCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateConnectionCommand request, CancellationToken cancellationToken)
     {
         try
         {
             Instant timestamp = _dateTimeService.Now;
-            Connector connector;
+            Connection connection;
 
-            switch (request.Type)
+            switch (request.Connector)
             {
-                case ConnectorType.AzureDevOpsBoards:
-                    connector = AzureDevOpsBoardsConnector.Create(request.Name, request.Description, timestamp);
+                case Connector.AzureDevOpsBoards:
+                    connection = AzureDevOpsBoardsConnection.Create(request.Name, request.Description, timestamp);
                     break;
                 default:
-                    return Result.Failure<Guid>($"Connector type '{request.Type}' is not supported.");
+                    return Result.Failure<Guid>($"Connector '{request.Connector}' is not supported.");
             }
 
-            await _appIntegrationDbContext.Connectors.AddAsync(connector, cancellationToken);
+            await _appIntegrationDbContext.Connections.AddAsync(connection, cancellationToken);
 
             await _appIntegrationDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(connector.Id);
+            return Result.Success(connection.Id);
         }
         catch (Exception ex)
         {

@@ -1,12 +1,12 @@
 ﻿namespace Moda.AppIntegration.Domain.Models;
-public sealed class AzureDevOpsBoardsConnector : Connector<AzureDevOpsBoardsConnectorConfiguration>
+public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsConnectionConfiguration>
 {
-    private AzureDevOpsBoardsConnector() : base() { }
-    private AzureDevOpsBoardsConnector(string name, string? description)
+    private AzureDevOpsBoardsConnection() : base() { }
+    private AzureDevOpsBoardsConnection(string name, string? description)
     {
         Name = name;
         Description = description;
-        Type = ConnectorType.AzureDevOpsBoards;
+        Connector = Connector.AzureDevOpsBoards;
     }
 
     public Result Update(string name, string? description, Instant timestamp)
@@ -28,7 +28,7 @@ public sealed class AzureDevOpsBoardsConnector : Connector<AzureDevOpsBoardsConn
         }
     }
 
-    public Result UpdateConfiguration(AzureDevOpsBoardsConnectorConfiguration? configuration, Instant timestamp)
+    public Result UpdateConfiguration(AzureDevOpsBoardsConnectionConfiguration? configuration, Instant timestamp)
     {
         try
         {
@@ -51,9 +51,9 @@ public sealed class AzureDevOpsBoardsConnector : Connector<AzureDevOpsBoardsConn
         IsValidConfiguration = Configuration?.IsValid() ?? false;
     }
 
-    public static AzureDevOpsBoardsConnector Create(string name, string? description, Instant timestamp)
+    public static AzureDevOpsBoardsConnection Create(string name, string? description, Instant timestamp)
     {
-        var connector = new AzureDevOpsBoardsConnector(name, description);
+        var connector = new AzureDevOpsBoardsConnection(name, description);
         connector.AddDomainEvent(EntityCreatedEvent.WithEntity(connector, timestamp));
         return connector;
     }

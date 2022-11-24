@@ -3,6 +3,6 @@
 namespace Moda.AppIntegration.Application.Persistence;
 public interface IAppIntegrationDbContext : IModaDbContext
 {
-    DbSet<Connector> Connectors { get; }
-    DbSet<AzureDevOpsBoardsConnector> AzureDevOpsBoardsConnectors { get; }
+    DbSet<Connection> Connections { get; }
+    DbSet<AzureDevOpsBoardsConnection> AzureDevOpsBoardsConnections { get; }
 }

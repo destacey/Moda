@@ -24,6 +24,7 @@ public static class ApplicationResource
     public const string Roles = nameof(Roles);
     public const string RoleClaims = nameof(RoleClaims);
 
+    public const string Connections = nameof(Connections);
     public const string Connectors = nameof(Connectors);
 
     public const string Employees = nameof(Employees);
@@ -60,6 +61,10 @@ public static class ApplicationPermissions
 
     private static readonly ApplicationPermission[] _appIntegration = new ApplicationPermission[]
     {
+        new("View Connections", ApplicationAction.View, ApplicationResource.Connections),
+        new("Create Connections", ApplicationAction.Create, ApplicationResource.Connections),
+        new("Update Connections", ApplicationAction.Update, ApplicationResource.Connections),
+        new("Delete Connections", ApplicationAction.Delete, ApplicationResource.Connections),
         new("View Connectors", ApplicationAction.View, ApplicationResource.Connectors),
         new("Create Connectors", ApplicationAction.Create, ApplicationResource.Connectors),
         new("Update Connectors", ApplicationAction.Update, ApplicationResource.Connectors),

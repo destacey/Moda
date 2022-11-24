@@ -1,9 +1,9 @@
-﻿namespace Moda.AppIntegration.Application.Connectors.Dtos;
-public sealed record AzureDevOpsBoardsConnectorConfigurationDto
+﻿namespace Moda.AppIntegration.Application.Connections.Dtos;
+public sealed record AzureDevOpsBoardsConnectionConfigurationDto
 {
-    /// <summary>Gets the connector identifier.</summary>
-    /// <value>The connector identifier.</value>
-    public Guid ConnectorId { get; set; }
+    /// <summary>Gets the connection identifier.</summary>
+    /// <value>The connection identifier.</value>
+    public Guid ConnectionId { get; set; }
 
     /// <summary>Gets the organization.</summary>
     /// <value>The Azure DevOps Organization name.</value>

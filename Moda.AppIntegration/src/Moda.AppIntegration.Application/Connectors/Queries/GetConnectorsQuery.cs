@@ -1,38 +1,20 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿
 
 namespace Moda.AppIntegration.Application.Connectors.Queries;
-public sealed record GetConnectorsQuery : IQuery<IReadOnlyList<ConnectorListDto>>
-{
-    public GetConnectorsQuery(bool includeInactive = false, ConnectorType? type = null)
-    {
-        IncludeInactive = includeInactive;
-        Type = type;
-    }
 
-    public bool IncludeInactive { get; }
-    public ConnectorType? Type { get; }
-}
+public sealed record GetConnectorsQuery : IQuery<IReadOnlyList<ConnectorListDto>> { }
 
 internal sealed class GetConnectorsQueryHandler : IQueryHandler<GetConnectorsQuery, IReadOnlyList<ConnectorListDto>>
 {
-    private readonly IAppIntegrationDbContext _appIntegrationDbContext;
-
-    public GetConnectorsQueryHandler(IAppIntegrationDbContext appIntegrationDbContext)
+    public Task<IReadOnlyList<ConnectorListDto>> Handle(GetConnectorsQuery request, CancellationToken cancellationToken)
     {
-        _appIntegrationDbContext = appIntegrationDbContext;
-    }
+        IReadOnlyList<ConnectorListDto> values = Enum.GetValues<Connector>().Select(c => new ConnectorListDto
+        {
+            Id = (int)c,
+            Name = c.GetDisplayName(),
+            Description = c.GetDisplayDescription()
+        }).ToList();
 
-    public async Task<IReadOnlyList<ConnectorListDto>> Handle(GetConnectorsQuery request, CancellationToken cancellationToken)
-    {
-        var query = _appIntegrationDbContext.Connectors.AsQueryable();
-
-        if (!request.IncludeInactive)
-            query = query.Where(c => c.IsActive);
-
-        if (request.Type.HasValue)
-            query = query.Where(c => c.Type == request.Type.Value);
-
-        return await query.ProjectToType<ConnectorListDto>().ToListAsync(cancellationToken);
+        return Task.FromResult(values);
     }
 }

@@ -1,9 +1,9 @@
 ﻿namespace Moda.AppIntegration.Domain.Models;
-public sealed record AzureDevOpsBoardsConnectorConfiguration
+public sealed record AzureDevOpsBoardsConnectionConfiguration
 {
     private readonly string _baseUrl = "https://dev.azure.com";
-    private AzureDevOpsBoardsConnectorConfiguration() { }
-    public AzureDevOpsBoardsConnectorConfiguration(string? organization, string? personalAccessToken)
+    private AzureDevOpsBoardsConnectionConfiguration() { }
+    public AzureDevOpsBoardsConnectionConfiguration(string? organization, string? personalAccessToken)
     {
         Organization = organization?.Trim();
         PersonalAccessToken = personalAccessToken?.Trim();
