@@ -16,9 +16,9 @@ public class EmployeesController : VersionNeutralApiController
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
     [OpenApiOperation("Get a list of all employees.", "")]
     //[ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Get))] // TODO not working
-    public async Task<ActionResult<IReadOnlyList<EmployeeListDto>>> GetList(CancellationToken cancellationToken, bool includeDisabled = false)
+    public async Task<ActionResult<IReadOnlyList<EmployeeListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
-        var employees = await _sender.Send(new GetEmployeesQuery(includeDisabled), cancellationToken);
+        var employees = await _sender.Send(new GetEmployeesQuery(includeInactive), cancellationToken);
         return Ok(employees.OrderBy(e => e.LastName));
     }
 

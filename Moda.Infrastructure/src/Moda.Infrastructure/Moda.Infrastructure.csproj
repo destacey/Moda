@@ -58,6 +58,7 @@
     <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
     <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
     <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Domain\Moda.Organization.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Moda.Work\src\Moda.Work.Application\Moda.Work.Application.csproj" />
     <ProjectReference Include="..\..\..\Moda.Work\src\Moda.Work.Domain\Moda.Work.Domain.csproj" />
   </ItemGroup>
 

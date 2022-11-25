@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 namespace Moda.Organization.Application.Employees.Queries;
 public sealed record GetEmployeesQuery : IQuery<IReadOnlyList<EmployeeListDto>>
 {
-    public GetEmployeesQuery(bool includeDisabled = false)
+    public GetEmployeesQuery(bool includeInactive = false)
     {
-        IncludeDisabled = includeDisabled;
+        IncludeInactive = includeInactive;
     }
 
-    public bool IncludeDisabled { get; }
+    public bool IncludeInactive { get; }
 }
 
 internal sealed class GetEmployeesQueryHandler : IQueryHandler<GetEmployeesQuery, IReadOnlyList<EmployeeListDto>>
@@ -25,7 +25,7 @@ internal sealed class GetEmployeesQueryHandler : IQueryHandler<GetEmployeesQuery
     {
         var query = _organizationDbContext.Employees.AsQueryable();
 
-        if (!request.IncludeDisabled)
+        if (!request.IncludeInactive)
             query = query.Where(e => e.IsActive);
 
         return await query.ProjectToType<EmployeeListDto>().ToListAsync(cancellationToken);

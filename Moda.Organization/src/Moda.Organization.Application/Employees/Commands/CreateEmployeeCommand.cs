@@ -20,7 +20,7 @@ public sealed record CreateEmployeeCommand : ICommand<int>
 
     /// <summary>Gets the employee name.</summary>
     /// <value>The employee name.</value>
-    public PersonName Name { get; } = null!;
+    public PersonName Name { get; }
 
     /// <summary>Gets the employee identifier.</summary>
     /// <value>The employee identifier.</value>
@@ -32,7 +32,7 @@ public sealed record CreateEmployeeCommand : ICommand<int>
 
     /// <summary>Gets the email.</summary>
     /// <value>The email.</value>
-    public EmailAddress Email { get; } = null!;
+    public EmailAddress Email { get; }
 
     /// <summary>Gets the job title.</summary>
     /// <value>The job title.</value>
