@@ -3,10 +3,10 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Moda.AppIntegration.Application.Connectors.Commands;
-public sealed record UpdateAzureDevOpsBoardsConnectorConfigurationCommand : ICommand<Guid>
+namespace Moda.AppIntegration.Application.Connections.Commands;
+public sealed record UpdateAzureDevOpsBoardsConnectionConfigurationCommand : ICommand<Guid>
 {
-    public UpdateAzureDevOpsBoardsConnectorConfigurationCommand(Guid id, string? organization, string? personalAccessToken)
+    public UpdateAzureDevOpsBoardsConnectionConfigurationCommand(Guid id, string? organization, string? personalAccessToken)
     {
         Id = id;
         Organization = organization;
@@ -26,11 +26,11 @@ public sealed record UpdateAzureDevOpsBoardsConnectorConfigurationCommand : ICom
     public string? PersonalAccessToken { get; }
 }
 
-public sealed class UpdateAzureDevOpsBoardsConnectorConfigurationCommandValidator : CustomValidator<UpdateAzureDevOpsBoardsConnectorConfigurationCommand>
+public sealed class UpdateAzureDevOpsBoardsConnectionConfigurationCommandValidator : CustomValidator<UpdateAzureDevOpsBoardsConnectionConfigurationCommand>
 {
     private readonly IAppIntegrationDbContext _appIntegrationDbContext;
 
-    public UpdateAzureDevOpsBoardsConnectorConfigurationCommandValidator(IAppIntegrationDbContext appIntegrationDbContext)
+    public UpdateAzureDevOpsBoardsConnectionConfigurationCommandValidator(IAppIntegrationDbContext appIntegrationDbContext)
     {
         _appIntegrationDbContext = appIntegrationDbContext;
         
@@ -38,7 +38,7 @@ public sealed class UpdateAzureDevOpsBoardsConnectorConfigurationCommandValidato
 
         RuleFor(c => c.Organization)
             .MaximumLength(256)
-            .MustAsync(async (cmd, organization, cancellationToken) => await BeUniqueOrganization(cmd.Id, organization, cancellationToken)).WithMessage("The organization for this connector already exists.");
+            .MustAsync(async (cmd, organization, cancellationToken) => await BeUniqueOrganization(cmd.Id, organization, cancellationToken)).WithMessage("The organization for this connection already exists.");
 
         RuleFor(c => c.PersonalAccessToken)
             .MaximumLength(256);
@@ -49,46 +49,46 @@ public sealed class UpdateAzureDevOpsBoardsConnectorConfigurationCommandValidato
         if (string.IsNullOrWhiteSpace(organization))
             return true;
         
-        var connectors = await _appIntegrationDbContext.AzureDevOpsBoardsConnectors
+        var connections = await _appIntegrationDbContext.AzureDevOpsBoardsConnections
             .Where(c => c.Id != id && !string.IsNullOrWhiteSpace(c.ConfigurationString))
             .ToListAsync(cancellationToken);
         
-        return connectors
+        return connections
             .Where(c => c.Configuration is not null && !string.IsNullOrWhiteSpace(c.Configuration.Organization))
             .All(c => c.Configuration!.Organization != organization);
     }
 }
 
-internal sealed class UpdateAzureDevOpsBoardsConnectorConfigurationCommandHandler : ICommandHandler<UpdateAzureDevOpsBoardsConnectorConfigurationCommand, Guid>
+internal sealed class UpdateAzureDevOpsBoardsConnectionConfigurationCommandHandler : ICommandHandler<UpdateAzureDevOpsBoardsConnectionConfigurationCommand, Guid>
 {
     private readonly IAppIntegrationDbContext _appIntegrationDbContext;
     private readonly IDateTimeService _dateTimeService;
-    private readonly ILogger<UpdateAzureDevOpsBoardsConnectorConfigurationCommandHandler> _logger;
+    private readonly ILogger<UpdateAzureDevOpsBoardsConnectionConfigurationCommandHandler> _logger;
 
-    public UpdateAzureDevOpsBoardsConnectorConfigurationCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeService dateTimeService, ILogger<UpdateAzureDevOpsBoardsConnectorConfigurationCommandHandler> logger)
+    public UpdateAzureDevOpsBoardsConnectionConfigurationCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeService dateTimeService, ILogger<UpdateAzureDevOpsBoardsConnectionConfigurationCommandHandler> logger)
     {
         _appIntegrationDbContext = appIntegrationDbContext;
         _dateTimeService = dateTimeService;
         _logger = logger;
     }
 
-    public async Task<Result<Guid>> Handle(UpdateAzureDevOpsBoardsConnectorConfigurationCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(UpdateAzureDevOpsBoardsConnectionConfigurationCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var connector = await _appIntegrationDbContext.AzureDevOpsBoardsConnectors
+            var connection = await _appIntegrationDbContext.AzureDevOpsBoardsConnections
                 .FirstAsync(c => c.Id == request.Id, cancellationToken);
-            if (connector is null)
-                return Result.Failure<Guid>("Azure DevOps Boards Connector not found.");
+            if (connection is null)
+                return Result.Failure<Guid>("Azure DevOps Boards Connection not found.");
             
-            var config = new AzureDevOpsBoardsConnectorConfiguration(request.Organization, request.PersonalAccessToken);
+            var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, request.PersonalAccessToken);
             
-            var updateResult = connector.UpdateConfiguration(config, _dateTimeService.Now);
+            var updateResult = connection.UpdateConfiguration(config, _dateTimeService.Now);
             if (updateResult.IsFailure)
             {
                 // Reset the entity
-                await _appIntegrationDbContext.Entry(connector).ReloadAsync(cancellationToken);
-                connector.ClearDomainEvents();
+                await _appIntegrationDbContext.Entry(connection).ReloadAsync(cancellationToken);
+                connection.ClearDomainEvents();
 
                 var requestName = request.GetType().Name;
                 _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
@@ -97,7 +97,7 @@ internal sealed class UpdateAzureDevOpsBoardsConnectorConfigurationCommandHandle
 
             await _appIntegrationDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(connector.Id);
+            return Result.Success(connection.Id);
         }
         catch (Exception ex)
         {

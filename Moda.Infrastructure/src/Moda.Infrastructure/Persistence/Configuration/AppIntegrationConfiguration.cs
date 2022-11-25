@@ -4,28 +4,28 @@ using Moda.AppIntegration.Domain.Enums;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
-public class ConnectorConfig : IEntityTypeConfiguration<Connector>
+public class ConnectionConfig : IEntityTypeConfiguration<Connection>
 {
-    public void Configure(EntityTypeBuilder<Connector> builder)
+    public void Configure(EntityTypeBuilder<Connection> builder)
     {
-        builder.ToTable("Connectors", SchemaNames.AppIntegration);
+        builder.ToTable("Connections", SchemaNames.AppIntegration);
 
         builder.HasKey(c => c.Id);
-        builder.HasDiscriminator(c => c.Type)
-            .HasValue<AzureDevOpsBoardsConnector>(ConnectorType.AzureDevOpsBoards);
+        builder.HasDiscriminator(c => c.Connector)
+            .HasValue<AzureDevOpsBoardsConnection>(Connector.AzureDevOpsBoards);
 
         builder.HasIndex(c => c.Id);
-        builder.HasIndex(e => new { e.Type, e.IsActive })
+        builder.HasIndex(e => new { e.Connector, e.IsActive })
             .IncludeProperties(e => new { e.Id, e.Name });
         builder.HasIndex(c => c.IsActive);
         builder.HasIndex(c => c.IsDeleted);
         
         builder.Property(c => c.Name).IsRequired().HasMaxLength(256);
         builder.Property(c => c.Description).HasMaxLength(1024);
-        builder.Property(c => c.Type)
+        builder.Property(c => c.Connector)
             .HasConversion(
                 c => c.ToString(),
-                c => (ConnectorType)Enum.Parse(typeof(ConnectorType), c))
+                c => (Connector)Enum.Parse(typeof(Connector), c))
             .HasMaxLength(128);
         builder.Property(c => c.ConfigurationString);
         builder.Property(c => c.IsActive);
@@ -44,9 +44,9 @@ public class ConnectorConfig : IEntityTypeConfiguration<Connector>
     }
 }
 
-public class AzureDevOpsBoardsConnectorConfig : IEntityTypeConfiguration<AzureDevOpsBoardsConnector>
+public class AzureDevOpsBoardsConnectionConfig : IEntityTypeConfiguration<AzureDevOpsBoardsConnection>
 {
-    public void Configure(EntityTypeBuilder<AzureDevOpsBoardsConnector> builder)
+    public void Configure(EntityTypeBuilder<AzureDevOpsBoardsConnection> builder)
     {
         // Ignore
         builder.Ignore(c => c.Configuration);

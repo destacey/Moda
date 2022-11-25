@@ -1,4 +1,4 @@
-<svg host="65bd71144e" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="641px" height="201px" viewBox="-0.5 -0.5 641 201" content="&lt;mxfile&gt;&lt;diagram id=&quot;ZLghyxcoto4Z8Yjbi2y3&quot; name=&quot;Page-1&quot;&gt;7VZNj5swEP01XCvAkJDjhiRtD1UPOXR7tGAC1hobGRNgf30NmA8XsqrEtr0sFzxvZvDMe4PBQmFWfxY4T7/xGKjl2nFtoZPluo7te+rWIk2P7AO3BxJBYh00AVfyCkOmRksSQ2EESs6pJLkJRpwxiKSBYSF4ZYbdODV3zXECC+AaYbpEf5BYpj0a+PaEfwGSpMPOjq09GR6CNVCkOObVDEJnC4WCc9mvsjoE2pI38NLnXR54x8IEMPknCUGfcMe01L3pumQzNCt4yWJo420LHauUSLjmOGq9lZJXYanMqLIctdSPAyGhfliSMzaqJgR4BlI0KkQnDNQ0pllNRO88jaUzkt2BY6zFTcYnT/2rhaZgnQ53QcdXlggoCgWG/TARzoptHGFKEqbWFG6q9mNLFlGz9aRhydv4G6E05JSLbgN0OIThRTVxLKTgLzDzOPYeHaDN4EzOcLu7RkkW/K+o9FASz5TEW0ri7FYkGcEtkuwWZEOsXkZtMs7AZBdqIp9n65+tKJ98bZ1qrVFnNIPBVFHPc2OW1ZpTWmcNeb9RfumutygveCki3QbSBxcWCegov4faBt+URQDFktzN02gLyWgx90+vpQAFneD+Pd848O8wgTtzAoOVCXRXJvA9BtBfcKM+aHgbI3/xXR25+Q9U7RdUnT9OT9cL/t3xqczp56HzzX7B0PkX&lt;/diagram&gt;&lt;/mxfile&gt;">
+<svg host="65bd71144e" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="641px" height="201px" viewBox="-0.5 -0.5 641 201" content="&lt;mxfile&gt;&lt;diagram id=&quot;ZLghyxcoto4Z8Yjbi2y3&quot; name=&quot;Page-1&quot;&gt;7ZbBkpswDIafhmsHMCTkuCHJtodODzl0e/SAAp4amzEmwD59bTABl3SnM6Tdy3KJ9VmKpV/CiYPion0WuMy/8hSo47tp66CD4/ueGwbqQ5NuINvIH0AmSGqcJnAmrzBGGlqTFCrLUXJOJSltmHDGIJEWw0Lwxna7cGqfWuIMFuCcYLqk30kq84FGoTvxz0CyfDzZc81OgUdnA6ocp7yZIXR0UCw4l8OqaGOgWrxRlyHu9IfdW2ICmPybgGgIuGJam9pMXrIbixW8Zilof9dB+yYnEs4lTvRuo9qrWC4LqixPLZfnm5SuICS0M2TyeQZegBSdcjG7ozSdbTaT0JvAsHwmsj9qjE1zs9s3T/WrhZHgvhz+Qo4vLBNQVQrGwzBxUa2TCFOSMbWmcFGp77UwRI3Wk8GSa/8LoTTmlIv+ALTbxfFJ1bCvpOA/YbbjuVu0Ax3BmZxxt38e05HA7kiw7Ii3udORG1zTkc1CbEjVu2hMxhnY6kJL5Mts/UM35VNorENretQb3WgwldTL3JhFaXMK660x7jfJT/3zluQVr0ViykDm3sIiA+MVDkgX+GZbBFAsydW+jNaIjBZj//RaC1DoANdv5cqBf8AEbuwJjO5MoH9nAh8xgOFCG/V7htcp8g/f1Zs27yDVdiHV8ePyDKL/d3sqc/rr0O/N/oCh4y8=&lt;/diagram&gt;&lt;/mxfile&gt;">
     <defs/>
     <g>
         <rect x="0" y="0" width="640" height="200" fill="rgb(255, 255, 255)" stroke="rgb(0, 0, 0)" pointer-events="all"/>
@@ -9,13 +9,13 @@
                     <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-start; justify-content: unsafe flex-start; width: 158px; height: 1px; padding-top: 27px; margin-left: 22px;">
                         <div data-drawio-colors="color: #000000; " style="box-sizing: border-box; font-size: 0px; text-align: left;">
                             <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(0, 0, 0); line-height: 1.2; pointer-events: all; white-space: normal; overflow-wrap: normal;">
-                                Ingress Connections
+                                Ingress Connectors
                             </div>
                         </div>
                     </div>
                 </foreignObject>
                 <text x="22" y="39" fill="#000000" font-family="Helvetica" font-size="12px">
-                    Ingress Connections
+                    Ingress Connectors
                 </text>
             </switch>
         </g>
@@ -62,13 +62,13 @@
                     <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-start; justify-content: unsafe flex-start; width: 158px; height: 1px; padding-top: 27px; margin-left: 462px;">
                         <div data-drawio-colors="color: #000000; " style="box-sizing: border-box; font-size: 0px; text-align: left;">
                             <div style="display: inline-block; font-size: 12px; font-family: Helvetica; color: rgb(0, 0, 0); line-height: 1.2; pointer-events: all; white-space: normal; overflow-wrap: normal;">
-                                Egress Connections
+                                Egress Connectors
                             </div>
                         </div>
                     </div>
                 </foreignObject>
                 <text x="462" y="39" fill="#000000" font-family="Helvetica" font-size="12px">
-                    Egress Connections
+                    Egress Connectors
                 </text>
             </switch>
         </g>

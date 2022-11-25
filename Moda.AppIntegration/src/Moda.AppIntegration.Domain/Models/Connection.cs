@@ -1,13 +1,13 @@
 ﻿using System.Text.Json;
 
 namespace Moda.AppIntegration.Domain.Models;
-public abstract class Connector : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
+public abstract class Connection : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
 {
     private string _name = null!;
     private string? _description;
 
-    /// <summary>Gets or sets the name of the connector.</summary>
-    /// <value>The name of the connector.</value>
+    /// <summary>Gets or sets the name of the connection.</summary>
+    /// <value>The name of the connection.</value>
     public string Name
     {
         get => _name;
@@ -15,7 +15,7 @@ public abstract class Connector : BaseAuditableEntity<Guid>, IAggregateRoot, IAc
     }
 
     /// <summary>Gets or sets the description.</summary>
-    /// <value>The connector description.</value>
+    /// <value>The connection description.</value>
     public string? Description 
     { 
         get => _description;
@@ -24,12 +24,12 @@ public abstract class Connector : BaseAuditableEntity<Guid>, IAggregateRoot, IAc
 
     /// <summary>Gets the type of connector.  This value cannot change.</summary>
     /// <value>The type of connector.</value>
-    public ConnectorType Type { get; protected set; }
+    public Connector Connector { get; protected set; }
 
     public string? ConfigurationString { get; protected set; }
 
     /// <summary>
-    /// Indicates whether the connector is active or not.  Inactive connectors are not included in the synchronization process.
+    /// Indicates whether the connection is active or not.  Inactive connection are not included in the synchronization process.
     /// </summary>
     /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; protected set; } = true;
@@ -61,7 +61,7 @@ public abstract class Connector : BaseAuditableEntity<Guid>, IAggregateRoot, IAc
     }
 
     /// <summary>
-    /// The process for deactivating a connector.
+    /// The process for deactivating a connection.
     /// </summary>
     /// <param name="deactivatedOn"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
@@ -79,7 +79,7 @@ public abstract class Connector : BaseAuditableEntity<Guid>, IAggregateRoot, IAc
     public abstract void ValidateConfiguration();
 }
 
-public abstract class Connector<T> : Connector
+public abstract class Connection<T> : Connection
 {
     public T? Configuration 
     { 

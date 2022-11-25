@@ -12,8 +12,8 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizat
 
     #region IAppIntegration
 
-    public DbSet<Connector> Connectors => Set<Connector>();
-    public DbSet<AzureDevOpsBoardsConnector> AzureDevOpsBoardsConnectors => Set<AzureDevOpsBoardsConnector>();
+    public DbSet<Connection> Connections => Set<Connection>();
+    public DbSet<AzureDevOpsBoardsConnection> AzureDevOpsBoardsConnections => Set<AzureDevOpsBoardsConnection>();
 
     #endregion IAppIntegration
 

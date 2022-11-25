@@ -3,10 +3,10 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Moda.AppIntegration.Application.Connectors.Commands;
-public sealed record UpdateAzureDevOpsBoardsConnectorCommand : ICommand<Guid>
+namespace Moda.AppIntegration.Application.Connections.Commands;
+public sealed record UpdateAzureDevOpsBoardsConnectionCommand : ICommand<Guid>
 {
-    public UpdateAzureDevOpsBoardsConnectorCommand(Guid id, string name, string? description)
+    public UpdateAzureDevOpsBoardsConnectionCommand(Guid id, string name, string? description)
     {
         Id = id;
         Name = name;
@@ -17,18 +17,18 @@ public sealed record UpdateAzureDevOpsBoardsConnectorCommand : ICommand<Guid>
     /// <value>The identifier.</value>
     public Guid Id { get; }
 
-    /// <summary>Gets or sets the name of the connector.</summary>
-    /// <value>The name of the connector.</value>
+    /// <summary>Gets or sets the name of the connection.</summary>
+    /// <value>The name of the connection.</value>
     public string Name { get; }
 
     /// <summary>Gets or sets the description.</summary>
-    /// <value>The connector description.</value>
+    /// <value>The connection description.</value>
     public string? Description { get; }
 }
 
-public sealed class UpdateAzureDevOpsBoardsConnectorCommandValidator : CustomValidator<UpdateAzureDevOpsBoardsConnectorCommand>
+public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomValidator<UpdateAzureDevOpsBoardsConnectionCommand>
 {
-    public UpdateAzureDevOpsBoardsConnectorCommandValidator()
+    public UpdateAzureDevOpsBoardsConnectionCommandValidator()
     {        
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -41,34 +41,34 @@ public sealed class UpdateAzureDevOpsBoardsConnectorCommandValidator : CustomVal
     }
 }
 
-internal sealed class UpdateAzureDevOpsBoardsConnectorCommandHandler : ICommandHandler<UpdateAzureDevOpsBoardsConnectorCommand, Guid>
+internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommandHandler<UpdateAzureDevOpsBoardsConnectionCommand, Guid>
 {
     private readonly IAppIntegrationDbContext _appIntegrationDbContext;
     private readonly IDateTimeService _dateTimeService;
-    private readonly ILogger<UpdateAzureDevOpsBoardsConnectorCommandHandler> _logger;
+    private readonly ILogger<UpdateAzureDevOpsBoardsConnectionCommandHandler> _logger;
 
-    public UpdateAzureDevOpsBoardsConnectorCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeService dateTimeService, ILogger<UpdateAzureDevOpsBoardsConnectorCommandHandler> logger)
+    public UpdateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeService dateTimeService, ILogger<UpdateAzureDevOpsBoardsConnectionCommandHandler> logger)
     {
         _appIntegrationDbContext = appIntegrationDbContext;
         _dateTimeService = dateTimeService;
         _logger = logger;
     }
 
-    public async Task<Result<Guid>> Handle(UpdateAzureDevOpsBoardsConnectorCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(UpdateAzureDevOpsBoardsConnectionCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var connector = await _appIntegrationDbContext.AzureDevOpsBoardsConnectors
+            var connection = await _appIntegrationDbContext.AzureDevOpsBoardsConnections
                 .FirstAsync(c => c.Id == request.Id, cancellationToken);
-            if (connector is null)
-                return Result.Failure<Guid>("Azure DevOps Boards Connector not found.");
+            if (connection is null)
+                return Result.Failure<Guid>("Azure DevOps Boards connection not found.");
             
-            var updateResult = connector.Update(request.Name, request.Description, _dateTimeService.Now);
+            var updateResult = connection.Update(request.Name, request.Description, _dateTimeService.Now);
             if (updateResult.IsFailure)
             {
                 // Reset the entity
-                await _appIntegrationDbContext.Entry(connector).ReloadAsync(cancellationToken);
-                connector.ClearDomainEvents();
+                await _appIntegrationDbContext.Entry(connection).ReloadAsync(cancellationToken);
+                connection.ClearDomainEvents();
 
                 var requestName = request.GetType().Name;
                 _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
@@ -77,7 +77,7 @@ internal sealed class UpdateAzureDevOpsBoardsConnectorCommandHandler : ICommandH
 
             await _appIntegrationDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(connector.Id);
+            return Result.Success(connection.Id);
         }
         catch (Exception ex)
         {
