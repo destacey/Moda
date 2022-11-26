@@ -1,7 +1,7 @@
 ﻿using Mapster;
 
 namespace Moda.Organization.Application.Employees.Dtos;
-public sealed record EmployeeListDto : IRegister
+public sealed record EmployeeListDto : IMapFrom<Employee>
 {
     /// <summary>Gets the identifier.</summary>
     /// <value>The identifier.</value>

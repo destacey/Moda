@@ -1,7 +1,7 @@
 ﻿using Mapster;
 
 namespace Moda.Work.Application.WorkTypes.Dtos;
-public sealed record WorkTypeDto : IRegister
+public sealed record WorkTypeDto : IMapFrom<WorkType>
 {
     public int Id { get; set; }
 
@@ -16,9 +16,4 @@ public sealed record WorkTypeDto : IRegister
     /// <summary>Indicates whether the work type is active or not.</summary>
     /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; set; }
-
-    public void Register(TypeAdapterConfig config)
-    {
-        config.NewConfig<WorkType, WorkTypeDto>();
-    }
 }

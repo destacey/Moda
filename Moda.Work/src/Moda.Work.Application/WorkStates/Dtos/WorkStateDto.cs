@@ -1,7 +1,7 @@
 ﻿using Mapster;
 
 namespace Moda.Work.Application.WorkStates.Dtos;
-public sealed record WorkStateDto : IRegister
+public sealed record WorkStateDto : IMapFrom<WorkState>
 {
     public int Id { get; set; }
 
@@ -16,9 +16,4 @@ public sealed record WorkStateDto : IRegister
     /// <summary>Indicates whether the work state is active or not.</summary>
     /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; set; }
-
-    public void Register(TypeAdapterConfig config)
-    {
-        config.NewConfig<WorkState, WorkStateDto>();
-    }
 }
