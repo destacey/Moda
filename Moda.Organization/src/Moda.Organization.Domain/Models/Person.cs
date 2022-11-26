@@ -2,7 +2,7 @@
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
-public class Person : BaseEntity<Guid>, IAggregateRoot
+public class Person : BaseEntity<Guid>
 {
     private Person() { }
 

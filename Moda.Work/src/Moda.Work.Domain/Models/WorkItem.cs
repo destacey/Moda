@@ -1,6 +1,6 @@
 ﻿namespace Moda.Work.Domain.Models;
 
-public sealed class WorkItem : BaseAuditableEntity<Guid>, IAggregateRoot
+public sealed class WorkItem : BaseAuditableEntity<Guid>
 {
     private readonly List<WorkItemRevision> _history = new();
 

@@ -3,7 +3,7 @@ using CSharpFunctionalExtensions;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
-public sealed class Employee : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
+public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
 {
     private readonly List<Employee> _directReports = new();
 

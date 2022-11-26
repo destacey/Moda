@@ -4,7 +4,7 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-public sealed class WorkState : BaseAuditableEntity<int>, IAggregateRoot, IActivatable
+public sealed class WorkState : BaseAuditableEntity<int>, IActivatable
 {
     private string _name = null!;
     private string? _description;
