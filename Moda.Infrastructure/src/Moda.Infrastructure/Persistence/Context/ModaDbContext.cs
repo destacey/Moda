@@ -28,6 +28,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizat
     #region IWork
 
     public DbSet<WorkState> WorkStates => Set<WorkState>();
+    public DbSet<WorkType> WorkTypes => Set<WorkType>();
 
     #endregion IWork
 

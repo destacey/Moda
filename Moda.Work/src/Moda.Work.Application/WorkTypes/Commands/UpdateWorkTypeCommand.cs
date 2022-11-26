@@ -3,10 +3,10 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Moda.Work.Application.WorkStates.Commands;
-public sealed record UpdateWorkStateCommand : ICommand<int>
+namespace Moda.Work.Application.WorkTypes.Commands;
+public sealed record UpdateWorkTypeCommand : ICommand<int>
 {
-    public UpdateWorkStateCommand(int id, string? description)
+    public UpdateWorkTypeCommand(int id, string? description)
     {
         Id = id;
         Description = description;
@@ -14,14 +14,14 @@ public sealed record UpdateWorkStateCommand : ICommand<int>
 
     public int Id { get; }
 
-    /// <summary>The description of the work state.</summary>
+    /// <summary>The description of the work type.</summary>
     /// <value>The description.</value>
     public string? Description { get; }
 }
 
-public sealed class UpdateWorkStateCommandValidator : CustomValidator<UpdateWorkStateCommand>
+public sealed class UpdateWorkTypeCommandValidator : CustomValidator<UpdateWorkTypeCommand>
 {
-    public UpdateWorkStateCommandValidator()
+    public UpdateWorkTypeCommandValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -30,35 +30,35 @@ public sealed class UpdateWorkStateCommandValidator : CustomValidator<UpdateWork
     }
 }
 
-internal sealed class UpdateWorkStateCommandHandler : ICommandHandler<UpdateWorkStateCommand, int>
+internal sealed class UpdateWorkTypeCommandHandler : ICommandHandler<UpdateWorkTypeCommand, int>
 {
     private readonly IWorkDbContext _workDbContext;
     private readonly IDateTimeService _dateTimeService;
-    private readonly ILogger<UpdateWorkStateCommandHandler> _logger;
+    private readonly ILogger<UpdateWorkTypeCommandHandler> _logger;
 
-    public UpdateWorkStateCommandHandler(IWorkDbContext workDbContext, IDateTimeService dateTimeService, ILogger<UpdateWorkStateCommandHandler> logger)
+    public UpdateWorkTypeCommandHandler(IWorkDbContext workDbContext, IDateTimeService dateTimeService, ILogger<UpdateWorkTypeCommandHandler> logger)
     {
         _workDbContext = workDbContext;
         _dateTimeService = dateTimeService;
         _logger = logger;
     }
 
-    public async Task<Result<int>> Handle(UpdateWorkStateCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(UpdateWorkTypeCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var workState = await _workDbContext.WorkStates
+            var workType = await _workDbContext.WorkTypes
                 .FirstAsync(p => p.Id == request.Id, cancellationToken);
-            if (workState is null)
-                return Result.Failure<int>("Work State not found.");
+            if (workType is null)
+                return Result.Failure<int>("Work Type not found.");
 
-            var updateResult = workState.Update(request.Description, _dateTimeService.Now);
+            var updateResult = workType.Update(request.Description, _dateTimeService.Now);
 
             if (updateResult.IsFailure)
             {
                 // Reset the entity
-                await _workDbContext.Entry(workState).ReloadAsync(cancellationToken);
-                workState.ClearDomainEvents();
+                await _workDbContext.Entry(workType).ReloadAsync(cancellationToken);
+                workType.ClearDomainEvents();
 
                 var requestName = request.GetType().Name;
                 _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
@@ -67,7 +67,7 @@ internal sealed class UpdateWorkStateCommandHandler : ICommandHandler<UpdateWork
 
             await _workDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(workState.Id);
+            return Result.Success(workType.Id);
         }
         catch (Exception ex)
         {

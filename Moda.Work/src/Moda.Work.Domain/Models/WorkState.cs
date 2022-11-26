@@ -9,14 +9,22 @@ public sealed class WorkState : BaseAuditableEntity<int>, IAggregateRoot, IActiv
     private string _name = null!;
     private string? _description;
 
+    private WorkState() { }
+
+    private WorkState(string name, string? description)
+    {
+        Name = name;
+        Description = description;
+    }
+
     /// <summary>The name of the work state.  The name cannot be changed.</summary>
     /// <value>The name.</value>
     public string Name
     {
         get => _name;
-        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+        init => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
     }
-
+    
     /// <summary>The description of the work state.</summary>
     /// <value>The description.</value>
     public string? Description
@@ -81,13 +89,14 @@ public sealed class WorkState : BaseAuditableEntity<int>, IAggregateRoot, IActiv
         return Result.Success();
     }
 
+    /// <summary>Creates the work state.</summary>
+    /// <param name="name">The name.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="timestamp">The timestamp.</param>
+    /// <returns></returns>
     public static WorkState Create(string name, string? description, Instant timestamp)
     {
-        WorkState workState = new() 
-        {
-            Name = name,
-            Description = description
-        };
+        WorkState workState = new(name, description);
 
         workState.AddDomainEvent(EntityCreatedEvent.WithEntity(workState, timestamp));
         return workState;

@@ -4,29 +4,29 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
-namespace Moda.Work.Application.WorkStates.Commands;
-public sealed record CreateWorkStateCommand : ICommand<int>
+namespace Moda.Work.Application.WorkTypes.Commands;
+public sealed record CreateWorkTypeCommand : ICommand<int>
 {
-    public CreateWorkStateCommand(string name, string? description)
+    public CreateWorkTypeCommand(string name, string? description)
     {
         Name = name;
         Description = description;
     }
 
-    /// <summary>The name of the work state.  The name cannot be changed.</summary>
+    /// <summary>The name of the work type.  The name cannot be changed.</summary>
     /// <value>The name.</value>
     public string Name { get; }
 
-    /// <summary>The description of the work state.</summary>
+    /// <summary>The description of the work type.</summary>
     /// <value>The description.</value>
     public string? Description { get; }
 }
 
-public sealed class CreateWorkStateCommandValidator : CustomValidator<CreateWorkStateCommand>
+public sealed class CreateWorkTypeCommandValidator : CustomValidator<CreateWorkTypeCommand>
 {
     private readonly IWorkDbContext _workDbContext;
 
-    public CreateWorkStateCommandValidator(IWorkDbContext workDbContext)
+    public CreateWorkTypeCommandValidator(IWorkDbContext workDbContext)
     {
         _workDbContext = workDbContext;
         
@@ -35,7 +35,7 @@ public sealed class CreateWorkStateCommandValidator : CustomValidator<CreateWork
         RuleFor(c => c.Name)
             .NotEmpty()
             .MaximumLength(256)
-            .MustAsync(BeUniqueName).WithMessage("The work state already exists.");
+            .MustAsync(BeUniqueName).WithMessage("The work type already exists.");
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);
@@ -43,37 +43,37 @@ public sealed class CreateWorkStateCommandValidator : CustomValidator<CreateWork
 
     public async Task<bool> BeUniqueName(string name, CancellationToken cancellationToken)
     {
-        return await _workDbContext.WorkStates
+        return await _workDbContext.WorkTypes
             .AllAsync(e => e.Name != name, cancellationToken);
     }
 }
 
-internal sealed class CreateWorkStateCommandHandler : ICommandHandler<CreateWorkStateCommand, int>
+internal sealed class CreateWorkTypeCommandHandler : ICommandHandler<CreateWorkTypeCommand, int>
 {
     private readonly IWorkDbContext _workDbContext;
     private readonly IDateTimeService _dateTimeService;
-    private readonly ILogger<CreateWorkStateCommandHandler> _logger;
+    private readonly ILogger<CreateWorkTypeCommandHandler> _logger;
 
-    public CreateWorkStateCommandHandler(IWorkDbContext workDbContext, IDateTimeService dateTimeService, ILogger<CreateWorkStateCommandHandler> logger)
+    public CreateWorkTypeCommandHandler(IWorkDbContext workDbContext, IDateTimeService dateTimeService, ILogger<CreateWorkTypeCommandHandler> logger)
     {
         _workDbContext = workDbContext;
         _dateTimeService = dateTimeService;
         _logger = logger;
     }
 
-    public async Task<Result<int>> Handle(CreateWorkStateCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(CreateWorkTypeCommand request, CancellationToken cancellationToken)
     {
         try
         {
             Instant timestamp = _dateTimeService.Now;
 
-            var workState = WorkState.Create(request.Name, request.Description, timestamp);
+            var workType = WorkType.Create(request.Name, request.Description, timestamp);
 
-            await _workDbContext.WorkStates.AddAsync(workState, cancellationToken);
+            await _workDbContext.WorkTypes.AddAsync(workType, cancellationToken);
 
             await _workDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(workState.Id);
+            return Result.Success(workType.Id);
         }
         catch (Exception ex)
         {

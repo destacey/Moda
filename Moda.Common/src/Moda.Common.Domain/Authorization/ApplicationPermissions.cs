@@ -33,6 +33,7 @@ public static class ApplicationResource
     public const string WorkItems = nameof(WorkItems);
     public const string WorkStateCategories = nameof(WorkStateCategories);
     public const string WorkStates = nameof(WorkStates);
+    public const string WorkTypes = nameof(WorkTypes);
 }
 
 public static class ApplicationPermissions
@@ -100,6 +101,11 @@ public static class ApplicationPermissions
         new("Create WorkStates", ApplicationAction.Create, ApplicationResource.WorkStates),
         new("Update WorkStates", ApplicationAction.Update, ApplicationResource.WorkStates),
         new("Delete WorkStates", ApplicationAction.Delete, ApplicationResource.WorkStates),
+
+        new("View WorkTypes", ApplicationAction.View, ApplicationResource.WorkTypes, IsBasic: true),
+        new("Create WorkTypes", ApplicationAction.Create, ApplicationResource.WorkTypes),
+        new("Update WorkTypes", ApplicationAction.Update, ApplicationResource.WorkTypes),
+        new("Delete WorkTypes", ApplicationAction.Delete, ApplicationResource.WorkTypes),
     };
 
     private static readonly ApplicationPermission[] _all = _common

@@ -13,11 +13,11 @@ public sealed record GetWorkStatesQuery : IQuery<IReadOnlyList<WorkStateDto>>
     public bool IncludeInactive { get; }
 }
 
-internal sealed class GetEmployeesQueryHandler : IQueryHandler<GetWorkStatesQuery, IReadOnlyList<WorkStateDto>>
+internal sealed class GetWorkStatesQueryHandler : IQueryHandler<GetWorkStatesQuery, IReadOnlyList<WorkStateDto>>
 {
     private readonly IWorkDbContext _workDbContext;
 
-    public GetEmployeesQueryHandler(IWorkDbContext workDbContext)
+    public GetWorkStatesQueryHandler(IWorkDbContext workDbContext)
     {
         _workDbContext = workDbContext;
     }
