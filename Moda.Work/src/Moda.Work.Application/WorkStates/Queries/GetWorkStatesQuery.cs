@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Moda.Work.Application.WorkStates.Dtos;
 
 namespace Moda.Work.Application.WorkStates.Queries;
-public sealed record GetWorkStatesQuery : IQuery<IReadOnlyList<WorkStateListDto>>
+public sealed record GetWorkStatesQuery : IQuery<IReadOnlyList<WorkStateDto>>
 {
     public GetWorkStatesQuery(bool includeInactive = false)
     {
@@ -13,7 +13,7 @@ public sealed record GetWorkStatesQuery : IQuery<IReadOnlyList<WorkStateListDto>
     public bool IncludeInactive { get; }
 }
 
-internal sealed class GetEmployeesQueryHandler : IQueryHandler<GetWorkStatesQuery, IReadOnlyList<WorkStateListDto>>
+internal sealed class GetEmployeesQueryHandler : IQueryHandler<GetWorkStatesQuery, IReadOnlyList<WorkStateDto>>
 {
     private readonly IWorkDbContext _workDbContext;
 
@@ -22,13 +22,13 @@ internal sealed class GetEmployeesQueryHandler : IQueryHandler<GetWorkStatesQuer
         _workDbContext = workDbContext;
     }
 
-    public async Task<IReadOnlyList<WorkStateListDto>> Handle(GetWorkStatesQuery request, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<WorkStateDto>> Handle(GetWorkStatesQuery request, CancellationToken cancellationToken)
     {
         var query = _workDbContext.WorkStates.AsQueryable();
 
         if (!request.IncludeInactive)
             query = query.Where(e => e.IsActive);
 
-        return await query.ProjectToType<WorkStateListDto>().ToListAsync(cancellationToken);
+        return await query.ProjectToType<WorkStateDto>().ToListAsync(cancellationToken);
     }
 }

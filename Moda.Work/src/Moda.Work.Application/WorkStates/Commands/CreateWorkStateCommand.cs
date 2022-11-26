@@ -2,8 +2,6 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Moda.AppIntegration.Application.Persistence;
-using Moda.Common.Application.Validation;
 using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
@@ -37,7 +35,7 @@ public sealed class CreateWorkStateCommandValidator : CustomValidator<CreateWork
         RuleFor(c => c.Name)
             .NotEmpty()
             .MaximumLength(256)
-            .MustAsync(BeUniqueName).WithMessage("The work state already exists."); ;
+            .MustAsync(BeUniqueName).WithMessage("The work state already exists.");
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);

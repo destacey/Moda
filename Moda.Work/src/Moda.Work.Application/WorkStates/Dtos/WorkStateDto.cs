@@ -1,7 +1,7 @@
 ﻿using Mapster;
 
 namespace Moda.Work.Application.WorkStates.Dtos;
-public sealed record WorkStateListDto : IRegister
+public sealed record WorkStateDto : IRegister
 {
     public int Id { get; set; }
 
@@ -19,6 +19,6 @@ public sealed record WorkStateListDto : IRegister
 
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<WorkState, WorkStateListDto>();
+        config.NewConfig<WorkState, WorkStateDto>();
     }
 }
