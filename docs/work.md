@@ -8,6 +8,7 @@
 - [Work Process](#work-process)
 - [Work Process Configuration](#work-process-configuration)
 - [Work Type](#work-type)
+- [Backlog Category](#backlog-category)
 - [Backlog Level](#backlog-level)
 - [Workflow](#workflow)
 - [Workflow Configurtion](#workflow-configuration)
@@ -46,8 +47,19 @@ Represents the type of work item.  Examples:
 - Feature
 - Epic
 
+
+## Backlog Category
+An enum that enables the backlog levels to be defined in a hierarchy that is normalized across the organization.  This value also defines the functionality enabled for different backlog levels.
+- Portfolio - Portfolio backlogs provide a way to group related items into a hierarchical structure.  This is the only backlog category that allows multiple backlog levels.
+- Requirement - The requirement backlog category contains your base level work items.  These items are owned by a single team.
+- Task - The task backlog contains task work items that are owned and managed by a parent work item.  The parent work item is typically from the requirement backlog category.
+
 ## Backlog Level
-Allows the work types to be defined in a hierarchy that is normalized across the organization.
+Allows the work types to be defined in a hierarchy that is normalized across the organization.  The default levels are:
+- Portfolio
+- Product
+- Team
+- Task
 
 ## Workflow
 A workflow is a set of work states that define the different stages a work item must go through to be considered done.
