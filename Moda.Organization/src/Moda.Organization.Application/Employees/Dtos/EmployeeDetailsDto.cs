@@ -2,7 +2,7 @@
 using NodaTime;
 
 namespace Moda.Organization.Application.Employees.Dtos;
-public sealed record EmployeeDetailsDto : IRegister
+public sealed record EmployeeDetailsDto : IMapFrom<Employee>
 {
     /// <summary>Gets the identifier.</summary>
     /// <value>The identifier.</value>

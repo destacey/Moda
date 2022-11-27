@@ -7,6 +7,7 @@ using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
 using Moda.Organization.Application;
 using Moda.Web.Api.Configurations;
+using Moda.Work.Application;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Serilog;
@@ -34,6 +35,7 @@ try
     builder.Services.AddCommonApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddOrganizationApplication();
+    builder.Services.AddWorkApplication();
     builder.Services.AddAppIntegrationApplication();
 
     var app = builder.Build();

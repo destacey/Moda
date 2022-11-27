@@ -4,15 +4,15 @@ namespace Moda.Work.Domain.Enums;
 
 public enum WorkStateCategory
 {
-    [Display(Name = "To Do")]
-    ToDo = 0,
+    [Display(Name = "Proposed", Description = "The work has been proposed but not yet started.")]
+    Proposed = 0,
 
-    [Display(Name = "In Progress")]
-    InProgress = 1,
+    [Display(Name = "Active", Description = "The work is currently being performed.")]
+    Active = 1,
 
-    [Display(Name = "Done")]
+    [Display(Name = "Done", Description = "The work has been completed.")]
     Done = 2,
 
-    [Display(Name = "Removed")]
+    [Display(Name = "Removed", Description = "The work has been removed from the backlog without being completed.")]
     Removed = 3
 }

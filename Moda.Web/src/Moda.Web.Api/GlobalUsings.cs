@@ -20,4 +20,5 @@ global using Moda.Web.Api.Models.AppIntegrations.Connections;
 global using Moda.Web.Api.Models.Identity.Roles;
 global using Moda.Web.Api.Models.Identity.Users;
 global using Moda.Web.Api.Models.Organizations.Employees;
+global using Moda.Work.Application.WorkStates.Commands;
 global using NSwag.Annotations;

@@ -3,7 +3,7 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-public sealed class Workflow : BaseAuditableEntity<Guid>, IAggregateRoot, IActivatable
+public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
 {
     private readonly List<WorkflowConfiguration> _configurations = new();
 

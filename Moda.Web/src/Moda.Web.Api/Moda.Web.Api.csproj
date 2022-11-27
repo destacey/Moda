@@ -24,6 +24,8 @@
     <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
     <ProjectReference Include="..\..\..\Moda.Infrastructure\src\Moda.Infrastructure.Migrators.MSSQL\Moda.Infrastructure.Migrators.MSSQL.csproj" />
     <ProjectReference Include="..\..\..\Moda.Infrastructure\src\Moda.Infrastructure\Moda.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
+    <ProjectReference Include="..\..\..\Moda.Work\src\Moda.Work.Application\Moda.Work.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿using Mapster;
 
 namespace Moda.AppIntegration.Application.Connections.Dtos;
-public sealed record ConnectionListDto : IRegister
+public sealed record ConnectionListDto : IMapFrom<Connection>
 {
     /// <summary>Gets the identifier.</summary>
     /// <value>The identifier.</value>
