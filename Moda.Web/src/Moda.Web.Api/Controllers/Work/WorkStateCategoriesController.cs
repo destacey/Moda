@@ -21,6 +21,6 @@ public class WorkStateCategoriesController : VersionNeutralApiController
     public async Task<ActionResult<IReadOnlyList<ConnectorListDto>>> GetList(CancellationToken cancellationToken)
     {
         var categories = await _sender.Send(new GetWorkStateCategoriesQuery(), cancellationToken);
-        return Ok(categories.OrderBy(c => c.Name));
+        return Ok(categories.OrderBy(c => c.Order));
     }
 }

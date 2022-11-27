@@ -10,7 +10,8 @@ internal sealed class GetWorkStateCategoriesQueryHandler : IQueryHandler<GetWork
         {
             Id = (int)c,
             Name = c.GetDisplayName(),
-            Description = c.GetDisplayDescription()
+            Description = c.GetDisplayDescription(),
+            Order = c.GetDisplayOrder()
         }).ToList();
 
         return Task.FromResult(values);
