@@ -15,7 +15,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
   </ItemGroup>
 
   <ItemGroup>
