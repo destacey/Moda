@@ -100,32 +100,4 @@ The work state category is an enum that helps sort and normalize work states acr
 4. Removed - The work has been removed from the backlog without being completed.
 
 # ERD
-```mermaid
-erDiagram
-    Workspace ||--o{ WorkItem : owns
-    WorkItem ||--o{ Link : "has"
-    WorkItem ||--o{ WorkItemRevision : "has"
-    WorkItemRevision ||--o{ WorkItemRevisionChange : "has"
-    Link }o--|| WorkItem : "is"
-
-    WorkProcess ||--o{ Workspace : "is assigned to"
-    WorkProcess ||--o{ WorkProcessConfiguration : owns
-
-    WorkProcessConfiguration }o--|| WorkType : "is associated to"
-    WorkProcessConfiguration }o--|| BacklogLevel : "is associated to"
-    WorkProcessConfiguration }o--|| Workflow : "is associated to"
-
-    WorkProcessConfiguration ||--o{ WorkItem : "is assigned to"
-
-    WorkType ||--o{ WorkItem : "is assigned to"
-
-    BacklogLevel ||--o{ WorkItem : "is assigned to"
-
-    Workflow ||--o{ WorkflowConfiguration : owns
-    WorkflowConfiguration }o--|| WorkState : "is associated to"
-    WorkflowConfiguration }o--|| WorkStateCategory : "is associated to"
-
-    WorkState ||--o{ WorkItem : "is assigned to"
-
-    WorkStateCategory ||--o{ WorkItem : "is assigned to"
-```
+![work domain erd](/work-domain-erd.drawio.svg)
