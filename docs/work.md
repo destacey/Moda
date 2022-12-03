@@ -49,13 +49,13 @@ Represents the type of work item.  Examples:
 
 
 ## Backlog Category
-An enum that enables the backlog levels to be defined in a hierarchy that is normalized across the organization.  This value also defines the functionality enabled for different backlog levels.
+An enum that enables backlog levels to be grouped based on purpose and functionality and normalized across the organization.
 - Portfolio - Portfolio backlogs provide a way to group related items into a hierarchical structure.  This is the only backlog category that allows multiple backlog levels.
-- Requirement - The requirement backlog category contains your base level work items.  These items are owned by a single team.
+- Requirement - The requirement backlog category contains your base level work items.  These work items are owned by a single team and represent the actual work.
 - Task - The task backlog contains task work items that are owned and managed by a parent work item.  The parent work item is typically from the requirement backlog category.
 
 ## Backlog Level
-Allows the work types to be defined in a hierarchy that is normalized across the organization.  The default levels are:
+Allows work types to be grouped and defined in a hierarchy that is normalized across the organization.  The default levels are:
 - Portfolio
 - Product
 - Team
