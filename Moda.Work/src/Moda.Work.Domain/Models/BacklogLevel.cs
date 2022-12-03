@@ -1,54 +1,62 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-/// <summary>
-/// A backlog level helps abstract work types
-/// </summary>
-public sealed class BacklogLevel : BaseAuditableEntity<Guid>, IActivatable
+/// <summary>Allows work types to be grouped and defined in a hierarchy.</summary>
+/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Int32&gt;" />
+/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
+public sealed class BacklogLevel : BaseAuditableEntity<int>, IActivatable
 {
-    private BacklogLevel() { }
+    private string _name = null!;
+    private string? _description;
 
-    public BacklogLevel(string name, string? description, byte order)
+    private BacklogLevel() { }
+    
+    private BacklogLevel(string name, string? description, int rank)
     {
-        Name = name.Trim();
-        Description = description?.Trim();
-        Order = order;
+        Name = name;
+        Description = description;
+        Rank = rank;
+    }
+
+    /// <summary>The name of the backlog level.</summary>
+    /// <value>The name.</value>
+    public string Name
+    {
+        get => _name;
+        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    }
+
+    /// <summary>The description of the backlog level.</summary>
+    /// <value>The description.</value>
+    public string? Description
+    {
+        get => _description;
+        private set => _description = value?.Trim();
     }
 
     /// <summary>
-    /// The name of the backlog level.
+    /// The rank of the backlog level. The higher the number, the higher the level.
     /// </summary>
-    public string Name { get; private set; } = null!;
+    /// <value>The rank.</value>
+    public int Rank { get; private set; }
 
-    /// <summary>
-    /// The description of the backlog level.
-    /// </summary>
-    public string? Description { get; private set; }
-
-    /// <summary>
-    /// The order in which the backlog levels are displayed. The lower the number, the higher the level. 
-    /// The minimum value is 0 and the maximum value is 255.
-    /// </summary>
-    public byte Order { get; private set; }
-
-    /// <summary>
-    /// Indicates whether the backlog level is active or not.  
-    /// </summary>
+    /// <summary>Indicates whether the backlog level is active or not.</summary>
+    /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; private set; } = true;
 
-    /// <summary>
-    /// The process for updating the backlog level properties.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
+    /// <summary>The process for updating the backlog level properties.</summary>
+    /// <param name="name">The name.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="rank">The rank.</param>
     /// <returns></returns>
-    public Result Update(string name, string? description, byte order)
+    public Result Update(string name, string? description, int rank)
     {
-        Name = name.Trim();
-        Description = description?.Trim();
-        Order = order;
+        Name = name;
+        Description = description;
+        Rank = rank;
 
         return Result.Success();
     }
@@ -85,5 +93,19 @@ public sealed class BacklogLevel : BaseAuditableEntity<Guid>, IActivatable
         }
 
         return Result.Success();
+    }
+
+    /// <summary>Creates the specified BacklogLevel.</summary>
+    /// <param name="name">The name.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="rank">The rank.</param>
+    /// <param name="timestamp">The timestamp.</param>
+    /// <returns></returns>
+    public static BacklogLevel Create(string name, string? description, int rank, Instant timestamp)
+    {
+        BacklogLevel backlogLevel = new(name, description, rank);
+
+        backlogLevel.AddDomainEvent(EntityCreatedEvent.WithEntity(backlogLevel, timestamp));
+        return backlogLevel;
     }
 }

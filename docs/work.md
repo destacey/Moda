@@ -55,11 +55,7 @@ An enum that enables backlog levels to be grouped based on purpose and functiona
 - Task - The task backlog contains task work items that are owned and managed by a parent work item.  The parent work item is typically from the requirement backlog category.
 
 ## Backlog Level
-Allows work types to be grouped and defined in a hierarchy that is normalized across the organization.  The default levels are:
-- Portfolio
-- Product
-- Team
-- Task
+Allows work types to be grouped and defined in a hierarchy.
 
 ## Workflow
 A workflow is a set of work states that define the different stages a work item must go through to be considered done.
@@ -88,7 +84,7 @@ A workflow is a set of work states that define the different stages a work item 
 The workflow configuration links work states, work state categories, and the order to the workflow.
 
 ## Work State
-The name of the stage within the workflow.  Each work state can be used in many workflows.
+Represents the state within a workflow.  Each work state can be used in many workflows.
 
 The name of the work state cannot be changed.  A new name represents a new work state.
 

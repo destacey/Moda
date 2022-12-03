@@ -4,6 +4,11 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
+/// <summary>
+/// Represents the state within a workflow.
+/// </summary>
+/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Int32&gt;" />
+/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
 public sealed class WorkState : BaseAuditableEntity<int>, IActivatable
 {
     private string _name = null!;

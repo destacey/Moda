@@ -10,5 +10,8 @@ public enum BacklogCategory
     Requirement = 1,
 
     [Display(Name = "Task", Description = "The task backlog contains task work items that are owned and managed by a parent work item.  The parent work item is typically from the requirement backlog category.", Order = 3)]
-    Task = 2
+    Task = 2,
+
+    [Display(Name = "Issue", Description = "A problem or blocker that needs to be resolved.  Issues are a way to document a problem and do not represent the work to resolve it.  They are typically linked to other work items that represent the action taken.", Order = 4)]
+    Issue = 3
 }
