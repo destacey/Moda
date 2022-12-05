@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Moda.Work.Application.BacklogCategories.Queries;
+﻿using Moda.Work.Application.BacklogCategories.Queries;
 
 namespace Moda.Web.Api.Controllers.Work;
 

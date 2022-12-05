@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-namespace Moda.Web.Api.Controllers.Organizations;
+﻿namespace Moda.Web.Api.Controllers.Organizations;
 public class EmployeesController : VersionNeutralApiController
 {
     private readonly ILogger<EmployeesController> _logger;

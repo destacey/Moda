@@ -52,27 +52,36 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>, IActivatable
     /// <param name="description">The description.</param>
     /// <param name="rank">The rank.</param>
     /// <returns></returns>
-    public Result Update(string name, string? description, int rank)
+    public Result Update(string name, string? description, int rank, Instant timestamp)
     {
-        Name = name;
-        Description = description;
-        Rank = rank;
+        try
+        {
+            Name = name;
+            Description = description;
+            Rank = rank;
 
-        return Result.Success();
+            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
     }
 
     /// <summary>
     /// The process for activating a backlog level.
     /// </summary>
-    /// <param name="activatedOn"></param>
+    /// <param name="timestamp"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Activate(Instant activatedOn)
+    public Result Activate(Instant timestamp)
     {
         if (!IsActive)
         {
             // TODO is there logic that would prevent activation?
             IsActive = true;
-            AddDomainEvent(EntityActivatedEvent.WithEntity(this, activatedOn));
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
@@ -81,15 +90,15 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>, IActivatable
     /// <summary>
     /// The process for deactivating a backlog level.
     /// </summary>
-    /// <param name="deactivatedOn"></param>
+    /// <param name="timestamp"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Deactivate(Instant deactivatedOn)
+    public Result Deactivate(Instant timestamp)
     {
         if (IsActive)
         {
             // TODO is there logic that would prevent deactivation?
             IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();

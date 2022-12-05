@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using FluentValidation.AspNetCore;
-using MediatR;
 
 namespace Moda.Web.Api.Controllers.Identity;
 

@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Moda.Work.Application.WorkStateCategories.Queries;
+﻿using Moda.Work.Application.WorkStateCategories.Queries;
 
 namespace Moda.Web.Api.Controllers.Work;
 

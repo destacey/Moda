@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
@@ -9,41 +10,54 @@ namespace Moda.Work.Domain.Models;
 /// </summary>
 public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
 {
+    private string _name = null!;
+    private string? _description;
+    
     private readonly List<WorkProcessConfiguration> _configurations = new();
     private readonly List<Workspace> _workspaces = new();
 
     private WorkProcess() { }
 
-    public WorkProcess(string name, string? description, Ownership ownership)
+    private WorkProcess(string name, string? description, Ownership ownership)
     {
-        Name = name.Trim();
-        Description = description?.Trim();
+        Name = name;
+        Description = description;
         Ownership = ownership;
     }
 
     /// <summary>
     /// The name of the work process.
     /// </summary>
-    public string Name { get; private set; } = null!;
+    public string Name
+    {
+        get => _name;
+        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    }
 
     /// <summary>
     /// The description of the work process.
     /// </summary>
-    public string? Description { get; private set; }
+    public string? Description
+    {
+        get => _description;
+        private set => _description = value?.Trim();
+    }
 
     /// <summary>
     /// Indicates whether the work process is owned by Moda or a third party system.  This value should not change.
     /// </summary>
-    public Ownership Ownership { get; }
+    /// <value>The ownership.</value>
+    public Ownership Ownership { get; init; }
 
     /// <summary>
-    /// Indicates whether the work process is active or not.  Only active work processes can be assigned 
+    /// Indicates whether the work process is active or not.  Only active work processes can be assigned
     /// to workspaces.  The default is false and the user should activate it after the configurations are complete.
     /// </summary>
+    /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; private set; } = false;
 
     public IReadOnlyCollection<WorkProcessConfiguration> Configurations => _configurations.AsReadOnly();
-
+    
     public IReadOnlyCollection<Workspace> Workspaces => _workspaces.AsReadOnly();
 
     /// <summary>
@@ -65,7 +79,7 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     }
 
     /// <summary>
-    /// The process for deactivating a work process.  Only work processes without assignments can be deactivated.
+    /// The process for deactivating a work process.  Only work processes without active assignments can be deactivated.
     /// </summary>
     /// <param name="deactivatedOn"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
@@ -75,8 +89,8 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
 
         if (IsActive)
         {
-            if (Workspaces.Any())
-                return Result.Failure("Unable to deactive with assigned workspaces.");
+            if (Workspaces.Any(w => w.IsActive))
+                return Result.Failure("Unable to deactive with active workspaces.");
 
             IsActive = false;
             AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));

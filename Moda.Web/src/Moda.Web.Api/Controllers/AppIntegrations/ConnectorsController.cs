@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-namespace Moda.Web.Api.Controllers.AppIntegrations;
+﻿namespace Moda.Web.Api.Controllers.AppIntegrations;
 
 public class ConnectorsController : VersionNeutralApiController
 {
