@@ -52,7 +52,7 @@ public sealed record CreateEmployeeRequest
     public CreateEmployeeCommand ToCreateEmployeeCommand()
     {
         PersonName personName = new(FirstName, MiddleName, LastName, Suffix, Title);
-        EmailAddress emailAddress = new(Email);
+        EmailAddress emailAddress = (EmailAddress)Email;
 
         return new CreateEmployeeCommand(personName, EmployeeNumber, HireDate, emailAddress, JobTitle, Department, ManagerId);
     }

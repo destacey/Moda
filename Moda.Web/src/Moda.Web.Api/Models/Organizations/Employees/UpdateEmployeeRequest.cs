@@ -56,7 +56,7 @@ public sealed record UpdateEmployeeRequest
     public UpdateEmployeeCommand ToUpdateEmployeeCommand()
     {
         PersonName personName = new(FirstName, MiddleName, LastName, Suffix, Title);
-        EmailAddress emailAddress = new(Email);
+        EmailAddress emailAddress = (EmailAddress)Email;
 
         return new UpdateEmployeeCommand(Id, personName, EmployeeNumber, HireDate, emailAddress, JobTitle, Department, ManagerId);
     }

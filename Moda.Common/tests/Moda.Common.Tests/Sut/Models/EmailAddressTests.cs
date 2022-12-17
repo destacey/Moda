@@ -12,7 +12,7 @@ public class EmailAddressTests
     {
         var result = new EmailAddress(input);
 
-        Assert.Equal(expected, result.Value);
+        Assert.Equal(expected, result);
     }
 
     [Fact]
@@ -75,10 +75,20 @@ public class EmailAddressTests
     }
 
     [Fact]
-    public void ToString_IsTheValue()
+    public void ImplicitOperatorString_IsTheValue()
     {
-        var result = new EmailAddress("test@test.com");
+        string input = "test@test.com";
+        string result = new EmailAddress(input);
 
-        Assert.Equal(result.ToString(), result.Value);
+        Assert.Equal(input, result);
+    }
+
+    [Fact]
+    public void ExplicitOperatorString_IsTheValue()
+    {
+        string input = "test@test.com";
+        EmailAddress result = (EmailAddress)input;        
+
+        Assert.Equal(input, result);
     }
 }
