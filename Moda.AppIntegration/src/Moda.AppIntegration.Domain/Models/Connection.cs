@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 
 namespace Moda.AppIntegration.Domain.Models;
-public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
+public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable<Instant>
 {
     private string _name = null!;
     private string? _description;
@@ -45,16 +45,16 @@ public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
     /// <summary>
     /// The process for activating a connector.
     /// </summary>
-    /// <param name="activatedOn"></param>
+    /// <param name="timestamp"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public virtual Result Activate(Instant activatedOn)
+    public virtual Result Activate(Instant timestamp)
     {
         if (!IsActive)
         {
             // Rules
             // AzDO Organization uniqueness is currently enforced by the command
             IsActive = true;
-            AddDomainEvent(EntityActivatedEvent.WithEntity(this, activatedOn));
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
@@ -63,14 +63,14 @@ public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
     /// <summary>
     /// The process for deactivating a connection.
     /// </summary>
-    /// <param name="deactivatedOn"></param>
+    /// <param name="timestamp"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public virtual Result Deactivate(Instant deactivatedOn)
+    public virtual Result Deactivate(Instant timestamp)
     {
         if (IsActive)
         {
             IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();

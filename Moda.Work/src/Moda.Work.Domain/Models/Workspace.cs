@@ -1,13 +1,12 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-/// <summary>
-/// A workspace is a container for work items.
-/// </summary>
-public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable
+/// <summary>A workspace is a container for work items.</summary>
+/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;Moda.Work.Domain.Models.WorkspaceActivatableArgs&gt;" />
+public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<WorkspaceActivatableArgs>
 {
     private string _name = null!;
     private string? _description;
@@ -116,40 +115,36 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable
         throw new NotImplementedException();
     }
 
-    /// <summary>
-    /// The process for activating a workspace.
-    /// </summary>
-    /// <param name="timestamp"></param>
+    /// <summary>The process for activating a workspace.</summary>
+    /// <param name="args">The arguments.</param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Activate(WorkProcess workProcess, Instant timestamp)
+    public Result Activate(WorkspaceActivatableArgs args)
     {        
-        if (WorkProcessId != workProcess.Id)
+        if (WorkProcessId != args.WorkProcess.Id)
             return Result.Failure($"Unable to activate the workspace because the work process does not match the workspace work process.");
 
-        if (!workProcess.IsActive)
+        if (!args.WorkProcess.IsActive)
             return Result.Failure($"Unable to activate the workspace because the work process is not active.");
 
         if (!IsActive)
         {            
             IsActive = true;
-            AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, args.Timestamp));
         }
 
         return Result.Success();
     }
 
-    /// <summary>
-    /// The process for deactivating a workspace.
-    /// </summary>
-    /// <param name="timestamp"></param>
+    /// <summary>The process for deactivating a workspace.</summary>
+    /// <param name="args">The arguments.</param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Deactivate(Instant timestamp)
+    public Result Deactivate(WorkspaceActivatableArgs args)
     {
         if (IsActive)
         {
             // TODO is there logic that would prevent deactivation?
             IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, args.Timestamp));
         }
 
         return Result.Success();

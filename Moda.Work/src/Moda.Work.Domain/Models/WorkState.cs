@@ -4,12 +4,10 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-/// <summary>
-/// Represents the state within a workflow.
-/// </summary>
+/// <summary>Represents the state within a workflow.</summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Int32&gt;" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
-public sealed class WorkState : BaseAuditableEntity<int>, IActivatable
+/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;NodaTime.Instant&gt;" />
+public sealed class WorkState : BaseAuditableEntity<int>, IActivatable<Instant>
 {
     private string _name = null!;
     private string? _description;
@@ -65,14 +63,14 @@ public sealed class WorkState : BaseAuditableEntity<int>, IActivatable
     /// <summary>
     /// The process for activating a work state.
     /// </summary>
-    /// <param name="activatedOn"></param>
+    /// <param name="timestamp"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Activate(Instant activatedOn)
+    public Result Activate(Instant timestamp)
     {
         if (!IsActive)
         {
             IsActive = true;
-            AddDomainEvent(EntityActivatedEvent.WithEntity(this, activatedOn));
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
@@ -81,14 +79,14 @@ public sealed class WorkState : BaseAuditableEntity<int>, IActivatable
     /// <summary>
     /// The process for deactivating a work state.
     /// </summary>
-    /// <param name="deactivatedOn"></param>
+    /// <param name="timestamp"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Deactivate(Instant deactivatedOn)
+    public Result Deactivate(Instant timestamp)
     {
         if (IsActive)
         {
             IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();

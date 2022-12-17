@@ -5,10 +5,12 @@ using NodaTime;
 namespace Moda.Work.Domain.Models;
 
 /// <summary>
-/// The work process defines a set of work process configurations that can be used 
+/// The work process defines a set of work process configurations that can be used
 /// within a workspace. A work process can be used in many workspaces.
 /// </summary>
-public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
+/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;NodaTime.Instant&gt;" />
+public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable<Instant>
 {
     private string _name = null!;
     private string? _description;
@@ -64,15 +66,15 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     /// The process for activating a work process.  A work process can only be activated if the configuration
     /// is valid.
     /// </summary>
-    /// <param name="activatedOn"></param>
+    /// <param name="timestamp"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Activate(Instant activatedOn)
+    public Result Activate(Instant timestamp)
     {
         if (!IsActive)
         {
             // TODO is there logic that would prevent activation?
             IsActive = true;
-            AddDomainEvent(EntityActivatedEvent.WithEntity(this, activatedOn));
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
@@ -81,9 +83,9 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     /// <summary>
     /// The process for deactivating a work process.  Only work processes without active assignments can be deactivated.
     /// </summary>
-    /// <param name="deactivatedOn"></param>
+    /// <param name="timestamp"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Deactivate(Instant deactivatedOn)
+    public Result Deactivate(Instant timestamp)
     {
         // TODO what is need to deactive a managed work process
 
@@ -93,7 +95,7 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
                 return Result.Failure("Unable to deactive with active workspaces.");
 
             IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();

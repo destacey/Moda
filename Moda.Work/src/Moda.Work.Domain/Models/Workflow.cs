@@ -3,7 +3,12 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
+/// <summary>
+/// 
+/// </summary>
+/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;NodaTime.Instant&gt;" />
+public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable<Instant>
 {
     private readonly List<WorkflowConfiguration> _configurations = new();
 
@@ -42,15 +47,15 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
     /// <summary>
     /// The process for activating a workflow.
     /// </summary>
-    /// <param name="activatedOn"></param>
+    /// <param name="timestamp"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Activate(Instant activatedOn)
+    public Result Activate(Instant timestamp)
     {
         if (!IsActive)
         {
             // TODO is there logic that would prevent activation?
             IsActive = true;
-            AddDomainEvent(EntityActivatedEvent.WithEntity(this, activatedOn));
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
@@ -59,15 +64,15 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
     /// <summary>
     /// The process for deactivating a workflow.
     /// </summary>
-    /// <param name="deactivatedOn"></param>
+    /// <param name="timestamp"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Deactivate(Instant deactivatedOn)
+    public Result Deactivate(Instant timestamp)
     {
         if (IsActive)
         {
             // TODO is there logic that would prevent deactivation?
             IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
