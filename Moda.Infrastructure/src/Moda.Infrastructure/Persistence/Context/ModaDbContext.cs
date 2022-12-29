@@ -27,6 +27,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizat
 
     #region IWork
 
+    public DbSet<BacklogLevelScheme> BacklogLevelSchemes => Set<BacklogLevelScheme>();
     public DbSet<BacklogLevel> BacklogLevels => Set<BacklogLevel>();
     public DbSet<WorkState> WorkStates => Set<WorkState>();
     public DbSet<WorkType> WorkTypes => Set<WorkType>();

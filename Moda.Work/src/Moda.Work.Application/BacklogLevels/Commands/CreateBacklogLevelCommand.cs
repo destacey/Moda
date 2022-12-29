@@ -2,16 +2,18 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Moda.Common.Domain.Enums;
 using NodaTime;
 
 namespace Moda.Work.Application.BacklogLevels.Commands;
 public sealed record CreateBacklogLevelCommand : ICommand<int>
 {
-    public CreateBacklogLevelCommand(string name, string? description, int rank)
+    public CreateBacklogLevelCommand(string name, string? description, Ownership ownership, int order)
     {
         Name = name;
         Description = description;
-        Rank = rank;
+        Ownership = ownership;
+        Order = order;
     }
 
     /// <summary>The name of the work type.  The name cannot be changed.</summary>
@@ -23,10 +25,16 @@ public sealed record CreateBacklogLevelCommand : ICommand<int>
     public string? Description { get; }
 
     /// <summary>
+    /// Indicates whether the backlog level is owned by Moda or a third party system.  This value should not change.
+    /// </summary>
+    /// <value>The ownership.</value>
+    public Ownership Ownership { get; }
+
+    /// <summary>
     /// The rank of the backlog level. The higher the number, the higher the level.
     /// </summary>
     /// <value>The rank.</value>
-    public int Rank { get; }
+    public int Order { get; }
 }
 
 public sealed class CreateBacklogLevelCommandValidator : CustomValidator<CreateBacklogLevelCommand>
@@ -74,7 +82,7 @@ internal sealed class CreateBacklogLevelCommandHandler : ICommandHandler<CreateB
         {
             Instant timestamp = _dateTimeService.Now;
 
-            var backlogLevel = BacklogLevel.Create(request.Name, request.Description, request.Rank, timestamp);
+            var backlogLevel = PortfolioBacklogLevel.Create(request.Name, request.Description, request.Ownership, request.Order, timestamp);
 
             await _workDbContext.BacklogLevels.AddAsync(backlogLevel, cancellationToken);
 

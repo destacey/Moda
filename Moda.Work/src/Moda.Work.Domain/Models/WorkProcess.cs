@@ -1,4 +1,5 @@
-﻿using Ardalis.GuardClauses;
+﻿
+using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using NodaTime;
 
@@ -15,7 +16,7 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable<Instan
     private string _name = null!;
     private string? _description;
     
-    private readonly List<WorkProcessConfiguration> _configurations = new();
+    private readonly List<WorkProcessScheme> _schemes = new();
     private readonly List<Workspace> _workspaces = new();
 
     private WorkProcess() { }
@@ -53,14 +54,31 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable<Instan
 
     /// <summary>
     /// Indicates whether the work process is active or not.  Only active work processes can be assigned
-    /// to workspaces.  The default is false and the user should activate it after the configurations are complete.
+    /// to workspaces.  The default is false and the user should activate it after the schemes are complete.
     /// </summary>
     /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; private set; } = false;
 
-    public IReadOnlyCollection<WorkProcessConfiguration> Configurations => _configurations.AsReadOnly();
+    public IReadOnlyCollection<WorkProcessScheme> Schemes => _schemes.AsReadOnly();
     
     public IReadOnlyCollection<Workspace> Workspaces => _workspaces.AsReadOnly();
+    
+    public Result Update(string name, string? description, Instant timestamp)
+    {
+        try
+        {
+            Name = name;
+            Description = description;
+
+            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
 
     /// <summary>
     /// The process for activating a work process.  A work process can only be activated if the configuration
@@ -99,5 +117,19 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable<Instan
         }
 
         return Result.Success();
+    }
+
+    /// <summary>Creates the specified name.</summary>
+    /// <param name="name">The name.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="ownership">The ownership.</param>
+    /// <param name="timestamp">The timestamp.</param>
+    /// <returns></returns>
+    public static WorkProcess Create(string name, string? description, Ownership ownership, Instant timestamp)
+    {
+        WorkProcess workProcess = new(name, description, ownership);
+
+        workProcess.AddDomainEvent(EntityCreatedEvent.WithEntity(workProcess, timestamp));
+        return workProcess;
     }
 }

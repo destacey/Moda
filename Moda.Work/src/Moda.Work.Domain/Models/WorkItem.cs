@@ -31,7 +31,7 @@ public sealed class WorkItem : BaseAuditableEntity<Guid>
 
     public Guid WorkProcessConfigurationId { get; private set; }
 
-    public WorkProcessConfiguration WorkProcessConfiguration { get; private set; } = null!;
+    public WorkProcessScheme WorkProcessConfiguration { get; private set; } = null!;
 
     /// <summary>
     /// The reason the work item is in its current state.

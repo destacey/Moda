@@ -53,16 +53,19 @@ An enum that enables backlog levels to be grouped based on purpose and functiona
 - Portfolio - Portfolio backlogs provide a way to group related items into a hierarchical structure.  This is the only backlog category that allows multiple backlog levels.
 - Requirement - The requirement backlog category contains your base level work items.  These work items are owned by a single team and represent the actual work.
 - Task - The task backlog contains task work items that are owned and managed by a parent work item.  The parent work item is typically from the requirement backlog category.
+- Other - A backlog for non-standard backlog items.  Work Item Types in this backlog category will not appear in backlog views.  It is used for special work item types.
 
 ## Backlog Level
-Allows work types to be grouped and defined in a hierarchy.
+Allows work types to be grouped, defined in a hierarchy, and normalized across the system.  There will be only one owned set of backlog levels in the system.  All managed backlog levels will be mapped to an owned backlog level.
 
 ## Workflow
 A workflow is a set of work states that define the different stages a work item must go through to be considered done.
 
+An active workflow is any workflow currently assigned to a process or work item.  When an active workflow is changed, the system will create a new workflow and update existing tickets to the new workflow.
+
 ### Business Rules
-- A workflow requires at least three work states be configured.
-- Each of the work state categories must be represented in a workflow for it to be valid.
+- An owned workflow requires at least three work states be configured.
+- Each of the work state categories must be represented in an owned workflow for it to be valid.
 - A work state can only be defined once within a workflow.
 - The order of work state categories within the workflow configuration must be grouped.  Proposed items are always at the beginning of the workflow and Done items are always at the end.
   - Valid Example (Order, Work State, Work State Category)

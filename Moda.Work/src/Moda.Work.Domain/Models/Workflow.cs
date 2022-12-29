@@ -10,7 +10,7 @@ namespace Moda.Work.Domain.Models;
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;NodaTime.Instant&gt;" />
 public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable<Instant>
 {
-    private readonly List<WorkflowConfiguration> _configurations = new();
+    private readonly List<WorkflowScheme> _schemes = new();
 
     private Workflow() { }
 
@@ -42,7 +42,7 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable<Instant>
     /// </summary>
     public bool IsActive { get; private set; } = false;
 
-    public IReadOnlyCollection<WorkflowConfiguration> Configurations => _configurations.AsReadOnly();
+    public IReadOnlyCollection<WorkflowScheme> Schemes => _schemes.AsReadOnly();
 
     /// <summary>
     /// The process for activating a workflow.

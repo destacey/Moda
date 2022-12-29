@@ -12,6 +12,6 @@ public enum BacklogCategory
     [Display(Name = "Task", Description = "The task backlog contains task work items that are owned and managed by a parent work item.  The parent work item is typically from the requirement backlog category.", Order = 3)]
     Task = 2,
 
-    [Display(Name = "Issue", Description = "A problem or blocker that needs to be resolved.  Issues are a way to document a problem and do not represent the work to resolve it.  They are typically linked to other work items that represent the action taken.", Order = 4)]
-    Issue = 3
+    [Display(Name = "Other", Description = "A backlog for non-standard backlog items.  Work Item Types in this backlog category will not appear in backlog views.  It is used for special work item types.", Order = 4)]
+    Other = 3
 }

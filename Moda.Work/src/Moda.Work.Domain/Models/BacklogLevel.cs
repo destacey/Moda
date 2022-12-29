@@ -7,19 +7,23 @@ namespace Moda.Work.Domain.Models;
 /// <summary>Allows work types to be grouped and defined in a hierarchy.</summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Int32&gt;" />
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;NodaTime.Instant&gt;" />
-public sealed class BacklogLevel : BaseAuditableEntity<int>, IActivatable<Instant>
+public sealed class BacklogLevel : BaseAuditableEntity<int>
 {
     private string _name = null!;
     private string? _description;
 
     private BacklogLevel() { }
     
-    private BacklogLevel(string name, string? description, int rank)
+    private BacklogLevel(string name, string? description, BacklogCategory category, Ownership ownership, int rank)
     {
         Name = name;
         Description = description;
+        Category = category;
+        Ownership = ownership;
         Rank = rank;
     }
+
+    public Guid ParentId { get; init; }
 
     /// <summary>The name of the backlog level.</summary>
     /// <value>The name.</value>
@@ -37,22 +41,27 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>, IActivatable<Instan
         private set => _description = value?.Trim();
     }
 
+    public BacklogCategory Category { get; init; }
+
     /// <summary>
-    /// The rank of the backlog level. The higher the number, the higher the level.
+    /// Indicates whether the backlog level is owned by Moda or a third party system.  This value should not change.
+    /// </summary>
+    /// <value>The ownership.</value>
+    public Ownership Ownership { get; init; }
+
+    /// <summary>
+    /// The rank of the backlog level.  The higher the rank, the higher the priority.
     /// </summary>
     /// <value>The rank.</value>
     public int Rank { get; private set; }
 
-    /// <summary>Indicates whether the backlog level is active or not.</summary>
-    /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
-    public bool IsActive { get; private set; } = true;
-
-    /// <summary>The process for updating the backlog level properties.</summary>
+    /// <summary>Updates the specified name.</summary>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
     /// <param name="rank">The rank.</param>
+    /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public Result Update(string name, string? description, int rank, Instant timestamp)
+    internal Result Update(string name, string? description, int rank, Instant timestamp)
     {
         try
         {
@@ -70,49 +79,17 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>, IActivatable<Instan
         }
     }
 
-    /// <summary>
-    /// The process for activating a backlog level.
-    /// </summary>
-    /// <param name="timestamp"></param>
-    /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Activate(Instant timestamp)
-    {
-        if (!IsActive)
-        {
-            // TODO is there logic that would prevent activation?
-            IsActive = true;
-            AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
-        }
-
-        return Result.Success();
-    }
-
-    /// <summary>
-    /// The process for deactivating a backlog level.
-    /// </summary>
-    /// <param name="timestamp"></param>
-    /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Deactivate(Instant timestamp)
-    {
-        if (IsActive)
-        {
-            // TODO is there logic that would prevent deactivation?
-            IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
-        }
-
-        return Result.Success();
-    }
-
     /// <summary>Creates the specified BacklogLevel.</summary>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
+    /// <param name="category">The category.</param>
+    /// <param name="ownership">The ownership.</param>
     /// <param name="rank">The rank.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public static BacklogLevel Create(string name, string? description, int rank, Instant timestamp)
+    internal static BacklogLevel Create(string name, string? description, BacklogCategory category, Ownership ownership, int rank, Instant timestamp)
     {
-        BacklogLevel backlogLevel = new(name, description, rank);
+        BacklogLevel backlogLevel = new(name, description, category, ownership, rank);
 
         backlogLevel.AddDomainEvent(EntityCreatedEvent.WithEntity(backlogLevel, timestamp));
         return backlogLevel;
