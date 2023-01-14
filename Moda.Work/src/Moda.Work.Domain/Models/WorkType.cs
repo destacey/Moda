@@ -7,9 +7,9 @@ namespace Moda.Work.Domain.Models;
 /// <summary>
 /// Represents a type of work item.
 /// </summary>
-/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Int32&gt;" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;NodaTime.Instant&gt;" />
-public sealed class WorkType : BaseAuditableEntity<int>, IActivatable<Instant>
+/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
+public sealed class WorkType : BaseAuditableEntity<int>, IActivatable
 {
     private string _name = null!;
     private string? _description;

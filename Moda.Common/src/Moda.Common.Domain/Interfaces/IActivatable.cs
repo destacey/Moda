@@ -1,10 +1,19 @@
 ﻿using CSharpFunctionalExtensions;
+using NodaTime;
 
 namespace Moda.Common.Domain.Interfaces;
 
-public interface IActivatable<T>
+public interface IActivatable<TActivate, TDeactivate>
 {
     bool IsActive { get; }
-    Result Activate(T args);
-    Result Deactivate(T args);
+    Result Activate(TActivate args);
+    Result Deactivate(TDeactivate args);
+}
+
+public interface IActivatable<T> : IActivatable<T, T>
+{
+}
+
+public interface IActivatable : IActivatable<Instant, Instant>
+{
 }

@@ -1,12 +1,13 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
 /// <summary>A workspace is a container for work items.</summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;Moda.Work.Domain.Models.WorkspaceActivatableArgs&gt;" />
-public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<WorkspaceActivatableArgs>
+/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;Moda.Work.Domain.Models.WorkspaceActivatableArgs, NodaTime.Instant&gt;" />
+public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<WorkspaceActivatableArgs, Instant>
 {
     private string _name = null!;
     private string? _description;
@@ -138,13 +139,13 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     /// <summary>The process for deactivating a workspace.</summary>
     /// <param name="args">The arguments.</param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Deactivate(WorkspaceActivatableArgs args)
+    public Result Deactivate(Instant timestamp)
     {
         if (IsActive)
         {
             // TODO is there logic that would prevent deactivation?
             IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, args.Timestamp));
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();

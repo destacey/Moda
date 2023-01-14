@@ -6,7 +6,6 @@ namespace Moda.Work.Domain.Models;
 
 /// <summary>Allows work types to be grouped and defined in a hierarchy.</summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Int32&gt;" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;NodaTime.Instant&gt;" />
 public sealed class BacklogLevel : BaseAuditableEntity<int>
 {
     private string _name = null!;

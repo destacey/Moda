@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 
 namespace Moda.AppIntegration.Domain.Models;
-public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable<Instant>
+public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
 {
     private string _name = null!;
     private string? _description;

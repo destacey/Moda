@@ -7,8 +7,8 @@ namespace Moda.Work.Domain.Models;
 /// 
 /// </summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;NodaTime.Instant&gt;" />
-public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable<Instant>
+/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
+public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
 {
     private readonly List<WorkflowScheme> _schemes = new();
 

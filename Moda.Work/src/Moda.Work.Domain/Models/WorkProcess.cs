@@ -10,8 +10,8 @@ namespace Moda.Work.Domain.Models;
 /// within a workspace. A work process can be used in many workspaces.
 /// </summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;NodaTime.Instant&gt;" />
-public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable<Instant>
+/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
+public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
 {
     private string _name = null!;
     private string? _description;
