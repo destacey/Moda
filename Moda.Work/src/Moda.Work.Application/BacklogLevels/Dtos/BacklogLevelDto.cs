@@ -11,9 +11,11 @@ public sealed record BacklogLevelDto : IMapFrom<BacklogLevel>
     /// <value>The description.</value>
     public string? Description { get; set; }
 
-    public int Rank { get; set; }
+    /// <summary>Gets or sets the category.</summary>
+    /// <value>The category.</value>
+    public BacklogCategory Category { get; set; }
 
-    /// <summary>Indicates whether the work type is active or not.</summary>
-    /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
-    public bool IsActive { get; set; }
+    /// <summary>Gets or sets the rank. The higher the rank, the higher the priority.</summary>
+    /// <value>The rank.</value>
+    public int Rank { get; set; }
 }

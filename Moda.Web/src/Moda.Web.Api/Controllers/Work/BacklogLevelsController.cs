@@ -1,5 +1,4 @@
 ﻿using Moda.Web.Api.Models.Work.BacklogLevels;
-using Moda.Web.Api.Models.Work.WorkTypes;
 using Moda.Work.Application.BacklogLevels.Dtos;
 using Moda.Work.Application.BacklogLevels.Queries;
 
@@ -19,12 +18,13 @@ public class BacklogLevelsController : VersionNeutralApiController
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BacklogLevels)]
     [OpenApiOperation("Get a list of all backlog levels.", "")]
-    public async Task<ActionResult<IReadOnlyList<BacklogLevelDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
+    public async Task<ActionResult<IReadOnlyList<BacklogLevelDto>>> GetList(CancellationToken cancellationToken)
     {
-        var backlogLevels = await _sender.Send(new GetBacklogLevelsQuery(includeInactive), cancellationToken);
-        return Ok(backlogLevels.OrderByDescending(s => s.Rank));
+        var backlogLevels = await _sender.Send(new GetBacklogLevelsQuery(), cancellationToken);
+        
+        return Ok(backlogLevels.OrderBy(l => (int)l.Category).ThenByDescending(s => s.Rank));
     }
-
+    
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BacklogLevels)]
     [OpenApiOperation("Get backlog level details using the id.", "")]

@@ -52,9 +52,11 @@ public sealed class UpdateBacklogLevelCommandValidator : CustomValidator<UpdateB
 
     public async Task<bool> BeUniqueName(int id, string name, CancellationToken cancellationToken)
     {
-        return await _workDbContext.BacklogLevels
-            .Where(c => c.Id != id)
-            .AllAsync(e => e.Name != name, cancellationToken);
+        var backlogLevelNames = await _workDbContext.BacklogLevelSchemes
+            .SelectMany(s => s.BacklogLevels.Where(c => c.Id != id).Select(l => l.Name))
+            .ToListAsync(cancellationToken);
+        
+        return backlogLevelNames.All(l => l != name);
     }
 }
 
@@ -75,8 +77,14 @@ internal sealed class UpdateBacklogLevelCommandHandler : ICommandHandler<UpdateB
     {
         try
         {
-            var backlogLevel = await _workDbContext.BacklogLevels
-                .FirstAsync(p => p.Id == request.Id, cancellationToken);
+            var scheme = await _workDbContext.BacklogLevelSchemes
+                .Include(s => s.BacklogLevels)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (scheme is null)
+                return Result.Failure<int>("The system backlog level scheme does not exist.");
+            
+            var backlogLevel = scheme.BacklogLevels.FirstOrDefault(p => p.Id == request.Id);
             if (backlogLevel is null)
                 return Result.Failure<int>("Backlog Level not found.");
 
@@ -84,10 +92,6 @@ internal sealed class UpdateBacklogLevelCommandHandler : ICommandHandler<UpdateB
 
             if (updateResult.IsFailure)
             {
-                // Reset the entity
-                await _workDbContext.Entry(backlogLevel).ReloadAsync(cancellationToken);
-                backlogLevel.ClearDomainEvents();
-
                 var requestName = request.GetType().Name;
                 _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
                 return Result.Failure<int>(updateResult.Error);

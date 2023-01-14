@@ -26,8 +26,9 @@ internal sealed class GetBacklogLevelQueryHandler : IQueryHandler<GetBacklogLeve
 
     public async Task<BacklogLevelDto?> Handle(GetBacklogLevelQuery request, CancellationToken cancellationToken)
     {
-        return await _workDbContext.BacklogLevels
+        return await _workDbContext.BacklogLevelSchemes
+            .SelectMany(s => s.BacklogLevels.Where(c => c.Id == request.Id))
             .ProjectToType<BacklogLevelDto>()
-            .FirstOrDefaultAsync(b => b.Id == request.Id, cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

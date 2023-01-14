@@ -61,7 +61,7 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>
     /// <param name="rank">The rank.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    internal Result Update(string name, string? description, int rank, Instant timestamp)
+    public Result Update(string name, string? description, int rank, Instant timestamp)
     {
         try
         {
@@ -87,7 +87,7 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>
     /// <param name="rank">The rank.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    internal static BacklogLevel Create(string name, string? description, BacklogCategory category, Ownership ownership, int rank, Instant timestamp)
+    public static BacklogLevel Create(string name, string? description, BacklogCategory category, Ownership ownership, int rank, Instant timestamp)
     {
         BacklogLevel backlogLevel = new(name, description, category, ownership, rank);
 

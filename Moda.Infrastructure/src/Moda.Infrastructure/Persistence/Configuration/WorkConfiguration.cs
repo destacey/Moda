@@ -5,7 +5,7 @@ using Moda.Work.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
-public class BacklogLevelConfigurationConfig : IEntityTypeConfiguration<BacklogLevelScheme>
+public class BacklogLevelSchemeConfig : IEntityTypeConfiguration<BacklogLevelScheme>
 {
     public void Configure(EntityTypeBuilder<BacklogLevelScheme> builder)
     {

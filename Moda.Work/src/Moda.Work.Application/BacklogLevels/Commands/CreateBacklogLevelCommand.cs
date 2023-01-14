@@ -8,12 +8,11 @@ using NodaTime;
 namespace Moda.Work.Application.BacklogLevels.Commands;
 public sealed record CreateBacklogLevelCommand : ICommand<int>
 {
-    public CreateBacklogLevelCommand(string name, string? description, Ownership ownership, int order)
+    public CreateBacklogLevelCommand(string name, string? description, int rank)
     {
         Name = name;
         Description = description;
-        Ownership = ownership;
-        Order = order;
+        Rank = rank;
     }
 
     /// <summary>The name of the work type.  The name cannot be changed.</summary>
@@ -25,16 +24,10 @@ public sealed record CreateBacklogLevelCommand : ICommand<int>
     public string? Description { get; }
 
     /// <summary>
-    /// Indicates whether the backlog level is owned by Moda or a third party system.  This value should not change.
-    /// </summary>
-    /// <value>The ownership.</value>
-    public Ownership Ownership { get; }
-
-    /// <summary>
     /// The rank of the backlog level. The higher the number, the higher the level.
     /// </summary>
     /// <value>The rank.</value>
-    public int Order { get; }
+    public int Rank { get; }
 }
 
 public sealed class CreateBacklogLevelCommandValidator : CustomValidator<CreateBacklogLevelCommand>
@@ -58,8 +51,10 @@ public sealed class CreateBacklogLevelCommandValidator : CustomValidator<CreateB
 
     public async Task<bool> BeUniqueName(string name, CancellationToken cancellationToken)
     {
-        return await _workDbContext.BacklogLevels
-            .AllAsync(e => e.Name != name, cancellationToken);
+        var backlogLevelNames = await _workDbContext.BacklogLevelSchemes
+            .SelectMany(s => s.BacklogLevels.Select(l => l.Name))
+            .ToListAsync(cancellationToken);
+        return backlogLevelNames.All(l => l != name);
     }
 }
 
@@ -80,11 +75,20 @@ internal sealed class CreateBacklogLevelCommandHandler : ICommandHandler<CreateB
     {
         try
         {
+            var scheme = await _workDbContext.BacklogLevelSchemes
+                .Include(s => s.BacklogLevels)
+                .FirstOrDefaultAsync(cancellationToken);
+            
+            if (scheme is null)
+                return Result.Failure<int>("The system backlog level scheme does not exist.");
+
             Instant timestamp = _dateTimeService.Now;
 
-            var backlogLevel = PortfolioBacklogLevel.Create(request.Name, request.Description, request.Ownership, request.Order, timestamp);
+            var backlogLevel = BacklogLevel.Create(request.Name, request.Description, BacklogCategory.Portfolio, Ownership.Owned, request.Rank, timestamp);
 
-            await _workDbContext.BacklogLevels.AddAsync(backlogLevel, cancellationToken);
+            var addResult = scheme.AddPortfolioBacklogLevel(backlogLevel, timestamp);
+            if (addResult.IsFailure)
+                return Result.Failure<int>(addResult.Error);
 
             await _workDbContext.SaveChangesAsync(cancellationToken);
 
