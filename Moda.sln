@@ -6,7 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{021967B9-A7A9-45FE-BBC4-1CA398EAD887}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		..\README.md = ..\README.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Common", "Moda.Common", "{FD3939FE-64C0-44CB-A57F-85B671554FF5}"

@@ -1,4 +1,5 @@
-﻿global using Microsoft.AspNetCore.Mvc;
+﻿global using MediatR;
+global using Microsoft.AspNetCore.Mvc;
 global using Moda.AppIntegration.Application.Connections.Commands;
 global using Moda.AppIntegration.Application.Connections.Dtos;
 global using Moda.AppIntegration.Application.Connections.Queries;

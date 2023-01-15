@@ -1,89 +1,96 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-/// <summary>
-/// A backlog level helps abstract work types
-/// </summary>
-public sealed class BacklogLevel : BaseAuditableEntity<Guid>, IActivatable
+/// <summary>Allows work types to be grouped and defined in a hierarchy.</summary>
+/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Int32&gt;" />
+public sealed class BacklogLevel : BaseAuditableEntity<int>
 {
+    private string _name = null!;
+    private string? _description;
+
     private BacklogLevel() { }
-
-    public BacklogLevel(string name, string? description, byte order)
+    
+    private BacklogLevel(string name, string? description, BacklogCategory category, Ownership ownership, int rank)
     {
-        Name = name.Trim();
-        Description = description?.Trim();
-        Order = order;
+        Name = name;
+        Description = description;
+        Category = category;
+        Ownership = ownership;
+        Rank = rank;
     }
 
-    /// <summary>
-    /// The name of the backlog level.
-    /// </summary>
-    public string Name { get; private set; } = null!;
+    public Guid ParentId { get; init; }
+
+    /// <summary>The name of the backlog level.</summary>
+    /// <value>The name.</value>
+    public string Name
+    {
+        get => _name;
+        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    }
+
+    /// <summary>The description of the backlog level.</summary>
+    /// <value>The description.</value>
+    public string? Description
+    {
+        get => _description;
+        private set => _description = value?.Trim();
+    }
+
+    public BacklogCategory Category { get; init; }
 
     /// <summary>
-    /// The description of the backlog level.
+    /// Indicates whether the backlog level is owned by Moda or a third party system.  This value should not change.
     /// </summary>
-    public string? Description { get; private set; }
+    /// <value>The ownership.</value>
+    public Ownership Ownership { get; init; }
 
     /// <summary>
-    /// The order in which the backlog levels are displayed. The lower the number, the higher the level. 
-    /// The minimum value is 0 and the maximum value is 255.
+    /// The rank of the backlog level.  The higher the rank, the higher the priority.
     /// </summary>
-    public byte Order { get; private set; }
+    /// <value>The rank.</value>
+    public int Rank { get; private set; }
 
-    /// <summary>
-    /// Indicates whether the backlog level is active or not.  
-    /// </summary>
-    public bool IsActive { get; private set; } = true;
-
-    /// <summary>
-    /// The process for updating the backlog level properties.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
+    /// <summary>Updates the specified name.</summary>
+    /// <param name="name">The name.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="rank">The rank.</param>
+    /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public Result Update(string name, string? description, byte order)
+    public Result Update(string name, string? description, int rank, Instant timestamp)
     {
-        Name = name.Trim();
-        Description = description?.Trim();
-        Order = order;
+        try
+        {
+            Name = name;
+            Description = description;
+            Rank = rank;
 
-        return Result.Success();
+            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
     }
 
-    /// <summary>
-    /// The process for activating a backlog level.
-    /// </summary>
-    /// <param name="activatedOn"></param>
-    /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Activate(Instant activatedOn)
+    /// <summary>Creates the specified BacklogLevel.</summary>
+    /// <param name="name">The name.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="category">The category.</param>
+    /// <param name="ownership">The ownership.</param>
+    /// <param name="rank">The rank.</param>
+    /// <param name="timestamp">The timestamp.</param>
+    /// <returns></returns>
+    public static BacklogLevel Create(string name, string? description, BacklogCategory category, Ownership ownership, int rank, Instant timestamp)
     {
-        if (!IsActive)
-        {
-            // TODO is there logic that would prevent activation?
-            IsActive = true;
-            AddDomainEvent(EntityActivatedEvent.WithEntity(this, activatedOn));
-        }
+        BacklogLevel backlogLevel = new(name, description, category, ownership, rank);
 
-        return Result.Success();
-    }
-
-    /// <summary>
-    /// The process for deactivating a backlog level.
-    /// </summary>
-    /// <param name="deactivatedOn"></param>
-    /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Deactivate(Instant deactivatedOn)
-    {
-        if (IsActive)
-        {
-            // TODO is there logic that would prevent deactivation?
-            IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));
-        }
-
-        return Result.Success();
+        backlogLevel.AddDomainEvent(EntityCreatedEvent.WithEntity(backlogLevel, timestamp));
+        return backlogLevel;
     }
 }

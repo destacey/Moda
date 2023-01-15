@@ -29,6 +29,8 @@ public static class ApplicationResource
 
     public const string Employees = nameof(Employees);
 
+    public const string BacklogCategories = nameof(BacklogCategories);
+    public const string BacklogLevels = nameof(BacklogLevels);
     public const string Workspaces = nameof(Workspaces);
     public const string WorkItems = nameof(WorkItems);
     public const string WorkStateCategories = nameof(WorkStateCategories);
@@ -85,6 +87,13 @@ public static class ApplicationPermissions
 
     private static readonly ApplicationPermission[] _work = new ApplicationPermission[]
     {
+        new("View BacklogCategories", ApplicationAction.View, ApplicationResource.BacklogCategories, IsBasic: true),
+
+        new("View BacklogLevels", ApplicationAction.View, ApplicationResource.BacklogLevels, IsBasic: true),
+        new("Create BacklogLevels", ApplicationAction.Create, ApplicationResource.BacklogLevels),
+        new("Update BacklogLevels", ApplicationAction.Update, ApplicationResource.BacklogLevels),
+        new("Delete BacklogLevels", ApplicationAction.Delete, ApplicationResource.BacklogLevels),
+
         new("View Workspaces", ApplicationAction.View, ApplicationResource.Workspaces, IsBasic: true),
         new("Create Workspaces", ApplicationAction.Create, ApplicationResource.Workspaces),
         new("Update Workspaces", ApplicationAction.Update, ApplicationResource.Workspaces),

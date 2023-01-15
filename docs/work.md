@@ -8,6 +8,7 @@
 - [Work Process](#work-process)
 - [Work Process Configuration](#work-process-configuration)
 - [Work Type](#work-type)
+- [Backlog Category](#backlog-category)
 - [Backlog Level](#backlog-level)
 - [Workflow](#workflow)
 - [Workflow Configurtion](#workflow-configuration)
@@ -46,15 +47,25 @@ Represents the type of work item.  Examples:
 - Feature
 - Epic
 
+
+## Backlog Category
+An enum that enables backlog levels to be grouped based on purpose and functionality and normalized across the organization.
+- Portfolio - Portfolio backlogs provide a way to group related items into a hierarchical structure.  This is the only backlog category that allows multiple backlog levels.
+- Requirement - The requirement backlog category contains your base level work items.  These work items are owned by a single team and represent the actual work.
+- Task - The task backlog contains task work items that are owned and managed by a parent work item.  The parent work item is typically from the requirement backlog category.
+- Other - A backlog for non-standard backlog items.  Work Item Types in this backlog category will not appear in backlog views.  It is used for special work item types.
+
 ## Backlog Level
-Allows the work types to be defined in a hierarchy that is normalized across the organization.
+Allows work types to be grouped, defined in a hierarchy, and normalized across the system.  There will be only one owned set of backlog levels in the system.  All managed backlog levels will be mapped to an owned backlog level.
 
 ## Workflow
 A workflow is a set of work states that define the different stages a work item must go through to be considered done.
 
+An active workflow is any workflow currently assigned to a process or work item.  When an active workflow is changed, the system will create a new workflow and update existing tickets to the new workflow.
+
 ### Business Rules
-- A workflow requires at least three work states be configured.
-- Each of the work state categories must be represented in a workflow for it to be valid.
+- An owned workflow requires at least three work states be configured.
+- Each of the work state categories must be represented in an owned workflow for it to be valid.
 - A work state can only be defined once within a workflow.
 - The order of work state categories within the workflow configuration must be grouped.  Proposed items are always at the beginning of the workflow and Done items are always at the end.
   - Valid Example (Order, Work State, Work State Category)
@@ -76,7 +87,7 @@ A workflow is a set of work states that define the different stages a work item 
 The workflow configuration links work states, work state categories, and the order to the workflow.
 
 ## Work State
-The name of the stage within the workflow.  Each work state can be used in many workflows.
+Represents the state within a workflow.  Each work state can be used in many workflows.
 
 The name of the work state cannot be changed.  A new name represents a new work state.
 
@@ -88,32 +99,4 @@ The work state category is an enum that helps sort and normalize work states acr
 4. Removed - The work has been removed from the backlog without being completed.
 
 # ERD
-```mermaid
-erDiagram
-    Workspace ||--o{ WorkItem : owns
-    WorkItem ||--o{ Link : "has"
-    WorkItem ||--o{ WorkItemRevision : "has"
-    WorkItemRevision ||--o{ WorkItemRevisionChange : "has"
-    Link }o--|| WorkItem : "is"
-
-    WorkProcess ||--o{ Workspace : "is assigned to"
-    WorkProcess ||--o{ WorkProcessConfiguration : owns
-
-    WorkProcessConfiguration }o--|| WorkType : "is associated to"
-    WorkProcessConfiguration }o--|| BacklogLevel : "is associated to"
-    WorkProcessConfiguration }o--|| Workflow : "is associated to"
-
-    WorkProcessConfiguration ||--o{ WorkItem : "is assigned to"
-
-    WorkType ||--o{ WorkItem : "is assigned to"
-
-    BacklogLevel ||--o{ WorkItem : "is assigned to"
-
-    Workflow ||--o{ WorkflowConfiguration : owns
-    WorkflowConfiguration }o--|| WorkState : "is associated to"
-    WorkflowConfiguration }o--|| WorkStateCategory : "is associated to"
-
-    WorkState ||--o{ WorkItem : "is assigned to"
-
-    WorkStateCategory ||--o{ WorkItem : "is assigned to"
-```
+![work domain erd](/work-domain-erd.drawio.svg)

@@ -30,8 +30,6 @@ public class EmailAddress : ValueObject
             : throw new ArgumentException("The value submitted does not meet the required format.", nameof(EmailAddress));
     }
 
-    public override string ToString()
-    {
-        return Value;
-    }
+    public static implicit operator string(EmailAddress emailAddress) => emailAddress.Value;
+    public static explicit operator EmailAddress(string value) => new EmailAddress(value);
 }

@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Moda.Web.Api.Models.Work.WorkStates;
+﻿using Moda.Web.Api.Models.Work.WorkStates;
 using Moda.Work.Application.WorkStates.Dtos;
 using Moda.Work.Application.WorkStates.Queries;
 

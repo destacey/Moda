@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Moda.Work.Application.WorkStateCategories.Queries;
+﻿using Moda.Work.Application.WorkStateCategories.Queries;
 
 namespace Moda.Web.Api.Controllers.Work;
 
@@ -21,6 +20,6 @@ public class WorkStateCategoriesController : VersionNeutralApiController
     public async Task<ActionResult<IReadOnlyList<ConnectorListDto>>> GetList(CancellationToken cancellationToken)
     {
         var categories = await _sender.Send(new GetWorkStateCategoriesQuery(), cancellationToken);
-        return Ok(categories.OrderBy(c => c.Name));
+        return Ok(categories.OrderBy(c => c.Order));
     }
 }
