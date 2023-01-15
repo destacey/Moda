@@ -1,13 +1,16 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-/// <summary>
-/// A workspace is a container for work items.
-/// </summary>
-public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable
+/// <summary>A workspace is a container for work items.</summary>
+/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;Moda.Work.Domain.Models.WorkspaceActivatableArgs, NodaTime.Instant&gt;" />
+public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<WorkspaceActivatableArgs, Instant>
 {
+    private string _name = null!;
+    private string? _description;
     private readonly List<WorkItem> _workItems = new();
 
     private Workspace() { }
@@ -23,12 +26,20 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable
     /// <summary>
     /// The name of the workspace.
     /// </summary>
-    public string Name { get; private set; } = null!;
+    public string Name
+    {
+        get => _name;
+        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    }
 
     /// <summary>
     /// The description of the workspace.
     /// </summary>
-    public string? Description { get; private set; }
+    public string? Description
+    {
+        get => _description;
+        private set => _description = value?.Trim();
+    }
 
     /// <summary>
     /// Indicates whether the workspace is owned by Moda or a third party system.  This value should not change.
@@ -45,12 +56,6 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable
     /// The foreign key for the work process.
     /// </summary>
     public Guid WorkProcessId { get; private set; }
-
-    /// <summary>
-    /// The work process assigned to the project.  The work process provides the work types, workflows, and configuration
-    /// for the workspace.
-    /// </summary>
-    public WorkProcess WorkProcess { get; private set; } = null!;
 
     /// <summary>
     /// Indicates whether the workspace is active or not.  Inactive workspaces will be locked.  This means that
@@ -103,7 +108,6 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable
         if (!WorkItems.Any())
         {
             WorkProcessId = workProcess.Id;
-            WorkProcess = workProcess;
             return Result.Success();
         }
 
@@ -112,35 +116,36 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable
         throw new NotImplementedException();
     }
 
-    /// <summary>
-    /// The process for activating a workspace.
-    /// </summary>
-    /// <param name="activatedOn"></param>
+    /// <summary>The process for activating a workspace.</summary>
+    /// <param name="args">The arguments.</param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Activate(Instant activatedOn)
-    {
+    public Result Activate(WorkspaceActivatableArgs args)
+    {        
+        if (WorkProcessId != args.WorkProcess.Id)
+            return Result.Failure($"Unable to activate the workspace because the work process does not match the workspace work process.");
+
+        if (!args.WorkProcess.IsActive)
+            return Result.Failure($"Unable to activate the workspace because the work process is not active.");
+
         if (!IsActive)
-        {
-            // TODO is there logic that would prevent activation?
+        {            
             IsActive = true;
-            AddDomainEvent(EntityActivatedEvent.WithEntity(this, activatedOn));
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, args.Timestamp));
         }
 
         return Result.Success();
     }
 
-    /// <summary>
-    /// The process for deactivating a workspace.
-    /// </summary>
-    /// <param name="deactivatedOn"></param>
+    /// <summary>The process for deactivating a workspace.</summary>
+    /// <param name="args">The arguments.</param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Deactivate(Instant deactivatedOn)
+    public Result Deactivate(Instant timestamp)
     {
         if (IsActive)
         {
             // TODO is there logic that would prevent deactivation?
             IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, deactivatedOn));
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();

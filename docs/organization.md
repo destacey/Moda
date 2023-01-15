@@ -5,6 +5,7 @@ The organization domain defines how employees are grouped within teams all the w
 - [Organization](#organization)
 - [Team of Teams](#team-of-teams)
 - [Team](#team)
+- [Employee](#employee)
 
 ## Organization
 The organization is the top level of the organizational hierarchy and is a way to group teams and teams of teams.  The organization could represent the whole company, a division, or a business unit.
@@ -19,15 +20,11 @@ The team is the lowest level of the organizational hierarchy and is made up of m
 
 A team can have a team of teams or an organization as a parent.
 
-# Open Questions
-- [ ] Should we use a graph db here or a sqlhierarchyid?
+## Employee
+A person that works for a company.
+
+# Logical Diagram
+![organization domain logical diagram](/organization-domain-logical.drawio.svg)
 
 # ERD
-```mermaid
-erDiagram
-    Organization ||--o{ Team-of-Teams : owns
-    Organization ||--o{ Team : "owns"
-
-    Team-of-Teams ||--o{ Team-of-Teams : "owns"
-    Team-of-Teams ||--o{ Team : owns
-```
+![organization domain erd](/organization-domain-erd.drawio.svg)

@@ -7,7 +7,7 @@ public abstract class BaseEntity<TId> : IEntity<TId>
     /// <summary>
     /// Unique identifier for this entity.
     /// </summary>
-    public TId Id { get; set; } = default!;
+    public TId Id { get; protected set; } = default!;
 
     private readonly List<DomainEvent> _domainEvents = new();
 
