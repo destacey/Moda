@@ -1,0 +1,54 @@
+﻿@page "/profile"
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@inject IAuthorizationService AuthorizationService
+@attribute [Authorize]
+
+<PageTitle>Profile</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Profile</MudText>
+
+<MudDataGrid Items="@_currentUser?.Claims"
+             Height="500px"
+             Dense="true" Sortable="true" Filterable="true"
+             FixedHeader="true"
+             QuickFilter="@_quickFilter">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Claims</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <Columns>
+        <Column T="Claim" Field="Type" />
+        <Column T="Claim" Field="Value" />
+    </Columns>
+</MudDataGrid>
+
+@code {
+    [CascadingParameter]
+    Task<AuthenticationState> authenticationStateTask { get; set; } = null!;
+
+    ClaimsPrincipal? _currentUser;
+
+    string _searchString = "";
+
+    protected async override Task OnInitializedAsync()
+    {
+        _currentUser = (await authenticationStateTask).User;
+    }
+
+    private Func<Claim, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Type.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Value.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+}
