@@ -13,7 +13,7 @@ public class ConnectorsController : VersionNeutralApiController
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Connectors)]
-    [OpenApiOperation(nameof(GetList), "Get a list of all connectors.", "")]
+    [OpenApiOperation("Get a list of all connectors.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<ConnectorListDto>>> GetList(CancellationToken cancellationToken)
     {

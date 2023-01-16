@@ -15,7 +15,7 @@ public class ProfileController : VersionNeutralApiController
     }
 
     [HttpGet]
-    [OpenApiOperation(nameof(Get), "Get profile details of currently logged in user.", "")]
+    [OpenApiOperation("Get profile details of currently logged in user.", "")]
     public async Task<ActionResult<UserDetailsDto>> Get(CancellationToken cancellationToken)
     {
         return User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId)
@@ -24,7 +24,7 @@ public class ProfileController : VersionNeutralApiController
     }
 
     [HttpPut]
-    [OpenApiOperation(nameof(Update), "Update profile details of currently logged in user.", "")]
+    [OpenApiOperation("Update profile details of currently logged in user.", "")]
     public async Task<ActionResult> Update(UpdateUserCommand request)
     {
         var validator = new UpdateUserCommandValidator(_userService);
@@ -43,7 +43,7 @@ public class ProfileController : VersionNeutralApiController
     }
 
     [HttpGet("permissions")]
-    [OpenApiOperation(nameof(GetPermissions), "Get permissions of currently logged in user.", "")]
+    [OpenApiOperation("Get permissions of currently logged in user.", "")]
     public async Task<ActionResult<List<string>>> GetPermissions(CancellationToken cancellationToken)
     {
         return User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId)
@@ -52,7 +52,7 @@ public class ProfileController : VersionNeutralApiController
     }
 
     [HttpGet("logs")]
-    [OpenApiOperation(nameof(GetLogs), "Get audit logs of currently logged in user.", "")]
+    [OpenApiOperation("Get audit logs of currently logged in user.", "")]
     public Task<List<AuditDto>> GetLogs()
     {
         return _mediator.Send(new GetMyAuditLogsQuery());

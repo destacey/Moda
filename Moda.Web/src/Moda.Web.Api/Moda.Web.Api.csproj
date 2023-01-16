@@ -45,15 +45,9 @@
         <Folder Include="wwwroot\" />
         <Folder Include="wwwroot\api\v1\" />
     </ItemGroup>
-
-    <ItemGroup>
-        <Content Update="wwwroot\api\v1\specification.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-
+    
     <Target Name="NSwag" AfterTargets="Build">
-        <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" 
+        <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
               Command="$(NSwagExe_Net70) aspnetcore2openapi /assembly:$(TargetDir)Moda.Web.Api.dll /output:wwwroot/api/v1/specification.json" />
         <Exec Command="$(NSwagExe_Net70) openapi2csclient /input:wwwroot/api/v1/specification.json /namespace:Moda.Api.Client /generateClientInterfaces:true /OperationGenerationMode:MultipleClientsFromFirstTagAndOperationId /output:../Moda.Web.BlazorClient/Services/ModaWebApiClient.generated.cs" />
     </Target>

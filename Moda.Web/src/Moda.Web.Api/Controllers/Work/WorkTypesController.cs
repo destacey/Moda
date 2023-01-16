@@ -17,7 +17,7 @@ public class WorkTypesController : VersionNeutralApiController
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkTypes)]
-    [OpenApiOperation(nameof(GetList), "Get a list of all work types.", "")]
+    [OpenApiOperation("Get a list of all work types.", "")]
     public async Task<ActionResult<IReadOnlyList<WorkTypeDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var workTypes = await _sender.Send(new GetWorkTypesQuery(includeInactive), cancellationToken);
@@ -26,7 +26,7 @@ public class WorkTypesController : VersionNeutralApiController
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkTypes)]
-    [OpenApiOperation(nameof(GetById), "Get work type details using the id.", "")]
+    [OpenApiOperation("Get work type details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WorkTypeDto>> GetById(int id)
@@ -40,7 +40,7 @@ public class WorkTypesController : VersionNeutralApiController
 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.WorkTypes)]
-    [OpenApiOperation(nameof(Create), "Create a work type.", "")]
+    [OpenApiOperation("Create a work type.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
     public async Task<ActionResult> Create(CreateWorkTypeRequest request, CancellationToken cancellationToken)
     {
@@ -53,7 +53,7 @@ public class WorkTypesController : VersionNeutralApiController
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkTypes)]
-    [OpenApiOperation(nameof(Update), "Update a work type.", "")]
+    [OpenApiOperation("Update a work type.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Update(int id, UpdateWorkTypeRequest request, CancellationToken cancellationToken)
@@ -70,7 +70,7 @@ public class WorkTypesController : VersionNeutralApiController
 
     //[HttpDelete("{id}")]
     //[MustHavePermission(ApplicationAction.Delete, ApplicationResource.WorkTypes)]
-    //[OpenApiOperation(nameof(Delete), "Delete a work type.", "")]
+    //[OpenApiOperation("Delete a work type.", "")]
     //public async Task<ActionResult> Delete(int id)
     //{
     //    throw new NotImplementedException();

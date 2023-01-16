@@ -17,7 +17,7 @@ public class BacklogLevelsController : VersionNeutralApiController
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BacklogLevels)]
-    [OpenApiOperation(nameof(GetList), "Get a list of all backlog levels.", "")]
+    [OpenApiOperation("Get a list of all backlog levels.", "")]
     public async Task<ActionResult<IReadOnlyList<BacklogLevelDto>>> GetList(CancellationToken cancellationToken)
     {
         var backlogLevels = await _sender.Send(new GetBacklogLevelsQuery(), cancellationToken);
@@ -27,7 +27,7 @@ public class BacklogLevelsController : VersionNeutralApiController
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BacklogLevels)]
-    [OpenApiOperation(nameof(GetById), "Get backlog level details using the id.", "")]
+    [OpenApiOperation("Get backlog level details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<BacklogLevelDto>> GetById(int id)
@@ -41,7 +41,7 @@ public class BacklogLevelsController : VersionNeutralApiController
 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.BacklogLevels)]
-    [OpenApiOperation(nameof(Create), "Create a backlog level.", "")]
+    [OpenApiOperation("Create a backlog level.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
     public async Task<ActionResult> Create(CreateBacklogLevelRequest request, CancellationToken cancellationToken)
     {
@@ -54,7 +54,7 @@ public class BacklogLevelsController : VersionNeutralApiController
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.BacklogLevels)]
-    [OpenApiOperation(nameof(Update), "Update a backlog level.", "")]
+    [OpenApiOperation("Update a backlog level.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Update(int id, UpdateBacklogLevelRequest request, CancellationToken cancellationToken)
@@ -71,7 +71,7 @@ public class BacklogLevelsController : VersionNeutralApiController
 
     //[HttpDelete("{id}")]
     //[MustHavePermission(ApplicationAction.Delete, ApplicationResource.BacklogLevels)]
-    //[OpenApiOperation(nameof(Delete), "Delete a backlog level.", "")]
+    //[OpenApiOperation("Delete a backlog level.", "")]
     //public async Task<ActionResult> Delete(int id)
     //{
     //    throw new NotImplementedException();

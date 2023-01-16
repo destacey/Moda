@@ -24,14 +24,14 @@ namespace Moda.Api.Client
         /// Get a list of all backlog categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> BacklogCategories_GetListAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all backlog categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> BacklogCategories_GetListAsync(System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -74,9 +74,9 @@ namespace Moda.Api.Client
         /// Get a list of all backlog categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> BacklogCategories_GetListAsync()
         {
-            return GetListAsync(System.Threading.CancellationToken.None);
+            return BacklogCategories_GetListAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -84,7 +84,7 @@ namespace Moda.Api.Client
         /// Get a list of all backlog categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> BacklogCategories_GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/backlogcategories");
@@ -258,53 +258,53 @@ namespace Moda.Api.Client
         /// Get a list of all backlog levels.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> GetList2Async();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> BacklogLevels_GetListAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all backlog levels.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> GetList2Async(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> BacklogLevels_GetListAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateBacklogLevelRequest request);
+        System.Threading.Tasks.Task BacklogLevels_CreateAsync(CreateBacklogLevelRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task BacklogLevels_CreateAsync(CreateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get backlog level details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<BacklogLevelDto> GetByIdAsync(int id);
+        System.Threading.Tasks.Task<BacklogLevelDto> BacklogLevels_GetByIdAsync(int id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get backlog level details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<BacklogLevelDto> GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<BacklogLevelDto> BacklogLevels_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateAsync(int id, UpdateBacklogLevelRequest request);
+        System.Threading.Tasks.Task BacklogLevels_UpdateAsync(int id, UpdateBacklogLevelRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateAsync(int id, UpdateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task BacklogLevels_UpdateAsync(int id, UpdateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -347,9 +347,9 @@ namespace Moda.Api.Client
         /// Get a list of all backlog levels.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> GetList2Async()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> BacklogLevels_GetListAsync()
         {
-            return GetList2Async(System.Threading.CancellationToken.None);
+            return BacklogLevels_GetListAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -357,7 +357,7 @@ namespace Moda.Api.Client
         /// Get a list of all backlog levels.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> GetList2Async(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> BacklogLevels_GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/backloglevels");
@@ -425,9 +425,9 @@ namespace Moda.Api.Client
         /// Create a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateAsync(CreateBacklogLevelRequest request)
+        public virtual System.Threading.Tasks.Task BacklogLevels_CreateAsync(CreateBacklogLevelRequest request)
         {
-            return CreateAsync(request, System.Threading.CancellationToken.None);
+            return BacklogLevels_CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -435,7 +435,7 @@ namespace Moda.Api.Client
         /// Create a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateAsync(CreateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task BacklogLevels_CreateAsync(CreateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -518,9 +518,9 @@ namespace Moda.Api.Client
         /// Get backlog level details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<BacklogLevelDto> GetByIdAsync(int id)
+        public virtual System.Threading.Tasks.Task<BacklogLevelDto> BacklogLevels_GetByIdAsync(int id)
         {
-            return GetByIdAsync(id, System.Threading.CancellationToken.None);
+            return BacklogLevels_GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -528,7 +528,7 @@ namespace Moda.Api.Client
         /// Get backlog level details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<BacklogLevelDto> GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<BacklogLevelDto> BacklogLevels_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -610,9 +610,9 @@ namespace Moda.Api.Client
         /// Update a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task UpdateAsync(int id, UpdateBacklogLevelRequest request)
+        public virtual System.Threading.Tasks.Task BacklogLevels_UpdateAsync(int id, UpdateBacklogLevelRequest request)
         {
-            return UpdateAsync(id, request, System.Threading.CancellationToken.None);
+            return BacklogLevels_UpdateAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -620,7 +620,7 @@ namespace Moda.Api.Client
         /// Update a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task UpdateAsync(int id, UpdateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task BacklogLevels_UpdateAsync(int id, UpdateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -809,14 +809,14 @@ namespace Moda.Api.Client
         /// Get a list of all work state categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetList22Async();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> WorkStateCategories_GetListAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all work state categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetList22Async(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> WorkStateCategories_GetListAsync(System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -859,9 +859,9 @@ namespace Moda.Api.Client
         /// Get a list of all work state categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetList22Async()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> WorkStateCategories_GetListAsync()
         {
-            return GetList22Async(System.Threading.CancellationToken.None);
+            return WorkStateCategories_GetListAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -869,7 +869,7 @@ namespace Moda.Api.Client
         /// Get a list of all work state categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetList22Async(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> WorkStateCategories_GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/workstatecategories");
@@ -1043,53 +1043,53 @@ namespace Moda.Api.Client
         /// Get a list of all work states.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> GetList23Async(bool? includeInactive);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> WorkStates_GetListAsync(bool? includeInactive);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all work states.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> GetList23Async(bool? includeInactive, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> WorkStates_GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Create2Async(CreateWorkStateRequest request);
+        System.Threading.Tasks.Task WorkStates_CreateAsync(CreateWorkStateRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Create2Async(CreateWorkStateRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task WorkStates_CreateAsync(CreateWorkStateRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get work state details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<WorkStateDto> GetById2Async(int id);
+        System.Threading.Tasks.Task<WorkStateDto> WorkStates_GetByIdAsync(int id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get work state details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<WorkStateDto> GetById2Async(int id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<WorkStateDto> WorkStates_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Update2Async(int id, UpdateWorkStateRequest request);
+        System.Threading.Tasks.Task WorkStates_UpdateAsync(int id, UpdateWorkStateRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Update2Async(int id, UpdateWorkStateRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task WorkStates_UpdateAsync(int id, UpdateWorkStateRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -1132,9 +1132,9 @@ namespace Moda.Api.Client
         /// Get a list of all work states.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> GetList23Async(bool? includeInactive)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> WorkStates_GetListAsync(bool? includeInactive)
         {
-            return GetList23Async(includeInactive, System.Threading.CancellationToken.None);
+            return WorkStates_GetListAsync(includeInactive, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1142,7 +1142,7 @@ namespace Moda.Api.Client
         /// Get a list of all work states.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> GetList23Async(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> WorkStates_GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/workstates?");
@@ -1215,9 +1215,9 @@ namespace Moda.Api.Client
         /// Create a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Create2Async(CreateWorkStateRequest request)
+        public virtual System.Threading.Tasks.Task WorkStates_CreateAsync(CreateWorkStateRequest request)
         {
-            return Create2Async(request, System.Threading.CancellationToken.None);
+            return WorkStates_CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1225,7 +1225,7 @@ namespace Moda.Api.Client
         /// Create a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Create2Async(CreateWorkStateRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task WorkStates_CreateAsync(CreateWorkStateRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -1308,9 +1308,9 @@ namespace Moda.Api.Client
         /// Get work state details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<WorkStateDto> GetById2Async(int id)
+        public virtual System.Threading.Tasks.Task<WorkStateDto> WorkStates_GetByIdAsync(int id)
         {
-            return GetById2Async(id, System.Threading.CancellationToken.None);
+            return WorkStates_GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1318,7 +1318,7 @@ namespace Moda.Api.Client
         /// Get work state details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<WorkStateDto> GetById2Async(int id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<WorkStateDto> WorkStates_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -1400,9 +1400,9 @@ namespace Moda.Api.Client
         /// Update a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Update2Async(int id, UpdateWorkStateRequest request)
+        public virtual System.Threading.Tasks.Task WorkStates_UpdateAsync(int id, UpdateWorkStateRequest request)
         {
-            return Update2Async(id, request, System.Threading.CancellationToken.None);
+            return WorkStates_UpdateAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1410,7 +1410,7 @@ namespace Moda.Api.Client
         /// Update a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Update2Async(int id, UpdateWorkStateRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task WorkStates_UpdateAsync(int id, UpdateWorkStateRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -1599,53 +1599,53 @@ namespace Moda.Api.Client
         /// Get a list of all work types.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> GetList24Async(bool? includeInactive);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> WorkTypes_GetListAsync(bool? includeInactive);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all work types.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> GetList24Async(bool? includeInactive, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> WorkTypes_GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Create22Async(CreateWorkTypeRequest request);
+        System.Threading.Tasks.Task WorkTypes_CreateAsync(CreateWorkTypeRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Create22Async(CreateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task WorkTypes_CreateAsync(CreateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get work type details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<WorkTypeDto> GetById22Async(int id);
+        System.Threading.Tasks.Task<WorkTypeDto> WorkTypes_GetByIdAsync(int id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get work type details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<WorkTypeDto> GetById22Async(int id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<WorkTypeDto> WorkTypes_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Update22Async(int id, UpdateWorkTypeRequest request);
+        System.Threading.Tasks.Task WorkTypes_UpdateAsync(int id, UpdateWorkTypeRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Update22Async(int id, UpdateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task WorkTypes_UpdateAsync(int id, UpdateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -1688,9 +1688,9 @@ namespace Moda.Api.Client
         /// Get a list of all work types.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> GetList24Async(bool? includeInactive)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> WorkTypes_GetListAsync(bool? includeInactive)
         {
-            return GetList24Async(includeInactive, System.Threading.CancellationToken.None);
+            return WorkTypes_GetListAsync(includeInactive, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1698,7 +1698,7 @@ namespace Moda.Api.Client
         /// Get a list of all work types.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> GetList24Async(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> WorkTypes_GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/worktypes?");
@@ -1771,9 +1771,9 @@ namespace Moda.Api.Client
         /// Create a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Create22Async(CreateWorkTypeRequest request)
+        public virtual System.Threading.Tasks.Task WorkTypes_CreateAsync(CreateWorkTypeRequest request)
         {
-            return Create22Async(request, System.Threading.CancellationToken.None);
+            return WorkTypes_CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1781,7 +1781,7 @@ namespace Moda.Api.Client
         /// Create a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Create22Async(CreateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task WorkTypes_CreateAsync(CreateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -1864,9 +1864,9 @@ namespace Moda.Api.Client
         /// Get work type details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<WorkTypeDto> GetById22Async(int id)
+        public virtual System.Threading.Tasks.Task<WorkTypeDto> WorkTypes_GetByIdAsync(int id)
         {
-            return GetById22Async(id, System.Threading.CancellationToken.None);
+            return WorkTypes_GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1874,7 +1874,7 @@ namespace Moda.Api.Client
         /// Get work type details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<WorkTypeDto> GetById22Async(int id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<WorkTypeDto> WorkTypes_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -1956,9 +1956,9 @@ namespace Moda.Api.Client
         /// Update a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Update22Async(int id, UpdateWorkTypeRequest request)
+        public virtual System.Threading.Tasks.Task WorkTypes_UpdateAsync(int id, UpdateWorkTypeRequest request)
         {
-            return Update22Async(id, request, System.Threading.CancellationToken.None);
+            return WorkTypes_UpdateAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1966,7 +1966,7 @@ namespace Moda.Api.Client
         /// Update a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Update22Async(int id, UpdateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task WorkTypes_UpdateAsync(int id, UpdateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -2155,53 +2155,53 @@ namespace Moda.Api.Client
         /// Get a list of all employees.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> GetList25Async(bool? includeInactive);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> Employees_GetListAsync(bool? includeInactive);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all employees.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> GetList25Async(bool? includeInactive, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> Employees_GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Create23Async(CreateEmployeeRequest request);
+        System.Threading.Tasks.Task Employees_CreateAsync(CreateEmployeeRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Create23Async(CreateEmployeeRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task Employees_CreateAsync(CreateEmployeeRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get employee details using the localId.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<EmployeeDetailsDto> GetById23Async(int id);
+        System.Threading.Tasks.Task<EmployeeDetailsDto> Employees_GetByIdAsync(int id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get employee details using the localId.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<EmployeeDetailsDto> GetById23Async(int id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<EmployeeDetailsDto> Employees_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Update23Async(System.Guid id, UpdateEmployeeRequest request);
+        System.Threading.Tasks.Task Employees_UpdateAsync(System.Guid id, UpdateEmployeeRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Update23Async(System.Guid id, UpdateEmployeeRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task Employees_UpdateAsync(System.Guid id, UpdateEmployeeRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -2244,9 +2244,9 @@ namespace Moda.Api.Client
         /// Get a list of all employees.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> GetList25Async(bool? includeInactive)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> Employees_GetListAsync(bool? includeInactive)
         {
-            return GetList25Async(includeInactive, System.Threading.CancellationToken.None);
+            return Employees_GetListAsync(includeInactive, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2254,7 +2254,7 @@ namespace Moda.Api.Client
         /// Get a list of all employees.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> GetList25Async(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> Employees_GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/employees?");
@@ -2327,9 +2327,9 @@ namespace Moda.Api.Client
         /// Create an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Create23Async(CreateEmployeeRequest request)
+        public virtual System.Threading.Tasks.Task Employees_CreateAsync(CreateEmployeeRequest request)
         {
-            return Create23Async(request, System.Threading.CancellationToken.None);
+            return Employees_CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2337,7 +2337,7 @@ namespace Moda.Api.Client
         /// Create an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Create23Async(CreateEmployeeRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task Employees_CreateAsync(CreateEmployeeRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -2420,9 +2420,9 @@ namespace Moda.Api.Client
         /// Get employee details using the localId.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<EmployeeDetailsDto> GetById23Async(int id)
+        public virtual System.Threading.Tasks.Task<EmployeeDetailsDto> Employees_GetByIdAsync(int id)
         {
-            return GetById23Async(id, System.Threading.CancellationToken.None);
+            return Employees_GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2430,7 +2430,7 @@ namespace Moda.Api.Client
         /// Get employee details using the localId.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<EmployeeDetailsDto> GetById23Async(int id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<EmployeeDetailsDto> Employees_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -2512,9 +2512,9 @@ namespace Moda.Api.Client
         /// Update an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Update23Async(System.Guid id, UpdateEmployeeRequest request)
+        public virtual System.Threading.Tasks.Task Employees_UpdateAsync(System.Guid id, UpdateEmployeeRequest request)
         {
-            return Update23Async(id, request, System.Threading.CancellationToken.None);
+            return Employees_UpdateAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2522,7 +2522,7 @@ namespace Moda.Api.Client
         /// Update an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Update23Async(System.Guid id, UpdateEmployeeRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task Employees_UpdateAsync(System.Guid id, UpdateEmployeeRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -2711,79 +2711,79 @@ namespace Moda.Api.Client
         /// Get a list of all roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> GetList26Async();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> Roles_GetListAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> GetList26Async(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> Roles_GetListAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create or update a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> Create24Async(CreateOrUpdateRoleRequest request);
+        System.Threading.Tasks.Task<string> Roles_CreateAsync(CreateOrUpdateRoleRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create or update a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> Create24Async(CreateOrUpdateRoleRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<string> Roles_CreateAsync(CreateOrUpdateRoleRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get role details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RoleDto> GetById24Async(string id);
+        System.Threading.Tasks.Task<RoleDto> Roles_GetByIdAsync(string id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get role details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RoleDto> GetById24Async(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RoleDto> Roles_GetByIdAsync(string id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Delete a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> DeleteAsync(string id);
+        System.Threading.Tasks.Task<string> Roles_DeleteAsync(string id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Delete a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> DeleteAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<string> Roles_DeleteAsync(string id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get role details with its permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string id);
+        System.Threading.Tasks.Task<RoleDto> Roles_GetByIdWithPermissionsAsync(string id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get role details with its permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RoleDto> Roles_GetByIdWithPermissionsAsync(string id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update a role's permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request);
+        System.Threading.Tasks.Task<string> Roles_UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update a role's permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<string> Roles_UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -2826,9 +2826,9 @@ namespace Moda.Api.Client
         /// Get a list of all roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> GetList26Async()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> Roles_GetListAsync()
         {
-            return GetList26Async(System.Threading.CancellationToken.None);
+            return Roles_GetListAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2836,7 +2836,7 @@ namespace Moda.Api.Client
         /// Get a list of all roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> GetList26Async(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> Roles_GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles");
@@ -2904,9 +2904,9 @@ namespace Moda.Api.Client
         /// Create or update a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<string> Create24Async(CreateOrUpdateRoleRequest request)
+        public virtual System.Threading.Tasks.Task<string> Roles_CreateAsync(CreateOrUpdateRoleRequest request)
         {
-            return Create24Async(request, System.Threading.CancellationToken.None);
+            return Roles_CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2914,7 +2914,7 @@ namespace Moda.Api.Client
         /// Create or update a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<string> Create24Async(CreateOrUpdateRoleRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<string> Roles_CreateAsync(CreateOrUpdateRoleRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -2989,9 +2989,9 @@ namespace Moda.Api.Client
         /// Get role details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<RoleDto> GetById24Async(string id)
+        public virtual System.Threading.Tasks.Task<RoleDto> Roles_GetByIdAsync(string id)
         {
-            return GetById24Async(id, System.Threading.CancellationToken.None);
+            return Roles_GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2999,7 +2999,7 @@ namespace Moda.Api.Client
         /// Get role details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<RoleDto> GetById24Async(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<RoleDto> Roles_GetByIdAsync(string id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles/{id}");
@@ -3068,9 +3068,9 @@ namespace Moda.Api.Client
         /// Delete a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<string> DeleteAsync(string id)
+        public virtual System.Threading.Tasks.Task<string> Roles_DeleteAsync(string id)
         {
-            return DeleteAsync(id, System.Threading.CancellationToken.None);
+            return Roles_DeleteAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3078,7 +3078,7 @@ namespace Moda.Api.Client
         /// Delete a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<string> DeleteAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<string> Roles_DeleteAsync(string id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles/{id}");
@@ -3147,9 +3147,9 @@ namespace Moda.Api.Client
         /// Get role details with its permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string id)
+        public virtual System.Threading.Tasks.Task<RoleDto> Roles_GetByIdWithPermissionsAsync(string id)
         {
-            return GetByIdWithPermissionsAsync(id, System.Threading.CancellationToken.None);
+            return Roles_GetByIdWithPermissionsAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3157,7 +3157,7 @@ namespace Moda.Api.Client
         /// Get role details with its permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<RoleDto> Roles_GetByIdWithPermissionsAsync(string id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles/{id}/permissions");
@@ -3226,9 +3226,9 @@ namespace Moda.Api.Client
         /// Update a role's permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request)
+        public virtual System.Threading.Tasks.Task<string> Roles_UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request)
         {
-            return UpdatePermissionsAsync(id, request, System.Threading.CancellationToken.None);
+            return Roles_UpdatePermissionsAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3236,7 +3236,7 @@ namespace Moda.Api.Client
         /// Update a role's permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<string> Roles_UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -3418,66 +3418,66 @@ namespace Moda.Api.Client
         /// Get list of all users.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> GetList27Async();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> Users_GetListAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get list of all users.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> GetList27Async(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> Users_GetListAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a user's details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<UserDetailsDto> GetById25Async(string id);
+        System.Threading.Tasks.Task<UserDetailsDto> Users_GetByIdAsync(string id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a user's details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<UserDetailsDto> GetById25Async(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<UserDetailsDto> Users_GetByIdAsync(string id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a user's roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string id);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> Users_GetRolesAsync(string id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a user's roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> Users_GetRolesAsync(string id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update a user's assigned roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> AssignRolesAsync(string id, AssignUserRolesRequest request);
+        System.Threading.Tasks.Task<string> Users_AssignRolesAsync(string id, AssignUserRolesRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update a user's assigned roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> AssignRolesAsync(string id, AssignUserRolesRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<string> Users_AssignRolesAsync(string id, AssignUserRolesRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Toggle a user's active status.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ToggleStatusAsync(string id, ToggleUserStatusRequest request);
+        System.Threading.Tasks.Task Users_ToggleStatusAsync(string id, ToggleUserStatusRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Toggle a user's active status.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ToggleStatusAsync(string id, ToggleUserStatusRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task Users_ToggleStatusAsync(string id, ToggleUserStatusRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -3520,9 +3520,9 @@ namespace Moda.Api.Client
         /// Get list of all users.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> GetList27Async()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> Users_GetListAsync()
         {
-            return GetList27Async(System.Threading.CancellationToken.None);
+            return Users_GetListAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3530,7 +3530,7 @@ namespace Moda.Api.Client
         /// Get list of all users.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> GetList27Async(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> Users_GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users");
@@ -3598,9 +3598,9 @@ namespace Moda.Api.Client
         /// Get a user's details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<UserDetailsDto> GetById25Async(string id)
+        public virtual System.Threading.Tasks.Task<UserDetailsDto> Users_GetByIdAsync(string id)
         {
-            return GetById25Async(id, System.Threading.CancellationToken.None);
+            return Users_GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3608,7 +3608,7 @@ namespace Moda.Api.Client
         /// Get a user's details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<UserDetailsDto> GetById25Async(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<UserDetailsDto> Users_GetByIdAsync(string id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users/{id}");
@@ -3687,9 +3687,9 @@ namespace Moda.Api.Client
         /// Get a user's roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string id)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> Users_GetRolesAsync(string id)
         {
-            return GetRolesAsync(id, System.Threading.CancellationToken.None);
+            return Users_GetRolesAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3697,7 +3697,7 @@ namespace Moda.Api.Client
         /// Get a user's roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> Users_GetRolesAsync(string id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users/{id}/roles");
@@ -3766,9 +3766,9 @@ namespace Moda.Api.Client
         /// Update a user's assigned roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<string> AssignRolesAsync(string id, AssignUserRolesRequest request)
+        public virtual System.Threading.Tasks.Task<string> Users_AssignRolesAsync(string id, AssignUserRolesRequest request)
         {
-            return AssignRolesAsync(id, request, System.Threading.CancellationToken.None);
+            return Users_AssignRolesAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3776,7 +3776,7 @@ namespace Moda.Api.Client
         /// Update a user's assigned roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<string> AssignRolesAsync(string id, AssignUserRolesRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<string> Users_AssignRolesAsync(string id, AssignUserRolesRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -3866,9 +3866,9 @@ namespace Moda.Api.Client
         /// Toggle a user's active status.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ToggleStatusAsync(string id, ToggleUserStatusRequest request)
+        public virtual System.Threading.Tasks.Task Users_ToggleStatusAsync(string id, ToggleUserStatusRequest request)
         {
-            return ToggleStatusAsync(id, request, System.Threading.CancellationToken.None);
+            return Users_ToggleStatusAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3876,7 +3876,7 @@ namespace Moda.Api.Client
         /// Toggle a user's active status.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ToggleStatusAsync(string id, ToggleUserStatusRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task Users_ToggleStatusAsync(string id, ToggleUserStatusRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -4066,53 +4066,53 @@ namespace Moda.Api.Client
         /// Get profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<UserDetailsDto> GetAsync();
+        System.Threading.Tasks.Task<UserDetailsDto> Profile_GetAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<UserDetailsDto> GetAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<UserDetailsDto> Profile_GetAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> Update24Async(UpdateUserCommand request);
+        System.Threading.Tasks.Task<FileResponse> Profile_UpdateAsync(UpdateUserCommand request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> Update24Async(UpdateUserCommand request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<FileResponse> Profile_UpdateAsync(UpdateUserCommand request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get permissions of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> Profile_GetPermissionsAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get permissions of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> Profile_GetPermissionsAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get audit logs of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> GetLogsAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> Profile_GetLogsAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get audit logs of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> GetLogsAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> Profile_GetLogsAsync(System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -4155,9 +4155,9 @@ namespace Moda.Api.Client
         /// Get profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<UserDetailsDto> GetAsync()
+        public virtual System.Threading.Tasks.Task<UserDetailsDto> Profile_GetAsync()
         {
-            return GetAsync(System.Threading.CancellationToken.None);
+            return Profile_GetAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4165,7 +4165,7 @@ namespace Moda.Api.Client
         /// Get profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<UserDetailsDto> GetAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<UserDetailsDto> Profile_GetAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/profile");
@@ -4233,9 +4233,9 @@ namespace Moda.Api.Client
         /// Update profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<FileResponse> Update24Async(UpdateUserCommand request)
+        public virtual System.Threading.Tasks.Task<FileResponse> Profile_UpdateAsync(UpdateUserCommand request)
         {
-            return Update24Async(request, System.Threading.CancellationToken.None);
+            return Profile_UpdateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4243,7 +4243,7 @@ namespace Moda.Api.Client
         /// Update profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<FileResponse> Update24Async(UpdateUserCommand request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<FileResponse> Profile_UpdateAsync(UpdateUserCommand request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -4316,9 +4316,9 @@ namespace Moda.Api.Client
         /// Get permissions of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> Profile_GetPermissionsAsync()
         {
-            return GetPermissionsAsync(System.Threading.CancellationToken.None);
+            return Profile_GetPermissionsAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4326,7 +4326,7 @@ namespace Moda.Api.Client
         /// Get permissions of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> Profile_GetPermissionsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/profile/permissions");
@@ -4394,9 +4394,9 @@ namespace Moda.Api.Client
         /// Get audit logs of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> GetLogsAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> Profile_GetLogsAsync()
         {
-            return GetLogsAsync(System.Threading.CancellationToken.None);
+            return Profile_GetLogsAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4404,7 +4404,7 @@ namespace Moda.Api.Client
         /// Get audit logs of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> GetLogsAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> Profile_GetLogsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/profile/logs");
@@ -4578,79 +4578,79 @@ namespace Moda.Api.Client
         /// Get a list of all Azure DevOps Boards connections.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetList28Async(bool? includeDisabled);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetListAsync(bool? includeDisabled);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all Azure DevOps Boards connections.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetList28Async(bool? includeDisabled, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetListAsync(bool? includeDisabled, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Create25Async(CreateAzureDevOpsBoardConnectionRequest request);
+        System.Threading.Tasks.Task AzureDevOpsBoardsConnections_CreateAsync(CreateAzureDevOpsBoardConnectionRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Create25Async(CreateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task AzureDevOpsBoardsConnections_CreateAsync(CreateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetById2AllAsync(System.Guid id);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetByIdAsync(System.Guid id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetById2AllAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetByIdAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Update25Async(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request);
+        System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Update25Async(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> GetConfigAsync(System.Guid id);
+        System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> AzureDevOpsBoardsConnections_GetConfigAsync(System.Guid id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> GetConfigAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> AzureDevOpsBoardsConnections_GetConfigAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request);
+        System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -4693,9 +4693,9 @@ namespace Moda.Api.Client
         /// Get a list of all Azure DevOps Boards connections.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetList28Async(bool? includeDisabled)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetListAsync(bool? includeDisabled)
         {
-            return GetList28Async(includeDisabled, System.Threading.CancellationToken.None);
+            return AzureDevOpsBoardsConnections_GetListAsync(includeDisabled, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4703,7 +4703,7 @@ namespace Moda.Api.Client
         /// Get a list of all Azure DevOps Boards connections.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetList28Async(bool? includeDisabled, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetListAsync(bool? includeDisabled, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections?");
@@ -4776,9 +4776,9 @@ namespace Moda.Api.Client
         /// Create an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Create25Async(CreateAzureDevOpsBoardConnectionRequest request)
+        public virtual System.Threading.Tasks.Task AzureDevOpsBoardsConnections_CreateAsync(CreateAzureDevOpsBoardConnectionRequest request)
         {
-            return Create25Async(request, System.Threading.CancellationToken.None);
+            return AzureDevOpsBoardsConnections_CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4786,7 +4786,7 @@ namespace Moda.Api.Client
         /// Create an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Create25Async(CreateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task AzureDevOpsBoardsConnections_CreateAsync(CreateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -4869,9 +4869,9 @@ namespace Moda.Api.Client
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetById2AllAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetByIdAsync(System.Guid id)
         {
-            return GetById2AllAsync(id, System.Threading.CancellationToken.None);
+            return AzureDevOpsBoardsConnections_GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4879,7 +4879,7 @@ namespace Moda.Api.Client
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetById2AllAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetByIdAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -4961,9 +4961,9 @@ namespace Moda.Api.Client
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Update25Async(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request)
+        public virtual System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request)
         {
-            return Update25Async(id, request, System.Threading.CancellationToken.None);
+            return AzureDevOpsBoardsConnections_UpdateAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4971,7 +4971,7 @@ namespace Moda.Api.Client
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Update25Async(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -5054,9 +5054,9 @@ namespace Moda.Api.Client
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> GetConfigAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> AzureDevOpsBoardsConnections_GetConfigAsync(System.Guid id)
         {
-            return GetConfigAsync(id, System.Threading.CancellationToken.None);
+            return AzureDevOpsBoardsConnections_GetConfigAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -5064,7 +5064,7 @@ namespace Moda.Api.Client
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> GetConfigAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> AzureDevOpsBoardsConnections_GetConfigAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -5146,9 +5146,9 @@ namespace Moda.Api.Client
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request)
+        public virtual System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request)
         {
-            return UpdateConfigAsync(id, request, System.Threading.CancellationToken.None);
+            return AzureDevOpsBoardsConnections_UpdateConfigAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -5156,7 +5156,7 @@ namespace Moda.Api.Client
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -5345,14 +5345,14 @@ namespace Moda.Api.Client
         /// Get a list of all connectors.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetList29Async();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> Connectors_GetListAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all connectors.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetList29Async(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> Connectors_GetListAsync(System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -5395,9 +5395,9 @@ namespace Moda.Api.Client
         /// Get a list of all connectors.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetList29Async()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> Connectors_GetListAsync()
         {
-            return GetList29Async(System.Threading.CancellationToken.None);
+            return Connectors_GetListAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -5405,7 +5405,7 @@ namespace Moda.Api.Client
         /// Get a list of all connectors.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetList29Async(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> Connectors_GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/connectors");

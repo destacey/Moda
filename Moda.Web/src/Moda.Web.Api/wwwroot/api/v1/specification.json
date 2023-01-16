@@ -16,7 +16,7 @@
           "BacklogCategories"
         ],
         "summary": "Get a list of all backlog categories.",
-        "operationId": "GetList",
+        "operationId": "BacklogCategories_GetList",
         "responses": {
           "200": {
             "description": "",
@@ -45,7 +45,7 @@
           "BacklogLevels"
         ],
         "summary": "Get a list of all backlog levels.",
-        "operationId": "GetList2",
+        "operationId": "BacklogLevels_GetList",
         "responses": {
           "200": {
             "description": "",
@@ -72,7 +72,7 @@
           "BacklogLevels"
         ],
         "summary": "Create a backlog level.",
-        "operationId": "Create",
+        "operationId": "BacklogLevels_Create",
         "requestBody": {
           "x-name": "request",
           "content": {
@@ -123,7 +123,7 @@
           "BacklogLevels"
         ],
         "summary": "Get backlog level details using the id.",
-        "operationId": "GetById",
+        "operationId": "BacklogLevels_GetById",
         "parameters": [
           {
             "name": "id",
@@ -169,7 +169,7 @@
           "BacklogLevels"
         ],
         "summary": "Update a backlog level.",
-        "operationId": "Update",
+        "operationId": "BacklogLevels_Update",
         "parameters": [
           {
             "name": "id",
@@ -222,7 +222,7 @@
           "WorkStateCategories"
         ],
         "summary": "Get a list of all work state categories.",
-        "operationId": "GetList22",
+        "operationId": "WorkStateCategories_GetList",
         "responses": {
           "200": {
             "description": "",
@@ -251,7 +251,7 @@
           "WorkStates"
         ],
         "summary": "Get a list of all work states.",
-        "operationId": "GetList23",
+        "operationId": "WorkStates_GetList",
         "parameters": [
           {
             "name": "includeInactive",
@@ -289,7 +289,7 @@
           "WorkStates"
         ],
         "summary": "Create a work state.",
-        "operationId": "Create2",
+        "operationId": "WorkStates_Create",
         "requestBody": {
           "x-name": "request",
           "content": {
@@ -340,7 +340,7 @@
           "WorkStates"
         ],
         "summary": "Get work state details using the id.",
-        "operationId": "GetById2",
+        "operationId": "WorkStates_GetById",
         "parameters": [
           {
             "name": "id",
@@ -386,7 +386,7 @@
           "WorkStates"
         ],
         "summary": "Update a work state.",
-        "operationId": "Update2",
+        "operationId": "WorkStates_Update",
         "parameters": [
           {
             "name": "id",
@@ -439,7 +439,7 @@
           "WorkTypes"
         ],
         "summary": "Get a list of all work types.",
-        "operationId": "GetList24",
+        "operationId": "WorkTypes_GetList",
         "parameters": [
           {
             "name": "includeInactive",
@@ -477,7 +477,7 @@
           "WorkTypes"
         ],
         "summary": "Create a work type.",
-        "operationId": "Create22",
+        "operationId": "WorkTypes_Create",
         "requestBody": {
           "x-name": "request",
           "content": {
@@ -528,7 +528,7 @@
           "WorkTypes"
         ],
         "summary": "Get work type details using the id.",
-        "operationId": "GetById22",
+        "operationId": "WorkTypes_GetById",
         "parameters": [
           {
             "name": "id",
@@ -574,7 +574,7 @@
           "WorkTypes"
         ],
         "summary": "Update a work type.",
-        "operationId": "Update22",
+        "operationId": "WorkTypes_Update",
         "parameters": [
           {
             "name": "id",
@@ -627,7 +627,7 @@
           "Employees"
         ],
         "summary": "Get a list of all employees.",
-        "operationId": "GetList25",
+        "operationId": "Employees_GetList",
         "parameters": [
           {
             "name": "includeInactive",
@@ -665,7 +665,7 @@
           "Employees"
         ],
         "summary": "Create an employee.",
-        "operationId": "Create23",
+        "operationId": "Employees_Create",
         "requestBody": {
           "x-name": "request",
           "content": {
@@ -716,7 +716,7 @@
           "Employees"
         ],
         "summary": "Get employee details using the localId.",
-        "operationId": "GetById23",
+        "operationId": "Employees_GetById",
         "parameters": [
           {
             "name": "id",
@@ -762,7 +762,7 @@
           "Employees"
         ],
         "summary": "Update an employee.",
-        "operationId": "Update23",
+        "operationId": "Employees_Update",
         "parameters": [
           {
             "name": "id",
@@ -815,7 +815,7 @@
           "Roles"
         ],
         "summary": "Get a list of all roles.",
-        "operationId": "GetList26",
+        "operationId": "Roles_GetList",
         "responses": {
           "200": {
             "description": "",
@@ -842,7 +842,7 @@
           "Roles"
         ],
         "summary": "Create or update a role.",
-        "operationId": "Create24",
+        "operationId": "Roles_Create",
         "requestBody": {
           "x-name": "request",
           "content": {
@@ -880,7 +880,7 @@
           "Roles"
         ],
         "summary": "Get role details.",
-        "operationId": "GetById24",
+        "operationId": "Roles_GetById",
         "parameters": [
           {
             "name": "id",
@@ -916,7 +916,7 @@
           "Roles"
         ],
         "summary": "Delete a role.",
-        "operationId": "Delete",
+        "operationId": "Roles_Delete",
         "parameters": [
           {
             "name": "id",
@@ -954,7 +954,7 @@
           "Roles"
         ],
         "summary": "Get role details with its permissions.",
-        "operationId": "GetByIdWithPermissions",
+        "operationId": "Roles_GetByIdWithPermissions",
         "parameters": [
           {
             "name": "id",
@@ -990,7 +990,7 @@
           "Roles"
         ],
         "summary": "Update a role's permissions.",
-        "operationId": "UpdatePermissions",
+        "operationId": "Roles_UpdatePermissions",
         "parameters": [
           {
             "name": "id",
@@ -1040,7 +1040,7 @@
           "Users"
         ],
         "summary": "Get list of all users.",
-        "operationId": "GetList27",
+        "operationId": "Users_GetList",
         "responses": {
           "200": {
             "description": "",
@@ -1069,7 +1069,7 @@
           "Users"
         ],
         "summary": "Get a user's details.",
-        "operationId": "GetById25",
+        "operationId": "Users_GetById",
         "parameters": [
           {
             "name": "id",
@@ -1117,7 +1117,7 @@
           "Users"
         ],
         "summary": "Get a user's roles.",
-        "operationId": "GetRoles",
+        "operationId": "Users_GetRoles",
         "parameters": [
           {
             "name": "id",
@@ -1156,7 +1156,7 @@
           "Users"
         ],
         "summary": "Update a user's assigned roles.",
-        "operationId": "AssignRoles",
+        "operationId": "Users_AssignRoles",
         "parameters": [
           {
             "name": "id",
@@ -1226,7 +1226,7 @@
           "Users"
         ],
         "summary": "Toggle a user's active status.",
-        "operationId": "ToggleStatus",
+        "operationId": "Users_ToggleStatus",
         "parameters": [
           {
             "name": "id",
@@ -1289,7 +1289,7 @@
           "Profile"
         ],
         "summary": "Get profile details of currently logged in user.",
-        "operationId": "Get",
+        "operationId": "Profile_Get",
         "responses": {
           "200": {
             "description": "",
@@ -1313,7 +1313,7 @@
           "Profile"
         ],
         "summary": "Update profile details of currently logged in user.",
-        "operationId": "Update24",
+        "operationId": "Profile_Update",
         "requestBody": {
           "x-name": "request",
           "content": {
@@ -1352,7 +1352,7 @@
           "Profile"
         ],
         "summary": "Get permissions of currently logged in user.",
-        "operationId": "GetPermissions",
+        "operationId": "Profile_GetPermissions",
         "responses": {
           "200": {
             "description": "",
@@ -1381,7 +1381,7 @@
           "Profile"
         ],
         "summary": "Get audit logs of currently logged in user.",
-        "operationId": "GetLogs",
+        "operationId": "Profile_GetLogs",
         "responses": {
           "200": {
             "description": "",
@@ -1410,7 +1410,7 @@
           "AzureDevOpsBoardsConnections"
         ],
         "summary": "Get a list of all Azure DevOps Boards connections.",
-        "operationId": "GetList28",
+        "operationId": "AzureDevOpsBoardsConnections_GetList",
         "parameters": [
           {
             "name": "includeDisabled",
@@ -1448,7 +1448,7 @@
           "AzureDevOpsBoardsConnections"
         ],
         "summary": "Create an Azure DevOps Boards connection.",
-        "operationId": "Create25",
+        "operationId": "AzureDevOpsBoardsConnections_Create",
         "requestBody": {
           "x-name": "request",
           "content": {
@@ -1499,7 +1499,7 @@
           "AzureDevOpsBoardsConnections"
         ],
         "summary": "Get Azure DevOps Boards connection based on id.",
-        "operationId": "GetById2All",
+        "operationId": "AzureDevOpsBoardsConnections_GetById",
         "parameters": [
           {
             "name": "id",
@@ -1548,7 +1548,7 @@
           "AzureDevOpsBoardsConnections"
         ],
         "summary": "Update an Azure DevOps Boards connection.",
-        "operationId": "Update25",
+        "operationId": "AzureDevOpsBoardsConnections_Update",
         "parameters": [
           {
             "name": "id",
@@ -1601,7 +1601,7 @@
           "AzureDevOpsBoardsConnections"
         ],
         "summary": "Get Azure DevOps Boards connection based on id.",
-        "operationId": "GetConfig",
+        "operationId": "AzureDevOpsBoardsConnections_GetConfig",
         "parameters": [
           {
             "name": "id",
@@ -1647,7 +1647,7 @@
           "AzureDevOpsBoardsConnections"
         ],
         "summary": "Update an Azure DevOps Boards connection.",
-        "operationId": "UpdateConfig",
+        "operationId": "AzureDevOpsBoardsConnections_UpdateConfig",
         "parameters": [
           {
             "name": "id",
@@ -1700,7 +1700,7 @@
           "Connectors"
         ],
         "summary": "Get a list of all connectors.",
-        "operationId": "GetList29",
+        "operationId": "Connectors_GetList",
         "responses": {
           "200": {
             "description": "",

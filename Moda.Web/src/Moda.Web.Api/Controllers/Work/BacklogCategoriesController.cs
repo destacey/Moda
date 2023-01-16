@@ -15,7 +15,7 @@ public class BacklogCategoriesController : VersionNeutralApiController
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BacklogCategories)]
-    [OpenApiOperation(nameof(GetList), "Get a list of all backlog categories.", "")]
+    [OpenApiOperation("Get a list of all backlog categories.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<ConnectorListDto>>> GetList(CancellationToken cancellationToken)
     {

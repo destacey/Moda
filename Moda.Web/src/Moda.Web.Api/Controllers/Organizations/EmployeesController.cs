@@ -13,7 +13,7 @@ public class EmployeesController : VersionNeutralApiController
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
-    [OpenApiOperation(nameof(GetList), "Get a list of all employees.", "")]
+    [OpenApiOperation("Get a list of all employees.", "")]
     //[ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Get))] // TODO not working
     public async Task<ActionResult<IReadOnlyList<EmployeeListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
@@ -23,7 +23,7 @@ public class EmployeesController : VersionNeutralApiController
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
-    [OpenApiOperation(nameof(GetById), "Get employee details using the localId.", "")]
+    [OpenApiOperation("Get employee details using the localId.", "")]
     //[ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Get))] // TODO not working
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -38,7 +38,7 @@ public class EmployeesController : VersionNeutralApiController
 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Employees)]
-    [OpenApiOperation(nameof(Create), "Create an employee.", "")]
+    [OpenApiOperation("Create an employee.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
     public async Task<ActionResult> Create(CreateEmployeeRequest request, CancellationToken cancellationToken)
     {
@@ -51,7 +51,7 @@ public class EmployeesController : VersionNeutralApiController
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Employees)]
-    [OpenApiOperation(nameof(Update), "Update an employee.", "")]
+    [OpenApiOperation("Update an employee.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Update(Guid id, UpdateEmployeeRequest request, CancellationToken cancellationToken)
@@ -68,7 +68,7 @@ public class EmployeesController : VersionNeutralApiController
 
     //[HttpDelete("{id}")]
     //[MustHavePermission(ApplicationAction.Delete, ApplicationResource.Employees)]
-    //[OpenApiOperation(nameof(Delete), "Delete an employee.", "")]
+    //[OpenApiOperation("Delete an employee.", "")]
     //public async Task<string> Delete(string id)
     //{
     //    throw new NotImplementedException();
