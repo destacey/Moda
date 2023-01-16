@@ -3,29 +3,29 @@ using FluentValidation.AspNetCore;
 
 namespace Moda.Web.Api.Controllers.Identity;
 
-public class PersonalController : VersionNeutralApiController
+public class ProfileController : VersionNeutralApiController
 {
     private readonly IUserService _userService;
     private readonly ISender _mediator;
 
-    public PersonalController(IUserService userService, ISender mediator)
+    public ProfileController(IUserService userService, ISender mediator)
     {
         _userService = userService;
         _mediator = mediator;
     }
 
-    [HttpGet("profile")]
-    [OpenApiOperation("Get profile details of currently logged in user.", "")]
-    public async Task<ActionResult<UserDetailsDto>> GetProfile(CancellationToken cancellationToken)
+    [HttpGet]
+    [OpenApiOperation(nameof(Get), "Get profile details of currently logged in user.", "")]
+    public async Task<ActionResult<UserDetailsDto>> Get(CancellationToken cancellationToken)
     {
         return User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId)
             ? Unauthorized()
             : Ok(await _userService.GetAsync(userId, cancellationToken));
     }
 
-    [HttpPut("profile")]
-    [OpenApiOperation("Update profile details of currently logged in user.", "")]
-    public async Task<ActionResult> UpdateProfile(UpdateUserCommand request)
+    [HttpPut]
+    [OpenApiOperation(nameof(Update), "Update profile details of currently logged in user.", "")]
+    public async Task<ActionResult> Update(UpdateUserCommand request)
     {
         var validator = new UpdateUserCommandValidator(_userService);
         var result = await validator.ValidateAsync(request);
@@ -43,7 +43,7 @@ public class PersonalController : VersionNeutralApiController
     }
 
     [HttpGet("permissions")]
-    [OpenApiOperation("Get permissions of currently logged in user.", "")]
+    [OpenApiOperation(nameof(GetPermissions), "Get permissions of currently logged in user.", "")]
     public async Task<ActionResult<List<string>>> GetPermissions(CancellationToken cancellationToken)
     {
         return User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId)
@@ -52,7 +52,7 @@ public class PersonalController : VersionNeutralApiController
     }
 
     [HttpGet("logs")]
-    [OpenApiOperation("Get audit logs of currently logged in user.", "")]
+    [OpenApiOperation(nameof(GetLogs), "Get audit logs of currently logged in user.", "")]
     public Task<List<AuditDto>> GetLogs()
     {
         return _mediator.Send(new GetMyAuditLogsQuery());

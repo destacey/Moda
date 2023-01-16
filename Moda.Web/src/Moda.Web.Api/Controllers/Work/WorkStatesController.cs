@@ -17,7 +17,7 @@ public class WorkStatesController : VersionNeutralApiController
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkStates)]
-    [OpenApiOperation("Get a list of all work states.", "")]
+    [OpenApiOperation(nameof(GetList), "Get a list of all work states.", "")]
     public async Task<ActionResult<IReadOnlyList<WorkStateDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var workStates = await _sender.Send(new GetWorkStatesQuery(includeInactive), cancellationToken);
@@ -26,7 +26,7 @@ public class WorkStatesController : VersionNeutralApiController
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkStates)]
-    [OpenApiOperation("Get work state details using the id.", "")]
+    [OpenApiOperation(nameof(GetById), "Get work state details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WorkStateDto>> GetById(int id)
@@ -40,7 +40,7 @@ public class WorkStatesController : VersionNeutralApiController
 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.WorkStates)]
-    [OpenApiOperation("Create a work state.", "")]
+    [OpenApiOperation(nameof(Create), "Create a work state.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
     public async Task<ActionResult> Create(CreateWorkStateRequest request, CancellationToken cancellationToken)
     {
@@ -53,7 +53,7 @@ public class WorkStatesController : VersionNeutralApiController
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkStates)]
-    [OpenApiOperation("Update a work state.", "")]
+    [OpenApiOperation(nameof(Update), "Update a work state.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Update(int id, UpdateWorkStateRequest request, CancellationToken cancellationToken)
@@ -70,7 +70,7 @@ public class WorkStatesController : VersionNeutralApiController
 
     //[HttpDelete("{id}")]
     //[MustHavePermission(ApplicationAction.Delete, ApplicationResource.WorkStates)]
-    //[OpenApiOperation("Delete a work state.", "")]
+    //[OpenApiOperation(nameof(Delete), "Delete a work state.", "")]
     //public async Task<ActionResult> Delete(int id)
     //{
     //    throw new NotImplementedException();

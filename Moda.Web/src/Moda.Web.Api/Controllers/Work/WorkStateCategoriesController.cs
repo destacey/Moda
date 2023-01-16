@@ -15,7 +15,7 @@ public class WorkStateCategoriesController : VersionNeutralApiController
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkStateCategories)]
-    [OpenApiOperation("Get a list of all work state categories.", "")]
+    [OpenApiOperation(nameof(GetList), "Get a list of all work state categories.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<ConnectorListDto>>> GetList(CancellationToken cancellationToken)
     {

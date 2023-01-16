@@ -1,4 +1,5 @@
 ﻿namespace Moda.Web.Api.Controllers.Organizations;
+
 public class EmployeesController : VersionNeutralApiController
 {
     private readonly ILogger<EmployeesController> _logger;
@@ -12,7 +13,7 @@ public class EmployeesController : VersionNeutralApiController
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
-    [OpenApiOperation("Get a list of all employees.", "")]
+    [OpenApiOperation(nameof(GetList), "Get a list of all employees.", "")]
     //[ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Get))] // TODO not working
     public async Task<ActionResult<IReadOnlyList<EmployeeListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
@@ -22,7 +23,7 @@ public class EmployeesController : VersionNeutralApiController
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
-    [OpenApiOperation("Get employee details using the localId.", "")]
+    [OpenApiOperation(nameof(GetById), "Get employee details using the localId.", "")]
     //[ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Get))] // TODO not working
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -37,9 +38,9 @@ public class EmployeesController : VersionNeutralApiController
 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Employees)]
-    [OpenApiOperation("Create an employee.", "")]
+    [OpenApiOperation(nameof(Create), "Create an employee.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
-    public async Task<ActionResult> CreateEmployee(CreateEmployeeRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> Create(CreateEmployeeRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateEmployeeCommand(), cancellationToken);
 
@@ -50,10 +51,10 @@ public class EmployeesController : VersionNeutralApiController
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Employees)]
-    [OpenApiOperation("Update an employee.", "")]
+    [OpenApiOperation(nameof(Update), "Update an employee.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> UpdateEmployee(Guid id, UpdateEmployeeRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> Update(Guid id, UpdateEmployeeRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
             return BadRequest();
@@ -67,7 +68,7 @@ public class EmployeesController : VersionNeutralApiController
 
     //[HttpDelete("{id}")]
     //[MustHavePermission(ApplicationAction.Delete, ApplicationResource.Employees)]
-    //[OpenApiOperation("Delete an employee.", "")]
+    //[OpenApiOperation(nameof(Delete), "Delete an employee.", "")]
     //public async Task<string> Delete(string id)
     //{
     //    throw new NotImplementedException();
