@@ -5,8 +5,8 @@ public class RolesController : VersionNeutralApiController
     private readonly IRoleService _roleService;
 
     public RolesController(IRoleService roleService)
-    { 
-        _roleService = roleService; 
+    {
+        _roleService = roleService;
     }
 
     [HttpGet]
@@ -40,15 +40,15 @@ public class RolesController : VersionNeutralApiController
     [OpenApiOperation("Update a role's permissions.", "")]
     public async Task<ActionResult<string>> UpdatePermissions(string id, UpdateRolePermissionsRequest request, CancellationToken cancellationToken)
     {
-        return id != request.RoleId 
-            ? BadRequest() 
+        return id != request.RoleId
+            ? BadRequest()
             : Ok(await _roleService.UpdatePermissionsAsync(request.ToUpdateRolePermissionsCommand(), cancellationToken));
     }
 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roles)]
     [OpenApiOperation("Create or update a role.", "")]
-    public async Task<ActionResult<string>> RegisterRole(CreateOrUpdateRoleRequest request)
+    public async Task<ActionResult<string>> Create(CreateOrUpdateRoleRequest request)
     {
         return await _roleService.CreateOrUpdateAsync(request.ToCreateOrUpdateRoleCommand());
     }

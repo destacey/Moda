@@ -21,10 +21,10 @@ public class BacklogLevelsController : VersionNeutralApiController
     public async Task<ActionResult<IReadOnlyList<BacklogLevelDto>>> GetList(CancellationToken cancellationToken)
     {
         var backlogLevels = await _sender.Send(new GetBacklogLevelsQuery(), cancellationToken);
-        
+
         return Ok(backlogLevels.OrderBy(l => (int)l.Category).ThenByDescending(s => s.Rank));
     }
-    
+
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BacklogLevels)]
     [OpenApiOperation("Get backlog level details using the id.", "")]

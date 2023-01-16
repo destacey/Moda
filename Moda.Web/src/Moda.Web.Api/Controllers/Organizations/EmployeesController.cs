@@ -1,4 +1,5 @@
 ﻿namespace Moda.Web.Api.Controllers.Organizations;
+
 public class EmployeesController : VersionNeutralApiController
 {
     private readonly ILogger<EmployeesController> _logger;
@@ -39,7 +40,7 @@ public class EmployeesController : VersionNeutralApiController
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Employees)]
     [OpenApiOperation("Create an employee.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
-    public async Task<ActionResult> CreateEmployee(CreateEmployeeRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> Create(CreateEmployeeRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateEmployeeCommand(), cancellationToken);
 
@@ -53,7 +54,7 @@ public class EmployeesController : VersionNeutralApiController
     [OpenApiOperation("Update an employee.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> UpdateEmployee(Guid id, UpdateEmployeeRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> Update(Guid id, UpdateEmployeeRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
             return BadRequest();

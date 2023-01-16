@@ -30,7 +30,7 @@ public class AzureDevOpsBoardsConnectionsController : VersionNeutralApiControlle
     public async Task<ActionResult<IReadOnlyList<ConnectionListDto>>> GetById(Guid id, CancellationToken cancellationToken)
     {
         var connection = await _sender.Send(new GetConnectionQuery(id), cancellationToken);
-        
+
         return connection is not null
             ? Ok(connection)
             : NotFound();
@@ -41,7 +41,7 @@ public class AzureDevOpsBoardsConnectionsController : VersionNeutralApiControlle
     [OpenApiOperation("Get Azure DevOps Boards connection based on id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<AzureDevOpsBoardsConnectionConfigurationDto>> GetConfigById(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<AzureDevOpsBoardsConnectionConfigurationDto>> GetConfig(Guid id, CancellationToken cancellationToken)
     {
         var config = await _sender.Send(new GetAzureDevOpsBoardsConnectionConfigurationQuery(id), cancellationToken);
 
