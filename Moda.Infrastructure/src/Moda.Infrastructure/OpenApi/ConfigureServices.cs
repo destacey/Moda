@@ -109,6 +109,7 @@ internal static class ConfigureServices
                 };
                 options.OAuth2Client.Scopes.Add(config["SecuritySettings:Swagger:ApiScope"]);
             });
+            app.UseReDoc(options => options.Path = "/redoc");
         }
 
         return app;
