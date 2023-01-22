@@ -81,7 +81,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.AppIntegration.Applica
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Work.Application", "Moda.Work\src\Moda.Work.Application\Moda.Work.Application.csproj", "{15095DC2-7C29-45BE-BF7E-1BEA769FEDC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Web.BlazorClient", "Moda.Web\src\Moda.Web.BlazorClient\Moda.Web.BlazorClient.csproj", "{39B83D12-0D1C-41EE-B8A0-7434861C0BD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Web.BlazorClient", "Moda.Web\src\Moda.Web.BlazorClient\Moda.Web.BlazorClient.csproj", "{39B83D12-0D1C-41EE-B8A0-7434861C0BD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,12 +1,36 @@
-﻿@using System.Net.Http
-@using System.Net.Http.Json
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Extensions.Configuration
+@using Microsoft.Extensions.DependencyInjection
 @using Microsoft.JSInterop
-@using MudBlazor
+@using Moda.Common.Domain.Authorization;
 @using Moda.Web.BlazorClient
 @using Moda.Web.BlazorClient.Shared
+@using Moda.Web.BlazorClient.Pages.Authentication
+@using Moda.Web.BlazorClient.Components.Common
+@using Moda.Web.BlazorClient.Components.ThemeManager
+@using Moda.Web.BlazorClient.Infrastructure.ApiClient
+@using Moda.Web.BlazorClient.Infrastructure.Auth
+@using Moda.Web.BlazorClient.Infrastructure.Common
+@using Moda.Web.BlazorClient.Infrastructure.Preferences
+@using Blazored.LocalStorage
+@using Mapster
+@using MudBlazor
+
+
+@attribute [Authorize]
+
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IConfiguration Config
+@inject IClientPreferenceManager ClientPreferences

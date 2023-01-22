@@ -47,8 +47,7 @@
     </ItemGroup>
     
     <Target Name="NSwag" AfterTargets="Build">
-        <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
-              Command="$(NSwagExe_Net70) aspnetcore2openapi /assembly:$(TargetDir)Moda.Web.Api.dll /output:wwwroot/api/v1/specification.json" />
-        <Exec Command="$(NSwagExe_Net70) openapi2csclient /input:wwwroot/api/v1/specification.json /namespace:Moda.Api.Client /generateClientInterfaces:true /OperationGenerationMode:MultipleClientsFromFirstTagAndOperationId /output:../Moda.Web.BlazorClient/Services/ModaWebApiClient.generated.cs" />
+        <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net70) aspnetcore2openapi /assembly:$(TargetDir)Moda.Web.Api.dll /output:wwwroot/api/v1/specification.json" />
+        <Exec Command="$(NSwagExe_Net70) openapi2csclient /input:wwwroot/api/v1/specification.json /namespace:Moda.Web.BlazorClient.Infrastructure.ApiClient /generateClientInterfaces:true /clientBaseInterface:IApiService /OperationGenerationMode:MultipleClientsFromOperationId /output:../Moda.Web.BlazorClient/Infrastructure/ApiClient/ModaApi.cs" />
     </Target>
 </Project>

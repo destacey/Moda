@@ -1,0 +1,72 @@
+﻿@page "/authentication/{action}"
+@attribute [AllowAnonymous]
+
+<RemoteAuthenticatorView Action="@Action">
+    @* Override the different child items to adapt them to our own style
+        I've done this for LogOutSucceeded now, already added the rest but with the defaults (and localization). *@
+    <LogOutSucceeded>
+        <MudItem Class="d-flex justify-center">
+            <MudText Typo="Typo.h5" GutterBottom="true">
+                You were successfully logged out.
+            </MudText>
+        </MudItem>
+        <MudItem Class="d-flex justify-center">
+            <MudButton OnClick="GoHome" Color="Color.Primary" Size="Size.Large">
+                Click here to log back in.
+            </MudButton>
+        </MudItem>
+    </LogOutSucceeded>
+    <LoggingIn>
+        <span>Logging you in...</span>
+    </LoggingIn>
+    <CompletingLoggingIn>
+        <span>Checking permissions...</span>
+    </CompletingLoggingIn>
+    <LogInFailed>
+        <MudItem Class="d-flex justify-center">
+            <MudText Typo="Typo.h5" GutterBottom="true">
+                Sorry, your login failed. Please try again or contact your administrator.
+            </MudText>
+        </MudItem>
+        @if (GetMessage() is string message && !string.IsNullOrWhiteSpace(message))
+        {
+            <MudItem Class="d-flex justify-center">
+                @message
+            </MudItem>
+        }
+    </LogInFailed>
+    <LogOut>
+        <span>Logging you out...</span>
+    </LogOut>
+    <CompletingLogOut>
+        <span>Logging you out...</span>
+    </CompletingLogOut>
+    <LogOutFailed>
+        <span>Sorry, log out operation failed. Please try again or contact your administrator.</span>
+    </LogOutFailed>
+    <UserProfile>
+        <span>Retrieving profile...</span>
+    </UserProfile>
+    <Registering>
+        <span>Registering account...</span>
+    </Registering>
+</RemoteAuthenticatorView>
+
+@code {
+    [Parameter] public string? Action { get; set; }
+
+    private void GoHome() => Navigation.NavigateTo("/");
+
+    private string? GetMessage()
+    {
+        var query = Navigation.ToAbsoluteUri(Navigation.Uri).Query;
+
+        if (!string.IsNullOrWhiteSpace(query)
+            && QueryHelpers.ParseQuery(query).TryGetValue("message", out var message))
+        {
+            return message.ToString();
+        }
+
+        return null;
+    }
+}

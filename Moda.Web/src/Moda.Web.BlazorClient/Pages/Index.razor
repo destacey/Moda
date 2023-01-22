@@ -1,6 +1,28 @@
-﻿@page "/"
+﻿@page "/home"
+@page "/"
 
-<PageTitle>Home</PageTitle>
+<MudContainer>
+    <MudGrid>
+        <MudItem xs="12" sm="12" md="12">
+            <MudText Align="Align.Center">
+                "Built with the goodness of" <MudLink Href="https://www.mudblazor.com" Target="_blank">MudBlazor</MudLink> Component Library and <MudLink Href="https://fullstackhero.net/" arget="_blank">fullstackhero Templates</MudLink>.
+            </MudText>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="12">
+            <MudText Align="Align.Center">Version 0.1.0</MudText>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
-<MudText Class="mb-8">Welcome to your new app, powered by MudBlazor!</MudText>
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    public IEnumerable<Claim>? Claims { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthState;
+        Claims = authState.User.Claims;
+    }
+}
