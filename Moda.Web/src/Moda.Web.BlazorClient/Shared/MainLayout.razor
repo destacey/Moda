@@ -9,7 +9,7 @@
         <MudSpacer />
         @*<LoginDisplay />*@
         
-        <UserMenu />
+        <UserMenu ThemeManagerOnClick="@ThemeManagerOnClick" />
         
         <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
     </MudAppBar>
@@ -28,29 +28,21 @@
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; } = default!;
+    
     [Parameter]
     public EventCallback OnDarkModeToggle { get; set; }
+    
     [Parameter]
-    public EventCallback<bool> OnRightToLeftToggle { get; set; }
+    public EventCallback<MouseEventArgs> ThemeManagerOnClick { get; set; }
 
     private bool _drawerOpen;
-    private bool _rightToLeft;
 
     protected override async Task OnInitializedAsync()
     {
         if (await ClientPreferences.GetPreference() is ClientPreference preference)
         {
-            _rightToLeft = preference.IsRTL;
             _drawerOpen = preference.IsDrawerOpen;
         }
-    }
-
-    private async Task RightToLeftToggle()
-    {
-        bool isRtl = await ClientPreferences.ToggleLayoutDirectionAsync();
-        _rightToLeft = isRtl;
-
-        await OnRightToLeftToggle.InvokeAsync(isRtl);
     }
 
     public async Task ToggleDarkMode()

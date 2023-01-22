@@ -39,18 +39,6 @@ public partial class ClientPreferenceManager : IClientPreferenceManager
         return false;
     }
 
-    public async Task<bool> ToggleLayoutDirectionAsync()
-    {
-        if (await GetPreference() is ClientPreference preference)
-        {
-            preference.IsRTL = !preference.IsRTL;
-            await SetPreference(preference);
-            return preference.IsRTL;
-        }
-
-        return false;
-    }
-
     public async Task<MudTheme> GetCurrentThemeAsync()
     {
         if (await GetPreference() is ClientPreference preference)
@@ -79,11 +67,6 @@ public partial class ClientPreferenceManager : IClientPreferenceManager
         }
 
         return CustomColors.Light.Primary;
-    }
-
-    public async Task<bool> IsRTL()
-    {
-        return await GetPreference() is ClientPreference preference ? preference.IsRTL : false;
     }
 
     public async Task<bool> IsDrawerOpen()

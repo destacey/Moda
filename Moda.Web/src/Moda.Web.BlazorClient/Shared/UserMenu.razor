@@ -24,6 +24,15 @@
                 </div>
             </MudMenuItem>
 
+            <MudDivider />
+
+            <MudMenuItem OnClick="ThemeManager">
+                <div class="d-flex">
+                    <MudIcon Class="mx-2" Icon="@Icons.Material.Filled.Brush" />
+                    <MudText>Theme Manager</MudText>
+                </div>
+            </MudMenuItem>
+
             <div class="mt-4 mx-4">
                 <MudButton Color="Color.Error" FullWidth="true" StartIcon="@Icons.Material.Filled.Logout"
                            Variant="Variant.Filled" OnClick="Logout">
@@ -35,6 +44,9 @@
 </MudMenu>
 
 @code {
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> ThemeManagerOnClick { get; set; }
 
     private void Profile()
     {
@@ -49,6 +61,11 @@
     private void AuditLogs()
     {
         Navigation.NavigateTo("/audit-logs");
+    }
+    
+    private async Task ThemeManager()
+    {
+        await ThemeManagerOnClick.InvokeAsync();
     }
 
     private void Logout()
