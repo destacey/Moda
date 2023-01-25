@@ -17,7 +17,8 @@
         </MudItem>
     </LogOutSucceeded>
     <LoggingIn>
-        <span>Logging you in...</span>
+        @*<span>Logging you in...</span>*@
+        <OnLoggingIn />
     </LoggingIn>
     <CompletingLoggingIn>
         <span>Checking permissions...</span>
@@ -68,5 +69,14 @@
         }
 
         return null;
+    }
+
+    private void ClientFeedback(string message)
+    {
+        Snackbar.Add(message, Severity.Normal, config =>
+        {
+            config.BackgroundBlurred = false;
+            config.Icon = Icons.Material.Filled.Security;
+        });
     }
 }

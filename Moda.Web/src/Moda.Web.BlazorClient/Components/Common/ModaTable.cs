@@ -15,7 +15,6 @@ public class ModaTable<T> : MudTable<T>
         {
             SetTablePreference(clientPreference.TablePreference);
         }
-
         
         await base.OnInitializedAsync();
     }

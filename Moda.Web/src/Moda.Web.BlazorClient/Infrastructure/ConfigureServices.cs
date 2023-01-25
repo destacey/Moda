@@ -34,8 +34,6 @@ public static class ConfigureServices
             // Add Api Http Client.
             .AddHttpClient(ClientName, client =>
             {
-                client.DefaultRequestHeaders.AcceptLanguage.Clear();
-                client.DefaultRequestHeaders.AcceptLanguage.ParseAdd(CultureInfo.DefaultThreadCurrentCulture?.TwoLetterISOLanguageName);
 #pragma warning disable CS8604 // Possible null reference argument.
                 client.BaseAddress = new Uri(config[ConfigNames.ApiBaseUrl]);
 #pragma warning restore CS8604 // Possible null reference argument.
