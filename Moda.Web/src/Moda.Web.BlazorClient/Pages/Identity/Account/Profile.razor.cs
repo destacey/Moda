@@ -20,7 +20,7 @@ public partial class Profile
 
     private readonly UpdateProfileRequest _profileModel = new();
 
-    //private string? _imageUrl;
+    private string? _imageUrl;
     private string? _userId;
     private char _firstLetterOfName;
 

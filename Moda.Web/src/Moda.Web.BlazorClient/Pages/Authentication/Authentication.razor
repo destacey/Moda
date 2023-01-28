@@ -2,8 +2,6 @@
 @attribute [AllowAnonymous]
 
 <RemoteAuthenticatorView Action="@Action">
-    @* Override the different child items to adapt them to our own style
-        I've done this for LogOutSucceeded now, already added the rest but with the defaults (and localization). *@
     <LogOutSucceeded>
         <MudItem Class="d-flex justify-center">
             <MudText Typo="Typo.h5" GutterBottom="true">
@@ -17,8 +15,7 @@
         </MudItem>
     </LogOutSucceeded>
     <LoggingIn>
-        @*<span>Logging you in...</span>*@
-        <OnLoggingIn />
+        <span>Logging you in...</span>
     </LoggingIn>
     <CompletingLoggingIn>
         <span>Checking permissions...</span>
@@ -69,14 +66,5 @@
         }
 
         return null;
-    }
-
-    private void ClientFeedback(string message)
-    {
-        Snackbar.Add(message, Severity.Normal, config =>
-        {
-            config.BackgroundBlurred = false;
-            config.Icon = Icons.Material.Filled.Security;
-        });
     }
 }

@@ -4,6 +4,8 @@
 // </auto-generated>
 //----------------------
 
+#nullable enable
+
 #pragma warning disable 108 // Disable "CS0108 '{derivedDto}.ToJson()' hides inherited member '{dtoBase}.ToJson()'. Use the new keyword if hiding was intended."
 #pragma warning disable 114 // Disable "CS0114 '{derivedDto}.RaisePropertyChanged(String)' hides inherited member 'dtoBase.RaisePropertyChanged(String)'. To make the current member override that implementation, add the override keyword. Otherwise add the new keyword."
 #pragma warning disable 472 // Disable "CS0472 The result of the expression is always 'false' since a value of type 'Int32' is never equal to 'null' of type 'Int32?'
@@ -38,13 +40,11 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class BacklogCategoriesClient : IBacklogCategoriesClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public BacklogCategoriesClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public BacklogCategoriesClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -54,12 +54,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -87,7 +81,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/backlogcategories");
+            urlBuilder_.Append("api/backlogcategories");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -167,7 +161,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -176,7 +170,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -194,7 +188,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -205,7 +199,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -311,13 +305,11 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class BacklogLevelsClient : IBacklogLevelsClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public BacklogLevelsClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public BacklogLevelsClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -327,12 +319,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -360,7 +346,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/backloglevels");
+            urlBuilder_.Append("api/backloglevels");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -441,7 +427,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/backloglevels");
+            urlBuilder_.Append("api/backloglevels");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -534,7 +520,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/backloglevels/{id}");
+            urlBuilder_.Append("api/backloglevels/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -629,7 +615,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/backloglevels/{id}");
+            urlBuilder_.Append("api/backloglevels/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -718,7 +704,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -727,7 +713,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -745,7 +731,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -756,7 +742,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -823,13 +809,11 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WorkStateCategoriesClient : IWorkStateCategoriesClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public WorkStateCategoriesClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public WorkStateCategoriesClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -839,12 +823,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -872,7 +850,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/workstatecategories");
+            urlBuilder_.Append("api/workstatecategories");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -952,7 +930,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -961,7 +939,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -979,7 +957,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -990,7 +968,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -1096,13 +1074,11 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WorkStatesClient : IWorkStatesClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public WorkStatesClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public WorkStatesClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -1112,12 +1088,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -1145,7 +1115,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/workstates?");
+            urlBuilder_.Append("api/workstates?");
             if (includeInactive != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("includeInactive") + "=").Append(System.Uri.EscapeDataString(ConvertToString(includeInactive, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -1231,7 +1201,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/workstates");
+            urlBuilder_.Append("api/workstates");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1324,7 +1294,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/workstates/{id}");
+            urlBuilder_.Append("api/workstates/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1419,7 +1389,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/workstates/{id}");
+            urlBuilder_.Append("api/workstates/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1508,7 +1478,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -1517,7 +1487,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -1535,7 +1505,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -1546,7 +1516,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -1652,13 +1622,11 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WorkTypesClient : IWorkTypesClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public WorkTypesClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public WorkTypesClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -1668,12 +1636,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -1701,7 +1663,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/worktypes?");
+            urlBuilder_.Append("api/worktypes?");
             if (includeInactive != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("includeInactive") + "=").Append(System.Uri.EscapeDataString(ConvertToString(includeInactive, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -1787,7 +1749,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/worktypes");
+            urlBuilder_.Append("api/worktypes");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1880,7 +1842,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/worktypes/{id}");
+            urlBuilder_.Append("api/worktypes/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1975,7 +1937,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/worktypes/{id}");
+            urlBuilder_.Append("api/worktypes/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2064,7 +2026,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -2073,7 +2035,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -2091,7 +2053,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -2102,7 +2064,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -2208,13 +2170,11 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class EmployeesClient : IEmployeesClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public EmployeesClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public EmployeesClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -2224,12 +2184,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -2257,7 +2211,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/employees?");
+            urlBuilder_.Append("api/employees?");
             if (includeInactive != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("includeInactive") + "=").Append(System.Uri.EscapeDataString(ConvertToString(includeInactive, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -2343,7 +2297,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/employees");
+            urlBuilder_.Append("api/employees");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2436,7 +2390,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/employees/{id}");
+            urlBuilder_.Append("api/employees/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2531,7 +2485,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/employees/{id}");
+            urlBuilder_.Append("api/employees/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2620,7 +2574,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -2629,7 +2583,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -2647,7 +2601,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -2658,7 +2612,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -2737,66 +2691,64 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get role details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RoleDto> GetByIdAsync(string id);
+        System.Threading.Tasks.Task<RoleDto> GetByIdAsync(string? id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get role details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RoleDto> GetByIdAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RoleDto> GetByIdAsync(string? id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Delete a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> DeleteAsync(string id);
+        System.Threading.Tasks.Task<string> DeleteAsync(string? id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Delete a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> DeleteAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<string> DeleteAsync(string? id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get role details with its permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string id);
+        System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string? id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get role details with its permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string? id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update a role's permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request);
+        System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string? id, UpdateRolePermissionsRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update a role's permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string? id, UpdateRolePermissionsRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class RolesClient : IRolesClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public RolesClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public RolesClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -2806,12 +2758,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -2839,7 +2785,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles");
+            urlBuilder_.Append("api/roles");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2920,7 +2866,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles");
+            urlBuilder_.Append("api/roles");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2989,7 +2935,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get role details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<RoleDto> GetByIdAsync(string id)
+        public virtual System.Threading.Tasks.Task<RoleDto> GetByIdAsync(string? id)
         {
             return GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
@@ -2999,10 +2945,10 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get role details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<RoleDto> GetByIdAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<RoleDto> GetByIdAsync(string? id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles/{id}");
+            urlBuilder_.Append("api/roles/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3068,7 +3014,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Delete a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<string> DeleteAsync(string id)
+        public virtual System.Threading.Tasks.Task<string> DeleteAsync(string? id)
         {
             return DeleteAsync(id, System.Threading.CancellationToken.None);
         }
@@ -3078,10 +3024,10 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Delete a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<string> DeleteAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<string> DeleteAsync(string? id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles/{id}");
+            urlBuilder_.Append("api/roles/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3147,7 +3093,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get role details with its permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string id)
+        public virtual System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string? id)
         {
             return GetByIdWithPermissionsAsync(id, System.Threading.CancellationToken.None);
         }
@@ -3157,10 +3103,10 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get role details with its permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string? id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles/{id}/permissions");
+            urlBuilder_.Append("api/roles/{id}/permissions");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3226,7 +3172,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Update a role's permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request)
+        public virtual System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string? id, UpdateRolePermissionsRequest request)
         {
             return UpdatePermissionsAsync(id, request, System.Threading.CancellationToken.None);
         }
@@ -3236,13 +3182,13 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Update a role's permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string? id, UpdateRolePermissionsRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles/{id}/permissions");
+            urlBuilder_.Append("api/roles/{id}/permissions");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3327,7 +3273,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -3336,7 +3282,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -3354,7 +3300,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -3365,7 +3311,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -3431,66 +3377,64 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get a user's details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<UserDetailsDto> GetByIdAsync(string id);
+        System.Threading.Tasks.Task<UserDetailsDto> GetByIdAsync(string? id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a user's details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<UserDetailsDto> GetByIdAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<UserDetailsDto> GetByIdAsync(string? id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a user's roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string id);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string? id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a user's roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string? id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update a user's assigned roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> AssignRolesAsync(string id, AssignUserRolesRequest request);
+        System.Threading.Tasks.Task<string> AssignRolesAsync(string? id, AssignUserRolesRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update a user's assigned roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> AssignRolesAsync(string id, AssignUserRolesRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<string> AssignRolesAsync(string? id, AssignUserRolesRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Toggle a user's active status.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ToggleStatusAsync(string id, ToggleUserStatusRequest request);
+        System.Threading.Tasks.Task ToggleStatusAsync(string? id, ToggleUserStatusRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Toggle a user's active status.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ToggleStatusAsync(string id, ToggleUserStatusRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task ToggleStatusAsync(string? id, ToggleUserStatusRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class UsersClient : IUsersClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public UsersClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public UsersClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -3500,12 +3444,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -3533,7 +3471,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users");
+            urlBuilder_.Append("api/users");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -3598,7 +3536,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get a user's details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<UserDetailsDto> GetByIdAsync(string id)
+        public virtual System.Threading.Tasks.Task<UserDetailsDto> GetByIdAsync(string? id)
         {
             return GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
@@ -3608,10 +3546,10 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get a user's details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<UserDetailsDto> GetByIdAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<UserDetailsDto> GetByIdAsync(string? id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users/{id}");
+            urlBuilder_.Append("api/users/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3687,7 +3625,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get a user's roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string id)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string? id)
         {
             return GetRolesAsync(id, System.Threading.CancellationToken.None);
         }
@@ -3697,10 +3635,10 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get a user's roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string? id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users/{id}/roles");
+            urlBuilder_.Append("api/users/{id}/roles");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3766,7 +3704,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Update a user's assigned roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<string> AssignRolesAsync(string id, AssignUserRolesRequest request)
+        public virtual System.Threading.Tasks.Task<string> AssignRolesAsync(string? id, AssignUserRolesRequest request)
         {
             return AssignRolesAsync(id, request, System.Threading.CancellationToken.None);
         }
@@ -3776,13 +3714,13 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Update a user's assigned roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<string> AssignRolesAsync(string id, AssignUserRolesRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<string> AssignRolesAsync(string? id, AssignUserRolesRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users/{id}/roles");
+            urlBuilder_.Append("api/users/{id}/roles");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3866,7 +3804,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Toggle a user's active status.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ToggleStatusAsync(string id, ToggleUserStatusRequest request)
+        public virtual System.Threading.Tasks.Task ToggleStatusAsync(string? id, ToggleUserStatusRequest request)
         {
             return ToggleStatusAsync(id, request, System.Threading.CancellationToken.None);
         }
@@ -3876,13 +3814,13 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Toggle a user's active status.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ToggleStatusAsync(string id, ToggleUserStatusRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task ToggleStatusAsync(string? id, ToggleUserStatusRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users/{id}/toggle-status");
+            urlBuilder_.Append("api/users/{id}/toggle-status");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3975,7 +3913,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -3984,7 +3922,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -4002,7 +3940,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -4013,7 +3951,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -4119,13 +4057,11 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class ProfileClient : IProfileClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public ProfileClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public ProfileClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -4135,12 +4071,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -4168,7 +4098,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<UserDetailsDto> GetAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/profile");
+            urlBuilder_.Append("api/profile");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4249,7 +4179,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/profile");
+            urlBuilder_.Append("api/profile");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4331,7 +4261,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/profile/permissions");
+            urlBuilder_.Append("api/profile/permissions");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4409,7 +4339,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> GetLogsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/profile/logs");
+            urlBuilder_.Append("api/profile/logs");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4489,7 +4419,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -4498,7 +4428,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -4516,7 +4446,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -4527,7 +4457,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -4659,13 +4589,11 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class AzureDevOpsBoardsConnectionsClient : IAzureDevOpsBoardsConnectionsClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public AzureDevOpsBoardsConnectionsClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public AzureDevOpsBoardsConnectionsClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -4675,12 +4603,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -4708,7 +4630,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetListAsync(bool? includeDisabled, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections?");
+            urlBuilder_.Append("api/azuredevopsboardsconnections?");
             if (includeDisabled != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("includeDisabled") + "=").Append(System.Uri.EscapeDataString(ConvertToString(includeDisabled, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -4794,7 +4716,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections");
+            urlBuilder_.Append("api/azuredevopsboardsconnections");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4887,7 +4809,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections/{id}");
+            urlBuilder_.Append("api/azuredevopsboardsconnections/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -4982,7 +4904,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections/{id}");
+            urlBuilder_.Append("api/azuredevopsboardsconnections/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -5072,7 +4994,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections/{id}/config");
+            urlBuilder_.Append("api/azuredevopsboardsconnections/{id}/config");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -5167,7 +5089,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections/{id}/config");
+            urlBuilder_.Append("api/azuredevopsboardsconnections/{id}/config");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -5256,7 +5178,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -5265,7 +5187,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -5283,7 +5205,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -5294,7 +5216,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -5361,13 +5283,11 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class ConnectorsClient : IConnectorsClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public ConnectorsClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public ConnectorsClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -5377,12 +5297,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -5410,7 +5324,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/connectors");
+            urlBuilder_.Append("api/connectors");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -5490,7 +5404,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -5499,7 +5413,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -5517,7 +5431,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -5528,7 +5442,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -5578,13 +5492,13 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class ConnectorListDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -5592,19 +5506,19 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class BacklogLevelDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("category", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public BacklogCategory Category { get; set; }
+        public BacklogCategory Category { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("rank", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Rank { get; set; }
+        public int Rank { get; set; } = default!;
 
     }
 
@@ -5626,21 +5540,21 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class ProblemDetails
     {
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Type { get; set; }
+        public string? Type { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Title { get; set; }
+        public string? Title { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? Status { get; set; }
+        public int? Status { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("detail", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Detail { get; set; }
+        public string? Detail { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("instance", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Instance { get; set; }
+        public string? Instance { get; set; } = default!;
 
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+        private System.Collections.Generic.IDictionary<string, object>? _additionalProperties;
 
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
@@ -5655,7 +5569,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class HttpValidationProblemDetails : ProblemDetails
     {
         [Newtonsoft.Json.JsonProperty("errors", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.IDictionary<string, System.Collections.Generic.ICollection<string>> Errors { get; set; }
+        public System.Collections.Generic.IDictionary<string, System.Collections.Generic.ICollection<string>> Errors { get; set; } = default!;
 
     }
 
@@ -5663,22 +5577,22 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class ErrorResult
     {
         [Newtonsoft.Json.JsonProperty("messages", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<string> Messages { get; set; }
+        public System.Collections.Generic.ICollection<string>? Messages { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("source", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Source { get; set; }
+        public string? Source { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("exception", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Exception { get; set; }
+        public string? Exception { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("errorId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ErrorId { get; set; }
+        public string? ErrorId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("supportMessage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string SupportMessage { get; set; }
+        public string? SupportMessage { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("statusCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int StatusCode { get; set; }
+        public int StatusCode { get; set; } = default!;
 
     }
 
@@ -5691,20 +5605,20 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// The description of the work type.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         /// <summary>
         /// The rank of the backlog level. The higher the number, the higher the level.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("rank", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Rank { get; set; }
+        public int Rank { get; set; } = default!;
 
     }
 
@@ -5712,7 +5626,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class UpdateBacklogLevelRequest
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         /// <summary>
         /// The name of the work type.  The name cannot be changed.
@@ -5720,20 +5634,20 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// The description of the work type.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         /// <summary>
         /// The rank of the backlog level. The higher the number, the higher the level.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("rank", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Rank { get; set; }
+        public int Rank { get; set; } = default!;
 
     }
 
@@ -5741,16 +5655,16 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class WorkStateDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = default!;
 
     }
 
@@ -5763,14 +5677,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// The description of the work state.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -5778,14 +5692,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class UpdateWorkStateRequest
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         /// <summary>
         /// The description of the work state.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -5793,16 +5707,16 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class WorkTypeDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = default!;
 
     }
 
@@ -5815,14 +5729,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// The description of the work type.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -5830,14 +5744,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class UpdateWorkTypeRequest
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         /// <summary>
         /// The description of the work type.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -5845,49 +5759,49 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class EmployeeListDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
+        public System.Guid Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("localId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int LocalId { get; set; }
+        public int LocalId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("middleName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("suffix", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Suffix { get; set; }
+        public string? Suffix { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Title { get; set; }
+        public string? Title { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("employeeNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string EmployeeNumber { get; set; }
+        public string EmployeeNumber { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("jobTitle", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string JobTitle { get; set; }
+        public string? JobTitle { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("department", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Department { get; set; }
+        public string? Department { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("managerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid? ManagerId { get; set; }
+        public System.Guid? ManagerId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("managerLocalId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? ManagerLocalId { get; set; }
+        public int? ManagerLocalId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("managerName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ManagerName { get; set; }
+        public string? ManagerName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = default!;
 
     }
 
@@ -5895,53 +5809,53 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class EmployeeDetailsDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
+        public System.Guid Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("localId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int LocalId { get; set; }
+        public int LocalId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("middleName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("suffix", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Suffix { get; set; }
+        public string? Suffix { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Title { get; set; }
+        public string? Title { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("employeeNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string EmployeeNumber { get; set; }
+        public string EmployeeNumber { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("hireDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
-        public System.DateTimeOffset? HireDate { get; set; }
+        public System.DateTimeOffset? HireDate { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("jobTitle", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string JobTitle { get; set; }
+        public string? JobTitle { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("department", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Department { get; set; }
+        public string? Department { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("managerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid? ManagerId { get; set; }
+        public System.Guid? ManagerId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("managerLocalId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? ManagerLocalId { get; set; }
+        public int? ManagerLocalId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("managerName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ManagerName { get; set; }
+        public string? ManagerName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = default!;
 
     }
 
@@ -5954,14 +5868,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = default!;
 
         /// <summary>
         /// Gets the middle name.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("middleName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(100)]
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; } = default!;
 
         /// <summary>
         /// Gets the last name.
@@ -5969,21 +5883,21 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = default!;
 
         /// <summary>
         /// Gets the suffix.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("suffix", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(50)]
-        public string Suffix { get; set; }
+        public string? Suffix { get; set; } = default!;
 
         /// <summary>
         /// Gets the employee's personal title.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(50)]
-        public string Title { get; set; }
+        public string? Title { get; set; } = default!;
 
         /// <summary>
         /// Gets the employee number.
@@ -5991,14 +5905,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("employeeNumber", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string EmployeeNumber { get; set; }
+        public string EmployeeNumber { get; set; } = default!;
 
         /// <summary>
         /// Gets the hire date.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("hireDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
-        public System.DateTimeOffset? HireDate { get; set; }
+        public System.DateTimeOffset? HireDate { get; set; } = default!;
 
         /// <summary>
         /// Gets the email.
@@ -6006,27 +5920,27 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         /// <summary>
         /// Gets the job title.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("jobTitle", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(256)]
-        public string JobTitle { get; set; }
+        public string? JobTitle { get; set; } = default!;
 
         /// <summary>
         /// Gets the department.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("department", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(256)]
-        public string Department { get; set; }
+        public string? Department { get; set; } = default!;
 
         /// <summary>
         /// Gets the manager identifier.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("managerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid? ManagerId { get; set; }
+        public System.Guid? ManagerId { get; set; } = default!;
 
     }
 
@@ -6037,7 +5951,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Gets or sets the identifier.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
+        public System.Guid Id { get; set; } = default!;
 
         /// <summary>
         /// Gets the first name.
@@ -6045,14 +5959,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = default!;
 
         /// <summary>
         /// Gets the middle name.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("middleName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(100)]
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; } = default!;
 
         /// <summary>
         /// Gets the last name.
@@ -6060,21 +5974,21 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = default!;
 
         /// <summary>
         /// Gets the suffix.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("suffix", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(50)]
-        public string Suffix { get; set; }
+        public string? Suffix { get; set; } = default!;
 
         /// <summary>
         /// Gets the employee's personal title.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(50)]
-        public string Title { get; set; }
+        public string? Title { get; set; } = default!;
 
         /// <summary>
         /// Gets the employee number.
@@ -6082,14 +5996,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("employeeNumber", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string EmployeeNumber { get; set; }
+        public string EmployeeNumber { get; set; } = default!;
 
         /// <summary>
         /// Gets the hire date.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("hireDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
-        public System.DateTimeOffset? HireDate { get; set; }
+        public System.DateTimeOffset? HireDate { get; set; } = default!;
 
         /// <summary>
         /// Gets the email.
@@ -6097,27 +6011,27 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         /// <summary>
         /// Gets the job title.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("jobTitle", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(256)]
-        public string JobTitle { get; set; }
+        public string? JobTitle { get; set; } = default!;
 
         /// <summary>
         /// Gets the department.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("department", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(256)]
-        public string Department { get; set; }
+        public string? Department { get; set; } = default!;
 
         /// <summary>
         /// Gets the manager identifier.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("managerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid? ManagerId { get; set; }
+        public System.Guid? ManagerId { get; set; } = default!;
 
     }
 
@@ -6125,13 +6039,13 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class RoleListDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Id { get; set; }
+        public string Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -6139,16 +6053,16 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class RoleDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Id { get; set; }
+        public string Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("permissions", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<string> Permissions { get; set; }
+        public System.Collections.Generic.ICollection<string>? Permissions { get; set; } = default!;
 
     }
 
@@ -6157,7 +6071,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     {
         [Newtonsoft.Json.JsonProperty("roleId", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
-        public string RoleId { get; set; }
+        public string RoleId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("permissions", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
@@ -6169,15 +6083,15 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class CreateOrUpdateRoleRequest
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Id { get; set; }
+        public string? Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -6185,25 +6099,25 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class UserDetailsDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Id { get; set; }
+        public string Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("userName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string UserName { get; set; }
+        public string? UserName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string LastName { get; set; }
+        public string? LastName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Email { get; set; }
+        public string? Email { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("phoneNumber", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; } = default!;
 
     }
 
@@ -6211,16 +6125,16 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class UserRoleDto
     {
         [Newtonsoft.Json.JsonProperty("roleId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string RoleId { get; set; }
+        public string? RoleId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("roleName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string RoleName { get; set; }
+        public string? RoleName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("enabled", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = default!;
 
     }
 
@@ -6228,10 +6142,10 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class AssignUserRolesRequest
     {
         [Newtonsoft.Json.JsonProperty("userId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string UserId { get; set; }
+        public string UserId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("userRoles", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<UserRoleDto> UserRoles { get; set; }
+        public System.Collections.Generic.ICollection<UserRoleDto> UserRoles { get; set; } = default!;
 
     }
 
@@ -6239,10 +6153,10 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class ToggleUserStatusRequest
     {
         [Newtonsoft.Json.JsonProperty("userId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string UserId { get; set; }
+        public string UserId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("activateUser", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool ActivateUser { get; set; }
+        public bool ActivateUser { get; set; } = default!;
 
     }
 
@@ -6251,25 +6165,25 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
-        public string Id { get; set; }
+        public string Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^[^@]+@[^@]+$")]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("phoneNumber", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; } = default!;
 
     }
 
@@ -6277,31 +6191,31 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class AuditDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
+        public System.Guid Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("userId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid UserId { get; set; }
+        public System.Guid UserId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Type { get; set; }
+        public string? Type { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("tableName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string TableName { get; set; }
+        public string? TableName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("dateTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset DateTime { get; set; }
+        public System.DateTime DateTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("oldValues", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string OldValues { get; set; }
+        public string? OldValues { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("newValues", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string NewValues { get; set; }
+        public string? NewValues { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("affectedColumns", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string AffectedColumns { get; set; }
+        public string? AffectedColumns { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("primaryKey", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PrimaryKey { get; set; }
+        public string? PrimaryKey { get; set; } = default!;
 
     }
 
@@ -6309,19 +6223,19 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class ConnectionListDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
+        public System.Guid Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("connector", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Connector { get; set; }
+        public string Connector { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isValidConfiguration", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsValidConfiguration { get; set; }
+        public bool IsValidConfiguration { get; set; } = default!;
 
     }
 
@@ -6329,16 +6243,16 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     public partial class AzureDevOpsBoardsConnectionConfigurationDto
     {
         [Newtonsoft.Json.JsonProperty("connectionId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid ConnectionId { get; set; }
+        public System.Guid ConnectionId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("organization", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Organization { get; set; }
+        public string? Organization { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("personalAccessToken", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PersonalAccessToken { get; set; }
+        public string? PersonalAccessToken { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("organizationUrl", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string OrganizationUrl { get; set; }
+        public string? OrganizationUrl { get; set; } = default!;
 
     }
 
@@ -6351,14 +6265,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the description.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -6369,7 +6283,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Gets or sets the identifier.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
+        public System.Guid Id { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the name of the connection.
@@ -6377,14 +6291,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the description.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -6395,19 +6309,19 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Gets the connection identifier.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("connectionId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid ConnectionId { get; set; }
+        public System.Guid ConnectionId { get; set; } = default!;
 
         /// <summary>
         /// Gets the organization.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("organization", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Organization { get; set; }
+        public string? Organization { get; set; } = default!;
 
         /// <summary>
         /// Gets the personal access token.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("personalAccessToken", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PersonalAccessToken { get; set; }
+        public string? PersonalAccessToken { get; set; } = default!;
 
     }
 
@@ -6427,11 +6341,11 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     {
         public int StatusCode { get; private set; }
 
-        public string Response { get; private set; }
+        public string? Response { get; private set; }
 
         public System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
 
-        public ApiException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Exception innerException)
+        public ApiException(string message, int statusCode, string? response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Exception? innerException)
             : base(message + "\n\nStatus: " + statusCode + "\nResponse: \n" + ((response == null) ? "(null)" : response.Substring(0, response.Length >= 512 ? 512 : response.Length)), innerException)
         {
             StatusCode = statusCode;
@@ -6450,7 +6364,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     {
         public TResult Result { get; private set; }
 
-        public ApiException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, TResult result, System.Exception innerException)
+        public ApiException(string message, int statusCode, string? response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, TResult result, System.Exception? innerException)
             : base(message, statusCode, response, headers, innerException)
         {
             Result = result;

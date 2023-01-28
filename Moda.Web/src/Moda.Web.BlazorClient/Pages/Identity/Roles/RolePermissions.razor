@@ -20,12 +20,11 @@ else
                 <MudTable Hover="true" Elevation="25" Items="@allRoleClaimsInGroup" Style="margin-bottom:0px!important" Filter="new Func<PermissionViewModel, bool>(Search)">
                     <ToolBarContent>
                         <div class="justify-center mud-text-align-center">
-                            <MudButton Variant="Variant.Filled" Color="Color.Info" Class="ml-auto" StartIcon="@Icons.Material.Filled.ArrowBack" Link="/roles">"Back"
-                            </MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Info" Class="ml-auto" StartIcon="@Icons.Material.Filled.ArrowBack" Link="/roles">Back</MudButton>
                             @if (_canEditRoleClaims)
                             {
                                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="SaveAsync"
-                                    ButtonType="ButtonType.Submit" Style="margin-left: 5px!important;" StartIcon="@Icons.Material.Filled.Save">"Update Permissions"
+                                    ButtonType="ButtonType.Submit" Style="margin-left: 5px!important;" StartIcon="@Icons.Material.Filled.Save">Update Permissions
                                 </MudButton>
                             }
                         </div>
@@ -40,16 +39,13 @@ else
                     </ToolBarContent>
                     <HeaderContent>
                         <MudTh>
-                            <MudTableSortLabel SortBy="new Func<PermissionViewModel, object?>(x => x.Name)">
-                                "Permission Name"</MudTableSortLabel>
+                            <MudTableSortLabel SortBy="new Func<PermissionViewModel, object?>(x => x.Name)">Permission Name</MudTableSortLabel>
                         </MudTh>
                         <MudTh>
-                            <MudTableSortLabel SortBy="new Func<PermissionViewModel, object?>(x => x.Description)">
-                                "Description"</MudTableSortLabel>
+                            <MudTableSortLabel SortBy="new Func<PermissionViewModel, object?>(x => x.Description)">Description</MudTableSortLabel>
                         </MudTh>
                         <MudTh>
-                            <MudTableSortLabel SortBy="new Func<PermissionViewModel, object>(x => x.Enabled)">"Status"
-                            </MudTableSortLabel>
+                            <MudTableSortLabel SortBy="new Func<PermissionViewModel, object>(x => x.Enabled)">Status</MudTableSortLabel>
                         </MudTh>
                     </HeaderContent>
                     <RowTemplate>

@@ -11,18 +11,12 @@
                     <MudText>Profile</MudText>
                 </div>
             </MudMenuItem>
-            <MudMenuItem OnClick="ProfileClaims">
-                <div class="d-flex">
-                    <MudIcon Class="mx-2" Icon="@Icons.Material.Filled.ManageAccounts" />
-                    <MudText>Profile/Claims</MudText>
-                </div>
-            </MudMenuItem>
-            <MudMenuItem OnClick="AuditLogs">
+@*            <MudMenuItem OnClick="AuditLogs">
                 <div class="d-flex">
                     <MudIcon Class="mx-2" Icon="@Icons.Material.Filled.LibraryBooks" />
                     <MudText>Logs</MudText>
                 </div>
-            </MudMenuItem>
+            </MudMenuItem>*@
 
             <MudDivider />
 
@@ -58,10 +52,10 @@
         Navigation.NavigateTo("/profileold");
     }
 
-    private void AuditLogs()
-    {
-        Navigation.NavigateTo("/audit-logs");
-    }
+    //private void AuditLogs()
+    //{
+    //    Navigation.NavigateTo("/audit-logs");
+    //}
     
     private async Task ThemeManager()
     {

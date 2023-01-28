@@ -3,31 +3,12 @@
 
 @inject IAuthenticationService AuthService
 
-@*<div class="d-flex justify-center">
-    <img src="images/moda-logo-primary.png" Style="height:120px" />
-</div>
-
-
-<AuthorizeView>
-    <Authorized>
-        <MudButton Link="profile" Color="Color.Inherit">Hello, @context.User.Identity?.Name!</MudButton>
-    </Authorized>
-    <NotAuthorized>
-        <MudButton Link="authentication/login" Color="Color.Inherit">Log in</MudButton>
-    </NotAuthorized>
-</AuthorizeView>*@
-
-
-@code {
-
-    //[CascadingParameter]
-    //public Task<AuthenticationState> AuthState { get; set; } = default!;
-    
+@code {    
     protected override void OnInitialized()
     {
-        //if (AuthService.ProviderType == AuthProvider.AzureAd)
-        //{
+        if (AuthService.ProviderType == AuthProvider.AzureAd)
+        {
             AuthService.NavigateToExternalLogin(Navigation.Uri);
-        //}
+        }
     }
 }

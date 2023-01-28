@@ -12,18 +12,18 @@ public partial class AuditLogs
 
     //protected EntityClientTableContext<RelatedAuditTrail, Guid, object> Context { get; set; } = default!;
 
-    private string? _searchString;
-    private MudDateRangePicker _dateRangePicker = default!;
-    private DateRange? _dateRange;
-    private bool _searchInOldValues;
-    private bool _searchInNewValues;
-    private List<RelatedAuditTrail> _trails = new();
+    //private string? _searchString;
+    //private MudDateRangePicker _dateRangePicker = default!;
+    //private DateRange? _dateRange;
+    //private bool _searchInOldValues;
+    //private bool _searchInNewValues;
+    //private List<RelatedAuditTrail> _trails = new();
 
     // Configure Automapper
-    static AuditLogs() =>
-        TypeAdapterConfig<AuditDto, RelatedAuditTrail>.NewConfig().Map(
-            dest => dest.LocalTime,
-            src => DateTime.SpecifyKind(src.DateTime.UtcDateTime, DateTimeKind.Utc).ToLocalTime());
+    //static AuditLogs() =>
+    //    TypeAdapterConfig<AuditDto, RelatedAuditTrail>.NewConfig().Map(
+    //        dest => dest.LocalTime,
+    //        src => DateTime.SpecifyKind(src.DateTime, DateTimeKind.Utc).ToLocalTime());
 
     protected override void OnInitialized()
     {
@@ -52,19 +52,19 @@ public partial class AuditLogs
         //    hasExtraActionsFunc: () => true);
     }
 
-    private void ShowBtnPress(Guid id)
-    {
-        var trail = _trails.First(f => f.Id == id);
-        trail.ShowDetails = !trail.ShowDetails;
-        foreach (var otherTrail in _trails.Except(new[] { trail }))
-        {
-            otherTrail.ShowDetails = false;
-        }
-    }
+    //private void ShowBtnPress(Guid id)
+    //{
+    //    var trail = _trails.First(f => f.Id == id);
+    //    trail.ShowDetails = !trail.ShowDetails;
+    //    foreach (var otherTrail in _trails.Except(new[] { trail }))
+    //    {
+    //        otherTrail.ShowDetails = false;
+    //    }
+    //}
 
-    public class RelatedAuditTrail : AuditDto
-    {
-        public bool ShowDetails { get; set; }
-        public DateTime LocalTime { get; set; }
-    }
+    //public class RelatedAuditTrail : AuditDto
+    //{
+    //    public bool ShowDetails { get; set; }
+    //    public DateTime LocalTime { get; set; }
+    //}
 }

@@ -2,12 +2,7 @@
     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
     <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Counter</MudNavLink>
     
-    @if (_canViewHangfire)
-    {
-        <MudNavLink Href="@_hangfireUrl" Match="NavLinkMatch.All" Target="_blank" Icon="@Icons.Material.Filled.Work">Hangfire</MudNavLink>
-    }
-
-    @if (CanViewAdministrationGroup)
+    @if (CanViewAdministrationGroup || _canViewHangfire)
     {
         <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="ml-4 my-3">Administration</MudText>
         @if (_canViewUsers)
@@ -16,7 +11,13 @@
         }
         @if (_canViewRoles)
         {
-            <MudNavLink Href="/roles" Icon="@Icons.Material.Filled.EmojiPeople">"Roles"</MudNavLink>
+            <MudNavLink Href="/roles" Icon="@Icons.Material.Filled.EmojiPeople">Roles</MudNavLink>
+        }
+        
+        @if (_canViewHangfire)
+        {
+            <MudNavLink Href="@_hangfireUrl" Match="NavLinkMatch.All" Target="_blank" Icon="@Icons.Material.Filled.Work">Hangfire</MudNavLink>
         }
     }
+    
 </MudNavMenu>

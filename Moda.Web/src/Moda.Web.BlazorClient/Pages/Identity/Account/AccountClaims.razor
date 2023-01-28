@@ -1,15 +1,10 @@
-﻿@page "/profileold"
-@using Microsoft.AspNetCore.Authorization
-@using System.Security.Claims
+﻿@using System.Security.Claims
+
 @inject IAuthorizationService AuthorizationService
-@attribute [Authorize]
 
-<PageTitle>Profile</PageTitle>
-
-<MudText Typo="Typo.h3" GutterBottom="true">Profile</MudText>
 
 <MudDataGrid Items="@_currentUser?.Claims"
-             Height="500px"
+             Height="600px"
              Dense="true" Sortable="true" Filterable="true"
              FixedHeader="true"
              QuickFilter="@_quickFilter">

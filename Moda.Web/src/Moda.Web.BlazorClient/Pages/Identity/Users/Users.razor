@@ -5,10 +5,10 @@
 
 @*<EntityTable TEntity="UserDetailsDto" TId="Guid" TRequest="CreateUserRequest" Context="@Context">
     <ExtraActions>
-        <MudMenuItem OnClick="(() => ViewProfile(context.Id))">"View Profile"</MudMenuItem>
+        <MudMenuItem OnClick="(() => ViewProfile(context.Id))">View Profile</MudMenuItem>
         @if (_canViewRoles)
         {
-            <MudMenuItem OnClick="(() => ManageRoles(context.Id))">"Manage Roles"</MudMenuItem>
+            <MudMenuItem OnClick="(() => ManageRoles(context.Id))">Manage Roles</MudMenuItem>
         }
     </ExtraActions>
 

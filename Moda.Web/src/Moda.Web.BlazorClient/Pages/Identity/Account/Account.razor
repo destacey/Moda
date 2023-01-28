@@ -6,12 +6,9 @@
     <MudTabPanel Text="Profile">
         <Profile />
     </MudTabPanel>
-    @if (!SecurityTabHidden)
-    {
-        <MudTabPanel Text="Security">
-            Missing security component
-        </MudTabPanel>
-    }
+    <MudTabPanel Text="Claims">
+        <AccountClaims />
+    </MudTabPanel>
 </MudTabs>
 
 @code
@@ -20,12 +17,4 @@
     public IAuthenticationService AuthService { get; set; } = default!;
 
     public bool SecurityTabHidden { get; set; } = false;
-
-    protected override void OnInitialized()
-    {
-        if (AuthService.ProviderType == AuthProvider.AzureAd)
-        {
-            SecurityTabHidden = true;
-        }
-    }
 }

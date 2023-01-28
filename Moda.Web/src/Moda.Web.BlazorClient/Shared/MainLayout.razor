@@ -7,11 +7,8 @@
             <MudImage Src="/images/moda-logo-primary.png" Alt="Moda" Height="150" />
         </MudLink>
         <MudSpacer />
-        @*<LoginDisplay />*@
         
         <UserMenu ThemeManagerOnClick="@ThemeManagerOnClick" />
-        
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
     </MudAppBar>
     
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Variant="DrawerVariant.Mini" MiniWidth="60px">

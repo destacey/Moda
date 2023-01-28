@@ -5,13 +5,13 @@
 @*<EntityTable TEntity="RelatedAuditTrail" TId="Guid" TRequest="object" Context="@Context" @bind-SearchString="_searchString">
 
     <AdvancedSearchContent>
-        <MudSwitch @bind-Checked="@_searchInOldValues" Color="Color.Primary" Style="margin-left: 5px;">"Search in Old Values"</MudSwitch>
-        <MudSwitch @bind-Checked="@_searchInNewValues" Color="Color.Primary" Style="margin-left: 5px;">"Search in New Values"</MudSwitch>
+        <MudSwitch @bind-Checked="@_searchInOldValues" Color="Color.Primary" Style="margin-left: 5px;">Search in Old Values</MudSwitch>
+        <MudSwitch @bind-Checked="@_searchInNewValues" Color="Color.Primary" Style="margin-left: 5px;">Search in New Values</MudSwitch>
         <MudDateRangePicker @ref="_dateRangePicker" PickerVariant="PickerVariant.Dialog" Label="Date Range For Searching" @bind-DateRange="_dateRange">
             <PickerActions>
-                <MudButton Class="mr-auto align-self-start" OnClick="@(() => _dateRangePicker.Clear())">"Clear"</MudButton>
-                <MudButton OnClick="@(() => _dateRangePicker.Close(false))">"Cancel"</MudButton>
-                <MudButton Color="Color.Primary" OnClick="@(() => _dateRangePicker.Close())">"Ok"</MudButton>
+                <MudButton Class="mr-auto align-self-start" OnClick="@(() => _dateRangePicker.Clear())">Clear</MudButton>
+                <MudButton OnClick="@(() => _dateRangePicker.Close(false))">Cancel</MudButton>
+                <MudButton Color="Color.Primary" OnClick="@(() => _dateRangePicker.Close())">Ok</MudButton>
             </PickerActions>
         </MudDateRangePicker>
     </AdvancedSearchContent>
@@ -29,7 +29,7 @@
                     <MudCard Elevation="25" style="margin: 10px !important;">
                         <MudCardHeader>
                             <CardHeaderContent>
-                                <MudAlert Severity="Severity.Info" Typo="Typo.body1">"Details for Trail ID" : <strong>@context.Id</strong></MudAlert>
+                                <MudAlert Severity="Severity.Info" Typo="Typo.body1">Details for Trail ID : <strong>@context.Id</strong></MudAlert>
                             </CardHeaderContent>
                         </MudCardHeader>
                         <MudCardContent>
@@ -38,7 +38,7 @@
                                     @if (!string.IsNullOrEmpty(context.AffectedColumns))
                                     {
                                         <tr class="mud-table-row" style="padding:10px!important">
-                                            <td>"Columns Affected"</td>
+                                            <td>Columns Affected</td>
                                             <td>
                                                 <MudItem>
                                                     @foreach (var column in context.AffectedColumns.Trim('[').Trim(']').Split(','))
@@ -50,7 +50,7 @@
                                         </tr>
                                     }
                                     <tr class="mud-table-row">
-                                        <td>"Primary Key"</td>
+                                        <td>Primary Key</td>
                                         <td>
                                             <MudItem>
                                                 <MudChip Label="true" Color="Color.Surface">@context.PrimaryKey?.Trim('{').Trim('}').Replace('"', ' ').Trim()</MudChip>
@@ -60,7 +60,7 @@
                                     @if (!string.IsNullOrEmpty(context.OldValues))
                                     {
                                         <tr class="mud-table-row">
-                                            <td>"Old Values"</td>
+                                            <td>Old Values</td>
                                             <td>
 
                                                 <MudItem>
@@ -84,7 +84,7 @@
                                     @if (!string.IsNullOrEmpty(context.NewValues))
                                     {
                                         <tr class="mud-table-row">
-                                            <td>"New Values"</td>
+                                            <td>New Values</td>
                                             <td>
 
                                                 <MudItem>
@@ -120,10 +120,10 @@
     //private RenderFragment<RelatedAuditTrail> DateFieldTemplate => trail => __builder =>
     //{
     //    <MudItem>
-    //        <MudChip Icon="@Icons.Material.Filled.Watch" IconColor="Color.Secondary" Label="true" Color="Color.Surface">"Local" : @trail.LocalTime.ToString("G")</MudChip>
+    //        <MudChip Icon="@Icons.Material.Filled.Watch" IconColor="Color.Secondary" Label="true" Color="Color.Surface">Local : @trail.LocalTime.ToString("G")</MudChip>
     //    </MudItem>
     //    <MudItem>
-    //        <MudChip Icon="@Icons.Material.Filled.Watch" IconColor="Color.Secondary" Label="true" Color="Color.Surface">"UTC" : @trail.DateTime.ToString("G")</MudChip>
+    //        <MudChip Icon="@Icons.Material.Filled.Watch" IconColor="Color.Secondary" Label="true" Color="Color.Surface">UTC : @trail.DateTime.ToString("G")</MudChip>
     //    </MudItem>
     //};
 }

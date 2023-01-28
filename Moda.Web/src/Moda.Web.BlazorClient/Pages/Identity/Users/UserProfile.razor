@@ -16,18 +16,15 @@ else
                     <MudCard Elevation="25">
                         <MudCardHeader>
                             <CardHeaderContent>
-                                <MudText Typo="Typo.body1">"Administrator Settings."</MudText>
-                                <MudText Typo="Typo.body2">"This is an Administrator Only View."</MudText>
+                                <MudText Typo="Typo.body1">Administrator Settings.</MudText>
+                                <MudText Typo="Typo.body2">This is an Administrator Only View.</MudText>
                             </CardHeaderContent>
                         </MudCardHeader>
                         <MudCardContent Class="pa-46" Style="padding:26px!important">
                             <MudGrid>
                                 <MudSwitch @bind-Checked="@_active" Color="Color.Primary" Label="Active?"></MudSwitch>
-                                <MudCheckBox ReadOnly @bind-Checked="@_emailConfirmed" Disabled Label="Email Confirmed?" Color="Color.Secondary">
-                                    </MudCheckBox>
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"
-                            OnClick="ToggleUserStatus" ButtonType="ButtonType.Submit">"Save Changes"
-                                </MudButton>
+                                <MudCheckBox ReadOnly @bind-Checked="@_emailConfirmed" Disabled Label="Email Confirmed?" Color="Color.Secondary"></MudCheckBox>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="ToggleUserStatus" ButtonType="ButtonType.Submit">Save Changes</MudButton>
                             </MudGrid>
                         </MudCardContent>
                     </MudCard>
@@ -70,7 +67,7 @@ else
             <MudCard Elevation="25">
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText>"Public Profile"</MudText>
+                        <MudText>Public Profile</MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
