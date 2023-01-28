@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using FluentValidation.AspNetCore;
+using Moda.Web.Api.Models.Profiles;
 
 namespace Moda.Web.Api.Controllers.Identity;
 
@@ -25,21 +26,13 @@ public class ProfileController : VersionNeutralApiController
 
     [HttpPut]
     [OpenApiOperation("Update profile details of currently logged in user.", "")]
-    public async Task<ActionResult> Update(UpdateUserCommand request)
+    public async Task<ActionResult<bool>> Update(UpdateProfileRequest request)
     {
-        var validator = new UpdateUserCommandValidator(_userService);
-        var result = await validator.ValidateAsync(request);
-        if (!result.IsValid)
-        {
-            result.AddToModelState(ModelState);
-            return UnprocessableEntity(ModelState);
-        }
-
         if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
             return Unauthorized();
 
-        await _userService.UpdateAsync(request, userId);
-        return Ok();
+        await _userService.UpdateAsync(request.ToUpdateUserCommand(), userId);
+        return Ok(true);
     }
 
     [HttpGet("permissions")]

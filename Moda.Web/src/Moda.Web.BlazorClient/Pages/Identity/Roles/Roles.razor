@@ -1,0 +1,33 @@
+﻿@page "/roles"
+@using Moda.Common.Domain.Authorization;
+@attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.RoleClaims)]
+@attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Roles)]
+
+<ModaTitle Title="Roles" Description="Manage Roles." />
+
+@*<EntityTable TEntity="RoleDto" TId="string" TRequest="CreateOrUpdateRoleRequest" Context="@Context">
+
+    <ExtraActions>
+        @if (_canViewRoleClaims)
+        {
+            <MudMenuItem @onclick="@(() => ManagePermissions(context.Id))">"Manage Permission"</MudMenuItem>
+        }
+    </ExtraActions>
+
+    <EditFormContent>
+        @if (!Context.AddEditModal.IsCreate)
+        {
+            <MudItem xs="12" md="6">
+                <MudTextField Value="context.Id" ReadOnly DisableUnderLine Label="Role Id" />
+            </MudItem>
+        }
+        <MudItem xs="12" md="6">
+            <MudTextField For="@(() => context.Name)" @bind-Value="context.Name" Label="Role Name" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField For="@(() => context.Description)" @bind-Value="context.Description"
+                Label="Description" />
+        </MudItem>
+    </EditFormContent>
+
+</EntityTable>*@

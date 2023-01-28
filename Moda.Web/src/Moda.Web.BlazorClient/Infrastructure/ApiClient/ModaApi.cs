@@ -4,6 +4,8 @@
 // </auto-generated>
 //----------------------
 
+#nullable enable
+
 #pragma warning disable 108 // Disable "CS0108 '{derivedDto}.ToJson()' hides inherited member '{dtoBase}.ToJson()'. Use the new keyword if hiding was intended."
 #pragma warning disable 114 // Disable "CS0114 '{derivedDto}.RaisePropertyChanged(String)' hides inherited member 'dtoBase.RaisePropertyChanged(String)'. To make the current member override that implementation, add the override keyword. Otherwise add the new keyword."
 #pragma warning disable 472 // Disable "CS0472 The result of the expression is always 'false' since a value of type 'Int32' is never equal to 'null' of type 'Int32?'
@@ -13,38 +15,36 @@
 #pragma warning disable 3016 // Disable "CS3016 Arrays as attribute arguments is not CLS-compliant"
 #pragma warning disable 8603 // Disable "CS8603 Possible null reference return"
 
-namespace Moda.Api.Client
+namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
 {
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface IBacklogCategoriesClient
+    public partial interface IBacklogCategoriesClient : IApiService
     {
         /// <summary>
         /// Get a list of all backlog categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> BacklogCategories_GetListAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all backlog categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> BacklogCategories_GetListAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class BacklogCategoriesClient : IBacklogCategoriesClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public BacklogCategoriesClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public BacklogCategoriesClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -54,12 +54,6 @@ namespace Moda.Api.Client
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -74,9 +68,9 @@ namespace Moda.Api.Client
         /// Get a list of all backlog categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> BacklogCategories_GetListAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync()
         {
-            return BacklogCategories_GetListAsync(System.Threading.CancellationToken.None);
+            return GetListAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -84,10 +78,10 @@ namespace Moda.Api.Client
         /// Get a list of all backlog categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> BacklogCategories_GetListAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/backlogcategories");
+            urlBuilder_.Append("api/backlogcategories");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -167,7 +161,7 @@ namespace Moda.Api.Client
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -176,7 +170,7 @@ namespace Moda.Api.Client
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -194,7 +188,7 @@ namespace Moda.Api.Client
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -205,7 +199,7 @@ namespace Moda.Api.Client
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -252,72 +246,70 @@ namespace Moda.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface IBacklogLevelsClient
+    public partial interface IBacklogLevelsClient : IApiService
     {
         /// <summary>
         /// Get a list of all backlog levels.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> BacklogLevels_GetListAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> GetListAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all backlog levels.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> BacklogLevels_GetListAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> GetListAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task BacklogLevels_CreateAsync(CreateBacklogLevelRequest request);
+        System.Threading.Tasks.Task CreateAsync(CreateBacklogLevelRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task BacklogLevels_CreateAsync(CreateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task CreateAsync(CreateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get backlog level details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<BacklogLevelDto> BacklogLevels_GetByIdAsync(int id);
+        System.Threading.Tasks.Task<BacklogLevelDto> GetByIdAsync(int id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get backlog level details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<BacklogLevelDto> BacklogLevels_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<BacklogLevelDto> GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task BacklogLevels_UpdateAsync(int id, UpdateBacklogLevelRequest request);
+        System.Threading.Tasks.Task UpdateAsync(int id, UpdateBacklogLevelRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task BacklogLevels_UpdateAsync(int id, UpdateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task UpdateAsync(int id, UpdateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class BacklogLevelsClient : IBacklogLevelsClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public BacklogLevelsClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public BacklogLevelsClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -327,12 +319,6 @@ namespace Moda.Api.Client
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -347,9 +333,9 @@ namespace Moda.Api.Client
         /// Get a list of all backlog levels.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> BacklogLevels_GetListAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> GetListAsync()
         {
-            return BacklogLevels_GetListAsync(System.Threading.CancellationToken.None);
+            return GetListAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -357,10 +343,10 @@ namespace Moda.Api.Client
         /// Get a list of all backlog levels.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> BacklogLevels_GetListAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<BacklogLevelDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/backloglevels");
+            urlBuilder_.Append("api/backloglevels");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -425,9 +411,9 @@ namespace Moda.Api.Client
         /// Create a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task BacklogLevels_CreateAsync(CreateBacklogLevelRequest request)
+        public virtual System.Threading.Tasks.Task CreateAsync(CreateBacklogLevelRequest request)
         {
-            return BacklogLevels_CreateAsync(request, System.Threading.CancellationToken.None);
+            return CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -435,13 +421,13 @@ namespace Moda.Api.Client
         /// Create a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task BacklogLevels_CreateAsync(CreateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task CreateAsync(CreateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/backloglevels");
+            urlBuilder_.Append("api/backloglevels");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -518,9 +504,9 @@ namespace Moda.Api.Client
         /// Get backlog level details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<BacklogLevelDto> BacklogLevels_GetByIdAsync(int id)
+        public virtual System.Threading.Tasks.Task<BacklogLevelDto> GetByIdAsync(int id)
         {
-            return BacklogLevels_GetByIdAsync(id, System.Threading.CancellationToken.None);
+            return GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -528,13 +514,13 @@ namespace Moda.Api.Client
         /// Get backlog level details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<BacklogLevelDto> BacklogLevels_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<BacklogLevelDto> GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/backloglevels/{id}");
+            urlBuilder_.Append("api/backloglevels/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -610,9 +596,9 @@ namespace Moda.Api.Client
         /// Update a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task BacklogLevels_UpdateAsync(int id, UpdateBacklogLevelRequest request)
+        public virtual System.Threading.Tasks.Task UpdateAsync(int id, UpdateBacklogLevelRequest request)
         {
-            return BacklogLevels_UpdateAsync(id, request, System.Threading.CancellationToken.None);
+            return UpdateAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -620,7 +606,7 @@ namespace Moda.Api.Client
         /// Update a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task BacklogLevels_UpdateAsync(int id, UpdateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task UpdateAsync(int id, UpdateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -629,7 +615,7 @@ namespace Moda.Api.Client
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/backloglevels/{id}");
+            urlBuilder_.Append("api/backloglevels/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -718,7 +704,7 @@ namespace Moda.Api.Client
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -727,7 +713,7 @@ namespace Moda.Api.Client
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -745,7 +731,7 @@ namespace Moda.Api.Client
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -756,7 +742,7 @@ namespace Moda.Api.Client
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -803,33 +789,31 @@ namespace Moda.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface IWorkStateCategoriesClient
+    public partial interface IWorkStateCategoriesClient : IApiService
     {
         /// <summary>
         /// Get a list of all work state categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> WorkStateCategories_GetListAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all work state categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> WorkStateCategories_GetListAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WorkStateCategoriesClient : IWorkStateCategoriesClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public WorkStateCategoriesClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public WorkStateCategoriesClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -839,12 +823,6 @@ namespace Moda.Api.Client
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -859,9 +837,9 @@ namespace Moda.Api.Client
         /// Get a list of all work state categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> WorkStateCategories_GetListAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync()
         {
-            return WorkStateCategories_GetListAsync(System.Threading.CancellationToken.None);
+            return GetListAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -869,10 +847,10 @@ namespace Moda.Api.Client
         /// Get a list of all work state categories.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> WorkStateCategories_GetListAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/workstatecategories");
+            urlBuilder_.Append("api/workstatecategories");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -952,7 +930,7 @@ namespace Moda.Api.Client
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -961,7 +939,7 @@ namespace Moda.Api.Client
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -979,7 +957,7 @@ namespace Moda.Api.Client
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -990,7 +968,7 @@ namespace Moda.Api.Client
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -1037,72 +1015,70 @@ namespace Moda.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface IWorkStatesClient
+    public partial interface IWorkStatesClient : IApiService
     {
         /// <summary>
         /// Get a list of all work states.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> WorkStates_GetListAsync(bool? includeInactive);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> GetListAsync(bool? includeInactive);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all work states.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> WorkStates_GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task WorkStates_CreateAsync(CreateWorkStateRequest request);
+        System.Threading.Tasks.Task CreateAsync(CreateWorkStateRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task WorkStates_CreateAsync(CreateWorkStateRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task CreateAsync(CreateWorkStateRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get work state details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<WorkStateDto> WorkStates_GetByIdAsync(int id);
+        System.Threading.Tasks.Task<WorkStateDto> GetByIdAsync(int id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get work state details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<WorkStateDto> WorkStates_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<WorkStateDto> GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task WorkStates_UpdateAsync(int id, UpdateWorkStateRequest request);
+        System.Threading.Tasks.Task UpdateAsync(int id, UpdateWorkStateRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task WorkStates_UpdateAsync(int id, UpdateWorkStateRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task UpdateAsync(int id, UpdateWorkStateRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WorkStatesClient : IWorkStatesClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public WorkStatesClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public WorkStatesClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -1112,12 +1088,6 @@ namespace Moda.Api.Client
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -1132,9 +1102,9 @@ namespace Moda.Api.Client
         /// Get a list of all work states.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> WorkStates_GetListAsync(bool? includeInactive)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> GetListAsync(bool? includeInactive)
         {
-            return WorkStates_GetListAsync(includeInactive, System.Threading.CancellationToken.None);
+            return GetListAsync(includeInactive, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1142,10 +1112,10 @@ namespace Moda.Api.Client
         /// Get a list of all work states.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> WorkStates_GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkStateDto>> GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/workstates?");
+            urlBuilder_.Append("api/workstates?");
             if (includeInactive != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("includeInactive") + "=").Append(System.Uri.EscapeDataString(ConvertToString(includeInactive, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -1215,9 +1185,9 @@ namespace Moda.Api.Client
         /// Create a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task WorkStates_CreateAsync(CreateWorkStateRequest request)
+        public virtual System.Threading.Tasks.Task CreateAsync(CreateWorkStateRequest request)
         {
-            return WorkStates_CreateAsync(request, System.Threading.CancellationToken.None);
+            return CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1225,13 +1195,13 @@ namespace Moda.Api.Client
         /// Create a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task WorkStates_CreateAsync(CreateWorkStateRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task CreateAsync(CreateWorkStateRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/workstates");
+            urlBuilder_.Append("api/workstates");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1308,9 +1278,9 @@ namespace Moda.Api.Client
         /// Get work state details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<WorkStateDto> WorkStates_GetByIdAsync(int id)
+        public virtual System.Threading.Tasks.Task<WorkStateDto> GetByIdAsync(int id)
         {
-            return WorkStates_GetByIdAsync(id, System.Threading.CancellationToken.None);
+            return GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1318,13 +1288,13 @@ namespace Moda.Api.Client
         /// Get work state details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<WorkStateDto> WorkStates_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<WorkStateDto> GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/workstates/{id}");
+            urlBuilder_.Append("api/workstates/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1400,9 +1370,9 @@ namespace Moda.Api.Client
         /// Update a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task WorkStates_UpdateAsync(int id, UpdateWorkStateRequest request)
+        public virtual System.Threading.Tasks.Task UpdateAsync(int id, UpdateWorkStateRequest request)
         {
-            return WorkStates_UpdateAsync(id, request, System.Threading.CancellationToken.None);
+            return UpdateAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1410,7 +1380,7 @@ namespace Moda.Api.Client
         /// Update a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task WorkStates_UpdateAsync(int id, UpdateWorkStateRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task UpdateAsync(int id, UpdateWorkStateRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -1419,7 +1389,7 @@ namespace Moda.Api.Client
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/workstates/{id}");
+            urlBuilder_.Append("api/workstates/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1508,7 +1478,7 @@ namespace Moda.Api.Client
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -1517,7 +1487,7 @@ namespace Moda.Api.Client
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -1535,7 +1505,7 @@ namespace Moda.Api.Client
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -1546,7 +1516,7 @@ namespace Moda.Api.Client
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -1593,72 +1563,70 @@ namespace Moda.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface IWorkTypesClient
+    public partial interface IWorkTypesClient : IApiService
     {
         /// <summary>
         /// Get a list of all work types.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> WorkTypes_GetListAsync(bool? includeInactive);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> GetListAsync(bool? includeInactive);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all work types.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> WorkTypes_GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task WorkTypes_CreateAsync(CreateWorkTypeRequest request);
+        System.Threading.Tasks.Task CreateAsync(CreateWorkTypeRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task WorkTypes_CreateAsync(CreateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task CreateAsync(CreateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get work type details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<WorkTypeDto> WorkTypes_GetByIdAsync(int id);
+        System.Threading.Tasks.Task<WorkTypeDto> GetByIdAsync(int id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get work type details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<WorkTypeDto> WorkTypes_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<WorkTypeDto> GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task WorkTypes_UpdateAsync(int id, UpdateWorkTypeRequest request);
+        System.Threading.Tasks.Task UpdateAsync(int id, UpdateWorkTypeRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task WorkTypes_UpdateAsync(int id, UpdateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task UpdateAsync(int id, UpdateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class WorkTypesClient : IWorkTypesClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public WorkTypesClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public WorkTypesClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -1668,12 +1636,6 @@ namespace Moda.Api.Client
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -1688,9 +1650,9 @@ namespace Moda.Api.Client
         /// Get a list of all work types.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> WorkTypes_GetListAsync(bool? includeInactive)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> GetListAsync(bool? includeInactive)
         {
-            return WorkTypes_GetListAsync(includeInactive, System.Threading.CancellationToken.None);
+            return GetListAsync(includeInactive, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1698,10 +1660,10 @@ namespace Moda.Api.Client
         /// Get a list of all work types.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> WorkTypes_GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WorkTypeDto>> GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/worktypes?");
+            urlBuilder_.Append("api/worktypes?");
             if (includeInactive != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("includeInactive") + "=").Append(System.Uri.EscapeDataString(ConvertToString(includeInactive, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -1771,9 +1733,9 @@ namespace Moda.Api.Client
         /// Create a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task WorkTypes_CreateAsync(CreateWorkTypeRequest request)
+        public virtual System.Threading.Tasks.Task CreateAsync(CreateWorkTypeRequest request)
         {
-            return WorkTypes_CreateAsync(request, System.Threading.CancellationToken.None);
+            return CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1781,13 +1743,13 @@ namespace Moda.Api.Client
         /// Create a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task WorkTypes_CreateAsync(CreateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task CreateAsync(CreateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/worktypes");
+            urlBuilder_.Append("api/worktypes");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1864,9 +1826,9 @@ namespace Moda.Api.Client
         /// Get work type details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<WorkTypeDto> WorkTypes_GetByIdAsync(int id)
+        public virtual System.Threading.Tasks.Task<WorkTypeDto> GetByIdAsync(int id)
         {
-            return WorkTypes_GetByIdAsync(id, System.Threading.CancellationToken.None);
+            return GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1874,13 +1836,13 @@ namespace Moda.Api.Client
         /// Get work type details using the id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<WorkTypeDto> WorkTypes_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<WorkTypeDto> GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/worktypes/{id}");
+            urlBuilder_.Append("api/worktypes/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1956,9 +1918,9 @@ namespace Moda.Api.Client
         /// Update a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task WorkTypes_UpdateAsync(int id, UpdateWorkTypeRequest request)
+        public virtual System.Threading.Tasks.Task UpdateAsync(int id, UpdateWorkTypeRequest request)
         {
-            return WorkTypes_UpdateAsync(id, request, System.Threading.CancellationToken.None);
+            return UpdateAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1966,7 +1928,7 @@ namespace Moda.Api.Client
         /// Update a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task WorkTypes_UpdateAsync(int id, UpdateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task UpdateAsync(int id, UpdateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -1975,7 +1937,7 @@ namespace Moda.Api.Client
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/worktypes/{id}");
+            urlBuilder_.Append("api/worktypes/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2064,7 +2026,7 @@ namespace Moda.Api.Client
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -2073,7 +2035,7 @@ namespace Moda.Api.Client
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -2091,7 +2053,7 @@ namespace Moda.Api.Client
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -2102,7 +2064,7 @@ namespace Moda.Api.Client
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -2149,72 +2111,70 @@ namespace Moda.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface IEmployeesClient
+    public partial interface IEmployeesClient : IApiService
     {
         /// <summary>
         /// Get a list of all employees.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> Employees_GetListAsync(bool? includeInactive);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> GetListAsync(bool? includeInactive);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all employees.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> Employees_GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Employees_CreateAsync(CreateEmployeeRequest request);
+        System.Threading.Tasks.Task CreateAsync(CreateEmployeeRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Employees_CreateAsync(CreateEmployeeRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task CreateAsync(CreateEmployeeRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get employee details using the localId.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<EmployeeDetailsDto> Employees_GetByIdAsync(int id);
+        System.Threading.Tasks.Task<EmployeeDetailsDto> GetByIdAsync(int id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get employee details using the localId.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<EmployeeDetailsDto> Employees_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<EmployeeDetailsDto> GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Employees_UpdateAsync(System.Guid id, UpdateEmployeeRequest request);
+        System.Threading.Tasks.Task UpdateAsync(System.Guid id, UpdateEmployeeRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Employees_UpdateAsync(System.Guid id, UpdateEmployeeRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task UpdateAsync(System.Guid id, UpdateEmployeeRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class EmployeesClient : IEmployeesClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public EmployeesClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public EmployeesClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -2224,12 +2184,6 @@ namespace Moda.Api.Client
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -2244,9 +2198,9 @@ namespace Moda.Api.Client
         /// Get a list of all employees.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> Employees_GetListAsync(bool? includeInactive)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> GetListAsync(bool? includeInactive)
         {
-            return Employees_GetListAsync(includeInactive, System.Threading.CancellationToken.None);
+            return GetListAsync(includeInactive, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2254,10 +2208,10 @@ namespace Moda.Api.Client
         /// Get a list of all employees.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> Employees_GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<EmployeeListDto>> GetListAsync(bool? includeInactive, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/employees?");
+            urlBuilder_.Append("api/employees?");
             if (includeInactive != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("includeInactive") + "=").Append(System.Uri.EscapeDataString(ConvertToString(includeInactive, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -2327,9 +2281,9 @@ namespace Moda.Api.Client
         /// Create an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Employees_CreateAsync(CreateEmployeeRequest request)
+        public virtual System.Threading.Tasks.Task CreateAsync(CreateEmployeeRequest request)
         {
-            return Employees_CreateAsync(request, System.Threading.CancellationToken.None);
+            return CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2337,13 +2291,13 @@ namespace Moda.Api.Client
         /// Create an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Employees_CreateAsync(CreateEmployeeRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task CreateAsync(CreateEmployeeRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/employees");
+            urlBuilder_.Append("api/employees");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2420,9 +2374,9 @@ namespace Moda.Api.Client
         /// Get employee details using the localId.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<EmployeeDetailsDto> Employees_GetByIdAsync(int id)
+        public virtual System.Threading.Tasks.Task<EmployeeDetailsDto> GetByIdAsync(int id)
         {
-            return Employees_GetByIdAsync(id, System.Threading.CancellationToken.None);
+            return GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2430,13 +2384,13 @@ namespace Moda.Api.Client
         /// Get employee details using the localId.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<EmployeeDetailsDto> Employees_GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<EmployeeDetailsDto> GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/employees/{id}");
+            urlBuilder_.Append("api/employees/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2512,9 +2466,9 @@ namespace Moda.Api.Client
         /// Update an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Employees_UpdateAsync(System.Guid id, UpdateEmployeeRequest request)
+        public virtual System.Threading.Tasks.Task UpdateAsync(System.Guid id, UpdateEmployeeRequest request)
         {
-            return Employees_UpdateAsync(id, request, System.Threading.CancellationToken.None);
+            return UpdateAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2522,7 +2476,7 @@ namespace Moda.Api.Client
         /// Update an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Employees_UpdateAsync(System.Guid id, UpdateEmployeeRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task UpdateAsync(System.Guid id, UpdateEmployeeRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -2531,7 +2485,7 @@ namespace Moda.Api.Client
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/employees/{id}");
+            urlBuilder_.Append("api/employees/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2620,7 +2574,7 @@ namespace Moda.Api.Client
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -2629,7 +2583,7 @@ namespace Moda.Api.Client
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -2647,7 +2601,7 @@ namespace Moda.Api.Client
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -2658,7 +2612,7 @@ namespace Moda.Api.Client
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -2705,98 +2659,96 @@ namespace Moda.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface IRolesClient
+    public partial interface IRolesClient : IApiService
     {
         /// <summary>
         /// Get a list of all roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> Roles_GetListAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> GetListAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> Roles_GetListAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create or update a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> Roles_CreateAsync(CreateOrUpdateRoleRequest request);
+        System.Threading.Tasks.Task<string> CreateAsync(CreateOrUpdateRoleRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create or update a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> Roles_CreateAsync(CreateOrUpdateRoleRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<string> CreateAsync(CreateOrUpdateRoleRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get role details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RoleDto> Roles_GetByIdAsync(string id);
+        System.Threading.Tasks.Task<RoleDto> GetByIdAsync(string? id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get role details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RoleDto> Roles_GetByIdAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RoleDto> GetByIdAsync(string? id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Delete a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> Roles_DeleteAsync(string id);
+        System.Threading.Tasks.Task<string> DeleteAsync(string? id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Delete a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> Roles_DeleteAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<string> DeleteAsync(string? id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get role details with its permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RoleDto> Roles_GetByIdWithPermissionsAsync(string id);
+        System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string? id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get role details with its permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<RoleDto> Roles_GetByIdWithPermissionsAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string? id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update a role's permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> Roles_UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request);
+        System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string? id, UpdateRolePermissionsRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update a role's permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> Roles_UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string? id, UpdateRolePermissionsRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class RolesClient : IRolesClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public RolesClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public RolesClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -2806,12 +2758,6 @@ namespace Moda.Api.Client
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -2826,9 +2772,9 @@ namespace Moda.Api.Client
         /// Get a list of all roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> Roles_GetListAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> GetListAsync()
         {
-            return Roles_GetListAsync(System.Threading.CancellationToken.None);
+            return GetListAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2836,10 +2782,10 @@ namespace Moda.Api.Client
         /// Get a list of all roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> Roles_GetListAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RoleListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles");
+            urlBuilder_.Append("api/roles");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2904,9 +2850,9 @@ namespace Moda.Api.Client
         /// Create or update a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<string> Roles_CreateAsync(CreateOrUpdateRoleRequest request)
+        public virtual System.Threading.Tasks.Task<string> CreateAsync(CreateOrUpdateRoleRequest request)
         {
-            return Roles_CreateAsync(request, System.Threading.CancellationToken.None);
+            return CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2914,13 +2860,13 @@ namespace Moda.Api.Client
         /// Create or update a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<string> Roles_CreateAsync(CreateOrUpdateRoleRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<string> CreateAsync(CreateOrUpdateRoleRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles");
+            urlBuilder_.Append("api/roles");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2989,9 +2935,9 @@ namespace Moda.Api.Client
         /// Get role details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<RoleDto> Roles_GetByIdAsync(string id)
+        public virtual System.Threading.Tasks.Task<RoleDto> GetByIdAsync(string? id)
         {
-            return Roles_GetByIdAsync(id, System.Threading.CancellationToken.None);
+            return GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -2999,10 +2945,10 @@ namespace Moda.Api.Client
         /// Get role details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<RoleDto> Roles_GetByIdAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<RoleDto> GetByIdAsync(string? id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles/{id}");
+            urlBuilder_.Append("api/roles/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3068,9 +3014,9 @@ namespace Moda.Api.Client
         /// Delete a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<string> Roles_DeleteAsync(string id)
+        public virtual System.Threading.Tasks.Task<string> DeleteAsync(string? id)
         {
-            return Roles_DeleteAsync(id, System.Threading.CancellationToken.None);
+            return DeleteAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3078,10 +3024,10 @@ namespace Moda.Api.Client
         /// Delete a role.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<string> Roles_DeleteAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<string> DeleteAsync(string? id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles/{id}");
+            urlBuilder_.Append("api/roles/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3147,9 +3093,9 @@ namespace Moda.Api.Client
         /// Get role details with its permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<RoleDto> Roles_GetByIdWithPermissionsAsync(string id)
+        public virtual System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string? id)
         {
-            return Roles_GetByIdWithPermissionsAsync(id, System.Threading.CancellationToken.None);
+            return GetByIdWithPermissionsAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3157,10 +3103,10 @@ namespace Moda.Api.Client
         /// Get role details with its permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<RoleDto> Roles_GetByIdWithPermissionsAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<RoleDto> GetByIdWithPermissionsAsync(string? id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles/{id}/permissions");
+            urlBuilder_.Append("api/roles/{id}/permissions");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3226,9 +3172,9 @@ namespace Moda.Api.Client
         /// Update a role's permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<string> Roles_UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request)
+        public virtual System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string? id, UpdateRolePermissionsRequest request)
         {
-            return Roles_UpdatePermissionsAsync(id, request, System.Threading.CancellationToken.None);
+            return UpdatePermissionsAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3236,13 +3182,13 @@ namespace Moda.Api.Client
         /// Update a role's permissions.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<string> Roles_UpdatePermissionsAsync(string id, UpdateRolePermissionsRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<string> UpdatePermissionsAsync(string? id, UpdateRolePermissionsRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/roles/{id}/permissions");
+            urlBuilder_.Append("api/roles/{id}/permissions");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3327,7 +3273,7 @@ namespace Moda.Api.Client
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -3336,7 +3282,7 @@ namespace Moda.Api.Client
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -3354,7 +3300,7 @@ namespace Moda.Api.Client
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -3365,7 +3311,7 @@ namespace Moda.Api.Client
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -3412,85 +3358,83 @@ namespace Moda.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface IUsersClient
+    public partial interface IUsersClient : IApiService
     {
         /// <summary>
         /// Get list of all users.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> Users_GetListAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> GetListAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get list of all users.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> Users_GetListAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> GetListAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a user's details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<UserDetailsDto> Users_GetByIdAsync(string id);
+        System.Threading.Tasks.Task<UserDetailsDto> GetByIdAsync(string? id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a user's details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<UserDetailsDto> Users_GetByIdAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<UserDetailsDto> GetByIdAsync(string? id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a user's roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> Users_GetRolesAsync(string id);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string? id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a user's roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> Users_GetRolesAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string? id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update a user's assigned roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> Users_AssignRolesAsync(string id, AssignUserRolesRequest request);
+        System.Threading.Tasks.Task<string> AssignRolesAsync(string? id, AssignUserRolesRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update a user's assigned roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<string> Users_AssignRolesAsync(string id, AssignUserRolesRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<string> AssignRolesAsync(string? id, AssignUserRolesRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Toggle a user's active status.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Users_ToggleStatusAsync(string id, ToggleUserStatusRequest request);
+        System.Threading.Tasks.Task ToggleStatusAsync(string? id, ToggleUserStatusRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Toggle a user's active status.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Users_ToggleStatusAsync(string id, ToggleUserStatusRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task ToggleStatusAsync(string? id, ToggleUserStatusRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class UsersClient : IUsersClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public UsersClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public UsersClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -3500,12 +3444,6 @@ namespace Moda.Api.Client
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -3520,9 +3458,9 @@ namespace Moda.Api.Client
         /// Get list of all users.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> Users_GetListAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> GetListAsync()
         {
-            return Users_GetListAsync(System.Threading.CancellationToken.None);
+            return GetListAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3530,10 +3468,10 @@ namespace Moda.Api.Client
         /// Get list of all users.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> Users_GetListAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserDetailsDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users");
+            urlBuilder_.Append("api/users");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -3598,9 +3536,9 @@ namespace Moda.Api.Client
         /// Get a user's details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<UserDetailsDto> Users_GetByIdAsync(string id)
+        public virtual System.Threading.Tasks.Task<UserDetailsDto> GetByIdAsync(string? id)
         {
-            return Users_GetByIdAsync(id, System.Threading.CancellationToken.None);
+            return GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3608,10 +3546,10 @@ namespace Moda.Api.Client
         /// Get a user's details.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<UserDetailsDto> Users_GetByIdAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<UserDetailsDto> GetByIdAsync(string? id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users/{id}");
+            urlBuilder_.Append("api/users/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3687,9 +3625,9 @@ namespace Moda.Api.Client
         /// Get a user's roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> Users_GetRolesAsync(string id)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string? id)
         {
-            return Users_GetRolesAsync(id, System.Threading.CancellationToken.None);
+            return GetRolesAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3697,10 +3635,10 @@ namespace Moda.Api.Client
         /// Get a user's roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> Users_GetRolesAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<UserRoleDto>> GetRolesAsync(string? id, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users/{id}/roles");
+            urlBuilder_.Append("api/users/{id}/roles");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3766,9 +3704,9 @@ namespace Moda.Api.Client
         /// Update a user's assigned roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<string> Users_AssignRolesAsync(string id, AssignUserRolesRequest request)
+        public virtual System.Threading.Tasks.Task<string> AssignRolesAsync(string? id, AssignUserRolesRequest request)
         {
-            return Users_AssignRolesAsync(id, request, System.Threading.CancellationToken.None);
+            return AssignRolesAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3776,13 +3714,13 @@ namespace Moda.Api.Client
         /// Update a user's assigned roles.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<string> Users_AssignRolesAsync(string id, AssignUserRolesRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<string> AssignRolesAsync(string? id, AssignUserRolesRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users/{id}/roles");
+            urlBuilder_.Append("api/users/{id}/roles");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3866,9 +3804,9 @@ namespace Moda.Api.Client
         /// Toggle a user's active status.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Users_ToggleStatusAsync(string id, ToggleUserStatusRequest request)
+        public virtual System.Threading.Tasks.Task ToggleStatusAsync(string? id, ToggleUserStatusRequest request)
         {
-            return Users_ToggleStatusAsync(id, request, System.Threading.CancellationToken.None);
+            return ToggleStatusAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -3876,13 +3814,13 @@ namespace Moda.Api.Client
         /// Toggle a user's active status.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Users_ToggleStatusAsync(string id, ToggleUserStatusRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task ToggleStatusAsync(string? id, ToggleUserStatusRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/users/{id}/toggle-status");
+            urlBuilder_.Append("api/users/{id}/toggle-status");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3975,7 +3913,7 @@ namespace Moda.Api.Client
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -3984,7 +3922,7 @@ namespace Moda.Api.Client
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -4002,7 +3940,7 @@ namespace Moda.Api.Client
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -4013,7 +3951,7 @@ namespace Moda.Api.Client
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -4060,72 +3998,70 @@ namespace Moda.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface IProfileClient
+    public partial interface IProfileClient : IApiService
     {
         /// <summary>
         /// Get profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<UserDetailsDto> Profile_GetAsync();
+        System.Threading.Tasks.Task<UserDetailsDto> GetAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<UserDetailsDto> Profile_GetAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<UserDetailsDto> GetAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> Profile_UpdateAsync(UpdateUserCommand request);
+        System.Threading.Tasks.Task<bool> UpdateAsync(UpdateProfileRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> Profile_UpdateAsync(UpdateUserCommand request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<bool> UpdateAsync(UpdateProfileRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get permissions of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> Profile_GetPermissionsAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get permissions of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> Profile_GetPermissionsAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get audit logs of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> Profile_GetLogsAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> GetLogsAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get audit logs of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> Profile_GetLogsAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> GetLogsAsync(System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class ProfileClient : IProfileClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public ProfileClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public ProfileClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -4135,12 +4071,6 @@ namespace Moda.Api.Client
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -4155,9 +4085,9 @@ namespace Moda.Api.Client
         /// Get profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<UserDetailsDto> Profile_GetAsync()
+        public virtual System.Threading.Tasks.Task<UserDetailsDto> GetAsync()
         {
-            return Profile_GetAsync(System.Threading.CancellationToken.None);
+            return GetAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4165,10 +4095,10 @@ namespace Moda.Api.Client
         /// Get profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<UserDetailsDto> Profile_GetAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<UserDetailsDto> GetAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/profile");
+            urlBuilder_.Append("api/profile");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4233,9 +4163,9 @@ namespace Moda.Api.Client
         /// Update profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<FileResponse> Profile_UpdateAsync(UpdateUserCommand request)
+        public virtual System.Threading.Tasks.Task<bool> UpdateAsync(UpdateProfileRequest request)
         {
-            return Profile_UpdateAsync(request, System.Threading.CancellationToken.None);
+            return UpdateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4243,13 +4173,13 @@ namespace Moda.Api.Client
         /// Update profile details of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<FileResponse> Profile_UpdateAsync(UpdateUserCommand request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<bool> UpdateAsync(UpdateProfileRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/profile");
+            urlBuilder_.Append("api/profile");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4262,7 +4192,7 @@ namespace Moda.Api.Client
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("PUT");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/octet-stream"));
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -4285,12 +4215,14 @@ namespace Moda.Api.Client
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200 || status_ == 206)
+                        if (status_ == 200)
                         {
-                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_);
-                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
-                            return fileResponse_;
+                            var objectResponse_ = await ReadObjectResponseAsync<bool>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -4316,9 +4248,9 @@ namespace Moda.Api.Client
         /// Get permissions of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> Profile_GetPermissionsAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync()
         {
-            return Profile_GetPermissionsAsync(System.Threading.CancellationToken.None);
+            return GetPermissionsAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4326,10 +4258,10 @@ namespace Moda.Api.Client
         /// Get permissions of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> Profile_GetPermissionsAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/profile/permissions");
+            urlBuilder_.Append("api/profile/permissions");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4394,9 +4326,9 @@ namespace Moda.Api.Client
         /// Get audit logs of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> Profile_GetLogsAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> GetLogsAsync()
         {
-            return Profile_GetLogsAsync(System.Threading.CancellationToken.None);
+            return GetLogsAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4404,10 +4336,10 @@ namespace Moda.Api.Client
         /// Get audit logs of currently logged in user.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> Profile_GetLogsAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AuditDto>> GetLogsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/profile/logs");
+            urlBuilder_.Append("api/profile/logs");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4487,7 +4419,7 @@ namespace Moda.Api.Client
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -4496,7 +4428,7 @@ namespace Moda.Api.Client
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -4514,7 +4446,7 @@ namespace Moda.Api.Client
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -4525,7 +4457,7 @@ namespace Moda.Api.Client
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -4572,98 +4504,96 @@ namespace Moda.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface IAzureDevOpsBoardsConnectionsClient
+    public partial interface IAzureDevOpsBoardsConnectionsClient : IApiService
     {
         /// <summary>
         /// Get a list of all Azure DevOps Boards connections.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetListAsync(bool? includeDisabled);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetListAsync(bool? includeDisabled);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all Azure DevOps Boards connections.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetListAsync(bool? includeDisabled, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetListAsync(bool? includeDisabled, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AzureDevOpsBoardsConnections_CreateAsync(CreateAzureDevOpsBoardConnectionRequest request);
+        System.Threading.Tasks.Task CreateAsync(CreateAzureDevOpsBoardConnectionRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AzureDevOpsBoardsConnections_CreateAsync(CreateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task CreateAsync(CreateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetByIdAsync(System.Guid id);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetByIdAsync(System.Guid id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetByIdAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetByIdAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request);
+        System.Threading.Tasks.Task UpdateAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task UpdateAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> AzureDevOpsBoardsConnections_GetConfigAsync(System.Guid id);
+        System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> GetConfigAsync(System.Guid id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> AzureDevOpsBoardsConnections_GetConfigAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> GetConfigAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request);
+        System.Threading.Tasks.Task UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class AzureDevOpsBoardsConnectionsClient : IAzureDevOpsBoardsConnectionsClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public AzureDevOpsBoardsConnectionsClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public AzureDevOpsBoardsConnectionsClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -4673,12 +4603,6 @@ namespace Moda.Api.Client
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -4693,9 +4617,9 @@ namespace Moda.Api.Client
         /// Get a list of all Azure DevOps Boards connections.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetListAsync(bool? includeDisabled)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetListAsync(bool? includeDisabled)
         {
-            return AzureDevOpsBoardsConnections_GetListAsync(includeDisabled, System.Threading.CancellationToken.None);
+            return GetListAsync(includeDisabled, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4703,10 +4627,10 @@ namespace Moda.Api.Client
         /// Get a list of all Azure DevOps Boards connections.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetListAsync(bool? includeDisabled, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetListAsync(bool? includeDisabled, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections?");
+            urlBuilder_.Append("api/azuredevopsboardsconnections?");
             if (includeDisabled != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("includeDisabled") + "=").Append(System.Uri.EscapeDataString(ConvertToString(includeDisabled, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -4776,9 +4700,9 @@ namespace Moda.Api.Client
         /// Create an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task AzureDevOpsBoardsConnections_CreateAsync(CreateAzureDevOpsBoardConnectionRequest request)
+        public virtual System.Threading.Tasks.Task CreateAsync(CreateAzureDevOpsBoardConnectionRequest request)
         {
-            return AzureDevOpsBoardsConnections_CreateAsync(request, System.Threading.CancellationToken.None);
+            return CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4786,13 +4710,13 @@ namespace Moda.Api.Client
         /// Create an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task AzureDevOpsBoardsConnections_CreateAsync(CreateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task CreateAsync(CreateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections");
+            urlBuilder_.Append("api/azuredevopsboardsconnections");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -4869,9 +4793,9 @@ namespace Moda.Api.Client
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetByIdAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetByIdAsync(System.Guid id)
         {
-            return AzureDevOpsBoardsConnections_GetByIdAsync(id, System.Threading.CancellationToken.None);
+            return GetByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4879,13 +4803,13 @@ namespace Moda.Api.Client
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> AzureDevOpsBoardsConnections_GetByIdAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectionListDto>> GetByIdAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections/{id}");
+            urlBuilder_.Append("api/azuredevopsboardsconnections/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -4961,9 +4885,9 @@ namespace Moda.Api.Client
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request)
+        public virtual System.Threading.Tasks.Task UpdateAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request)
         {
-            return AzureDevOpsBoardsConnections_UpdateAsync(id, request, System.Threading.CancellationToken.None);
+            return UpdateAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -4971,7 +4895,7 @@ namespace Moda.Api.Client
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task UpdateAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -4980,7 +4904,7 @@ namespace Moda.Api.Client
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections/{id}");
+            urlBuilder_.Append("api/azuredevopsboardsconnections/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -5054,9 +4978,9 @@ namespace Moda.Api.Client
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> AzureDevOpsBoardsConnections_GetConfigAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> GetConfigAsync(System.Guid id)
         {
-            return AzureDevOpsBoardsConnections_GetConfigAsync(id, System.Threading.CancellationToken.None);
+            return GetConfigAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -5064,13 +4988,13 @@ namespace Moda.Api.Client
         /// Get Azure DevOps Boards connection based on id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> AzureDevOpsBoardsConnections_GetConfigAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<AzureDevOpsBoardsConnectionConfigurationDto> GetConfigAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections/{id}/config");
+            urlBuilder_.Append("api/azuredevopsboardsconnections/{id}/config");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -5146,9 +5070,9 @@ namespace Moda.Api.Client
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request)
+        public virtual System.Threading.Tasks.Task UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request)
         {
-            return AzureDevOpsBoardsConnections_UpdateConfigAsync(id, request, System.Threading.CancellationToken.None);
+            return UpdateConfigAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -5156,7 +5080,7 @@ namespace Moda.Api.Client
         /// Update an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task AzureDevOpsBoardsConnections_UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task UpdateConfigAsync(System.Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -5165,7 +5089,7 @@ namespace Moda.Api.Client
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/azuredevopsboardsconnections/{id}/config");
+            urlBuilder_.Append("api/azuredevopsboardsconnections/{id}/config");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -5254,7 +5178,7 @@ namespace Moda.Api.Client
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -5263,7 +5187,7 @@ namespace Moda.Api.Client
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -5281,7 +5205,7 @@ namespace Moda.Api.Client
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -5292,7 +5216,7 @@ namespace Moda.Api.Client
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -5339,33 +5263,31 @@ namespace Moda.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface IConnectorsClient
+    public partial interface IConnectorsClient : IApiService
     {
         /// <summary>
         /// Get a list of all connectors.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> Connectors_GetListAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of all connectors.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> Connectors_GetListAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class ConnectorsClient : IConnectorsClient
     {
-        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public ConnectorsClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public ConnectorsClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
@@ -5375,12 +5297,6 @@ namespace Moda.Api.Client
             var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
 
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -5395,9 +5311,9 @@ namespace Moda.Api.Client
         /// Get a list of all connectors.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> Connectors_GetListAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync()
         {
-            return Connectors_GetListAsync(System.Threading.CancellationToken.None);
+            return GetListAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -5405,10 +5321,10 @@ namespace Moda.Api.Client
         /// Get a list of all connectors.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> Connectors_GetListAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ConnectorListDto>> GetListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/connectors");
+            urlBuilder_.Append("api/connectors");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -5488,7 +5404,7 @@ namespace Moda.Api.Client
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -5497,7 +5413,7 @@ namespace Moda.Api.Client
                 try
                 {
                     var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (Newtonsoft.Json.JsonException exception)
                 {
@@ -5515,7 +5431,7 @@ namespace Moda.Api.Client
                     {
                         var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
                         var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (Newtonsoft.Json.JsonException exception)
@@ -5526,7 +5442,7 @@ namespace Moda.Api.Client
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -5576,13 +5492,13 @@ namespace Moda.Api.Client
     public partial class ConnectorListDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -5590,19 +5506,19 @@ namespace Moda.Api.Client
     public partial class BacklogLevelDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("category", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public BacklogCategory Category { get; set; }
+        public BacklogCategory Category { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("rank", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Rank { get; set; }
+        public int Rank { get; set; } = default!;
 
     }
 
@@ -5624,21 +5540,21 @@ namespace Moda.Api.Client
     public partial class ProblemDetails
     {
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Type { get; set; }
+        public string? Type { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Title { get; set; }
+        public string? Title { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? Status { get; set; }
+        public int? Status { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("detail", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Detail { get; set; }
+        public string? Detail { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("instance", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Instance { get; set; }
+        public string? Instance { get; set; } = default!;
 
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+        private System.Collections.Generic.IDictionary<string, object>? _additionalProperties;
 
         [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
@@ -5653,7 +5569,7 @@ namespace Moda.Api.Client
     public partial class HttpValidationProblemDetails : ProblemDetails
     {
         [Newtonsoft.Json.JsonProperty("errors", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.IDictionary<string, System.Collections.Generic.ICollection<string>> Errors { get; set; }
+        public System.Collections.Generic.IDictionary<string, System.Collections.Generic.ICollection<string>> Errors { get; set; } = default!;
 
     }
 
@@ -5661,22 +5577,22 @@ namespace Moda.Api.Client
     public partial class ErrorResult
     {
         [Newtonsoft.Json.JsonProperty("messages", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<string> Messages { get; set; }
+        public System.Collections.Generic.ICollection<string>? Messages { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("source", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Source { get; set; }
+        public string? Source { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("exception", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Exception { get; set; }
+        public string? Exception { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("errorId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ErrorId { get; set; }
+        public string? ErrorId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("supportMessage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string SupportMessage { get; set; }
+        public string? SupportMessage { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("statusCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int StatusCode { get; set; }
+        public int StatusCode { get; set; } = default!;
 
     }
 
@@ -5689,20 +5605,20 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// The description of the work type.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         /// <summary>
         /// The rank of the backlog level. The higher the number, the higher the level.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("rank", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Rank { get; set; }
+        public int Rank { get; set; } = default!;
 
     }
 
@@ -5710,7 +5626,7 @@ namespace Moda.Api.Client
     public partial class UpdateBacklogLevelRequest
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         /// <summary>
         /// The name of the work type.  The name cannot be changed.
@@ -5718,20 +5634,20 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// The description of the work type.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         /// <summary>
         /// The rank of the backlog level. The higher the number, the higher the level.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("rank", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Rank { get; set; }
+        public int Rank { get; set; } = default!;
 
     }
 
@@ -5739,16 +5655,16 @@ namespace Moda.Api.Client
     public partial class WorkStateDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = default!;
 
     }
 
@@ -5761,14 +5677,14 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// The description of the work state.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -5776,14 +5692,14 @@ namespace Moda.Api.Client
     public partial class UpdateWorkStateRequest
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         /// <summary>
         /// The description of the work state.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -5791,16 +5707,16 @@ namespace Moda.Api.Client
     public partial class WorkTypeDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = default!;
 
     }
 
@@ -5813,14 +5729,14 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// The description of the work type.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -5828,14 +5744,14 @@ namespace Moda.Api.Client
     public partial class UpdateWorkTypeRequest
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Id { get; set; }
+        public int Id { get; set; } = default!;
 
         /// <summary>
         /// The description of the work type.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -5843,49 +5759,49 @@ namespace Moda.Api.Client
     public partial class EmployeeListDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
+        public System.Guid Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("localId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int LocalId { get; set; }
+        public int LocalId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("middleName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("suffix", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Suffix { get; set; }
+        public string? Suffix { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Title { get; set; }
+        public string? Title { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("employeeNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string EmployeeNumber { get; set; }
+        public string EmployeeNumber { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("jobTitle", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string JobTitle { get; set; }
+        public string? JobTitle { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("department", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Department { get; set; }
+        public string? Department { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("managerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid? ManagerId { get; set; }
+        public System.Guid? ManagerId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("managerLocalId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? ManagerLocalId { get; set; }
+        public int? ManagerLocalId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("managerName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ManagerName { get; set; }
+        public string? ManagerName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = default!;
 
     }
 
@@ -5893,53 +5809,53 @@ namespace Moda.Api.Client
     public partial class EmployeeDetailsDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
+        public System.Guid Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("localId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int LocalId { get; set; }
+        public int LocalId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("middleName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("suffix", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Suffix { get; set; }
+        public string? Suffix { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Title { get; set; }
+        public string? Title { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("employeeNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string EmployeeNumber { get; set; }
+        public string EmployeeNumber { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("hireDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
-        public System.DateTimeOffset? HireDate { get; set; }
+        public System.DateTimeOffset? HireDate { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("jobTitle", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string JobTitle { get; set; }
+        public string? JobTitle { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("department", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Department { get; set; }
+        public string? Department { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("managerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid? ManagerId { get; set; }
+        public System.Guid? ManagerId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("managerLocalId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? ManagerLocalId { get; set; }
+        public int? ManagerLocalId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("managerName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ManagerName { get; set; }
+        public string? ManagerName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = default!;
 
     }
 
@@ -5952,14 +5868,14 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = default!;
 
         /// <summary>
         /// Gets the middle name.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("middleName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(100)]
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; } = default!;
 
         /// <summary>
         /// Gets the last name.
@@ -5967,21 +5883,21 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = default!;
 
         /// <summary>
         /// Gets the suffix.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("suffix", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(50)]
-        public string Suffix { get; set; }
+        public string? Suffix { get; set; } = default!;
 
         /// <summary>
         /// Gets the employee's personal title.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(50)]
-        public string Title { get; set; }
+        public string? Title { get; set; } = default!;
 
         /// <summary>
         /// Gets the employee number.
@@ -5989,14 +5905,14 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("employeeNumber", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string EmployeeNumber { get; set; }
+        public string EmployeeNumber { get; set; } = default!;
 
         /// <summary>
         /// Gets the hire date.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("hireDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
-        public System.DateTimeOffset? HireDate { get; set; }
+        public System.DateTimeOffset? HireDate { get; set; } = default!;
 
         /// <summary>
         /// Gets the email.
@@ -6004,27 +5920,27 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         /// <summary>
         /// Gets the job title.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("jobTitle", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(256)]
-        public string JobTitle { get; set; }
+        public string? JobTitle { get; set; } = default!;
 
         /// <summary>
         /// Gets the department.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("department", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(256)]
-        public string Department { get; set; }
+        public string? Department { get; set; } = default!;
 
         /// <summary>
         /// Gets the manager identifier.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("managerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid? ManagerId { get; set; }
+        public System.Guid? ManagerId { get; set; } = default!;
 
     }
 
@@ -6035,7 +5951,7 @@ namespace Moda.Api.Client
         /// Gets or sets the identifier.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
+        public System.Guid Id { get; set; } = default!;
 
         /// <summary>
         /// Gets the first name.
@@ -6043,14 +5959,14 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = default!;
 
         /// <summary>
         /// Gets the middle name.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("middleName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(100)]
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; } = default!;
 
         /// <summary>
         /// Gets the last name.
@@ -6058,21 +5974,21 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = default!;
 
         /// <summary>
         /// Gets the suffix.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("suffix", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(50)]
-        public string Suffix { get; set; }
+        public string? Suffix { get; set; } = default!;
 
         /// <summary>
         /// Gets the employee's personal title.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(50)]
-        public string Title { get; set; }
+        public string? Title { get; set; } = default!;
 
         /// <summary>
         /// Gets the employee number.
@@ -6080,14 +5996,14 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("employeeNumber", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string EmployeeNumber { get; set; }
+        public string EmployeeNumber { get; set; } = default!;
 
         /// <summary>
         /// Gets the hire date.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("hireDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
-        public System.DateTimeOffset? HireDate { get; set; }
+        public System.DateTimeOffset? HireDate { get; set; } = default!;
 
         /// <summary>
         /// Gets the email.
@@ -6095,27 +6011,27 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         /// <summary>
         /// Gets the job title.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("jobTitle", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(256)]
-        public string JobTitle { get; set; }
+        public string? JobTitle { get; set; } = default!;
 
         /// <summary>
         /// Gets the department.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("department", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(256)]
-        public string Department { get; set; }
+        public string? Department { get; set; } = default!;
 
         /// <summary>
         /// Gets the manager identifier.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("managerId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid? ManagerId { get; set; }
+        public System.Guid? ManagerId { get; set; } = default!;
 
     }
 
@@ -6123,13 +6039,13 @@ namespace Moda.Api.Client
     public partial class RoleListDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Id { get; set; }
+        public string Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -6137,16 +6053,16 @@ namespace Moda.Api.Client
     public partial class RoleDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Id { get; set; }
+        public string Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("permissions", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<string> Permissions { get; set; }
+        public System.Collections.Generic.ICollection<string>? Permissions { get; set; } = default!;
 
     }
 
@@ -6155,7 +6071,7 @@ namespace Moda.Api.Client
     {
         [Newtonsoft.Json.JsonProperty("roleId", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
-        public string RoleId { get; set; }
+        public string RoleId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("permissions", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
@@ -6167,15 +6083,15 @@ namespace Moda.Api.Client
     public partial class CreateOrUpdateRoleRequest
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Id { get; set; }
+        public string? Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -6183,25 +6099,25 @@ namespace Moda.Api.Client
     public partial class UserDetailsDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Id { get; set; }
+        public string Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("userName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string UserName { get; set; }
+        public string? UserName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string LastName { get; set; }
+        public string? LastName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Email { get; set; }
+        public string? Email { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("phoneNumber", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; } = default!;
 
     }
 
@@ -6209,16 +6125,16 @@ namespace Moda.Api.Client
     public partial class UserRoleDto
     {
         [Newtonsoft.Json.JsonProperty("roleId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string RoleId { get; set; }
+        public string? RoleId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("roleName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string RoleName { get; set; }
+        public string? RoleName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("enabled", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = default!;
 
     }
 
@@ -6226,10 +6142,10 @@ namespace Moda.Api.Client
     public partial class AssignUserRolesRequest
     {
         [Newtonsoft.Json.JsonProperty("userId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string UserId { get; set; }
+        public string UserId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("userRoles", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<UserRoleDto> UserRoles { get; set; }
+        public System.Collections.Generic.ICollection<UserRoleDto> UserRoles { get; set; } = default!;
 
     }
 
@@ -6237,37 +6153,37 @@ namespace Moda.Api.Client
     public partial class ToggleUserStatusRequest
     {
         [Newtonsoft.Json.JsonProperty("userId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string UserId { get; set; }
+        public string UserId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("activateUser", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool ActivateUser { get; set; }
+        public bool ActivateUser { get; set; } = default!;
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class UpdateUserCommand
+    public partial class UpdateProfileRequest
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
-        public string Id { get; set; }
+        public string Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("firstName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("lastName", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("email", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^[^@]+@[^@]+$")]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("phoneNumber", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; } = default!;
 
     }
 
@@ -6275,31 +6191,31 @@ namespace Moda.Api.Client
     public partial class AuditDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
+        public System.Guid Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("userId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid UserId { get; set; }
+        public System.Guid UserId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Type { get; set; }
+        public string? Type { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("tableName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string TableName { get; set; }
+        public string? TableName { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("dateTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset DateTime { get; set; }
+        public System.DateTime DateTime { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("oldValues", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string OldValues { get; set; }
+        public string? OldValues { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("newValues", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string NewValues { get; set; }
+        public string? NewValues { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("affectedColumns", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string AffectedColumns { get; set; }
+        public string? AffectedColumns { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("primaryKey", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PrimaryKey { get; set; }
+        public string? PrimaryKey { get; set; } = default!;
 
     }
 
@@ -6307,19 +6223,19 @@ namespace Moda.Api.Client
     public partial class ConnectionListDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
+        public System.Guid Id { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("connector", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Connector { get; set; }
+        public string Connector { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("isValidConfiguration", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool IsValidConfiguration { get; set; }
+        public bool IsValidConfiguration { get; set; } = default!;
 
     }
 
@@ -6327,16 +6243,16 @@ namespace Moda.Api.Client
     public partial class AzureDevOpsBoardsConnectionConfigurationDto
     {
         [Newtonsoft.Json.JsonProperty("connectionId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid ConnectionId { get; set; }
+        public System.Guid ConnectionId { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("organization", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Organization { get; set; }
+        public string? Organization { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("personalAccessToken", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PersonalAccessToken { get; set; }
+        public string? PersonalAccessToken { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("organizationUrl", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string OrganizationUrl { get; set; }
+        public string? OrganizationUrl { get; set; } = default!;
 
     }
 
@@ -6349,14 +6265,14 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the description.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -6367,7 +6283,7 @@ namespace Moda.Api.Client
         /// Gets or sets the identifier.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
+        public System.Guid Id { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the name of the connection.
@@ -6375,14 +6291,14 @@ namespace Moda.Api.Client
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// Gets or sets the description.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; } = default!;
 
     }
 
@@ -6393,19 +6309,19 @@ namespace Moda.Api.Client
         /// Gets the connection identifier.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("connectionId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid ConnectionId { get; set; }
+        public System.Guid ConnectionId { get; set; } = default!;
 
         /// <summary>
         /// Gets the organization.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("organization", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Organization { get; set; }
+        public string? Organization { get; set; } = default!;
 
         /// <summary>
         /// Gets the personal access token.
         /// </summary>
         [Newtonsoft.Json.JsonProperty("personalAccessToken", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PersonalAccessToken { get; set; }
+        public string? PersonalAccessToken { get; set; } = default!;
 
     }
 
@@ -6418,41 +6334,6 @@ namespace Moda.Api.Client
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class FileResponse : System.IDisposable
-    {
-        private System.IDisposable _client;
-        private System.IDisposable _response;
-
-        public int StatusCode { get; private set; }
-
-        public System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
-
-        public System.IO.Stream Stream { get; private set; }
-
-        public bool IsPartial
-        {
-            get { return StatusCode == 206; }
-        }
-
-        public FileResponse(int statusCode, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.IO.Stream stream, System.IDisposable client, System.IDisposable response)
-        {
-            StatusCode = statusCode;
-            Headers = headers;
-            Stream = stream;
-            _client = client;
-            _response = response;
-        }
-
-        public void Dispose()
-        {
-            Stream.Dispose();
-            if (_response != null)
-                _response.Dispose();
-            if (_client != null)
-                _client.Dispose();
-        }
-    }
 
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -6460,11 +6341,11 @@ namespace Moda.Api.Client
     {
         public int StatusCode { get; private set; }
 
-        public string Response { get; private set; }
+        public string? Response { get; private set; }
 
         public System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
 
-        public ApiException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Exception innerException)
+        public ApiException(string message, int statusCode, string? response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Exception? innerException)
             : base(message + "\n\nStatus: " + statusCode + "\nResponse: \n" + ((response == null) ? "(null)" : response.Substring(0, response.Length >= 512 ? 512 : response.Length)), innerException)
         {
             StatusCode = statusCode;
@@ -6483,7 +6364,7 @@ namespace Moda.Api.Client
     {
         public TResult Result { get; private set; }
 
-        public ApiException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, TResult result, System.Exception innerException)
+        public ApiException(string message, int statusCode, string? response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, TResult result, System.Exception? innerException)
             : base(message, statusCode, response, headers, innerException)
         {
             Result = result;

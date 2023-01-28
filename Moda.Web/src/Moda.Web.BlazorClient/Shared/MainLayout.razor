@@ -1,32 +1,54 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" />
-<MudDialogProvider />
-<MudSnackbarProvider />
-
 <MudLayout>
     <MudAppBar Elevation="2">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">Moda</MudText>
+        <MudLink Href="/" Underline="Underline.None">
+            <MudImage Src="/images/moda-logo-primary.png" Alt="Moda" Height="150" />
+        </MudLink>
         <MudSpacer />
-        <LoginDisplay />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        
+        <UserMenu ThemeManagerOnClick="@ThemeManagerOnClick" />
     </MudAppBar>
+    
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Variant="DrawerVariant.Mini" MiniWidth="60px">
         <NavMenu />
     </MudDrawer>
+    
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="my-3 pt-3">
-            @Body
+            @ChildContent
         </MudContainer>
     </MudMainContent>
 </MudLayout>
-@code {
-    bool _isDarkMode = true;
-    bool _drawerOpen = true;
 
-    void DrawerToggle()
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = default!;
+    
+    [Parameter]
+    public EventCallback OnDarkModeToggle { get; set; }
+    
+    [Parameter]
+    public EventCallback<MouseEventArgs> ThemeManagerOnClick { get; set; }
+
+    private bool _drawerOpen;
+
+    protected override async Task OnInitializedAsync()
     {
-        _drawerOpen = !_drawerOpen;
+        if (await ClientPreferences.GetPreference() is ClientPreference preference)
+        {
+            _drawerOpen = preference.IsDrawerOpen;
+        }
+    }
+
+    public async Task ToggleDarkMode()
+    {
+        await OnDarkModeToggle.InvokeAsync();
+    }
+
+    private async Task DrawerToggle()
+    {
+        _drawerOpen = await ClientPreferences.ToggleDrawerAsync();
     }
 }

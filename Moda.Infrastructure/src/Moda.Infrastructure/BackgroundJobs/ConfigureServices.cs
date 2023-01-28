@@ -52,6 +52,8 @@ internal static class ConfigureServices
     internal static IApplicationBuilder UseHangfireDashboard(this IApplicationBuilder app, IConfiguration config)
     {
         var dashboardOptions = config.GetSection("HangfireSettings:Dashboard").Get<DashboardOptions>()!;
+        var appPath = config["HangfireSettings:Dashboard:AppPath"];
+        dashboardOptions.AppPath = string.IsNullOrWhiteSpace(appPath) ? null : appPath;
 
         dashboardOptions.Authorization = new[]
         {

@@ -1,0 +1,57 @@
+﻿@using Moda.Web.BlazorClient.Infrastructure.Theme;
+@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="_currentTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<AuthorizeView>
+    <NotAuthorized>
+        <MudAppBar Elevation="0" Style="background:#6e6e6e00!important">
+            <ThemeDrawer @bind-ThemeDrawerOpen="_themeDrawerOpen" ThemePreference="_themePreference"
+                ThemePreferenceChanged="ThemePreferenceChanged" />
+        </MudAppBar>
+        <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center" Style="height: 100vh;">
+            <MudPaper Elevation="25" Class="pa-8"> 
+                @Body
+            </MudPaper>
+        </MudContainer>
+    </NotAuthorized>
+    <Authorized>
+        <MudLayout>
+            <ThemeDrawer @bind-ThemeDrawerOpen="_themeDrawerOpen" ThemePreference="_themePreference"
+                ThemePreferenceChanged="ThemePreferenceChanged" />
+            <MainLayout ThemeManagerOnClick="@(() => _themeDrawerOpen = true)">
+                @Body
+            </MainLayout>
+        </MudLayout>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    private ClientPreference? _themePreference;
+    private MudTheme _currentTheme = new LightTheme();
+    private bool _themeDrawerOpen;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _themePreference = await ClientPreferences.GetPreference() as ClientPreference;
+        if (_themePreference == null) _themePreference = new ClientPreference();
+        SetCurrentTheme(_themePreference);
+    }
+
+    private async Task ThemePreferenceChanged(ClientPreference themePreference)
+    {
+        SetCurrentTheme(themePreference);
+        await ClientPreferences.SetPreference(themePreference);
+    }
+
+    private void SetCurrentTheme(ClientPreference themePreference)
+    {
+        _currentTheme = themePreference.IsDarkMode ? new DarkTheme() : new LightTheme();
+        _currentTheme.Palette.Primary = themePreference.PrimaryColor;
+        _currentTheme.Palette.Secondary = themePreference.SecondaryColor;
+        _currentTheme.LayoutProperties.DefaultBorderRadius = $"{themePreference.BorderRadius}px";
+        _currentTheme.LayoutProperties.DefaultBorderRadius = $"{themePreference.BorderRadius}px";
+    }
+}

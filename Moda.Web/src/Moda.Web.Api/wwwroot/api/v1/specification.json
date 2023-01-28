@@ -1319,7 +1319,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateUserCommand"
+                "$ref": "#/components/schemas/UpdateProfileRequest"
               }
             }
           },
@@ -1330,10 +1330,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/octet-stream": {
+              "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "type": "boolean"
                 }
               }
             }
@@ -2523,7 +2522,7 @@
           }
         }
       },
-      "UpdateUserCommand": {
+      "UpdateProfileRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [

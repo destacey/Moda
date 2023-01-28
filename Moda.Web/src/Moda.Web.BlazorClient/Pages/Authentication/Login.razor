@@ -1,0 +1,14 @@
+﻿@page "/login"
+@attribute [AllowAnonymous]
+
+@inject IAuthenticationService AuthService
+
+@code {    
+    protected override void OnInitialized()
+    {
+        if (AuthService.ProviderType == AuthProvider.AzureAd)
+        {
+            AuthService.NavigateToExternalLogin(Navigation.Uri);
+        }
+    }
+}
