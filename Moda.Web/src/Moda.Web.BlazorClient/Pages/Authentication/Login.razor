@@ -6,9 +6,6 @@
 @code {    
     protected override void OnInitialized()
     {
-        if (AuthService.ProviderType == AuthProvider.AzureAd)
-        {
-            AuthService.NavigateToExternalLogin(Navigation.Uri);
-        }
+        AuthService.NavigateToExternalLogin(Navigation.Uri);     
     }
 }
