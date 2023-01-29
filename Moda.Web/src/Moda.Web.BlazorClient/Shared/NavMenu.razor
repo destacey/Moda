@@ -2,10 +2,12 @@
     <MudTooltip Text="Home" Placement="Placement.Right">
         <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
     </MudTooltip>
+    <br />
 
     <MudTooltip Text="Counter" Placement="Placement.Right">
         <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Counter</MudNavLink>
     </MudTooltip>
+    <br />
 
     @if (CanViewAdministrationGroup || _canViewHangfire)
     {
@@ -15,12 +17,14 @@
             <MudTooltip Text="Users" Placement="Placement.Right">
                 <MudNavLink Match="NavLinkMatch.Prefix" Href="/users" Icon="@Icons.Material.Filled.PeopleAlt">Users</MudNavLink>
             </MudTooltip>
+            <br />
         }
         @if (_canViewRoles)
         {
             <MudTooltip Text="Roles" Placement="Placement.Right">
                 <MudNavLink Match="NavLinkMatch.Prefix" Href="/roles" Icon="@Icons.Material.Filled.EmojiPeople">Roles</MudNavLink>
             </MudTooltip>
+            <br />
         }
 
         @if (_canViewHangfire)
@@ -28,6 +32,7 @@
             <MudTooltip Text="Background Jobs" Placement="Placement.Right">
                 <MudNavLink Href="@_hangfireUrl" Target="_blank" Icon="@Icons.Material.Filled.AutoMode">Background Jobs</MudNavLink>
             </MudTooltip>
+            <br />
         }
     }
 
