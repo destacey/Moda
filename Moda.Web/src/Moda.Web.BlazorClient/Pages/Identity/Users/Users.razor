@@ -26,7 +26,11 @@
                 </MudTooltip>
             </ToolBarContent>
             <Columns>
-                <Column T="UserDetailsDto" Field="UserName" Title="Username" />
+                <Column T="UserDetailsDto" Field="UserName" Title="Username" >
+                    <CellTemplate>
+                        <MudLink Href="@($"/users/{context.Item.Id}/profile")" Class="ma-0 pa-0">@context.Item.UserName</MudLink>
+                    </CellTemplate>
+                </Column>
                 <Column T="UserDetailsDto" Field="FirstName" Title="First Name" />
                 <Column T="UserDetailsDto" Field="LastName" Title="Last Name" />
                 <Column T="UserDetailsDto" Field="Email" />

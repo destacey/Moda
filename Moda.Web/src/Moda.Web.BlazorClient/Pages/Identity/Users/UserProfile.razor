@@ -1,6 +1,11 @@
 ﻿@page "/users/{Id}/profile"
 @attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Users)]
 
+@inject IAuthorizationService AuthService
+@inject IUsersClient UsersClient
+
+<MudBreadcrumbs Items="_breadcrumbs" />
+
 <ModaTitle Title="@Title" Description="@Description" />
 @if (!_loaded)
 {
@@ -23,7 +28,6 @@ else
                         <MudCardContent Class="pa-46" Style="padding:26px!important">
                             <MudGrid>
                                 <MudSwitch @bind-Checked="@_active" Color="Color.Primary" Label="Active?"></MudSwitch>
-                                <MudCheckBox ReadOnly @bind-Checked="@_emailConfirmed" Disabled Label="Email Confirmed?" Color="Color.Secondary"></MudCheckBox>
                                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="ToggleUserStatus" ButtonType="ButtonType.Submit">Save Changes</MudButton>
                             </MudGrid>
                         </MudCardContent>
@@ -36,31 +40,32 @@ else
                 <MudCardContent Style="padding:0px!important">
                     <div class="d-flex justify-center mb-4">
                         @*@if (!string.IsNullOrEmpty(_imageUrl))
-                        {
-                            <MudAvatar Square="true" Image="@_imageUrl" Style=" width:100%;height:auto;"> </MudAvatar>
-                        }
-                        else
-                        {*@
-                            <MudAvatar Square="true" Color="Color.Primary" Style="width:100%;height:300px;">@_firstLetterOfName
-                            </MudAvatar>
-                      @*  }*@
+                    {
+                    <MudAvatar Square="true" Image="@_imageUrl" Style=" width:100%;height:auto;"> </MudAvatar>
+                    }
+                    else
+                    {*@
+                        <MudAvatar Square="true" Color="Color.Primary" Style="width:100%;height:200px;font-size:5rem;">
+                            @_firstLetterOfName
+                        </MudAvatar>
+                        @*  }*@
                     </div>
                     <MudText Typo="Typo.h6" Align="Align.Center">@_firstName @_lastName</MudText>
                     <MudText Align="Align.Center">@_email</MudText>
                 </MudCardContent>
                 @*<MudCardActions Class="d-flex justify-center">
-                    <div style="padding-bottom:20px">
-                        @if (!string.IsNullOrEmpty(_imageUrl))
-                        {
-                            <MudButton HtmlTag="label" DisableElevation Variant="Variant.Filled" Color="Color.Info"
+            <div style="padding-bottom:20px">
+            @if (!string.IsNullOrEmpty(_imageUrl))
+            {
+            <MudButton HtmlTag="label" DisableElevation Variant="Variant.Filled" Color="Color.Info"
             Size="Size.Small" Target="_blank" StartIcon="@Icons.Material.Filled.RemoveRedEye" Link="@_imageUrl"
-                        Style="margin-left: 5px;">
-                                "View"
-                            </MudButton>
-                        }
-                    </div>
+            Style="margin-left: 5px;">
+            "View"
+            </MudButton>
+            }
+            </div>
 
-                </MudCardActions>*@
+            </MudCardActions>*@
             </MudCard>
         </MudItem>
         <MudItem xs="12" sm="8" md="8">
@@ -79,7 +84,8 @@ else
                             <MudField Label="Last Name" Variant="Variant.Outlined">@_lastName</MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudField Label="Phone Number" Variant="Variant.Outlined">@_phoneNumber
+                            <MudField Label="Phone Number" Variant="Variant.Outlined">
+                                @_phoneNumber
                             </MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
@@ -94,7 +100,111 @@ else
 
 @code
 {
-public class CustomStringToBoolConverter : BoolConverter<string>
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    [Parameter]
+    public string? Id { get; set; }
+    [Parameter]
+    public string? Title { get; set; }
+    [Parameter]
+    public string? Description { get; set; }
+
+    private bool _active;
+    private bool _emailConfirmed;
+    private char _firstLetterOfName;
+    private string? _firstName;
+    private string? _lastName;
+    private string? _phoneNumber;
+    private string? _email;
+    //private string? _imageUrl;
+    private bool _loaded;
+    private bool _canToggleUserStatus;
+
+    private List<BreadcrumbItem> _breadcrumbs = new()
+    {
+        new BreadcrumbItem("Users", href: "/users"),
+        new BreadcrumbItem("Details", href: null, disabled: true)
+    };
+
+    private async Task ToggleUserStatus()
+    {
+        var request = new ToggleUserStatusRequest { ActivateUser = _active, UserId = Id! };
+        await ApiHelper.ExecuteCallGuardedAsync(() => UsersClient.ToggleStatusAsync(Id, request), Snackbar);
+        Navigation.NavigateTo("/users");
+    }
+
+    [Parameter]
+    public string? ImageUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(
+                () => UsersClient.GetByIdAsync(Id), Snackbar)
+            is UserDetailsDto user)
+        {
+            _firstName = user.FirstName;
+            _lastName = user.LastName;
+            _email = user.Email;
+            _phoneNumber = user.PhoneNumber;
+            _active = user.IsActive;
+            //_emailConfirmed = user.EmailConfirmed;
+            //_imageUrl = string.IsNullOrEmpty(user.ImageUrl) ? string.Empty : (Config[ConfigNames.ApiBaseUrl] + user.ImageUrl);
+            Title = $"{_firstName} {_lastName}'s Profile";
+            Description = _email;
+            if (_firstName?.Length > 0)
+            {
+                _firstLetterOfName = _firstName.ToUpper().FirstOrDefault();
+            }
+        }
+
+        var state = await AuthState;
+        _canToggleUserStatus = await AuthService.HasPermissionAsync(state.User, ApplicationAction.Update, ApplicationResource.Users);
+        _loaded = true;
+    }
+
+    //private async Task UploadFiles(InputFileChangeEventArgs e)
+    //{
+    //    var file = e.File;
+    //    if (file is not null)
+    //    {
+    //        string? extension = Path.GetExtension(file.Name);
+    //        if (!ApplicationConstants.SupportedImageFormats.Contains(extension.ToLower()))
+    //        {
+    //            Snackbar.Add("Image Format Not Supported.", Severity.Error);
+    //            return;
+    //        }
+
+    //        string? fileName = $"{_userId}-{Guid.NewGuid():N}";
+    //        fileName = fileName[..Math.Min(fileName.Length, 90)];
+    //        var imageFile = await file.RequestImageFileAsync(ApplicationConstants.StandardImageFormat, ApplicationConstants.MaxImageWidth, ApplicationConstants.MaxImageHeight);
+    //        byte[]? buffer = new byte[imageFile.Size];
+    //        await imageFile.OpenReadStream(ApplicationConstants.MaxAllowedSize).ReadAsync(buffer);
+    //        string? base64String = $"data:{ApplicationConstants.StandardImageFormat};base64,{Convert.ToBase64String(buffer)}";
+    //        //_profileModel.Image = new FileUploadRequest() { Name = fileName, Data = base64String, Extension = extension };
+
+    //        await UpdateProfileAsync();
+    //    }
+    //}
+
+    //public async Task RemoveImageAsync()
+    //{
+    //    string deleteContent = "You're sure you want to delete your Profile Image?";
+    //    var parameters = new DialogParameters
+    //    {
+    //        { nameof(DeleteConfirmation.ContentText), deleteContent }
+    //    };
+    //    var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
+    //    var dialog = DialogService.Show<DeleteConfirmation>("Delete", parameters, options);
+    //    var result = await dialog.Result;
+    //    if (!result.Cancelled)
+    //    {
+    //        _profileModel.DeleteCurrentImage = true;
+    //        await UpdateProfileAsync();
+    //    }
+    //}
+    
+    public class CustomStringToBoolConverter : BoolConverter<string>
     {
 
         public CustomStringToBoolConverter()
