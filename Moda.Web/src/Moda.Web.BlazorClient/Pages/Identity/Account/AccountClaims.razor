@@ -3,10 +3,12 @@
 @inject IAuthorizationService AuthorizationService
 
 
-<MudDataGrid Items="@_currentUser?.Claims"
+<MudDataGrid Items="@_claims"
+             Elevation="0"
              Height="600px"
-             Dense="true" Sortable="true" Filterable="true"
-             FixedHeader="true"
+             Dense="true" Bordered="true" Striped="true"
+             Sortable="true" Filterable="true" Hover="true"
+             FixedHeader="true" 
              QuickFilter="@_quickFilter">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Claims</MudText>
@@ -15,7 +17,7 @@
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <Columns>
-        <Column T="Claim" Field="Type" />
+        <Column T="Claim" Field="Type"/>
         <Column T="Claim" Field="Value" />
     </Columns>
 </MudDataGrid>
@@ -24,13 +26,13 @@
     [CascadingParameter]
     Task<AuthenticationState> authenticationStateTask { get; set; } = null!;
 
-    ClaimsPrincipal? _currentUser;
+    List<Claim> _claims = new();
 
     string _searchString = "";
 
     protected async override Task OnInitializedAsync()
     {
-        _currentUser = (await authenticationStateTask).User;
+        _claims = (await authenticationStateTask).User.Claims.ToList();
     }
 
     private Func<Claim, bool> _quickFilter => x =>
