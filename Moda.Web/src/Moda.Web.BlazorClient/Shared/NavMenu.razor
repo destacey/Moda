@@ -1,23 +1,34 @@
 ﻿<MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Counter</MudNavLink>
-    
+    <MudTooltip Text="Home" Placement="Placement.Right">
+        <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+    </MudTooltip>
+
+    <MudTooltip Text="Counter" Placement="Placement.Right">
+        <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Counter</MudNavLink>
+    </MudTooltip>
+
     @if (CanViewAdministrationGroup || _canViewHangfire)
     {
-        <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="ml-4 my-3">Administration</MudText>
+        <MudDivider Class="my-1" />
         @if (_canViewUsers)
         {
-            <MudNavLink Match="NavLinkMatch.Prefix" Href="/users" Icon="@Icons.Material.Filled.PeopleAlt">Users</MudNavLink>
+            <MudTooltip Text="Users" Placement="Placement.Right">
+                <MudNavLink Match="NavLinkMatch.Prefix" Href="/users" Icon="@Icons.Material.Filled.PeopleAlt">Users</MudNavLink>
+            </MudTooltip>
         }
         @if (_canViewRoles)
         {
-            <MudNavLink Href="/roles" Icon="@Icons.Material.Filled.EmojiPeople">Roles</MudNavLink>
+            <MudTooltip Text="Roles" Placement="Placement.Right">
+                <MudNavLink Match="NavLinkMatch.Prefix" Href="/roles" Icon="@Icons.Material.Filled.EmojiPeople">Roles</MudNavLink>
+            </MudTooltip>
         }
-        
+
         @if (_canViewHangfire)
         {
-            <MudNavLink Href="@_hangfireUrl" Match="NavLinkMatch.All" Target="_blank" Icon="@Icons.Material.Filled.Work">Hangfire</MudNavLink>
+            <MudTooltip Text="Background Jobs" Placement="Placement.Right">
+                <MudNavLink Href="@_hangfireUrl" Target="_blank" Icon="@Icons.Material.Filled.AutoMode">Background Jobs</MudNavLink>
+            </MudTooltip>
         }
     }
-    
+
 </MudNavMenu>

@@ -20,9 +20,10 @@ internal class AzureAdAuthenticationService : IAuthenticationService
     public Task<bool> LogInAsync() =>
         throw new NotImplementedException();
 
-    public async Task LogOutAsync()
+    public Task LogOutAsync()
     {
         _navigation.NavigateToLogout("authentication/logout");
+        return Task.CompletedTask;
     }
 
     public Task ReLoginAsync(string returnUrl)
