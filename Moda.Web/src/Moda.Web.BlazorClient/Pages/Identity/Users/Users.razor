@@ -1,44 +1,119 @@
 ﻿@page "/users"
 @attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Users)]
 
-<ModaTitle Title="Users" Description="Manage Users" />
+@inject IAuthorizationService AuthService
+@inject IUsersClient UsersClient
 
-@*<EntityTable TEntity="UserDetailsDto" TId="Guid" TRequest="CreateUserRequest" Context="@Context">
-    <ExtraActions>
+<ErrorBoundary>
+    <ChildContent>
+        <PageTitle>Users</PageTitle>
+        <ModaTitle Title="Users" Description="Manage Users" />
+
+        <MudDataGrid @ref="@_userGrid"
+                     Items="@_users"
+                     Elevation="0"
+                     Height="700px"
+                     Dense="true" Bordered="true" Striped="true" Outlined="true"
+                     Sortable="true" Filterable="true" Hover="true"
+                     FixedHeader="true"
+                     Loading="@_isLoading"
+                     QuickFilter="@_quickFilter">
+            <ToolBarContent>
+                <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudIconButton OnClick="@(() => ReloadData())" Icon="@Icons.Material.Filled.Refresh" Edge="Edge.Start" Color="Color.Inherit" />
+            </ToolBarContent>
+            <Columns>
+                <Column T="UserDetailsDto" Field="UserName" Title="Username" />
+                <Column T="UserDetailsDto" Field="FirstName" Title="First Name" />
+                <Column T="UserDetailsDto" Field="LastName" Title="Last Name" />
+                <Column T="UserDetailsDto" Field="Email" />
+                <Column T="UserDetailsDto" Field="IsActive" Title="Active" />
+            </Columns>
+            <LoadingContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading users...</MudText>
+            </LoadingContent>
+            <LoadingContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No users found.</MudText>
+            </LoadingContent>
+        </MudDataGrid>
+        <DataGridCountLabel DataGrid="@_userGrid" UnitLabel="users" />
+    </ChildContent>
+    <ErrorContent>
+        <ModaCustomError />
+    </ErrorContent>
+</ErrorBoundary>
+
+@*    <ExtraActions>
         <MudMenuItem OnClick="(() => ViewProfile(context.Id))">View Profile</MudMenuItem>
         @if (_canViewRoles)
         {
             <MudMenuItem OnClick="(() => ManageRoles(context.Id))">Manage Roles</MudMenuItem>
         }
-    </ExtraActions>
+    </ExtraActions>*@
 
-    <EditFormContent>
-        <MudItem xs="12" md="6">
-            <MudTextField For="@(() => context.UserName)" @bind-Value="context.UserName" Label="User Name" />
-        </MudItem>
-        <MudItem xs="12" md="6">
-            <MudTextField For="@(() => context.FirstName)" @bind-Value="context.FirstName" Label="First Name" />
-        </MudItem>
-        <MudItem xs="12" md="6">
-            <MudTextField For="@(() => context.LastName)" @bind-Value="context.LastName" Label="Last Name" />
-        </MudItem>
-        <MudItem xs="12" md="6">
-            <MudTextField For="@(() => context.Email)" InputType="InputType.Email" @bind-Value="context.Email"
-                Label="Email" />
-        </MudItem>
-        <MudItem xs="12" md="12">
-            <MudTextField For="@(() => context.PhoneNumber)" @bind-Value="context.PhoneNumber"
-                Label="Phone Number" />
-        </MudItem>
-        <MudItem xs="12" md="6">
-            <MudTextField For="@(() => context.Password)" @bind-Value="context.Password" Label="Password"
-                InputType="@_passwordInput" Adornment="Adornment.End" AdornmentIcon="@_passwordInputIcon"
-                OnAdornmentClick="TogglePasswordVisibility" />
-        </MudItem>
-        <MudItem xs="12" md="6">
-            <MudTextField For="@(() => context.ConfirmPassword)" @bind-Value="context.ConfirmPassword"
-                Label="Confirm Password" InputType="InputType.Password" />
-        </MudItem>
-    </EditFormContent>
+@code {
+    [CascadingParameter]
+    Task<AuthenticationState> AuthState { get; set; } = null!;
 
-</EntityTable>*@
+    MudDataGrid<UserDetailsDto> _userGrid = new();
+    List<UserDetailsDto> _users = new();
+
+    string _searchString = "";
+    bool _isLoading = true;
+    bool _canExportUsers;
+    bool _canViewRoles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        _canExportUsers = await AuthService.HasPermissionAsync(user, ApplicationAction.Export, ApplicationResource.Users);
+        _canViewRoles = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.UserRoles);
+
+        await GetUsers();
+    }
+
+    private void ViewProfile(in Guid userId) =>
+        Navigation.NavigateTo($"/users/{userId}/profile");
+
+    private void ManageRoles(in Guid userId) =>
+        Navigation.NavigateTo($"/users/{userId}/roles");
+
+    private Func<UserDetailsDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.UserName) && x.UserName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.FirstName) && x.FirstName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.LastName) && x.LastName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.Email) && x.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+
+    private async Task ReloadData()
+    {
+        await GetUsers();
+    }
+
+    private async Task GetUsers()
+    {
+        _isLoading = true;
+
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => UsersClient.GetListAsync(), Snackbar)
+        is List<UserDetailsDto> result)
+        {
+            _users = result;
+        }
+
+        _isLoading = false;
+    }
+}
