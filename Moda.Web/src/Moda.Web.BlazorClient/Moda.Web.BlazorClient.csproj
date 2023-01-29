@@ -5,6 +5,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>4b5ba091-9618-480a-b141-e31b46169722</UserSecretsId>
+        <RunAOTCompilation>true</RunAOTCompilation>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -33,7 +34,7 @@
 	  <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
 	</ItemGroup>
 
-    <Target Name="NSwag">
+    <Target Name="NSwag" Condition="'$(Configuration)'=='DEBUG'">
         <Exec WorkingDirectory="$(ProjectDir)\ApiClient" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net70) run nswag.json /variables:Configuration=$(Configuration)" />
     </Target>
 	

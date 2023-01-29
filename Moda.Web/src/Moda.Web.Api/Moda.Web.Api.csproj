@@ -46,7 +46,7 @@
         <Folder Include="wwwroot\api\v1\" />
     </ItemGroup>
     
-    <Target Name="NSwag" AfterTargets="Build">
+    <Target Name="NSwag" AfterTargets="Build" Condition="'$(Configuration)'=='DEBUG'">
         <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net70) aspnetcore2openapi /assembly:$(TargetDir)Moda.Web.Api.dll /output:wwwroot/api/v1/specification.json" />
     </Target>
 </Project>
