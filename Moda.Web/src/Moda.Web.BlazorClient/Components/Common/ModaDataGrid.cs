@@ -4,7 +4,7 @@ using MudBlazor;
 
 namespace Moda.Web.BlazorClient.Components.Common;
 
-public class ModaTable<T> : MudTable<T>
+public class ModaDataGrid<T> : MudDataGrid<T>
 {
     [Inject]
     private IClientPreferenceManager ClientPreferences { get; set; } = default!;

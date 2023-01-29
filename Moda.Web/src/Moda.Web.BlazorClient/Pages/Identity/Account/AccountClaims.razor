@@ -1,38 +1,40 @@
 ﻿@using System.Security.Claims
 
-@inject IAuthorizationService AuthorizationService
-
-
-<MudDataGrid Items="@_claims"
-             Elevation="0"
-             Height="600px"
-             Dense="true" Bordered="true" Striped="true"
-             Sortable="true" Filterable="true" Hover="true"
-             FixedHeader="true" 
-             QuickFilter="@_quickFilter">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Claims</MudText>
-        <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-    </ToolBarContent>
-    <Columns>
-        <Column T="Claim" Field="Type"/>
-        <Column T="Claim" Field="Value" />
-    </Columns>
-</MudDataGrid>
+<MudContainer Class="pa-0">
+    <MudDataGrid @ref="@_claimGrid"
+                 Items="@_claims"
+                 Elevation="0"
+                 Height="600px"
+                 Dense="true" Bordered="true" Striped="true"
+                 Sortable="true" Filterable="true" Hover="true"
+                 FixedHeader="true"
+                 QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Claims</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <Column T="Claim" Field="Type" />
+            <Column T="Claim" Field="Value" />
+        </Columns>
+    </MudDataGrid>
+    <DataGridCountLabel DataGrid="@_claimGrid" UnitLabel="claims" />
+</MudContainer>
 
 @code {
     [CascadingParameter]
-    Task<AuthenticationState> authenticationStateTask { get; set; } = null!;
+    Task<AuthenticationState> AuthState { get; set; } = null!;
 
+    MudDataGrid<Claim> _claimGrid = new();
     List<Claim> _claims = new();
 
     string _searchString = "";
 
     protected async override Task OnInitializedAsync()
     {
-        _claims = (await authenticationStateTask).User.Claims.ToList();
+        _claims = (await AuthState).User.Claims.ToList();
     }
 
     private Func<Claim, bool> _quickFilter => x =>

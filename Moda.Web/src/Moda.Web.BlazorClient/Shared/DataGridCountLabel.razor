@@ -1,0 +1,20 @@
+﻿@typeparam TItem
+
+<MudText Class="ma-3" Typo="Typo.caption" Align="Align.Left">@_itemCountString2</MudText>
+
+@code {
+    [Parameter]
+    public MudDataGrid<TItem>? DataGrid { get; set; }
+
+    [Parameter]
+    public string UnitLabel { get; set; } = "";
+
+    int _filterCount => DataGrid?.GetFilteredItemsCount() ?? 0;
+    int _itemCount => DataGrid?.Items?.Count() ?? 0;
+
+    string _itemCountString2 => _itemCount == 0
+        ? ""
+        : _filterCount == _itemCount
+            ? $"{_itemCount} {UnitLabel}"
+            : $"{_filterCount} / {_itemCount} {UnitLabel}";
+}
