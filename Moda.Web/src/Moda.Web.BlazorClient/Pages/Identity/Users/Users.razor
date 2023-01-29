@@ -21,7 +21,9 @@
             <ToolBarContent>
                 <MudSpacer />
                 <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                <MudIconButton OnClick="@(() => ReloadData())" Icon="@Icons.Material.Filled.Refresh" Edge="Edge.Start" Color="Color.Inherit" />
+                <MudTooltip Text="Reload Data" Placement="Placement.Top">
+                    <MudIconButton OnClick="@(() => ReloadData())" Icon="@Icons.Material.Filled.Refresh" Edge="Edge.Start" Color="Color.Inherit" />
+                </MudTooltip>
             </ToolBarContent>
             <Columns>
                 <Column T="UserDetailsDto" Field="UserName" Title="Username" />
@@ -33,9 +35,9 @@
             <LoadingContent>
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading users...</MudText>
             </LoadingContent>
-            <LoadingContent>
+            <NoRecordsContent>
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No users found.</MudText>
-            </LoadingContent>
+            </NoRecordsContent>
         </MudDataGrid>
         <DataGridCountLabel DataGrid="@_userGrid" UnitLabel="users" />
     </ChildContent>
@@ -108,8 +110,7 @@
     {
         _isLoading = true;
 
-        if (await ApiHelper.ExecuteCallGuardedAsync(() => UsersClient.GetListAsync(), Snackbar)
-        is List<UserDetailsDto> result)
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => UsersClient.GetListAsync(), Snackbar) is List<UserDetailsDto> result)
         {
             _users = result;
         }

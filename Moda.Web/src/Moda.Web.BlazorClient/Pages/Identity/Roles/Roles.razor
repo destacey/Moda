@@ -1,33 +1,102 @@
 ﻿@page "/roles"
 @using Moda.Common.Domain.Authorization;
-@attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.RoleClaims)]
 @attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Roles)]
 
-<ModaTitle Title="Roles" Description="Manage Roles." />
+@inject IAuthorizationService AuthService
+@inject IRolesClient RolesClient
 
-@*<EntityTable TEntity="RoleDto" TId="string" TRequest="CreateOrUpdateRoleRequest" Context="@Context">
+<ErrorBoundary>
+    <ChildContent>
+        <PageTitle>Roles</PageTitle>
+        <ModaTitle Title="Roles" Description="Manage Roles" />
 
-    <ExtraActions>
-        @if (_canViewRoleClaims)
+        <MudDataGrid @ref="@_roleGrid"
+                     Items="@_roles"
+                     Elevation="0"
+                     Height="700px"
+                     Dense="true" Bordered="true" Striped="true" Outlined="true"
+                     Sortable="true" Filterable="true" Hover="true"
+                     FixedHeader="true"
+                     Loading="@_isLoading"
+                     QuickFilter="@_quickFilter">
+            <ToolBarContent>
+                <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTooltip Text="Reload Data" Placement="Placement.Top">
+                    <MudIconButton OnClick="@(() => ReloadData())" Icon="@Icons.Material.Filled.Refresh" Edge="Edge.Start" Color="Color.Inherit" />
+                </MudTooltip>
+            </ToolBarContent>
+            <Columns>
+                <Column T="RoleListDto" Field="Name" />
+                <Column T="RoleListDto" Field="Description" />
+            </Columns>
+            <LoadingContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading roles...</MudText>
+            </LoadingContent>
+            <NoRecordsContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No roles found.</MudText>
+            </NoRecordsContent>
+        </MudDataGrid>
+        <DataGridCountLabel DataGrid="@_roleGrid" UnitLabel="roles" />
+    </ChildContent>
+    <ErrorContent>
+        <ModaCustomError />
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    [CascadingParameter]
+    Task<AuthenticationState> AuthState { get; set; } = null!;
+
+    MudDataGrid<RoleListDto> _roleGrid = new();
+    List<RoleListDto> _roles = new();
+
+    string _searchString = "";
+    bool _isLoading = true;
+    bool _canViewRoleClaims;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthState;
+        _canViewRoleClaims = await AuthService.HasPermissionAsync(state.User, ApplicationAction.View, ApplicationResource.RoleClaims);
+
+        await GetRoles();
+    }
+
+    private void ManagePermissions(string? roleId)
+    {
+        ArgumentNullException.ThrowIfNull(roleId, nameof(roleId));
+        Navigation.NavigateTo($"/roles/{roleId}/permissions");
+    }
+
+    private Func<RoleListDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.Description) && x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+
+    private async Task ReloadData()
+    {
+        await GetRoles();
+    }
+
+    private async Task GetRoles()
+    {
+        _isLoading = true;
+
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => RolesClient.GetListAsync(), Snackbar) is List<RoleListDto> result)
         {
-            <MudMenuItem @onclick="@(() => ManagePermissions(context.Id))">"Manage Permission"</MudMenuItem>
+            _roles = result;
         }
-    </ExtraActions>
 
-    <EditFormContent>
-        @if (!Context.AddEditModal.IsCreate)
-        {
-            <MudItem xs="12" md="6">
-                <MudTextField Value="context.Id" ReadOnly DisableUnderLine Label="Role Id" />
-            </MudItem>
-        }
-        <MudItem xs="12" md="6">
-            <MudTextField For="@(() => context.Name)" @bind-Value="context.Name" Label="Role Name" />
-        </MudItem>
-        <MudItem xs="12" md="6">
-            <MudTextField For="@(() => context.Description)" @bind-Value="context.Description"
-                Label="Description" />
-        </MudItem>
-    </EditFormContent>
-
-</EntityTable>*@
+        _isLoading = false;
+    }
+}
