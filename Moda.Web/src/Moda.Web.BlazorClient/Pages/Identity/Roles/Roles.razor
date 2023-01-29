@@ -10,14 +10,14 @@
         <PageTitle>Roles</PageTitle>
         <ModaTitle Title="Roles" Description="Manage Roles" />
 
-        <MudDataGrid @ref="@_roleGrid"
+        <MudDataGrid @ref="@_grid"
                      Items="@_roles"
                      Elevation="0"
                      Height="700px"
-                     Dense="true" Bordered="true" Striped="true" Outlined="true"
-                     Sortable="true" Filterable="true" Hover="true"
+                     SortMode="SortMode.Multiple" Filterable="true"
                      FixedHeader="true"
                      Loading="@_isLoading"
+                     LoadingProgressColor="@Color.Secondary"
                      QuickFilter="@_quickFilter">
             <ToolBarContent>
                 <MudSpacer />
@@ -37,7 +37,7 @@
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No roles found.</MudText>
             </NoRecordsContent>
         </MudDataGrid>
-        <DataGridCountLabel DataGrid="@_roleGrid" UnitLabel="roles" />
+        <DataGridCountLabel DataGrid="@_grid" UnitLabel="roles" />
     </ChildContent>
     <ErrorContent>
         <ModaCustomError />
@@ -46,9 +46,9 @@
 
 @code {
     [CascadingParameter]
-    Task<AuthenticationState> AuthState { get; set; } = null!;
+    Task<AuthenticationState> AuthState { get; set; } = default!;
 
-    MudDataGrid<RoleListDto> _roleGrid = new();
+    MudDataGrid<RoleListDto> _grid = default!;
     List<RoleListDto> _roles = new();
 
     string _searchString = "";
@@ -57,8 +57,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var state = await AuthState;
-        _canViewRoleClaims = await AuthService.HasPermissionAsync(state.User, ApplicationAction.View, ApplicationResource.RoleClaims);
+        var user = (await AuthState).User;
+        _canViewRoleClaims = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.RoleClaims);
+
+        if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
+        {
+            SetTablePreference(clientPreference.TablePreference);
+        }
 
         await GetRoles();
     }
@@ -98,5 +103,13 @@
         }
 
         _isLoading = false;
+    }
+
+    private void SetTablePreference(ModaTablePreference tablePreference)
+    {
+        _grid.Dense = tablePreference.IsDense;
+        _grid.Striped = tablePreference.IsStriped;
+        _grid.Bordered = tablePreference.HasBorder;
+        _grid.Hover = tablePreference.IsHoverable;
     }
 }
