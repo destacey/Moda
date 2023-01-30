@@ -111,7 +111,6 @@ else
     public string? Description { get; set; }
 
     private bool _active;
-    private bool _emailConfirmed;
     private char _firstLetterOfName;
     private string? _firstName;
     private string? _lastName;
@@ -124,7 +123,7 @@ else
     private List<BreadcrumbItem> _breadcrumbs = new()
     {
         new BreadcrumbItem("Users", href: "/users"),
-        new BreadcrumbItem("Details", href: null, disabled: true)
+        new BreadcrumbItem("Profile", href: null, disabled: true)
     };
 
     private async Task ToggleUserStatus()
@@ -148,7 +147,6 @@ else
             _email = user.Email;
             _phoneNumber = user.PhoneNumber;
             _active = user.IsActive;
-            //_emailConfirmed = user.EmailConfirmed;
             //_imageUrl = string.IsNullOrEmpty(user.ImageUrl) ? string.Empty : (Config[ConfigNames.ApiBaseUrl] + user.ImageUrl);
             Title = $"{_firstName} {_lastName}'s Profile";
             Description = _email;

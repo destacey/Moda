@@ -22,19 +22,27 @@
                 <MudSpacer />
                 <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 <MudTooltip Text="Reload Data" Placement="Placement.Top">
-                    <MudIconButton OnClick="@(() => ReloadData())" Icon="@Icons.Material.Filled.Refresh" Edge="Edge.Start" Color="Color.Inherit" />
+                    <MudFab OnClick="@(() => ReloadData())" Size="Size.Small" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" />
                 </MudTooltip>
             </ToolBarContent>
             <Columns>
-                <Column T="UserDetailsDto" Field="UserName" Title="Username" >
-                    <CellTemplate>
-                        <MudLink Href="@($"/users/{context.Item.Id}/profile")" Class="ma-0 pa-0">@context.Item.UserName</MudLink>
-                    </CellTemplate>
-                </Column>
+                <Column T="UserDetailsDto" Field="UserName" Title="Username" />
                 <Column T="UserDetailsDto" Field="FirstName" Title="First Name" />
                 <Column T="UserDetailsDto" Field="LastName" Title="Last Name" />
                 <Column T="UserDetailsDto" Field="Email" />
                 <Column T="UserDetailsDto" Field="IsActive" Title="Active" />
+                <Column T="UserDetailsDto" Title="Actions" Sortable="false" Filterable="false" CellClass="d-flex justify-end" >
+                    <CellTemplate>
+                        <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true"
+                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter" OffsetX="true">
+                            <MudMenuItem OnClick="@(() => ViewProfile(@context.Item.Id))">View Profile</MudMenuItem>
+                            @if (_canViewRoles)
+                            {
+                                <MudMenuItem OnClick="@(() => ManageRoles(context.Item.Id))">Manage Permissions</MudMenuItem>
+                            }
+                        </MudMenu>
+                    </CellTemplate>
+                </Column>
             </Columns>
             <LoadingContent>
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading users...</MudText>
@@ -83,11 +91,11 @@
 
         await GetUsers();
     }
-
-    private void ViewProfile(in Guid userId) =>
+    
+    private void ViewProfile(in string userId) =>
         Navigation.NavigateTo($"/users/{userId}/profile");
 
-    private void ManageRoles(in Guid userId) =>
+    private void ManageRoles(in string userId) =>
         Navigation.NavigateTo($"/users/{userId}/roles");
 
     private Func<UserDetailsDto, bool> _quickFilter => x =>
