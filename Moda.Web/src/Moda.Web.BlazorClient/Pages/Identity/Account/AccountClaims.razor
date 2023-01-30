@@ -1,12 +1,12 @@
 ﻿@using System.Security.Claims
 
+
 <MudContainer Class="pa-0">
-    <MudDataGrid @ref="@_claimGrid"
+    <MudDataGrid @ref="@_grid"
                  Items="@_claims"
                  Elevation="0"
                  Height="600px"
-                 Dense="true" Bordered="true" Striped="true"
-                 Sortable="true" Filterable="true" Hover="true"
+                 SortMode="SortMode.Multiple" Filterable="true"
                  FixedHeader="true"
                  QuickFilter="@_quickFilter">
         <ToolBarContent>
@@ -20,20 +20,25 @@
             <Column T="Claim" Field="Value" />
         </Columns>
     </MudDataGrid>
-    <DataGridCountLabel DataGrid="@_claimGrid" UnitLabel="claims" />
+    <DataGridCountLabel DataGrid="@_grid" UnitLabel="claims" />
 </MudContainer>
 
 @code {
     [CascadingParameter]
-    Task<AuthenticationState> AuthState { get; set; } = null!;
+    Task<AuthenticationState> AuthState { get; set; } = default!;
 
-    MudDataGrid<Claim> _claimGrid = new();
+    MudDataGrid<Claim> _grid = default!;
     List<Claim> _claims = new();
 
     string _searchString = "";
 
     protected async override Task OnInitializedAsync()
     {
+        if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
+        {
+            SetTablePreference(clientPreference.TablePreference);
+        }
+        
         _claims = (await AuthState).User.Claims.ToList();
     }
 
@@ -50,4 +55,12 @@
 
         return false;
     };
+
+    private void SetTablePreference(ModaTablePreference tablePreference)
+    {
+        _grid.Dense = tablePreference.IsDense;
+        _grid.Striped = tablePreference.IsStriped;
+        _grid.Bordered = tablePreference.HasBorder;
+        _grid.Hover = tablePreference.IsHoverable;
+    }
 }

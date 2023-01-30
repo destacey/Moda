@@ -10,25 +10,48 @@
         <PageTitle>Roles</PageTitle>
         <ModaTitle Title="Roles" Description="Manage Roles" />
 
-        <MudDataGrid @ref="@_roleGrid"
+        <MudDataGrid @ref="@_grid"
                      Items="@_roles"
                      Elevation="0"
                      Height="700px"
-                     Dense="true" Bordered="true" Striped="true" Outlined="true"
-                     Sortable="true" Filterable="true" Hover="true"
+                     SortMode="SortMode.Multiple" Filterable="true"
                      FixedHeader="true"
                      Loading="@_isLoading"
+                     LoadingProgressColor="@Color.Secondary"
                      QuickFilter="@_quickFilter">
             <ToolBarContent>
                 <MudSpacer />
                 <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 <MudTooltip Text="Reload Data" Placement="Placement.Top">
-                    <MudIconButton OnClick="@(() => ReloadData())" Icon="@Icons.Material.Filled.Refresh" Edge="Edge.Start" Color="Color.Inherit" />
+                    <MudFab OnClick="@(() => ReloadData())" Size="Size.Small" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" />
                 </MudTooltip>
             </ToolBarContent>
             <Columns>
                 <Column T="RoleListDto" Field="Name" />
+@*                    <CellTemplate>
+                        <MudLink Href="@($"/roles/{context.Item.Id}/")" Class="ma-0 pa-0">@context.Item.Name</MudLink>
+                    </CellTemplate>
+                </Column>*@
                 <Column T="RoleListDto" Field="Description" />
+                <Column T="RoleListDto" Title="Actions" Sortable="false" Filterable="false" CellClass="d-flex justify-end" >
+                    <CellTemplate>
+                        <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true"
+                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter" OffsetX="true">
+                            @*@if (_canUpdateRoleClaims)
+                            {
+                                <MudMenuItem @onclick="@(() => InvokeModal(context))">Edit</MudMenuItem>
+                            }
+                            @if (_canDeleteRoleClaims)
+                            {
+                                <MudMenuItem Style="color:red!important" @onclick="@(() => Delete(context))">Delete</MudMenuItem>
+                            }*@
+                            @if (_canViewRoleClaims)
+                            {
+                                <MudMenuItem OnClick="@(() => ManagePermissions(context.Item.Id))">Manage Permissions</MudMenuItem>
+                            }
+                        </MudMenu>
+                    </CellTemplate>
+                </Column>
             </Columns>
             <LoadingContent>
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading roles...</MudText>
@@ -37,7 +60,7 @@
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No roles found.</MudText>
             </NoRecordsContent>
         </MudDataGrid>
-        <DataGridCountLabel DataGrid="@_roleGrid" UnitLabel="roles" />
+        <DataGridCountLabel DataGrid="@_grid" UnitLabel="roles" />
     </ChildContent>
     <ErrorContent>
         <ModaCustomError />
@@ -46,19 +69,28 @@
 
 @code {
     [CascadingParameter]
-    Task<AuthenticationState> AuthState { get; set; } = null!;
+    Task<AuthenticationState> AuthState { get; set; } = default!;
 
-    MudDataGrid<RoleListDto> _roleGrid = new();
+    MudDataGrid<RoleListDto> _grid = default!;
     List<RoleListDto> _roles = new();
 
     string _searchString = "";
     bool _isLoading = true;
     bool _canViewRoleClaims;
+    bool _canUpdateRoleClaims;
+    //bool _canDeleteRoleClaims;
 
     protected override async Task OnInitializedAsync()
     {
-        var state = await AuthState;
-        _canViewRoleClaims = await AuthService.HasPermissionAsync(state.User, ApplicationAction.View, ApplicationResource.RoleClaims);
+        var user = (await AuthState).User;
+        _canViewRoleClaims = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.RoleClaims);
+        _canUpdateRoleClaims = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.RoleClaims);
+        //_canDeleteRoleClaims = await AuthService.HasPermissionAsync(user, ApplicationAction.Delete, ApplicationResource.RoleClaims);
+
+        if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
+        {
+            SetTablePreference(clientPreference.TablePreference);
+        }
 
         await GetRoles();
     }
@@ -98,5 +130,13 @@
         }
 
         _isLoading = false;
+    }
+
+    private void SetTablePreference(ModaTablePreference tablePreference)
+    {
+        _grid.Dense = tablePreference.IsDense;
+        _grid.Striped = tablePreference.IsStriped;
+        _grid.Bordered = tablePreference.HasBorder;
+        _grid.Hover = tablePreference.IsHoverable;
     }
 }

@@ -8,7 +8,6 @@
         <MudIconButton Color="Color.Default" Icon="@Icons.Material.Filled.Close"
             OnClick="@(() => ThemeDrawerOpenChanged.InvokeAsync(false))" Size="Size.Small" />
     </MudDrawerHeader>
-    <MudDivider Style="margin-bottom:10px!important" />
     <div style="padding:20px!important">
         <MudExpansionPanels DisableBorders="true" Elevation="25">
             <DarkModePanel OnIconClicked="ToggleDarkLightMode" />
@@ -16,8 +15,8 @@
                 CurrentColor="Color.Primary" />
             <ColorPanel OnColorClicked="UpdateThemeSecondaryColor" Colors="_colors" ColorType="Secondary Color"
                 CurrentColor="Color.Secondary" />
-            <RadiusPanel Radius="ThemePreference==null ? 0 : ThemePreference.BorderRadius"
-                OnSliderChanged="UpdateBorderRadius" />
+            @*<RadiusPanel Radius="ThemePreference==null ? 0 : ThemePreference.BorderRadius"
+                OnSliderChanged="UpdateBorderRadius" />*@
             <TableCustomizationPanel OnDenseSwitchToggled="ToggleEntityTableDense"
                 OnStripedSwitchToggled="ToggleEntityTableStriped" OnBorderdedSwitchToggled="ToggleEntityTableBorder"
                 OnHoverableSwitchToggled="ToggleEntityTableHoverable" />

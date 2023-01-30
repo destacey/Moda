@@ -41,7 +41,7 @@ public partial class UserRoles
             is UserDetailsDto user)
         {
             _title = $"{user.FirstName} {user.LastName}";
-            _description = string.Format("Manage {0} {1}'s Roles", user.FirstName, user.LastName);
+            _description = $"Manage {user.FirstName} {user.LastName}'s Roles";
 
             if (await ApiHelper.ExecuteCallGuardedAsync(
                     () => UsersClient.GetRolesAsync(user.Id.ToString()), Snackbar)

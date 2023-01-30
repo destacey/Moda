@@ -9,20 +9,20 @@
         <PageTitle>Users</PageTitle>
         <ModaTitle Title="Users" Description="Manage Users" />
 
-        <MudDataGrid @ref="@_userGrid"
+        <MudDataGrid @ref="@_grid"
                      Items="@_users"
                      Elevation="0"
                      Height="700px"
-                     Dense="true" Bordered="true" Striped="true" Outlined="true"
-                     Sortable="true" Filterable="true" Hover="true"
+                     SortMode="SortMode.Multiple" Filterable="true"
                      FixedHeader="true"
                      Loading="@_isLoading"
+                     LoadingProgressColor="@Color.Secondary"
                      QuickFilter="@_quickFilter">
             <ToolBarContent>
                 <MudSpacer />
                 <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 <MudTooltip Text="Reload Data" Placement="Placement.Top">
-                    <MudIconButton OnClick="@(() => ReloadData())" Icon="@Icons.Material.Filled.Refresh" Edge="Edge.Start" Color="Color.Inherit" />
+                    <MudFab OnClick="@(() => ReloadData())" Size="Size.Small" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" />
                 </MudTooltip>
             </ToolBarContent>
             <Columns>
@@ -31,6 +31,18 @@
                 <Column T="UserDetailsDto" Field="LastName" Title="Last Name" />
                 <Column T="UserDetailsDto" Field="Email" />
                 <Column T="UserDetailsDto" Field="IsActive" Title="Active" />
+                <Column T="UserDetailsDto" Title="Actions" Sortable="false" Filterable="false" CellClass="d-flex justify-end" >
+                    <CellTemplate>
+                        <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true"
+                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter" OffsetX="true">
+                            <MudMenuItem OnClick="@(() => ViewProfile(@context.Item.Id))">View Profile</MudMenuItem>
+                            @if (_canViewRoles)
+                            {
+                                <MudMenuItem OnClick="@(() => ManageRoles(context.Item.Id))">Manage Permissions</MudMenuItem>
+                            }
+                        </MudMenu>
+                    </CellTemplate>
+                </Column>
             </Columns>
             <LoadingContent>
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading users...</MudText>
@@ -39,7 +51,7 @@
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No users found.</MudText>
             </NoRecordsContent>
         </MudDataGrid>
-        <DataGridCountLabel DataGrid="@_userGrid" UnitLabel="users" />
+        <DataGridCountLabel DataGrid="@_grid" UnitLabel="users" />
     </ChildContent>
     <ErrorContent>
         <ModaCustomError />
@@ -56,9 +68,9 @@
 
 @code {
     [CascadingParameter]
-    Task<AuthenticationState> AuthState { get; set; } = null!;
+    Task<AuthenticationState> AuthState { get; set; } = default!;
 
-    MudDataGrid<UserDetailsDto> _userGrid = new();
+    MudDataGrid<UserDetailsDto> _grid = default!;
     List<UserDetailsDto> _users = new();
 
     string _searchString = "";
@@ -72,13 +84,18 @@
         _canExportUsers = await AuthService.HasPermissionAsync(user, ApplicationAction.Export, ApplicationResource.Users);
         _canViewRoles = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.UserRoles);
 
+        if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
+        {
+            SetTablePreference(clientPreference.TablePreference);
+        }
+
         await GetUsers();
     }
-
-    private void ViewProfile(in Guid userId) =>
+    
+    private void ViewProfile(in string userId) =>
         Navigation.NavigateTo($"/users/{userId}/profile");
 
-    private void ManageRoles(in Guid userId) =>
+    private void ManageRoles(in string userId) =>
         Navigation.NavigateTo($"/users/{userId}/roles");
 
     private Func<UserDetailsDto, bool> _quickFilter => x =>
@@ -116,5 +133,13 @@
         }
 
         _isLoading = false;
+    }
+
+    private void SetTablePreference(ModaTablePreference tablePreference)
+    {
+        _grid.Dense = tablePreference.IsDense;
+        _grid.Striped = tablePreference.IsStriped;
+        _grid.Bordered = tablePreference.HasBorder;
+        _grid.Hover = tablePreference.IsHoverable;
     }
 }

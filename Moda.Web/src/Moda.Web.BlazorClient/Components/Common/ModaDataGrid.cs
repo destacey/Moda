@@ -21,6 +21,8 @@ public class ModaDataGrid<T> : MudDataGrid<T>
 
     private void SetTablePreference(ModaTablePreference tablePreference)
     {
+        FixedHeader = true;
+
         Dense = tablePreference.IsDense;
         Striped = tablePreference.IsStriped;
         Bordered = tablePreference.HasBorder;
