@@ -3,9 +3,7 @@
 <MudLayout>
     <MudAppBar Elevation="2">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudLink Href="/" Underline="Underline.None">
-            <MudImage Src="/images/moda-logo-primary.png" Alt="Moda" Height="150" />
-        </MudLink>
+        <MudImage Src="/images/moda-logo-primary.png" Alt="Moda" Height="150" />
         <MudSpacer />
         
         <UserMenu ThemeManagerOnClick="@ThemeManagerOnClick" />
