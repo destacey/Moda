@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 
 namespace Moda.Infrastructure.Identity;
@@ -19,6 +20,7 @@ internal partial class UserService
         string? objectId = principal.GetObjectId();
         if (string.IsNullOrWhiteSpace(objectId))
         {
+            _logger.LogError("Invalid principal objectId");
             throw new InternalServerException("Invalid objectId");
         }
 
@@ -38,7 +40,7 @@ internal partial class UserService
 
     private async Task<ApplicationUser> CreateOrUpdateFromPrincipalAsync(ClaimsPrincipal principal)
     {
-        string principalObjectId = principal.GetObjectId() ?? throw new InternalServerException(string.Format("Principal ObjectId is missing or null."));
+        string principalObjectId = principal.GetObjectId() ?? throw new InternalServerException("Principal ObjectId is missing or null.");
 
         var adUser = await _graphServiceClient.Users[principalObjectId].Request().GetAsync();
         string? email = principal.FindFirstValue(ClaimTypes.Upn) ?? adUser.Mail;
@@ -46,20 +48,25 @@ internal partial class UserService
         
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(username))
         {
-            throw new InternalServerException(string.Format("Username or Email not valid."));
+            _logger.LogError("Username {Username} or Email {Email} not valid", username, email);
+            throw new InternalServerException("Username or Email not valid.");
         }
 
         var user = await _userManager.FindByNameAsync(username);
         if (user is not null && !string.IsNullOrWhiteSpace(user.ObjectId))
         {
-            throw new InternalServerException(string.Format("Username {0} is already taken.", username));
+            _logger.LogError("Username or Email {Username} not valid", username);
+            throw new InternalServerException($"Username {username} is already taken.");
         }
 
         if (user is null)
         {
             user = await _userManager.FindByEmailAsync(email);
             if (user is not null && !string.IsNullOrWhiteSpace(user.ObjectId))
-                throw new InternalServerException(string.Format("Email {0} is already taken.", email));
+            {
+                _logger.LogError("Email {email} is already taken.", email);
+                throw new InternalServerException($"Email {email} is already taken.");
+            }
         }
 
         IdentityResult? result;
@@ -92,16 +99,23 @@ internal partial class UserService
             await _events.PublishAsync(new ApplicationUserCreatedEvent(user.Id, _dateTimeService.Now));
         }
 
-        return result.Succeeded 
-            ? user
-            : throw new InternalServerException("Validation Errors Occurred.");
+        if (!result.Succeeded)
+        {
+            _logger.LogError("Error creating user from principal: {Errors}", result.Errors.Select(e => e.Description));
+            throw new InternalServerException("Validation Errors Occurred.");
+        }
+
+        return user;
     }
 
     public async Task UpdateAsync(UpdateUserCommand command, string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
-
-        _ = user ?? throw new NotFoundException("User Not Found.");
+        if (user is null)
+        {
+            _logger.LogError("User with id {UserId} not found.", userId);
+            throw new NotFoundException("User Not Found.");
+        }
 
         user.FirstName = command.FirstName;
         user.LastName = command.LastName;
@@ -118,7 +132,10 @@ internal partial class UserService
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeService.Now));
 
         if (!result.Succeeded)
+        {
+            _logger.LogError("Error updating user: {Errors}", result.Errors.Select(e => e.Description));
             throw new InternalServerException("Update profile failed");
+        }
     }
 
     private async Task<Guid> GetOrCreatePersonId(string principalObjectId)
@@ -128,17 +145,23 @@ internal partial class UserService
         if (personId.HasValue)
         {
             var existingUser = await _userManager.FindByIdAsync(personId.Value.ToString());
+            if (existingUser is not null)
+            {
+                _logger.LogError("Person with key {PrincipalObjectId} already exists.", principalObjectId);
+                throw new InternalServerException($"Person with key {principalObjectId} already exists.");
+            }
 
-            return existingUser is not null
-                ? throw new InternalServerException(string.Format("Person with key {0} already exists.", principalObjectId))
-                : personId.Value;
+            return personId.Value;
         }
 
         // else, create new person
         var result = await _sender.Send(new CreatePersonCommand(principalObjectId!));
+        if (result.IsFailure)
+        {
+            _logger.LogError("Create Person failed: {Error}", result.Error);
+            throw new InternalServerException("Create Person failed");
+        }
 
-        return result.IsSuccess 
-            ? result.Value 
-            : throw new InternalServerException("Create Person failed");
+        return result.Value;
     }
 }

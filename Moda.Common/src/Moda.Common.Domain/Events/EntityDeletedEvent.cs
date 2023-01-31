@@ -4,17 +4,17 @@ namespace Moda.Common.Domain.Events;
 
 public static class EntityDeletedEvent
 {
-    public static EntityDeletedEvent<TEntity> WithEntity<TEntity>(TEntity entity, Instant created) where TEntity : class, IEntity
-        => new(entity, created);
+    public static EntityDeletedEvent<TEntity> WithEntity<TEntity>(TEntity entity, Instant timestamp) where TEntity : class, IEntity
+        => new(entity, timestamp);
 }
 
 public record EntityDeletedEvent<TEntity> : DomainEvent, IGenericDomainEvent
     where TEntity : class, IEntity
 {
-    internal EntityDeletedEvent(TEntity entity, Instant triggeredOn)
+    internal EntityDeletedEvent(TEntity entity, Instant timestamp)
     {
         Entity = entity;
-        TriggeredOn = triggeredOn;
+        Timestamp = timestamp;
     }
 
     public TEntity Entity { get; }

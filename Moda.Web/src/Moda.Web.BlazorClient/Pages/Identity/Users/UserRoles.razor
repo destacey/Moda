@@ -9,12 +9,9 @@
 }
 else
 {
-    <MudTable Hover="true" Elevation="25" Items="_userRolesList" Filter="new Func<UserRoleDto, bool>(Search)">
+    <MudTable Dense="true" Hover="true" Bordered="true" Striped="true" Elevation="25" Items="_userRolesList" Height="700px" Filter="new Func<UserRoleDto, bool>(Search)">
         <ToolBarContent>
-           @* <div class="justify-center mud-text-align-center">
-                <MudButton Variant="Variant.Filled" Color="Color.Info" Class="ml-auto" StartIcon="@Icons.Material.Filled.ArrowBack" Link="/users">
-                   Back
-                </MudButton>
+            <div class="justify-center mud-text-align-center">
                 @if (_canEditUsers)
                 {
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="SaveAsync" StartIcon="@Icons.Material.Filled.Save"
@@ -22,7 +19,7 @@ else
                         Update
                     </MudButton>
                 }
-            </div>*@
+            </div>
             <MudSpacer />
             @if (_canSearchRoles)
             {

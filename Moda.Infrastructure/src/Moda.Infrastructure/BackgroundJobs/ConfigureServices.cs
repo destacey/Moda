@@ -1,7 +1,6 @@
 using Hangfire;
 using Hangfire.Console;
 using Hangfire.Console.Extensions;
-using Hangfire.PostgreSql;
 using Hangfire.SqlServer;
 using HangfireBasicAuthenticationFilter;
 using Microsoft.AspNetCore.Builder;

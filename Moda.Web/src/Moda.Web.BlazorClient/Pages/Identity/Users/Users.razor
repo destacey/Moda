@@ -33,7 +33,7 @@
                 <Column T="UserDetailsDto" Field="IsActive" Title="Active" />
                 <Column T="UserDetailsDto" Title="Actions" Sortable="false" Filterable="false" CellClass="d-flex justify-end" >
                     <CellTemplate>
-                        <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true"
+                        <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true" Size="Size.Small"
                             EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter" OffsetX="true">
                             <MudMenuItem OnClick="@(() => ViewProfile(@context.Item.Id))">View Profile</MudMenuItem>
                             @if (_canViewRoles)
