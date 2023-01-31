@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Moda.Common.Domain.Authorization;
 using Moda.Web.BlazorClient.Infrastructure.ApiClient;
 using Moda.Web.BlazorClient.Infrastructure.Auth;
+using Moda.Web.BlazorClient.Infrastructure.Preferences;
 using Moda.Web.BlazorClient.Shared;
+using MudBlazor;
 
 namespace Moda.Web.BlazorClient.Pages.Identity.Users;
 
@@ -18,7 +20,7 @@ public partial class UserRoles
     protected IAuthorizationService AuthService { get; set; } = default!;
     [Inject]
     protected IUsersClient UsersClient { get; set; } = default!;
-
+    
     private List<UserRoleDto> _userRolesList = default!;
 
     private string _title = string.Empty;
@@ -31,7 +33,7 @@ public partial class UserRoles
     private bool _loaded;
 
     protected override async Task OnInitializedAsync()
-    {
+    {        
         var state = await AuthState;
         _canEditUsers = await AuthService.HasPermissionAsync(state.User, ApplicationAction.Update, ApplicationResource.Users);
         _canSearchRoles = await AuthService.HasPermissionAsync(state.User, ApplicationAction.View, ApplicationResource.UserRoles);
@@ -56,8 +58,14 @@ public partial class UserRoles
 
     private async Task SaveAsync()
     {
+        if (string.IsNullOrWhiteSpace(Id))
+        {
+            Snackbar.Add("User Id is required.", MudBlazor.Severity.Error);
+        }
+        
         var request = new AssignUserRolesRequest()
         {
+            UserId = Id!,
             UserRoles = _userRolesList
         };
 
