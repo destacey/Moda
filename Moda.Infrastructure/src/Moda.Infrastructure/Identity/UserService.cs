@@ -2,12 +2,15 @@ using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Moda.Infrastructure.Identity;
 
 internal partial class UserService : IUserService
 {
+    private readonly ILogger<UserService> _logger;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
@@ -19,6 +22,7 @@ internal partial class UserService : IUserService
     private readonly IDateTimeService _dateTimeService;
 
     public UserService(
+        ILogger<UserService> logger,
         SignInManager<ApplicationUser> signInManager,
         UserManager<ApplicationUser> userManager,
         RoleManager<ApplicationRole> roleManager,
@@ -29,6 +33,7 @@ internal partial class UserService : IUserService
         ISender sender,
         IDateTimeService dateTimeService)
     {
+        _logger = logger;
         _signInManager = signInManager;
         _userManager = userManager;
         _roleManager = roleManager;
@@ -88,7 +93,11 @@ internal partial class UserService : IUserService
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == userId);
 
-        _ = user ?? throw new NotFoundException("User Not Found.");
+        if (user is null)
+        {
+            _logger.LogError("UserId {UserId} not found", userId);
+            throw new NotFoundException("User Not Found.");
+        }
 
         return user.Email;
     }
@@ -96,12 +105,18 @@ internal partial class UserService : IUserService
     public async Task ToggleStatusAsync(ToggleUserStatusCommand command, CancellationToken cancellationToken)
     {
         var user = await _userManager.Users.Where(u => u.Id == command.UserId).FirstOrDefaultAsync(cancellationToken);
-
-        _ = user ?? throw new NotFoundException("User Not Found.");
+        if (user is null)
+        {
+            _logger.LogError("UserId {UserId} not found", command.UserId);
+            throw new NotFoundException("User Not Found.");
+        }
 
         bool isAdmin = await _userManager.IsInRoleAsync(user, ApplicationRoles.Admin);
         if (isAdmin)
+        {
+            _logger.LogError("Administrators Profile's Status cannot be toggled");
             throw new ConflictException("Administrators Profile's Status cannot be toggled");
+        }
 
         user.IsActive = command.ActivateUser;
 
