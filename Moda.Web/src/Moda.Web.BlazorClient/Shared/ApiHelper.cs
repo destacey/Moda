@@ -1,4 +1,5 @@
-﻿using Moda.Web.BlazorClient.Components.Common;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Moda.Web.BlazorClient.Components.Common;
 using Moda.Web.BlazorClient.Infrastructure.ApiClient;
 using MudBlazor;
 
@@ -23,6 +24,10 @@ public static class ApiHelper
             }
 
             return result;
+        }
+        catch(AccessTokenNotAvailableException ex)
+        {
+            ex.Redirect();
         }
         catch (ApiException<HttpValidationProblemDetails> ex)
         {

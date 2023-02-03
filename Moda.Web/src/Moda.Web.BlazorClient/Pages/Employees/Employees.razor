@@ -1,0 +1,132 @@
+﻿@page "/employees"
+@attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
+
+@inject IAuthorizationService AuthService
+@inject IEmployeesClient EmployeesClient
+
+<ErrorBoundary>
+    <ChildContent>
+        <PageTitle>Employees</PageTitle>
+        <ModaTitle Title="Employees" />
+
+        <MudDataGrid @ref="@_grid"
+                     Items="@_employees"
+                     Elevation="0"
+                     Height="700px"
+                     SortMode="SortMode.Multiple" Filterable="true"
+                     FixedHeader="true"
+                     Loading="@_isLoading"
+                     LoadingProgressColor="@Color.Secondary"
+                     QuickFilter="@_quickFilter">
+            <ToolBarContent>
+                <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTooltip Text="Reload Data" Placement="Placement.Top">
+                    <MudFab OnClick="@(() => ReloadData(_includeDisabled))" Size="Size.Small" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" />
+                </MudTooltip>
+            </ToolBarContent>
+            <Columns>
+                <Column T="EmployeeListDto" Field="FirstName" Title="First Name" />
+                <Column T="EmployeeListDto" Field="LastName" Title="Last Name" />
+                <Column T="EmployeeListDto" Field="Department" />
+                <Column T="EmployeeListDto" Field="JobTitle" Title="Job Title" />
+                <Column T="EmployeeListDto" Field="Email" />
+                <Column T="EmployeeListDto" Field="IsActive" Title="Active" />
+            </Columns>
+            <LoadingContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading employees...</MudText>
+            </LoadingContent>
+            <NoRecordsContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No employees found.</MudText>
+            </NoRecordsContent>
+        </MudDataGrid>
+        <DataGridCountLabel DataGrid="@_grid" UnitLabel="employees" />
+
+        <div class="d-flex flex-wrap mt-3">
+            <MudSwitch CheckedChanged="@((bool value) => ReloadData(value))" Color="Color.Primary" Label="Include Disabled" />
+        </div>
+    </ChildContent>
+    <ErrorContent>
+        <ModaCustomError />
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    [CascadingParameter]
+    Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    MudDataGrid<EmployeeListDto> _grid = default!;
+    List<EmployeeListDto> _employees = new();
+
+    string _searchString = "";
+    bool _isLoading = true;
+    bool _includeDisabled = false;
+    bool _canCreateEmployees;
+    bool _canUpdateEmployees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        _canCreateEmployees = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.Employees);
+        _canUpdateEmployees = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Employees);
+
+        if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
+        {
+            SetTablePreference(clientPreference.TablePreference);
+        }
+
+        await GetEmployees();
+    }
+
+    private void ViewEmployee(in string employeeId) =>
+        Navigation.NavigateTo($"/employees/{employeeId}");
+
+    private Func<EmployeeListDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.FirstName) && x.FirstName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.LastName) && x.LastName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+            
+        if (!string.IsNullOrWhiteSpace(x.Department) && x.Department.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.JobTitle) && x.JobTitle.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.Email) && x.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+
+    private async Task ReloadData(bool includeDisabled)
+    {
+        _includeDisabled = includeDisabled;
+        await GetEmployees();
+    }
+
+    private async Task GetEmployees()
+    {
+        _isLoading = true;
+
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => EmployeesClient.GetListAsync(_includeDisabled), Snackbar) is List<EmployeeListDto> result)
+        {
+            _employees = result;
+        }
+
+        _isLoading = false;
+    }
+
+    private void SetTablePreference(ModaTablePreference tablePreference)
+    {
+        _grid.Dense = tablePreference.IsDense;
+        _grid.Striped = tablePreference.IsStriped;
+        _grid.Bordered = tablePreference.HasBorder;
+        _grid.Hover = tablePreference.IsHoverable;
+    }
+}

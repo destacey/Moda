@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Moda.Common.Domain.Authorization;
 using Moda.Web.BlazorClient.Infrastructure.ApiClient;
 using Moda.Web.BlazorClient.Infrastructure.Auth;
-using Moda.Web.BlazorClient.Infrastructure.Preferences;
 using Moda.Web.BlazorClient.Shared;
-using MudBlazor;
 
 namespace Moda.Web.BlazorClient.Pages.Identity.Users;
 
