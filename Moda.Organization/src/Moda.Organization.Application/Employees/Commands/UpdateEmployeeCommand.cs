@@ -109,7 +109,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
         try
         {
             var employee = await _organizationDbContext.Employees
-                .FirstAsync(p => p.Id == request.Id, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
             if (employee is null)
                 return Result.Failure<int>("Employee not found.");
 

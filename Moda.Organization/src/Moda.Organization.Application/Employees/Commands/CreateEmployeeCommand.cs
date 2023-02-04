@@ -64,7 +64,7 @@ public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmplo
         RuleFor(e => e.EmployeeNumber)
             .NotEmpty()
             .MaximumLength(256)
-            .MustAsync(BeUniqueEmployeeId).WithMessage("The EmployeeId already exists.");
+            .MustAsync(BeUniqueEmployeeNumber).WithMessage("The EmployeeId already exists.");
 
         RuleFor(e => e.Email)
             .NotNull()
@@ -77,7 +77,7 @@ public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmplo
             .MaximumLength(256);
     }
 
-    public async Task<bool> BeUniqueEmployeeId(string employeeNumber, CancellationToken cancellationToken)
+    public async Task<bool> BeUniqueEmployeeNumber(string employeeNumber, CancellationToken cancellationToken)
     {
         return await _organizationDbContext.Employees.AllAsync(x => x.EmployeeNumber != employeeNumber, cancellationToken);
     }
@@ -100,10 +100,10 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
     {
         try
         {
-            var personId = await _organizationDbContext.People
+            var personId = (await _organizationDbContext.People
                 .Where(p => p.Key == request.EmployeeNumber)
                 .Select(p => (Guid?)p.Id)
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken)) ?? Guid.NewGuid();
 
             // verify the manager exists
             var managerId = request.ManagerId;
@@ -114,7 +114,7 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
             }
 
             var employee = Employee.Create(
-                personId ?? Guid.NewGuid(),
+                personId,
                 request.Name,
                 request.EmployeeNumber,
                 request.HireDate,

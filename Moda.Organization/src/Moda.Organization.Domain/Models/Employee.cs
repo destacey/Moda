@@ -157,6 +157,14 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
         }
     }
 
+    /// <summary>Updates the manager identifier.</summary>
+    /// <param name="managerId">The manager identifier.</param>
+    public void UpdateManagerId(Guid? managerId, Instant timestamp)
+    {
+        ManagerId = managerId;
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+    }
+
     /// <summary>Creates an Employee and adds a domain event with the timestamp.</summary>
     /// <param name="personId">The person identifier.</param>
     /// <param name="personName">Name of the person.</param>
