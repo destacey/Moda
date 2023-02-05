@@ -22,4 +22,19 @@ public class BackgroundJobsController : VersionNeutralApiController
         var jobs = _jobService.GetRunningJobs();
         return Ok(jobs);
     }
+
+    [HttpPost]
+    [MustHavePermission(ApplicationAction.Create, ApplicationResource.BackgroundJobs)]
+    [OpenApiOperation("Create a background job.", "")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    public ActionResult<IReadOnlyList<BackgroundJobDto>> Create()
+    {
+        var jobs = _jobService.Enqueue(() => Wait());
+        return Accepted();
+    }
+
+    public async Task Wait()
+    {
+        await Task.Delay(120 * 1000);
+    }
 }

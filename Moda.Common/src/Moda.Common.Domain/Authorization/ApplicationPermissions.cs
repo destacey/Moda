@@ -46,7 +46,8 @@ public static class ApplicationPermissions
     private static readonly ApplicationPermission[] _backgroundJobs = new ApplicationPermission[]
     {
         new("View Hangfire", ApplicationAction.View, ApplicationResource.Hangfire),
-        new("View Background Jobs", ApplicationAction.View, ApplicationResource.BackgroundJobs)
+        new("View Background Jobs", ApplicationAction.View, ApplicationResource.BackgroundJobs),
+        new("Create Background Jobs", ApplicationAction.Create, ApplicationResource.BackgroundJobs)
     };
 
     private static readonly ApplicationPermission[] _identity = new ApplicationPermission[]

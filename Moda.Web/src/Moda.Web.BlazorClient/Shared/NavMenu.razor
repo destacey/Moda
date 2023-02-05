@@ -9,7 +9,7 @@
     </MudTooltip>
     <br />
 
-    @if (CanViewAdministrationGroup || _canViewHangfire)
+    @if (_canViewAdministrationGroup)
     {
         <MudDivider Class="my-1" />
         @if (_canViewUsers)
@@ -31,14 +31,6 @@
         {
             <MudTooltip Text="Background Jobs" Placement="Placement.Right">
                 <MudNavLink Match="NavLinkMatch.Prefix" Href="/background-jobs" Icon="@Icons.Material.Filled.Update">Background Jobs</MudNavLink>
-            </MudTooltip>
-            <br />
-        }
-
-        @if (_canViewHangfire)
-        {
-            <MudTooltip Text="Hangfire Dashboard" Placement="Placement.Right">
-                <MudNavLink Href="@_hangfireUrl" Target="_blank" Icon="@Icons.Material.Filled.AutoMode">Hangfire Dashboard</MudNavLink>
             </MudTooltip>
             <br />
         }

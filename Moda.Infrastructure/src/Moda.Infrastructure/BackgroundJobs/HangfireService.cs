@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Hangfire;
 using Moda.Common.Application.BackgroundJobs;
+using NodaTime;
 
 namespace Moda.Infrastructure.BackgroundJobs;
 
@@ -16,12 +17,14 @@ public class HangfireService : IJobService
         {
             backgroundJobs.Add(new BackgroundJobDto
             {
-                Name = job.Key,
-                Type = job.Value.Job.Type,
-                Method = job.Value.Job.Method,
+                Id = job.Key,
+                Status = "Running",
+                Type = job.Value.Job.Type.Name,
+                Namespace = job.Value.Job.Type.Namespace ?? "Unknown",
+                Action = job.Value.Job.Method.Name,
                 Args = job.Value.Job.Args,
                 InProcessingState = job.Value.InProcessingState,
-                StartedAt = job.Value.StartedAt
+                StartedAt = job.Value.StartedAt is not null ? Instant.FromDateTimeUtc(DateTime.SpecifyKind((DateTime)job.Value.StartedAt, DateTimeKind.Utc)) : null
             });
         }
         return backgroundJobs;

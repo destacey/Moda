@@ -39,6 +39,41 @@
         ]
       }
     },
+    "/api/backgroundjobs": {
+      "post": {
+        "tags": [
+          "BackgroundJobs"
+        ],
+        "summary": "Create a background job.",
+        "operationId": "BackgroundJobs_Create",
+        "responses": {
+          "202": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "BackgroundJobs"
+        ],
+        "operationId": "BackgroundJobs_Wait",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/backlogcategories": {
       "get": {
         "tags": [
@@ -1758,21 +1793,20 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "namespace": {
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
-          "method": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/MethodInfo"
-              }
-            ]
+          "action": {
+            "type": "string"
           },
           "args": {
             "type": "array",
@@ -1785,530 +1819,6 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
-          }
-        }
-      },
-      "MethodInfo": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/MethodBase"
-          },
-          {
-            "type": "object",
-            "x-abstract": true,
-            "additionalProperties": false,
-            "properties": {
-              "memberType": {
-                "$ref": "#/components/schemas/MemberTypes"
-              },
-              "returnParameter": {
-                "$ref": "#/components/schemas/ParameterInfo"
-              },
-              "returnType": {
-                "type": "string"
-              }
-            }
-          }
-        ]
-      },
-      "MemberTypes": {
-        "type": "integer",
-        "description": "",
-        "x-enumFlags": true,
-        "x-enumNames": [
-          "Constructor",
-          "Event",
-          "Field",
-          "Method",
-          "Property",
-          "TypeInfo",
-          "Custom",
-          "NestedType",
-          "All"
-        ],
-        "enum": [
-          1,
-          2,
-          4,
-          8,
-          16,
-          32,
-          64,
-          128,
-          191
-        ]
-      },
-      "ParameterInfo": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "attributes": {
-            "$ref": "#/components/schemas/ParameterAttributes"
-          },
-          "member": {
-            "$ref": "#/components/schemas/MemberInfo"
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "parameterType": {
-            "type": "string"
-          },
-          "position": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "isIn": {
-            "type": "boolean"
-          },
-          "isLcid": {
-            "type": "boolean"
-          },
-          "isOptional": {
-            "type": "boolean"
-          },
-          "isOut": {
-            "type": "boolean"
-          },
-          "isRetval": {
-            "type": "boolean"
-          },
-          "defaultValue": {
-            "nullable": true
-          },
-          "rawDefaultValue": {
-            "nullable": true
-          },
-          "hasDefaultValue": {
-            "type": "boolean"
-          },
-          "customAttributes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
-            }
-          },
-          "metadataToken": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "ParameterAttributes": {
-        "type": "integer",
-        "description": "",
-        "x-enumFlags": true,
-        "x-enumNames": [
-          "None",
-          "In",
-          "Out",
-          "Lcid",
-          "Retval",
-          "Optional",
-          "HasDefault",
-          "HasFieldMarshal",
-          "Reserved3",
-          "Reserved4",
-          "ReservedMask"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          4,
-          8,
-          16,
-          4096,
-          8192,
-          16384,
-          32768,
-          61440
-        ]
-      },
-      "MemberInfo": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "module": {
-            "$ref": "#/components/schemas/Module"
-          },
-          "customAttributes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
-            }
-          },
-          "isCollectible": {
-            "type": "boolean"
-          },
-          "metadataToken": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "Module": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "assembly": {
-            "$ref": "#/components/schemas/Assembly"
-          },
-          "fullyQualifiedName": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "mdStreamVersion": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "moduleVersionId": {
-            "type": "string",
-            "format": "guid"
-          },
-          "scopeName": {
-            "type": "string"
-          },
-          "moduleHandle": {
-            "$ref": "#/components/schemas/ModuleHandle"
-          },
-          "customAttributes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
-            }
-          },
-          "metadataToken": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "Assembly": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "definedTypes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "exportedTypes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "codeBase": {
-            "type": "string",
-            "deprecated": true,
-            "x-deprecatedMessage": "Assembly.CodeBase and Assembly.EscapedCodeBase are only included for .NET Framework compatibility. Use Assembly.Location.",
-            "nullable": true
-          },
-          "entryPoint": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/MethodInfo"
-              }
-            ]
-          },
-          "fullName": {
-            "type": "string",
-            "nullable": true
-          },
-          "imageRuntimeVersion": {
-            "type": "string"
-          },
-          "isDynamic": {
-            "type": "boolean"
-          },
-          "location": {
-            "type": "string"
-          },
-          "reflectionOnly": {
-            "type": "boolean"
-          },
-          "isCollectible": {
-            "type": "boolean"
-          },
-          "isFullyTrusted": {
-            "type": "boolean"
-          },
-          "customAttributes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CustomAttributeData"
-            }
-          },
-          "escapedCodeBase": {
-            "type": "string",
-            "deprecated": true,
-            "x-deprecatedMessage": "Assembly.CodeBase and Assembly.EscapedCodeBase are only included for .NET Framework compatibility. Use Assembly.Location."
-          },
-          "manifestModule": {
-            "$ref": "#/components/schemas/Module"
-          },
-          "modules": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Module"
-            }
-          },
-          "globalAssemblyCache": {
-            "type": "boolean",
-            "deprecated": true,
-            "x-deprecatedMessage": "The Global Assembly Cache is not supported."
-          },
-          "hostContext": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "securityRuleSet": {
-            "$ref": "#/components/schemas/SecurityRuleSet"
-          }
-        }
-      },
-      "CustomAttributeData": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "attributeType": {
-            "type": "string"
-          },
-          "constructor": {
-            "$ref": "#/components/schemas/ConstructorInfo"
-          },
-          "constructorArguments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CustomAttributeTypedArgument"
-            }
-          },
-          "namedArguments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CustomAttributeNamedArgument"
-            }
-          }
-        }
-      },
-      "ConstructorInfo": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/MethodBase"
-          },
-          {
-            "type": "object",
-            "x-abstract": true,
-            "additionalProperties": false,
-            "properties": {
-              "memberType": {
-                "$ref": "#/components/schemas/MemberTypes"
-              }
-            }
-          }
-        ]
-      },
-      "MethodBase": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/MemberInfo"
-          },
-          {
-            "type": "object",
-            "x-abstract": true,
-            "additionalProperties": false,
-            "properties": {
-              "methodImplementationFlags": {
-                "$ref": "#/components/schemas/MethodImplAttributes"
-              },
-              "callingConvention": {
-                "$ref": "#/components/schemas/CallingConventions"
-              },
-              "isAbstract": {
-                "type": "boolean"
-              },
-              "isConstructor": {
-                "type": "boolean"
-              },
-              "isFinal": {
-                "type": "boolean"
-              },
-              "isHideBySig": {
-                "type": "boolean"
-              },
-              "isSpecialName": {
-                "type": "boolean"
-              },
-              "isStatic": {
-                "type": "boolean"
-              },
-              "isVirtual": {
-                "type": "boolean"
-              },
-              "isAssembly": {
-                "type": "boolean"
-              },
-              "isFamily": {
-                "type": "boolean"
-              },
-              "isFamilyAndAssembly": {
-                "type": "boolean"
-              },
-              "isFamilyOrAssembly": {
-                "type": "boolean"
-              },
-              "isPrivate": {
-                "type": "boolean"
-              },
-              "isPublic": {
-                "type": "boolean"
-              },
-              "isConstructedGenericMethod": {
-                "type": "boolean"
-              },
-              "isGenericMethod": {
-                "type": "boolean"
-              },
-              "isGenericMethodDefinition": {
-                "type": "boolean"
-              },
-              "containsGenericParameters": {
-                "type": "boolean"
-              },
-              "isSecurityCritical": {
-                "type": "boolean"
-              },
-              "isSecuritySafeCritical": {
-                "type": "boolean"
-              },
-              "isSecurityTransparent": {
-                "type": "boolean"
-              }
-            }
-          }
-        ]
-      },
-      "MethodImplAttributes": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "IL",
-          "Managed",
-          "Native",
-          "OPTIL",
-          "Runtime",
-          "CodeTypeMask",
-          "Unmanaged",
-          "ManagedMask",
-          "NoInlining",
-          "ForwardRef",
-          "Synchronized",
-          "NoOptimization",
-          "PreserveSig",
-          "AggressiveInlining",
-          "AggressiveOptimization",
-          "InternalCall",
-          "MaxMethodImplVal"
-        ],
-        "enum": [
-          0,
-          0,
-          1,
-          2,
-          3,
-          3,
-          4,
-          4,
-          8,
-          16,
-          32,
-          64,
-          128,
-          256,
-          512,
-          4096,
-          65535
-        ]
-      },
-      "CallingConventions": {
-        "type": "integer",
-        "description": "",
-        "x-enumFlags": true,
-        "x-enumNames": [
-          "Standard",
-          "VarArgs",
-          "Any",
-          "HasThis",
-          "ExplicitThis"
-        ],
-        "enum": [
-          1,
-          2,
-          3,
-          32,
-          64
-        ]
-      },
-      "CustomAttributeTypedArgument": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "argumentType": {
-            "type": "string"
-          },
-          "value": {
-            "nullable": true
-          }
-        }
-      },
-      "CustomAttributeNamedArgument": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "memberInfo": {
-            "$ref": "#/components/schemas/MemberInfo"
-          },
-          "typedValue": {
-            "$ref": "#/components/schemas/CustomAttributeTypedArgument"
-          },
-          "memberName": {
-            "type": "string"
-          },
-          "isField": {
-            "type": "boolean"
-          }
-        }
-      },
-      "SecurityRuleSet": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "None",
-          "Level1",
-          "Level2"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ]
-      },
-      "ModuleHandle": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "mdStreamVersion": {
-            "type": "integer",
-            "format": "int32"
           }
         }
       },
