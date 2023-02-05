@@ -1,0 +1,128 @@
+﻿@page "/background-jobs"
+@attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.BackgroundJobs)]
+
+@inject IAuthorizationService AuthService
+@inject IBackgroundJobsClient BackgroundJobsClient
+
+<ErrorBoundary>
+    <ChildContent>
+        <PageTitle>Background Jobs</PageTitle>
+        <ModaTitle Title="Background Jobs">
+            @*<AuthorizeView Policy="AdminUserPolicy">*@
+                @*<MudIconButton Title="Sync employees with external directory" @onclick="@SyncEmployees" Icon="@Icons.Material.Filled.CloudSync" Size="Size.Small" Color="Color.Default" aria-label="sync"></MudIconButton>*@
+            @*</AuthorizeView>*@
+        </ModaTitle>
+
+        <MudDataGrid @ref="@_grid"
+                     Items="@_jobs"
+                     Elevation="0"
+                     Height="700px"
+                     SortMode="SortMode.Multiple" 
+                     Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterRow"
+                     FixedHeader="true"
+                     Loading="@_isLoading"
+                     LoadingProgressColor="@Color.Secondary"
+                     QuickFilter="@_quickFilter">
+            <ToolBarContent>
+                <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTooltip Text="Reload Data" Placement="Placement.Top">
+                    <MudFab OnClick="@(() => ReloadData())" Size="Size.Small" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" />
+                </MudTooltip>
+            </ToolBarContent>
+            <Columns>
+                <Column T="BackgroundJobDto" Field="Name" />
+                <Column T="BackgroundJobDto" Field="Type" Title="Type" />
+                <Column T="BackgroundJobDto" Field="Method" Title="Method" />
+                <Column T="BackgroundJobDto" Field="StartedAt" Title="Start" />
+                <Column T="BackgroundJobDto" Field="InProcessingState" Title="Is Processing?" />
+            </Columns>
+            <LoadingContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading background jobs...</MudText>
+            </LoadingContent>
+            <NoRecordsContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No background jobs found.</MudText>
+            </NoRecordsContent>
+        </MudDataGrid>
+        <DataGridCountLabel DataGrid="@_grid" UnitLabel="background jobs" />
+        
+    </ChildContent>
+    <ErrorContent>
+        <ModaCustomError />
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    [CascadingParameter]
+    Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    MudDataGrid<BackgroundJobDto> _grid = default!;
+    List<BackgroundJobDto> _jobs = new();
+
+    string _searchString = "";
+    bool _isLoading = true;
+    bool _includeDisabled = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+
+        if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
+        {
+            SetTablePreference(clientPreference.TablePreference);
+        }
+
+        await GetRunningJobs();
+    }
+
+    //private void ViewEmployee(in string employeeId) =>
+    //    Navigation.NavigateTo($"/employees/{employeeId}");
+
+    private Func<BackgroundJobDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        //if (x.Type is not null && x.Type.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+            
+        //if (x.Method is not null && x.Method.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+
+        //if (!string.IsNullOrWhiteSpace(x.JobTitle) && x.JobTitle.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+
+        //if (!string.IsNullOrWhiteSpace(x.Email) && x.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+
+        return false;
+    };
+
+    private async Task ReloadData()
+    {
+        await GetRunningJobs();
+    }
+
+    private async Task GetRunningJobs()
+    {
+        _isLoading = true;
+
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => BackgroundJobsClient.GetRunningJobsAsync(), Snackbar) is List<BackgroundJobDto> result)
+        {
+            _jobs = result;
+        }
+
+        _isLoading = false;
+    }
+
+    private void SetTablePreference(ModaTablePreference tablePreference)
+    {
+        _grid.Dense = tablePreference.IsDense;
+        _grid.Striped = tablePreference.IsStriped;
+        _grid.Bordered = tablePreference.HasBorder;
+        _grid.Hover = tablePreference.IsHoverable;
+    }
+}

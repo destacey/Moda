@@ -27,10 +27,18 @@
             <br />
         }
 
-        @if (_canViewHangfire)
+        @if (_canViewBackgroundJobs)
         {
             <MudTooltip Text="Background Jobs" Placement="Placement.Right">
-                <MudNavLink Href="@_hangfireUrl" Target="_blank" Icon="@Icons.Material.Filled.AutoMode">Background Jobs</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.Prefix" Href="/background-jobs" Icon="@Icons.Material.Filled.Update">Background Jobs</MudNavLink>
+            </MudTooltip>
+            <br />
+        }
+
+        @if (_canViewHangfire)
+        {
+            <MudTooltip Text="Hangfire Dashboard" Placement="Placement.Right">
+                <MudNavLink Href="@_hangfireUrl" Target="_blank" Icon="@Icons.Material.Filled.AutoMode">Hangfire Dashboard</MudNavLink>
             </MudTooltip>
             <br />
         }

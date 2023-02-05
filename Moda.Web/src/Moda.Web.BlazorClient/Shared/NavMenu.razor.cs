@@ -16,17 +16,19 @@ public partial class NavMenu
     protected IAuthorizationService AuthService { get; set; } = default!;
 
     private string? _hangfireUrl;
-    private bool _canViewHangfire;
     private bool _canViewUsers;
     private bool _canViewRoles;
-    private bool CanViewAdministrationGroup => _canViewUsers || _canViewRoles;
+    private bool _canViewBackgroundJobs;
+    private bool _canViewHangfire;
+    private bool CanViewAdministrationGroup => _canViewUsers || _canViewRoles || _canViewBackgroundJobs || _canViewHangfire;
     
     protected override async Task OnInitializedAsync()
     {
         _hangfireUrl = Config[ConfigNames.ApiBaseUrl] + "jobs";
         var user = (await AuthState).User;
-        _canViewHangfire = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.Hangfire);
-        _canViewRoles = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.Roles);
         _canViewUsers = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.Users);
+        _canViewRoles = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.Roles);
+        _canViewBackgroundJobs = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.BackgroundJobs);
+        _canViewHangfire = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.Hangfire);
     }
 }
