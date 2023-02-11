@@ -28,6 +28,7 @@ public static class ConfigureServices
             .AddOpenApiDocumentation(config)
             .AddPersistence(config)
             .AddRequestLogging(config)
+            .AddApplicationInsightsTelemetry()
             .AddRouting(options => options.LowercaseUrls = true)
             .AddServices();
     }

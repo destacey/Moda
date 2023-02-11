@@ -12,6 +12,7 @@
     <PackageReference Include="Hangfire.Console.Extensions" Version="1.0.5" />
     <PackageReference Include="Hangfire.Dashboard.Basic.Authentication" Version="5.0.0" />
     <PackageReference Include="Mapster" Version="7.3.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
@@ -31,18 +32,20 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.2" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.2" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="1.25.10" />
-    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.25.10" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="1.26.0" />
+    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.26.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="NodaTime" Version="3.1.6" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.18.2" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
+    <PackageReference Include="Serilog.Enrichers.Span" Version="3.1.0" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
     <PackageReference Include="Serilog.Expressions" Version="3.4.1" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
+    <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
@@ -56,6 +59,7 @@
     <ProjectReference Include="..\..\..\Moda.AppIntegration\src\Moda.AppIntegration.Domain\Moda.AppIntegration.Domain.csproj" />
     <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
     <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Moda.Integrations\src\Moda.Integrations.MicrosoftGraph\Moda.Integrations.MicrosoftGraph.csproj" />
     <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
     <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Domain\Moda.Organization.Domain.csproj" />
     <ProjectReference Include="..\..\..\Moda.Work\src\Moda.Work.Application\Moda.Work.Application.csproj" />
