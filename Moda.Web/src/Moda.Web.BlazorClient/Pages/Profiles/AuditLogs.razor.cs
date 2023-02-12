@@ -1,7 +1,5 @@
-using Mapster;
 using Microsoft.AspNetCore.Components;
 using Moda.Web.BlazorClient.Infrastructure.ApiClient;
-using MudBlazor;
 
 namespace Moda.Web.BlazorClient.Pages.Profiles;
 

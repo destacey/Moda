@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Moda.Web.BlazorClient.Components.Common;
 using Moda.Web.BlazorClient.Infrastructure.ApiClient;
 using Moda.Web.BlazorClient.Infrastructure.Auth;
 using Moda.Web.BlazorClient.Shared;

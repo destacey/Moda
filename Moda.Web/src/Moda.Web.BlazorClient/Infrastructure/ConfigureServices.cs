@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authorization;
 using Moda.Common.Domain.Authorization;
 using Moda.Web.BlazorClient.Infrastructure.ApiClient;
@@ -41,7 +40,7 @@ public static class ConfigureServices
                 .AddAuthenticationHandler(config)
                 .Services
             .AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient(ClientName));
-    
+
     private static void RegisterPermissionClaims(AuthorizationOptions options)
     {
         foreach (var permission in ApplicationPermissions.All)

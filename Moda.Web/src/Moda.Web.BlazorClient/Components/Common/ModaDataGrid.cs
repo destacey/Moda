@@ -15,7 +15,7 @@ public class ModaDataGrid<T> : MudDataGrid<T>
         {
             SetTablePreference(clientPreference.TablePreference);
         }
-        
+
         await base.OnInitializedAsync();
     }
 

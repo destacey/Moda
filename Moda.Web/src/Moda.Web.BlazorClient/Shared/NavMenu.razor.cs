@@ -19,7 +19,7 @@ public partial class NavMenu
     private bool _canViewRoles;
     private bool _canViewBackgroundJobs;
     private bool _canViewAdministrationGroup => _canViewUsers || _canViewRoles || _canViewBackgroundJobs;
-    
+
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthState).User;

@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
 using Moda.Common.Domain.Authorization;
 using Moda.Web.BlazorClient.Infrastructure.ApiClient;
 

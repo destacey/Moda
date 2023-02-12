@@ -4,7 +4,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.Auth;
 
 internal static class ConfigureServices
 {
-    public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration config) => 
+    public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration config) =>
         config[nameof(AuthProvider)] switch
         {
             // AzureAd

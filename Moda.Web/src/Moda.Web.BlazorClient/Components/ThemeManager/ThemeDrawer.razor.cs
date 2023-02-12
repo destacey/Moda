@@ -1,6 +1,6 @@
-﻿using Moda.Web.BlazorClient.Infrastructure.Preferences;
+﻿using Microsoft.AspNetCore.Components;
+using Moda.Web.BlazorClient.Infrastructure.Preferences;
 using Moda.Web.BlazorClient.Infrastructure.Theme;
-using Microsoft.AspNetCore.Components;
 
 namespace Moda.Web.BlazorClient.Components.ThemeManager;
 

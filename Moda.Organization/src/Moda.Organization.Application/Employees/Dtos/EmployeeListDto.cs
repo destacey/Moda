@@ -5,64 +5,68 @@ public sealed record EmployeeListDto : IMapFrom<Employee>
 {
     /// <summary>Gets the identifier.</summary>
     /// <value>The identifier.</value>
-    public Guid Id { get; private set; }
+    public Guid Id { get; set; }
 
     /// <summary>Gets the local identifier.</summary>
     /// <value>The local identifier.</value>
-    public int LocalId { get; private set; }
+    public int LocalId { get; set; }
 
     /// <summary>Gets the first name.</summary>
     /// <value>The first name.</value>
-    public string FirstName { get; private set; } = null!;
+    public required string FirstName { get; set; }
 
     /// <summary>Gets the middle name.</summary>
     /// <value>The middle name.</value>
-    public string? MiddleName { get; private set; }
+    public string? MiddleName { get; set; }
 
     /// <summary>Gets the last name.</summary>
     /// <value>The last name.</value>
-    public string LastName { get; private set; } = null!;
+    public required string LastName { get; set; }
 
     /// <summary>Gets the suffix.</summary>
     /// <value>The suffix.</value>
-    public string? Suffix { get; private set; }
+    public string? Suffix { get; set; }
 
     /// <summary>Gets the employee's personal title.</summary>
     /// <value>The title.</value>
-    public string? Title { get; private set; }
+    public string? Title { get; set; }
 
     /// <summary>Gets the employee number.</summary>
     /// <value>The employee number.</value>
-    public string EmployeeNumber { get; private set; } = null!;
+    public required string EmployeeNumber { get; set; }
 
     /// <summary>Gets the email.</summary>
     /// <value>The email.</value>
-    public string Email { get; private set; } = null!;
+    public required string Email { get; set; }
 
     /// <summary>Gets the job title.</summary>
     /// <value>The job title.</value>
-    public string? JobTitle { get; private set; }
+    public string? JobTitle { get; set; }
 
     /// <summary>Gets the department.</summary>
     /// <value>The department.</value>
-    public string? Department { get; private set; }
+    public string? Department { get; set; }
+
+    /// <summary>Gets the office location.</summary>
+    /// <value>The office location.</value>
+    public string? OfficeLocation { get; set; }
 
     /// <summary>Gets the manager identifier.</summary>
     /// <value>The manager identifier.</value>
-    public Guid? ManagerId { get; private set; }
+    public Guid? ManagerId { get; set; }
 
     /// <summary>Gets the local identifier.</summary>
     /// <value>The local identifier.</value>
-    public int? ManagerLocalId { get; private set; }
+    public int? ManagerLocalId { get; set; }
 
     /// <summary>Gets the manager.</summary>
     /// <value>The manager.</value>
-    public string? ManagerName { get; private set; }
+    public string? ManagerName { get; set; }
 
     /// <summary>
     /// Indicates whether the employee is active or not.  
     /// </summary>
-    public bool IsActive { get; private set; }
+    public bool IsActive { get; set; }
 
     public void Register(TypeAdapterConfig config)
     {

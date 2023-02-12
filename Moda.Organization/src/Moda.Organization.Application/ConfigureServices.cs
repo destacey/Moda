@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using FluentValidation;
 using Mapster;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Moda.Organization.Application;

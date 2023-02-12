@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using Moda.Web.BlazorClient.Components.Common;
 using Moda.Web.BlazorClient.Infrastructure.ApiClient;
 using MudBlazor;
 
@@ -25,7 +24,7 @@ public static class ApiHelper
 
             return result;
         }
-        catch(AccessTokenNotAvailableException ex)
+        catch (AccessTokenNotAvailableException ex)
         {
             ex.Redirect();
         }
@@ -46,7 +45,8 @@ public static class ApiHelper
         }
         catch (Exception ex)
         {
-            snackbar.Add(ex.Message, Severity.Error);
+            string message = string.IsNullOrWhiteSpace(ex.Message) ? "Unknown error" : ex.Message;
+            snackbar.Add(message, Severity.Error);
         }
 
         return default;
@@ -84,6 +84,11 @@ public static class ApiHelper
         catch (ApiException<ErrorResult> ex)
         {
             snackbar.Add(ex.Result.Exception, Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            string message = string.IsNullOrWhiteSpace(ex.Message) ? "Unknown error" : ex.Message;
+            snackbar.Add(message, Severity.Error);
         }
 
         return false;

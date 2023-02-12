@@ -4,7 +4,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Moda.Infrastructure.Common.Services;
 
-public class NewtonSoftService : ISerializerService
+public class NewtonsoftService : ISerializerService
 {
     public T Deserialize<T>(string text)
     {
@@ -18,7 +18,7 @@ public class NewtonSoftService : ISerializerService
             ContractResolver = new CamelCasePropertyNamesContractResolver(),
             NullValueHandling = NullValueHandling.Ignore,
             Converters = new List<JsonConverter>
-            {                
+            {
                 new StringEnumConverter(new CamelCaseNamingStrategy())
             }
         });

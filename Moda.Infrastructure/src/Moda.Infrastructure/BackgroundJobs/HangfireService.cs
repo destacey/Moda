@@ -10,7 +10,7 @@ public class HangfireService : IJobService
     public IEnumerable<BackgroundJobDto> GetRunningJobs()
     {
         List<BackgroundJobDto> backgroundJobs = new();
-        
+
         var jobs = JobStorage.Current.GetMonitoringApi().ProcessingJobs(0, 1000);
 
         foreach (var job in jobs)
@@ -18,11 +18,10 @@ public class HangfireService : IJobService
             backgroundJobs.Add(new BackgroundJobDto
             {
                 Id = job.Key,
-                Status = "Running",
+                Status = job.Value.InProcessingState ? "Running" : "Not Running",
                 Type = job.Value.Job.Type.Name,
                 Namespace = job.Value.Job.Type.Namespace ?? "Unknown",
                 Action = job.Value.Job.Method.Name,
-                Args = job.Value.Job.Args,
                 InProcessingState = job.Value.InProcessingState,
                 StartedAt = job.Value.StartedAt is not null ? Instant.FromDateTimeUtc(DateTime.SpecifyKind((DateTime)job.Value.StartedAt, DateTimeKind.Utc)) : null
             });

@@ -1,9 +1,5 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moda.Common.Extensions;
-using Moda.Organization.Application.Interfaces;
 
 namespace Moda.Organization.Application.Employees.Commands;
 public sealed record BulkUpsertEmployeesCommand : ICommand
@@ -70,8 +66,9 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                         externalEmployee.Email,
                         externalEmployee.JobTitle,
                         externalEmployee.Department,
+                        externalEmployee.OfficeLocation,
                         managerId,
-                        externalEmployee.IsActive,  
+                        externalEmployee.IsActive,
                         _dateTimeService.Now
                         );
 
@@ -97,11 +94,12 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                         externalEmployee.Email,
                         externalEmployee.JobTitle,
                         externalEmployee.Department,
+                        externalEmployee.OfficeLocation,
                         managerId,
                         _dateTimeService.Now
                         );
 
-                    employees.Add(newEmployee);
+                    await _organizationDbContext.Employees.AddAsync(newEmployee);
                 }
 
                 // check only when no errors on update or create
@@ -148,7 +146,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                 .Select(p => (Guid?)p.Id)
                 .FirstOrDefaultAsync(cancellationToken)) ?? Guid.NewGuid();
         }
-        
+
         async Task SetMissingManagers()
         {
             if (missingManagers.Any())

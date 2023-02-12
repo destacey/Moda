@@ -5,10 +5,11 @@ public interface IExternalEmployee
 {
     string EmployeeNumber { get; }
     PersonName Name { get; }
-    LocalDate? HireDate { get; }
+    Instant? HireDate { get; }
     EmailAddress Email { get; }
     string? JobTitle { get; }
     string? Department { get; }
+    string? OfficeLocation { get; }
     string? ManagerEmployeeNumber { get; }
     bool IsActive { get; }
 }

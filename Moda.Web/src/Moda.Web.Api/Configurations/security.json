@@ -9,6 +9,12 @@
             "RootIssuer": "https://sts.windows.net/<Your AzureAd TenantId>/",
             "ClientSecret": "<Your ClientSecret of the AzureAd Server App Registration>"
         },
+        "GraphApi": {
+            "Enabled": true,
+            "BaseUrl": "https://graph.microsoft.com/beta",
+            "Scopes": "Directory.Read.All",
+            "AllEmployeesGroupObjectId": null
+        },
         "Swagger": {
             "AuthorizationUrl": "https://login.microsoftonline.com/<Your TenantId of the AzureAd Server App Registration>/oauth2/v2.0/authorize",
             "TokenUrl": "https://login.microsoftonline.com/<Your TenantId of the AzureAd Server App Registration>/oauth2/v2.0/token",

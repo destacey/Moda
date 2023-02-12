@@ -8,10 +8,10 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
     public void Configure(EntityTypeBuilder<Employee> builder)
     {
         builder.ToTable("Employees", SchemaNames.Organization);
-        
+
         builder.HasKey(e => e.Id);
         builder.HasAlternateKey(e => e.LocalId);
-        
+
         builder.HasIndex(e => e.Id);
         builder.HasIndex(e => e.EmployeeNumber)
             .IsUnique()
@@ -26,6 +26,7 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
 
         builder.Property(e => e.JobTitle).HasMaxLength(256);
         builder.Property(e => e.Department).HasMaxLength(256);
+        builder.Property(e => e.OfficeLocation).HasMaxLength(256);
         builder.Property(e => e.IsActive);
 
         //builder.Property(e => e.DirectReports).HasField("_directReports");
@@ -67,7 +68,7 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
 }
 
 public class PersonConfig : IEntityTypeConfiguration<Person>
-{    
+{
     public void Configure(EntityTypeBuilder<Person> builder)
     {
         builder.ToTable("People", SchemaNames.Organization);

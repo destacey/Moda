@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Moda.Common.Domain.Authorization;
-using System.Security.Claims;
 
 namespace Moda.Web.BlazorClient.Infrastructure.Auth;
 

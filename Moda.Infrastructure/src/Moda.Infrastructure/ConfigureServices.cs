@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moda.Integrations.MicrosoftGraph;
+using Moda.Organization.Application.Interfaces;
 using NodaTime;
 
 namespace Moda.Infrastructure;
@@ -16,6 +18,9 @@ public static class ConfigureServices
         //MapsterSettings.Configure();
 
         services.AddSingleton<IClock>(SystemClock.Instance);
+
+        // INTEGRATIONS
+        services.AddScoped<IExternalEmployeeDirectoryService, MicrosoftGraphService>();
 
         return services
             .AddApiVersioning()

@@ -8,15 +8,23 @@
     <ChildContent>
         <PageTitle>Background Jobs</PageTitle>
         <ModaTitle Title="Background Jobs" Description="this is a test">
-                @if (_canViewHangfire)
-                {
-                    <MudIconButton Title="Hangfire Dashboard" Href="@_hangfireUrl" Target="_blank" Icon="@Icons.Material.Filled.Dashboard" Size="Size.Small" Color="Color.Default" aria-label="Hangfire Dashboard"></MudIconButton>
-                }
-                @if (_canCreateBackgroundJobs)
-                {
-                    <MudIconButton Title="Sync employees with external directory" @onclick="@SyncEmployees" Icon="@Icons.Material.Filled.CloudSync" Size="Size.Small" Color="Color.Default" aria-label="sync"></MudIconButton>
-                }
+            @if (_canViewHangfire)
+            {
+                <MudIconButton Title="Hangfire Dashboard" Href="@_hangfireUrl" Target="_blank" Icon="@Icons.Material.Filled.Dashboard" Size="Size.Small" Color="Color.Default" aria-label="Hangfire Dashboard"></MudIconButton>
+            }
         </ModaTitle>
+
+        @if (_canRunBackgroundJobs && _jobTypes.Any())
+        {
+            <MudContainer Class="ml-0 pl-0 mb-2">
+                @foreach (var item in _jobTypes)
+                {
+                    <MudTooltip Placement="Placement.Right" Text="@item.Description">
+                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Small" Class="mr-2" OnClick="@(() => RunBackgroundJob(@item.Id))">@item.Name</MudButton>
+                    </MudTooltip>
+                }
+            </MudContainer>
+        }
 
         <MudDataGrid @ref="@_grid"
                      Items="@_jobs"
@@ -42,7 +50,6 @@
                 <Column T="BackgroundJobDto" Field="Type" />
                 <Column T="BackgroundJobDto" Field="Namespace" />
                 <Column T="BackgroundJobDto" Field="StartedAt" Title="Start (UTC)" />
-                <Column T="BackgroundJobDto" Field="InProcessingState" Title="Is Processing?" />
             </Columns>
             <LoadingContent>
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading background jobs...</MudText>
@@ -65,31 +72,33 @@
 
     MudDataGrid<BackgroundJobDto> _grid = default!;
     List<BackgroundJobDto> _jobs = new();
+    List<BackgroundJobTypeDto> _jobTypes = new();
 
     string _searchString = "";
     bool _isLoading = true;
 
     private string? _hangfireUrl;
     bool _canViewHangfire;
-    bool _canCreateBackgroundJobs;
+    bool _canRunBackgroundJobs;
 
     protected override async Task OnInitializedAsync()
     {
         _hangfireUrl = Config[ConfigNames.ApiBaseUrl] + "jobs";
+
         var user = (await AuthState).User;
         _canViewHangfire = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.Hangfire);
-        _canCreateBackgroundJobs = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.BackgroundJobs);
+        _canRunBackgroundJobs = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.BackgroundJobs);
 
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
             SetTablePreference(clientPreference.TablePreference);
         }
 
-        await GetRunningJobs();
+        await Task.WhenAll(new Task[] {
+            GetRunningJobs(),
+            GetJobTypes()
+    });
     }
-
-    //private void ViewEmployee(in string employeeId) =>
-    //    Navigation.NavigateTo($"/employees/{employeeId}");
 
     private Func<BackgroundJobDto, bool> _quickFilter => x =>
     {
@@ -131,9 +140,17 @@
         _isLoading = false;
     }
 
-    private async Task SyncEmployees()
+    private async Task GetJobTypes()
     {
-        await BackgroundJobsClient.CreateAsync();
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => BackgroundJobsClient.GetJobTypesAsync(), Snackbar) is List<BackgroundJobTypeDto> result)
+        {
+            _jobTypes = result;
+        }
+    }
+
+    private async Task RunBackgroundJob(int jobTypeId)
+    {
+        await ApiHelper.ExecuteCallGuardedAsync(() => BackgroundJobsClient.RunAsync(jobTypeId), Snackbar);
 
         await GetRunningJobs();
     }

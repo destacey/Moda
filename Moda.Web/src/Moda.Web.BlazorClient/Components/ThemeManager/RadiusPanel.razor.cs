@@ -1,5 +1,5 @@
-using Moda.Web.BlazorClient.Infrastructure.Preferences;
 using Microsoft.AspNetCore.Components;
+using Moda.Web.BlazorClient.Infrastructure.Preferences;
 
 namespace Moda.Web.BlazorClient.Components.ThemeManager;
 

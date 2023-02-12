@@ -1,10 +1,8 @@
 ﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Moda.Organization.Application.Interfaces;
 
 namespace Moda.Organization.Application.Validators;
 public sealed class ExternalEmployeeValidator : CustomValidator<IExternalEmployee>
-{    
+{
     public ExternalEmployeeValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
@@ -25,6 +23,9 @@ public sealed class ExternalEmployeeValidator : CustomValidator<IExternalEmploye
             .MaximumLength(256);
 
         RuleFor(e => e.Department)
+            .MaximumLength(256);
+
+        RuleFor(e => e.OfficeLocation)
             .MaximumLength(256);
     }
 }
