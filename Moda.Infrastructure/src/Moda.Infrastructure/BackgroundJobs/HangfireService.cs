@@ -1,10 +1,34 @@
 using System.Linq.Expressions;
 using Hangfire;
+using Moda.Common.Application.BackgroundJobs;
+using NodaTime;
 
 namespace Moda.Infrastructure.BackgroundJobs;
 
 public class HangfireService : IJobService
 {
+    public IEnumerable<BackgroundJobDto> GetRunningJobs()
+    {
+        List<BackgroundJobDto> backgroundJobs = new();
+
+        var jobs = JobStorage.Current.GetMonitoringApi().ProcessingJobs(0, 1000);
+
+        foreach (var job in jobs)
+        {
+            backgroundJobs.Add(new BackgroundJobDto
+            {
+                Id = job.Key,
+                Status = job.Value.InProcessingState ? "Running" : "Not Running",
+                Type = job.Value.Job.Type.Name,
+                Namespace = job.Value.Job.Type.Namespace ?? "Unknown",
+                Action = job.Value.Job.Method.Name,
+                InProcessingState = job.Value.InProcessingState,
+                StartedAt = job.Value.StartedAt is not null ? Instant.FromDateTimeUtc(DateTime.SpecifyKind((DateTime)job.Value.StartedAt, DateTimeKind.Utc)) : null
+            });
+        }
+        return backgroundJobs;
+    }
+
     public bool Delete(string jobId) =>
         BackgroundJob.Delete(jobId);
 

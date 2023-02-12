@@ -4,3 +4,4 @@ global using Moda.Common.Application.Interfaces;
 global using Moda.Common.Application.Models;
 global using Moda.Common.Application.Validation;
 global using Moda.Common.Domain.Events;
+global using Moda.Common.Extensions;

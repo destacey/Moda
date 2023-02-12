@@ -1,13 +1,11 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using NodaTime;
 
 namespace Moda.Organization.Application.Employees.Commands;
 public sealed record CreateEmployeeCommand : ICommand<int>
 {
-    public CreateEmployeeCommand(PersonName name, string employeeNumber, LocalDate? hireDate, EmailAddress email, string? jobTitle, string? department, Guid? managerId)
+    public CreateEmployeeCommand(PersonName name, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)
     {
         Name = name;
         EmployeeNumber = employeeNumber;
@@ -15,6 +13,7 @@ public sealed record CreateEmployeeCommand : ICommand<int>
         Email = email;
         JobTitle = jobTitle;
         Department = department;
+        OfficeLocation = officeLocation;
         ManagerId = managerId;
     }
 
@@ -28,7 +27,7 @@ public sealed record CreateEmployeeCommand : ICommand<int>
 
     /// <summary>Gets the hire date.</summary>
     /// <value>The hire date.</value>
-    public LocalDate? HireDate { get; }
+    public Instant? HireDate { get; }
 
     /// <summary>Gets the email.</summary>
     /// <value>The email.</value>
@@ -41,6 +40,10 @@ public sealed record CreateEmployeeCommand : ICommand<int>
     /// <summary>Gets the department.</summary>
     /// <value>The department.</value>
     public string? Department { get; }
+
+    /// <summary>Gets the office location.</summary>
+    /// <value>The office location.</value>
+    public string? OfficeLocation { get; }
 
     /// <summary>Gets the manager identifier.</summary>
     /// <value>The manager identifier.</value>
@@ -64,7 +67,7 @@ public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmplo
         RuleFor(e => e.EmployeeNumber)
             .NotEmpty()
             .MaximumLength(256)
-            .MustAsync(BeUniqueEmployeeId).WithMessage("The EmployeeId already exists.");
+            .MustAsync(BeUniqueEmployeeNumber).WithMessage("The EmployeeId already exists.");
 
         RuleFor(e => e.Email)
             .NotNull()
@@ -75,9 +78,12 @@ public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmplo
 
         RuleFor(e => e.Department)
             .MaximumLength(256);
+
+        RuleFor(e => e.OfficeLocation)
+            .MaximumLength(256);
     }
 
-    public async Task<bool> BeUniqueEmployeeId(string employeeNumber, CancellationToken cancellationToken)
+    public async Task<bool> BeUniqueEmployeeNumber(string employeeNumber, CancellationToken cancellationToken)
     {
         return await _organizationDbContext.Employees.AllAsync(x => x.EmployeeNumber != employeeNumber, cancellationToken);
     }
@@ -100,27 +106,28 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
     {
         try
         {
-            var personId = await _organizationDbContext.People
+            var personId = (await _organizationDbContext.People
                 .Where(p => p.Key == request.EmployeeNumber)
                 .Select(p => (Guid?)p.Id)
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken)) ?? Guid.NewGuid();
 
             // verify the manager exists
             var managerId = request.ManagerId;
-            if (managerId.HasValue 
+            if (managerId.HasValue
                 && await _organizationDbContext.Employees.AllAsync(e => e.Id != request.ManagerId, cancellationToken))
             {
                 managerId = null;
             }
 
             var employee = Employee.Create(
-                personId ?? Guid.NewGuid(),
+                personId,
                 request.Name,
                 request.EmployeeNumber,
                 request.HireDate,
                 request.Email,
                 request.JobTitle,
                 request.Department,
+                request.OfficeLocation,
                 managerId,
                 _dateTimeService.Now
                 );

@@ -35,7 +35,7 @@ public sealed record UpdateEmployeeRequest
 
     /// <summary>Gets the hire date.</summary>
     /// <value>The hire date.</value>
-    public LocalDate? HireDate { get; set; }
+    public Instant? HireDate { get; set; }
 
     /// <summary>Gets the email.</summary>
     /// <value>The email.</value>
@@ -49,6 +49,10 @@ public sealed record UpdateEmployeeRequest
     /// <value>The department.</value>
     public string? Department { get; set; }
 
+    /// <summary>Gets the office location.</summary>
+    /// <value>The office location.</value>
+    public string? OfficeLocation { get; set; }
+
     /// <summary>Gets the manager identifier.</summary>
     /// <value>The manager identifier.</value>
     public Guid? ManagerId { get; set; }
@@ -58,7 +62,7 @@ public sealed record UpdateEmployeeRequest
         PersonName personName = new(FirstName, MiddleName, LastName, Suffix, Title);
         EmailAddress emailAddress = (EmailAddress)Email;
 
-        return new UpdateEmployeeCommand(Id, personName, EmployeeNumber, HireDate, emailAddress, JobTitle, Department, ManagerId);
+        return new UpdateEmployeeCommand(Id, personName, EmployeeNumber, HireDate, emailAddress, JobTitle, Department, OfficeLocation, ManagerId);
     }
 }
 
@@ -97,6 +101,9 @@ public sealed class UpdateEmployeeRequestValidator : CustomValidator<UpdateEmplo
             .MaximumLength(256);
 
         RuleFor(e => e.Department)
+            .MaximumLength(256);
+
+        RuleFor(e => e.OfficeLocation)
             .MaximumLength(256);
     }
 }

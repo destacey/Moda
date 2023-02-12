@@ -1,0 +1,165 @@
+﻿@page "/background-jobs"
+@attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.BackgroundJobs)]
+
+@inject IAuthorizationService AuthService
+@inject IBackgroundJobsClient BackgroundJobsClient
+
+<ErrorBoundary>
+    <ChildContent>
+        <PageTitle>Background Jobs</PageTitle>
+        <ModaTitle Title="Background Jobs" Description="this is a test">
+            @if (_canViewHangfire)
+            {
+                <MudIconButton Title="Hangfire Dashboard" Href="@_hangfireUrl" Target="_blank" Icon="@Icons.Material.Filled.Dashboard" Size="Size.Small" Color="Color.Default" aria-label="Hangfire Dashboard"></MudIconButton>
+            }
+        </ModaTitle>
+
+        @if (_canRunBackgroundJobs && _jobTypes.Any())
+        {
+            <MudContainer Class="ml-0 pl-0 mb-2">
+                @foreach (var item in _jobTypes)
+                {
+                    <MudTooltip Placement="Placement.Right" Text="@item.Description">
+                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Small" Class="mr-2" OnClick="@(() => RunBackgroundJob(@item.Id))">@item.Name</MudButton>
+                    </MudTooltip>
+                }
+            </MudContainer>
+        }
+
+        <MudDataGrid @ref="@_grid"
+                     Items="@_jobs"
+                     Elevation="0"
+                     Height="700px"
+                     SortMode="SortMode.Multiple"
+                     Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterRow"
+                     FixedHeader="true"
+                     Loading="@_isLoading"
+                     LoadingProgressColor="@Color.Secondary"
+                     QuickFilter="@_quickFilter">
+            <ToolBarContent>
+                <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTooltip Text="Reload Data" Placement="Placement.Top">
+                    <MudFab OnClick="@(() => ReloadData())" Size="Size.Small" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" />
+                </MudTooltip>
+            </ToolBarContent>
+            <Columns>
+                <Column T="BackgroundJobDto" Field="Id" />
+                <Column T="BackgroundJobDto" Field="Action" />
+                <Column T="BackgroundJobDto" Field="Status" />
+                <Column T="BackgroundJobDto" Field="Type" />
+                <Column T="BackgroundJobDto" Field="Namespace" />
+                <Column T="BackgroundJobDto" Field="StartedAt" Title="Start (UTC)" />
+            </Columns>
+            <LoadingContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading background jobs...</MudText>
+            </LoadingContent>
+            <NoRecordsContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No background jobs found.</MudText>
+            </NoRecordsContent>
+        </MudDataGrid>
+        <DataGridCountLabel DataGrid="@_grid" UnitLabel="background jobs" />
+
+    </ChildContent>
+    <ErrorContent>
+        <ModaCustomError />
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    [CascadingParameter]
+    Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    MudDataGrid<BackgroundJobDto> _grid = default!;
+    List<BackgroundJobDto> _jobs = new();
+    List<BackgroundJobTypeDto> _jobTypes = new();
+
+    string _searchString = "";
+    bool _isLoading = true;
+
+    private string? _hangfireUrl;
+    bool _canViewHangfire;
+    bool _canRunBackgroundJobs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hangfireUrl = Config[ConfigNames.ApiBaseUrl] + "jobs";
+
+        var user = (await AuthState).User;
+        _canViewHangfire = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.Hangfire);
+        _canRunBackgroundJobs = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.BackgroundJobs);
+
+        if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
+        {
+            SetTablePreference(clientPreference.TablePreference);
+        }
+
+        await Task.WhenAll(new Task[] {
+            GetRunningJobs(),
+            GetJobTypes()
+    });
+    }
+
+    private Func<BackgroundJobDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Id.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Status.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Action.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Type.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Namespace.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+
+    private async Task ReloadData()
+    {
+        await GetRunningJobs();
+    }
+
+    private async Task GetRunningJobs()
+    {
+        _isLoading = true;
+
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => BackgroundJobsClient.GetRunningJobsAsync(), Snackbar) is List<BackgroundJobDto> result)
+        {
+            _jobs = result;
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task GetJobTypes()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => BackgroundJobsClient.GetJobTypesAsync(), Snackbar) is List<BackgroundJobTypeDto> result)
+        {
+            _jobTypes = result;
+        }
+    }
+
+    private async Task RunBackgroundJob(int jobTypeId)
+    {
+        await ApiHelper.ExecuteCallGuardedAsync(() => BackgroundJobsClient.RunAsync(jobTypeId), Snackbar);
+
+        await GetRunningJobs();
+    }
+
+    private void SetTablePreference(ModaTablePreference tablePreference)
+    {
+        _grid.Dense = tablePreference.IsDense;
+        _grid.Striped = tablePreference.IsStriped;
+        _grid.Bordered = tablePreference.HasBorder;
+        _grid.Hover = tablePreference.IsHoverable;
+    }
+}

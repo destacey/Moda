@@ -1,8 +1,15 @@
-﻿<MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-2">@Title</MudText>
-<MudText Color="Color.Surface" Class="mb-4">@Description</MudText>
+﻿<MudContainer Class="px-0 mb-2">
+    <MudText Typo="Typo.h5" Class="mb-2">@Title</MudText>
+    <MudText Color="Color.Surface" Class="mb-4">@Description</MudText>
+    @if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+</MudContainer>
 
 @code
 {
     [Parameter] public string? Title { get; set; }
     [Parameter] public string? Description { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
 }

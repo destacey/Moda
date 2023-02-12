@@ -1,6 +1,5 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Moda.Organization.Application.Employees.Queries;
 public sealed record GetEmployeeQuery : IQuery<EmployeeDetailsDto?>

@@ -22,7 +22,7 @@ public class Person : BaseEntity<Guid>
     /// <returns>A Person</returns>
     public static Person Create(string key, Instant timestamp)
     {
-        Person person = new (Guid.NewGuid(), key);
+        Person person = new(Guid.NewGuid(), key);
         person.AddDomainEvent(EntityCreatedEvent.WithEntity(person, timestamp));
         return person;
     }

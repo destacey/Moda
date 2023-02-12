@@ -18,7 +18,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "7.0.1")
+                .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -380,7 +380,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<DateTime?>("HireDate")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -406,6 +406,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.Property<Guid?>("ManagerId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OfficeLocation")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 

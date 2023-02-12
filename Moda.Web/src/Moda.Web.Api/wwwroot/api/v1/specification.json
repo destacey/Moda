@@ -10,6 +10,104 @@
     "version": "v1"
   },
   "paths": {
+    "/api/backgroundjobs/job-types": {
+      "get": {
+        "tags": [
+          "BackgroundJobs"
+        ],
+        "summary": "Get a list of all job types.",
+        "operationId": "BackgroundJobs_GetJobTypes",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BackgroundJobTypeDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/backgroundjobs/running": {
+      "get": {
+        "tags": [
+          "BackgroundJobs"
+        ],
+        "summary": "Get a list of running jobs.",
+        "operationId": "BackgroundJobs_GetRunningJobs",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BackgroundJobDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/backgroundjobs": {
+      "post": {
+        "tags": [
+          "BackgroundJobs"
+        ],
+        "summary": "Run a background job.",
+        "operationId": "BackgroundJobs_Run",
+        "parameters": [
+          {
+            "name": "jobTypeId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/backlogcategories": {
       "get": {
         "tags": [
@@ -1725,6 +1823,85 @@
   },
   "components": {
     "schemas": {
+      "BackgroundJobTypeDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "BackgroundJobDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "namespace": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "inProcessingState": {
+            "type": "boolean"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "ConnectorListDto": {
         "type": "object",
         "additionalProperties": false,
@@ -1781,35 +1958,6 @@
           2,
           3
         ]
-      },
-      "ProblemDetails": {
-        "type": "object",
-        "additionalProperties": {
-          "nullable": true
-        },
-        "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "instance": {
-            "type": "string",
-            "nullable": true
-          }
-        }
       },
       "HttpValidationProblemDetails": {
         "allOf": [
@@ -2092,6 +2240,10 @@
             "type": "string",
             "nullable": true
           },
+          "officeLocation": {
+            "type": "string",
+            "nullable": true
+          },
           "managerId": {
             "type": "string",
             "format": "guid",
@@ -2157,6 +2309,10 @@
             "nullable": true
           },
           "department": {
+            "type": "string",
+            "nullable": true
+          },
+          "officeLocation": {
             "type": "string",
             "nullable": true
           },
@@ -2234,7 +2390,7 @@
           "hireDate": {
             "type": "string",
             "description": "Gets the hire date.",
-            "format": "date",
+            "format": "date-time",
             "nullable": true
           },
           "email": {
@@ -2254,6 +2410,13 @@
           "department": {
             "type": "string",
             "description": "Gets the department.",
+            "maxLength": 256,
+            "minLength": 0,
+            "nullable": true
+          },
+          "officeLocation": {
+            "type": "string",
+            "description": "Gets the office location.",
             "maxLength": 256,
             "minLength": 0,
             "nullable": true
@@ -2326,7 +2489,7 @@
           "hireDate": {
             "type": "string",
             "description": "Gets the hire date.",
-            "format": "date",
+            "format": "date-time",
             "nullable": true
           },
           "email": {
@@ -2346,6 +2509,13 @@
           "department": {
             "type": "string",
             "description": "Gets the department.",
+            "maxLength": 256,
+            "minLength": 0,
+            "nullable": true
+          },
+          "officeLocation": {
+            "type": "string",
+            "description": "Gets the office location.",
             "maxLength": 256,
             "minLength": 0,
             "nullable": true

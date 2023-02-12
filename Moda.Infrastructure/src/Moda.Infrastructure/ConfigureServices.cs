@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moda.Integrations.MicrosoftGraph;
+using Moda.Organization.Application.Interfaces;
 using NodaTime;
 
 namespace Moda.Infrastructure;
@@ -17,6 +19,9 @@ public static class ConfigureServices
 
         services.AddSingleton<IClock>(SystemClock.Instance);
 
+        // INTEGRATIONS
+        services.AddScoped<IExternalEmployeeDirectoryService, MicrosoftGraphService>();
+
         return services
             .AddApiVersioning()
             .AddAuth(config)
@@ -28,6 +33,7 @@ public static class ConfigureServices
             .AddOpenApiDocumentation(config)
             .AddPersistence(config)
             .AddRequestLogging(config)
+            .AddApplicationInsightsTelemetry()
             .AddRouting(options => options.LowercaseUrls = true)
             .AddServices();
     }

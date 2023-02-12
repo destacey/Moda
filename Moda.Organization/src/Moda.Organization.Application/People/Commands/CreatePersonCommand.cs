@@ -1,7 +1,5 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Moda.Organization.Application.People.Commands;
 public sealed record CreatePersonCommand : ICommand<Guid>

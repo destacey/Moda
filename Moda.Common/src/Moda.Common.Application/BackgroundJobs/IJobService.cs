@@ -1,9 +1,11 @@
 using System.Linq.Expressions;
 
-namespace Moda.Common.Application.Interfaces;
+namespace Moda.Common.Application.BackgroundJobs;
 
 public interface IJobService : ITransientService
 {
+    IEnumerable<BackgroundJobDto> GetRunningJobs();
+
     string Enqueue(Expression<Action> methodCall);
 
     string Enqueue(Expression<Func<Task>> methodCall);

@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Headers;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
+using Moda.Integrations.MicrosoftGraph;
 using Serilog;
 
 namespace Moda.Infrastructure.Auth.AzureAd;
@@ -55,12 +55,14 @@ internal static class ConfigureServices
             {
                 //var assertion = new UserAssertion(token);
                 var authResult = await confidentialClientApplication.AcquireTokenForClient(scopes).ExecuteAsync();
-                    //.AcquireTokenOnBehalfOf(scopes, assertion).ExecuteAsync();
+                //.AcquireTokenOnBehalfOf(scopes, assertion).ExecuteAsync();
 
                 message.Headers.Authorization =
                     new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
             }));
         });
+
+        services.AddScoped<MicrosoftGraphService>();
 
         return services;
     }

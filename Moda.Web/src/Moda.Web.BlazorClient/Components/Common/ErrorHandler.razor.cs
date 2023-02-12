@@ -1,5 +1,5 @@
-﻿using Moda.Web.BlazorClient.Infrastructure.Auth;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
+using Moda.Web.BlazorClient.Infrastructure.Auth;
 using MudBlazor;
 
 namespace Moda.Web.BlazorClient.Components.Common;

@@ -9,7 +9,7 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
 
     private Employee() { }
 
-    private Employee(Guid personId, PersonName personName, string employeeNumber, LocalDate? hireDate, EmailAddress email, string? jobTitle, string? department, Guid? managerId)
+    private Employee(Guid personId, PersonName personName, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)
     {
         Id = Guard.Against.Default(personId);
         Name = Guard.Against.Null(personName);
@@ -18,6 +18,7 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
         Email = email;
         JobTitle = jobTitle?.Trim();
         Department = department?.Trim();
+        OfficeLocation = officeLocation?.Trim();
         ManagerId = managerId.HasValue ? Guard.Against.Default(managerId) : null;
     }
 
@@ -35,7 +36,7 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
 
     /// <summary>Gets the hire date.</summary>
     /// <value>The hire date.</value>
-    public LocalDate? HireDate { get; private set; }
+    public Instant? HireDate { get; private set; }
 
     /// <summary>Gets the email.</summary>
     /// <value>The email.</value>
@@ -48,6 +49,10 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
     /// <summary>Gets the department.</summary>
     /// <value>The department.</value>
     public string? Department { get; private set; }
+
+    /// <summary>Gets the office location.</summary>
+    /// <value>The office location.</value>
+    public string? OfficeLocation { get; private set; }
 
     /// <summary>Gets the manager identifier.</summary>
     /// <value>The manager identifier.</value>
@@ -107,16 +112,19 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
     /// <param name="email">The email.</param>
     /// <param name="jobTitle">The job title.</param>
     /// <param name="department">The department.</param>
+    /// <param name="officeLocation">The office location.</param>
     /// <param name="managerId">The manager identifier.</param>
+    /// <param name="isActive">if set to <c>true</c> [is active].</param>
     /// <param name="timestamp">The timestamp for the event.</param>
     /// <returns>Result</returns>
     public Result Update(
         PersonName name,
         string employeeNumber,
-        LocalDate? hireDate,
+        Instant? hireDate,
         EmailAddress email,
         string? jobTitle,
         string? department,
+        string? officeLocation,
         Guid? managerId,
         bool isActive,
         Instant timestamp
@@ -131,6 +139,7 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
             HireDate = hireDate;
             JobTitle = jobTitle?.Trim();
             Department = department?.Trim();
+            OfficeLocation = officeLocation?.Trim();
 
             if (ManagerId != managerId)
             {
@@ -138,7 +147,7 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
                 Manager = null;
             }
 
-            if (IsActive != isActive) 
+            if (IsActive != isActive)
             {
                 var result = IsActive ? Activate(timestamp) : Deactivate(timestamp);
                 if (result.IsFailure)
@@ -157,7 +166,17 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
         }
     }
 
-    /// <summary>Creates an Employee and adds a domain event with the timestamp.</summary>
+    /// <summary>Updates the manager identifier.</summary>
+    /// <param name="managerId">The manager identifier.</param>
+    public void UpdateManagerId(Guid? managerId, Instant timestamp)
+    {
+        ManagerId = managerId;
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+    }
+
+    /// <summary>
+    /// Creates an Employee and adds a domain event with the timestamp.
+    /// </summary>
     /// <param name="personId">The person identifier.</param>
     /// <param name="personName">Name of the person.</param>
     /// <param name="employeeNumber">The employee identifier.</param>
@@ -165,21 +184,23 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
     /// <param name="email">The email.</param>
     /// <param name="jobTitle">The job title.</param>
     /// <param name="department">The department.</param>
+    /// <param name="officeLocation">The office location.</param>
     /// <param name="managerId">The manager identifier.</param>
     /// <param name="timestamp">The timestamp for the domain event.</param>
     /// <returns>An Employee</returns>
     public static Employee Create(
-        Guid personId, 
-        PersonName personName, 
-        string employeeNumber, 
-        LocalDate? hireDate, 
-        EmailAddress email, 
-        string? jobTitle, 
-        string? department, 
-        Guid? managerId, 
+        Guid personId,
+        PersonName personName,
+        string employeeNumber,
+        Instant? hireDate,
+        EmailAddress email,
+        string? jobTitle,
+        string? department,
+        string? officeLocation,
+        Guid? managerId,
         Instant timestamp)
     {
-        Employee employee = new(personId, personName, employeeNumber, hireDate, email, jobTitle, department, managerId);
+        Employee employee = new(personId, personName, employeeNumber, hireDate, email, jobTitle, department, officeLocation, managerId);
         employee.AddDomainEvent(EntityCreatedEvent.WithEntity(employee, timestamp));
         return employee;
     }

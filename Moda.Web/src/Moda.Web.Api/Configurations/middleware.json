@@ -1,5 +1,5 @@
 {
   "MiddlewareSettings": {
-    "EnableHttpsLogging": false
+    "EnableHttpsLogging": true
   }
 }

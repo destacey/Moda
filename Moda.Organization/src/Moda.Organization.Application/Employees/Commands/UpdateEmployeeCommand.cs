@@ -1,13 +1,11 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using NodaTime;
 
 namespace Moda.Organization.Application.Employees.Commands;
 public sealed record UpdateEmployeeCommand : ICommand<int>
 {
-    public UpdateEmployeeCommand(Guid id, PersonName name, string employeeNumber, LocalDate? hireDate, EmailAddress email, string? jobTitle, string? department, Guid? managerId)
+    public UpdateEmployeeCommand(Guid id, PersonName name, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)
     {
         Id = id;
         Name = name;
@@ -16,6 +14,7 @@ public sealed record UpdateEmployeeCommand : ICommand<int>
         Email = email;
         JobTitle = jobTitle;
         Department = department;
+        OfficeLocation = officeLocation;
         ManagerId = managerId;
     }
 
@@ -33,7 +32,7 @@ public sealed record UpdateEmployeeCommand : ICommand<int>
 
     /// <summary>Gets the hire date.</summary>
     /// <value>The hire date.</value>
-    public LocalDate? HireDate { get; }
+    public Instant? HireDate { get; }
 
     /// <summary>Gets the email.</summary>
     /// <value>The email.</value>
@@ -46,6 +45,10 @@ public sealed record UpdateEmployeeCommand : ICommand<int>
     /// <summary>Gets the department.</summary>
     /// <value>The department.</value>
     public string? Department { get; }
+
+    /// <summary>Gets the office location.</summary>
+    /// <value>The office location.</value>
+    public string? OfficeLocation { get; }
 
     /// <summary>Gets the manager identifier.</summary>
     /// <value>The manager identifier.</value>
@@ -81,6 +84,9 @@ public sealed class UpdateEmployeeCommandValidator : CustomValidator<UpdateEmplo
 
         RuleFor(e => e.Department)
             .MaximumLength(256);
+
+        RuleFor(e => e.OfficeLocation)
+            .MaximumLength(256);
     }
 
     public async Task<bool> BeUniqueEmployeeNumber(Guid id, string employeeNumber, CancellationToken cancellationToken)
@@ -109,12 +115,12 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
         try
         {
             var employee = await _organizationDbContext.Employees
-                .FirstAsync(p => p.Id == request.Id, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
             if (employee is null)
                 return Result.Failure<int>("Employee not found.");
 
             // verify the manager exists
-            if (request.ManagerId.HasValue 
+            if (request.ManagerId.HasValue
                 && employee.ManagerId != request.ManagerId
                 && await _organizationDbContext.Employees.AllAsync(e => e.Id != request.ManagerId.Value, cancellationToken))
             {
@@ -129,6 +135,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
                 request.Email,
                 request.JobTitle,
                 request.Department,
+                request.OfficeLocation,
                 request.ManagerId,
                 employee.IsActive,  // this command should not change IsActive
                 _dateTimeService.Now

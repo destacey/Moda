@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Moda.Organization.Application.People.EventHandlers;
 
@@ -29,7 +28,7 @@ public sealed class EmployeeCreatedEventHandler : EventNotificationHandler<Entit
         // Do nothing if the key already exists.
         if (await _organizationDbContext.People.AnyAsync(p => p.Key == @event.Entity.EmployeeNumber, cancellationToken))
             return;
-        
+
         try
         {
             var person = Person.CreateFromExisting(@event.Entity.Id, @event.Entity.EmployeeNumber, _dateTimeService.Now);

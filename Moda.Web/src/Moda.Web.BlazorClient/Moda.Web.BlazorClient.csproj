@@ -35,8 +35,8 @@
 	  <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
 	</ItemGroup>
 
-    <Target Name="NSwag" Condition="'$(Configuration)'=='DEBUG'">
-        <Exec WorkingDirectory="$(ProjectDir)\ApiClient" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net70) run nswag.json /variables:Configuration=$(Configuration)" />
+    <Target Name="NSwag" AfterTargets="Build" Condition="'$(Configuration)'=='DEBUG'">
+        <Exec WorkingDirectory="$(ProjectDir)Infrastructure\ApiClient" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net70) run nswag.json /variables:Configuration=$(Configuration)" />
     </Target>
 	
 </Project>

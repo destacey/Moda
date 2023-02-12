@@ -5,5 +5,8 @@ public static class GuidExtensions
         => value == default;
 
     public static bool IsDefault(this Guid? value)
-        => value is null ? false : value.Value.IsDefault();
+        => value is not null && value.Value.IsDefault();
+
+    public static bool IsNullEmptyOrDefault(this Guid? value)
+        => value is null || value.Value == Guid.Empty || value.Value.IsDefault();
 }
