@@ -43,4 +43,51 @@ public class EnumerableExtensionsTests
         // Assert
         result.Should().HaveCount(0);
     }
+
+    [Theory]
+    [MemberData(nameof(NotNullAndAnyArrayData))]
+    public void NotNullAndAny_WithArray(IEnumerable<int> source, bool expectedResult)
+    {
+        // Act
+        var result = source.NotNullAndAny();
+
+        // Assert
+        result.Should().Be(expectedResult);
+    }
+
+    public static IEnumerable<object[]> NotNullAndAnyArrayData
+    {
+        get
+        {
+            yield return new object[] { new int[] { 1, 2, 3 }, true };
+            yield return new object[] { new int[] { 1}, true };
+            yield return new object[] { new int[5], true };
+            yield return new object[] { Array.Empty<int>(), false };
+            yield return new object[] { null!, false };
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(NotNullAndAnyListData))]
+    public void NotNullAndAny_WithList(IEnumerable<int> source, bool expectedResult)
+    {
+        // Act
+        var result = source.NotNullAndAny();
+
+        // Assert
+        result.Should().Be(expectedResult);
+    }
+
+    // TODO Guid not IXunitSerializable, only shows as one test
+    public static IEnumerable<object[]> NotNullAndAnyListData
+    {
+        get
+        {
+            yield return new object[] { new List<int>() { 1, 2, 3 }, true };
+            yield return new object[] { new List<int>() { 1 }, true };
+            yield return new object[] { new List<int>(5), false };
+            yield return new object[] { Enumerable.Empty<int>(), false };
+            yield return new object[] { null!, false };
+        }
+    }
 }

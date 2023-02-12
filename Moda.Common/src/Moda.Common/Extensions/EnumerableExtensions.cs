@@ -3,6 +3,11 @@
 namespace Moda.Common.Extensions;
 public static class EnumerableExtensions
 {
+    /// <summary>Batches the specified batch size.</summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source">The source.</param>
+    /// <param name="batchSize">Size of the batch.</param>
+    /// <returns></returns>
     public static IEnumerable<IList<T>> Batch<T>(this IEnumerable<T> source, int batchSize)
     {
         Guard.Against.Null(source);
@@ -23,5 +28,14 @@ public static class EnumerableExtensions
         {
             yield return list;
         }
+    }
+
+    /// <summary>Nots the null and any.</summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source">The source.</param>
+    /// <returns></returns>
+    public static bool NotNullAndAny<T>(this IEnumerable<T>? source)
+    {
+        return source is not null && source.Any();
     }
 }
