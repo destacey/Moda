@@ -16,7 +16,7 @@
 
         @if (_canRunBackgroundJobs && _jobTypes.Any())
         {
-            <MudContainer Class="ml-0 pl-0 mb-2">
+            <MudContainer Class="mx-0 px-0 mb-2">
                 @foreach (var item in _jobTypes)
                 {
                     <MudTooltip Placement="Placement.Right" Text="@item.Description">
