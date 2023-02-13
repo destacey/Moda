@@ -6,9 +6,9 @@ public static class GenericExtensions
     {
         ArgumentNullException.ThrowIfNull(branchSelector);
 
-        Stack<T> stack = new ();
+        Stack<T> stack = new();
         stack.Push(root);
-        
+
         while (stack.Count > 0)
         {
             var current = stack.Pop();

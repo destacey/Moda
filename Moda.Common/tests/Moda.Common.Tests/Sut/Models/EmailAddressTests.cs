@@ -87,7 +87,7 @@ public class EmailAddressTests
     public void ExplicitOperatorString_IsTheValue()
     {
         string input = "test@test.com";
-        EmailAddress result = (EmailAddress)input;        
+        EmailAddress result = (EmailAddress)input;
 
         Assert.Equal(input, result);
     }

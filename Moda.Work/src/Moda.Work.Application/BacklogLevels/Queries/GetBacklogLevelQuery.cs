@@ -9,7 +9,7 @@ public sealed record GetBacklogLevelQuery : IQuery<BacklogLevelDto?>
     {
         Id = id;
     }
-    
+
     public int Id { get; }
 }
 

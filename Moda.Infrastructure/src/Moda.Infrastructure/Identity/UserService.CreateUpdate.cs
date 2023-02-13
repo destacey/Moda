@@ -45,7 +45,7 @@ internal partial class UserService
         var adUser = await _graphServiceClient.Users[principalObjectId].Request().GetAsync();
         string? email = principal.FindFirstValue(ClaimTypes.Upn) ?? adUser.Mail;
         string? username = principal.GetDisplayName() ?? adUser.GivenName;
-        
+
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(username))
         {
             _logger.LogError("Username {Username} or Email {Email} not valid", username, email);

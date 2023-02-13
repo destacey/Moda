@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using MediatR;
-using Moda.Common.Application.Identity.Users;
 
 namespace Moda.Common.Application.Behaviors;
 

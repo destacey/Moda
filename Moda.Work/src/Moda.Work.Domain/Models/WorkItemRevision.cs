@@ -17,7 +17,7 @@ public sealed class WorkItemRevision : BaseEntity<Guid>, ISoftDelete
         Revision = revision;
         RevisedById = revisedById;
         RevisedDate = revisedDate;
-        
+
         if (changes?.Count() > 0)
             _changes.AddRange(changes.ToList());
     }

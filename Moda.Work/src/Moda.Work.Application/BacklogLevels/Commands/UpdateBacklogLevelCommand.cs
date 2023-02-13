@@ -34,11 +34,11 @@ public sealed record UpdateBacklogLevelCommand : ICommand<int>
 public sealed class UpdateBacklogLevelCommandValidator : CustomValidator<UpdateBacklogLevelCommand>
 {
     private readonly IWorkDbContext _workDbContext;
-    
+
     public UpdateBacklogLevelCommandValidator(IWorkDbContext workDbContext)
     {
         _workDbContext = workDbContext;
-        
+
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(c => c.Name)
@@ -55,7 +55,7 @@ public sealed class UpdateBacklogLevelCommandValidator : CustomValidator<UpdateB
         var backlogLevelNames = await _workDbContext.BacklogLevelSchemes
             .SelectMany(s => s.BacklogLevels.Where(c => c.Id != id).Select(l => l.Name))
             .ToListAsync(cancellationToken);
-        
+
         return backlogLevelNames.All(l => l != name);
     }
 }
@@ -83,7 +83,7 @@ internal sealed class UpdateBacklogLevelCommandHandler : ICommandHandler<UpdateB
 
             if (scheme is null)
                 return Result.Failure<int>("The system backlog level scheme does not exist.");
-            
+
             var backlogLevel = scheme.BacklogLevels.FirstOrDefault(p => p.Id == request.Id);
             if (backlogLevel is null)
                 return Result.Failure<int>("Backlog Level not found.");

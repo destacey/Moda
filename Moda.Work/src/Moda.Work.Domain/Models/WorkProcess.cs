@@ -15,7 +15,7 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
 {
     private string _name = null!;
     private string? _description;
-    
+
     private readonly List<WorkProcessScheme> _schemes = new();
     private readonly List<Workspace> _workspaces = new();
 
@@ -60,9 +60,9 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     public bool IsActive { get; private set; } = false;
 
     public IReadOnlyCollection<WorkProcessScheme> Schemes => _schemes.AsReadOnly();
-    
+
     public IReadOnlyCollection<Workspace> Workspaces => _workspaces.AsReadOnly();
-    
+
     public Result Update(string name, string? description, Instant timestamp)
     {
         try

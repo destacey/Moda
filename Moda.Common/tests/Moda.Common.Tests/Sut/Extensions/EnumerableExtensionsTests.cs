@@ -60,7 +60,7 @@ public class EnumerableExtensionsTests
         get
         {
             yield return new object[] { new int[] { 1, 2, 3 }, true };
-            yield return new object[] { new int[] { 1}, true };
+            yield return new object[] { new int[] { 1 }, true };
             yield return new object[] { new int[5], true };
             yield return new object[] { Array.Empty<int>(), false };
             yield return new object[] { null!, false };

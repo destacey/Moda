@@ -12,12 +12,12 @@ public sealed record GetWorkStateQuery : IQuery<WorkStateDto?>
     {
         Id = id;
     }
-    
+
     public GetWorkStateQuery(string name)
     {
         Name = Guard.Against.NullOrWhiteSpace(name).Trim();
     }
-    
+
     public int? Id { get; }
     public string? Name { get; }
 }

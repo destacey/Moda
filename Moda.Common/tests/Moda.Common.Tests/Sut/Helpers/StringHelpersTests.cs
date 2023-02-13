@@ -14,7 +14,7 @@ public class StringHelpersTests
     {
         // Act
         var result = StringHelpers.Concat(words);
-        
+
         // Arrange
         Assert.Equal(expected, result);
     }

@@ -8,7 +8,7 @@ public static class EntityCreatedEvent
         => new(entity, timestamp);
 }
 
-public record EntityCreatedEvent<TEntity> : DomainEvent, IGenericDomainEvent 
+public record EntityCreatedEvent<TEntity> : DomainEvent, IGenericDomainEvent
     where TEntity : class, IEntity
 {
     internal EntityCreatedEvent(TEntity entity, Instant timestamp)

@@ -30,7 +30,7 @@ public class PersonName : ValueObject
     {
         yield return FirstName;
 
-        if (MiddleName is not null) 
+        if (MiddleName is not null)
             yield return MiddleName;
 
         yield return LastName;

@@ -2,8 +2,8 @@
 
 namespace Moda.Common.Application.Behaviors;
 
-public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> 
-    where TRequest : notnull, IRequest<TResponse>  
+public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull, IRequest<TResponse>
 {
     private readonly ILogger<TRequest> _logger;
 

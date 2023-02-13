@@ -1,6 +1,4 @@
-﻿using Mapster;
-
-namespace Moda.Work.Application.WorkTypes.Dtos;
+﻿namespace Moda.Work.Application.WorkTypes.Dtos;
 public sealed record WorkTypeDto : IMapFrom<WorkType>
 {
     public int Id { get; set; }

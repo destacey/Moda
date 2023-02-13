@@ -16,10 +16,10 @@ public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
 
     /// <summary>Gets or sets the description.</summary>
     /// <value>The connection description.</value>
-    public string? Description 
-    { 
+    public string? Description
+    {
         get => _description;
-        protected set => _description = value?.Trim(); 
+        protected set => _description = value?.Trim();
     }
 
     /// <summary>Gets the type of connector.  This value cannot change.</summary>
@@ -81,9 +81,9 @@ public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
 
 public abstract class Connection<T> : Connection
 {
-    public T? Configuration 
-    { 
+    public T? Configuration
+    {
         get => ConfigurationString is null ? default : JsonSerializer.Deserialize<T>(ConfigurationString);
-        protected set => ConfigurationString = JsonSerializer.Serialize(value); 
+        protected set => ConfigurationString = JsonSerializer.Serialize(value);
     }
 }

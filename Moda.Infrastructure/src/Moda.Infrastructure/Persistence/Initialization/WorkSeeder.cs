@@ -24,7 +24,7 @@ public class WorkSeeder : ICustomSeeder
             {
                 throw new InvalidOperationException(result.Error);
             }
-            
+
             await dbContext.SaveChangesAsync(cancellationToken);
         }
         else

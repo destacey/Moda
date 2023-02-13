@@ -37,7 +37,7 @@ public sealed class CreateBacklogLevelCommandValidator : CustomValidator<CreateB
     public CreateBacklogLevelCommandValidator(IWorkDbContext workDbContext)
     {
         _workDbContext = workDbContext;
-        
+
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(c => c.Name)
@@ -78,7 +78,7 @@ internal sealed class CreateBacklogLevelCommandHandler : ICommandHandler<CreateB
             var scheme = await _workDbContext.BacklogLevelSchemes
                 .Include(s => s.BacklogLevels)
                 .FirstOrDefaultAsync(cancellationToken);
-            
+
             if (scheme is null)
                 return Result.Failure<int>("The system backlog level scheme does not exist.");
 

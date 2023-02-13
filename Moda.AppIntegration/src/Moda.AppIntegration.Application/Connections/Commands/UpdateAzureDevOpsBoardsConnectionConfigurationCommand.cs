@@ -33,7 +33,7 @@ public sealed class UpdateAzureDevOpsBoardsConnectionConfigurationCommandValidat
     public UpdateAzureDevOpsBoardsConnectionConfigurationCommandValidator(IAppIntegrationDbContext appIntegrationDbContext)
     {
         _appIntegrationDbContext = appIntegrationDbContext;
-        
+
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(c => c.Organization)
@@ -48,11 +48,11 @@ public sealed class UpdateAzureDevOpsBoardsConnectionConfigurationCommandValidat
     {
         if (string.IsNullOrWhiteSpace(organization))
             return true;
-        
+
         var connections = await _appIntegrationDbContext.AzureDevOpsBoardsConnections
             .Where(c => c.Id != id && !string.IsNullOrWhiteSpace(c.ConfigurationString))
             .ToListAsync(cancellationToken);
-        
+
         return connections
             .Where(c => c.Configuration is not null && !string.IsNullOrWhiteSpace(c.Configuration.Organization))
             .All(c => c.Configuration!.Organization != organization);
@@ -80,9 +80,9 @@ internal sealed class UpdateAzureDevOpsBoardsConnectionConfigurationCommandHandl
                 .FirstAsync(c => c.Id == request.Id, cancellationToken);
             if (connection is null)
                 return Result.Failure<Guid>("Azure DevOps Boards Connection not found.");
-            
+
             var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, request.PersonalAccessToken);
-            
+
             var updateResult = connection.UpdateConfiguration(config, _dateTimeService.Now);
             if (updateResult.IsFailure)
             {

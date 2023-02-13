@@ -31,11 +31,11 @@ internal sealed class GetAzureDevOpsBoardsConnectionConfigurationQueryHandler : 
         return connection is null
             ? null
             : new AzureDevOpsBoardsConnectionConfigurationDto()
-                {
-                    ConnectionId = connection.Id,
-                    Organization = connection.Configuration?.Organization,
-                    PersonalAccessToken = connection.Configuration?.PersonalAccessToken,
-                    OrganizationUrl = connection.Configuration?.OrganizationUrl
-                };
+            {
+                ConnectionId = connection.Id,
+                Organization = connection.Configuration?.Organization,
+                PersonalAccessToken = connection.Configuration?.PersonalAccessToken,
+                OrganizationUrl = connection.Configuration?.OrganizationUrl
+            };
     }
 }
