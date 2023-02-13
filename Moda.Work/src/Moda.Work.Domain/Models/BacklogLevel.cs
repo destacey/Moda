@@ -12,7 +12,7 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>
     private string? _description;
 
     private BacklogLevel() { }
-    
+
     private BacklogLevel(string name, string? description, BacklogCategory category, Ownership ownership, int rank)
     {
         Name = name;

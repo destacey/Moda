@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Moda.Common.Application.BackgroundJobs;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Moda.Infrastructure.Identity;
 

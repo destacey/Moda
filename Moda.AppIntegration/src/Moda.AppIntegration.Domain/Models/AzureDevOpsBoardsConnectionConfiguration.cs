@@ -16,7 +16,7 @@ public sealed record AzureDevOpsBoardsConnectionConfiguration
     /// <summary>Gets the personal access token.</summary>
     /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
     public string? PersonalAccessToken { get; }
-    
+
     public string? OrganizationUrl
         => string.IsNullOrWhiteSpace(Organization) ? null : $"{_baseUrl}/{Organization}";
 

@@ -8,7 +8,7 @@ public class GenericExtensionsTests
     public void FlattenHierarchy_WhenNoChildren_ReturnsRoot()
     {
         // Arrange
-        DepthFirstFlattenTestModel root = new () { Name = "root" };
+        DepthFirstFlattenTestModel root = new() { Name = "root" };
 
         // Act
         var result = root.FlattenHierarchy(n => n.Children);
@@ -26,21 +26,21 @@ public class GenericExtensionsTests
         DepthFirstFlattenTestModel twoTwo = new() { Name = "twoTwo" };
         DepthFirstFlattenTestModel threeOne = new() { Name = "threeOne" };
         DepthFirstFlattenTestModel threeTwo = new() { Name = "threeTwo" };
-        
+
         DepthFirstFlattenTestModel one = new() { Name = "one" };
-        DepthFirstFlattenTestModel two = new() 
-        { 
+        DepthFirstFlattenTestModel two = new()
+        {
             Name = "two",
             Children = new() { twoOne, twoTwo }
         };
-        DepthFirstFlattenTestModel three = new() 
-        { 
+        DepthFirstFlattenTestModel three = new()
+        {
             Name = "three",
             Children = new() { threeOne, threeTwo }
         };
-        
-        DepthFirstFlattenTestModel root = new() 
-        { 
+
+        DepthFirstFlattenTestModel root = new()
+        {
             Name = "root",
             Children = new() { one, two, three }
         };

@@ -120,7 +120,7 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     /// <param name="args">The arguments.</param>
     /// <returns>Result that indicates success or a list of errors</returns>
     public Result Activate(WorkspaceActivatableArgs args)
-    {        
+    {
         if (WorkProcessId != args.WorkProcess.Id)
             return Result.Failure($"Unable to activate the workspace because the work process does not match the workspace work process.");
 
@@ -128,7 +128,7 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
             return Result.Failure($"Unable to activate the workspace because the work process is not active.");
 
         if (!IsActive)
-        {            
+        {
             IsActive = true;
             AddDomainEvent(EntityActivatedEvent.WithEntity(this, args.Timestamp));
         }

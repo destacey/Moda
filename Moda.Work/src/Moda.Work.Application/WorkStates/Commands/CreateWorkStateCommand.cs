@@ -29,7 +29,7 @@ public sealed class CreateWorkStateCommandValidator : CustomValidator<CreateWork
     public CreateWorkStateCommandValidator(IWorkDbContext workDbContext)
     {
         _workDbContext = workDbContext;
-        
+
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(c => c.Name)

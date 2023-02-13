@@ -27,7 +27,7 @@ public sealed class WorkState : BaseAuditableEntity<int>, IActivatable
         get => _name;
         init => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
     }
-    
+
     /// <summary>The description of the work state.</summary>
     /// <value>The description.</value>
     public string? Description

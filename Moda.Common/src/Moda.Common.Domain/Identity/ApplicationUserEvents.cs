@@ -6,7 +6,7 @@ public abstract record ApplicationUserEvent : DomainEvent
 {
     public string UserId { get; set; } = default!;
 
-    protected ApplicationUserEvent(string userId, Instant timestamp) => 
+    protected ApplicationUserEvent(string userId, Instant timestamp) =>
         (UserId, Timestamp) = (userId, timestamp);
 }
 

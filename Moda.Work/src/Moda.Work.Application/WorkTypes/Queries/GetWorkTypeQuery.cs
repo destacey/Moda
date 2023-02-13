@@ -12,12 +12,12 @@ public sealed record GetWorkTypeQuery : IQuery<WorkTypeDto?>
     {
         Id = id;
     }
-    
+
     public GetWorkTypeQuery(string name)
     {
         Name = Guard.Against.NullOrWhiteSpace(name).Trim();
     }
-    
+
     public int? Id { get; }
     public string? Name { get; }
 }

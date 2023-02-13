@@ -19,7 +19,7 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
             .IncludeProperties(e => new { e.Id, e.Name });
         builder.HasIndex(c => c.IsActive);
         builder.HasIndex(c => c.IsDeleted);
-        
+
         builder.Property(c => c.Name).IsRequired().HasMaxLength(256);
         builder.Property(c => c.Description).HasMaxLength(1024);
         builder.Property(c => c.Connector)

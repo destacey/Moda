@@ -11,7 +11,7 @@ public sealed record UpdateRolePermissionsCommand
     }
 
     public string RoleId { get; }
-    public List<string> Permissions { get; } = new ();
+    public List<string> Permissions { get; } = new();
 }
 
 public sealed class UpdateRolePermissionsCommandValidator : CustomValidator<UpdateRolePermissionsCommand>

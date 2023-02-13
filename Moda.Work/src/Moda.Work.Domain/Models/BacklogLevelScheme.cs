@@ -38,7 +38,7 @@ public class BacklogLevelScheme : BaseAuditableEntity<Guid>
 
         if (_backlogLevels.Any(l => l.Name == backlogLevel.Name))
             return Result.Failure($"A backlog level with the name '{backlogLevel.Name}' already exists.");
-        
+
         _backlogLevels.Add(backlogLevel);
         AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
         return Result.Success();
@@ -62,7 +62,7 @@ public class BacklogLevelScheme : BaseAuditableEntity<Guid>
         var backlogLevel = _backlogLevels.FirstOrDefault(x => x.Id == id);
         if (backlogLevel is null)
             return Result.Failure<int>("Backlog Level not found.");
-        
+
         if (backlogLevel.Category != BacklogCategory.Portfolio)
             return Result.Failure("Backlog level must be of category Portfolio.");
 
@@ -72,7 +72,7 @@ public class BacklogLevelScheme : BaseAuditableEntity<Guid>
         var result = backlogLevel.Update(name, description, rank, timestamp);
         if (result.IsFailure)
             return Result.Failure<int>(result.Error);
-        
+
         AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
         return Result.Success();
     }
@@ -94,8 +94,8 @@ public class BacklogLevelScheme : BaseAuditableEntity<Guid>
                         || existing.Rank != defaultBacklogLevel.Rank)
                     {
                         var result = existing.Update(
-                            defaultBacklogLevel.Name, 
-                            defaultBacklogLevel.Description, 
+                            defaultBacklogLevel.Name,
+                            defaultBacklogLevel.Description,
                             defaultBacklogLevel.Rank,
                             timestamp);
 

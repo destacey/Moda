@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using FluentValidation.AspNetCore;
 using Moda.Web.Api.Models.Profiles;
 
 namespace Moda.Web.Api.Controllers.Identity;

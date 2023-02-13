@@ -6,5 +6,5 @@ public sealed record ToggleUserStatusRequest
     public bool ActivateUser { get; set; }
 
     public ToggleUserStatusCommand ToToggleUserStatusCommand()
-        => new (UserId, ActivateUser);
+        => new(UserId, ActivateUser);
 }

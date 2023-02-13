@@ -105,7 +105,7 @@ internal sealed class WorkItemService
         try
         {
             var workitems = new List<WorkItem>();
-            
+
             var batches = workItemIds.Batch(_maxBatchSize);
             foreach (var batch in batches)
             {

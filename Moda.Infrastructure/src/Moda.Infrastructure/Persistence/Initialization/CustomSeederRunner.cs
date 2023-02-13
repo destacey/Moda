@@ -9,7 +9,7 @@ internal class CustomSeederRunner
     private readonly IDateTimeService _dateTimeService;
 
     public CustomSeederRunner(IServiceProvider serviceProvider, ModaDbContext dbContext, IDateTimeService dateTimeService)
-    {        
+    {
         _seeders = serviceProvider.GetServices<ICustomSeeder>().ToArray();
         _dbContext = dbContext;
         _dateTimeService = dateTimeService;
@@ -19,7 +19,7 @@ internal class CustomSeederRunner
     {
         foreach (var seeder in _seeders)
         {
-            await seeder.Initialize(_dbContext, _dateTimeService , cancellationToken);
+            await seeder.Initialize(_dbContext, _dateTimeService, cancellationToken);
         }
     }
 }

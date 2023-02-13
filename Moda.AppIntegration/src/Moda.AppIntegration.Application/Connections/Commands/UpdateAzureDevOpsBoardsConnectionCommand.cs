@@ -29,7 +29,7 @@ public sealed record UpdateAzureDevOpsBoardsConnectionCommand : ICommand<Guid>
 public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomValidator<UpdateAzureDevOpsBoardsConnectionCommand>
 {
     public UpdateAzureDevOpsBoardsConnectionCommandValidator()
-    {        
+    {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(c => c.Name)
@@ -62,7 +62,7 @@ internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommand
                 .FirstAsync(c => c.Id == request.Id, cancellationToken);
             if (connection is null)
                 return Result.Failure<Guid>("Azure DevOps Boards connection not found.");
-            
+
             var updateResult = connection.Update(request.Name, request.Description, _dateTimeService.Now);
             if (updateResult.IsFailure)
             {

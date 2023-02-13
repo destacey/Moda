@@ -9,7 +9,7 @@ public enum Ownership
 
     [Display(Description = "The object is owned by an external system.")]
     Managed = 1,
-    
+
     [Display(Description = "The object is owned by Moda, but not changable by a user.")]
     System = 2,
 }

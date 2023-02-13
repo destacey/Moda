@@ -33,7 +33,7 @@ public class AzureDevOpsService  // TODO add interface
 
         return areas; // map to local type and return interface instead of concrete type
     }
-    
+
     public async Task<Result<List<WorkItemClassificationNode>>> GetIterations(Guid projectId, CancellationToken cancellationToken)
     {
         var iterationService = GetService<IterationService>();
@@ -48,7 +48,7 @@ public class AzureDevOpsService  // TODO add interface
         var projectService = GetService<ProjectService>();
 
         var project = await projectService.GetProject(projectId);
-        
+
         return project; // map to local type and return interface instead of concrete type
     }
 

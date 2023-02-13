@@ -30,9 +30,9 @@ internal class ConnectionStringValidator : IConnectionStringValidator
                     var mssqlcs = new SqlConnectionStringBuilder(connectionString);
                     break;
 
-                //case DbProviderKeys.Npgsql:
-                //    var postgresqlcs = new NpgsqlConnectionStringBuilder(connectionString);
-                //    break;
+                    //case DbProviderKeys.Npgsql:
+                    //    var postgresqlcs = new NpgsqlConnectionStringBuilder(connectionString);
+                    //    break;
             }
 
             return true;

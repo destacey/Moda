@@ -38,14 +38,14 @@ public class BacklogLevelConfig : IEntityTypeConfiguration<BacklogLevel>
     public void Configure(EntityTypeBuilder<BacklogLevel> builder)
     {
         builder.ToTable("BacklogLevels", SchemaNames.Work);
-        
+
         builder.HasKey(w => w.Id);
 
         builder.HasIndex(w => w.Id);
         builder.HasIndex(w => w.ParentId);
 
         builder.Property(w => w.Name).IsRequired().HasMaxLength(256);
-        builder.Property(w => w.Description).HasMaxLength(1024); 
+        builder.Property(w => w.Description).HasMaxLength(1024);
         builder.Property(w => w.Category)
             .HasConversion(
                 w => w.ToString(),
@@ -60,7 +60,7 @@ public class BacklogLevelConfig : IEntityTypeConfiguration<BacklogLevel>
         builder.Property(w => w.LastModifiedBy);
         builder.Property(w => w.Deleted);
         builder.Property(w => w.DeletedBy);
-        builder.Property(w => w.IsDeleted);        
+        builder.Property(w => w.IsDeleted);
     }
 }
 
