@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Extensions;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
@@ -35,7 +36,7 @@ public sealed class WorkType : BaseAuditableEntity<int>, IActivatable
     public string? Description
     {
         get => _description;
-        private set => _description = value?.Trim();
+        private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>Indicates whether the work type is active or not.</summary>

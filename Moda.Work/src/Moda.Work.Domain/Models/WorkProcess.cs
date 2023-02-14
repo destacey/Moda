@@ -1,6 +1,7 @@
 ﻿
 using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Extensions;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
@@ -43,7 +44,7 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     public string? Description
     {
         get => _description;
-        private set => _description = value?.Trim();
+        private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>
