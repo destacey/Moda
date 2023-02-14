@@ -1,4 +1,6 @@
-﻿namespace Moda.Common.Tests.Sut.Extensions;
+﻿using FluentAssertions;
+
+namespace Moda.Common.Tests.Sut.Extensions;
 public class StringExtensionsTests
 {
     [Theory]
@@ -16,7 +18,8 @@ public class StringExtensionsTests
     public void IsValidEmailAddressFormat(string emailAddress, bool expectedResult)
     {
         var result = StringExtensions.IsValidEmailAddressFormat(emailAddress);
-        Assert.Equal(expectedResult, result);
+
+        result.Should().Be(expectedResult);
     }
 
     [Theory]
@@ -32,7 +35,8 @@ public class StringExtensionsTests
     public void IsValidPhoneNumberFormat(string phoneNumber, bool expectedResult)
     {
         var result = StringExtensions.IsValidPhoneNumberFormat(phoneNumber);
-        Assert.Equal(expectedResult, result);
+
+        result.Should().Be(expectedResult);
     }
 
     [Theory]
@@ -53,6 +57,7 @@ public class StringExtensionsTests
     public void IsValidZipCodeFormat(string zipCode, bool expectedResult)
     {
         var result = StringExtensions.IsValidZipCodeFormat(zipCode);
-        Assert.Equal(expectedResult, result);
+
+        result.Should().Be(expectedResult);
     }
 }
