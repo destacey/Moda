@@ -30,4 +30,9 @@ public static class StringExtensions
 
         return Regex.IsMatch(value, zipCodeRegex);
     }
+
+    public static string? NullIfWhiteSpacePlusTrim(this string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+    }
 }

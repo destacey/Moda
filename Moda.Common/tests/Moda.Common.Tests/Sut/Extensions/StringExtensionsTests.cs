@@ -60,4 +60,18 @@ public class StringExtensionsTests
 
         result.Should().Be(expectedResult);
     }
+
+    [Theory]
+    [InlineData("Test", "Test")]
+    [InlineData("Test ", "Test")]
+    [InlineData("  Test", "Test")]
+    [InlineData(" ", null)]
+    [InlineData("", null)]
+    [InlineData(null, null)]
+    public void NullIfWhiteSpacePlusTrim(string value, string expectedResult)
+    {
+        var result = StringExtensions.NullIfWhiteSpacePlusTrim(value);
+
+        result.Should().Be(expectedResult);
+    }
 }
