@@ -1,0 +1,25 @@
+﻿using FluentAssertions;
+using Moda.Organization.Domain.Extensions;
+
+namespace Moda.Organization.Domain.Tests.Sut.Extensions;
+public class StringExtensionsTests
+{
+    [Theory]
+    [InlineData("CS", true)]
+    [InlineData("CORE", true)]
+    [InlineData("IAMAWESOME", true)]
+    [InlineData("N", false)]
+    [InlineData("AWESOMETEAM", false)]
+    [InlineData("TTt", false)]
+    [InlineData("T2T", false)]
+    [InlineData("T.T", false)]
+    [InlineData(" ", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void IsValidOrganizationCodeFormat(string code, bool expectedResult)
+    {
+        var result = StringExtensions.IsValidOrganizationCodeFormat(code);
+        
+        result.Should().Be(expectedResult);
+    }
+}
