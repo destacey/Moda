@@ -31,5 +31,5 @@ public class EmailAddress : ValueObject
     }
 
     public static implicit operator string(EmailAddress emailAddress) => emailAddress.Value;
-    public static explicit operator EmailAddress(string value) => new EmailAddress(value);
+    public static explicit operator EmailAddress(string value) => new(value);
 }

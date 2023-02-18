@@ -20,4 +20,10 @@
         <ProjectReference Include="..\Moda.Organization.Domain\Moda.Organization.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Teams\Commands\" />
+      <Folder Include="Teams\Dtos\" />
+      <Folder Include="Teams\Queries\" />
+    </ItemGroup>
+
 </Project>

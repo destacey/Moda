@@ -4,13 +4,13 @@ namespace Moda.Organization.Domain.Extensions;
 public static class StringExtensions
 {
     /// <summary>
-    /// Determines whether the value is valid organization code format.  Organiation codes are uppercase letters only, 2-10 characters.
+    /// Determines whether the value is valid team code format.  Team codes are uppercase letters only, 2-10 characters.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>
-    ///   <c>true</c> if [is valid organization code format] [the specified value]; otherwise, <c>false</c>.
+    ///   <c>true</c> if [is valid team code format] [the specified value]; otherwise, <c>false</c>.
     /// </returns>
-    public static bool IsValidOrganizationCodeFormat(this string? value)
+    public static bool IsValidTeamCodeFormat(this string? value)
     {
         if (string.IsNullOrWhiteSpace(value)) return false;
 

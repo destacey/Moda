@@ -18,7 +18,7 @@ public class StringExtensionsTests
     [InlineData(null, false)]
     public void IsValidOrganizationCodeFormat(string code, bool expectedResult)
     {
-        var result = StringExtensions.IsValidOrganizationCodeFormat(code);
+        var result = StringExtensions.IsValidTeamCodeFormat(code);
         
         result.Should().Be(expectedResult);
     }
