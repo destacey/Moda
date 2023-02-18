@@ -14,4 +14,5 @@ global using Moda.Organization.Application.Employees.Dtos;
 global using Moda.Organization.Application.Interfaces;
 global using Moda.Organization.Application.Persistence;
 global using Moda.Organization.Application.Validators;
+global using Moda.Organization.Domain.Enums;
 global using Moda.Organization.Domain.Models;

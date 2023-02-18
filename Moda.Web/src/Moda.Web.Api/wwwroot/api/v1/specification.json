@@ -108,6 +108,35 @@
         ]
       }
     },
+    "/api/teamtypes": {
+      "get": {
+        "tags": [
+          "TeamTypes"
+        ],
+        "summary": "Get a list of all team types.",
+        "operationId": "TeamTypes_GetList",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamTypeDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/backlogcategories": {
       "get": {
         "tags": [
@@ -123,7 +152,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ConnectorListDto"
+                    "$ref": "#/components/schemas/BacklogCategoryDto"
                   }
                 }
               }
@@ -329,7 +358,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ConnectorListDto"
+                    "$ref": "#/components/schemas/WorkStateCategoryListDto"
                   }
                 }
               }
@@ -1902,7 +1931,7 @@
           }
         }
       },
-      "ConnectorListDto": {
+      "TeamTypeDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -1916,6 +1945,31 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "BacklogCategoryDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -2072,6 +2126,27 @@
           "rank": {
             "type": "integer",
             "description": "The rank of the backlog level. The higher the number, the higher the level.",
+            "format": "int32"
+          }
+        }
+      },
+      "WorkStateCategoryListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
             "format": "int32"
           }
         }
@@ -2885,6 +2960,23 @@
           "personalAccessToken": {
             "type": "string",
             "description": "Gets the personal access token.",
+            "nullable": true
+          }
+        }
+      },
+      "ConnectorListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
             "nullable": true
           }
         }
