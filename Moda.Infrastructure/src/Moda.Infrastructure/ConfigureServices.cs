@@ -29,7 +29,7 @@ public static class ConfigureServices
             .AddCorsPolicy(config)
             .AddExceptionMiddleware()
             .AddHealthCheck()
-            .AddMediatR(Assembly.GetExecutingAssembly())
+            .AddMediatR(options => options.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
             .AddOpenApiDocumentation(config)
             .AddPersistence(config)
             .AddRequestLogging(config)
