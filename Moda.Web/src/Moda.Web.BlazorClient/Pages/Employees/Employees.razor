@@ -133,26 +133,6 @@
         _isLoading = false;
     }
 
-    //private async Task SyncEmployees()
-    //{
-    //    var dialogTitle = "Sync Employees";
-    //    var dialogOptions = new DialogOptions()
-    //        {
-    //            DisableBackdropClick = true,
-    //            MaxWidth = MaxWidth.Small,
-    //            FullWidth = true
-    //        };
-
-    //    var dialog = DialogService.Show<SyncEmployees_Dialog>(dialogTitle, dialogOptions);
-
-    //    var result = await dialog.Result;
-
-    //    if (!result.Cancelled)
-    //    {
-    //        await GetEmployees();
-    //    }
-    //}
-
     private void SetTablePreference(ModaTablePreference tablePreference)
     {
         _grid.Dense = tablePreference.IsDense;

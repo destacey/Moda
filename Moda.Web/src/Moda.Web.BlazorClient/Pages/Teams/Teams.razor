@@ -1,0 +1,127 @@
+﻿@page "/teams"
+@attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+
+@inject IAuthorizationService AuthService
+@inject ITeamsClient TeamsClient
+
+<ErrorBoundary>
+    <ChildContent>
+        <PageTitle>Teams</PageTitle>
+        <ModaTitle Title="Teams" />
+
+        <MudDataGrid @ref="@_grid"
+                     Items="@_teams"
+                     Elevation="0"
+                     Height="700px"
+                     SortMode="SortMode.Multiple" Filterable="true"
+                     FixedHeader="true"
+                     Loading="@_isLoading"
+                     LoadingProgressColor="@Color.Secondary"
+                     QuickFilter="@_quickFilter">
+            <ToolBarContent>
+                <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTooltip Text="Reload Data" Placement="Placement.Top">
+                    <MudFab OnClick="@(() => ReloadData(_includeDisabled))" Size="Size.Small" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" />
+                </MudTooltip>
+            </ToolBarContent>
+            <Columns>
+                <Column T="TeamListDto" Field="Name" />
+                <Column T="TeamListDto" Field="Code" />
+                <Column T="TeamListDto" Field="Type" />
+                @if (_includeDisabled)
+                {                    
+                    <Column T="TeamListDto" Field="IsActive" Title="Active" />
+                }
+            </Columns>
+            <LoadingContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading teams...</MudText>
+            </LoadingContent>
+            <NoRecordsContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No teams found.</MudText>
+            </NoRecordsContent>
+        </MudDataGrid>
+        <DataGridCountLabel DataGrid="@_grid" UnitLabel="teams" />
+
+        <div class="d-flex flex-wrap mt-3">
+            <MudSwitch CheckedChanged="@((bool value) => ReloadData(value))" Color="Color.Primary" Label="Include Disabled" />
+        </div>
+    </ChildContent>
+    <ErrorContent>
+        <ModaCustomError />
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    [CascadingParameter]
+    Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    MudDataGrid<TeamListDto> _grid = default!;
+    List<TeamListDto> _teams = new();
+
+    string _searchString = "";
+    bool _isLoading = true;
+    bool _includeDisabled = false;
+    bool _canCreateTeams;
+    bool _canUpdateTeams;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        _canCreateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.Teams);
+        _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Teams);
+
+        if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
+        {
+            SetTablePreference(clientPreference.TablePreference);
+        }
+
+        await GetTeams();
+    }
+
+    private void ViewTeam(in string teamId) =>
+        Navigation.NavigateTo($"/teams/{teamId}");
+
+    private Func<TeamListDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.Code) && x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+            
+        if (!string.IsNullOrWhiteSpace(x.Type) && x.Type.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+
+    private async Task ReloadData(bool includeDisabled)
+    {
+        _includeDisabled = includeDisabled;
+        await GetTeams();
+    }
+
+    private async Task GetTeams()
+    {
+        _isLoading = true;
+
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsClient.GetListAsync(_includeDisabled), Snackbar) is List<TeamListDto> result)
+        {
+            _teams = result;
+        }
+
+        _isLoading = false;
+    }
+
+    private void SetTablePreference(ModaTablePreference tablePreference)
+    {
+        _grid.Dense = tablePreference.IsDense;
+        _grid.Striped = tablePreference.IsStriped;
+        _grid.Bordered = tablePreference.HasBorder;
+        _grid.Hover = tablePreference.IsHoverable;
+    }
+}

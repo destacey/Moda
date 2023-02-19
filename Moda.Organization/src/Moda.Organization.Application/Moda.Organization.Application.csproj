@@ -21,8 +21,6 @@
 
     <ItemGroup>
       <Folder Include="Teams\Commands\" />
-      <Folder Include="Teams\Dtos\" />
-      <Folder Include="Teams\Queries\" />
     </ItemGroup>
 
 </Project>
