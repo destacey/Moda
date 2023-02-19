@@ -20,10 +20,10 @@
                      QuickFilter="@_quickFilter">
             <ToolBarContent>
                 <MudSpacer />
-                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                <MudTooltip Text="Reload Data" Placement="Placement.Top">
-                    <MudFab OnClick="@(() => ReloadData(_includeDisabled))" Size="Size.Small" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" />
-                </MudTooltip>
+                <MudToolBar>
+                    <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
+                    <MudIconButton OnClick="@(() => RefreshData(_includeDisabled))" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
+                </MudToolBar>
             </ToolBarContent>
             <Columns>
                 <Column T="TeamListDto" Field="Name" />
@@ -44,7 +44,7 @@
         <DataGridCountLabel DataGrid="@_grid" UnitLabel="teams" />
 
         <div class="d-flex flex-wrap mt-3">
-            <MudSwitch CheckedChanged="@((bool value) => ReloadData(value))" Color="Color.Primary" Label="Include Disabled" />
+            <MudSwitch CheckedChanged="@((bool value) => RefreshData(value))" Color="Color.Primary" Label="Include Disabled" />
         </div>
     </ChildContent>
     <ErrorContent>
@@ -99,7 +99,7 @@
         return false;
     };
 
-    private async Task ReloadData(bool includeDisabled)
+    private async Task RefreshData(bool includeDisabled)
     {
         _includeDisabled = includeDisabled;
         await GetTeams();

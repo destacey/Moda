@@ -1,11 +1,13 @@
-﻿<MudContainer Class="mx-0 px-0 mb-2">
-    <MudText Typo="Typo.h5" Class="mb-2">@Title</MudText>
-    <MudText Color="Color.Surface" Class="mb-4">@Description</MudText>
-    @if (ChildContent is not null)
-    {
+﻿<MudGrid Justify="Justify.SpaceBetween">
+    @*justify not working*@
+    <MudItem xs="12" md="6">
+        <MudText Typo="Typo.h5" Class="mb-1">@Title</MudText>
+        <MudText Typo="Typo.subtitle1">@Description</MudText>
+    </MudItem>
+    <MudItem xs="12" md="6">
         @ChildContent
-    }
-</MudContainer>
+    </MudItem>
+</MudGrid>
 
 @code
 {

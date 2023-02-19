@@ -10,12 +10,12 @@ public class LightTheme : MudTheme
         {
             Primary = CustomColors.Light.Primary,
             Secondary = CustomColors.Light.Secondary,
+            Success = CustomColors.Light.Primary,
             Background = CustomColors.Light.Background,
+            DrawerBackground = CustomColors.Light.DrawerBackground,
+            DrawerText = "rgba(0,0,0, 0.7)",
             AppbarBackground = CustomColors.Light.AppbarBackground,
             AppbarText = CustomColors.Light.AppbarText,
-            DrawerBackground = CustomColors.Light.Background,
-            DrawerText = "rgba(0,0,0, 0.7)",
-            Success = CustomColors.Light.Primary,
             TableLines = "#e0e0e029",
             OverlayDark = "hsl(0deg 0% 0% / 75%)"
         };

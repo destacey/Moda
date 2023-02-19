@@ -10,7 +10,7 @@
         <ModaTitle Title="Background Jobs" Description="this is a test">
             @if (_canViewHangfire)
             {
-                <MudIconButton Title="Hangfire Dashboard" Href="@_hangfireUrl" Target="_blank" Icon="@Icons.Material.Filled.Dashboard" Size="Size.Small" Color="Color.Default" aria-label="Hangfire Dashboard"></MudIconButton>
+                <MudIconButton Title="Hangfire Dashboard" Href="@_hangfireUrl" Target="_blank" Icon="@Icons.Material.Filled.Dashboard" Size="Size.Small" aria-label="Hangfire Dashboard"></MudIconButton>
             }
         </ModaTitle>
 
@@ -38,10 +38,10 @@
                      QuickFilter="@_quickFilter">
             <ToolBarContent>
                 <MudSpacer />
-                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                <MudTooltip Text="Reload Data" Placement="Placement.Top">
-                    <MudFab OnClick="@(() => ReloadData())" Size="Size.Small" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" />
-                </MudTooltip>
+                <MudToolBar>
+                    <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
+                    <MudIconButton OnClick="@(() => RefreshData())" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
+                </MudToolBar>
             </ToolBarContent>
             <Columns>
                 <Column T="BackgroundJobDto" Field="Id" />
@@ -123,7 +123,7 @@
         return false;
     };
 
-    private async Task ReloadData()
+    private async Task RefreshData()
     {
         await GetRunningJobs();
     }
