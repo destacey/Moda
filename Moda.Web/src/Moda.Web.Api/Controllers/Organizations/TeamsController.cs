@@ -1,5 +1,6 @@
 ﻿using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
+using Moda.Web.Api.Models.Organizations.Teams;
 
 namespace Moda.Web.Api.Controllers.Organizations;
 
@@ -40,18 +41,31 @@ public class TeamsController : ControllerBase
             : NotFound();
     }
 
-    //[HttpPost]
-    //[MustHavePermission(ApplicationAction.Create, ApplicationResource.Teams)]
-    //[OpenApiOperation("Create an team.", "")]
-    //[ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
-    //public async Task<ActionResult> Create(CreateTeamRequest request, CancellationToken cancellationToken)
-    //{
-    //    var result = await _sender.Send(request.ToCreateTeamCommand(), cancellationToken);
+    [HttpPost("/team")]
+    [MustHavePermission(ApplicationAction.Create, ApplicationResource.Teams)]
+    [OpenApiOperation("Create a team.", "")]
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
+    public async Task<ActionResult> CreateTeam(CreateTeamRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToCreateTeamCommand(), cancellationToken);
 
-    //    return result.IsSuccess
-    //        ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
-    //        : BadRequest(result.Error);
-    //}
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
+            : BadRequest(result.Error);
+    }
+
+    [HttpPost("/team-of-teams")]
+    [MustHavePermission(ApplicationAction.Create, ApplicationResource.Teams)]
+    [OpenApiOperation("Create a team of teams.", "")]
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
+    public async Task<ActionResult> CreateTeamOfTeams(CreateTeamOfTeamsRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToCreateTeamOfTeamsCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
+            : BadRequest(result.Error);
+    }
 
     //[HttpPut("{id}")]
     //[MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]

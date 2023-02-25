@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Moda.Web.Api.Models.Profiles;
+namespace Moda.Web.Api.Models.UserManagement.Profiles;
 
 public sealed record UpdateProfileRequest
 {

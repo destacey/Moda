@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Moda.Web.Api.Models.Profiles;
+using Moda.Web.Api.Models.UserManagement.Profiles;
 
 namespace Moda.Web.Api.Controllers.UserManagement;
 

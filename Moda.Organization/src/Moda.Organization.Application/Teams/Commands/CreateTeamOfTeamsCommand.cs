@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
-namespace Moda.Organization.Application.TeamOfTeamss.Commands;
+namespace Moda.Organization.Application.Teams.Commands;
 public sealed record CreateTeamOfTeamsCommand : ICommand<int>
 {
     public CreateTeamOfTeamsCommand(string name, TeamCode code, string? description)

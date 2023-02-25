@@ -1520,6 +1520,108 @@
         ]
       }
     },
+    "/team": {
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Create a team.",
+        "operationId": "Teams_CreateTeam",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTeamRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/team-of-teams": {
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Create a team of teams.",
+        "operationId": "Teams_CreateTeamOfTeams",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTeamOfTeamsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/app-integration/azure-devops-boards-connections": {
       "get": {
         "tags": [
@@ -2939,6 +3041,68 @@
           },
           "isActive": {
             "type": "boolean"
+          }
+        }
+      },
+      "CreateTeamRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "code"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Gets the team name.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "code": {
+            "type": "string",
+            "description": "Gets the code.",
+            "maxLength": 10,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "Gets the team description.",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
+      "CreateTeamOfTeamsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "code"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Gets the team name.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "code": {
+            "type": "string",
+            "description": "Gets the code.",
+            "maxLength": 10,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "Gets the team description.",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
           }
         }
       },
