@@ -79,19 +79,21 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
         builder.HasKey(o => o.Id);
         builder.HasAlternateKey(o => o.LocalId);
 
-        builder.HasIndex(o => o.Id);
+        builder.HasIndex(o => o.Id)
+            .IncludeProperties(o => new { o.LocalId, o.Name, o.Code, o.IsActive, o.IsDeleted });
         builder.HasIndex(o => o.LocalId)
-            .IsUnique()
-            .IncludeProperties(e => new { e.Id, e.Name, e.Code });
+            .IncludeProperties(o => new { o.Id, o.Name, o.Code, o.IsActive, o.IsDeleted });
+        builder.HasIndex(o => o.Name)
+            .IsUnique();
         builder.HasIndex(o => o.Code)
             .IsUnique()
-            .IncludeProperties(e => new { e.Id, e.LocalId, e.Name });
+            .IncludeProperties(o => new { o.Id, o.LocalId, o.Name, o.IsActive, o.IsDeleted });
         builder.HasIndex(o => o.IsActive);
         builder.HasIndex(o => o.IsDeleted);
 
         builder.Property(o => o.LocalId).ValueGeneratedOnAdd();
 
-        builder.Property(o => o.Name).IsRequired().HasMaxLength(256);
+        builder.Property(o => o.Name).IsRequired().HasMaxLength(128);
         builder.Property(o => o.Code).IsRequired()
             .HasConversion(
                 o => o.ToString(),
@@ -100,15 +102,8 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
         builder.Property(o => o.Description).HasMaxLength(1024);
         builder.Property(o => o.Type).IsRequired()
             .HasConversion<EnumConverter<TeamType>>()
-            //.HasConversion(
-            //    w => w.ToString(),
-            //    w => (TeamType)Enum.Parse(typeof(TeamType), w))
             .HasMaxLength(64);
         builder.Property(o => o.IsActive);
-
-
-        //builder.OwnsOne(o => o.Code)
-        //    .Property(o => o.Value).IsRequired().HasColumnName("Code").HasMaxLength(10);
 
         // Audit
         builder.Property(o => o.Created);

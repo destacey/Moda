@@ -19,8 +19,4 @@
         <ProjectReference Include="..\Moda.Organization.Domain\Moda.Organization.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Teams\Commands\" />
-    </ItemGroup>
-
 </Project>
