@@ -19,7 +19,7 @@ public class StringExtensionsTests
     public void IsValidOrganizationCodeFormat(string code, bool expectedResult)
     {
         var result = StringExtensions.IsValidTeamCodeFormat(code);
-        
+
         result.Should().Be(expectedResult);
     }
 }

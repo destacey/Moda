@@ -3,7 +3,10 @@ using Moda.Work.Application.BacklogCategories.Queries;
 
 namespace Moda.Web.Api.Controllers.Work;
 
-public class BacklogCategoriesController : VersionNeutralApiController
+[Route("api/work/backlog-categories")]
+[ApiVersionNeutral]
+[ApiController]
+public class BacklogCategoriesController : ControllerBase
 {
     private readonly ISender _sender;
 

@@ -3,7 +3,10 @@ using Moda.Work.Application.WorkStateCategories.Queries;
 
 namespace Moda.Web.Api.Controllers.Work;
 
-public class WorkStateCategoriesController : VersionNeutralApiController
+[Route("api/work/work-state-categories")]
+[ApiVersionNeutral]
+[ApiController]
+public class WorkStateCategoriesController : ControllerBase
 {
     private readonly ISender _sender;
 

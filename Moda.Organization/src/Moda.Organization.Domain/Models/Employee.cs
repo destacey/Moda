@@ -76,10 +76,10 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
 
     /// <summary>Gets the manager identifier.</summary>
     /// <value>The manager identifier.</value>
-    public Guid? ManagerId 
-    { 
-        get => _managerId; 
-        private set => _managerId = value.HasValue ? Guard.Against.Default(value) : null; 
+    public Guid? ManagerId
+    {
+        get => _managerId;
+        private set => _managerId = value.HasValue ? Guard.Against.Default(value) : null;
     }
 
     /// <summary>Gets the manager.</summary>

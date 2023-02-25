@@ -1,6 +1,9 @@
 ﻿namespace Moda.Web.Api.Controllers.Organizations;
 
-public class EmployeesController : VersionNeutralApiController
+[Route("api/organization/employees")]
+[ApiVersionNeutral]
+[ApiController]
+public class EmployeesController : ControllerBase
 {
     private readonly ILogger<EmployeesController> _logger;
     private readonly ISender _sender;

@@ -3,7 +3,10 @@ using Moda.Organization.Application.Teams.Queries;
 
 namespace Moda.Web.Api.Controllers.Organizations;
 
-public class TeamsController : VersionNeutralApiController
+[Route("api/organization/teams")]
+[ApiVersionNeutral]
+[ApiController]
+public class TeamsController : ControllerBase
 {
     private readonly ILogger<TeamsController> _logger;
     private readonly ISender _sender;

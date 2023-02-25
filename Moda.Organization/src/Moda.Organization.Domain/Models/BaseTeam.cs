@@ -24,10 +24,10 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
 
     /// <summary>Gets the code.</summary>
     /// <value>The code.</value>
-    public TeamCode Code 
-    { 
-        get => _code; 
-        protected set => _code = Guard.Against.Null(value, nameof(Code)); 
+    public TeamCode Code
+    {
+        get => _code;
+        protected set => _code = Guard.Against.Null(value, nameof(Code));
     }
 
     /// <summary>

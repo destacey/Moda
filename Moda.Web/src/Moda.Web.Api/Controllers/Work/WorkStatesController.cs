@@ -4,7 +4,10 @@ using Moda.Work.Application.WorkStates.Queries;
 
 namespace Moda.Web.Api.Controllers.Work;
 
-public class WorkStatesController : VersionNeutralApiController
+[Route("api/work/work-states")]
+[ApiVersionNeutral]
+[ApiController]
+public class WorkStatesController : ControllerBase
 {
     private readonly ILogger<WorkStatesController> _logger;
     private readonly ISender _sender;

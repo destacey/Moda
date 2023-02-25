@@ -4,7 +4,10 @@ using Moda.Work.Application.BacklogLevels.Queries;
 
 namespace Moda.Web.Api.Controllers.Work;
 
-public class BacklogLevelsController : VersionNeutralApiController
+[Route("api/work/backlog-levels")]
+[ApiVersionNeutral]
+[ApiController]
+public class BacklogLevelsController : ControllerBase
 {
     private readonly ILogger<BacklogLevelsController> _logger;
     private readonly ISender _sender;

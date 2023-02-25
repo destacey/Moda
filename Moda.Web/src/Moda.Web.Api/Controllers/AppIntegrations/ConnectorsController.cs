@@ -1,6 +1,9 @@
 ﻿namespace Moda.Web.Api.Controllers.AppIntegrations;
 
-public class ConnectorsController : VersionNeutralApiController
+[Route("api/app-integration/connectors")]
+[ApiVersionNeutral]
+[ApiController]
+public class ConnectorsController : ControllerBase
 {
     private readonly ILogger<ConnectorsController> _logger;
     private readonly ISender _sender;

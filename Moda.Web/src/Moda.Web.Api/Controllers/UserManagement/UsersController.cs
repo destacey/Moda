@@ -1,6 +1,9 @@
-namespace Moda.Web.Api.Controllers.Identity;
+namespace Moda.Web.Api.Controllers.UserManagement;
 
-public class UsersController : VersionNeutralApiController
+[Route("api/user-management/users")]
+[ApiVersionNeutral]
+[ApiController]
+public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
 

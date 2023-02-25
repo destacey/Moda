@@ -1,6 +1,9 @@
 ﻿namespace Moda.Web.Api.Controllers.AppIntegrations;
 
-public class AzureDevOpsBoardsConnectionsController : VersionNeutralApiController
+[Route("api/app-integration/azure-devops-boards-connections")]
+[ApiVersionNeutral]
+[ApiController]
+public class AzureDevOpsBoardsConnectionsController : ControllerBase
 {
     private readonly ILogger<AzureDevOpsBoardsConnectionsController> _logger;
     private readonly ISender _sender;

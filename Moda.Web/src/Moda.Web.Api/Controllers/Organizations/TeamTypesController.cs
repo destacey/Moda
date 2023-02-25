@@ -3,7 +3,10 @@ using Moda.Work.Application.BacklogCategories.Queries;
 
 namespace Moda.Web.Api.Controllers.Work;
 
-public class TeamTypesController : VersionNeutralApiController
+[Route("api/organization/team-types")]
+[ApiVersionNeutral]
+[ApiController]
+public class TeamTypesController : ControllerBase
 {
     private readonly ISender _sender;
 
