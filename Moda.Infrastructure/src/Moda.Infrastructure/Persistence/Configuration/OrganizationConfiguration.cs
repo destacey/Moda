@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Moda.Common.Models;
 using Moda.Organization.Domain.Enums;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
@@ -25,6 +26,12 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
         builder.Property(e => e.EmployeeNumber).IsRequired().HasMaxLength(256);
         builder.Property(e => e.HireDate);
 
+        builder.Property(e => e.Email).IsRequired()
+            .HasConversion(
+                e => e.Value,
+                e => new EmailAddress(e))
+            .HasMaxLength(256);
+
         builder.Property(e => e.JobTitle).HasMaxLength(256);
         builder.Property(e => e.Department).HasMaxLength(256);
         builder.Property(e => e.OfficeLocation).HasMaxLength(256);
@@ -48,8 +55,7 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
             .Property(e => e.Title).HasColumnName("Title").HasMaxLength(50);
 
         //// EmailAddress
-        builder.OwnsOne(e => e.Email)
-            .Property(e => e.Value).IsRequired().HasColumnName("Email").HasMaxLength(256);
+        //builder.OwnsOne(e => e.Email).Property(e => e.Value).IsRequired().HasColumnName("Email").HasMaxLength(256);
 
 
         // Audit
@@ -96,8 +102,8 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
         builder.Property(o => o.Name).IsRequired().HasMaxLength(128);
         builder.Property(o => o.Code).IsRequired()
             .HasConversion(
-                o => o.ToString(),
-                o => new TeamCode(o!))
+                o => o.Value,
+                o => new TeamCode(o))
             .HasMaxLength(10);
         builder.Property(o => o.Description).HasMaxLength(1024);
         builder.Property(o => o.Type).IsRequired()

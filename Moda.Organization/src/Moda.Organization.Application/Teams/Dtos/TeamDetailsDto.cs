@@ -1,5 +1,7 @@
-﻿namespace Moda.Organization.Application.Teams.Dtos;
-public class TeamDetailsDto : IMapFrom<Team>
+﻿using Mapster;
+
+namespace Moda.Organization.Application.Teams.Dtos;
+public class TeamDetailsDto : IMapFrom<BaseTeam>
 {
     /// <summary>Gets or sets the identifier.</summary>
     /// <value>The identifier.</value>
@@ -31,4 +33,11 @@ public class TeamDetailsDto : IMapFrom<Team>
     /// Indicates whether the organization is active or not.  
     /// </summary>
     public bool IsActive { get; set; }
+
+    public void Register(TypeAdapterConfig config)
+    {
+        config.NewConfig<BaseTeam, TeamDetailsDto>()
+            .Map(dest => dest.Code, src => src.Code.Value)
+            .Map(dest => dest.Type, src => src.Type.GetDisplayName());
+    }
 }

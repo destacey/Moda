@@ -7,7 +7,7 @@
 <ErrorBoundary>
     <ChildContent>
         <PageTitle>Background Jobs</PageTitle>
-        <ModaTitle Title="Background Jobs" Description="this is a test">
+        <ModaTitle Title="Background Jobs">
             @if (_canViewHangfire)
             {
                 <MudIconButton Title="Hangfire Dashboard" Href="@_hangfireUrl" Target="_blank" Icon="@Icons.Material.Filled.Dashboard" Size="Size.Small" aria-label="Hangfire Dashboard"></MudIconButton>
@@ -28,7 +28,7 @@
 
         <MudDataGrid @ref="@_grid"
                      Items="@_jobs"
-                     Elevation="0"
+                     Elevation="1"
                      Height="700px"
                      SortMode="SortMode.Multiple"
                      Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterRow"

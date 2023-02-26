@@ -7,11 +7,19 @@
 <ErrorBoundary>
     <ChildContent>
         <PageTitle>Teams</PageTitle>
-        <ModaTitle Title="Teams" />
+        <ModaTitle Title="Teams">
+            @if (_canCreateTeams)
+            {                
+                <MudButtonGroup Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
+                    <MudButton OnClick="@CreateTeam">Create Team</MudButton>
+                    <MudButton OnClick="@CreateTeamOfTeams">Create Team of Teams</MudButton>
+                </MudButtonGroup>
+            }
+        </ModaTitle>
 
         <MudDataGrid @ref="@_grid"
                      Items="@_teams"
-                     Elevation="0"
+                     Elevation="1"
                      Height="700px"
                      SortMode="SortMode.Multiple" Filterable="true"
                      FixedHeader="true"
@@ -123,5 +131,45 @@
         _grid.Striped = tablePreference.IsStriped;
         _grid.Bordered = tablePreference.HasBorder;
         _grid.Hover = tablePreference.IsHoverable;
+    }
+
+    private async Task CreateTeam()
+    {
+        var dialogTitle = "Create Team";
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<CreateTeam_Dialog>(dialogTitle, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetTeams();
+        }
+    }
+
+    private async Task CreateTeamOfTeams()
+    {
+        var dialogTitle = "Create Team of Teams";
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<CreateTeamOfTeams_Dialog>(dialogTitle, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetTeams();
+        }
     }
 }

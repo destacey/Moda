@@ -77,7 +77,7 @@ internal static class ConfigureServices
             });
 
             // Add the FluentValidationSchemaProcessor as a scoped service
-            services.AddScoped<FluentValidationSchemaProcessor>(provider =>
+            services.AddScoped(provider =>
             {
                 var validationRules = provider.GetService<IEnumerable<FluentValidationRule>>();
                 var loggerFactory = provider.GetService<ILoggerFactory>();

@@ -13,7 +13,6 @@ public sealed class TeamCodeValidator : CustomValidator<TeamCode>
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(x => x.Value)
-            .NotEmpty()
             .MinimumLength(2)
             .MaximumLength(10)
             .MustAsync(BeUniqueTeamCode).WithMessage("The Team code already exists.");

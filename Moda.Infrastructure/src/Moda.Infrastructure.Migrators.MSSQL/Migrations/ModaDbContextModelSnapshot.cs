@@ -822,7 +822,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.OwnsOne("Moda.Common.Models.EmailAddress", "Email", b1 =>
+                    b.OwnsOne("Moda.Organization.Domain.Models.Employee.Email#Moda.Common.Models.EmailAddress", "Email", b1 =>
                         {
                             b1.Property<Guid>("EmployeeId")
                                 .HasColumnType("uniqueidentifier");
@@ -841,7 +841,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                 .HasForeignKey("EmployeeId");
                         });
 
-                    b.OwnsOne("Moda.Common.Models.PersonName", "Name", b1 =>
+                    b.OwnsOne("Moda.Organization.Domain.Models.Employee.Name#Moda.Common.Models.PersonName", "Name", b1 =>
                         {
                             b1.Property<Guid>("EmployeeId")
                                 .HasColumnType("uniqueidentifier");

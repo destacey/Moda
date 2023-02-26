@@ -88,7 +88,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Web.BlazorClient", "Mo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Integrations.MicrosoftGraph", "Moda.Integrations\src\Moda.Integrations.MicrosoftGraph\Moda.Integrations.MicrosoftGraph.csproj", "{65BBD71B-9734-4F10-BE7A-168E9FAEFF75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Organization.Domain.Tests", "Moda.Organization\tests\Moda.Organization.Domain.Tests\Moda.Organization.Domain.Tests.csproj", "{BADF979B-908E-47C3-8EF8-8665B43B11E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Organization.Domain.Tests", "Moda.Organization\tests\Moda.Organization.Domain.Tests\Moda.Organization.Domain.Tests.csproj", "{BADF979B-908E-47C3-8EF8-8665B43B11E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -19,6 +19,7 @@ public class ResponseLoggingMiddleware : IMiddleware
     {
         await next(httpContext);
         var originalBody = httpContext.Response.Body;
+
         using var newBody = new MemoryStream();
         httpContext.Response.Body = newBody;
         string responseBody;
@@ -34,13 +35,17 @@ public class ResponseLoggingMiddleware : IMiddleware
 
         string email = _currentUser.GetUserEmail() is string userEmail ? userEmail : "Anonymous";
         var userId = _currentUser.GetUserId();
-        if (userId != Guid.Empty) LogContext.PushProperty("UserId", userId);
+
+        if (userId != Guid.Empty) 
+            LogContext.PushProperty("UserId", userId);
+
         LogContext.PushProperty("UserEmail", email);
         LogContext.PushProperty("StatusCode", httpContext.Response.StatusCode);
         LogContext.PushProperty("ResponseTimeUTC", _dateTimeService.Now);
         Log.ForContext("ResponseHeaders", httpContext.Response.Headers.ToDictionary(h => h.Key, h => h.Value.ToString()), destructureObjects: true)
-       .ForContext("ResponseBody", responseBody)
-       .Information("HTTP {RequestMethod} Request to {RequestPath} by {RequesterEmail} has Status Code {StatusCode}.", httpContext.Request.Method, httpContext.Request.Path, string.IsNullOrEmpty(email) ? "Anonymous" : email, httpContext.Response.StatusCode);
+            .ForContext("ResponseBody", responseBody)
+            .Information("HTTP {RequestMethod} Request to {RequestPath} by {RequesterEmail} has Status Code {StatusCode}.", httpContext.Request.Method, httpContext.Request.Path, string.IsNullOrEmpty(email) ? "Anonymous" : email, httpContext.Response.StatusCode);
+
         newBody.Seek(0, SeekOrigin.Begin);
         await newBody.CopyToAsync(originalBody);
     }

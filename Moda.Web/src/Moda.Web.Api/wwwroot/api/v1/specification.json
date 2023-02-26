@@ -1520,7 +1520,7 @@
         ]
       }
     },
-    "/team": {
+    "/api/organization/teams/team": {
       "post": {
         "tags": [
           "Teams"
@@ -1571,7 +1571,7 @@
         ]
       }
     },
-    "/team-of-teams": {
+    "/api/organization/teams/team-of-teams": {
       "post": {
         "tags": [
           "Teams"
@@ -3079,8 +3079,7 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name",
-          "code"
+          "name"
         ],
         "properties": {
           "name": {
@@ -3094,8 +3093,7 @@
             "type": "string",
             "description": "Gets the code.",
             "maxLength": 10,
-            "minLength": 1,
-            "nullable": false
+            "minLength": 2
           },
           "description": {
             "type": "string",

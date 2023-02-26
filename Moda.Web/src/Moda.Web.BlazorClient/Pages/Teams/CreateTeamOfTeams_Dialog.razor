@@ -1,0 +1,104 @@
+﻿@using System.ComponentModel.DataAnnotations;
+
+@implements IDisposable
+
+@inject ISnackbar Snackbar
+@inject ITeamsClient TeamsClient
+
+<MudDialog>
+    <DialogContent>
+        <EditForm id="createTeamOfTeamsForm" EditContext="_editContext" OnValidSubmit="CreateTeamOfTeams">
+            <DataAnnotationsValidator />
+            <MudTextField Label="Name"
+                          @bind-Value="_model.Name" For="@(() => _model.Name)"/>
+
+            <DataAnnotationsValidator />
+            <MudTextField Label="Code" Mask="@(new RegexMask(@"^[A-Z]{0,10}$"))" MaxLength="10" Counter="10" Immediate="true"
+                          @bind-Value="_model.Code" For="@(() => _model.Code)"
+                          HelperText="Team codes are uppercase letters only, 2-10 characters." />
+
+            <DataAnnotationsValidator />
+            <MudTextField Label="Description" Lines="6" MaxLength="1024" Counter="1024" Immediate="true"
+                          @bind-Value="_model.Description" For="@(() => _model.Description)" />
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton form="createTeamOfTeamsForm" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_isSaving">
+            @if (_isSaving)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Saving</MudText>
+            }
+            else
+            {
+                <MudText>Create</MudText>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+
+    private CreateTeamOfTeamsRequest _model = new();
+
+    private bool _isSaving = false;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new(_model);
+        _editContext.OnValidationRequested += HandleValidationRequested;
+        _messageStore = new(_editContext);
+    }
+
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+    {
+        _messageStore?.Clear();
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task CreateTeamOfTeams()
+    {
+        try
+        {
+            _isSaving = true;
+            _messageStore?.Clear();
+            await TeamsClient.CreateTeamOfTeamsAsync(_model);
+            Snackbar.Add("Team of Teams created", MudBlazor.Severity.Success);
+
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException<HttpValidationProblemDetails> ex)
+        {
+            foreach (var error in ex.Result.Errors)
+            {
+                string key = error.Key;
+                if (key == "code.Value")
+                {
+                    key = nameof(_model.Code);
+                }
+                _messageStore?.Add(_editContext!.Field(key), error.Value);
+            }
+            _editContext!.NotifyValidationStateChanged();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add($"Error creating team of teams.", MudBlazor.Severity.Error);
+        }
+        _isSaving = false;
+    }
+
+    public void Dispose()
+    {
+        if (_editContext is not null)
+        {
+            _editContext.OnValidationRequested -= HandleValidationRequested;
+        }
+    }
+}

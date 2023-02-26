@@ -5008,7 +5008,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("team");
+            urlBuilder_.Append("api/organization/teams/team");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -5101,7 +5101,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("team-of-teams");
+            urlBuilder_.Append("api/organization/teams/team-of-teams");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -7557,9 +7557,8 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// <summary>
         /// Gets the code.
         /// </summary>
-        [Newtonsoft.Json.JsonProperty("code", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
+        [Newtonsoft.Json.JsonProperty("code", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 2)]
         public string Code { get; set; } = default!;
 
         /// <summary>

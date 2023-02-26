@@ -41,11 +41,11 @@ public class TeamsController : ControllerBase
             : NotFound();
     }
 
-    [HttpPost("/team")]
+    [HttpPost("team")]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Teams)]
     [OpenApiOperation("Create a team.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
-    public async Task<ActionResult> CreateTeam(CreateTeamRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> CreateTeam([FromBody] CreateTeamRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateTeamCommand(), cancellationToken);
 
@@ -54,7 +54,7 @@ public class TeamsController : ControllerBase
             : BadRequest(result.Error);
     }
 
-    [HttpPost("/team-of-teams")]
+    [HttpPost("team-of-teams")]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Teams)]
     [OpenApiOperation("Create a team of teams.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
