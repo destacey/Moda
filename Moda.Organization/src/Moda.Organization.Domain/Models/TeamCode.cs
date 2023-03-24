@@ -5,6 +5,8 @@ using Moda.Organization.Domain.Extensions;
 namespace Moda.Organization.Domain.Models;
 public class TeamCode : ValueObject
 {
+    public static string Regex = "^([A-Z0-9]){2,10}$";
+
     public TeamCode(string value)
     {
         value = Guard.Against.NullOrWhiteSpace(value, nameof(TeamCode)).Trim().ToUpper();

@@ -1,0 +1,27 @@
+﻿
+<MudGrid Class="pa-0">
+    <MudBreakpointProvider>
+        <MudHidden Breakpoint="Breakpoint.SmAndUp" Invert="true">
+            <MudItem xs="@LabelSize" Class="pa-1">
+                <MudText Typo="Typo.body1" Class="">@Label</MudText>
+            </MudItem>
+            <MudItem xs="@TextSize" Class="pa-1">
+                <MudText Typo="Typo.body1" Class="">@Text</MudText>
+            </MudItem>
+        </MudHidden>
+        <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+            <MudItem Class="pa-1">
+                <MudText Typo="Typo.body1" Class="">@Label</MudText>
+                <MudText Typo="Typo.body1" Class="">@Text</MudText>
+            </MudItem>
+        </MudHidden>
+    </MudBreakpointProvider>
+</MudGrid>
+
+@code
+{
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public int LabelSize { get; set; } = 3;
+    [Parameter] public int TextSize { get; set; } = 9;
+}

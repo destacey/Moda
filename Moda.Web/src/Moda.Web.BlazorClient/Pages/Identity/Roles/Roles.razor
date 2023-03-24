@@ -36,7 +36,7 @@
                 <Column T="RoleListDto" Title="Actions" Sortable="false" Filterable="false" CellClass="d-flex justify-end" >
                     <CellTemplate>
                         <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true" Size="Size.Small"
-                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter" OffsetX="true">
+                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
                             @*@if (_canUpdateRoleClaims)
                             {
                                 <MudMenuItem @onclick="@(() => InvokeModal(context))">Edit</MudMenuItem>

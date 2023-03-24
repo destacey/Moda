@@ -1,0 +1,112 @@
+﻿@page "/teams-of-teams/{Id:int}"
+
+@attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+
+@inject IAuthorizationService AuthService
+@inject ITeamsOfTeamsClient TeamsOfTeamsClient
+
+<PageTitle>Team of Teams Details</PageTitle>
+<ModaPageBreadCrumbs Breadcrumbs="_breadcrumbs" />
+
+@if (_loading)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <ModaTitle Title="@_title" Description="@_description">
+        @if (_showPageActions)
+        {
+            <MudButtonGroup Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
+                @if (_canUpdateTeams)
+                {
+                    <MudButton OnClick="@UpdateTeam">Edit Team of Teams</MudButton>
+                }
+            </MudButtonGroup>
+        }
+    </ModaTitle>
+
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="px-3">
+        <MudTabPanel Text="Details">
+            <MudGrid Class="px-4 py-1">
+                <MudItem xs="12" md="5">
+                    <ModaFieldGroup Label="Type:" Text="@_team?.Type" />
+                    <ModaFieldGroup Label="Code:" Text="@_team?.Code" />
+                    <ModaFieldGroup Label="Is Active?:" Text="@_team?.IsActive.ToString()" />
+                </MudItem>
+                <MudItem xs="12" md="7">
+                    <ModaFieldGroup Label="Description:" Text="@_team?.Description" />
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+    </MudTabs>
+}
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; } // from route
+
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    private List<BreadcrumbItem> _breadcrumbs = new()
+    {
+        new BreadcrumbItem("Teams", href: "/teams"),
+        new BreadcrumbItem("Details", href: null, disabled: true)
+    };
+
+    private TeamOfTeamsDetailsDto? _team;
+
+    private bool _loading = true;
+
+    private string _title = string.Empty;
+    private string _description = string.Empty;
+
+    private bool _showPageActions;
+    private bool _canUpdateTeams;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetTeam();
+
+        var user = (await AuthState).User;
+        _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.TeamsOfTeams);
+        _showPageActions = _canUpdateTeams;
+
+        _loading = false;
+    }
+
+    private async Task GetTeam()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsOfTeamsClient.GetByIdAsync(Id), Snackbar) is TeamOfTeamsDetailsDto result)
+        {
+            _title = $"{result.Name}";
+            _description = "Team of Teams Details";
+
+            _team = result;
+        }
+    }
+
+    private async Task UpdateTeam()
+    {
+        var dialogTitle = "Edit Team of Teams";
+        var parameters = new DialogParameters { ["Id"] = _team!.LocalId };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<UpdateTeamOfTeams_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetTeam();
+        }
+    }
+}

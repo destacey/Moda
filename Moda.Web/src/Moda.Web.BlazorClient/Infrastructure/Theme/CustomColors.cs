@@ -35,7 +35,7 @@ public static class CustomColors
         public const string Primary = "#2196f3";
         public const string Secondary = "#3eaf7c";
         public const string Background = "#1b1f22";
-        public const string AppbarBackground = "#1b1f22";
+        public const string AppbarBackground = "#323232";
         public const string DrawerBackground = "#121212";
         public const string Surface = "#202528";
         public const string Disabled = "#545454";

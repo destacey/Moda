@@ -1,12 +1,31 @@
-﻿<MudGrid Justify="Justify.SpaceBetween">
-    @*justify not working*@
-    <MudItem xs="12" md="6">
+﻿
+<MudGrid Class="pb-3">
+    <MudItem xs="12" md="_titleSectionSize" Class="py-1">
         <MudText Typo="Typo.h5" Class="mb-1">@Title</MudText>
-        <MudText Typo="Typo.subtitle1">@Description</MudText>
+        @if (!string.IsNullOrEmpty(Description))
+        {
+            <MudText Typo="Typo.subtitle2">@Description</MudText>
+        }
     </MudItem>
-    <MudItem xs="12" md="6">
-        @ChildContent
-    </MudItem>
+    @if (ChildContent is not null)
+    {
+        <MudItem xs="12" md="6" Class="py-1">
+            <MudBreakpointProvider>
+                <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert="true">
+                    <MudGrid Justify="Justify.FlexEnd">
+                        <MudItem Class="py-0">
+                            @ChildContent
+                        </MudItem>
+                    </MudGrid>
+                </MudHidden>
+                <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true">
+                    <MudItem>
+                        @ChildContent
+                    </MudItem>
+                </MudHidden>
+            </MudBreakpointProvider>
+        </MudItem>
+    }
 </MudGrid>
 
 @code
@@ -14,4 +33,11 @@
     [Parameter] public string? Title { get; set; }
     [Parameter] public string? Description { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private int _titleSectionSize = 6;
+
+    protected override void OnInitialized()
+    {
+        _titleSectionSize = ChildContent is null ? 12 : 6;
+    }
 }

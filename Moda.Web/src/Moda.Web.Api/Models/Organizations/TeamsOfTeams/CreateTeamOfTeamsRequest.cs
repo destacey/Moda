@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using Moda.Organization.Application.Teams.Commands;
-using Moda.Organization.Domain.Extensions;
 using Moda.Organization.Domain.Models;
+using Moda.Organization.Domain.Extensions;
+using Moda.Organization.Application.TeamsOfTeams.Commands;
 
-namespace Moda.Web.Api.Models.Organizations.Teams;
+namespace Moda.Web.Api.Models.Organizations.TeamsOfTeams;
 
-public sealed record CreateTeamRequest
+public sealed record CreateTeamOfTeamsRequest
 {
     /// <summary>Gets the team name.</summary>
     /// <value>The team name.</value>
@@ -19,15 +19,17 @@ public sealed record CreateTeamRequest
     /// <value>The team description.</value>
     public string? Description { get; set; }
 
-    public CreateTeamCommand ToCreateTeamCommand()
+    public CreateTeamOfTeamsCommand ToCreateTeamOfTeamsCommand()
     {
-        return new CreateTeamCommand(Name, (TeamCode)Code, Description);
+        TeamCode code = (TeamCode)Code;
+
+        return new CreateTeamOfTeamsCommand(Name, code, Description);
     }
 }
 
-public sealed class CreateTeamRequestValidator : CustomValidator<CreateTeamRequest>
+public sealed class CreateTeamOfTeamsRequestValidator : CustomValidator<CreateTeamOfTeamsRequest>
 {
-    public CreateTeamRequestValidator()
+    public CreateTeamOfTeamsRequestValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -36,7 +38,6 @@ public sealed class CreateTeamRequestValidator : CustomValidator<CreateTeamReque
             .MaximumLength(128);
 
         RuleFor(t => t.Code)
-            .NotEmpty()
             .MinimumLength(2)
             .MaximumLength(10)
             .Must(t => t.IsValidTeamCodeFormat())

@@ -1,4 +1,6 @@
-﻿namespace Moda.Web.Api.Controllers.AppIntegrations;
+﻿using Moda.Web.Api.Models.AppIntegrations.Connections;
+
+namespace Moda.Web.Api.Controllers.AppIntegrations;
 
 [Route("api/app-integration/azure-devops-boards-connections")]
 [ApiVersionNeutral]

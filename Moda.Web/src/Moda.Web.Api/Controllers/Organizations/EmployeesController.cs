@@ -1,4 +1,6 @@
-﻿namespace Moda.Web.Api.Controllers.Organizations;
+﻿using Moda.Web.Api.Models.Organizations.Employees;
+
+namespace Moda.Web.Api.Controllers.Organizations;
 
 [Route("api/organization/employees")]
 [ApiVersionNeutral]

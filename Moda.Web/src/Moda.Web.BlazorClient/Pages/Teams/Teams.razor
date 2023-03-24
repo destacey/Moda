@@ -1,96 +1,108 @@
 ﻿@page "/teams"
+@using Moda.Web.BlazorClient.Models.Teams;
+@using Moda.Web.BlazorClient.Pages.TeamsOfTeams;
 @attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
 
 @inject IAuthorizationService AuthService
 @inject ITeamsClient TeamsClient
+@inject ITeamsOfTeamsClient TeamsOfTeamsClient
 
-<ErrorBoundary>
-    <ChildContent>
-        <PageTitle>Teams</PageTitle>
-        <ModaTitle Title="Teams">
+<PageTitle>Teams</PageTitle>
+<ModaTitle Title="Teams">
+    @if (_showPageActions)
+    {
+        <MudButtonGroup Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
             @if (_canCreateTeams)
-            {                
-                <MudButtonGroup Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
-                    <MudButton OnClick="@CreateTeam">Create Team</MudButton>
-                    <MudButton OnClick="@CreateTeamOfTeams">Create Team of Teams</MudButton>
-                </MudButtonGroup>
+            {
+                <MudButton OnClick="@CreateTeam">Create Team</MudButton>
             }
-        </ModaTitle>
+            @if (_canCreateTeamsOfTeams)
+            {
+                <MudButton OnClick="@CreateTeamOfTeams">Create Team of Teams</MudButton>
+            }
+        </MudButtonGroup>
+    }
+</ModaTitle>
 
-        <MudDataGrid @ref="@_grid"
-                     Items="@_teams"
-                     Elevation="1"
-                     Height="700px"
-                     SortMode="SortMode.Multiple" Filterable="true"
-                     FixedHeader="true"
-                     Loading="@_isLoading"
-                     LoadingProgressColor="@Color.Secondary"
-                     QuickFilter="@_quickFilter">
-            <ToolBarContent>
-                <MudSpacer />
-                <MudToolBar>
-                    <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
-                    <MudIconButton OnClick="@(() => RefreshData(_includeDisabled))" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
-                </MudToolBar>
-            </ToolBarContent>
-            <Columns>
-                <Column T="TeamListDto" Field="Name" />
-                <Column T="TeamListDto" Field="Code" />
-                <Column T="TeamListDto" Field="Type" />
-                @if (_includeDisabled)
-                {                    
-                    <Column T="TeamListDto" Field="IsActive" Title="Active" />
-                }
-            </Columns>
-            <LoadingContent>
-                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading teams...</MudText>
-            </LoadingContent>
-            <NoRecordsContent>
-                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No teams found.</MudText>
-            </NoRecordsContent>
-        </MudDataGrid>
-        <DataGridCountLabel DataGrid="@_grid" UnitLabel="teams" />
+<MudDataGrid @ref="@_grid"
+             Items="@_teams"
+             Elevation="1"
+             Height="800px"
+             Virtualize="true"
+             ColumnResizeMode="ResizeMode.Container"
+             SortMode="SortMode.Multiple" Filterable="true"
+             FixedHeader="true"
+             Loading="@_isLoading"
+             LoadingProgressColor="@Color.Secondary"
+             QuickFilter="@_quickFilter">
+    <ToolBarContent>
+        <MudSpacer />
+        <MudToolBar>
+            <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
+            <MudIconButton OnClick="@(() => RefreshData(_includeDisabled))" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
+        </MudToolBar>
+    </ToolBarContent>
+    <Columns>
+        <Column T="TeamListViewModel" Field="LocalId" Title="Id" />
+        <Column T="TeamListViewModel" Field="Name">
+            <CellTemplate>
+                <MudLink Href="@(context.Item.DetailsUrl)">@context.Item.Name</MudLink>
+            </CellTemplate>
+        </Column>
+        <Column T="TeamListViewModel" Field="Code" />
+        <Column T="TeamListViewModel" Field="Type" />
+        <Column T="TeamListViewModel" Field="IsActive" Title="Active" Hidden="@(!_includeDisabled)" />
+    </Columns>
+    <LoadingContent>
+        <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading teams...</MudText>
+    </LoadingContent>
+    <NoRecordsContent>
+        <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No teams found.</MudText>
+    </NoRecordsContent>
+</MudDataGrid>
+<DataGridCountLabel DataGrid="@_grid" UnitLabel="teams" />
 
-        <div class="d-flex flex-wrap mt-3">
-            <MudSwitch CheckedChanged="@((bool value) => RefreshData(value))" Color="Color.Primary" Label="Include Disabled" />
-        </div>
-    </ChildContent>
-    <ErrorContent>
-        <ModaCustomError />
-    </ErrorContent>
-</ErrorBoundary>
+<div class="d-flex flex-wrap mt-3">
+    <MudSwitch CheckedChanged="@((bool value) => RefreshData(value))" Color="Color.Primary" Label="Include Disabled" />
+</div>
 
 @code {
     [CascadingParameter]
-    Task<AuthenticationState> AuthState { get; set; } = default!;
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
 
-    MudDataGrid<TeamListDto> _grid = default!;
-    List<TeamListDto> _teams = new();
+    private MudDataGrid<TeamListViewModel> _grid = default!;
+    private List<TeamListViewModel> _teams = new();
 
-    string _searchString = "";
-    bool _isLoading = true;
-    bool _includeDisabled = false;
-    bool _canCreateTeams;
-    bool _canUpdateTeams;
+    private string _searchString = "";
+    private bool _isLoading = true;
+    private bool _includeDisabled;
+    private bool _canCreateTeams;
+    private bool _canUpdateTeams;
+    private bool _canCreateTeamsOfTeams;
+    private bool _canUpdateTeamsOfTeams;
+    private bool _showPageActions;
 
     protected override async Task OnInitializedAsync()
     {
-        var user = (await AuthState).User;
-        _canCreateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.Teams);
-        _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Teams);
-
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
             SetTablePreference(clientPreference.TablePreference);
         }
 
         await GetTeams();
+
+        var user = (await AuthState).User;
+        _canCreateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.Teams);
+        _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Teams);
+        _canCreateTeamsOfTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.TeamsOfTeams);
+        _canUpdateTeamsOfTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.TeamsOfTeams);
+        _showPageActions = _canCreateTeams || _canCreateTeamsOfTeams;
     }
 
     private void ViewTeam(in string teamId) =>
         Navigation.NavigateTo($"/teams/{teamId}");
 
-    private Func<TeamListDto, bool> _quickFilter => x =>
+    private Func<TeamListViewModel, bool> _quickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;
@@ -100,8 +112,11 @@
 
         if (!string.IsNullOrWhiteSpace(x.Code) && x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-            
+
         if (!string.IsNullOrWhiteSpace(x.Type) && x.Type.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.LocalId.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         return false;
@@ -117,10 +132,22 @@
     {
         _isLoading = true;
 
-        if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsClient.GetListAsync(_includeDisabled), Snackbar) is List<TeamListDto> result)
+        var getTeams = ApiHelper.ExecuteCallGuardedAsync(() => TeamsClient.GetListAsync(_includeDisabled), Snackbar);
+        var getTeamsOfTeams = ApiHelper.ExecuteCallGuardedAsync(() => TeamsOfTeamsClient.GetListAsync(_includeDisabled), Snackbar);
+
+        await Task.WhenAll(getTeams, getTeamsOfTeams);
+
+        List<TeamListViewModel> _latestTeams = new();
+        if (getTeams.Result is List<TeamListDto> teamsResult)
         {
-            _teams = result;
+            _latestTeams.AddRange(teamsResult.Select(t => TeamListViewModel.FromTeamListDto(t)));
         }
+        if (getTeamsOfTeams.Result is List<TeamOfTeamsListDto> teamOfTeamsResult)
+        {
+            _latestTeams.AddRange(teamOfTeamsResult.Select(t => TeamListViewModel.FromTeamOfTeamsListDto(t)));
+        }
+
+        _teams = _latestTeams;
 
         _isLoading = false;
     }

@@ -1,12 +1,14 @@
 ﻿using FluentValidation;
-using Moda.Organization.Application.Teams.Commands;
-using Moda.Organization.Domain.Models;
+using Moda.Organization.Application.TeamsOfTeams.Commands;
 using Moda.Organization.Domain.Extensions;
+using Moda.Organization.Domain.Models;
 
-namespace Moda.Web.Api.Models.Organizations.Teams;
+namespace Moda.Web.Api.Models.Organizations.TeamOfTeams;
 
-public sealed record CreateTeamOfTeamsRequest
+public sealed record UpdateTeamOfTeamsRequest
 {
+    public Guid Id { get; set; }
+
     /// <summary>Gets the team name.</summary>
     /// <value>The team name.</value>
     public required string Name { get; set; }
@@ -19,17 +21,15 @@ public sealed record CreateTeamOfTeamsRequest
     /// <value>The team description.</value>
     public string? Description { get; set; }
 
-    public CreateTeamOfTeamsCommand ToCreateTeamOfTeamsCommand()
+    public UpdateTeamOfTeamsCommand ToUpdateTeamOfTeamsCommand()
     {
-        TeamCode code = (TeamCode)Code;
-
-        return new CreateTeamOfTeamsCommand(Name, code, Description);
+        return new UpdateTeamOfTeamsCommand(Id, Name, (TeamCode)Code, Description);
     }
 }
 
-public sealed class CreateTeamOfTeamsRequestValidator : CustomValidator<CreateTeamOfTeamsRequest>
+public sealed class UpdateTeamOfTeamsRequestValidator : CustomValidator<UpdateTeamOfTeamsRequest>
 {
-    public CreateTeamOfTeamsRequestValidator()
+    public UpdateTeamOfTeamsRequestValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -38,10 +38,11 @@ public sealed class CreateTeamOfTeamsRequestValidator : CustomValidator<CreateTe
             .MaximumLength(128);
 
         RuleFor(t => t.Code)
+            .NotEmpty()
             .MinimumLength(2)
             .MaximumLength(10)
             .Must(t => t.IsValidTeamCodeFormat())
-                .WithMessage("Invalid code format. Team codes are uppercase letters only, 2-10 characters.");
+                .WithMessage("Invalid code format. Team codes are uppercase letters and numbers only, 2-10 characters.");
 
         RuleFor(t => t.Description)
             .MaximumLength(1024);

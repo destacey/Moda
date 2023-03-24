@@ -10,6 +10,8 @@ public class TeamCodeTests
     [InlineData("MP ", "MP")]
     [InlineData(" TESTTEAM ", "TESTTEAM")]
     [InlineData("GREATTEAMA", "GREATTEAMA")]
+    [InlineData("TEAM1", "TEAM1")] // number
+    [InlineData("1TEAM1", "1TEAM1")] // number
     public void New_Valid(string input, string expectedResult)
     {
         var result = new TeamCode(input);
@@ -49,7 +51,6 @@ public class TeamCodeTests
 
     [Theory]
     [InlineData("BEST TEAM")]  // space
-    [InlineData("TEAM1")] // number
     [InlineData("T")] // too short
     [InlineData("BESTTEAMTWO")] // too long
     [InlineData("TEAM*")] // special character

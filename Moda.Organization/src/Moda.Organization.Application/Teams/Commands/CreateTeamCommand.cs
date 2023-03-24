@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 
 namespace Moda.Organization.Application.Teams.Commands;
 public sealed record CreateTeamCommand : ICommand<int>
@@ -36,9 +35,7 @@ public sealed class CreateTeamCommandValidator : CustomValidator<CreateTeamComma
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(t => t.Name)
-            .NotNull()
-            .MaximumLength(128)
-            .MustAsync(BeUniqueTeamName).WithMessage("The team name already exists.");
+            .SetValidator(t => new TeamNameValidator(_organizationDbContext));
 
         RuleFor(t => t.Code)
             .NotEmpty()
@@ -46,11 +43,6 @@ public sealed class CreateTeamCommandValidator : CustomValidator<CreateTeamComma
 
         RuleFor(t => t.Description)
             .MaximumLength(1024);
-    }
-
-    public async Task<bool> BeUniqueTeamName(string name, CancellationToken cancellationToken)
-    {
-        return await _organizationDbContext.Teams.AllAsync(x => x.Name != name, cancellationToken);
     }
 }
 
@@ -71,10 +63,8 @@ internal sealed class CreateTeamCommandHandler : ICommandHandler<CreateTeamComma
     {
         try
         {
-            Instant timestamp = _dateTimeService.Now;
-
-            var team = Team.Create(request.Name, request.Code, request.Description, timestamp);
-            await _organizationDbContext.Teams.AddAsync(team, cancellationToken);
+            var team = Team.Create(request.Name, request.Code, request.Description, _dateTimeService.Now);
+            await _organizationDbContext.Teams.AddAsync((Team)team, cancellationToken);
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);
 

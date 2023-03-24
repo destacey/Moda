@@ -3,23 +3,31 @@
 @implements IDisposable
 
 @inject ISnackbar Snackbar
-@inject ITeamsClient TeamsClient
+@inject ITeamsOfTeamsClient TeamsOfTeamsClient
 
 <MudDialog>
     <DialogContent>
-        <EditForm id="createTeamOfTeamsForm" EditContext="_editContext" OnValidSubmit="CreateTeamOfTeams">
+        <EditForm id="createTeamOfTeamsForm" EditContext="_editContext" OnValidSubmit="Create">
             <DataAnnotationsValidator />
             <MudTextField Label="Name"
-                          @bind-Value="_model.Name" For="@(() => _model.Name)"/>
+                          MaxLength="128" Counter="128" Immediate="true"
+                          @bind-Value="_model.Name"
+                          For="@(() => _model.Name)" />
 
             <DataAnnotationsValidator />
-            <MudTextField Label="Code" Mask="@(new RegexMask(@"^[A-Z]{0,10}$"))" MaxLength="10" Counter="10" Immediate="true"
-                          @bind-Value="_model.Code" For="@(() => _model.Code)"
-                          HelperText="Team codes are uppercase letters only, 2-10 characters." />
+            <MudTextField Label="Code"
+                          Mask="@(new RegexMask(@"^[A-Z0-9]{0,10}$"))"
+                          MaxLength="10" Counter="10" Immediate="true"
+                          @bind-Value="_model.Code"
+                          For="@(() => _model.Code)"
+                          HelperText="Team codes are uppercase letters and numbers only, 2-10 characters." />
 
             <DataAnnotationsValidator />
-            <MudTextField Label="Description" Lines="6" MaxLength="1024" Counter="1024" Immediate="true"
-                          @bind-Value="_model.Description" For="@(() => _model.Description)" />
+            <MudTextField Label="Description"
+                          Lines="6"
+                          MaxLength="1024" Counter="1024" Immediate="true"
+                          @bind-Value="_model.Description"
+                          For="@(() => _model.Description)" />
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -63,13 +71,13 @@
 
     private void Cancel() => MudDialog.Cancel();
 
-    private async Task CreateTeamOfTeams()
+    private async Task Create()
     {
         try
         {
             _isSaving = true;
             _messageStore?.Clear();
-            await TeamsClient.CreateTeamOfTeamsAsync(_model);
+            await TeamsOfTeamsClient.CreateAsync(_model);
             Snackbar.Add("Team of Teams created", MudBlazor.Severity.Success);
 
             MudDialog.Close(DialogResult.Ok(true));

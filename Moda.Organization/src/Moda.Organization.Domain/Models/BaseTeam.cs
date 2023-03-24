@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using Moda.Common.Extensions;
 using Moda.Organization.Domain.Enums;
+using Moda.Organization.Domain.Interfaces;
 
 namespace Moda.Organization.Domain.Models;
 public abstract class BaseTeam : BaseAuditableEntity<Guid>

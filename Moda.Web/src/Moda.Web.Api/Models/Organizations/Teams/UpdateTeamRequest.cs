@@ -5,8 +5,10 @@ using Moda.Organization.Domain.Models;
 
 namespace Moda.Web.Api.Models.Organizations.Teams;
 
-public sealed record CreateTeamRequest
+public sealed record UpdateTeamRequest
 {
+    public Guid Id { get; set; }
+
     /// <summary>Gets the team name.</summary>
     /// <value>The team name.</value>
     public required string Name { get; set; }
@@ -19,15 +21,15 @@ public sealed record CreateTeamRequest
     /// <value>The team description.</value>
     public string? Description { get; set; }
 
-    public CreateTeamCommand ToCreateTeamCommand()
+    public UpdateTeamCommand ToUpdateTeamCommand()
     {
-        return new CreateTeamCommand(Name, (TeamCode)Code, Description);
+        return new UpdateTeamCommand(Id, Name, (TeamCode)Code, Description);
     }
 }
 
-public sealed class CreateTeamRequestValidator : CustomValidator<CreateTeamRequest>
+public sealed class UpdateTeamRequestValidator : CustomValidator<UpdateTeamRequest>
 {
-    public CreateTeamRequestValidator()
+    public UpdateTeamRequestValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 

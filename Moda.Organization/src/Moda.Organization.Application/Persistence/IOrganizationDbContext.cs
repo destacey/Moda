@@ -5,5 +5,7 @@ public interface IOrganizationDbContext : IModaDbContext
 {
     DbSet<Employee> Employees { get; }
     DbSet<Person> People { get; }
-    DbSet<BaseTeam> Teams { get; }
+    DbSet<BaseTeam> BaseTeams { get; }
+    DbSet<Team> Teams { get; }
+    DbSet<TeamOfTeams> TeamOfTeams { get; }
 }
