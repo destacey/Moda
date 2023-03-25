@@ -19,7 +19,7 @@ public class TeamCode : ValueObject
 
     public string Value { get; } = null!;
 
-    protected override IEnumerable<object> GetEqualityComponents()
+    protected override IEnumerable<IComparable> GetEqualityComponents()
     {
         yield return Value;
     }
