@@ -18,8 +18,8 @@
             </MudToolBar>
         </ToolBarContent>
         <Columns>
-            <Column T="Claim" Field="Type" />
-            <Column T="Claim" Field="Value" />
+            <PropertyColumn Property="x => x.Type" />
+            <PropertyColumn Property="x => x.Value" />
         </Columns>
     </MudDataGrid>
     <DataGridCountLabel DataGrid="@_grid" UnitLabel="claims" />

@@ -43,15 +43,15 @@
         </MudToolBar>
     </ToolBarContent>
     <Columns>
-        <Column T="TeamListViewModel" Field="LocalId" Title="Id" />
-        <Column T="TeamListViewModel" Field="Name">
+        <PropertyColumn Property="x => x.LocalId" Title="Id" />
+        <PropertyColumn Property="x => x.Name" Title="Name">
             <CellTemplate>
                 <MudLink Href="@(context.Item.DetailsUrl)">@context.Item.Name</MudLink>
             </CellTemplate>
-        </Column>
-        <Column T="TeamListViewModel" Field="Code" />
-        <Column T="TeamListViewModel" Field="Type" />
-        <Column T="TeamListViewModel" Field="IsActive" Title="Active" Hidden="@(!_includeDisabled)" />
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Code" />
+        <PropertyColumn Property="x => x.Type" />
+        <PropertyColumn Property="x => x.IsActive" Title="Active" Hidden="@(!_includeDisabled)" />
     </Columns>
     <LoadingContent>
         <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading teams...</MudText>

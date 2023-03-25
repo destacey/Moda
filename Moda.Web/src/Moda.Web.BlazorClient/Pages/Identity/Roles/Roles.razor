@@ -27,23 +27,19 @@
                 </MudToolBar>
             </ToolBarContent>
             <Columns>
-                <Column T="RoleListDto" Field="Name" />
-@*                    <CellTemplate>
-                        <MudLink Href="@($"/roles/{context.Item.Id}/")" Class="ma-0 pa-0">@context.Item.Name</MudLink>
-                    </CellTemplate>
-                </Column>*@
-                <Column T="RoleListDto" Field="Description" />
-                <Column T="RoleListDto" Title="Actions" Sortable="false" Filterable="false" CellClass="d-flex justify-end" >
+                <PropertyColumn Property="x => x.Name" />
+                <PropertyColumn Property="x => x.Description" />
+                <TemplateColumn Title="Actions" CellClass="d-flex justify-end" Sortable="false" Filterable="false">
                     <CellTemplate>
                         <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true" Size="Size.Small"
-                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
+                                 EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
                             @*@if (_canUpdateRoleClaims)
                             {
-                                <MudMenuItem @onclick="@(() => InvokeModal(context))">Edit</MudMenuItem>
+                            <MudMenuItem @onclick="@(() => InvokeModal(context))">Edit</MudMenuItem>
                             }
                             @if (_canDeleteRoleClaims)
                             {
-                                <MudMenuItem Style="color:red!important" @onclick="@(() => Delete(context))">Delete</MudMenuItem>
+                            <MudMenuItem Style="color:red!important" @onclick="@(() => Delete(context))">Delete</MudMenuItem>
                             }*@
                             @if (_canViewRoleClaims)
                             {
@@ -51,7 +47,7 @@
                             }
                         </MudMenu>
                     </CellTemplate>
-                </Column>
+                </TemplateColumn>
             </Columns>
             <LoadingContent>
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading roles...</MudText>

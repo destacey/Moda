@@ -26,17 +26,14 @@
                 </MudToolBar>
             </ToolBarContent>
             <Columns>
-                <Column T="EmployeeListDto" Field="FirstName" Title="First Name" />
-                <Column T="EmployeeListDto" Field="LastName" Title="Last Name" />
-                <Column T="EmployeeListDto" Field="Department" />
-                <Column T="EmployeeListDto" Field="JobTitle" Title="Job Title" />
-                <Column T="EmployeeListDto" Field="ManagerName" Title="Manager" />
-                <Column T="EmployeeListDto" Field="OfficeLocation" Title="Office Location" />                
-                <Column T="EmployeeListDto" Field="Email" />
-                @if (_includeDisabled)
-                {                    
-                    <Column T="EmployeeListDto" Field="IsActive" Title="Active" />
-                }
+                <PropertyColumn Property="x => x.FirstName" Title="First Name" />
+                <PropertyColumn Property="x => x.LastName" Title="Last Name" />
+                <PropertyColumn Property="x => x.Department" />
+                <PropertyColumn Property="x => x.JobTitle" Title="Job Title" />
+                <PropertyColumn Property="x => x.ManagerName" Title="Manager" />
+                <PropertyColumn Property="x => x.OfficeLocation" Title="Office Location" />
+                <PropertyColumn Property="x => x.Email" Title="Email" />
+                <PropertyColumn Property="x => x.IsActive" Title="Active" Hidden="@(!_includeDisabled)" />
             </Columns>
             <LoadingContent>
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading employees...</MudText>
