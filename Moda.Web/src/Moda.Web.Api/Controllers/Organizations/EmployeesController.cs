@@ -19,7 +19,9 @@ public class EmployeesController : ControllerBase
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
     [OpenApiOperation("Get a list of all employees.", "")]
-    //[ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Get))] // TODO not working
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<IReadOnlyList<EmployeeListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var employees = await _sender.Send(new GetEmployeesQuery(includeInactive), cancellationToken);
@@ -29,9 +31,9 @@ public class EmployeesController : ControllerBase
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
     [OpenApiOperation("Get employee details using the localId.", "")]
-    //[ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Get))] // TODO not working
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<EmployeeDetailsDto>> GetById(int id)
     {
         var employee = await _sender.Send(new GetEmployeeQuery(id));
@@ -59,6 +61,7 @@ public class EmployeesController : ControllerBase
     [OpenApiOperation("Update an employee.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult> Update(Guid id, UpdateEmployeeRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)

@@ -19,6 +19,9 @@ public class ProfileController : ControllerBase
 
     [HttpGet]
     [OpenApiOperation("Get profile details of currently logged in user.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<UserDetailsDto>> Get(CancellationToken cancellationToken)
     {
         return User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId)
@@ -28,17 +31,23 @@ public class ProfileController : ControllerBase
 
     [HttpPut]
     [OpenApiOperation("Update profile details of currently logged in user.", "")]
-    public async Task<ActionResult<bool>> Update(UpdateProfileRequest request)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult> Update(UpdateProfileRequest request)
     {
         if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
             return Unauthorized();
 
         await _userService.UpdateAsync(request.ToUpdateUserCommand(), userId);
-        return Ok(true);
+        return NoContent();
     }
 
     [HttpGet("permissions")]
     [OpenApiOperation("Get permissions of currently logged in user.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<List<string>>> GetPermissions(CancellationToken cancellationToken)
     {
         return User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId)
@@ -48,6 +57,9 @@ public class ProfileController : ControllerBase
 
     [HttpGet("logs")]
     [OpenApiOperation("Get audit logs of currently logged in user.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public Task<List<AuditDto>> GetLogs()
     {
         return _mediator.Send(new GetMyAuditLogsQuery());

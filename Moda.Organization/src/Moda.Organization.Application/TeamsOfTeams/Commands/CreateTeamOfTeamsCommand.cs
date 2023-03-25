@@ -36,7 +36,9 @@ public sealed class CreateTeamOfTeamsCommandValidator : CustomValidator<CreateTe
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(t => t.Name)
-            .SetValidator(t => new TeamNameValidator(_organizationDbContext));
+            .NotEmpty()
+            .MaximumLength(128)
+            .MustAsync(BeUniqueTeamName).WithMessage("The Team name already exists.");
 
         RuleFor(t => t.Code)
             .NotEmpty()
@@ -44,6 +46,11 @@ public sealed class CreateTeamOfTeamsCommandValidator : CustomValidator<CreateTe
 
         RuleFor(t => t.Description)
             .MaximumLength(1024);
+    }
+
+    public async Task<bool> BeUniqueTeamName(string name, CancellationToken cancellationToken)
+    {
+        return await _organizationDbContext.BaseTeams.AllAsync(x => x.Name != name, cancellationToken);
     }
 }
 

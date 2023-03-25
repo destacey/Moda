@@ -19,6 +19,8 @@ public class WorkStateCategoriesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkStateCategories)]
     [OpenApiOperation("Get a list of all work state categories.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<IReadOnlyList<WorkStateCategoryListDto>>> GetList(CancellationToken cancellationToken)
     {
         var categories = await _sender.Send(new GetWorkStateCategoriesQuery(), cancellationToken);

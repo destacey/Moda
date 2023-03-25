@@ -40,7 +40,12 @@ public sealed class UpdateTeamCommandValidator : CustomValidator<UpdateTeamComma
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(t => t.Name)
-            .SetValidator(t => new TeamNameValidator(_organizationDbContext, t.Id));
+            .NotEmpty()
+            .MaximumLength(128)
+            .MustAsync(async (model, name, cancellationToken) =>
+            {
+                return await BeUniqueTeamName(model.Id, name, cancellationToken);
+            }).WithMessage("The Team name already exists.");
 
         RuleFor(t => t.Code)
             .NotEmpty()
@@ -48,6 +53,11 @@ public sealed class UpdateTeamCommandValidator : CustomValidator<UpdateTeamComma
 
         RuleFor(t => t.Description)
             .MaximumLength(1024);
+    }
+
+    public async Task<bool> BeUniqueTeamName(Guid id, string name, CancellationToken cancellationToken)
+    {
+        return await _organizationDbContext.BaseTeams.Where(t => t.Id != id).AllAsync(x => x.Name != name, cancellationToken);
     }
 }
 

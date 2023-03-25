@@ -21,6 +21,9 @@ public class WorkTypesController : ControllerBase
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkTypes)]
     [OpenApiOperation("Get a list of all work types.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<IReadOnlyList<WorkTypeDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var workTypes = await _sender.Send(new GetWorkTypesQuery(includeInactive), cancellationToken);
@@ -31,10 +34,12 @@ public class WorkTypesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkTypes)]
     [OpenApiOperation("Get work type details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<WorkTypeDto>> GetById(int id)
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<WorkTypeDto>> GetById(int id, CancellationToken cancellationToken)
     {
-        var workType = await _sender.Send(new GetWorkTypeQuery(id));
+        var workType = await _sender.Send(new GetWorkTypeQuery(id), cancellationToken);
 
         return workType is not null
             ? Ok(workType)
@@ -58,7 +63,8 @@ public class WorkTypesController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkTypes)]
     [OpenApiOperation("Update a work type.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult> Update(int id, UpdateWorkTypeRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
