@@ -42,9 +42,9 @@ internal partial class UserService
     {
         string principalObjectId = principal.GetObjectId() ?? throw new InternalServerException("Principal ObjectId is missing or null.");
 
-        var adUser = await _graphServiceClient.Users[principalObjectId].Request().GetAsync();
-        string? email = principal.FindFirstValue(ClaimTypes.Upn) ?? adUser.Mail;
-        string? username = principal.GetDisplayName() ?? adUser.GivenName;
+        var adUser = await _graphServiceClient.Users[principalObjectId].GetAsync();
+        string? email = principal.FindFirstValue(ClaimTypes.Upn) ?? adUser?.Mail;
+        string? username = principal.GetDisplayName() ?? adUser?.GivenName;
 
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(username))
         {

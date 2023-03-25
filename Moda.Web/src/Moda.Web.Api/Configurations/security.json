@@ -5,14 +5,14 @@
             "Domain": "<Your Domain>.onmicrosoft.com",
             "TenantId": "<Your TenantId of the AzureAd Server App Registration>",
             "ClientId": "<Your ClientId of the AzureAd Server App Registration>",
+            "ClientSecret": "<Your ClientSecret of the AzureAd Server App Registration>",
             "Scopes": "access_as_user",
-            "RootIssuer": "https://sts.windows.net/<Your AzureAd TenantId>/",
-            "ClientSecret": "<Your ClientSecret of the AzureAd Server App Registration>"
+            "RootIssuer": "https://sts.windows.net/<Your AzureAd TenantId>/"
         },
         "GraphApi": {
             "Enabled": true,
             "BaseUrl": "https://graph.microsoft.com/beta",
-            "Scopes": "Directory.Read.All",
+            "Scopes": ".default",
             "AllEmployeesGroupObjectId": null
         },
         "Swagger": {
