@@ -26,15 +26,15 @@
                 </MudToolBar>
             </ToolBarContent>
             <Columns>
-                <Column T="UserDetailsDto" Field="UserName" Title="Username" />
-                <Column T="UserDetailsDto" Field="FirstName" Title="First Name" />
-                <Column T="UserDetailsDto" Field="LastName" Title="Last Name" />
-                <Column T="UserDetailsDto" Field="Email" />
-                <Column T="UserDetailsDto" Field="IsActive" Title="Active" />
-                <Column T="UserDetailsDto" Title="Actions" Sortable="false" Filterable="false" CellClass="d-flex justify-end" >
+                <PropertyColumn Property="x => x.UserName" Title="Username" />
+                <PropertyColumn Property="x => x.FirstName" Title="First Name" />
+                <PropertyColumn Property="x => x.LastName" Title="Last Name" />
+                <PropertyColumn Property="x => x.Email" />
+                <PropertyColumn Property="x => x.IsActive" Title="Active" />
+                <TemplateColumn Title="Actions" CellClass="d-flex justify-end" Sortable="false" Filterable="false">
                     <CellTemplate>
                         <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true" Size="Size.Small"
-                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter" OffsetX="true">
+                                 EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
                             <MudMenuItem OnClick="@(() => ViewProfile(@context.Item.Id))">View Profile</MudMenuItem>
                             @if (_canViewRoles)
                             {
@@ -42,7 +42,7 @@
                             }
                         </MudMenu>
                     </CellTemplate>
-                </Column>
+                </TemplateColumn>
             </Columns>
             <LoadingContent>
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading users...</MudText>

@@ -44,12 +44,12 @@
                 </MudToolBar>
             </ToolBarContent>
             <Columns>
-                <Column T="BackgroundJobDto" Field="Id" />
-                <Column T="BackgroundJobDto" Field="Action" />
-                <Column T="BackgroundJobDto" Field="Status" />
-                <Column T="BackgroundJobDto" Field="Type" />
-                <Column T="BackgroundJobDto" Field="Namespace" />
-                <Column T="BackgroundJobDto" Field="StartedAt" Title="Start (UTC)" />
+                <PropertyColumn Property="x => x.Id" />
+                <PropertyColumn Property="x => x.Action" />
+                <PropertyColumn Property="x => x.Status" />
+                <PropertyColumn Property="x => x.Type" />
+                <PropertyColumn Property="x => x.Namespace" />
+                <PropertyColumn Property="x => x.StartedAt" Title="Start (UTC)" />
             </Columns>
             <LoadingContent>
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading background jobs...</MudText>

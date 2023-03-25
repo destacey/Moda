@@ -1,4 +1,5 @@
-﻿using Microsoft.Graph;
+﻿using Ardalis.GuardClauses;
+using Microsoft.Graph.Models;
 using Moda.Common.Models;
 using Moda.Organization.Application.Interfaces;
 using NodaTime;
@@ -8,14 +9,14 @@ public sealed record AzureAdEmployee : IExternalEmployee
 {
     public AzureAdEmployee(User user)
     {
-        EmployeeNumber = user.Id;
-        Name = new PersonName(user.GivenName, null, user.Surname);
+        EmployeeNumber = Guard.Against.NullOrWhiteSpace(user.Id);
+        Name = new PersonName(Guard.Against.NullOrWhiteSpace(user.GivenName), null, Guard.Against.NullOrWhiteSpace(user.Surname));
         HireDate = user.HireDate is not null
             ? Instant.FromDateTimeOffset((DateTimeOffset)user.HireDate)
             : user.EmployeeHireDate is not null
                 ? Instant.FromDateTimeOffset((DateTimeOffset)user.EmployeeHireDate)
                 : null;
-        Email = new Common.Models.EmailAddress(user.Mail ?? user.UserPrincipalName);
+        Email = new Common.Models.EmailAddress(user.Mail ?? Guard.Against.NullOrWhiteSpace(user.UserPrincipalName));
         JobTitle = user.JobTitle;
         Department = user.Department;
         OfficeLocation = user.OfficeLocation;

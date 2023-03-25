@@ -1,8 +1,10 @@
 ﻿using System.Security.Claims;
+using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
+using NotFoundException = Moda.Common.Application.Exceptions.NotFoundException;
 
 namespace Moda.Infrastructure.Identity;
 
@@ -42,9 +44,9 @@ internal partial class UserService
     {
         string principalObjectId = principal.GetObjectId() ?? throw new InternalServerException("Principal ObjectId is missing or null.");
 
-        var adUser = await _graphServiceClient.Users[principalObjectId].Request().GetAsync();
-        string? email = principal.FindFirstValue(ClaimTypes.Upn) ?? adUser.Mail;
-        string? username = principal.GetDisplayName() ?? adUser.GivenName;
+        var adUser = await _graphServiceClient.Users[principalObjectId].GetAsync();
+        string? email = principal.FindFirstValue(ClaimTypes.Upn) ?? adUser?.Mail;
+        string? username = principal.GetDisplayName() ?? adUser?.GivenName;
 
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(username))
         {
@@ -84,8 +86,8 @@ internal partial class UserService
             {
                 Id = newUserId.ToString(),
                 ObjectId = principalObjectId,
-                FirstName = principal.FindFirstValue(ClaimTypes.GivenName) ?? adUser.GivenName,
-                LastName = principal.FindFirstValue(ClaimTypes.Surname) ?? adUser.Surname,
+                FirstName = principal.FindFirstValue(ClaimTypes.GivenName) ?? Guard.Against.NullOrWhiteSpace(adUser?.GivenName),
+                LastName = principal.FindFirstValue(ClaimTypes.Surname) ?? Guard.Against.NullOrWhiteSpace(adUser?.Surname),
                 Email = email,
                 NormalizedEmail = email.ToUpperInvariant(),
                 UserName = username,

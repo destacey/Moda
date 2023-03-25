@@ -26,7 +26,7 @@ public class PersonName : ValueObject
     public string FullName
         => StringHelpers.Concat(Title, FirstName, MiddleName, LastName, Suffix);
 
-    protected override IEnumerable<object> GetEqualityComponents()
+    protected override IEnumerable<IComparable> GetEqualityComponents()
     {
         yield return FirstName;
 

@@ -1,11 +1,8 @@
-﻿using System.Net.Http.Headers;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Graph;
-using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
+using Moda.Infrastructure.GraphApi;
 using Moda.Integrations.MicrosoftGraph;
 using Serilog;
 
@@ -26,40 +23,15 @@ internal static class ConfigureServices
             })
              .AddMicrosoftIdentityWebApi(
                  jwtOptions => jwtOptions.Events = new AzureAdJwtBearerEvents(logger, config),
-                 msIdentityOptions => config.GetSection("SecuritySettings:AzureAd").Bind(msIdentityOptions))
-            .EnableTokenAcquisitionToCallDownstreamApi(clientAppOptions => config.GetSection("SecuritySettings:AzureAd").Bind(clientAppOptions))
-            //.EnableTokenAcquisitionToCallDownstreamApi(confidentialClientApplicationOptions =>
-            //{
-            //    confidentialClientApplicationOptions.ClientId = config.GetSection("SecuritySettings:AzureAd").GetValue<string>("ClientId");
-            //    confidentialClientApplicationOptions.ClientSecret = config.GetSection("SecuritySettings:AzureAd").GetValue<string>("ClientSecret");
-            //    confidentialClientApplicationOptions.TenantId = config.GetSection("SecuritySettings:AzureAd").GetValue<string>("TenantId");
-            //})
-            //.AddMicrosoftGraph(config.GetSection("SecuritySettings:GraphApi"))
+                 msIdentityOptions => config.GetSection(AzureAdSettings.SectionName).Bind(msIdentityOptions))
+            .EnableTokenAcquisitionToCallDownstreamApi(clientAppOptions => config.GetSection(AzureAdSettings.SectionName).Bind(clientAppOptions))
             .AddInMemoryTokenCaches();
 
         services.AddScoped(provider =>
         {
-            string[] scopes = { "https://graph.microsoft.com/.default" };
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            var httpContext = provider.GetRequiredService<IHttpContextAccessor>();
-            //var token = (httpContext?.HttpContext?.User?.Identity as ClaimsIdentity)
-            //    ?.FindFirst("jwt")?.Value;
-
-            var confidentialClientApplication = ConfidentialClientApplicationBuilder
-                .Create(configuration["SecuritySettings:AzureAd:ClientId"])
-                .WithTenantId(configuration["SecuritySettings:AzureAd:TenantId"])
-                .WithClientSecret(configuration["SecuritySettings:AzureAd:ClientSecret"] ?? "")
-                .Build();
-
-            return new GraphServiceClient(new DelegateAuthenticationProvider(async message =>
-            {
-                //var assertion = new UserAssertion(token);
-                var authResult = await confidentialClientApplication.AcquireTokenForClient(scopes).ExecuteAsync();
-                //.AcquireTokenOnBehalfOf(scopes, assertion).ExecuteAsync();
-
-                message.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
-            }));
+            var azureAdSettings = AzureAdSettings.GetConfig(config);
+            GraphHelper.InitializeGraphForAppOnlyAuth(azureAdSettings);
+            return GraphHelper.GetAppOnlyClient();
         });
 
         services.AddScoped<MicrosoftGraphService>();
