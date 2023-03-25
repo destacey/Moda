@@ -1,5 +1,8 @@
+using System;
 using System.Net;
+using Azure;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Serilog.Context;
 
@@ -24,15 +27,44 @@ internal class ExceptionMiddleware : IMiddleware
         {
             await next(context);
         }
+        catch (ValidationException ex)
+        {
+            string email = _currentUser.GetUserEmail() is string userEmail ? userEmail : "Anonymous";
+            var userId = _currentUser.GetUserId();
+
+            if (userId != Guid.Empty)
+                LogContext.PushProperty("UserId", userId);
+
+            LogContext.PushProperty("UserEmail", email);
+            string errorId = Guid.NewGuid().ToString();
+            LogContext.PushProperty("ErrorId", errorId);
+            LogContext.PushProperty("StackTrace", ex.StackTrace);
+
+            var details = new HttpValidationProblemDetails(ex.Errors)
+            {
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+            };
+
+            var response = context.Response;
+            response.ContentType = "application/json";
+            response.StatusCode = StatusCodes.Status400BadRequest;
+
+            Log.Error($"{ex.Message.Trim()} Request failed with Status Code {context.Response.StatusCode} and Error Id {errorId}.");
+            await response.WriteAsync(_jsonSerializer.Serialize(details));
+        }
         catch (Exception exception)
         {
             string email = _currentUser.GetUserEmail() is string userEmail ? userEmail : "Anonymous";
             var userId = _currentUser.GetUserId();
-            if (userId != Guid.Empty) LogContext.PushProperty("UserId", userId);
+
+            if (userId != Guid.Empty) 
+                 LogContext.PushProperty("UserId", userId);
+
             LogContext.PushProperty("UserEmail", email);
             string errorId = Guid.NewGuid().ToString();
             LogContext.PushProperty("ErrorId", errorId);
             LogContext.PushProperty("StackTrace", exception.StackTrace);
+
             var errorResult = new ErrorResult
             {
                 Source = exception.TargetSite?.DeclaringType?.FullName,
@@ -40,10 +72,12 @@ internal class ExceptionMiddleware : IMiddleware
                 ErrorId = errorId,
                 SupportMessage = "exceptionmiddleware.supportmessage"
             };
+
             errorResult.Messages!.Add(exception.Message);
+
             var response = context.Response;
             response.ContentType = "application/json";
-            if (exception is not CustomException && exception.InnerException != null)
+            if (exception is not CustomException && exception.InnerException is not null)
             {
                 while (exception.InnerException != null)
                 {
@@ -59,7 +93,6 @@ internal class ExceptionMiddleware : IMiddleware
                     {
                         errorResult.Messages = e.ErrorMessages;
                     }
-
                     break;
 
                 case KeyNotFoundException:

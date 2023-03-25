@@ -1,6 +1,9 @@
-namespace Moda.Web.Api.Controllers.Identity;
+namespace Moda.Web.Api.Controllers.UserManagement;
 
-public class RolesController : VersionNeutralApiController
+[Route("api/user-management/roles")]
+[ApiVersionNeutral]
+[ApiController]
+public class RolesController : ControllerBase
 {
     private readonly IRoleService _roleService;
 

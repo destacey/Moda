@@ -1,4 +1,5 @@
-﻿using Moda.Common.Models;
+﻿using FluentAssertions;
+using Moda.Common.Models;
 
 namespace Moda.Common.Tests.Sut.Models;
 
@@ -8,11 +9,11 @@ public class EmailAddressTests
     [InlineData("test@test.com", "test@test.com")]
     [InlineData("test.me@test.com", "test.me@test.com")]
     [InlineData(" test@test.com ", "test@test.com")]
-    public void New_Valid(string input, string expected)
+    public void New_Valid(string input, string expectedResult)
     {
         var result = new EmailAddress(input);
 
-        Assert.Equal(expected, result);
+        result.Value.Should().Be(expectedResult);
     }
 
     [Fact]
@@ -22,7 +23,7 @@ public class EmailAddressTests
 
         var exception = Assert.Throws<ArgumentException>(() => new EmailAddress(""));
 
-        Assert.Equal(expectedExceptionMessage, exception.Message);
+        exception.Message.Should().Be(expectedExceptionMessage);
     }
 
     [Fact]
@@ -32,7 +33,7 @@ public class EmailAddressTests
 
         var exception = Assert.Throws<ArgumentException>(() => new EmailAddress(" "));
 
-        Assert.Equal(expectedExceptionMessage, exception.Message);
+        exception.Message.Should().Be(expectedExceptionMessage);
     }
 
     [Fact]
@@ -42,7 +43,7 @@ public class EmailAddressTests
 
         var exception = Assert.Throws<ArgumentNullException>(() => new EmailAddress(null!));
 
-        Assert.Equal(expectedExceptionMessage, exception.Message);
+        exception.Message.Should().Be(expectedExceptionMessage);
     }
 
     [Theory]
@@ -60,7 +61,7 @@ public class EmailAddressTests
 
         var exception = Assert.Throws<ArgumentException>(() => new EmailAddress(input));
 
-        Assert.Equal(expectedExceptionMessage, exception.Message);
+        exception.Message.Should().Be(expectedExceptionMessage);
     }
 
     [Fact]
@@ -70,8 +71,8 @@ public class EmailAddressTests
         var email2 = new EmailAddress("test@test.com");
         var email3 = new EmailAddress("different@test.com");
 
-        Assert.Equal(email1, email2);
-        Assert.NotEqual(email1, email3);
+        email1.Should().Be(email2);
+        email1.Should().NotBe(email3);
     }
 
     [Fact]
@@ -80,7 +81,7 @@ public class EmailAddressTests
         string input = "test@test.com";
         string result = new EmailAddress(input);
 
-        Assert.Equal(input, result);
+        result.Should().Be(input);
     }
 
     [Fact]

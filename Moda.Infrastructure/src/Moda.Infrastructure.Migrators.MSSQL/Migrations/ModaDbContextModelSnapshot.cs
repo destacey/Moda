@@ -18,7 +18,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "7.0.2")
+                .HasAnnotation("ProductVersion", "7.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -352,6 +352,92 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Users", "Identity");
                 });
 
+            modelBuilder.Entity("Moda.Organization.Domain.Models.BaseTeam", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("LocalId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocalId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("LocalId");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Code"), new[] { "Id", "LocalId", "Name", "IsActive", "IsDeleted" });
+
+                    b.HasIndex("Id");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "LocalId", "Name", "Code", "IsActive", "IsDeleted" });
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("IsDeleted");
+
+                    b.HasIndex("LocalId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("LocalId"), new[] { "Id", "Name", "Code", "IsActive", "IsDeleted" });
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Teams", "Organization");
+
+                    b.HasDiscriminator<string>("Type");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("Moda.Organization.Domain.Models.Employee", b =>
                 {
                     b.Property<Guid>("Id")
@@ -664,6 +750,20 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasDiscriminator().HasValue("AzureDevOpsBoards");
                 });
 
+            modelBuilder.Entity("Moda.Organization.Domain.Models.Team", b =>
+                {
+                    b.HasBaseType("Moda.Organization.Domain.Models.BaseTeam");
+
+                    b.HasDiscriminator().HasValue("Team");
+                });
+
+            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOfTeams", b =>
+                {
+                    b.HasBaseType("Moda.Organization.Domain.Models.BaseTeam");
+
+                    b.HasDiscriminator().HasValue("TeamOfTeams");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
@@ -722,7 +822,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.OwnsOne("Moda.Common.Models.EmailAddress", "Email", b1 =>
+                    b.OwnsOne("Moda.Organization.Domain.Models.Employee.Email#Moda.Common.Models.EmailAddress", "Email", b1 =>
                         {
                             b1.Property<Guid>("EmployeeId")
                                 .HasColumnType("uniqueidentifier");
@@ -741,7 +841,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                 .HasForeignKey("EmployeeId");
                         });
 
-                    b.OwnsOne("Moda.Common.Models.PersonName", "Name", b1 =>
+                    b.OwnsOne("Moda.Organization.Domain.Models.Employee.Name#Moda.Common.Models.PersonName", "Name", b1 =>
                         {
                             b1.Property<Guid>("EmployeeId")
                                 .HasColumnType("uniqueidentifier");

@@ -70,3 +70,19 @@
 .moda-nav-child {
     padding-left: 10px !important;
 }
+
+.mud-tabs-toolbar-content {
+    background: var(--mud-palette-background);
+}
+
+.mud-tab {
+    background: var(--mud-palette-background);
+}
+
+.mud-tabs-scroll-button {
+    background: var(--mud-palette-background);
+}
+
+.mud-tabs-panels {
+    background: var(--mud-palette-surface);
+}

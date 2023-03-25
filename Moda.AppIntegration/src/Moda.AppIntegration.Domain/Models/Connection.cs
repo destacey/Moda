@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
 public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
@@ -19,7 +20,7 @@ public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
     public string? Description
     {
         get => _description;
-        protected set => _description = value?.Trim();
+        protected set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>Gets the type of connector.  This value cannot change.</summary>

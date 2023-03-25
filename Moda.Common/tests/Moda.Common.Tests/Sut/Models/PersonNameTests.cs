@@ -1,4 +1,5 @@
-﻿using Moda.Common.Models;
+﻿using FluentAssertions;
+using Moda.Common.Models;
 
 namespace Moda.Common.Tests.Sut.Models;
 
@@ -15,11 +16,11 @@ public class PersonNameTests
         var result = new PersonName(firstName, middleName, lastName, suffix, title);
 
         // Assert
-        Assert.Equal(firstName, result.FirstName);
-        Assert.Equal(middleName, result.MiddleName);
-        Assert.Equal(lastName, result.LastName);
-        Assert.Equal(suffix, result.Suffix);
-        Assert.Equal(title, result.Title);
+        result.FirstName.Should().Be(firstName);
+        result.MiddleName.Should().Be(middleName);
+        result.LastName.Should().Be(lastName);
+        result.Suffix.Should().Be(suffix);
+        result.Title.Should().Be(title);
     }
 
 
@@ -32,7 +33,7 @@ public class PersonNameTests
 
         var exception = Assert.Throws<ArgumentException>(() => new PersonName(firstName, null, "Test"));
 
-        Assert.Equal(expectedExceptionMessage, exception.Message);
+        exception.Message.Should().Be(expectedExceptionMessage);
     }
 
     [Fact]
@@ -43,7 +44,7 @@ public class PersonNameTests
 
         var exception = Assert.Throws<ArgumentNullException>(() => new PersonName(firstName!, null, "Smith"));
 
-        Assert.Equal(expectedExceptionMessage, exception.Message);
+        exception.Message.Should().Be(expectedExceptionMessage);
     }
 
     [Theory]
@@ -55,7 +56,7 @@ public class PersonNameTests
 
         var exception = Assert.Throws<ArgumentException>(() => new PersonName("John", null, lastName));
 
-        Assert.Equal(expectedExceptionMessage, exception.Message);
+        exception.Message.Should().Be(expectedExceptionMessage);
     }
 
     [Fact]
@@ -66,7 +67,7 @@ public class PersonNameTests
 
         var exception = Assert.Throws<ArgumentNullException>(() => new PersonName("John", null, lastName!));
 
-        Assert.Equal(expectedExceptionMessage, exception.Message);
+        exception.Message.Should().Be(expectedExceptionMessage);
     }
 
     [Fact]
@@ -76,8 +77,8 @@ public class PersonNameTests
         var personName2 = new PersonName("John", "", "Smith", "", "");
         var personName3 = new PersonName("John", "Doe", "Smith");
 
-        Assert.Equal(personName1, personName2);
-        Assert.NotEqual(personName1, personName3);
+        personName1.Should().Be(personName2);
+        personName1.Should().NotBe(personName3);
     }
 
     [Theory]
@@ -92,7 +93,7 @@ public class PersonNameTests
         var result = personName.DisplayName;
 
         // Assert
-        Assert.Equal(expected, result);
+        result.Should().Be(expected);
     }
 
     [Theory]
@@ -108,6 +109,6 @@ public class PersonNameTests
         var result = personName.FullName;
 
         // Assert
-        Assert.Equal(expected, result);
+        result.Should().Be(expected);
     }
 }

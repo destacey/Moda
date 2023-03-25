@@ -1,10 +1,12 @@
-﻿using CSharpFunctionalExtensions;
-using Moda.Common.Application.BackgroundJobs;
+﻿using Moda.Common.Application.BackgroundJobs;
 using Moda.Organization.Application.Interfaces;
 
-namespace Moda.Web.Api.Controllers;
+namespace Moda.Web.Api.Controllers.Admin;
 
-public class BackgroundJobsController : VersionNeutralApiController
+[Route("api/admin/background-jobs")]
+[ApiVersionNeutral]
+[ApiController]
+public class BackgroundJobsController : ControllerBase
 {
     private readonly ILogger<BackgroundJobsController> _logger;
     private readonly IJobService _jobService;
@@ -46,7 +48,7 @@ public class BackgroundJobsController : VersionNeutralApiController
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult Run(int jobTypeId, CancellationToken cancellationToken)
-    {        
+    {
         switch ((BackgroundJobType)jobTypeId)
         {
             case BackgroundJobType.EmployeeImport:

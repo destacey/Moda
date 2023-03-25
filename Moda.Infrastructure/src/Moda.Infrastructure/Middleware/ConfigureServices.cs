@@ -16,7 +16,7 @@ internal static class ConfigureServices
     {
         if (GetMiddlewareSettings(config).EnableHttpsLogging)
         {
-            services.AddSingleton<RequestLoggingMiddleware>();
+            services.AddScoped<RequestLoggingMiddleware>();
             services.AddScoped<ResponseLoggingMiddleware>();
         }
 

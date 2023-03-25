@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -29,7 +28,7 @@ public static class ConfigureServices
             .AddCorsPolicy(config)
             .AddExceptionMiddleware()
             .AddHealthCheck()
-            .AddMediatR(Assembly.GetExecutingAssembly())
+            .AddMediatR(options => options.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()))
             .AddOpenApiDocumentation(config)
             .AddPersistence(config)
             .AddRequestLogging(config)

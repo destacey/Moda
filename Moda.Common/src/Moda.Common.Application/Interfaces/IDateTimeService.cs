@@ -2,7 +2,7 @@
 
 namespace Moda.Common.Application.Interfaces;
 
-public interface IDateTimeService : ITransientService
+public interface IDateTimeService : IScopedService
 {
     Instant Now { get; }
 }

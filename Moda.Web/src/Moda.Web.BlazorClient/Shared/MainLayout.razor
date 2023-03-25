@@ -1,20 +1,18 @@
 ﻿@inherits LayoutComponentBase
 
 <MudLayout>
-    <MudAppBar Elevation="2">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudImage Src="/images/moda-logo-primary.png" Alt="Moda" Height="150" />
+    <MudAppBar Dense="true" Elevation="0" >
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudText Typo="Typo.h6" Class="ml-2" >Moda</MudText>
+        @*<MudImage Src="/images/moda-logo-primary.png" Alt="Moda" Height="150" />*@
         <MudSpacer />
-        
         <UserMenu ThemeManagerOnClick="@ThemeManagerOnClick" />
     </MudAppBar>
-    
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Variant="DrawerVariant.Mini" MiniWidth="55px">
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Mini" Elevation="1">
         <NavMenu />
     </MudDrawer>
-    
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="my-3 pt-3">
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="my-3">
             @ChildContent
         </MudContainer>
     </MudMainContent>
@@ -23,10 +21,10 @@
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; } = default!;
-    
+
     [Parameter]
     public EventCallback OnDarkModeToggle { get; set; }
-    
+
     [Parameter]
     public EventCallback<MouseEventArgs> ThemeManagerOnClick { get; set; }
 

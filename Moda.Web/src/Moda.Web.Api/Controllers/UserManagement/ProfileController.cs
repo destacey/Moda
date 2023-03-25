@@ -1,9 +1,12 @@
 using System.Security.Claims;
-using Moda.Web.Api.Models.Profiles;
+using Moda.Web.Api.Models.UserManagement.Profiles;
 
-namespace Moda.Web.Api.Controllers.Identity;
+namespace Moda.Web.Api.Controllers.UserManagement;
 
-public class ProfileController : VersionNeutralApiController
+[Route("api/user-management/profiles")]
+[ApiVersionNeutral]
+[ApiController]
+public class ProfileController : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly ISender _mediator;

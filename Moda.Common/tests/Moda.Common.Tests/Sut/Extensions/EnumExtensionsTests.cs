@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using FluentAssertions;
 
 namespace Moda.Common.Tests.Sut.Extensions;
 public class EnumExtensionsTests
@@ -16,7 +17,7 @@ public class EnumExtensionsTests
         var result = currentEnum.GetDisplayName();
 
         // Assert
-        Assert.Equal(expectedName, result);
+        result.Should().Be(expectedName);
     }
 
     [Theory]
@@ -32,7 +33,7 @@ public class EnumExtensionsTests
         var result = currentEnum.GetDisplayDescription();
 
         // Assert
-        Assert.Equal(expectedName, result);
+        result.Should().Be(expectedName);
     }
 }
 

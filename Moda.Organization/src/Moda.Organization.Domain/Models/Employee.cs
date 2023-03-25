@@ -1,25 +1,33 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Extensions;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
 public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
 {
     private readonly List<Employee> _directReports = new();
+    private PersonName _name = null!;
+    private string _employeeNumber = null!;
+    private EmailAddress _email = null!;
+    private string? _jobTitle;
+    private string? _department;
+    private string? _officeLocation;
+    private Guid? _managerId;
 
     private Employee() { }
 
     private Employee(Guid personId, PersonName personName, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)
     {
         Id = Guard.Against.Default(personId);
-        Name = Guard.Against.Null(personName);
-        EmployeeNumber = Guard.Against.Null(employeeNumber).Trim();
+        Name = personName;
+        EmployeeNumber = employeeNumber;
         HireDate = hireDate;
         Email = email;
-        JobTitle = jobTitle?.Trim();
-        Department = department?.Trim();
-        OfficeLocation = officeLocation?.Trim();
-        ManagerId = managerId.HasValue ? Guard.Against.Default(managerId) : null;
+        JobTitle = jobTitle;
+        Department = department;
+        OfficeLocation = officeLocation;
+        ManagerId = managerId;
     }
 
     /// <summary>Gets the local identifier.</summary>
@@ -28,11 +36,19 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
 
     /// <summary>Gets the employee name.</summary>
     /// <value>The employee name.</value>
-    public PersonName Name { get; private set; } = null!;
+    public PersonName Name
+    {
+        get => _name;
+        private set => _name = Guard.Against.Null(value, nameof(EmployeeNumber));
+    }
 
     /// <summary>Gets the employee number.</summary>
     /// <value>The employee number.</value>
-    public string EmployeeNumber { get; private set; } = null!;
+    public string EmployeeNumber
+    {
+        get => _employeeNumber;
+        private set => _employeeNumber = Guard.Against.NullOrWhiteSpace(value, nameof(EmployeeNumber)).Trim();
+    }
 
     /// <summary>Gets the hire date.</summary>
     /// <value>The hire date.</value>
@@ -40,23 +56,31 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
 
     /// <summary>Gets the email.</summary>
     /// <value>The email.</value>
-    public EmailAddress Email { get; private set; } = null!;
+    public EmailAddress Email
+    {
+        get => _email;
+        private set => _email = Guard.Against.Null(value, nameof(Email));
+    }
 
     /// <summary>Gets the job title.</summary>
     /// <value>The job title.</value>
-    public string? JobTitle { get; private set; }
+    public string? JobTitle { get => _jobTitle; private set => _jobTitle = value.NullIfWhiteSpacePlusTrim(); }
 
     /// <summary>Gets the department.</summary>
     /// <value>The department.</value>
-    public string? Department { get; private set; }
+    public string? Department { get => _department; private set => _department = value.NullIfWhiteSpacePlusTrim(); }
 
     /// <summary>Gets the office location.</summary>
     /// <value>The office location.</value>
-    public string? OfficeLocation { get; private set; }
+    public string? OfficeLocation { get => _officeLocation; private set => _officeLocation = value.NullIfWhiteSpacePlusTrim(); }
 
     /// <summary>Gets the manager identifier.</summary>
     /// <value>The manager identifier.</value>
-    public Guid? ManagerId { get; private set; }
+    public Guid? ManagerId
+    {
+        get => _managerId;
+        private set => _managerId = value.HasValue ? Guard.Against.Default(value) : null;
+    }
 
     /// <summary>Gets the manager.</summary>
     /// <value>The manager.</value>
@@ -135,15 +159,15 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
             if (Name != name) Name = name;
             if (Email != email) Email = email;
 
-            EmployeeNumber = Guard.Against.Null(employeeNumber).Trim();
+            EmployeeNumber = employeeNumber;
             HireDate = hireDate;
-            JobTitle = jobTitle?.Trim();
-            Department = department?.Trim();
-            OfficeLocation = officeLocation?.Trim();
+            JobTitle = jobTitle;
+            Department = department;
+            OfficeLocation = officeLocation;
 
             if (ManagerId != managerId)
             {
-                ManagerId = managerId.HasValue ? Guard.Against.Default(managerId) : null;
+                ManagerId = managerId;
                 Manager = null;
             }
 

@@ -1,39 +1,23 @@
-﻿<MudNavMenu>
-    <MudTooltip Text="Home" Placement="Placement.Right">
-        <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    </MudTooltip>
-    <br />
-
-    <MudTooltip Text="Employees" Placement="Placement.Right">
-        <MudNavLink Href="employees" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Groups">Employees</MudNavLink>
-    </MudTooltip>
-    <br />
+﻿
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+    <MudNavLink Href="teams" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Groups">Teams</MudNavLink>
+    <MudNavLink Href="employees" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">Employees</MudNavLink>
 
     @if (_canViewAdministrationGroup)
     {
         <MudDivider Class="my-1" />
         @if (_canViewUsers)
         {
-            <MudTooltip Text="Users" Placement="Placement.Right">
-                <MudNavLink Match="NavLinkMatch.Prefix" Href="/users" Icon="@Icons.Material.Filled.SwitchAccount">Users</MudNavLink>
-            </MudTooltip>
-            <br />
+            <MudNavLink Match="NavLinkMatch.Prefix" Href="/users" Icon="@Icons.Material.Filled.SwitchAccount">Users</MudNavLink>
         }
         @if (_canViewRoles)
         {
-            <MudTooltip Text="Roles" Placement="Placement.Right">
-                <MudNavLink Match="NavLinkMatch.Prefix" Href="/roles" Icon="@Icons.Material.Filled.LockPerson">Roles</MudNavLink>
-            </MudTooltip>
-            <br />
+            <MudNavLink Match="NavLinkMatch.Prefix" Href="/roles" Icon="@Icons.Material.Filled.LockPerson">Roles</MudNavLink>
         }
-
         @if (_canViewBackgroundJobs)
         {
-            <MudTooltip Text="Background Jobs" Placement="Placement.Right">
-                <MudNavLink Match="NavLinkMatch.Prefix" Href="/background-jobs" Icon="@Icons.Material.Filled.Update">Background Jobs</MudNavLink>
-            </MudTooltip>
-            <br />
+            <MudNavLink Match="NavLinkMatch.Prefix" Href="/background-jobs" Icon="@Icons.Material.Filled.Update">Background Jobs</MudNavLink>
         }
     }
-
 </MudNavMenu>

@@ -13,8 +13,9 @@
         <ToolBarContent>
             <MudText Typo="Typo.h6">Claims</MudText>
             <MudSpacer />
-            <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudToolBar>
+                <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
+            </MudToolBar>
         </ToolBarContent>
         <Columns>
             <Column T="Claim" Field="Type" />

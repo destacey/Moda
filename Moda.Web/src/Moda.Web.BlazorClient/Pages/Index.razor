@@ -1,18 +1,10 @@
-﻿@page "/home"
-@page "/"
+﻿@page "/"
 
-<MudContainer>
-    <MudGrid>
-        <MudItem xs="12" sm="12" md="12">
-            <MudText Align="Align.Center">
-                "Built with the goodness of" <MudLink Href="https://www.mudblazor.com" Target="_blank">MudBlazor</MudLink> Component Library and <MudLink Href="https://fullstackhero.net/" arget="_blank">fullstackhero Templates</MudLink>.
-            </MudText>
-        </MudItem>
-        <MudItem xs="12" sm="12" md="12">
-            <MudText Align="Align.Center">Version 0.1.0</MudText>
-        </MudItem>
-    </MudGrid>
-</MudContainer>
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h2" Align="Align.Center">Welcome to Moda!</MudText>
+    </MudItem>
+</MudGrid>
 
 @code {
     [CascadingParameter]

@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Extensions;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
@@ -37,7 +38,7 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>
     public string? Description
     {
         get => _description;
-        private set => _description = value?.Trim();
+        private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
     public BacklogCategory Category { get; init; }

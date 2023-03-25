@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Extensions;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
@@ -17,8 +18,8 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
 
     public Workspace(string name, string? description, Ownership ownership, Guid workProcessId)
     {
-        Name = name.Trim();
-        Description = description?.Trim();
+        Name = name;
+        Description = description;
         Ownership = ownership;
         WorkProcessId = workProcessId;
     }
@@ -38,7 +39,7 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     public string? Description
     {
         get => _description;
-        private set => _description = value?.Trim();
+        private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>

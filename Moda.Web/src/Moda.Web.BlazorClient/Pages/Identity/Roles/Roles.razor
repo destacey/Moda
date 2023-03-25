@@ -12,7 +12,7 @@
 
         <MudDataGrid @ref="@_grid"
                      Items="@_roles"
-                     Elevation="0"
+                     Elevation="1"
                      Height="700px"
                      SortMode="SortMode.Multiple" Filterable="true"
                      FixedHeader="true"
@@ -21,10 +21,10 @@
                      QuickFilter="@_quickFilter">
             <ToolBarContent>
                 <MudSpacer />
-                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                <MudTooltip Text="Reload Data" Placement="Placement.Top">
-                    <MudFab OnClick="@(() => ReloadData())" Size="Size.Small" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" />
-                </MudTooltip>
+                <MudToolBar>
+                    <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
+                    <MudIconButton OnClick="@(() => RefreshData())" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
+                </MudToolBar>
             </ToolBarContent>
             <Columns>
                 <Column T="RoleListDto" Field="Name" />
@@ -36,7 +36,7 @@
                 <Column T="RoleListDto" Title="Actions" Sortable="false" Filterable="false" CellClass="d-flex justify-end" >
                     <CellTemplate>
                         <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true" Size="Size.Small"
-                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter" OffsetX="true">
+                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
                             @*@if (_canUpdateRoleClaims)
                             {
                                 <MudMenuItem @onclick="@(() => InvokeModal(context))">Edit</MudMenuItem>
@@ -115,7 +115,7 @@
         return false;
     };
 
-    private async Task ReloadData()
+    private async Task RefreshData()
     {
         await GetRoles();
     }

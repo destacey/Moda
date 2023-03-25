@@ -4,7 +4,7 @@
 @inject IAuthorizationService AuthService
 @inject IUsersClient UsersClient
 
-<MudBreadcrumbs Items="_breadcrumbs" />
+<ModaPageBreadCrumbs Breadcrumbs="_breadcrumbs" />
 
 <ModaTitle Title="@Title" Description="@Description" />
 @if (!_loaded)
@@ -78,18 +78,18 @@ else
                 <MudCardContent>
                     <MudGrid>
                         <MudItem xs="12" md="6">
-                            <MudField Label="First Name" Variant="Variant.Outlined">@_firstName</MudField>
+                            <MudField Label="First Name" Variant="Variant.Text">@_firstName</MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudField Label="Last Name" Variant="Variant.Outlined">@_lastName</MudField>
+                            <MudField Label="Last Name" Variant="Variant.Text">@_lastName</MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudField Label="Phone Number" Variant="Variant.Outlined">
+                            <MudField Label="Phone Number" Variant="Variant.Text">
                                 @_phoneNumber
                             </MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudField Label="Email" Variant="Variant.Outlined">@_email</MudField>
+                                <MudField Label="Email" Variant="Variant.Text">@_email</MudField>
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>

@@ -29,6 +29,8 @@ public static class ApplicationResource
     public const string Connectors = nameof(Connectors);
 
     public const string Employees = nameof(Employees);
+    public const string Teams = nameof(Teams);
+    public const string TeamsOfTeams = nameof(TeamsOfTeams);
 
     public const string BacklogCategories = nameof(BacklogCategories);
     public const string BacklogLevels = nameof(BacklogLevels);
@@ -88,6 +90,15 @@ public static class ApplicationPermissions
         new("Create Employees", ApplicationAction.Create, ApplicationResource.Employees),
         new("Update Employees", ApplicationAction.Update, ApplicationResource.Employees),
         new("Delete Employees", ApplicationAction.Delete, ApplicationResource.Employees),
+
+        new("View Teams and Teams of Teams", ApplicationAction.View, ApplicationResource.Teams, IsBasic: true),
+        new("Create Teams", ApplicationAction.Create, ApplicationResource.Teams),
+        new("Update Teams", ApplicationAction.Update, ApplicationResource.Teams),
+        new("Delete Teams", ApplicationAction.Delete, ApplicationResource.Teams),
+
+        new("Create Teams of Teams", ApplicationAction.Create, ApplicationResource.TeamsOfTeams),
+        new("Update Teams of Teams", ApplicationAction.Update, ApplicationResource.TeamsOfTeams),
+        new("Delete Teams of Teams", ApplicationAction.Delete, ApplicationResource.TeamsOfTeams),
     };
 
     private static readonly ApplicationPermission[] _work = new ApplicationPermission[]
