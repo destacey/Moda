@@ -4,59 +4,52 @@
 @inject IAuthorizationService AuthService
 @inject IUsersClient UsersClient
 
-<ErrorBoundary>
-    <ChildContent>
-        <PageTitle>Users</PageTitle>
-        <ModaTitle Title="Users" Description="Manage Users" />
+<PageTitle>Users</PageTitle>
+<ModaTitle Title="Users" Description="Manage Users" />
 
-        <MudDataGrid @ref="@_grid"
-                     Items="@_users"
-                     Elevation="1"
-                     Height="700px"
-                     SortMode="SortMode.Multiple" Filterable="true"
-                     FixedHeader="true"
-                     Loading="@_isLoading"
-                     LoadingProgressColor="@Color.Secondary"
-                     QuickFilter="@_quickFilter">
-            <ToolBarContent>
-                <MudSpacer />
-                <MudToolBar>
-                    <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
-                    <MudIconButton OnClick="@(() => RefreshData())" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
-                </MudToolBar>
-            </ToolBarContent>
-            <Columns>
-                <PropertyColumn Property="x => x.UserName" Title="Username" />
-                <PropertyColumn Property="x => x.FirstName" Title="First Name" />
-                <PropertyColumn Property="x => x.LastName" Title="Last Name" />
-                <PropertyColumn Property="x => x.Email" />
-                <PropertyColumn Property="x => x.IsActive" Title="Active" />
-                <TemplateColumn Title="Actions" CellClass="d-flex justify-end" Sortable="false" Filterable="false">
-                    <CellTemplate>
-                        <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true" Size="Size.Small"
-                                 EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
-                            <MudMenuItem OnClick="@(() => ViewProfile(@context.Item.Id))">View Profile</MudMenuItem>
-                            @if (_canViewRoles)
-                            {
-                                <MudMenuItem OnClick="@(() => ManageRoles(context.Item.Id))">Manage Permissions</MudMenuItem>
-                            }
-                        </MudMenu>
-                    </CellTemplate>
-                </TemplateColumn>
-            </Columns>
-            <LoadingContent>
-                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading users...</MudText>
-            </LoadingContent>
-            <NoRecordsContent>
-                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No users found.</MudText>
-            </NoRecordsContent>
-        </MudDataGrid>
-        <DataGridCountLabel DataGrid="@_grid" UnitLabel="users" />
-    </ChildContent>
-    <ErrorContent>
-        <ModaCustomError />
-    </ErrorContent>
-</ErrorBoundary>
+<MudDataGrid @ref="@_grid"
+             Items="@_users"
+             Elevation="1"
+             Height="700px"
+             SortMode="SortMode.Multiple" Filterable="true"
+             FixedHeader="true"
+             Loading="@_isLoading"
+             LoadingProgressColor="@Color.Secondary"
+             QuickFilter="@_quickFilter">
+    <ToolBarContent>
+        <MudSpacer />
+        <MudToolBar>
+            <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
+            <MudIconButton OnClick="@(() => RefreshData())" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
+        </MudToolBar>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.UserName" Title="Username" />
+        <PropertyColumn Property="x => x.FirstName" Title="First Name" />
+        <PropertyColumn Property="x => x.LastName" Title="Last Name" />
+        <PropertyColumn Property="x => x.Email" />
+        <PropertyColumn Property="x => x.IsActive" Title="Active" />
+        <TemplateColumn Title="Actions" CellClass="d-flex justify-end" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true" Size="Size.Small"
+                         EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
+                    <MudMenuItem OnClick="@(() => ViewProfile(@context.Item.Id))">View Profile</MudMenuItem>
+                    @if (_canViewRoles)
+                    {
+                        <MudMenuItem OnClick="@(() => ManageRoles(context.Item.Id))">Manage Permissions</MudMenuItem>
+                    }
+                </MudMenu>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <LoadingContent>
+        <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading users...</MudText>
+    </LoadingContent>
+    <NoRecordsContent>
+        <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No users found.</MudText>
+    </NoRecordsContent>
+</MudDataGrid>
+<DataGridCountLabel DataGrid="@_grid" UnitLabel="users" />
 
 @*    <ExtraActions>
         <MudMenuItem OnClick="(() => ViewProfile(context.Id))">View Profile</MudMenuItem>
@@ -91,7 +84,7 @@
 
         await GetUsers();
     }
-    
+
     private void ViewProfile(in string userId) =>
         Navigation.NavigateTo($"/users/{userId}/profile");
 
