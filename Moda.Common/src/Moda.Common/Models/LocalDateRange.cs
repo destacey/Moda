@@ -43,10 +43,10 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
         return (Start <= value) && (value <= End);
     }
 
-    /// <summary>Includeses the specified range.</summary>
+    /// <summary>Includes the specified range.</summary>
     /// <param name="range">The range.</param>
     /// <returns></returns>
-    public bool Includes(IDateRange<LocalDate> range)
+    public bool Includes(LocalDateRange range)
     {
         return (Start <= range.Start) && (range.End <= End);
     }
@@ -54,7 +54,7 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
     /// <summary>Overlapses the specified range.</summary>
     /// <param name="range">The range.</param>
     /// <returns></returns>
-    public bool Overlaps(IDateRange<LocalDate> range)
+    public bool Overlaps(LocalDateRange range)
     {
         return Includes(range) 
             || range.Includes(this)

@@ -1,10 +1,19 @@
 ﻿namespace Moda.Common.Interfaces;
-public interface IDateRange<T>
-{
-    T Start { get; }
-    T End { get; }
 
-    bool Includes(T value);
-    bool Includes(IDateRange<T> range);
-    bool Overlaps(IDateRange<T> range);
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="TS">The type of the Start property.</typeparam>
+/// <typeparam name="TE">The type of the End property.</typeparam>
+public interface IDateRange<TS,TE>
+{
+    TS Start { get; }
+    TE End { get; }
+
+    bool Includes(TS value);
+}
+
+
+public interface IDateRange<T> : IDateRange<T,T>
+{
 }
