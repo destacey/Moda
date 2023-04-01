@@ -21,6 +21,8 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
         Type = TeamType.TeamOfTeams;
     }
 
+    public IReadOnlyCollection<TeamToTeamMembership> ChildMemberships => _teamToTeamMemberships.Where(m => m.TargetId == Id).ToList().AsReadOnly();
+
     /// <summary>
     /// The process for activating a team of teams.
     /// </summary>
@@ -31,7 +33,6 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
         if (!IsActive)
         {
             IsActive = true;
-            AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
@@ -46,8 +47,11 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
     {
         if (IsActive)
         {
+            var membershipStates = TeamToTeamMemberships.Select(x => x.StateOn(timestamp.InUtc().LocalDateTime.Date)).ToArray();
+            if (membershipStates.Any(m => m == MembershipState.Active || m == MembershipState.Future))
+                return Result.Failure("Cannot deactivate a team of teams that has active team to team memberships.");
+
             IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
@@ -59,17 +63,14 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
     /// <param name="name"></param>
     /// <param name="code"></param>
     /// <param name="description"></param>
-    /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result Update(string name, TeamCode code, string? description, Instant timestamp)
+    public Result Update(string name, TeamCode code, string? description)
     {
         try
         {
             Name = name;
             Code = code;
             Description = description;
-
-            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();
         }
@@ -83,12 +84,9 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
     /// <param name="name">The name.</param>
     /// <param name="code">The code.</param>
     /// <param name="description">The description.</param>
-    /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public static TeamOfTeams Create(string name, TeamCode code, string? description, Instant timestamp)
+    public static TeamOfTeams Create(string name, TeamCode code, string? description)
     {
-        var team = new TeamOfTeams(name, code, description);
-        team.AddDomainEvent(EntityCreatedEvent.WithEntity(team, timestamp));
-        return team;
+        return new TeamOfTeams(name, code, description);
     }
 }

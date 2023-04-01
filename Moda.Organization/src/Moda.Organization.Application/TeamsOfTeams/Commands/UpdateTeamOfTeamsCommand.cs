@@ -86,8 +86,7 @@ internal sealed class UpdateTeamOfTeamsCommandHandler : ICommandHandler<UpdateTe
             var updateResult = team.Update(
                 request.Name,
                 request.Code,
-                request.Description,
-                _dateTimeService.Now
+                request.Description
                 );
 
             if (updateResult.IsFailure)

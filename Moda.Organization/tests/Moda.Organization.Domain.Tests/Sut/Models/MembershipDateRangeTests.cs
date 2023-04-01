@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Moda.Common.Models;
 using Moda.Organization.Domain.Models;
 using NodaTime;
 

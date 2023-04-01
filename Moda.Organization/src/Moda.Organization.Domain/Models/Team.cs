@@ -32,7 +32,6 @@ public sealed class Team : BaseTeam, IActivatable
         {
             // TODO is there logic that would prevent activation?
             IsActive = true;
-            AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
@@ -48,8 +47,11 @@ public sealed class Team : BaseTeam, IActivatable
         if (IsActive)
         {
             // TODO is there logic that would prevent deactivation?
+            var membershipStates = TeamToTeamMemberships.Select(x => x.StateOn(timestamp.InUtc().LocalDateTime.Date)).ToArray();
+            if (membershipStates.Any(m => m == MembershipState.Active || m == MembershipState.Future))
+                return Result.Failure("Cannot deactivate a team that has active team to team memberships.");
+
             IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
@@ -63,15 +65,13 @@ public sealed class Team : BaseTeam, IActivatable
     /// <param name="description"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result Update(string name, TeamCode code, string? description, Instant timestamp)
+    public Result Update(string name, TeamCode code, string? description)
     {
         try
         {
             Name = name;
             Code = code;
             Description = description;
-
-            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();
         }
@@ -85,12 +85,9 @@ public sealed class Team : BaseTeam, IActivatable
     /// <param name="name">The name.</param>
     /// <param name="code">The code.</param>
     /// <param name="description">The description.</param>
-    /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public static Team Create(string name, TeamCode code, string? description, Instant timestamp)
+    public static Team Create(string name, TeamCode code, string? description)
     {
-        var team = new Team(name, code, description, TeamType.Team);
-        team.AddDomainEvent(EntityCreatedEvent.WithEntity(team, timestamp));
-        return team;
+        return new Team(name, code, description, TeamType.Team);
     }
 }
