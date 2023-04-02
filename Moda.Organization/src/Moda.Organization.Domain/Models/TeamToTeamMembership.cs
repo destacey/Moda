@@ -24,7 +24,7 @@ public sealed class TeamToTeamMembership : BaseMembership
 
     /// <summary>Gets the target or parent team of teams.</summary>
     /// <value>The target.</value>
-    public BaseTeam Target { get; private set; } = null!;
+    public TeamOfTeams Target { get; private set; } = null!;
 
     internal static TeamToTeamMembership Create(Guid childId, Guid parentId, MembershipDateRange dateRange)
     {

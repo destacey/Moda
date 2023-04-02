@@ -47,7 +47,7 @@ public sealed class Team : BaseTeam, IActivatable
         if (IsActive)
         {
             // TODO is there logic that would prevent deactivation?
-            var membershipStates = TeamToTeamMemberships.Select(x => x.StateOn(timestamp.InUtc().LocalDateTime.Date)).ToArray();
+            var membershipStates = ParentMemberships.Select(x => x.StateOn(timestamp.InUtc().LocalDateTime.Date)).ToArray();
             if (membershipStates.Any(m => m == MembershipState.Active || m == MembershipState.Future))
                 return Result.Failure("Cannot deactivate a team that has active team to team memberships.");
 

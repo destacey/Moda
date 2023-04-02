@@ -65,7 +65,6 @@ public class TeamTests
         sut.Name.Should().Be(name.Trim());
         sut.Description.Should().Be(description);
         sut.IsActive.Should().BeTrue();
-        sut.TeamToTeamMemberships.Should().BeEmpty();
         sut.ParentMemberships.Should().BeEmpty();
     }
 
@@ -259,7 +258,6 @@ public class TeamTests
         
         // Assert
         result.IsSuccess.Should().BeTrue();
-        team.TeamToTeamMemberships.Count.Should().Be(1);
         team.ParentMemberships.Count.Should().Be(1);
         team.ParentMemberships.First().SourceId.Should().Be(team.Id);
         team.ParentMemberships.First().TargetId.Should().Be(teamOfTeams.Id);
@@ -282,7 +280,6 @@ public class TeamTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        team.TeamToTeamMemberships.Count.Should().Be(1);
         team.ParentMemberships.Count.Should().Be(1);
         team.ParentMemberships.First().SourceId.Should().Be(team.Id);
         team.ParentMemberships.First().TargetId.Should().Be(teamOfTeams.Id);
@@ -308,7 +305,6 @@ public class TeamTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(expectedErrorMessage);
-        team.TeamToTeamMemberships.Count.Should().Be(0);
         team.ParentMemberships.Count.Should().Be(0);
     }
 
@@ -330,7 +326,6 @@ public class TeamTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(expectedErrorMessage);
-        team.TeamToTeamMemberships.Count.Should().Be(0);
         team.ParentMemberships.Count.Should().Be(0);
     }
 
@@ -345,7 +340,7 @@ public class TeamTests
         MembershipDateRange dateRange = new(start, end);
         var createresult = team.AddTeamToTeamMembership(teamOfTeams, dateRange, _now);
 
-        var membership = team.TeamToTeamMemberships.First();
+        var membership = team.ParentMemberships.First();
         membership.SetPrivate(m => m.Id, Guid.NewGuid());
         membership.SetPrivate(m => m.Source, team);
         membership.SetPrivate(m => m.Target, teamOfTeams);
@@ -359,7 +354,6 @@ public class TeamTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        team.TeamToTeamMemberships.Count.Should().Be(1);
         team.ParentMemberships.Count.Should().Be(1);
         team.ParentMemberships.First().SourceId.Should().Be(team.Id);
         team.ParentMemberships.First().TargetId.Should().Be(teamOfTeams.Id);
@@ -378,7 +372,7 @@ public class TeamTests
         MembershipDateRange dateRange = new(start, end);
         var createresult = team.AddTeamToTeamMembership(teamOfTeams, dateRange, _now);
 
-        var membership = team.TeamToTeamMemberships.First();
+        var membership = team.ParentMemberships.First();
         membership.SetPrivate(m => m.Id, Guid.NewGuid());
         membership.SetPrivate(m => m.Source, team);
         membership.SetPrivate(m => m.Target, teamOfTeams);
@@ -394,7 +388,6 @@ public class TeamTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        team.TeamToTeamMemberships.Count.Should().Be(1);
         team.ParentMemberships.Count.Should().Be(1);
         team.ParentMemberships.First().DateRange.Start.Should().Be(start);
         team.ParentMemberships.First().DateRange.End.Should().Be(end);
@@ -411,7 +404,7 @@ public class TeamTests
         MembershipDateRange dateRange = new(start, end);
         var createresult = team.AddTeamToTeamMembership(teamOfTeams, dateRange, _now);
 
-        var membership = team.TeamToTeamMemberships.First();
+        var membership = team.ParentMemberships.First();
         membership.SetPrivate(m => m.Id, Guid.NewGuid());
         membership.SetPrivate(m => m.Source, team);
         membership.SetPrivate(m => m.Target, teamOfTeams);
@@ -427,7 +420,6 @@ public class TeamTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        team.TeamToTeamMemberships.Count.Should().Be(1);
         team.ParentMemberships.Count.Should().Be(1);
         team.ParentMemberships.First().DateRange.Start.Should().Be(start);
         team.ParentMemberships.First().DateRange.End.Should().Be(end);
@@ -444,7 +436,7 @@ public class TeamTests
         MembershipDateRange dateRange = new(start, end);
         var createresult = team.AddTeamToTeamMembership(teamOfTeams, dateRange, _now);
 
-        var membership = team.TeamToTeamMemberships.First();
+        var membership = team.ParentMemberships.First();
         membership.SetPrivate(m => m.Id, Guid.NewGuid());
         membership.SetPrivate(m => m.Source, team);
         membership.SetPrivate(m => m.Target, teamOfTeams);
@@ -454,7 +446,6 @@ public class TeamTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        team.TeamToTeamMemberships.Count.Should().Be(0);
         team.ParentMemberships.Count.Should().Be(0);
     }
 
@@ -469,7 +460,7 @@ public class TeamTests
         MembershipDateRange dateRange = new(start, end);
         var createresult = team.AddTeamToTeamMembership(teamOfTeams, dateRange, _now);
 
-        var membership = team.TeamToTeamMemberships.First();
+        var membership = team.ParentMemberships.First();
         membership.SetPrivate(m => m.Id, Guid.NewGuid());
         membership.SetPrivate(m => m.Source, team);
         membership.SetPrivate(m => m.Target, teamOfTeams);
@@ -481,7 +472,6 @@ public class TeamTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        team.TeamToTeamMemberships.Count.Should().Be(1);
         team.ParentMemberships.Count.Should().Be(1);
     }
 
@@ -496,7 +486,7 @@ public class TeamTests
         MembershipDateRange dateRange = new(start, end);
         var createresult = team.AddTeamToTeamMembership(teamOfTeams, dateRange, _now);
 
-        var membership = team.TeamToTeamMemberships.First();
+        var membership = team.ParentMemberships.First();
         membership.SetPrivate(m => m.Id, Guid.NewGuid());
         membership.SetPrivate(m => m.Source, team);
         membership.SetPrivate(m => m.Target, teamOfTeams);
@@ -508,7 +498,6 @@ public class TeamTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        team.TeamToTeamMemberships.Count.Should().Be(1);
         team.ParentMemberships.Count.Should().Be(1);
     }
 

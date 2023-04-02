@@ -11,7 +11,7 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
     private TeamCode _code = null!;
     private string? _description;
 
-    protected readonly List<TeamToTeamMembership> _teamToTeamMemberships = new();
+    protected readonly List<TeamToTeamMembership> _parentTeamMemberships = new();
 
     /// <summary>Gets the local identifier.</summary>
     /// <value>The local identifier.</value>
@@ -54,11 +54,11 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
 
     /// <summary>Gets the team to team memberships.</summary>
     /// <value>The team to team memberships.</value>
-    public IReadOnlyCollection<TeamToTeamMembership> TeamToTeamMemberships => _teamToTeamMemberships.AsReadOnly();
+    //public IReadOnlyCollection<TeamToTeamMembership> TeamToTeamMemberships => _teamToTeamMemberships.AsReadOnly();
 
     /// <summary>Gets the parent memberships.</summary>
     /// <value>The parent memberships.</value>
-    public IReadOnlyCollection<TeamToTeamMembership> ParentMemberships => _teamToTeamMemberships.Where(m => m.SourceId == Id).ToList().AsReadOnly();
+    public IReadOnlyCollection<TeamToTeamMembership> ParentMemberships => _parentTeamMemberships.AsReadOnly();
 
     /// <summary>Adds the team to team membership.</summary>
     /// <param name="parentTeam">The parent team.</param>
@@ -87,7 +87,7 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
             }
 
             var membership = TeamToTeamMembership.Create(Id, parentTeam.Id, dateRange);
-            _teamToTeamMemberships.Add(membership);
+            _parentTeamMemberships.Add(membership);
 
             return Result.Success();
         }
@@ -149,7 +149,7 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
             if (!membership.Target.IsActive)
                 return Result.Failure($"Memberships can not be removed from inactive teams. {membership.Target.IsActive} is inactive.");
 
-            _teamToTeamMemberships.Remove(membership);
+            _parentTeamMemberships.Remove(membership);
 
             return Result.Success();
         }

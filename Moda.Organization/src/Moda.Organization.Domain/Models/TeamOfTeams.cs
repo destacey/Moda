@@ -11,6 +11,8 @@ namespace Moda.Organization.Domain.Models;
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
 public sealed class TeamOfTeams : BaseTeam, IActivatable
 {
+    private readonly List<TeamToTeamMembership> _childTeamMemberships = new();
+
     private TeamOfTeams() { }
 
     private TeamOfTeams(string name, TeamCode code, string? description)
@@ -21,7 +23,7 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
         Type = TeamType.TeamOfTeams;
     }
 
-    public IReadOnlyCollection<TeamToTeamMembership> ChildMemberships => _teamToTeamMemberships.Where(m => m.TargetId == Id).ToList().AsReadOnly();
+    public IReadOnlyCollection<TeamToTeamMembership> ChildMemberships => _childTeamMemberships.AsReadOnly();
 
     /// <summary>
     /// The process for activating a team of teams.
@@ -47,8 +49,9 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
     {
         if (IsActive)
         {
-            var membershipStates = TeamToTeamMemberships.Select(x => x.StateOn(timestamp.InUtc().LocalDateTime.Date)).ToArray();
-            if (membershipStates.Any(m => m == MembershipState.Active || m == MembershipState.Future))
+            var parentMembershipStates = ParentMemberships.Select(x => x.StateOn(timestamp.InUtc().LocalDateTime.Date)).ToArray();
+            var childMembershipStates = ParentMemberships.Select(x => x.StateOn(timestamp.InUtc().LocalDateTime.Date)).ToArray();
+            if (parentMembershipStates.Union(childMembershipStates).Any(m => m == MembershipState.Active || m == MembershipState.Future))
                 return Result.Failure("Cannot deactivate a team of teams that has active team to team memberships.");
 
             IsActive = false;
