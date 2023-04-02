@@ -1,8 +1,5 @@
-using System;
 using System.Net;
-using Azure;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Serilog.Context;
 
@@ -57,8 +54,8 @@ internal class ExceptionMiddleware : IMiddleware
             string email = _currentUser.GetUserEmail() is string userEmail ? userEmail : "Anonymous";
             var userId = _currentUser.GetUserId();
 
-            if (userId != Guid.Empty) 
-                 LogContext.PushProperty("UserId", userId);
+            if (userId != Guid.Empty)
+                LogContext.PushProperty("UserId", userId);
 
             LogContext.PushProperty("UserEmail", email);
             string errorId = Guid.NewGuid().ToString();

@@ -56,7 +56,7 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
     /// <returns></returns>
     public bool Overlaps(LocalDateRange range)
     {
-        return Includes(range) 
+        return Includes(range)
             || range.Includes(this)
             || (range.Start <= Start && Start <= range.End && range.End <= End)
             || (Start <= range.Start && range.Start <= End && End <= range.End);

@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 
 namespace Moda.Organization.Application.TeamsOfTeams.Commands;
 public sealed record CreateTeamOfTeamsCommand : ICommand<int>

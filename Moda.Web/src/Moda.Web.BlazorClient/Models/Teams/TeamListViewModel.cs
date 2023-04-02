@@ -1,5 +1,4 @@
-﻿using Moda.Common.Application.Interfaces;
-using Moda.Web.BlazorClient.Infrastructure.ApiClient;
+﻿using Moda.Web.BlazorClient.Infrastructure.ApiClient;
 
 namespace Moda.Web.BlazorClient.Models.Teams;
 
@@ -13,7 +12,7 @@ public record TeamListViewModel
     public bool IsActive { get; set; } = default!;
 
     public string DetailsUrl
-        => Type == "Team" 
+        => Type == "Team"
             ? $"teams/{LocalId}"
             : $"teams-of-teams/{LocalId}";
 

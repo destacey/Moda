@@ -9,7 +9,7 @@ namespace Moda.Organization.Domain.Tests.Sut.Models;
 public class TeamTests
 {
     private readonly Instant _now = Instant.FromUtc(2020, 1, 1, 8, 0);
-    private readonly TeamCode _genericTeamCode = new ("Test");
+    private readonly TeamCode _genericTeamCode = new("Test");
 
     private Team GenerateTeam(bool isActive)
     {
@@ -252,10 +252,10 @@ public class TeamTests
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = new(2023, 5, 1); ;
         MembershipDateRange dateRange = new(start, end);
-        
+
         // Act
         var result = team.AddTeamToTeamMembership(teamOfTeams, dateRange, _now);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         team.ParentMemberships.Count.Should().Be(1);

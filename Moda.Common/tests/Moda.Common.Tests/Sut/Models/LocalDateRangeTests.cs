@@ -9,8 +9,8 @@ public class LocalDateRangeTests
     public void New_WithGap_Success()
     {
         // ARRANGE
-        LocalDate start = new (2020, 1, 1);
-        LocalDate end = new (2020, 2, 1);
+        LocalDate start = new(2020, 1, 1);
+        LocalDate end = new(2020, 2, 1);
         var expectedDays = 32;
 
         // ACT
@@ -26,8 +26,8 @@ public class LocalDateRangeTests
     public void New_NoGap_Success()
     {
         // ARRANGE
-        LocalDate start = new (2020, 1, 1);
-        LocalDate end = new (2020, 1, 2);
+        LocalDate start = new(2020, 1, 1);
+        LocalDate end = new(2020, 1, 2);
         var expectedDays = 2;
 
         // ACT
@@ -43,8 +43,8 @@ public class LocalDateRangeTests
     public void New_SameValue_Success()
     {
         // ARRANGE
-        LocalDate start = new (2020, 1, 1);
-        LocalDate end = new (2020, 1, 1);
+        LocalDate start = new(2020, 1, 1);
+        LocalDate end = new(2020, 1, 1);
         var expectedDays = 1;
 
         // ACT
@@ -60,8 +60,8 @@ public class LocalDateRangeTests
     public void New_EarlierEnd_Throws()
     {
         // ARRANGE
-        LocalDate start = new (2020, 1, 2);
-        LocalDate end = new (2020, 1, 1);
+        LocalDate start = new(2020, 1, 2);
+        LocalDate end = new(2020, 1, 1);
 
         // ACT & ASSERT
         var excpetion = Assert.Throws<ArgumentException>(() => new LocalDateRange(start, end));
@@ -113,7 +113,7 @@ public class LocalDateRangeTests
     }
     public static IEnumerable<object[]> Includes_SingleData()
     {
-        yield return new object[] 
+        yield return new object[]
         {
             new LocalDate(2020, 1, 1),
             new LocalDate(2020, 1, 10),
@@ -172,7 +172,7 @@ public class LocalDateRangeTests
         yield return new object[]
         {
             new LocalDateRange(
-                new LocalDate(2020, 1, 1), 
+                new LocalDate(2020, 1, 1),
                 new LocalDate(2020, 1, 10)),
             new LocalDateRange(
                 new LocalDate(2020, 1, 1),

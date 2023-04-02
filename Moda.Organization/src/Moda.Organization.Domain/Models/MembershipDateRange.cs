@@ -81,8 +81,8 @@ public class MembershipDateRange : ValueObject, IDateRange<LocalDate, LocalDate?
         }
         else
         {
-            return (Start <= range.Start && range.Start <= End) 
-                ||(Start <= range.End && range.End <= End);
+            return (Start <= range.Start && range.Start <= End)
+                || (Start <= range.End && range.End <= End);
         }
     }
 
