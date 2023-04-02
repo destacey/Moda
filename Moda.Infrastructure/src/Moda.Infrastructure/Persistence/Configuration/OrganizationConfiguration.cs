@@ -23,14 +23,15 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
 
         builder.Property(e => e.LocalId).ValueGeneratedOnAdd();
 
-        builder.Property(e => e.EmployeeNumber).IsRequired().HasMaxLength(256);
+        builder.Property(e => e.EmployeeNumber).HasMaxLength(256).IsRequired();
         builder.Property(e => e.HireDate);
 
-        builder.Property(e => e.Email).IsRequired()
+        builder.Property(e => e.Email)
             .HasConversion(
                 e => e.Value,
                 e => new EmailAddress(e))
-            .HasMaxLength(256);
+            .HasMaxLength(256)
+            .IsRequired();
 
         builder.Property(e => e.JobTitle).HasMaxLength(256);
         builder.Property(e => e.Department).HasMaxLength(256);
@@ -38,24 +39,14 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
         builder.Property(e => e.IsActive);
 
         // Value Objects
-        //// PersonName
-        builder.OwnsOne(e => e.Name)
-            .Property(e => e.FirstName).IsRequired().HasColumnName("FirstName").HasMaxLength(100).IsRequired();
-
-        builder.OwnsOne(e => e.Name)
-            .Property(e => e.MiddleName).HasColumnName("MiddleName").HasMaxLength(100);
-
-        builder.OwnsOne(e => e.Name)
-            .Property(e => e.LastName).IsRequired().HasColumnName("LastName").HasMaxLength(100).IsRequired();
-
-        builder.OwnsOne(e => e.Name)
-            .Property(e => e.Suffix).HasColumnName("Suffix").HasMaxLength(50);
-
-        builder.OwnsOne(e => e.Name)
-            .Property(e => e.Title).HasColumnName("Title").HasMaxLength(50);
-
-        //// EmailAddress
-        //builder.OwnsOne(e => e.Email).Property(e => e.Value).IsRequired().HasColumnName("Email").HasMaxLength(256);
+        builder.OwnsOne(e => e.Name, options =>
+        {
+            options.Property(e => e.FirstName).HasColumnName("FirstName").HasMaxLength(100).IsRequired();
+            options.Property(e => e.MiddleName).HasColumnName("MiddleName").HasMaxLength(100);
+            options.Property(e => e.LastName).HasColumnName("LastName").HasMaxLength(100).IsRequired();
+            options.Property(e => e.Suffix).HasColumnName("Suffix").HasMaxLength(50);
+            options.Property(e => e.Title).HasColumnName("Title").HasMaxLength(50);
+        });
 
 
         // Audit
@@ -121,6 +112,44 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
         builder.Property(o => o.IsDeleted);
 
         // Relationships
+
+        // Ignore
+        builder.Ignore(o => o.ParentMemberships);
+    }
+}
+
+public class TeamToTeamMembershipConfig : IEntityTypeConfiguration<TeamToTeamMembership>
+{
+    public void Configure(EntityTypeBuilder<TeamToTeamMembership> builder)
+    {
+        builder.ToTable("TeamToTeamMemberships", SchemaNames.Organization);
+
+        builder.HasKey(m => m.Id);
+
+        builder.HasIndex(m => m.Id)
+            .IncludeProperties(m => new { m.SourceId, m.TargetId, m.IsDeleted });
+
+        // Value Objects
+        builder.OwnsOne(m => m.DateRange, options =>
+        {
+            options.HasIndex(i => new { i.Start, i.End });
+
+            options.Property(d => d.Start).HasColumnName("Start").IsRequired();
+            options.Property(d => d.End).HasColumnName("End");
+        });
+
+        // Relationships
+        builder.HasOne(o => o.Source).WithMany(m => m.ParentMemberships).HasForeignKey(m => m.SourceId).OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne(o => o.Target).WithMany(m => m.ChildMemberships).HasForeignKey(m => m.TargetId).OnDelete(DeleteBehavior.NoAction);
+
+        // Audit
+        builder.Property(o => o.Created);
+        builder.Property(o => o.CreatedBy);
+        builder.Property(o => o.LastModified);
+        builder.Property(o => o.LastModifiedBy);
+        builder.Property(o => o.Deleted);
+        builder.Property(o => o.DeletedBy);
+        builder.Property(o => o.IsDeleted);
     }
 }
 

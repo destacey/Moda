@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Moda.Organization.Domain.Enums;
 using Moda.Organization.Domain.Models;
 using NodaTime;
 
@@ -23,7 +22,6 @@ public class TeamToTeamMembershipTests
         sut.SourceId.Should().Be(childId);
         sut.TargetId.Should().Be(parentId);
         sut.DateRange.Should().Be(dateRange);
-        sut.Type.Should().Be(MembershipType.TeamToTeam);
     }
 
     [Fact]
@@ -34,7 +32,7 @@ public class TeamToTeamMembershipTests
         var parentId = childId;
         var start = new LocalDate(2020, 1, 1);
         var end = new LocalDate(2020, 2, 1);
-        var dateRange = new MembershipDateRange(start,end);
+        var dateRange = new MembershipDateRange(start, end);
 
         // Act
         Action action = () => TeamToTeamMembership.Create(childId, parentId, dateRange);

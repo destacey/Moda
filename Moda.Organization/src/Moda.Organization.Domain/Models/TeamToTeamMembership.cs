@@ -1,6 +1,4 @@
-﻿using Moda.Organization.Domain.Enums;
-
-namespace Moda.Organization.Domain.Models;
+﻿namespace Moda.Organization.Domain.Models;
 public sealed class TeamToTeamMembership : BaseMembership
 {
     private TeamToTeamMembership() { }
@@ -12,7 +10,6 @@ public sealed class TeamToTeamMembership : BaseMembership
             throw new ArgumentException("A team or team of teams cannot have a membership with its self.");
         }
 
-        Type = MembershipType.TeamToTeam;
         SourceId = sourceId;
         TargetId = targetId;
         DateRange = dateRange;
@@ -20,11 +17,11 @@ public sealed class TeamToTeamMembership : BaseMembership
 
     /// <summary>Gets the source or child team or team of teams.</summary>
     /// <value>The source.</value>
-    public BaseTeam Source { get; private set; } = null!;
+    public BaseTeam Source { get; private set; } = default!;
 
     /// <summary>Gets the target or parent team of teams.</summary>
     /// <value>The target.</value>
-    public TeamOfTeams Target { get; private set; } = null!;
+    public TeamOfTeams Target { get; private set; } = default!;
 
     internal static TeamToTeamMembership Create(Guid childId, Guid parentId, MembershipDateRange dateRange)
     {

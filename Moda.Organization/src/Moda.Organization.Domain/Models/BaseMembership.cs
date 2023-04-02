@@ -15,15 +15,11 @@ public abstract class BaseMembership : BaseAuditableEntity<Guid>
     /// <value>The target identifier.</value>
     public Guid TargetId { get; init; }
 
-    /// <summary>Gets the type.</summary>
-    /// <value>The type.</value>
-    public MembershipType Type { get; init; }
-
     /// <summary>Gets or sets the date range.</summary>
     /// <value>The date range.</value>
-    public MembershipDateRange DateRange 
-    { 
-        get => _dateRange; 
+    public MembershipDateRange DateRange
+    {
+        get => _dateRange;
         protected set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
     }
 
