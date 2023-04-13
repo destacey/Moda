@@ -11,7 +11,7 @@ namespace Moda.Organization.Domain.Models;
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
 public sealed class TeamOfTeams : BaseTeam, IActivatable
 {
-    private readonly List<TeamToTeamMembership> _childTeamMemberships = new();
+    private readonly List<TeamMembership> _childTeamMemberships = new();
 
     private TeamOfTeams() { }
 
@@ -23,7 +23,7 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
         Type = TeamType.TeamOfTeams;
     }
 
-    public IReadOnlyCollection<TeamToTeamMembership> ChildMemberships => _childTeamMemberships.AsReadOnly();
+    public IReadOnlyCollection<TeamMembership> ChildMemberships => _childTeamMemberships.AsReadOnly();
 
     /// <summary>
     /// The process for activating a team of teams.
@@ -52,7 +52,7 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
             var parentMembershipStates = ParentMemberships.Select(x => x.StateOn(timestamp.InUtc().LocalDateTime.Date)).ToArray();
             var childMembershipStates = ParentMemberships.Select(x => x.StateOn(timestamp.InUtc().LocalDateTime.Date)).ToArray();
             if (parentMembershipStates.Union(childMembershipStates).Any(m => m == MembershipState.Active || m == MembershipState.Future))
-                return Result.Failure("Cannot deactivate a team of teams that has active team to team memberships.");
+                return Result.Failure("Cannot deactivate a team of teams that has active team memberships.");
 
             IsActive = false;
         }

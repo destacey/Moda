@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Moda.Common.Models;
 using Moda.Organization.Domain.Enums;
 
@@ -102,6 +103,14 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
             .HasMaxLength(64);
         builder.Property(o => o.IsActive);
 
+        //builder.Property(o => o.ParentMemberships)
+        //    .HasField("_parentMemberships")
+        //    .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        //builder.Metadata
+        //    .FindNavigation("ParentMemberships")!
+        //    .SetField("_parentMemberships");
+
         // Audit
         builder.Property(o => o.Created);
         builder.Property(o => o.CreatedBy);
@@ -114,15 +123,14 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
         // Relationships
 
         // Ignore
-        builder.Ignore(o => o.ParentMemberships);
     }
 }
 
-public class TeamToTeamMembershipConfig : IEntityTypeConfiguration<TeamToTeamMembership>
+public class TeamMembershipConfig : IEntityTypeConfiguration<TeamMembership>
 {
-    public void Configure(EntityTypeBuilder<TeamToTeamMembership> builder)
+    public void Configure(EntityTypeBuilder<TeamMembership> builder)
     {
-        builder.ToTable("TeamToTeamMemberships", SchemaNames.Organization);
+        builder.ToTable("TeamMemberships", SchemaNames.Organization);
 
         builder.HasKey(m => m.Id);
 
@@ -139,7 +147,12 @@ public class TeamToTeamMembershipConfig : IEntityTypeConfiguration<TeamToTeamMem
         });
 
         // Relationships
-        builder.HasOne(o => o.Source).WithMany(m => m.ParentMemberships).HasForeignKey(m => m.SourceId).OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne(o => o.Source)
+            .WithMany(m => m.ParentMemberships)
+                //.Metadata
+                //    .FindNavigationsTo(nameof(BaseTeam.ParentMemberships))
+                //    .SetField("_parentMemberships")
+            .HasForeignKey(m => m.SourceId).OnDelete(DeleteBehavior.NoAction);
         builder.HasOne(o => o.Target).WithMany(m => m.ChildMemberships).HasForeignKey(m => m.TargetId).OnDelete(DeleteBehavior.NoAction);
 
         // Audit

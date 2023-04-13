@@ -23,9 +23,9 @@ public abstract class BaseMembership : BaseAuditableEntity<Guid>
         protected set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
     }
 
-    /// <summary>Changes the date range.</summary>
+    /// <summary>Updates the specified date range.</summary>
     /// <param name="dateRange">The date range.</param>
-    public void ChangeDateRange(MembershipDateRange dateRange)
+    public void Update(MembershipDateRange dateRange)
     {
         DateRange = dateRange;
     }

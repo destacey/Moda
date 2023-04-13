@@ -11,7 +11,7 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
     private TeamCode _code = null!;
     private string? _description;
 
-    protected readonly List<TeamToTeamMembership> _parentTeamMemberships = new();
+    protected List<TeamMembership> _parentMemberships = new();
 
     /// <summary>Gets the local identifier.</summary>
     /// <value>The local identifier.</value>
@@ -52,20 +52,16 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
     /// </summary>
     public bool IsActive { get; protected set; } = true;
 
-    /// <summary>Gets the team to team memberships.</summary>
-    /// <value>The team to team memberships.</value>
-    //public IReadOnlyCollection<TeamToTeamMembership> TeamToTeamMemberships => _teamToTeamMemberships.AsReadOnly();
-
     /// <summary>Gets the parent memberships.</summary>
     /// <value>The parent memberships.</value>
-    public IReadOnlyCollection<TeamToTeamMembership> ParentMemberships => _parentTeamMemberships.AsReadOnly();
+    public IReadOnlyCollection<TeamMembership> ParentMemberships => _parentMemberships;//.AsReadOnly();
 
-    /// <summary>Adds the team to team membership.</summary>
+    /// <summary>Adds the team membership.</summary>
     /// <param name="parentTeam">The parent team.</param>
     /// <param name="dateRange">The date range.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public Result AddTeamToTeamMembership(TeamOfTeams parentTeam, MembershipDateRange dateRange, Instant timestamp)
+    public Result AddTeamMembership(TeamOfTeams parentTeam, MembershipDateRange dateRange, Instant timestamp)
     {
         try
         {
@@ -78,16 +74,16 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
             if (!parentTeam.IsActive)
                 return Result.Failure($"Memberships can not be added to inactive teams. {parentTeam.Name} is inactive.");
 
-            if (ParentMemberships.Any(m => m.DateRange.Overlaps(dateRange)))
-                return Result.Failure("Teams can only have one active parent Team to Team Membership.  This membership would create an overlapping membership.");
+            if (_parentMemberships.Any(m => m.DateRange.Overlaps(dateRange)))
+                return Result.Failure("Teams can only have one active parent Team Membership.  This membership would create an overlapping membership.");
 
             if (Type == TeamType.TeamOfTeams)
             {
                 //TODO - check for circular references - the parent team can not be a descendant of this team
             }
 
-            var membership = TeamToTeamMembership.Create(Id, parentTeam.Id, dateRange);
-            _parentTeamMemberships.Add(membership);
+            var membership = TeamMembership.Create(Id, parentTeam.Id, dateRange);
+            _parentMemberships.Add(membership);
 
             return Result.Success();
         }
@@ -98,19 +94,19 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
     }
 
     /// <summary>
-    /// Updates the team to team membership.
+    /// Updates the team membership.
     /// </summary>
     /// <param name="membershipId"></param>
     /// <param name="dateRange"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result UpdateTeamToTeamMembership(Guid membershipId, MembershipDateRange dateRange, Instant timestamp)
+    public Result UpdateTeamMembership(Guid membershipId, MembershipDateRange dateRange, Instant timestamp)
     {
         try
         {
             Guard.Against.Null(dateRange);
 
-            var membership = ParentMemberships.Single(m => m.Id == membershipId);
+            var membership = _parentMemberships.Single(m => m.Id == membershipId);
 
             if (!IsActive)
                 return Result.Failure($"Memberships can not be updated on inactive teams. {Name} is inactive.");
@@ -118,10 +114,10 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
             if (!membership.Target.IsActive)
                 return Result.Failure($"Memberships can not be updated on inactive teams. {membership.Target.IsActive} is inactive.");
 
-            if (ParentMemberships.Any(m => m.Id != membershipId && m.DateRange.Overlaps(dateRange)))
-                return Result.Failure("Teams can only have one active parent Team to Team Membership.  This membership would create an overlapping membership.");
+            if (_parentMemberships.Any(m => m.Id != membershipId && m.DateRange.Overlaps(dateRange)))
+                return Result.Failure("Teams can only have one active parent Team Membership.  This membership would create an overlapping membership.");
 
-            membership.ChangeDateRange(dateRange);
+            membership.Update(dateRange);
 
             return Result.Success();
         }
@@ -132,16 +128,16 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
     }
 
     /// <summary>
-    /// Removes the team to team membership.
+    /// Removes the team membership.
     /// </summary>
     /// <param name="membershipId"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result RemoveTeamToTeamMembership(Guid membershipId)
+    public Result RemoveTeamMembership(Guid membershipId)
     {
         try
         {
-            var membership = ParentMemberships.Single(m => m.Id == membershipId);
+            var membership = _parentMemberships.Single(m => m.Id == membershipId);
 
             if (!IsActive)
                 return Result.Failure($"Memberships can not be removed from inactive teams. {Name} is inactive.");
@@ -149,7 +145,7 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
             if (!membership.Target.IsActive)
                 return Result.Failure($"Memberships can not be removed from inactive teams. {membership.Target.IsActive} is inactive.");
 
-            _parentTeamMemberships.Remove(membership);
+            _parentMemberships.Remove(membership);
 
             return Result.Success();
         }

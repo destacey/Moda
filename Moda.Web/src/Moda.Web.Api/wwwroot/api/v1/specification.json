@@ -2186,6 +2186,69 @@
         ]
       }
     },
+    "/api/organization/teams/{id}/memberships": {
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Add a parent team memberhship.",
+        "operationId": "Teams_AddTeamMembership",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTeamMembershipRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/organization/teams-of-teams": {
       "get": {
         "tags": [
@@ -4048,6 +4111,39 @@
             "description": "Gets the team description.",
             "maxLength": 1024,
             "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
+      "AddTeamMembershipRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "teamId",
+          "parentTeamId",
+          "start"
+        ],
+        "properties": {
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "parentTeamId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "start": {
+            "type": "string",
+            "format": "date",
+            "nullable": false
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
             "nullable": true
           }
         }

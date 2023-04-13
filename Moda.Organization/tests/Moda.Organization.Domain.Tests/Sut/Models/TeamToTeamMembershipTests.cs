@@ -16,7 +16,7 @@ public class TeamToTeamMembershipTests
         var dateRange = new MembershipDateRange(start, end);
 
         // Act
-        var sut = TeamToTeamMembership.Create(childId, parentId, dateRange);
+        var sut = TeamMembership.Create(childId, parentId, dateRange);
 
         // Assert
         sut.SourceId.Should().Be(childId);
@@ -35,7 +35,7 @@ public class TeamToTeamMembershipTests
         var dateRange = new MembershipDateRange(start, end);
 
         // Act
-        Action action = () => TeamToTeamMembership.Create(childId, parentId, dateRange);
+        Action action = () => TeamMembership.Create(childId, parentId, dateRange);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("A team or team of teams cannot have a membership with its self.");
