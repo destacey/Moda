@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Moda.Common.Domain.Authorization;
 using Moda.Web.BlazorClient.Infrastructure.ApiClient;
 using Moda.Web.BlazorClient.Infrastructure.Auth;
+using Moda.Web.BlazorClient.Infrastructure.Auth.Graph;
 using Moda.Web.BlazorClient.Infrastructure.Preferences;
 using MudBlazor;
 using MudBlazor.Services;
@@ -28,7 +29,7 @@ public static class ConfigureServices
             .AutoRegisterInterfaces<IAppService>()
             .AutoRegisterInterfaces<IApiService>()
             .AddAuthentication(config)
-            .AddAuthorizationCore(RegisterPermissionClaims)
+            .AddAuthorizationCore(RegisterPermissionClaims)        
 
             // Add Api Http Client.
             .AddHttpClient(ClientName, client =>
