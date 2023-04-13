@@ -11,7 +11,7 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
     private TeamCode _code = null!;
     private string? _description;
 
-    protected List<TeamMembership> _parentMemberships = new();
+    protected readonly List<TeamMembership> _parentMemberships = new();
 
     /// <summary>Gets the local identifier.</summary>
     /// <value>The local identifier.</value>
@@ -54,7 +54,7 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
 
     /// <summary>Gets the parent memberships.</summary>
     /// <value>The parent memberships.</value>
-    public IReadOnlyCollection<TeamMembership> ParentMemberships => _parentMemberships;//.AsReadOnly();
+    public IReadOnlyCollection<TeamMembership> ParentMemberships => _parentMemberships.AsReadOnly();
 
     /// <summary>Adds the team membership.</summary>
     /// <param name="parentTeam">The parent team.</param>

@@ -11,7 +11,7 @@ namespace Moda.Organization.Domain.Models;
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
 public sealed class TeamOfTeams : BaseTeam, IActivatable
 {
-    private readonly List<TeamMembership> _childTeamMemberships = new();
+    private readonly List<TeamMembership> _childMemberships = new();
 
     private TeamOfTeams() { }
 
@@ -23,7 +23,7 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
         Type = TeamType.TeamOfTeams;
     }
 
-    public IReadOnlyCollection<TeamMembership> ChildMemberships => _childTeamMemberships.AsReadOnly();
+    public IReadOnlyCollection<TeamMembership> ChildMemberships => _childMemberships.AsReadOnly();
 
     /// <summary>
     /// The process for activating a team of teams.

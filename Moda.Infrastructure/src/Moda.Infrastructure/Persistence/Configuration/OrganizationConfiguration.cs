@@ -103,14 +103,6 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
             .HasMaxLength(64);
         builder.Property(o => o.IsActive);
 
-        //builder.Property(o => o.ParentMemberships)
-        //    .HasField("_parentMemberships")
-        //    .UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        //builder.Metadata
-        //    .FindNavigation("ParentMemberships")!
-        //    .SetField("_parentMemberships");
-
         // Audit
         builder.Property(o => o.Created);
         builder.Property(o => o.CreatedBy);
@@ -149,9 +141,6 @@ public class TeamMembershipConfig : IEntityTypeConfiguration<TeamMembership>
         // Relationships
         builder.HasOne(o => o.Source)
             .WithMany(m => m.ParentMemberships)
-                //.Metadata
-                //    .FindNavigationsTo(nameof(BaseTeam.ParentMemberships))
-                //    .SetField("_parentMemberships")
             .HasForeignKey(m => m.SourceId).OnDelete(DeleteBehavior.NoAction);
         builder.HasOne(o => o.Target).WithMany(m => m.ChildMemberships).HasForeignKey(m => m.TargetId).OnDelete(DeleteBehavior.NoAction);
 
