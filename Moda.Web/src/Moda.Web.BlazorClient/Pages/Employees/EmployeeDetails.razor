@@ -1,0 +1,59 @@
+﻿@page "/employees/{Id:int}"
+@attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
+
+@inject IAuthorizationService AuthService
+@inject IEmployeesClient EmployeesClient
+
+<PageTitle>Employees</PageTitle>
+<ModaTitle Title="Employees" />
+@if (_loading)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; } // from route
+
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    private List<BreadcrumbItem> _breadcrumbs = new()
+    {
+        new BreadcrumbItem("Employees", href: "/employees"),
+        new BreadcrumbItem("Details", href: null, disabled: true)
+    };
+
+    private EmployeeDetailsDto? _employee;
+
+    private bool _loading = true;
+
+    private string _title = string.Empty;
+    private string _description = string.Empty;
+
+    private bool _showPageActions;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetEmployee();
+
+        var user = (await AuthState).User;
+
+        _loading = false;
+    }
+
+    private async Task GetEmployee()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => EmployeesClient.GetByIdAsync(Id), Snackbar) is EmployeeDetailsDto result)
+        {
+            _title = $"{result.FirstName} {result.LastName}";
+            _description = "Employee Details";
+
+            _employee = result;
+        }
+    }
+}

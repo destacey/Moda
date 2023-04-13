@@ -22,6 +22,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="7.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Graph" Version="5.5.0" />
 		<PackageReference Include="MudBlazor" Version="6.2.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="NSwag.MSBuild" Version="13.18.2">

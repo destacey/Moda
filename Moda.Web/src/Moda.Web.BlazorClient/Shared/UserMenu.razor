@@ -1,4 +1,9 @@
-﻿<MudMenu AnchorOrigin="Origin.BottomRight" LockScroll="true" TransformOrigin="Origin.TopRight">
+﻿@inject IAccessTokenProvider TokenProvider
+@inject IHttpClientFactory ClientFactory
+@inject IHttpClientFactory HttpClientFactory
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<MudMenu AnchorOrigin="Origin.BottomRight" LockScroll="true" TransformOrigin="Origin.TopRight">
     <ActivatorContent>
         <MudIconButton Icon="@Icons.Material.Filled.Person" />
     </ActivatorContent>
@@ -11,11 +16,11 @@
                     <MudText>Account</MudText>
                 </div>
             </MudMenuItem>
-@*            <MudMenuItem OnClick="AuditLogs">
-                <div class="d-flex">
-                    <MudIcon Class="mx-2" Icon="@Icons.Material.Filled.LibraryBooks" />
-                    <MudText>Logs</MudText>
-                </div>
+            @*            <MudMenuItem OnClick="AuditLogs">
+            <div class="d-flex">
+            <MudIcon Class="mx-2" Icon="@Icons.Material.Filled.LibraryBooks" />
+            <MudText>Logs</MudText>
+            </div>
             </MudMenuItem>*@
 
             <MudDivider />
@@ -42,6 +47,40 @@
     [Parameter]
     public EventCallback<MouseEventArgs> ThemeManagerOnClick { get; set; }
 
+        private string? ImageUri { get; set; }
+    private HttpClient _graphClient;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var imageUri = await localStorage.GetItemAsync<string>("imageUri");
+        if (imageUri != null)
+        {
+            ImageUri = imageUri;
+        }
+        else
+        {
+            _graphClient = HttpClientFactory.CreateClient("GraphAPI");
+            try
+            {
+                var dataRequest = await _graphClient.GetAsync("https://graph.microsoft.com/v1.0/me/photo/$value");
+
+                if (dataRequest.IsSuccessStatusCode)
+                {
+                    using var stream = await dataRequest.Content.ReadAsStreamAsync();
+                    byte[] bytes = new byte[stream.Length];
+                    stream.Read(bytes, 0, (int)stream.Length);
+                    imageUri = $"data:image/png;base64,{Convert.ToBase64String(bytes)}";
+                    await localStorage.SetItemAsync("imageUri", imageUri);
+                    ImageUri = imageUri;
+                }
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                ex.Redirect();
+            }
+        }
+    }
+
     private void Profile()
     {
         Navigation.NavigateTo("/account");
@@ -56,7 +95,7 @@
     //{
     //    Navigation.NavigateTo("/audit-logs");
     //}
-    
+
     private async Task ThemeManager()
     {
         await ThemeManagerOnClick.InvokeAsync();
