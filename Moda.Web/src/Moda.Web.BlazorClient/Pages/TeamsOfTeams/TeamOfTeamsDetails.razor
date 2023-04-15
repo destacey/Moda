@@ -32,6 +32,7 @@ else
                 <MudItem xs="12" md="5">
                     <ModaFieldGroup Label="Type:" Text="@_team?.Type" />
                     <ModaFieldGroup Label="Code:" Text="@_team?.Code" />
+                    <ModaFieldGroup Label="Team of Teams:" Text="@_team?.TeamOfTeams?.Name" Link="@(_team?.TeamOfTeams is null ? null : $"teams-of-teams/{_team.TeamOfTeams.LocalId}")" />
                     <ModaFieldGroup Label="Is Active?:" Text="@_team?.IsActive.ToString()" />
                 </MudItem>
                 <MudItem xs="12" md="7">

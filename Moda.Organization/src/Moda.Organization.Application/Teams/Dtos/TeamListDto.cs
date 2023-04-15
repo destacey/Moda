@@ -36,6 +36,6 @@ public class TeamListDto : IMapFrom<BaseTeam>
         config.NewConfig<BaseTeam, TeamListDto>()
             .Map(dest => dest.Code, src => src.Code.Value)
             .Map(dest => dest.Type, src => src.Type.GetDisplayName())
-            .Map(dest => dest.TeamOfTeams, src => src.ParentMemberships.FirstOrDefault().Target);
+            .Map(dest => dest.TeamOfTeams, src => src.ParentMemberships == null ? null : src.ParentMemberships.FirstOrDefault()!.Target);
     }
 }

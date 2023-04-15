@@ -6,13 +6,27 @@
                 <MudText Typo="Typo.body1" Class="">@Label</MudText>
             </MudItem>
             <MudItem xs="@TextSize" Class="pa-1">
-                <MudText Typo="Typo.body1" Class="">@Text</MudText>
+                @if(_isLink)
+                {
+                    <MudLink Href="@Link" Typo="Typo.body1">@Text</MudLink>
+                }
+                else
+                {
+                    <MudText Typo="Typo.body1" Class="">@Text</MudText>
+                }
             </MudItem>
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
             <MudItem Class="pa-1">
                 <MudText Typo="Typo.body1" Class="">@Label</MudText>
-                <MudText Typo="Typo.body1" Class="">@Text</MudText>
+                @if (_isLink)
+                {
+                    <MudLink Href="@Link" Typo="Typo.body1">@Text</MudLink>
+                }
+                else
+                {
+                    <MudText Typo="Typo.body1" Class="">@Text</MudText>
+                }
             </MudItem>
         </MudHidden>
     </MudBreakpointProvider>
@@ -24,4 +38,7 @@
     [Parameter] public string? Text { get; set; }
     [Parameter] public int LabelSize { get; set; } = 3;
     [Parameter] public int TextSize { get; set; } = 9;
+    [Parameter] public string? Link { get; set; }
+
+    private bool _isLink => !string.IsNullOrWhiteSpace(Text) && !string.IsNullOrWhiteSpace(Link);
 }

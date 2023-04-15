@@ -4071,6 +4071,14 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "teamOfTeams": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NavigationDto"
+              }
+            ]
           }
         }
       },
@@ -4234,6 +4242,14 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "teamOfTeams": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NavigationDto"
+              }
+            ]
           }
         }
       },
