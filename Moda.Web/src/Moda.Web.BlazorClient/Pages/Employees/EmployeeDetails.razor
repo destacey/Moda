@@ -12,7 +12,17 @@
 }
 else
 {
-
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="px-3">
+        <MudTabPanel Text="Details">
+            <MudGrid Class="px-4 py-1">
+                <MudItem xs="12" md="5">
+                    <ModaFieldGroup Label="First:" Text="@_employee?.FirstName" />
+                    <ModaFieldGroup Label="Middle:" Text="@_employee?.MiddleName" />
+                    <ModaFieldGroup Label="Last:" Text="@_employee?.LastName" />
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+    </MudTabs>
 }
 
 @code {
