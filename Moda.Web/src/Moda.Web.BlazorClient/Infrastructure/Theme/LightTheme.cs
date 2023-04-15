@@ -1,4 +1,5 @@
 ﻿using MudBlazor;
+using MudBlazor.Utilities;
 
 namespace Moda.Web.BlazorClient.Infrastructure.Theme;
 
@@ -6,8 +7,9 @@ public class LightTheme : MudTheme
 {
     public LightTheme()
     {
-        Palette = new Palette()
+        Palette = new PaletteLight()
         {
+            // Palette Overrides
             Primary = CustomColors.Light.Primary,
             Secondary = CustomColors.Light.Secondary,
             Success = CustomColors.Light.Primary,
@@ -16,9 +18,10 @@ public class LightTheme : MudTheme
             DrawerText = "rgba(0,0,0, 0.7)",
             AppbarBackground = CustomColors.Light.AppbarBackground,
             AppbarText = CustomColors.Light.AppbarText,
-            TableLines = "#e0e0e029",
+            TableLines = new MudColor(Colors.Grey.Lighten2).SetAlpha(6.0).ToString(MudColorOutputFormats.RGBA),
             OverlayDark = "hsl(0deg 0% 0% / 75%)"
         };
+
         LayoutProperties = new LayoutProperties()
         {
             DefaultBorderRadius = "5px"
