@@ -15,15 +15,20 @@ public sealed record GetTeamsQuery : IQuery<IReadOnlyList<TeamListDto>>
 internal sealed class GetTeamsQueryHandler : IQueryHandler<GetTeamsQuery, IReadOnlyList<TeamListDto>>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
+    private readonly IDateTimeService _dateTimeService;
 
-    public GetTeamsQueryHandler(IOrganizationDbContext organizationDbContext)
+    public GetTeamsQueryHandler(IOrganizationDbContext organizationDbContext, IDateTimeService dateTimeService)
     {
         _organizationDbContext = organizationDbContext;
+        _dateTimeService = dateTimeService;
     }
 
     public async Task<IReadOnlyList<TeamListDto>> Handle(GetTeamsQuery request, CancellationToken cancellationToken)
     {
-        var query = _organizationDbContext.Teams.AsQueryable();
+        var today = _dateTimeService.Now.InUtc().Date;
+        var query = _organizationDbContext.Teams
+            .Include(t => t.ParentMemberships.Where(m => m.DateRange.Start <= today && (!m.DateRange.End.HasValue || today <= m.DateRange.End)))
+            .AsQueryable();
 
         if (!request.IncludeInactive)
             query = query.Where(e => e.IsActive);

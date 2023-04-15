@@ -4016,6 +4016,31 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "teamOfTeams": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NavigationDto"
+              }
+            ]
+          }
+        }
+      },
+      "NavigationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "localId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
           }
         }
       },
@@ -4171,6 +4196,14 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "teamOfTeams": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NavigationDto"
+              }
+            ]
           }
         }
       },

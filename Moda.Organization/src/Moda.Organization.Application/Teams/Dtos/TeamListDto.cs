@@ -29,10 +29,13 @@ public class TeamListDto : IMapFrom<BaseTeam>
     /// </summary>
     public bool IsActive { get; set; }
 
+    public NavigationDto? TeamOfTeams { get; set; }
+
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<BaseTeam, TeamListDto>()
             .Map(dest => dest.Code, src => src.Code.Value)
-            .Map(dest => dest.Type, src => src.Type.GetDisplayName());
+            .Map(dest => dest.Type, src => src.Type.GetDisplayName())
+            .Map(dest => dest.TeamOfTeams, src => src.ParentMemberships.FirstOrDefault().Target);
     }
 }

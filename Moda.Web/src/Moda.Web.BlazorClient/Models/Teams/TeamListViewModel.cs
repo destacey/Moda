@@ -10,11 +10,18 @@ public record TeamListViewModel
     public string Code { get; set; } = default!;
     public string Type { get; set; } = default!;
     public bool IsActive { get; set; } = default!;
+    public NavigationDto? TeamOfTeams { get; set; }
+    
+    // hack until the datagrid nullable issue is fixed
+    public string? TeamOfTeamsName { get; set; }
 
     public string DetailsUrl
         => Type == "Team"
             ? $"teams/{LocalId}"
             : $"teams-of-teams/{LocalId}";
+
+    public string? TeamOfTeamsDetailsUrl
+        => TeamOfTeams is not null ? $"teams-of-teams/{TeamOfTeams.LocalId}" : null;
 
     public static TeamListViewModel FromTeamListDto(TeamListDto dto)
     {
@@ -25,7 +32,9 @@ public record TeamListViewModel
             Name = dto.Name,
             Code = dto.Code,
             Type = dto.Type,
-            IsActive = dto.IsActive
+            IsActive = dto.IsActive,
+            TeamOfTeams = dto.TeamOfTeams,
+            TeamOfTeamsName = dto.TeamOfTeams?.Name
         };
     }
 
@@ -38,7 +47,9 @@ public record TeamListViewModel
             Name = dto.Name,
             Code = dto.Code,
             Type = dto.Type,
-            IsActive = dto.IsActive
+            IsActive = dto.IsActive,
+            TeamOfTeams = dto.TeamOfTeams,
+            TeamOfTeamsName = dto.TeamOfTeams?.Name
         };
     }
 }

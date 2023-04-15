@@ -51,6 +51,14 @@
         </PropertyColumn>
         <PropertyColumn Property="x => x.Code" />
         <PropertyColumn Property="x => x.Type" />
+        <PropertyColumn Property="x => x.TeamOfTeamsName" Title="Team of Teams">
+            <CellTemplate>
+                @if (context.Item.TeamOfTeams is not null)
+                {                    
+                    <MudLink Href="@(context.Item.TeamOfTeamsDetailsUrl)">@context.Item.TeamOfTeamsName</MudLink>
+                }
+            </CellTemplate>
+        </PropertyColumn>
         <PropertyColumn Property="x => x.IsActive" Title="Active" Hidden="@(!_includeDisabled)" />
     </Columns>
     <LoadingContent>
@@ -110,6 +118,9 @@
         if (!string.IsNullOrWhiteSpace(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
+        if (!string.IsNullOrWhiteSpace(x.TeamOfTeamsName) && x.TeamOfTeamsName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
         if (!string.IsNullOrWhiteSpace(x.Code) && x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
@@ -147,7 +158,7 @@
             _latestTeams.AddRange(teamOfTeamsResult.Select(t => TeamListViewModel.FromTeamOfTeamsListDto(t)));
         }
 
-        _teams = _latestTeams;
+        _teams = _latestTeams.OrderBy(t => t.Name).ToList();
 
         _isLoading = false;
     }
