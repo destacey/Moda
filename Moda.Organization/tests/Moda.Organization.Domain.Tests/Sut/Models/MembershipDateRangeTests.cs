@@ -5,6 +5,8 @@ using NodaTime;
 namespace Moda.Organization.Domain.Tests.Sut.Models;
 public class MembershipDateRangeTests
 {
+    #region New
+
     [Fact]
     public void New_WithGap_Success()
     {
@@ -78,6 +80,10 @@ public class MembershipDateRangeTests
         // ASSERT
         excpetion.Message.Should().Be("Nullable object must have a value.");
     }
+
+    #endregion New
+
+    #region Includes
 
     [Theory]
     [MemberData(nameof(Includes_SingleData))]
@@ -296,6 +302,10 @@ public class MembershipDateRangeTests
         };
     }
 
+    #endregion Includes
+
+    #region Overlaps
+
     [Theory]
     [MemberData(nameof(Overlaps_RangeData))]
     public void Overlaps_Range(MembershipDateRange range1, MembershipDateRange range2, bool expected)
@@ -441,6 +451,10 @@ public class MembershipDateRangeTests
         };
     }
 
+    #endregion Overlaps
+
+    #region Equals
+
     [Fact]
     public void GetEqualityComponents_SameValue_EqualityTrue()
     {
@@ -477,4 +491,6 @@ public class MembershipDateRangeTests
         result1.Should().NotBe(result2);
         result1.GetHashCode().Should().NotBe(result2.GetHashCode());
     }
+
+    #endregion Equals
 }
