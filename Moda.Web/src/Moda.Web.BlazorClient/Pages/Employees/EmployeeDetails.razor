@@ -3,6 +3,9 @@
 
 @inject IAuthorizationService AuthService
 @inject IEmployeesClient EmployeesClient
+@inject IAccessTokenProvider TokenProvider
+@inject IHttpClientFactory HttpClientFactory
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <PageTitle>Employees</PageTitle>
 <ModaTitle Title="Employees" />
@@ -15,12 +18,85 @@ else
     <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="px-3">
         <MudTabPanel Text="Details">
             <MudGrid Class="px-4 py-1">
-                <MudItem xs="12" md="5">
-                    <ModaFieldGroup Label="First:" Text="@_employee?.FirstName" />
-                    <ModaFieldGroup Label="Middle:" Text="@_employee?.MiddleName" />
-                    <ModaFieldGroup Label="Last:" Text="@_employee?.LastName" />
+                <MudItem xs="4">
+                    <MudCard>
+                        <MudCardHeader>
+                            <CardHeaderAvatar>
+                                <MudAvatar>
+                                    <MudImage Src="@_imageUri" Alt="@_employee.FullName" />
+                                </MudAvatar>
+                            </CardHeaderAvatar>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">@_employee.FullName</MudText>
+                                <MudText Typo="Typo.body1">@_employee.Email</MudText>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Default" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Info" Color="Color.Default" OnClick="@ShowAdvancedInfo" />
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudGrid Class="pa-0">
+                                <MudBreakpointProvider>
+                                    <MudHidden Breakpoint="Breakpoint.SmAndUp" Invert="true">
+                                        <MudItem xs="3" Class="pa-1">
+                                            <MudText Typo="Typo.body1" Class="">Manager:</MudText>
+                                        </MudItem>
+                                        <MudItem xs="9" Class="pa-1">
+                                            <MudButton Typo="Typo.body1" Color="Color.Secondary" EndIcon="@Icons.Material.Filled.NavigateNext" OnClick="ViewManagerDetails">@_employee.ManagerName</MudButton>
+                                        </MudItem>
+                                    </MudHidden>
+                                    <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+                                        <MudItem Class="pa-1">
+                                            <MudText Typo="Typo.body1" Class="">Manager:</MudText>
+                                            <MudButton Typo="Typo.body1" Class="" Color="Color.Secondary" EndIcon="@Icons.Material.Filled.NavigateNext" OnClick="ViewManagerDetails">@_employee.ManagerName</MudButton>
+                                        </MudItem>
+                                    </MudHidden>
+                                </MudBreakpointProvider>
+                            </MudGrid>
+                            <ModaFieldGroup Label="Department:" Text="@_employee.Department" />
+                            <ModaFieldGroup Label="Job Title:" Text="@_employee.JobTitle" />
+                            <ModaFieldGroup Label="Hire Date:" Text="@_employee.HireDate?.ToString()" />
+                            <ModaFieldGroup Label="Office Location:" Text="@_employee.OfficeLocation" />
+                            <MudPaper Elevation="-1" hidden="@_hideAdvanced">
+                                <ModaFieldGroup Label="Moda DB Row Id:" Text="@_employee.Id.ToString()" />
+                                <ModaFieldGroup Label="External Source Employee Number:" Text="@_employee.EmployeeNumber" />
+                            </MudPaper>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudCard>
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.body1">Direct Reports</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudList Clickable="true">
+
+                            </MudList>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudCard>
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.body1">Teams</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudList Clickable="true">
+
+                            </MudList>
+                        </MudCardContent>
+                    </MudCard>
                 </MudItem>
             </MudGrid>
+        </MudTabPanel>
+        <MudTabPanel Text="Org Chart">
+
         </MudTabPanel>
     </MudTabs>
 }
@@ -39,21 +115,63 @@ else
     };
 
     private EmployeeDetailsDto? _employee;
+    private List<EmployeeListDto?> _directReports = new List<EmployeeListDto?>();
+    private List<TeamListDto?> _teams = new List<TeamListDto?>();
+    private HttpClient _graphClient;
+    private string? _imageUri { get; set; }
 
     private bool _loading = true;
+    private bool _hideAdvanced = true;
 
     private string _title = string.Empty;
     private string _description = string.Empty;
 
-    private bool _showPageActions;
+    public void ViewManagerDetails() => Navigation.NavigateTo($"/employees/{_employee.ManagerLocalId}");
 
-    protected override async Task OnInitializedAsync()
+    private void ShowAdvancedInfo()
+    {
+        _hideAdvanced = !_hideAdvanced;
+    }
+
+    protected override async Task OnParametersSetAsync()
     {
         await GetEmployee();
+
+        var imageUri = await localStorage.GetItemAsync<string>($"{_employee.LocalId}ImageUri");
+        if (imageUri != null)
+        {
+            _imageUri = imageUri;
+        }
+        else
+        {
+            _graphClient = HttpClientFactory.CreateClient("GraphAPI");
+            try
+            {
+                var dataRequest = await _graphClient.GetAsync($"https://graph.microsoft.com/v1.0/users/{_employee.EmployeeNumber}/photo/$value");
+                if (dataRequest.IsSuccessStatusCode)
+                {
+                    using var stream = await dataRequest.Content.ReadAsStreamAsync();
+                    byte[] bytes = new byte[stream.Length];
+                    stream.Read(bytes, 0, (int)stream.Length);
+                    imageUri = $"data:image/png;base64,{Convert.ToBase64String(bytes)}";
+                    await localStorage.SetItemAsync($"{_employee.LocalId}ImageUri", imageUri);
+                    _imageUri = imageUri;
+                }
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                ex.Redirect();
+            }
+        }
 
         var user = (await AuthState).User;
 
         _loading = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // We use OnParametersSet instead of this because when you navigate to your manager, it won't re-run this since we're on the same "page" with just different parameters
     }
 
     private async Task GetEmployee()
@@ -64,6 +182,8 @@ else
             _description = "Employee Details";
 
             _employee = result;
+
+            // TODO: Set _directReports and _teams here, no API call for that right now that I can see
         }
     }
 }
