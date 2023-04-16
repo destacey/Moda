@@ -29,7 +29,7 @@ public static class ConfigureServices
             .AutoRegisterInterfaces<IAppService>()
             .AutoRegisterInterfaces<IApiService>()
             .AddAuthentication(config)
-            .AddAuthorizationCore(RegisterPermissionClaims)        
+            .AddAuthorizationCore(RegisterPermissionClaims)
 
             // Add Api Http Client.
             .AddHttpClient(ClientName, client =>
