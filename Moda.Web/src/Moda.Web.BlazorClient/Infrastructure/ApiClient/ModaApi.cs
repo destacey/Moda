@@ -5135,14 +5135,27 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         System.Threading.Tasks.Task UpdateAsync(System.Guid id, UpdateTeamRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
-        /// Add a parent team memberhship.
+        /// Get parent team memberships.
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<TeamMembershipsDto>> GetTeamMembershipsAsync(System.Guid id);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get parent team memberships.
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<TeamMembershipsDto>> GetTeamMembershipsAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Add a parent team membership.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task AddTeamMembershipAsync(System.Guid id, AddTeamMembershipRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
-        /// Add a parent team memberhship.
+        /// Add a parent team membership.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task AddTeamMembershipAsync(System.Guid id, AddTeamMembershipRequest request, System.Threading.CancellationToken cancellationToken);
@@ -5570,7 +5583,103 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         }
 
         /// <summary>
-        /// Add a parent team memberhship.
+        /// Get parent team memberships.
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<TeamMembershipsDto>> GetTeamMembershipsAsync(System.Guid id)
+        {
+            return GetTeamMembershipsAsync(id, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get parent team memberships.
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<TeamMembershipsDto>> GetTeamMembershipsAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("api/organization/teams/{id}/memberships");
+            urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<TeamMembershipsDto>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ErrorResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ErrorResult>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ErrorResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ErrorResult>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Add a parent team membership.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task AddTeamMembershipAsync(System.Guid id, AddTeamMembershipRequest request)
@@ -5580,7 +5689,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
-        /// Add a parent team memberhship.
+        /// Add a parent team membership.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task AddTeamMembershipAsync(System.Guid id, AddTeamMembershipRequest request, System.Threading.CancellationToken cancellationToken)
@@ -5825,14 +5934,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         System.Threading.Tasks.Task UpdateAsync(System.Guid id, UpdateTeamOfTeamsRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
-        /// Add a parent team memberhship.
+        /// Add a parent team membership.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task AddTeamMembershipAsync(System.Guid id, AddTeamMembershipRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
-        /// Add a parent team memberhship.
+        /// Add a parent team membership.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task AddTeamMembershipAsync(System.Guid id, AddTeamMembershipRequest request, System.Threading.CancellationToken cancellationToken);
@@ -6250,7 +6359,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         }
 
         /// <summary>
-        /// Add a parent team memberhship.
+        /// Add a parent team membership.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task AddTeamMembershipAsync(System.Guid id, AddTeamMembershipRequest request)
@@ -6260,7 +6369,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
-        /// Add a parent team memberhship.
+        /// Add a parent team membership.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task AddTeamMembershipAsync(System.Guid id, AddTeamMembershipRequest request, System.Threading.CancellationToken cancellationToken)
@@ -8756,7 +8865,15 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public bool IsActive { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("teamOfTeams", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public NavigationDto? TeamOfTeams { get; set; } = default!;
+        public TeamNavigationDto? TeamOfTeams { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class TeamNavigationDto : NavigationDto
+    {
+        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Type { get; set; } = default!;
 
     }
 
@@ -8799,7 +8916,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public bool IsActive { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("teamOfTeams", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public NavigationDto? TeamOfTeams { get; set; } = default!;
+        public TeamNavigationDto? TeamOfTeams { get; set; } = default!;
 
     }
 
@@ -8863,6 +8980,31 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class TeamMembershipsDto
+    {
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid Id { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("child", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public TeamNavigationDto Child { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("parent", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public TeamNavigationDto Parent { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("start", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
+        public System.DateTime Start { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("end", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
+        public System.DateTime? End { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("state", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string State { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class AddTeamMembershipRequest
     {
         [Newtonsoft.Json.JsonProperty("teamId", Required = Newtonsoft.Json.Required.Always)]
@@ -8906,7 +9048,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public bool IsActive { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("teamOfTeams", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public NavigationDto? TeamOfTeams { get; set; } = default!;
+        public TeamNavigationDto? TeamOfTeams { get; set; } = default!;
 
     }
 
@@ -8935,7 +9077,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public bool IsActive { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("teamOfTeams", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public NavigationDto? TeamOfTeams { get; set; } = default!;
+        public TeamNavigationDto? TeamOfTeams { get; set; } = default!;
 
     }
 

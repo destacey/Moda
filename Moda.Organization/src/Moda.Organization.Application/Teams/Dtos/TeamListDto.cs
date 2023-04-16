@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Moda.Organization.Application.Models;
 
 namespace Moda.Organization.Application.Teams.Dtos;
 public class TeamListDto : IMapFrom<BaseTeam>
@@ -29,7 +30,7 @@ public class TeamListDto : IMapFrom<BaseTeam>
     /// </summary>
     public bool IsActive { get; set; }
 
-    public NavigationDto? TeamOfTeams { get; set; }
+    public TeamNavigationDto? TeamOfTeams { get; set; }
 
     public void Register(TypeAdapterConfig config)
     {

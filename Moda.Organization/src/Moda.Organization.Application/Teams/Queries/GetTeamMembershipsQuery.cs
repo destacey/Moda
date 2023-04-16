@@ -1,15 +1,16 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Moda.Organization.Application.Models;
 
 namespace Moda.Organization.Application.Teams.Queries;
-public sealed record GetTeamQuery : IQuery<TeamDetailsDto?>
+public sealed record GetTeamMembershipsQuery : IQuery<IReadOnlyList<TeamMembershipsDto>>
 {
-    public GetTeamQuery(Guid teamId)
+    public GetTeamMembershipsQuery(Guid teamId)
     {
         TeamId = teamId;
     }
 
-    public GetTeamQuery(int teamLocalId)
+    public GetTeamMembershipsQuery(int teamLocalId)
     {
         TeamLocalId = teamLocalId;
     }
@@ -18,24 +19,25 @@ public sealed record GetTeamQuery : IQuery<TeamDetailsDto?>
     public int? TeamLocalId { get; }
 }
 
-internal sealed class GetTeamQueryHandler : IQueryHandler<GetTeamQuery, TeamDetailsDto?>
+internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamMembershipsQuery, IReadOnlyList<TeamMembershipsDto>>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly ILogger<GetTeamQueryHandler> _logger;
+    private readonly ILogger<GetTeamMembershipsQueryHandler> _logger;
     private readonly IDateTimeService _dateTimeService;
 
-    public GetTeamQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamQueryHandler> logger, IDateTimeService dateTimeService)
+    public GetTeamMembershipsQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamMembershipsQueryHandler> logger, IDateTimeService dateTimeService)
     {
         _organizationDbContext = organizationDbContext;
         _logger = logger;
         _dateTimeService = dateTimeService;
     }
 
-    public async Task<TeamDetailsDto?> Handle(GetTeamQuery request, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<TeamMembershipsDto>> Handle(GetTeamMembershipsQuery request, CancellationToken cancellationToken)
     {
         var today = _dateTimeService.Now.InUtc().Date;
         var query = _organizationDbContext.Teams
-            .Include(t => t.ParentMemberships.Where(m => m.DateRange.Start <= today && (!m.DateRange.End.HasValue || today <= m.DateRange.End)))
+            .Include(t => t.ParentMemberships)
+                .ThenInclude(m => m.Target)
             .AsQueryable();
 
         if (request.TeamId.HasValue)
@@ -55,9 +57,9 @@ internal sealed class GetTeamQueryHandler : IQueryHandler<GetTeamQuery, TeamDeta
             throw exception;
         }
 
-        return await query
-            .AsNoTrackingWithIdentityResolution()
-            .ProjectToType<TeamDetailsDto>()
-            .FirstOrDefaultAsync(cancellationToken);
+        var team = await query
+            .SingleAsync(cancellationToken);
+
+        return team.ParentMemberships.Select(m => TeamMembershipsDto.Create(m, _dateTimeService)).ToList();
     }
 }

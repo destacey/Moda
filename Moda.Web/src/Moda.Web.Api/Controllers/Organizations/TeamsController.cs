@@ -1,4 +1,5 @@
-﻿using Moda.Organization.Application.Teams.Dtos;
+﻿using Moda.Organization.Application.Models;
+using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
 using Moda.Web.Api.Models.Organizations;
 using Moda.Web.Api.Models.Organizations.Teams;
@@ -86,9 +87,22 @@ public class TeamsController : ControllerBase
     //    throw new NotImplementedException();
     //}
 
+    [HttpGet("{id}/memberships")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get parent team memberships.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<IReadOnlyList<TeamMembershipsDto>>> GetTeamMemberships(Guid id, CancellationToken cancellationToken)
+    {
+        var memberships = await _sender.Send(new GetTeamMembershipsQuery(id), cancellationToken);
+
+        return Ok(memberships);
+    }
+
     [HttpPost("{id}/memberships")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
-    [OpenApiOperation("Add a parent team memberhship.", "")]
+    [OpenApiOperation("Add a parent team membership.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]

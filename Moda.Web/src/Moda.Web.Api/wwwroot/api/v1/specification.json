@@ -2187,11 +2187,70 @@
       }
     },
     "/api/organization/teams/{id}/memberships": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get parent team memberships.",
+        "operationId": "Teams_GetTeamMemberships",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamMembershipsDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
       "post": {
         "tags": [
           "Teams"
         ],
-        "summary": "Add a parent team memberhship.",
+        "summary": "Add a parent team membership.",
         "operationId": "Teams_AddTeamMembership",
         "parameters": [
           {
@@ -2482,7 +2541,7 @@
         "tags": [
           "TeamsOfTeams"
         ],
-        "summary": "Add a parent team memberhship.",
+        "summary": "Add a parent team membership.",
         "operationId": "TeamsOfTeams_AddTeamMembership",
         "parameters": [
           {
@@ -4084,11 +4143,27 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/NavigationDto"
+                "$ref": "#/components/schemas/TeamNavigationDto"
               }
             ]
           }
         }
+      },
+      "TeamNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        ]
       },
       "NavigationDto": {
         "type": "object",
@@ -4139,7 +4214,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/NavigationDto"
+                "$ref": "#/components/schemas/TeamNavigationDto"
               }
             ]
           }
@@ -4211,6 +4286,34 @@
           }
         }
       },
+      "TeamMembershipsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "child": {
+            "$ref": "#/components/schemas/TeamNavigationDto"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/TeamNavigationDto"
+          },
+          "start": {
+            "type": "string",
+            "format": "date"
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
       "AddTeamMembershipRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -4272,7 +4375,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/NavigationDto"
+                "$ref": "#/components/schemas/TeamNavigationDto"
               }
             ]
           }
@@ -4310,7 +4413,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/NavigationDto"
+                "$ref": "#/components/schemas/TeamNavigationDto"
               }
             ]
           }

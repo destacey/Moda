@@ -1,7 +1,6 @@
-﻿using Mapster;
+﻿namespace Moda.Common.Application.Dtos;
 
-namespace Moda.Organization.Application.Teams.Dtos;
-public record NavigationDto : IMapFrom<BaseTeam>
+public record NavigationDto
 {
     public Guid Id { get; set; }
     public int LocalId { get; set; }
