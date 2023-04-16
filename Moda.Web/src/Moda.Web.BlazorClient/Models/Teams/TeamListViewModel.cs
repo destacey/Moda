@@ -11,7 +11,7 @@ public record TeamListViewModel
     public string Type { get; set; } = default!;
     public bool IsActive { get; set; } = default!;
     public NavigationDto? TeamOfTeams { get; set; }
-    
+
     // hack until the datagrid nullable issue is fixed
     public string? TeamOfTeamsName { get; set; }
 

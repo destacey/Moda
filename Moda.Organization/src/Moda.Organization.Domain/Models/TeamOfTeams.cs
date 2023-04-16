@@ -95,17 +95,17 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
             query = _childMemberships.Where(x => x.StateOn(date) == MembershipState.Future).AsQueryable();
         }
 
-        List<Guid> descendantTeamIds = new ();
+        List<Guid> descendantTeamIds = new();
         foreach (var membership in _childMemberships)
-        {            
+        {
             if (membership.Source is TeamOfTeams teamOfTeams)
             {
                 descendantTeamIds.AddRange(teamOfTeams.GetDescendantTeamIdsAsOf(date, includeFuture));
             }
-            
-            descendantTeamIds.Add(membership.SourceId);            
+
+            descendantTeamIds.Add(membership.SourceId);
         }
-        
+
         return descendantTeamIds;
     }
 

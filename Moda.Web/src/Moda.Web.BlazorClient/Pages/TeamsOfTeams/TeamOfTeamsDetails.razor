@@ -2,6 +2,7 @@
 
 @using Moda.Web.BlazorClient.Models.Teams;
 @using Moda.Web.BlazorClient.Shared.Organizations;
+@using Moda.Web.BlazorClient.Components.Organizations;
 
 @attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
 
@@ -44,6 +45,9 @@ else
                 </MudItem>
             </MudGrid>
         </MudTabPanel>
+        <MudTabPanel Text="Team Memberships">
+            <TeamMembershipsGrid Memberships="_teamMemberships" />
+        </MudTabPanel>
     </MudTabs>
 }
 
@@ -62,6 +66,7 @@ else
     };
 
     private TeamOfTeamsDetailsDto? _team;
+    private List<TeamMembershipsDto> _teamMemberships = new();
 
     private bool _loading = true;
 
@@ -77,8 +82,11 @@ else
         await GetTeam();
 
         var user = (await AuthState).User;
-        _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.TeamsOfTeams);
+        _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Teams);
         _showPageActions = _canUpdateTeams;
+
+        // TODO: move to on tab change rather than on init
+        await GetTeamMemberships();
 
         _loading = false;
     }
@@ -112,6 +120,14 @@ else
         if (!result.Canceled)
         {
             await GetTeam();
+        }
+    }
+
+    private async Task GetTeamMemberships()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsOfTeamsClient.GetTeamMembershipsAsync(_team!.Id), Snackbar) is List<TeamMembershipsDto> result)
+        {
+            _teamMemberships = result.ToList();
         }
     }
 

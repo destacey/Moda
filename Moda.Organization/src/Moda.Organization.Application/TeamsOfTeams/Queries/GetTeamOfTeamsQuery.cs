@@ -1,6 +1,5 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Moda.Common.Application.Interfaces;
 
 namespace Moda.Organization.Application.TeamsOfTeams.Queries;
 public sealed record GetTeamOfTeamsQuery : IQuery<TeamOfTeamsDetailsDto?>

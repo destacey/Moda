@@ -102,8 +102,8 @@
         var user = (await AuthState).User;
         _canCreateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.Teams);
         _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Teams);
-        _canCreateTeamsOfTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.TeamsOfTeams);
-        _canUpdateTeamsOfTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.TeamsOfTeams);
+        _canCreateTeamsOfTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.Teams);
+        _canUpdateTeamsOfTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Teams);
         _showPageActions = _canCreateTeams || _canCreateTeamsOfTeams;
     }
 

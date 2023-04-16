@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moda.Organization.Application.Models;
 
-namespace Moda.Organization.Application.Teams.Queries;
+namespace Moda.Organization.Application.TeamsOfTeams.Queries;
 public sealed record GetTeamMembershipsQuery : IQuery<IReadOnlyList<TeamMembershipsDto>>
 {
     public GetTeamMembershipsQuery(Guid teamId)
@@ -34,9 +34,11 @@ internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamMemb
     public async Task<IReadOnlyList<TeamMembershipsDto>> Handle(GetTeamMembershipsQuery request, CancellationToken cancellationToken)
     {
         var today = _dateTimeService.Now.InUtc().Date;
-        var query = _organizationDbContext.Teams
+        var query = _organizationDbContext.TeamOfTeams
             .Include(t => t.ParentMemberships)
                 .ThenInclude(m => m.Target)
+            .Include(t => t.ChildMemberships)
+                .ThenInclude(m => m.Source)
             .AsQueryable();
 
         if (request.TeamId.HasValue)
@@ -59,6 +61,16 @@ internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamMemb
         var team = await query
             .SingleAsync(cancellationToken);
 
-        return team.ParentMemberships.Select(m => TeamMembershipsDto.Create(m, _dateTimeService)).ToList();
+        List<TeamMembershipsDto> memberships = new List<TeamMembershipsDto>();
+        if (team.ParentMemberships.Any())
+        {
+            memberships.AddRange(team.ParentMemberships.Select(m => TeamMembershipsDto.Create(m, _dateTimeService)).ToList());
+        }
+        if (team.ChildMemberships.Any())
+        {
+            memberships.AddRange(team.ChildMemberships.Select(m => TeamMembershipsDto.Create(m, _dateTimeService)).ToList());
+        }
+
+        return memberships;
     }
 }
