@@ -1,8 +1,7 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
-namespace Moda.Organization.Application.Teams.Commands;
+namespace Moda.Organization.Application.TeamsOfTeams.Commands;
 public sealed record AddTeamMembershipCommand : ICommand
 {
     public AddTeamMembershipCommand(Guid teamId, Guid parentTeamId, MembershipDateRange dateRange)
@@ -51,9 +50,7 @@ internal sealed class AddTeamMembershipCommandHandler : ICommandHandler<AddTeamM
     {
         try
         {
-            var team = await _organizationDbContext.Teams
-                .Include(t => t.ParentMemberships)
-                .SingleAsync(t => t.Id == request.TeamId);
+            var team = await GetTeamWithAllChildMemberships(request.TeamId, cancellationToken);
 
             var parentTeam = await _organizationDbContext.TeamOfTeams
                 .SingleAsync(t => t.Id == request.ParentTeamId);
@@ -74,5 +71,28 @@ internal sealed class AddTeamMembershipCommandHandler : ICommandHandler<AddTeamM
 
             return Result.Failure($"Moda Request: Exception for Request {requestName} {request}");
         }
+    }
+
+    private async Task<TeamOfTeams> GetTeamWithAllChildMemberships(Guid teamId, CancellationToken cancellationToken)
+    {
+        var today = _dateTimeService.Now.InUtc().Date;
+        var team = await _organizationDbContext.TeamOfTeams
+            .Include(t => t.ParentMemberships)
+            .Include(t => t.ChildMemberships.Where(m => m.DateRange != null && (today <= m.DateRange.Start || (!m.DateRange.End.HasValue && m.DateRange.Start <= today) || (m.DateRange.Start <= today && today <= m.DateRange.End))))
+                .ThenInclude(m => m.Source)
+            .SingleAsync(t => t.Id == teamId, cancellationToken);
+
+        if (team.ChildMemberships.Any())
+        {
+            foreach (var childTeam in team.ChildMemberships.Where(m => m.IsActiveOn(today) || m.IsFutureOn(today)).Select(m => m.Source))
+            {
+                if (childTeam is TeamOfTeams childTeamOfTeams)
+                {
+                    await GetTeamWithAllChildMemberships(childTeamOfTeams.Id, cancellationToken);
+                }
+            }
+        }
+
+        return team;
     }
 }

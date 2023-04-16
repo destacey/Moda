@@ -33,6 +33,9 @@ internal sealed class GetTeamsQueryHandler : IQueryHandler<GetTeamsQuery, IReadO
         if (!request.IncludeInactive)
             query = query.Where(e => e.IsActive);
 
-        return await query.ProjectToType<TeamListDto>().ToListAsync(cancellationToken);
+        return await query.AsNoTrackingWithIdentityResolution()
+            .AsNoTrackingWithIdentityResolution()
+            .ProjectToType<TeamListDto>()
+            .ToListAsync(cancellationToken);
     }
 }

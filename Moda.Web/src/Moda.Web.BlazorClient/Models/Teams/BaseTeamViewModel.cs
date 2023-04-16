@@ -13,6 +13,13 @@ public class BaseTeamViewModel
         Type = dto.Type;
     }
 
+    public BaseTeamViewModel(TeamOfTeamsDetailsDto dto)
+    {
+        Id = dto.Id;
+        Name = dto.Name;
+        Type = dto.Type;
+    }
+
     public BaseTeamViewModel(TeamOfTeamsListDto dto)
     {
         Id = dto.Id;

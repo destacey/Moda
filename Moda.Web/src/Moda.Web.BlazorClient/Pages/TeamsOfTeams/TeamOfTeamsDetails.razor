@@ -1,5 +1,8 @@
 ﻿@page "/teams-of-teams/{Id:int}"
 
+@using Moda.Web.BlazorClient.Models.Teams;
+@using Moda.Web.BlazorClient.Shared.Organizations;
+
 @attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
 
 @inject IAuthorizationService AuthService
@@ -21,6 +24,7 @@ else
                 @if (_canUpdateTeams)
                 {
                     <MudButton OnClick="@UpdateTeam">Edit</MudButton>
+                    <MudButton OnClick="@AddTeamMembership">Add Team Membership</MudButton>
                 }
             </MudButtonGroup>
         }
@@ -102,6 +106,27 @@ else
             };
 
         var dialog = DialogService.Show<UpdateTeamOfTeams_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetTeam();
+        }
+    }
+
+    private async Task AddTeamMembership()
+    {
+        var dialogTitle = "Add Team Membership";
+        var parameters = new DialogParameters { ["Team"] = new BaseTeamViewModel(_team!) };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<AddTeamMembership_Dialog>(dialogTitle, parameters, dialogOptions);
 
         var result = await dialog.Result;
 

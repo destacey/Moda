@@ -79,7 +79,8 @@ else
 
         if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsOfTeamsClient.GetListAsync(false), Snackbar) is List<TeamOfTeamsListDto> result)
         {
-            foreach (var item in result.OrderBy(t => t.Name))
+            // TODO: add logic to filter out teams that are already in the team of teams
+            foreach (var item in result.Where(t => t.Id != Team.Id).OrderBy(t => t.Name))
             {
                 _teams.Add(new BaseTeamViewModel(item));
             }
@@ -114,9 +115,9 @@ else
             {
                 await TeamsClient.AddTeamMembershipAsync(_model.TeamId, _model.ToAddTeamMembershipRequest());
             }
-            else if (Team.Type == "TeamOfTeams")
+            else if (Team.Type == "Team of Teams")
             {
-
+                await TeamsOfTeamsClient.AddTeamMembershipAsync(_model.TeamId, _model.ToAddTeamMembershipRequest());
             }
             else
             {
@@ -135,9 +136,14 @@ else
             }
             _editContext!.NotifyValidationStateChanged();
         }
+        catch (ApiException<ErrorResult> ex)
+        {
+            ErrorResult error = ex.Result;
+            Snackbar.Add($"Error adding team membership. {error.SupportMessage}", MudBlazor.Severity.Error);
+        }
         catch (Exception)
         {
-            Snackbar.Add($"Error adding team memberhip.", MudBlazor.Severity.Error);
+            Snackbar.Add("Error adding team membership.", MudBlazor.Severity.Error);
         }
         _isSaving = false;
     }

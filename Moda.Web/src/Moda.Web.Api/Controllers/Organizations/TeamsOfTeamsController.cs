@@ -1,5 +1,6 @@
 ﻿using Moda.Organization.Application.TeamsOfTeams.Dtos;
 using Moda.Organization.Application.TeamsOfTeams.Queries;
+using Moda.Web.Api.Models.Organizations;
 using Moda.Web.Api.Models.Organizations.TeamOfTeams;
 using Moda.Web.Api.Models.Organizations.TeamsOfTeams;
 
@@ -84,4 +85,29 @@ public class TeamsOfTeamsController : ControllerBase
     //{
     //    throw new NotImplementedException();
     //}
+
+    [HttpPost("{id}/memberships")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.TeamsOfTeams)]
+    [OpenApiOperation("Add a parent team memberhship.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult> AddTeamMembership(Guid id, [FromBody] AddTeamMembershipRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToTeamOfTeamsAddParentTeamMembershipCommand(), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "TeamsOfTeamsController.AddTeamMembership"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
 }

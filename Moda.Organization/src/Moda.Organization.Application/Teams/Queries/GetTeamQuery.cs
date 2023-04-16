@@ -18,13 +18,13 @@ public sealed record GetTeamQuery : IQuery<TeamDetailsDto?>
     public int? TeamLocalId { get; }
 }
 
-internal sealed class GetTeamQueryHandler : IQueryHandler<GetTeamQuery, TeamDetailsDto?>
+internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamQuery, TeamDetailsDto?>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly ILogger<GetTeamQueryHandler> _logger;
+    private readonly ILogger<GetTeamMembershipsQueryHandler> _logger;
     private readonly IDateTimeService _dateTimeService;
 
-    public GetTeamQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamQueryHandler> logger, IDateTimeService dateTimeService)
+    public GetTeamMembershipsQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamMembershipsQueryHandler> logger, IDateTimeService dateTimeService)
     {
         _organizationDbContext = organizationDbContext;
         _logger = logger;
@@ -56,6 +56,7 @@ internal sealed class GetTeamQueryHandler : IQueryHandler<GetTeamQuery, TeamDeta
         }
 
         return await query
+            .AsNoTrackingWithIdentityResolution()
             .ProjectToType<TeamDetailsDto>()
             .FirstOrDefaultAsync(cancellationToken);
     }

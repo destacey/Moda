@@ -77,9 +77,11 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
             if (_parentMemberships.Any(m => m.DateRange.Overlaps(dateRange)))
                 return Result.Failure("Teams can only have one active parent Team Membership.  This membership would create an overlapping membership.");
 
-            if (Type == TeamType.TeamOfTeams)
+            if (this is TeamOfTeams teamOfTeams)
             {
-                //TODO - check for circular references - the parent team can not be a descendant of this team
+                var descendantIds = teamOfTeams.GetDescendantTeamIdsAsOf(timestamp.InUtc().Date);
+                if (descendantIds.Contains(parentTeam.Id))
+                    return Result.Failure($"The parent team {parentTeam.Name} is a descendant of this team.  This would create a circular reference.");
             }
 
             var membership = TeamMembership.Create(Id, parentTeam.Id, dateRange);

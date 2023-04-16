@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Moda.Organization.Application.Teams.Commands;
 using Moda.Organization.Domain.Models;
 using NodaTime;
 
@@ -12,9 +11,14 @@ public sealed record AddTeamMembershipRequest
     public LocalDate Start { get; set; }
     public LocalDate? End { get; set; }
 
-    public AddTeamMembershipCommand ToAddParentTeamMembershipCommand()
+    public Organization.Application.Teams.Commands.AddTeamMembershipCommand ToTeamAddParentTeamMembershipCommand()
     {
-        return new AddTeamMembershipCommand(TeamId, ParentTeamId, new MembershipDateRange(Start, End));
+        return new Organization.Application.Teams.Commands.AddTeamMembershipCommand(TeamId, ParentTeamId, new MembershipDateRange(Start, End));
+    }
+
+    public Organization.Application.TeamsOfTeams.Commands.AddTeamMembershipCommand ToTeamOfTeamsAddParentTeamMembershipCommand()
+    {
+        return new Organization.Application.TeamsOfTeams.Commands.AddTeamMembershipCommand(TeamId, ParentTeamId, new MembershipDateRange(Start, End));
     }
 }
 

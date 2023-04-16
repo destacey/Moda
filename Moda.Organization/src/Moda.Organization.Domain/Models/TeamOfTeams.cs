@@ -83,6 +83,32 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
         }
     }
 
+    /// <summary>Gets the descendant team ids as of.</summary>
+    /// <param name="date">The date.</param>
+    /// <param name="includeFuture">if set to <c>true</c> [include future].</param>
+    /// <returns></returns>
+    public List<Guid> GetDescendantTeamIdsAsOf(LocalDate date, bool includeFuture = false)
+    {
+        var query = _childMemberships.Where(x => x.StateOn(date) == MembershipState.Active).AsQueryable();
+        if (includeFuture)
+        {
+            query = _childMemberships.Where(x => x.StateOn(date) == MembershipState.Future).AsQueryable();
+        }
+
+        List<Guid> descendantTeamIds = new ();
+        foreach (var membership in _childMemberships)
+        {            
+            if (membership.Source is TeamOfTeams teamOfTeams)
+            {
+                descendantTeamIds.AddRange(teamOfTeams.GetDescendantTeamIdsAsOf(date, includeFuture));
+            }
+            
+            descendantTeamIds.Add(membership.SourceId);            
+        }
+        
+        return descendantTeamIds;
+    }
+
     /// <summary>Creates the specified team of teams.</summary>
     /// <param name="name">The name.</param>
     /// <param name="code">The code.</param>

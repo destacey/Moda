@@ -91,13 +91,23 @@ public class TeamsController : ControllerBase
     [OpenApiOperation("Add a parent team memberhship.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult> AddTeamMembership(Guid id, [FromBody] AddTeamMembershipRequest request, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(request.ToAddParentTeamMembershipCommand(), cancellationToken);
+        var result = await _sender.Send(request.ToTeamAddParentTeamMembershipCommand(), cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : BadRequest(result.Error);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "TeamsController.AddTeamMembership"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
     }
 }

@@ -57,6 +57,7 @@ internal sealed class GetTeamOfTeamsQueryHandler : IQueryHandler<GetTeamOfTeamsQ
         }
 
         return await query
+            .AsNoTrackingWithIdentityResolution()
             .ProjectToType<TeamOfTeamsDetailsDto>()
             .FirstOrDefaultAsync(cancellationToken);
     }
