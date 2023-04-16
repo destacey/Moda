@@ -41,7 +41,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var imageUri = await localStorage.GetItemAsync<string>("meImageUri");
+        var imageUri = await localStorage.GetItemAsync<string>(StorageConstants.Local.ImageUri);
         if (imageUri != null)
         {
             ImageUri = imageUri;
@@ -59,7 +59,7 @@
                     byte[] bytes = new byte[stream.Length];
                     stream.Read(bytes, 0, (int)stream.Length);
                     imageUri = $"data:image/png;base64,{Convert.ToBase64String(bytes)}";
-                    await localStorage.SetItemAsync("meImageUri", imageUri);
+                    await localStorage.SetItemAsync(StorageConstants.Local.ImageUri, imageUri);
                     ImageUri = imageUri;
                 }
             }
