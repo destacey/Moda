@@ -1,5 +1,4 @@
 ﻿@inject IAccessTokenProvider TokenProvider
-@inject IHttpClientFactory ClientFactory
 @inject IHttpClientFactory HttpClientFactory
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
@@ -42,7 +41,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var imageUri = await localStorage.GetItemAsync<string>("imageUri");
+        var imageUri = await localStorage.GetItemAsync<string>("meImageUri");
         if (imageUri != null)
         {
             ImageUri = imageUri;
@@ -60,7 +59,7 @@
                     byte[] bytes = new byte[stream.Length];
                     stream.Read(bytes, 0, (int)stream.Length);
                     imageUri = $"data:image/png;base64,{Convert.ToBase64String(bytes)}";
-                    await localStorage.SetItemAsync("imageUri", imageUri);
+                    await localStorage.SetItemAsync("meImageUri", imageUri);
                     ImageUri = imageUri;
                 }
             }

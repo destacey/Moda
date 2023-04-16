@@ -3944,7 +3944,7 @@
           },
           "hireDate": {
             "type": "string",
-            "format": "date",
+            "format": "date-time",
             "nullable": true
           },
           "email": {
@@ -3978,6 +3978,10 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
