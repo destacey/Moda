@@ -148,7 +148,7 @@ else
         var nodes = new List<NodeModel>();
         var links = new List<LinkModel>();
         // TODO: Need to find some way to get an x-value here that is the parent paper's width / 2
-        var managerNode = GetEmployeeNode(_employee.ManagerName, 50, 50);
+        var managerNode = GetEmployeeNode(_employee.ManagerName ?? "My Manager", 50, 50);
         var meNode = GetEmployeeNode(_employee.FullName + " (Me)", 50, 200);
         nodes.Add(managerNode);
         nodes.Add(meNode);
