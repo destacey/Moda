@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 
 namespace Moda.Organization.Application.TeamsOfTeams.Commands;
 public sealed record CreateTeamOfTeamsCommand : ICommand<int>
@@ -71,7 +70,7 @@ internal sealed class CreateTeamOfTeamsCommandHandler : ICommandHandler<CreateTe
     {
         try
         {
-            var team = TeamOfTeams.Create(request.Name, request.Code, request.Description, _dateTimeService.Now);
+            var team = TeamOfTeams.Create(request.Name, request.Code, request.Description);
             await _organizationDbContext.TeamOfTeams.AddAsync(team, cancellationToken);
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);

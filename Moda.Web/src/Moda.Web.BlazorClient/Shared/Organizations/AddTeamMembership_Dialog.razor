@@ -1,0 +1,195 @@
+﻿@using System.ComponentModel.DataAnnotations;
+@using Moda.Web.BlazorClient.Models.Teams;
+
+@implements IDisposable
+
+@inject ISnackbar Snackbar
+@inject ITeamsClient TeamsClient
+@inject ITeamsOfTeamsClient TeamsOfTeamsClient
+
+@if (_loading)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+            <EditForm id="addTeamMembershipForm" EditContext="_editContext" OnValidSubmit="Add">
+                <MudTextField Label="Team Name" Variant="Variant.Text" Value="Team.Name" />
+
+                <DataAnnotationsValidator />
+                <MudSelect Dense="true" Label="Parent Team" Variant="Variant.Text" AnchorOrigin="Origin.BottomCenter"
+                       @bind-Value="_model.ParentTeamId" For="@(() => _model.ParentTeamId)">
+                    <MudSelectItem Value="@Guid.Empty">Select Team</MudSelectItem>
+                    @foreach (var item in _teams)
+                    {
+                        <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                    }
+                </MudSelect>
+
+                <DataAnnotationsValidator />
+                <MudDatePicker Label="Start" AnchorOrigin="Origin.BottomCenter" Editable="true" @bind-Date="_model.Start" For="@(() => _model.Start)" />
+
+                <DataAnnotationsValidator />
+                <MudDatePicker Label="End" AnchorOrigin="Origin.BottomCenter" Editable="true" @bind-Date="_model.End" For="@(() => _model.End)" />
+            </EditForm>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel">Cancel</MudButton>
+            <MudButton form="addTeamMembershipForm" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_isSaving">
+                @if (_isSaving)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Saving</MudText>
+                }
+                else
+                {
+                    <MudText>Save</MudText>
+                }
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+    [Parameter]
+    public BaseTeamViewModel Team { get; set; } = null!;
+
+    [Parameter]
+    public string TeamName { get; set; } = null!;
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    private bool _loading = true;
+
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+
+    private AddTeamMembershipViewModel _model = new ();
+
+    private List<BaseTeamViewModel> _teams = new();
+
+    private bool _isSaving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _model.TeamId = Team.Id;
+
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsOfTeamsClient.GetListAsync(false), Snackbar) is List<TeamOfTeamsListDto> result)
+        {
+            // TODO: add logic to filter out teams that are already in the team of teams
+            foreach (var item in result.Where(t => t.Id != Team.Id).OrderBy(t => t.Name))
+            {
+                _teams.Add(new BaseTeamViewModel(item));
+            }
+        }
+        else
+        {
+            Cancel();
+        }
+
+        _editContext = new(_model);
+        _editContext.OnValidationRequested += HandleValidationRequested;
+        _messageStore = new(_editContext);
+
+        _loading = false;
+    }
+
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+    {
+        _messageStore?.Clear();
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Add()
+    {
+        try
+        {
+            _isSaving = true;
+            _messageStore?.Clear();
+
+            if (Team.Type == "Team")
+            {
+                await TeamsClient.AddTeamMembershipAsync(_model.TeamId, _model.ToAddTeamMembershipRequest());
+            }
+            else if (Team.Type == "Team of Teams")
+            {
+                await TeamsOfTeamsClient.AddTeamMembershipAsync(_model.TeamId, _model.ToAddTeamMembershipRequest());
+            }
+            else
+            {
+                throw new Exception();
+            }
+
+            Snackbar.Add("Team membership added", MudBlazor.Severity.Success);
+
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException<HttpValidationProblemDetails> ex)
+        {
+            foreach (var error in ex.Result.Errors)
+            {
+                _messageStore?.Add(_editContext!.Field(error.Key), error.Value);
+            }
+            _editContext!.NotifyValidationStateChanged();
+        }
+        catch (ApiException<ErrorResult> ex)
+        {
+            ErrorResult error = ex.Result;
+            Snackbar.Add($"Error adding team membership. {error.SupportMessage}", MudBlazor.Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Error adding team membership.", MudBlazor.Severity.Error);
+        }
+        _isSaving = false;
+    }
+
+    public void Dispose()
+    {
+        if (_editContext is not null)
+        {
+            _editContext.OnValidationRequested -= HandleValidationRequested;
+        }
+    }
+
+    public partial class AddTeamMembershipViewModel
+    {
+        [Newtonsoft.Json.JsonProperty("teamId", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public System.Guid TeamId { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("parentTeamId", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public System.Guid ParentTeamId { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("start", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
+        public System.DateTime? Start { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("end", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
+        public System.DateTime? End { get; set; } = default!;
+
+        public AddTeamMembershipRequest ToAddTeamMembershipRequest()
+        {
+            if (!Start.HasValue)
+            {
+                throw new Exception();
+            }
+
+            return new AddTeamMembershipRequest
+                {
+                    TeamId = TeamId,
+                    ParentTeamId = ParentTeamId,
+                    Start = (DateTime)Start,
+                    End = End
+                };
+        }
+
+    }
+}

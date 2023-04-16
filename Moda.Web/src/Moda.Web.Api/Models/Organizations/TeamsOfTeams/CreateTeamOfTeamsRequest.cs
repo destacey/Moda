@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using Moda.Organization.Domain.Models;
-using Moda.Organization.Domain.Extensions;
 using Moda.Organization.Application.TeamsOfTeams.Commands;
+using Moda.Organization.Domain.Extensions;
+using Moda.Organization.Domain.Models;
 
 namespace Moda.Web.Api.Models.Organizations.TeamsOfTeams;
 

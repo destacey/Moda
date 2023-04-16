@@ -42,9 +42,9 @@ public sealed class UpdateTeamOfTeamsCommandValidator : CustomValidator<UpdateTe
         RuleFor(t => t.Name)
             .NotEmpty()
             .MaximumLength(128)
-            .MustAsync(async (model, name, cancellationToken) => 
-            { 
-                return await BeUniqueTeamName(model.Id, name, cancellationToken); 
+            .MustAsync(async (model, name, cancellationToken) =>
+            {
+                return await BeUniqueTeamName(model.Id, name, cancellationToken);
             }).WithMessage("The Team name already exists.");
 
         RuleFor(t => t.Code)
@@ -86,8 +86,7 @@ internal sealed class UpdateTeamOfTeamsCommandHandler : ICommandHandler<UpdateTe
             var updateResult = team.Update(
                 request.Name,
                 request.Code,
-                request.Description,
-                _dateTimeService.Now
+                request.Description
                 );
 
             if (updateResult.IsFailure)

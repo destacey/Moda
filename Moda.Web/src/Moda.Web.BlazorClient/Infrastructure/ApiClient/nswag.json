@@ -58,7 +58,7 @@
             "responseClass": "SwaggerResponse",
             "namespace": "Moda.Web.BlazorClient.Infrastructure.ApiClient",
             "requiredPropertiesMustBeDefined": true,
-            "dateType": "System.DateTimeOffset",
+            "dateType": "System.DateTime",
             "jsonConverters": null,
             "anyType": "object",
             "dateTimeType": "System.DateTime",

@@ -18,7 +18,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "7.0.3")
+                .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -460,6 +460,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<string>("EmployeeNumber")
                         .IsRequired()
                         .HasMaxLength(256)
@@ -536,6 +541,52 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id" });
 
                     b.ToTable("People", "Organization");
+                });
+
+            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamMembership", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SourceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TargetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "SourceId", "TargetId", "IsDeleted" });
+
+                    b.HasIndex("SourceId");
+
+                    b.HasIndex("TargetId");
+
+                    b.ToTable("TeamMemberships", "Organization");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevel", b =>
@@ -822,25 +873,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.OwnsOne("Moda.Organization.Domain.Models.Employee.Email#Moda.Common.Models.EmailAddress", "Email", b1 =>
-                        {
-                            b1.Property<Guid>("EmployeeId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(256)
-                                .HasColumnType("nvarchar(256)")
-                                .HasColumnName("Email");
-
-                            b1.HasKey("EmployeeId");
-
-                            b1.ToTable("Employees", "Organization");
-
-                            b1.WithOwner()
-                                .HasForeignKey("EmployeeId");
-                        });
-
                     b.OwnsOne("Moda.Organization.Domain.Models.Employee.Name#Moda.Common.Models.PersonName", "Name", b1 =>
                         {
                             b1.Property<Guid>("EmployeeId")
@@ -881,13 +913,55 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                 .HasForeignKey("EmployeeId");
                         });
 
-                    b.Navigation("Email")
-                        .IsRequired();
-
                     b.Navigation("Manager");
 
                     b.Navigation("Name")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamMembership", b =>
+                {
+                    b.HasOne("Moda.Organization.Domain.Models.BaseTeam", "Source")
+                        .WithMany("ParentMemberships")
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Organization.Domain.Models.TeamOfTeams", "Target")
+                        .WithMany("ChildMemberships")
+                        .HasForeignKey("TargetId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.OwnsOne("Moda.Organization.Domain.Models.TeamMembership.DateRange#Moda.Organization.Domain.Models.MembershipDateRange", "DateRange", b1 =>
+                        {
+                            b1.Property<Guid>("TeamMembershipId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTime?>("End")
+                                .HasColumnType("date")
+                                .HasColumnName("End");
+
+                            b1.Property<DateTime>("Start")
+                                .HasColumnType("date")
+                                .HasColumnName("Start");
+
+                            b1.HasKey("TeamMembershipId");
+
+                            b1.HasIndex("Start", "End");
+
+                            b1.ToTable("TeamMemberships", "Organization");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TeamMembershipId");
+                        });
+
+                    b.Navigation("DateRange")
+                        .IsRequired();
+
+                    b.Navigation("Source");
+
+                    b.Navigation("Target");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevel", b =>
@@ -899,6 +973,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Moda.Organization.Domain.Models.BaseTeam", b =>
+                {
+                    b.Navigation("ParentMemberships");
+                });
+
             modelBuilder.Entity("Moda.Organization.Domain.Models.Employee", b =>
                 {
                     b.Navigation("DirectReports");
@@ -907,6 +986,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevelScheme", b =>
                 {
                     b.Navigation("BacklogLevels");
+                });
+
+            modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOfTeams", b =>
+                {
+                    b.Navigation("ChildMemberships");
                 });
 #pragma warning restore 612, 618
         }

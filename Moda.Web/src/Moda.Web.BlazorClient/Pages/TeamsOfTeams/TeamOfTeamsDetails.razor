@@ -1,5 +1,9 @@
 ﻿@page "/teams-of-teams/{Id:int}"
 
+@using Moda.Web.BlazorClient.Models.Teams;
+@using Moda.Web.BlazorClient.Shared.Organizations;
+@using Moda.Web.BlazorClient.Components.Organizations;
+
 @attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
 
 @inject IAuthorizationService AuthService
@@ -20,7 +24,8 @@ else
             <MudButtonGroup Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
                 @if (_canUpdateTeams)
                 {
-                    <MudButton OnClick="@UpdateTeam">Edit Team of Teams</MudButton>
+                    <MudButton OnClick="@UpdateTeam">Edit</MudButton>
+                    <MudButton OnClick="@AddTeamMembership">Add Team Membership</MudButton>
                 }
             </MudButtonGroup>
         }
@@ -32,12 +37,16 @@ else
                 <MudItem xs="12" md="5">
                     <ModaFieldGroup Label="Type:" Text="@_team?.Type" />
                     <ModaFieldGroup Label="Code:" Text="@_team?.Code" />
+                    <ModaFieldGroup Label="Team of Teams:" Text="@_team?.TeamOfTeams?.Name" Link="@(_team?.TeamOfTeams is null ? null : $"teams-of-teams/{_team.TeamOfTeams.LocalId}")" />
                     <ModaFieldGroup Label="Is Active?:" Text="@_team?.IsActive.ToString()" />
                 </MudItem>
                 <MudItem xs="12" md="7">
                     <ModaFieldGroup Label="Description:" Text="@_team?.Description" />
                 </MudItem>
             </MudGrid>
+        </MudTabPanel>
+        <MudTabPanel Text="Team Memberships">
+            <TeamMembershipsGrid Memberships="_teamMemberships" />
         </MudTabPanel>
     </MudTabs>
 }
@@ -57,6 +66,7 @@ else
     };
 
     private TeamOfTeamsDetailsDto? _team;
+    private List<TeamMembershipsDto> _teamMemberships = new();
 
     private bool _loading = true;
 
@@ -72,8 +82,11 @@ else
         await GetTeam();
 
         var user = (await AuthState).User;
-        _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.TeamsOfTeams);
+        _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Teams);
         _showPageActions = _canUpdateTeams;
+
+        // TODO: move to on tab change rather than on init
+        await GetTeamMemberships();
 
         _loading = false;
     }
@@ -101,6 +114,35 @@ else
             };
 
         var dialog = DialogService.Show<UpdateTeamOfTeams_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetTeam();
+        }
+    }
+
+    private async Task GetTeamMemberships()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsOfTeamsClient.GetTeamMembershipsAsync(_team!.Id), Snackbar) is List<TeamMembershipsDto> result)
+        {
+            _teamMemberships = result.ToList();
+        }
+    }
+
+    private async Task AddTeamMembership()
+    {
+        var dialogTitle = "Add Team Membership";
+        var parameters = new DialogParameters { ["Team"] = new BaseTeamViewModel(_team!) };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<AddTeamMembership_Dialog>(dialogTitle, parameters, dialogOptions);
 
         var result = await dialog.Result;
 

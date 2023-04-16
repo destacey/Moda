@@ -4,67 +4,62 @@
 @inject IAuthorizationService AuthService
 @inject IBackgroundJobsClient BackgroundJobsClient
 
-<ErrorBoundary>
-    <ChildContent>
-        <PageTitle>Background Jobs</PageTitle>
-        <ModaTitle Title="Background Jobs">
+<PageTitle>Background Jobs</PageTitle>
+<ModaTitle Title="Background Jobs">
+    @if (_showPageActions)
+    {
+        <MudMenu Label="Actions" Color="Color.Primary" Variant="Variant.Filled" Dense="true" Size="Size.Small"
+             EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
             @if (_canViewHangfire)
             {
-                <MudIconButton Title="Hangfire Dashboard" Href="@_hangfireUrl" Target="_blank" Icon="@Icons.Material.Filled.Dashboard" Size="Size.Small" aria-label="Hangfire Dashboard"></MudIconButton>
+                <MudMenuItem Href="@_hangfireUrl" Target="_blank">Hangfire Dashboard</MudMenuItem>
             }
-        </ModaTitle>
-
-        @if (_canRunBackgroundJobs && _jobTypes.Any())
-        {
-            <MudContainer Class="mx-0 px-0 mb-2">
+            @if (_canRunBackgroundJobs && _jobTypes.Any())
+            {
+                <MudDivider Class="my-1" />
+                <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Jobs</MudText>
                 @foreach (var item in _jobTypes)
                 {
-                    <MudTooltip Placement="Placement.Right" Text="@item.Description">
-                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Small" Class="mr-2" OnClick="@(() => RunBackgroundJob(@item.Id))">@item.Name</MudButton>
-                    </MudTooltip>
+                    <MudMenuItem OnClick="@(() => RunBackgroundJob(@item.Id))">@item.Name</MudMenuItem>
                 }
-            </MudContainer>
-        }
+            }
+        </MudMenu>
+    }
+</ModaTitle>
 
-        <MudDataGrid @ref="@_grid"
-                     Items="@_jobs"
-                     Elevation="1"
-                     Height="700px"
-                     SortMode="SortMode.Multiple"
-                     Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterRow"
-                     FixedHeader="true"
-                     Loading="@_isLoading"
-                     LoadingProgressColor="@Color.Secondary"
-                     QuickFilter="@_quickFilter">
-            <ToolBarContent>
-                <MudSpacer />
-                <MudToolBar>
-                    <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
-                    <MudIconButton OnClick="@(() => RefreshData())" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
-                </MudToolBar>
-            </ToolBarContent>
-            <Columns>
-                <PropertyColumn Property="x => x.Id" />
-                <PropertyColumn Property="x => x.Action" />
-                <PropertyColumn Property="x => x.Status" />
-                <PropertyColumn Property="x => x.Type" />
-                <PropertyColumn Property="x => x.Namespace" />
-                <PropertyColumn Property="x => x.StartedAt" Title="Start (UTC)" />
-            </Columns>
-            <LoadingContent>
-                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading background jobs...</MudText>
-            </LoadingContent>
-            <NoRecordsContent>
-                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No background jobs found.</MudText>
-            </NoRecordsContent>
-        </MudDataGrid>
-        <DataGridCountLabel DataGrid="@_grid" UnitLabel="background jobs" />
-
-    </ChildContent>
-    <ErrorContent>
-        <ModaCustomError />
-    </ErrorContent>
-</ErrorBoundary>
+<MudDataGrid @ref="@_grid"
+             Items="@_jobs"
+             Elevation="1"
+             Height="700px"
+             SortMode="SortMode.Multiple"
+             Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterRow"
+             FixedHeader="true"
+             Loading="@_loading"
+             LoadingProgressColor="@Color.Secondary"
+             QuickFilter="@_quickFilter">
+    <ToolBarContent>
+        <MudSpacer />
+        <MudToolBar>
+            <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
+            <MudIconButton OnClick="@(() => RefreshData())" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
+        </MudToolBar>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Id" />
+        <PropertyColumn Property="x => x.Action" />
+        <PropertyColumn Property="x => x.Status" />
+        <PropertyColumn Property="x => x.Type" />
+        <PropertyColumn Property="x => x.Namespace" />
+        <PropertyColumn Property="x => x.StartedAt" Title="Start (UTC)" />
+    </Columns>
+    <LoadingContent>
+        <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading background jobs...</MudText>
+    </LoadingContent>
+    <NoRecordsContent>
+        <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No background jobs found.</MudText>
+    </NoRecordsContent>
+</MudDataGrid>
+<DataGridCountLabel DataGrid="@_grid" UnitLabel="background jobs" />
 
 @code {
     [CascadingParameter]
@@ -75,20 +70,15 @@
     List<BackgroundJobTypeDto> _jobTypes = new();
 
     string _searchString = "";
-    bool _isLoading = true;
+    bool _loading = true;
 
     private string? _hangfireUrl;
+    bool _showPageActions;
     bool _canViewHangfire;
     bool _canRunBackgroundJobs;
 
     protected override async Task OnInitializedAsync()
     {
-        _hangfireUrl = Config[ConfigNames.ApiBaseUrl] + "jobs";
-
-        var user = (await AuthState).User;
-        _canViewHangfire = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.Hangfire);
-        _canRunBackgroundJobs = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.BackgroundJobs);
-
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
             SetTablePreference(clientPreference.TablePreference);
@@ -98,6 +88,16 @@
             GetRunningJobs(),
             GetJobTypes()
     });
+
+        _hangfireUrl = Config[ConfigNames.ApiBaseUrl] + "jobs";
+
+        var user = (await AuthState).User;
+        _canViewHangfire = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.Hangfire);
+        _canRunBackgroundJobs = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.BackgroundJobs);
+
+        _showPageActions = _canViewHangfire || _canRunBackgroundJobs;
+
+        _loading = false;
     }
 
     private Func<BackgroundJobDto, bool> _quickFilter => x =>
@@ -125,19 +125,17 @@
 
     private async Task RefreshData()
     {
+        _loading = true;
         await GetRunningJobs();
+        _loading = false;
     }
 
     private async Task GetRunningJobs()
     {
-        _isLoading = true;
-
         if (await ApiHelper.ExecuteCallGuardedAsync(() => BackgroundJobsClient.GetRunningJobsAsync(), Snackbar) is List<BackgroundJobDto> result)
         {
             _jobs = result;
         }
-
-        _isLoading = false;
     }
 
     private async Task GetJobTypes()
@@ -147,6 +145,9 @@
             _jobTypes = result;
         }
     }
+
+    private void ViewDashboard() =>
+        Navigation.NavigateTo(_hangfireUrl!);
 
     private async Task RunBackgroundJob(int jobTypeId)
     {

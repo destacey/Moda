@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Moda.Organization.Application.Models;
 
 namespace Moda.Organization.Application.TeamsOfTeams.Dtos;
 public class TeamOfTeamsDetailsDto : IMapFrom<BaseTeam>
@@ -34,10 +35,13 @@ public class TeamOfTeamsDetailsDto : IMapFrom<BaseTeam>
     /// </summary>
     public bool IsActive { get; set; }
 
+    public TeamNavigationDto? TeamOfTeams { get; set; }
+
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<BaseTeam, TeamOfTeamsDetailsDto>()
             .Map(dest => dest.Code, src => src.Code.Value)
-            .Map(dest => dest.Type, src => src.Type.GetDisplayName());
+            .Map(dest => dest.Type, src => src.Type.GetDisplayName())
+            .Map(dest => dest.TeamOfTeams, src => src.ParentMemberships == null ? null : src.ParentMemberships.FirstOrDefault()!.Target);
     }
 }

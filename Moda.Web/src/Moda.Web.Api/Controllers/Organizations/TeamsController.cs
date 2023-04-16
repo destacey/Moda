@@ -1,5 +1,7 @@
-﻿using Moda.Organization.Application.Teams.Dtos;
+﻿using Moda.Organization.Application.Models;
+using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
+using Moda.Web.Api.Models.Organizations;
 using Moda.Web.Api.Models.Organizations.Teams;
 
 namespace Moda.Web.Api.Controllers.Organizations;
@@ -84,4 +86,42 @@ public class TeamsController : ControllerBase
     //{
     //    throw new NotImplementedException();
     //}
+
+    [HttpGet("{id}/memberships")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get parent team memberships.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<IReadOnlyList<TeamMembershipsDto>>> GetTeamMemberships(Guid id, CancellationToken cancellationToken)
+    {
+        var memberships = await _sender.Send(new GetTeamMembershipsQuery(id), cancellationToken);
+
+        return Ok(memberships);
+    }
+
+    [HttpPost("{id}/memberships")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Add a parent team membership.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult> AddTeamMembership(Guid id, [FromBody] AddTeamMembershipRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToTeamAddParentTeamMembershipCommand(), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "TeamsController.AddTeamMembership"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
 }

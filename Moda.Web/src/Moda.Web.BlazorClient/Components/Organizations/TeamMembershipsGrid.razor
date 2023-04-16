@@ -1,0 +1,89 @@
+﻿
+<MudGrid>
+    <MudItem xs="12" Class="px-2 pt-2 pb-0">
+        <MudDataGrid @ref="@_grid"
+                     Items="@Memberships"
+                     Elevation="1"
+                     Height="600px"
+                     Virtualize="true"
+                     ColumnResizeMode="ResizeMode.Container"
+                     SortMode="SortMode.Multiple" Filterable="true"
+                     FixedHeader="true"
+                     Loading="@_isLoading"
+                     LoadingProgressColor="@Color.Secondary"
+                     QuickFilter="@_quickFilter">
+            <ToolBarContent>
+                <MudSpacer />
+                <MudToolBar>
+                    <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
+                </MudToolBar>
+            </ToolBarContent>
+            <Columns>
+                <PropertyColumn Property="x => x.Child.Name" Title="Child" />
+                <PropertyColumn Property="x => x.Parent.Name" Title="Parent" />
+                <PropertyColumn Property="x => x.State" Title="State" />
+                <PropertyColumn Property="x => x.Start" Title="Start" Format="MM/dd/yyyy" />
+                <PropertyColumn Property="x => x.End" Title="End" Format="MM/dd/yyyy" />
+            </Columns>
+            <LoadingContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading team memberships...</MudText>
+            </LoadingContent>
+            <NoRecordsContent>
+                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No team memberships found.</MudText>
+            </NoRecordsContent>
+        </MudDataGrid>
+    </MudItem>
+    <MudItem xs="12" Class="pt-0">
+        <DataGridCountLabel DataGrid="@_grid" UnitLabel="memberships" />
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public List<TeamMembershipsDto> Memberships { get; set; } = default!;
+
+    private MudDataGrid<TeamMembershipsDto> _grid = default!;
+    private string _searchString = "";
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
+        {
+            SetTablePreference(clientPreference.TablePreference);
+        }
+        Memberships.OrderByDescending(m => m.Start);
+        _isLoading = false;
+    }
+
+    private void SetTablePreference(ModaTablePreference tablePreference)
+    {
+        _grid.Dense = tablePreference.IsDense;
+        _grid.Striped = tablePreference.IsStriped;
+        _grid.Bordered = tablePreference.HasBorder;
+        _grid.Hover = tablePreference.IsHoverable;
+    }
+
+    private Func<TeamMembershipsDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Child.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Parent.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.State.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Start.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.End.HasValue && x.End!.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+}

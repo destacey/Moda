@@ -8,10 +8,11 @@ internal static class ModelBuilderExtensions
 {
     public static ModelBuilder AppendGlobalQueryFilter<TInterface>(this ModelBuilder modelBuilder, Expression<Func<TInterface, bool>> filter)
     {
-        // get a list of entities without a baseType that implement the interface TInterface
+        //get a list of entities without a baseType that implement the interface TInterface
         var entities = modelBuilder.Model.GetEntityTypes()
             .Where(e => e.BaseType is null && e.ClrType.GetInterface(typeof(TInterface).Name) is not null)
-            .Select(e => e.ClrType);
+            .Select(e => e.ClrType)
+            .Where(t => typeof(TInterface).IsAssignableFrom(t));
 
         foreach (var entity in entities)
         {

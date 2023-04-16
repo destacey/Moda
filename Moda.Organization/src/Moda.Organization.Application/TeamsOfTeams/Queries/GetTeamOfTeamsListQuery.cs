@@ -15,19 +15,26 @@ public sealed record GetTeamOfTeamsListQuery : IQuery<IReadOnlyList<TeamOfTeamsL
 internal sealed class GetTeamOfTeamsListQueryHandler : IQueryHandler<GetTeamOfTeamsListQuery, IReadOnlyList<TeamOfTeamsListDto>>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
+    private readonly IDateTimeService _dateTimeService;
 
-    public GetTeamOfTeamsListQueryHandler(IOrganizationDbContext organizationDbContext)
+    public GetTeamOfTeamsListQueryHandler(IOrganizationDbContext organizationDbContext, IDateTimeService dateTimeService)
     {
         _organizationDbContext = organizationDbContext;
+        _dateTimeService = dateTimeService;
     }
 
     public async Task<IReadOnlyList<TeamOfTeamsListDto>> Handle(GetTeamOfTeamsListQuery request, CancellationToken cancellationToken)
     {
-        var query = _organizationDbContext.TeamOfTeams.AsQueryable();
+        var today = _dateTimeService.Now.InUtc().Date;
+        var query = _organizationDbContext.TeamOfTeams
+            .Include(t => t.ParentMemberships.Where(m => m.DateRange.Start <= today && (!m.DateRange.End.HasValue || today <= m.DateRange.End)))
+            .AsQueryable();
 
         if (!request.IncludeInactive)
             query = query.Where(e => e.IsActive);
 
-        return await query.ProjectToType<TeamOfTeamsListDto>().ToListAsync(cancellationToken);
+        return await query.AsNoTrackingWithIdentityResolution()
+            .ProjectToType<TeamOfTeamsListDto>()
+            .ToListAsync(cancellationToken);
     }
 }
