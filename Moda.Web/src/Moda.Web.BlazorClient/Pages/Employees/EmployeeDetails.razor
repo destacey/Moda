@@ -1,4 +1,8 @@
 ﻿@page "/employees/{Id:int}"
+@using Blazor.Diagrams.Core;
+@using Blazor.Diagrams.Core.Geometry;
+@using Blazor.Diagrams.Core.Models;
+@using Blazor.Diagrams.Components;
 @attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
 
 @inject IAuthorizationService AuthService
@@ -96,7 +100,11 @@ else
             </MudGrid>
         </MudTabPanel>
         <MudTabPanel Text="Org Chart">
-
+            <MudPaper Height="800px" Width="100%">
+                <CascadingValue Value="OrgChart">
+                    <DiagramCanvas></DiagramCanvas>
+                </CascadingValue>
+            </MudPaper>
         </MudTabPanel>
     </MudTabs>
 }
@@ -126,6 +134,8 @@ else
     private string _title = string.Empty;
     private string _description = string.Empty;
 
+    private Diagram OrgChart { get; set; }
+
     public void ViewManagerDetails() => Navigation.NavigateTo($"/employees/{_employee.ManagerLocalId}");
 
     private void ShowAdvancedInfo()
@@ -133,9 +143,42 @@ else
         _hideAdvanced = !_hideAdvanced;
     }
 
+    private async Task GenOrgChart()
+    {
+        var nodes = new List<NodeModel>();
+        var links = new List<LinkModel>();
+        // TODO: Need to find some way to get an x-value here that is the parent paper's width / 2
+        var managerNode = GetEmployeeNode(_employee.ManagerName, 50, 50);
+        var meNode = GetEmployeeNode(_employee.FullName + " (Me)", 50, 200);
+        nodes.Add(managerNode);
+        nodes.Add(meNode);
+
+        links.Add(new LinkModel(managerNode.GetPort(PortAlignment.Bottom), meNode.GetPort(PortAlignment.Top)));
+        for (var i = 0; i < _directReports.Count; i++)
+        {
+            var directReportNode = GetEmployeeNode(_directReports[i].FirstName, (i * 150) + 50, 400);
+            nodes.Add(directReportNode);
+            links.Add(new LinkModel(meNode.GetPort(PortAlignment.Bottom), directReportNode.GetPort(PortAlignment.Top)));
+        }
+        OrgChart.Nodes.Add(nodes.ToArray());
+        OrgChart.Links.Add(links.ToArray());
+    }
+
+    private NodeModel GetEmployeeNode(string employeeName, double x, double y)
+    {
+        var node = new NodeModel(new Point(x, y));
+        node.Title = employeeName;
+        node.AddPort(PortAlignment.Top);
+        node.AddPort(PortAlignment.Bottom);
+        node.Size = new Blazor.Diagrams.Core.Geometry.Size(width: 100, height: 100);
+        return node;
+    }
+
     protected override async Task OnParametersSetAsync()
     {
+        OrgChart = new Diagram();
         await GetEmployee();
+        await GenOrgChart();
 
         var imageUri = await localStorage.GetItemAsync<string>($"{_employee.LocalId}ImageUri");
         if (imageUri != null)
