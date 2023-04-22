@@ -46,7 +46,7 @@ else
             </MudGrid>
         </MudTabPanel>
         <MudTabPanel Text="Team Memberships">
-            <TeamMembershipsGrid Memberships="_teamMemberships" />
+            <TeamMembershipsGrid Memberships="_teamMemberships" GetTeamMemberships="GetTeamMemberships" CanUpdateTeamMemberships="_canUpdateTeams" />
         </MudTabPanel>
     </MudTabs>
 }
@@ -84,9 +84,6 @@ else
         var user = (await AuthState).User;
         _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Teams);
         _showPageActions = _canUpdateTeams;
-
-        // TODO: move to on tab change rather than on init
-        await GetTeamMemberships();
 
         _loading = false;
     }
