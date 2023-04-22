@@ -2,13 +2,13 @@
 @using Microsoft.Extensions.Options
 
 @inject IAuthenticationService AuthService
-@inject IOptionsSnapshot<RemoteAuthenticationOptions<ApiAuthorizationProviderOptions>> Options
+@inject NavigationManager NavigationManager
 
 @code {
     protected override void OnInitialized()
     {
-        AuthService.NavigateToExternalLogin(Options.Get(
-            Microsoft.Extensions.Options.Options.DefaultName)
-            .AuthenticationPaths.LogInPath);
+        var currentUrl = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).PathAndQuery;
+        var returnUrl = currentUrl == "/" ? null : currentUrl;
+        AuthService.NavigateToExternalLogin(returnUrl);
     }
 }
