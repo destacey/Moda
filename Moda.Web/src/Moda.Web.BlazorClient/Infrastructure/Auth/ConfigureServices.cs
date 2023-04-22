@@ -19,6 +19,7 @@ internal static class ConfigureServices
                         config[$"{nameof(AuthProvider.AzureAd)}:{ConfigNames.ApiScope}"]);
 #pragma warning restore CS8604 // Possible null reference argument.
                     options.ProviderOptions.LoginMode = "redirect";
+                    options.ProviderOptions.Cache.CacheLocation = "localStorage";
                 })
                     .AddAccountClaimsPrincipalFactory<AzureAdClaimsPrincipalFactory>()
                     .Services,
