@@ -19,8 +19,16 @@
                 </MudToolBar>
             </ToolBarContent>
             <Columns>
-                <PropertyColumn Property="x => x.Child.Name" Title="Child" />
-                <PropertyColumn Property="x => x.Parent.Name" Title="Parent" />
+                <PropertyColumn Property="x => x.Child.Name" Title="Child">
+                    <CellTemplate>
+                        <MudLink Href="@(GetTeamDetailUrl(context.Item.Child))">@context.Item.Child.Name</MudLink>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.Parent.Name" Title="Parent">
+                    <CellTemplate>
+                        <MudLink Href="@(GetTeamDetailUrl(context.Item.Parent))">@context.Item.Parent.Name</MudLink>
+                    </CellTemplate>
+                </PropertyColumn>
                 <PropertyColumn Property="x => x.State" Title="State" />
                 <PropertyColumn Property="x => x.Start" Title="Start" Format="MM/dd/yyyy" />
                 <PropertyColumn Property="x => x.End" Title="End" Format="MM/dd/yyyy" />
@@ -86,4 +94,11 @@
 
         return false;
     };
+
+    private string GetTeamDetailUrl(TeamNavigationDto team)
+    {
+        return team.Type == "Team"
+            ? $"teams/{team.LocalId}"
+            : $"teams-of-teams/{team.LocalId}";
+    }
 }
