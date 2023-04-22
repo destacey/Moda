@@ -57,7 +57,7 @@ else
     public int Id { get; set; } // from route
 
     [CascadingParameter]
-    protected Task<AuthenticationState> AuthState { get; set; } = default!;
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
 
     private List<BreadcrumbItem> _breadcrumbs = new()
     {

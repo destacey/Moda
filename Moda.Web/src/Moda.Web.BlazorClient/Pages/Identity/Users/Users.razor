@@ -61,7 +61,7 @@
 
 @code {
     [CascadingParameter]
-    Task<AuthenticationState> AuthState { get; set; } = default!;
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
 
     MudDataGrid<UserDetailsDto> _grid = default!;
     List<UserDetailsDto> _users = new();
