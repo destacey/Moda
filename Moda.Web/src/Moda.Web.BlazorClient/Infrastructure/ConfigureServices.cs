@@ -19,10 +19,12 @@ public static class ConfigureServices
             .AddMudServices(configuration =>
             {
                 configuration.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
-                configuration.SnackbarConfiguration.HideTransitionDuration = 100;
-                configuration.SnackbarConfiguration.ShowTransitionDuration = 100;
-                configuration.SnackbarConfiguration.VisibleStateDuration = 3000;
-                configuration.SnackbarConfiguration.ShowCloseIcon = false;
+                configuration.SnackbarConfiguration.HideTransitionDuration = 500;
+                configuration.SnackbarConfiguration.ShowTransitionDuration = 500;
+                configuration.SnackbarConfiguration.VisibleStateDuration = 5000;
+                configuration.SnackbarConfiguration.ShowCloseIcon = true;
+                configuration.SnackbarConfiguration.NewestOnTop = true;
+                configuration.SnackbarConfiguration.PreventDuplicates = false;
             })
             .AddScoped<IClientPreferenceManager, ClientPreferenceManager>()
             .AutoRegisterInterfaces<IAppService>()

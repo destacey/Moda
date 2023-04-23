@@ -4,7 +4,7 @@ public interface IAuthenticationService
 {
     AuthProvider ProviderType { get; }
 
-    void NavigateToExternalLogin(string returnUrl);
+    void NavigateToExternalLogin(string? returnUrl);
 
 
     //// not needed at this time because we are only using AzureAd
@@ -12,5 +12,5 @@ public interface IAuthenticationService
 
     Task LogOutAsync();
 
-    Task ReLoginAsync(string returnUrl);
+    Task ReLoginAsync(string? returnUrl);
 }

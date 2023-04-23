@@ -90,6 +90,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
 
             if (entry.State == EntityState.Deleted && entry.Entity is ISoftDelete softDelete)
             {
+                softDelete.IsDeleted = true;
                 softDelete.DeletedBy = userId;
                 softDelete.Deleted = timestamp;
                 entry.State = EntityState.Modified;

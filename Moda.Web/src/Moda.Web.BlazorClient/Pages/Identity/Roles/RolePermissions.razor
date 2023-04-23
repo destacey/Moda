@@ -81,7 +81,7 @@ else
     public string Id { get; set; } = default!; // from route
 
     [CascadingParameter]
-    protected Task<AuthenticationState> AuthState { get; set; } = default!;
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
 
     private Dictionary<string, List<PermissionViewModel>> _groupedRoleClaims = default!;
 

@@ -1,10 +1,10 @@
-﻿
+﻿@using Moda.Web.BlazorClient.Models.Teams;
 <MudGrid>
     <MudItem xs="12" Class="px-2 pt-2 pb-0">
         <MudDataGrid @ref="@_grid"
                      Items="@Memberships"
                      Elevation="1"
-                     Height="600px"
+                     Height="550px"
                      Virtualize="true"
                      ColumnResizeMode="ResizeMode.Container"
                      SortMode="SortMode.Multiple" Filterable="true"
@@ -19,11 +19,31 @@
                 </MudToolBar>
             </ToolBarContent>
             <Columns>
-                <PropertyColumn Property="x => x.Child.Name" Title="Child" />
-                <PropertyColumn Property="x => x.Parent.Name" Title="Parent" />
+                <PropertyColumn Property="x => x.Child.Name" Title="Child">
+                    <CellTemplate>
+                        <MudLink Href="@GetTeamDetailUrl(context.Item.Child)">@context.Item.Child.Name</MudLink>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.Parent.Name" Title="Parent">
+                    <CellTemplate>
+                        <MudLink Href="@GetTeamDetailUrl(context.Item.Parent)">@context.Item.Parent.Name</MudLink>
+                    </CellTemplate>
+                </PropertyColumn>
                 <PropertyColumn Property="x => x.State" Title="State" />
                 <PropertyColumn Property="x => x.Start" Title="Start" Format="MM/dd/yyyy" />
                 <PropertyColumn Property="x => x.End" Title="End" Format="MM/dd/yyyy" />
+                    
+                <TemplateColumn Title="Actions" CellClass="d-flex justify-end" Sortable="false" Filterable="false" Hidden="@(!_showMembershipActions)">
+                    <CellTemplate>
+                        <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true" Size="Size.Small" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
+                            @if (CanUpdateTeamMemberships)
+                            {
+                                @*<MudMenuItem OnClick="@(() => EditTeamMembership.InvokeAsync(context.Item))">Edit Membership</MudMenuItem>*@
+                                <MudMenuItem OnClick="@(() => RemoveTeamMembership.InvokeAsync(context.Item))">Remove Membership</MudMenuItem>
+                            }
+                        </MudMenu>
+                    </CellTemplate>
+                </TemplateColumn>
             </Columns>
             <LoadingContent>
                 <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading team memberships...</MudText>
@@ -39,20 +59,43 @@
 </MudGrid>
 
 @code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    [Parameter] 
+    public EventCallback GetTeamMemberships { get; set; }
+
+    [Parameter]
+    public EventCallback<TeamMembershipsDto> EditTeamMembership { get; set; }
+
+    [Parameter]
+    public EventCallback<TeamMembershipsDto> RemoveTeamMembership { get; set; }
+
     [Parameter]
     public List<TeamMembershipsDto> Memberships { get; set; } = default!;
+
+    [Parameter]
+    public bool CanUpdateTeamMemberships { get; set; }
 
     private MudDataGrid<TeamMembershipsDto> _grid = default!;
     private string _searchString = "";
     private bool _isLoading = true;
 
+    private bool _showMembershipActions;
+
     protected override async Task OnInitializedAsync()
     {
+        // TODO: cache instead of calling every time the tab is selected
+        await GetTeamMemberships.InvokeAsync();
+        Memberships.OrderByDescending(m => m.Start);
+
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
             SetTablePreference(clientPreference.TablePreference);
         }
-        Memberships.OrderByDescending(m => m.Start);
+
+        _showMembershipActions = CanUpdateTeamMemberships;
+
         _isLoading = false;
     }
 
@@ -81,9 +124,16 @@
         if (x.Start.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (x.End.HasValue && x.End!.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (x.End.HasValue && x.End.Value.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         return false;
     };
+
+    private string GetTeamDetailUrl(TeamNavigationDto team)
+    {
+        return team.Type == "Team"
+            ? $"teams/{team.LocalId}"
+            : $"teams-of-teams/{team.LocalId}";
+    }
 }

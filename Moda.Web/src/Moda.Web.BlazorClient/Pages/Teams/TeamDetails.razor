@@ -25,13 +25,13 @@ else
                 @if (_canUpdateTeams)
                 {
                     <MudButton OnClick="@UpdateTeam">Edit</MudButton>
-                    <MudButton OnClick="@AddTeamMembership">Add Team Membership</MudButton>
+                    <MudButton OnClick="@AddTeamMembershipDialog">Add Team Membership</MudButton>
                 }
             </MudButtonGroup>
         }
     </ModaTitle>
 
-    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="px-3">
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="px-3" @bind-ActivePanelIndex="@_activeTabIndex">
         <MudTabPanel Text="Details">
             <MudGrid Class="px-4 py-1">
                 <MudItem xs="12" md="5">
@@ -46,7 +46,11 @@ else
             </MudGrid>
         </MudTabPanel>
         <MudTabPanel Text="Team Memberships">
-            <TeamMembershipsGrid Memberships="_teamMemberships" />
+            <TeamMembershipsGrid Memberships="_teamMemberships" 
+                GetTeamMemberships="GetTeamMemberships" 
+                CanUpdateTeamMemberships="_canUpdateTeams"
+                EditTeamMembership="EditTeamMembershipDialog"
+                RemoveTeamMembership="RemoveTeamMembershipDialog"/>
         </MudTabPanel>
     </MudTabs>
 }
@@ -56,7 +60,9 @@ else
     public int Id { get; set; } // from route
 
     [CascadingParameter]
-    protected Task<AuthenticationState> AuthState { get; set; } = default!;
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    private int _activeTabIndex = 0;
 
     private List<BreadcrumbItem> _breadcrumbs = new()
     {
@@ -75,16 +81,17 @@ else
     private bool _showPageActions;
     private bool _canUpdateTeams;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        // reset the page when the route changes
+        _activeTabIndex = 0;
+        _teamMemberships.Clear();
+
         await GetTeam();
 
         var user = (await AuthState).User;
         _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Teams);
         _showPageActions = _canUpdateTeams;
-
-        // TODO: move to on tab change rather than on init
-        await GetTeamMemberships();
 
         _loading = false;
     }
@@ -129,7 +136,7 @@ else
         }
     }
 
-    private async Task AddTeamMembership()
+    private async Task AddTeamMembershipDialog()
     {
         var dialogTitle = "Add Team Membership";
         var parameters = new DialogParameters { ["Team"] = new BaseTeamViewModel(_team!) };
@@ -146,7 +153,73 @@ else
 
         if (!result.Canceled)
         {
-            await GetTeam();
+            await GetTeamMemberships();
+        }
+    }
+
+    private async Task EditTeamMembershipDialog(TeamMembershipsDto membership)
+    {
+        //var dialogTitle = "Edit Team Membership";
+        //var parameters = new DialogParameters { [membership.Child.Type] = new BaseTeamViewModel(_team!) };
+        //var dialogOptions = new DialogOptions()
+        //    {
+        //        DisableBackdropClick = true,
+        //        MaxWidth = MaxWidth.Small,
+        //        FullWidth = true
+        //    };
+
+        //var dialog = DialogService.Show<AddTeamMembership_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        //var result = await dialog.Result;
+
+        //if (!result.Canceled)
+        //{
+        //    await GetTeamMemberships.InvokeAsync();
+        //}
+    }
+
+    private async Task RemoveTeamMembershipDialog(TeamMembershipsDto membership)
+    {
+        var dialogTitle = "Remove Team Membership";
+        var parameters = new DialogParameters { 
+                ["TeamMembership"] = membership,
+                ["RemoveTeamMembership"] = EventCallback.Factory.Create<Guid>(this, RemoveTeamMembership)
+        };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<RemoveTeamMembership_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            // TODO: what if just removed the membership from the list instead of calling the API again?
+            await GetTeamMemberships();
+        }
+    }
+
+    private async Task RemoveTeamMembership(Guid teamMembershipId)
+    {
+        try
+        {
+            await TeamsClient.RemoveTeamMembershipAsync(_team!.Id, teamMembershipId);
+            await GetTeamMemberships();
+
+            Snackbar.Add("Team membership removed", MudBlazor.Severity.Success);
+        }
+        catch (ApiException<ErrorResult> ex)
+        {
+            ErrorResult error = ex.Result;
+            Snackbar.Add($"Error removing team membership. {error.SupportMessage}", MudBlazor.Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Error removing team membership.", MudBlazor.Severity.Error);
         }
     }
 }

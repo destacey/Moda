@@ -101,7 +101,7 @@ else
 @code
 {
     [CascadingParameter]
-    protected Task<AuthenticationState> AuthState { get; set; } = default!;
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
 
     [Parameter]
     public string? Id { get; set; }

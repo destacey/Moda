@@ -13,7 +13,7 @@ public partial class UserRoles
     [Parameter]
     public string? Id { get; set; }
     [CascadingParameter]
-    protected Task<AuthenticationState> AuthState { get; set; } = default!;
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
     [Inject]
     protected IAuthorizationService AuthService { get; set; } = default!;
     [Inject]

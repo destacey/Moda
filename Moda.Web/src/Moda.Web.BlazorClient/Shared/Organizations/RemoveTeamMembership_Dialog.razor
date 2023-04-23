@@ -1,0 +1,59 @@
+﻿@inject ISnackbar Snackbar
+@inject ITeamsClient TeamsClient
+
+<MudDialog>
+    <DialogContent>
+        <MudText>Are you sure you want to remove this team membership?  This cannot be undone.</MudText>
+        <MudContainer>
+            <ModaFieldGroup Label="Team" Text="@TeamMembership.Child.Name" />
+            <ModaFieldGroup Label="Parent" Text="@TeamMembership.Parent.Name" />
+            <ModaFieldGroup Label="Start" Text="@TeamMembership.Start.ToShortDateString()" />
+            <ModaFieldGroup Label="End" Text="@TeamMembership.End?.ToShortDateString()" />
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton OnClick="Remove" ButtonType="ButtonType.Submit" Color="Color.Warning" Variant="Variant.Filled" Disabled="@_isSaving">
+            @if (_isSaving)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Saving</MudText>
+            }
+            else
+            {
+                <MudText>Remove</MudText>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public TeamMembershipsDto TeamMembership { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<Guid> RemoveTeamMembership { get; set; } = default!;
+
+    private bool _isSaving = false;
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Remove()
+    {
+        _isSaving = true;
+        try
+        {
+            await RemoveTeamMembership.InvokeAsync(TeamMembership.Id);
+
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Error removing team membership.", MudBlazor.Severity.Error);
+        }
+        _isSaving = false;
+    }
+}

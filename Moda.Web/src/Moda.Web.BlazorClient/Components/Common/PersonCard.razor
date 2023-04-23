@@ -26,7 +26,7 @@
     public string? Style { get; set; }
 
     [CascadingParameter]
-    protected Task<AuthenticationState> AuthState { get; set; } = default!;
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
 
     private string? UserId { get; set; }
     private string? Email { get; set; }

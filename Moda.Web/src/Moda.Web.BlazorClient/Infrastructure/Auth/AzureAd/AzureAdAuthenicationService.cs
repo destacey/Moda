@@ -1,20 +1,28 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.Extensions.Options;
 
 namespace Moda.Web.BlazorClient.Infrastructure.Auth.AzureAd;
 
 internal class AzureAdAuthenticationService : IAuthenticationService
 {
     private readonly NavigationManager _navigation;
+    private readonly IOptionsSnapshot<RemoteAuthenticationOptions<ApiAuthorizationProviderOptions>> _optionsSnapshot;
 
-    public AzureAdAuthenticationService(NavigationManager navigation) =>
-        (_navigation) = (navigation);
+    public AzureAdAuthenticationService(NavigationManager navigation, IOptionsSnapshot<RemoteAuthenticationOptions<ApiAuthorizationProviderOptions>> optionsSnapshot)
+    {
+        _navigation = navigation;
+        _optionsSnapshot = optionsSnapshot;
+    }
 
     public AuthProvider ProviderType => AuthProvider.AzureAd;
 
-    public void NavigateToExternalLogin(string returnUrl) =>
-        _navigation.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(returnUrl)}");
-
+    public void NavigateToExternalLogin(string? returnUrl)
+    {
+        returnUrl = string.IsNullOrWhiteSpace(returnUrl) ? null : $"?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        // TODO: the returnUrl is not working
+        _navigation.NavigateTo($"{_optionsSnapshot.Get(Options.DefaultName).AuthenticationPaths.LogInPath}{returnUrl}");
+    }
 
     //// not needed at this time because we are only using AzureAd
     public Task<bool> LogInAsync() =>
@@ -26,7 +34,7 @@ internal class AzureAdAuthenticationService : IAuthenticationService
         return Task.CompletedTask;
     }
 
-    public Task ReLoginAsync(string returnUrl)
+    public Task ReLoginAsync(string? returnUrl)
     {
         NavigateToExternalLogin(returnUrl);
         return Task.CompletedTask;
