@@ -31,7 +31,7 @@ else
         }
     </ModaTitle>
 
-    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="px-3">
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="px-3" @bind-ActivePanelIndex="@_activeTabIndex">
         <MudTabPanel Text="Details">
             <MudGrid Class="px-4 py-1">
                 <MudItem xs="12" md="5">
@@ -62,6 +62,8 @@ else
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; } = default!;
 
+    private int _activeTabIndex = 0;
+
     private List<BreadcrumbItem> _breadcrumbs = new()
     {
         new BreadcrumbItem("Teams", href: "/teams"),
@@ -79,8 +81,12 @@ else
     private bool _showPageActions;
     private bool _canUpdateTeams;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        // reset the page when the route changes
+        _activeTabIndex = 0;
+        _teamMemberships.Clear();
+
         await GetTeam();
 
         var user = (await AuthState).User;
