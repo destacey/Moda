@@ -8,6 +8,7 @@
 
 @inject IAuthorizationService AuthService
 @inject ITeamsOfTeamsClient TeamsOfTeamsClient
+@inject ITeamsClient TeamsClient
 
 <PageTitle>Team of Teams Details</PageTitle>
 <ModaPageBreadCrumbs Breadcrumbs="_breadcrumbs" />
@@ -25,7 +26,7 @@ else
                 @if (_canUpdateTeams)
                 {
                     <MudButton OnClick="@UpdateTeam">Edit</MudButton>
-                    <MudButton OnClick="@AddTeamMembership">Add Team Membership</MudButton>
+                    <MudButton OnClick="@AddTeamMembershipDialog">Add Team Membership</MudButton>
                 }
             </MudButtonGroup>
         }
@@ -46,7 +47,11 @@ else
             </MudGrid>
         </MudTabPanel>
         <MudTabPanel Text="Team Memberships">
-            <TeamMembershipsGrid Memberships="_teamMemberships" GetTeamMemberships="GetTeamMemberships" CanUpdateTeamMemberships="_canUpdateTeams" />
+            <TeamMembershipsGrid Memberships="_teamMemberships"
+                             GetTeamMemberships="GetTeamMemberships"
+                             CanUpdateTeamMemberships="_canUpdateTeams"
+                             EditTeamMembership="EditTeamMembershipDialog"
+                             RemoveTeamMembership="RemoveTeamMembershipDialog" />
         </MudTabPanel>
     </MudTabs>
 }
@@ -128,7 +133,7 @@ else
         }
     }
 
-    private async Task AddTeamMembership()
+    private async Task AddTeamMembershipDialog()
     {
         var dialogTitle = "Add Team Membership";
         var parameters = new DialogParameters { ["Team"] = new BaseTeamViewModel(_team!) };
@@ -145,7 +150,91 @@ else
 
         if (!result.Canceled)
         {
-            await GetTeam();
+            await GetTeamMemberships();
+        }
+    }
+
+    private async Task EditTeamMembershipDialog(TeamMembershipsDto membership)
+    {
+        //var dialogTitle = "Edit Team Membership";
+        //var parameters = new DialogParameters
+        //    {
+        //        ["TeamMembership"] = membership,
+        //        ["EditTeamMembership"] = EventCallback.Factory.Create<Guid>(this, EditTeamMembership)
+        //    };
+        //var dialogOptions = new DialogOptions()
+        //    {
+        //        DisableBackdropClick = true,
+        //        MaxWidth = MaxWidth.Small,
+        //        FullWidth = true
+        //    };
+
+        //var dialog = DialogService.Show<EditTeamMembership_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        //var result = await dialog.Result;
+
+        //if (!result.Canceled)
+        //{
+        //    // TODO: what if just removed the membership from the list instead of calling the API again?
+        //    await GetTeamMemberships();
+        //}
+    }
+
+    private async Task RemoveTeamMembershipDialog(TeamMembershipsDto membership)
+    {
+        var dialogTitle = "Remove Team Membership";
+        var parameters = new DialogParameters
+            {
+                ["TeamMembership"] = membership,
+                ["RemoveTeamMembership"] = EventCallback.Factory.Create<Guid>(this, RemoveTeamMembership)
+            };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<RemoveTeamMembership_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            // TODO: what if just removed the membership from the list instead of calling the API again?
+            await GetTeamMemberships();
+        }
+    }
+
+    private async Task RemoveTeamMembership(Guid teamMembershipId)
+    {
+        try
+        {
+            var childTeam = _teamMemberships.First(x => x.Id == teamMembershipId).Child;
+            if (childTeam.Type == "Team")
+            {
+                await TeamsClient.RemoveTeamMembershipAsync(childTeam.Id, teamMembershipId);
+            }
+            else if (childTeam.Type == "Team of Teams")
+            {
+                await TeamsOfTeamsClient.RemoveTeamMembershipAsync(childTeam.Id, teamMembershipId);
+            }
+            else
+            {
+                throw new Exception();
+            }
+            await GetTeamMemberships();
+
+            Snackbar.Add("Team membership removed", MudBlazor.Severity.Success);
+        }
+        catch (ApiException<ErrorResult> ex)
+        {
+            ErrorResult error = ex.Result;
+            Snackbar.Add($"Error removing team membership. {error.SupportMessage}", MudBlazor.Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Error removing team membership.", MudBlazor.Severity.Error);
         }
     }
 }

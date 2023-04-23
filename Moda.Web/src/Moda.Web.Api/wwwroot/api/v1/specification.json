@@ -2186,7 +2186,7 @@
         ]
       }
     },
-    "/api/organization/teams/{id}/memberships": {
+    "/api/organization/teams/{id}/team-memberships": {
       "get": {
         "tags": [
           "Teams"
@@ -2276,6 +2276,67 @@
           "required": true,
           "x-position": 2
         },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/organization/teams/{id}/team-memberships/{teamMembershipId}": {
+      "delete": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Remove a parent team membership.",
+        "operationId": "Teams_RemoveTeamMembership",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "teamMembershipId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          }
+        ],
         "responses": {
           "204": {
             "description": ""
@@ -2536,7 +2597,7 @@
         ]
       }
     },
-    "/api/organization/teams-of-teams/{id}/memberships": {
+    "/api/organization/teams-of-teams/{id}/team-memberships": {
       "get": {
         "tags": [
           "TeamsOfTeams"
@@ -2626,6 +2687,67 @@
           "required": true,
           "x-position": 2
         },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/organization/teams-of-teams/{id}/team-memberships/{teamMembershipId}": {
+      "delete": {
+        "tags": [
+          "TeamsOfTeams"
+        ],
+        "summary": "Remove a parent team membership.",
+        "operationId": "TeamsOfTeams_RemoveTeamMembership",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "teamMembershipId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          }
+        ],
         "responses": {
           "204": {
             "description": ""

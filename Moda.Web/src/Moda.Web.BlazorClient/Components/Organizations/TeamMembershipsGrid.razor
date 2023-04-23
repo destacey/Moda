@@ -4,7 +4,7 @@
         <MudDataGrid @ref="@_grid"
                      Items="@Memberships"
                      Elevation="1"
-                     Height="600px"
+                     Height="550px"
                      Virtualize="true"
                      ColumnResizeMode="ResizeMode.Container"
                      SortMode="SortMode.Multiple" Filterable="true"
@@ -21,12 +21,12 @@
             <Columns>
                 <PropertyColumn Property="x => x.Child.Name" Title="Child">
                     <CellTemplate>
-                        <MudLink Href="@(GetTeamDetailUrl(context.Item.Child))">@context.Item.Child.Name</MudLink>
+                        <MudLink Href="@GetTeamDetailUrl(context.Item.Child)">@context.Item.Child.Name</MudLink>
                     </CellTemplate>
                 </PropertyColumn>
                 <PropertyColumn Property="x => x.Parent.Name" Title="Parent">
                     <CellTemplate>
-                        <MudLink Href="@(GetTeamDetailUrl(context.Item.Parent))">@context.Item.Parent.Name</MudLink>
+                        <MudLink Href="@GetTeamDetailUrl(context.Item.Parent)">@context.Item.Parent.Name</MudLink>
                     </CellTemplate>
                 </PropertyColumn>
                 <PropertyColumn Property="x => x.State" Title="State" />
@@ -38,8 +38,8 @@
                         <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true" Size="Size.Small" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
                             @if (CanUpdateTeamMemberships)
                             {
-                                <MudMenuItem OnClick="@(() => EditTeamMembership(context.Item))">Edit Membership</MudMenuItem>
-                                <MudMenuItem OnClick="@(() => DeleteTeamMembership(context.Item))">Delete Membership</MudMenuItem>
+                                @*<MudMenuItem OnClick="@(() => EditTeamMembership.InvokeAsync(context.Item))">Edit Membership</MudMenuItem>*@
+                                <MudMenuItem OnClick="@(() => RemoveTeamMembership.InvokeAsync(context.Item))">Remove Membership</MudMenuItem>
                             }
                         </MudMenu>
                     </CellTemplate>
@@ -64,6 +64,12 @@
 
     [Parameter] 
     public EventCallback GetTeamMemberships { get; set; }
+
+    [Parameter]
+    public EventCallback<TeamMembershipsDto> EditTeamMembership { get; set; }
+
+    [Parameter]
+    public EventCallback<TeamMembershipsDto> RemoveTeamMembership { get; set; }
 
     [Parameter]
     public List<TeamMembershipsDto> Memberships { get; set; } = default!;
@@ -129,47 +135,5 @@
         return team.Type == "Team"
             ? $"teams/{team.LocalId}"
             : $"teams-of-teams/{team.LocalId}";
-    }
-
-    private async Task EditTeamMembership(TeamMembershipsDto membership)
-    {
-        //var dialogTitle = "Edit Team Membership";
-        //var parameters = new DialogParameters { [membership.Child.Type] = new BaseTeamViewModel(_team!) };
-        //var dialogOptions = new DialogOptions()
-        //    {
-        //        DisableBackdropClick = true,
-        //        MaxWidth = MaxWidth.Small,
-        //        FullWidth = true
-        //    };
-
-        //var dialog = DialogService.Show<AddTeamMembership_Dialog>(dialogTitle, parameters, dialogOptions);
-
-        //var result = await dialog.Result;
-
-        //if (!result.Canceled)
-        //{
-        //    await GetTeamMemberships.InvokeAsync();
-        //}
-    }
-
-    private async Task DeleteTeamMembership(TeamMembershipsDto membership)
-    {
-        //var dialogTitle = "Delete Team Membership";
-        //var parameters = new DialogParameters { [membership.Child.Type] = new BaseTeamViewModel(_team!) };
-        //var dialogOptions = new DialogOptions()
-        //    {
-        //        DisableBackdropClick = true,
-        //        MaxWidth = MaxWidth.Small,
-        //        FullWidth = true
-        //    };
-
-        //var dialog = DialogService.Show<AddTeamMembership_Dialog>(dialogTitle, parameters, dialogOptions);
-
-        //var result = await dialog.Result;
-
-        //if (!result.Canceled)
-        //{
-        //    await GetTeamMemberships.InvokeAsync();
-        //}
     }
 }

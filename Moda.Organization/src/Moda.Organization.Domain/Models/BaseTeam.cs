@@ -129,31 +129,28 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
         }
     }
 
-    /// <summary>
-    /// Removes the team membership.
-    /// </summary>
-    /// <param name="membershipId"></param>
-    /// <param name="timestamp"></param>
-    /// <returns></returns>
-    public Result RemoveTeamMembership(Guid membershipId)
+    /// <summary>Removes a team membership.</summary>
+    /// <param name="membershipId">The membership identifier.</param>
+    /// <returns>On success, returns the TeamMembership that was deleted.  This is needed until the EF core bug is fixed.</returns>
+    public Result<TeamMembership> RemoveTeamMembership(Guid membershipId)
     {
         try
         {
             var membership = _parentMemberships.Single(m => m.Id == membershipId);
 
             if (!IsActive)
-                return Result.Failure($"Memberships can not be removed from inactive teams. {Name} is inactive.");
+                return Result.Failure<TeamMembership>($"Memberships can not be removed from inactive teams. {Name} is inactive.");
 
             if (!membership.Target.IsActive)
-                return Result.Failure($"Memberships can not be removed from inactive teams. {membership.Target.IsActive} is inactive.");
+                return Result.Failure<TeamMembership>($"Memberships can not be removed from inactive teams. {membership.Target.IsActive} is inactive.");
 
             _parentMemberships.Remove(membership);
 
-            return Result.Success();
+            return Result.Success(membership);
         }
         catch (Exception ex)
         {
-            return Result.Failure(ex.ToString());
+            return Result.Failure<TeamMembership>(ex.ToString());
         }
     }
 }
