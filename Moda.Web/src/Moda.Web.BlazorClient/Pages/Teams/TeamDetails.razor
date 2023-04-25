@@ -49,7 +49,7 @@ else
             <TeamMembershipsGrid Memberships="_teamMemberships" 
                 GetTeamMemberships="GetTeamMemberships" 
                 CanUpdateTeamMemberships="_canUpdateTeams"
-                EditTeamMembership="EditTeamMembershipDialog"
+                UpdateTeamMembership="UpdateTeamMembershipDialog"
                 RemoveTeamMembership="RemoveTeamMembershipDialog"/>
         </MudTabPanel>
     </MudTabs>
@@ -157,25 +157,28 @@ else
         }
     }
 
-    private async Task EditTeamMembershipDialog(TeamMembershipsDto membership)
+    private async Task UpdateTeamMembershipDialog(TeamMembershipsDto membership)
     {
-        //var dialogTitle = "Edit Team Membership";
-        //var parameters = new DialogParameters { [membership.Child.Type] = new BaseTeamViewModel(_team!) };
-        //var dialogOptions = new DialogOptions()
-        //    {
-        //        DisableBackdropClick = true,
-        //        MaxWidth = MaxWidth.Small,
-        //        FullWidth = true
-        //    };
+        var dialogTitle = "Update Team Membership";
+        var parameters = new DialogParameters
+            {
+                ["TeamMembership"] = membership
+            };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
 
-        //var dialog = DialogService.Show<AddTeamMembership_Dialog>(dialogTitle, parameters, dialogOptions);
+        var dialog = DialogService.Show<UpdateTeamMembership_Dialog>(dialogTitle, parameters, dialogOptions);
 
-        //var result = await dialog.Result;
+        var result = await dialog.Result;
 
-        //if (!result.Canceled)
-        //{
-        //    await GetTeamMemberships.InvokeAsync();
-        //}
+        if (!result.Canceled)
+        {
+            await GetTeamMemberships();
+        }
     }
 
     private async Task RemoveTeamMembershipDialog(TeamMembershipsDto membership)
