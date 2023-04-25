@@ -17,7 +17,10 @@
                      FixedHeader="true"
                      Loading="@_isLoading"
                      LoadingProgressColor="@Color.Secondary"
-                     QuickFilter="@_quickFilter">
+                     QuickFilter="@_quickFilter"
+                     RowClick=@((DataGridRowClickEventArgs<EmployeeListDto> evnt) => {
+                         ViewEmployeeDetails(evnt);
+                     })>
             <ToolBarContent>
                 <MudSpacer />
                 <MudToolBar>
@@ -80,8 +83,8 @@
         await GetEmployees();
     }
 
-    private void ViewEmployee(in string employeeId) =>
-        Navigation.NavigateTo($"/employees/{employeeId}");
+    public void ViewEmployeeDetails(DataGridRowClickEventArgs<EmployeeListDto> ev) =>
+        Navigation.NavigateTo($"/employees/{ev.Item.LocalId}");
 
     private Func<EmployeeListDto, bool> _quickFilter => x =>
     {
