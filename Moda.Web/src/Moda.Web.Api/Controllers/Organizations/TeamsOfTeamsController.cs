@@ -129,6 +129,34 @@ public class TeamsOfTeamsController : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{id}/team-memberships/{teamMembershipId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Update a team membership.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult> UpdateTeamMembership(Guid id, Guid teamMembershipId, [FromBody] UpdateTeamMembershipRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.TeamId || teamMembershipId != request.TeamMembershipId)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToTeamOfTeamsUpdateTeamMembershipCommand(), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "TeamsOfTeamsController.UpdateTeamMembership"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
     [HttpDelete("{id}/team-memberships/{teamMembershipId}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
     [OpenApiOperation("Remove a parent team membership.", "")]

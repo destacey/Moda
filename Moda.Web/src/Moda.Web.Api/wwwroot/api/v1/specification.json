@@ -2128,7 +2128,7 @@
         "tags": [
           "Teams"
         ],
-        "summary": "Update an team.",
+        "summary": "Update a team.",
         "operationId": "Teams_Update",
         "parameters": [
           {
@@ -2309,6 +2309,77 @@
       }
     },
     "/api/organization/teams/{id}/team-memberships/{teamMembershipId}": {
+      "put": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Update a team membership.",
+        "operationId": "Teams_UpdateTeamMembership",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "teamMembershipId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTeamMembershipRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
       "delete": {
         "tags": [
           "Teams"
@@ -2720,6 +2791,77 @@
       }
     },
     "/api/organization/teams-of-teams/{id}/team-memberships/{teamMembershipId}": {
+      "put": {
+        "tags": [
+          "TeamsOfTeams"
+        ],
+        "summary": "Update a team membership.",
+        "operationId": "TeamsOfTeams_UpdateTeamMembership",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "teamMembershipId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTeamMembershipRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
       "delete": {
         "tags": [
           "TeamsOfTeams"
@@ -4515,6 +4657,39 @@
             "nullable": false
           },
           "parentTeamId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "start": {
+            "type": "string",
+            "format": "date",
+            "nullable": false
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        }
+      },
+      "UpdateTeamMembershipRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "teamId",
+          "teamMembershipId",
+          "start"
+        ],
+        "properties": {
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "teamMembershipId": {
             "type": "string",
             "format": "guid",
             "minLength": 1,
