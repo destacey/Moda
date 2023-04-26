@@ -38,7 +38,7 @@
                         <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true" Size="Size.Small" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
                             @if (CanUpdateTeamMemberships)
                             {
-                                @*<MudMenuItem OnClick="@(() => EditTeamMembership.InvokeAsync(context.Item))">Edit Membership</MudMenuItem>*@
+                                <MudMenuItem OnClick="@(() => UpdateTeamMembership.InvokeAsync(context.Item))">Update Membership</MudMenuItem>
                                 <MudMenuItem OnClick="@(() => RemoveTeamMembership.InvokeAsync(context.Item))">Remove Membership</MudMenuItem>
                             }
                         </MudMenu>
@@ -66,7 +66,7 @@
     public EventCallback GetTeamMemberships { get; set; }
 
     [Parameter]
-    public EventCallback<TeamMembershipsDto> EditTeamMembership { get; set; }
+    public EventCallback<TeamMembershipsDto> UpdateTeamMembership { get; set; }
 
     [Parameter]
     public EventCallback<TeamMembershipsDto> RemoveTeamMembership { get; set; }

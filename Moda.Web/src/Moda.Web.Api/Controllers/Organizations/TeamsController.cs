@@ -64,7 +64,7 @@ public class TeamsController : ControllerBase
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
-    [OpenApiOperation("Update an team.", "")]
+    [OpenApiOperation("Update a team.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
@@ -122,6 +122,34 @@ public class TeamsController : ControllerBase
                 StatusCode = 400,
                 SupportMessage = result.Error,
                 Source = "TeamsController.AddTeamMembership"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
+    [HttpPut("{id}/team-memberships/{teamMembershipId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Update a team membership.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult> UpdateTeamMembership(Guid id, Guid teamMembershipId, [FromBody] UpdateTeamMembershipRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.TeamId || teamMembershipId != request.TeamMembershipId)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToTeamUpdateTeamMembershipCommand(), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "TeamsController.UpdateTeamMembership"
             };
             return BadRequest(error);
         }
