@@ -83,6 +83,8 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+        _loading = true;
+
         // reset the page when the route changes
         _activeTabIndex = 0;
         _teamMemberships.Clear();
