@@ -17,10 +17,7 @@
                      FixedHeader="true"
                      Loading="@_isLoading"
                      LoadingProgressColor="@Color.Secondary"
-                     QuickFilter="@_quickFilter"
-                     RowClick=@((DataGridRowClickEventArgs<EmployeeListDto> evnt) => {
-                         ViewEmployeeDetails(evnt);
-                     })>
+                     QuickFilter="@_quickFilter">
             <ToolBarContent>
                 <MudSpacer />
                 <MudToolBar>
@@ -29,11 +26,23 @@
                 </MudToolBar>
             </ToolBarContent>
             <Columns>
+                <PropertyColumn Property="x => x.LocalId" Title="Id">
+                    <CellTemplate>
+                        <MudLink Href="@($"/employees/{context.Item.LocalId}")">@context.Item.LocalId</MudLink>
+                    </CellTemplate>
+                </PropertyColumn>
                 <PropertyColumn Property="x => x.FirstName" Title="First Name" />
                 <PropertyColumn Property="x => x.LastName" Title="Last Name" />
                 <PropertyColumn Property="x => x.Department" />
                 <PropertyColumn Property="x => x.JobTitle" Title="Job Title" />
-                <PropertyColumn Property="x => x.ManagerName" Title="Manager" />
+                <PropertyColumn Property="x => x.ManagerName" Title="Manager">
+                    <CellTemplate>
+                        @if (context.Item.ManagerLocalId is not null)
+                        {
+                            <MudLink Href="@($"/employees/{context.Item.ManagerLocalId}")">@context.Item.ManagerName</MudLink>
+                        }
+                    </CellTemplate>
+                </PropertyColumn>
                 <PropertyColumn Property="x => x.OfficeLocation" Title="Office Location" />
                 <PropertyColumn Property="x => x.Email" Title="Email" />
                 <PropertyColumn Property="x => x.IsActive" Title="Active" Hidden="@(!_includeDisabled)" />
@@ -83,12 +92,12 @@
         await GetEmployees();
     }
 
-    public void ViewEmployeeDetails(DataGridRowClickEventArgs<EmployeeListDto> ev) =>
-        Navigation.NavigateTo($"/employees/{ev.Item.LocalId}");
-
     private Func<EmployeeListDto, bool> _quickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.LocalId.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         if (!string.IsNullOrWhiteSpace(x.FirstName) && x.FirstName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
@@ -96,7 +105,7 @@
 
         if (!string.IsNullOrWhiteSpace(x.LastName) && x.LastName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-            
+
         if (!string.IsNullOrWhiteSpace(x.Department) && x.Department.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
