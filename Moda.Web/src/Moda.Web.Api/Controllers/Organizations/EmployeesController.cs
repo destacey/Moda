@@ -81,4 +81,16 @@ public class EmployeesController : ControllerBase
     //{
     //    throw new NotImplementedException();
     //}
+
+    [HttpGet("{id}/direct-reports")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
+    [OpenApiOperation("Get a list of direct reports for an employee.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<IReadOnlyList<EmployeeListDto>>> GetDirectReports(Guid id, CancellationToken cancellationToken)
+    {
+        var directReports = await _sender.Send(new GetDirectReportsQuery(id), cancellationToken);
+        return Ok(directReports.OrderBy(e => e.LastName));
+    }
 }

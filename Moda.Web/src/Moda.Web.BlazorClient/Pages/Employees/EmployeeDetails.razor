@@ -59,20 +59,26 @@ else
                         </MudCardContent>
                     </MudCard>
                 </MudItem>
-                <MudItem xs="12" md="6">
-                    <MudCard>
-                        <MudCardHeader>
-                            <CardHeaderContent>
-                                <MudText Typo="Typo.body1">Direct Reports</MudText>
-                            </CardHeaderContent>
-                        </MudCardHeader>
-                        <MudCardContent>
-                            <MudList Clickable="true">
-
-                            </MudList>
-                        </MudCardContent>
-                    </MudCard>
-                </MudItem>
+                @if (_directReports.Any())
+                {
+                    <MudItem xs="12" md="6">
+                        <MudCard>
+                            <MudCardHeader>
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.body1">Direct Reports</MudText>
+                                </CardHeaderContent>
+                            </MudCardHeader>
+                            <MudCardContent>
+                                <MudList Clickable="true">
+                                    @foreach(var report in _directReports)
+                                    {
+                                        <MudListItem Text="@($"{report.FirstName} {report.LastName}")" OnClick="@(() => ViewEmployeeDetails(report.LocalId))" />
+                                    }
+                                </MudList>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                }                
                 @*<MudItem xs="4">
             <MudCard>
             <MudCardHeader>
@@ -132,6 +138,9 @@ else
 
     private Diagram _orgChart = default!;
 
+    private void ViewEmployeeDetails(int employeeLocalId) =>
+        Navigation.NavigateTo($"/employees/{employeeLocalId}");
+
     protected override async Task OnParametersSetAsync()
     {
         _loading = true;
@@ -140,6 +149,7 @@ else
         _activeTabIndex = 0;
 
         await GetEmployee();
+        await GetDirectReports();
 
         _orgChart = new Diagram();
         GenOrgChart();
@@ -183,6 +193,25 @@ else
         _hideAdvanced = !_hideAdvanced;
     }
 
+    private async Task GetEmployee()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => EmployeesClient.GetByIdAsync(Id), Snackbar) is EmployeeDetailsDto result)
+        {
+            _title = $"{result.FirstName} {result.LastName}";
+            _description = "Employee Details";
+
+            _employee = result;
+        }
+    }
+
+    private async Task GetDirectReports()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => EmployeesClient.GetDirectReportsAsync(_employee.Id), Snackbar) is List<EmployeeListDto> result)
+        {
+            _directReports = result;
+        }
+    }
+
     private void GenOrgChart()
     {
         var nodes = new List<NodeModel>();
@@ -196,7 +225,7 @@ else
         if (_employee.ManagerName is not null)
         {
             managerNode = GetEmployeeNode(_employee.ManagerName, 50, 50);
-            nodes.Add(managerNode);            
+            nodes.Add(managerNode);
             links.Add(new LinkModel(managerNode.GetPort(PortAlignment.Bottom), meNode.GetPort(PortAlignment.Top)));
         }
 
@@ -219,16 +248,5 @@ else
         node.AddPort(PortAlignment.Bottom);
         node.Size = new Blazor.Diagrams.Core.Geometry.Size(width: 100, height: 100);
         return node;
-    }
-
-    private async Task GetEmployee()
-    {
-        if (await ApiHelper.ExecuteCallGuardedAsync(() => EmployeesClient.GetByIdAsync(Id), Snackbar) is EmployeeDetailsDto result)
-        {
-            _title = $"{result.FirstName} {result.LastName}";
-            _description = "Employee Details";
-
-            _employee = result;
-        }
     }
 }
