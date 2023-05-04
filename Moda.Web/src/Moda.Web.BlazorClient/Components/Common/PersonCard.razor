@@ -48,25 +48,26 @@
         }
         else
         {
-            _graphClient = HttpClientFactory.CreateClient("GraphAPI");
-            try
-            {
-                var dataRequest = await _graphClient.GetAsync("https://graph.microsoft.com/v1.0/me/photo/$value");
+            //// TODO this isn't working when running in Release mode
+            //_graphClient = HttpClientFactory.CreateClient("GraphAPI");
+            //try
+            //{
+            //    var dataRequest = await _graphClient.GetAsync("https://graph.microsoft.com/v1.0/me/photo/$value");
 
-                if (dataRequest.IsSuccessStatusCode)
-                {
-                    using var stream = await dataRequest.Content.ReadAsStreamAsync();
-                    byte[] bytes = new byte[stream.Length];
-                    stream.Read(bytes, 0, (int)stream.Length);
-                    imageUri = $"data:image/png;base64,{Convert.ToBase64String(bytes)}";
-                    await localStorage.SetItemAsync(StorageConstants.Local.ImageUri, imageUri);
-                    ImageUri = imageUri;
-                }
-            }
-            catch (AccessTokenNotAvailableException ex)
-            {
-                ex.Redirect();
-            }
+            //    if (dataRequest.IsSuccessStatusCode)
+            //    {
+            //        using var stream = await dataRequest.Content.ReadAsStreamAsync();
+            //        byte[] bytes = new byte[stream.Length];
+            //        stream.Read(bytes, 0, (int)stream.Length);
+            //        imageUri = $"data:image/png;base64,{Convert.ToBase64String(bytes)}";
+            //        await localStorage.SetItemAsync(StorageConstants.Local.ImageUri, imageUri);
+            //        ImageUri = imageUri;
+            //    }
+            //}
+            //catch (AccessTokenNotAvailableException ex)
+            //{
+            //    ex.Redirect();
+            //}
         }
     }
 
