@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using CSharpFunctionalExtensions;
 
 namespace Moda.Common.Application.Identity.Users;
 
@@ -26,7 +27,8 @@ public interface IUserService : ITransientService
 
     Task ToggleStatusAsync(ToggleUserStatusCommand command, CancellationToken cancellationToken);
 
-    Task<string> GetOrCreateFromPrincipalAsync(ClaimsPrincipal principal);
+    Task<(string Id, string? EmployeeId)> GetOrCreateFromPrincipalAsync(ClaimsPrincipal principal);
     Task UpdateAsync(UpdateUserCommand command, string userId);
+    Task<Result> UpdateMissingEmployeeIds(CancellationToken cancellationToken);
 
 }

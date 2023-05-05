@@ -87,7 +87,6 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                 else
                 { // create
                     var newEmployee = Employee.Create(
-                        await GetPersonIdAsync(externalEmployee.EmployeeNumber),
                         externalEmployee.Name,
                         externalEmployee.EmployeeNumber,
                         externalEmployee.HireDate,
@@ -137,14 +136,6 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
 
             var managerId = employees?.FirstOrDefault(e => e.EmployeeNumber == managerEmployeeNumber)?.Id;
             return managerId.IsNullEmptyOrDefault() ? null : managerId;
-        }
-
-        async Task<Guid> GetPersonIdAsync(string employeeNumber)
-        {
-            return (await _organizationDbContext.People
-                .Where(p => p.Key == employeeNumber)
-                .Select(p => (Guid?)p.Id)
-                .FirstOrDefaultAsync(cancellationToken)) ?? Guid.NewGuid();
         }
 
         async Task SetMissingManagers()

@@ -27,7 +27,7 @@ else
                         </MudCardHeader>
                         <MudCardContent Class="pa-46" Style="padding:26px!important">
                             <MudGrid>
-                                <MudSwitch @bind-Checked="@_active" Color="Color.Primary" Label="Active?"></MudSwitch>
+                                <MudSwitch @bind-Checked="@_user.IsActive" Color="Color.Primary" Label="Active?"></MudSwitch>
                                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="ToggleUserStatus" ButtonType="ButtonType.Submit">Save Changes</MudButton>
                             </MudGrid>
                         </MudCardContent>
@@ -50,8 +50,8 @@ else
                         </MudAvatar>
                         @*  }*@
                     </div>
-                    <MudText Typo="Typo.h6" Align="Align.Center">@_firstName @_lastName</MudText>
-                    <MudText Align="Align.Center">@_email</MudText>
+                    <MudText Typo="Typo.h6" Align="Align.Center">@_user.FirstName @_user.LastName</MudText>
+                    <MudText Align="Align.Center">@_user.Email</MudText>
                 </MudCardContent>
                 @*<MudCardActions Class="d-flex justify-center">
             <div style="padding-bottom:20px">
@@ -78,18 +78,26 @@ else
                 <MudCardContent>
                     <MudGrid>
                         <MudItem xs="12" md="6">
-                            <MudField Label="First Name" Variant="Variant.Text">@_firstName</MudField>
+                            <MudField Label="First Name" Variant="Variant.Text">@_user.FirstName</MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudField Label="Last Name" Variant="Variant.Text">@_lastName</MudField>
+                            <MudField Label="Last Name" Variant="Variant.Text">@_user.LastName</MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MudField Label="Phone Number" Variant="Variant.Text">
-                                @_phoneNumber
+                                @_user.PhoneNumber
                             </MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
-                                <MudField Label="Email" Variant="Variant.Text">@_email</MudField>
+                                <MudField Label="Email" Variant="Variant.Text">@_user.Email</MudField>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudField Label="Employee" Variant="Variant.Text">
+                                @if (_user.Employee is not null)
+                                {
+                                    <MudLink Href="@($"/employees/{@_user.Employee.LocalId}")">@_user.Employee.Name</MudLink>
+                                }
+                            </MudField>
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>
@@ -110,13 +118,9 @@ else
     [Parameter]
     public string? Description { get; set; }
 
-    private bool _active;
-    private char _firstLetterOfName;
-    private string? _firstName;
-    private string? _lastName;
-    private string? _phoneNumber;
-    private string? _email;
-    //private string? _imageUrl;
+    private UserDetailsDto _user = default!;
+
+    private char? _firstLetterOfName;
     private bool _loaded;
     private bool _canToggleUserStatus;
 
@@ -128,37 +132,36 @@ else
 
     private async Task ToggleUserStatus()
     {
-        var request = new ToggleUserStatusRequest { ActivateUser = _active, UserId = Id! };
-        await ApiHelper.ExecuteCallGuardedAsync(() => UsersClient.ToggleStatusAsync(Id, request), Snackbar);
+        var request = new ToggleUserStatusRequest { ActivateUser = _user.IsActive, UserId = Id! };
+        await ApiHelper.ExecuteCallGuardedAsync(() => UsersClient.ToggleStatusAsync(_user.Id, request), Snackbar);
         Navigation.NavigateTo("/users");
     }
 
     [Parameter]
     public string? ImageUrl { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        if (await ApiHelper.ExecuteCallGuardedAsync(
-                () => UsersClient.GetByIdAsync(Id), Snackbar)
-            is UserDetailsDto user)
-        {
-            _firstName = user.FirstName;
-            _lastName = user.LastName;
-            _email = user.Email;
-            _phoneNumber = user.PhoneNumber;
-            _active = user.IsActive;
-            //_imageUrl = string.IsNullOrEmpty(user.ImageUrl) ? string.Empty : (Config[ConfigNames.ApiBaseUrl] + user.ImageUrl);
-            Title = $"{_firstName} {_lastName}'s Profile";
-            Description = _email;
-            if (_firstName?.Length > 0)
-            {
-                _firstLetterOfName = _firstName.ToUpper().FirstOrDefault();
-            }
-        }
+        await GetUser();
 
         var state = await AuthState;
         _canToggleUserStatus = await AuthService.HasPermissionAsync(state.User, ApplicationAction.Update, ApplicationResource.Users);
         _loaded = true;
+    }
+
+    private async Task GetUser()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => UsersClient.GetByIdAsync(Id), Snackbar) is UserDetailsDto user)
+        {
+            _user = user;
+
+            Title = $"{_user.FirstName} {_user.LastName}'s Profile";
+            Description = _user.Email;
+            if (_user.FirstName?.Length > 0)
+            {
+                _firstLetterOfName = _user.FirstName.ToUpper().FirstOrDefault();
+            }
+        }
     }
 
     //private async Task UploadFiles(InputFileChangeEventArgs e)

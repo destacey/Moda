@@ -28,6 +28,14 @@
         <PropertyColumn Property="x => x.FirstName" Title="First Name" />
         <PropertyColumn Property="x => x.LastName" Title="Last Name" />
         <PropertyColumn Property="x => x.Email" />
+        <PropertyColumn Property="x => x.Employee" Title="Employee">
+            <CellTemplate>
+                @if (context.Item.Employee?.LocalId is not null)
+                {
+                    <MudLink Href="@($"/employees/{context.Item.Employee.LocalId}")">@context.Item.Employee.Name</MudLink>
+                }
+            </CellTemplate>
+        </PropertyColumn>
         <PropertyColumn Property="x => x.IsActive" Title="Active" />
         <TemplateColumn Title="Actions" CellClass="d-flex justify-end" Sortable="false" Filterable="false">
             <CellTemplate>

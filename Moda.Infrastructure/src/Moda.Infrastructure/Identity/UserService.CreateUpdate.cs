@@ -1,9 +1,11 @@
 ﻿using System.Security.Claims;
 using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
+using Moda.Organization.Application.Employees.Queries;
 using NotFoundException = Moda.Common.Application.Exceptions.NotFoundException;
 
 namespace Moda.Infrastructure.Identity;
@@ -17,7 +19,7 @@ internal partial class UserService
     /// If no user is found with that ObjectId, a new one is created and populated with the values from the ClaimsPrincipal.
     /// If a role claim is present in the principal, and the user is not yet in that roll, then the user is added to that role.
     /// </summary>
-    public async Task<string> GetOrCreateFromPrincipalAsync(ClaimsPrincipal principal)
+    public async Task<(string Id, string? EmployeeId)> GetOrCreateFromPrincipalAsync(ClaimsPrincipal principal)
     {
         string? objectId = principal.GetObjectId();
         if (string.IsNullOrWhiteSpace(objectId))
@@ -37,7 +39,7 @@ internal partial class UserService
             await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeService.Now, true));
         }
 
-        return user.Id;
+        return (user.Id, user.EmployeeId?.ToString());
     }
 
     private async Task<ApplicationUser> CreateOrUpdateFromPrincipalAsync(ClaimsPrincipal principal)
@@ -81,10 +83,8 @@ internal partial class UserService
         }
         else
         {
-            Guid newUserId = await GetOrCreatePersonId(principalObjectId);
             user = new ApplicationUser
             {
-                Id = newUserId.ToString(),
                 ObjectId = principalObjectId,
                 FirstName = principal.FindFirstValue(ClaimTypes.GivenName) ?? Guard.Against.NullOrWhiteSpace(adUser?.GivenName),
                 LastName = principal.FindFirstValue(ClaimTypes.Surname) ?? Guard.Against.NullOrWhiteSpace(adUser?.Surname),
@@ -94,7 +94,8 @@ internal partial class UserService
                 NormalizedUserName = username.ToUpperInvariant(),
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                IsActive = true
+                IsActive = true,
+                EmployeeId = await GetEmployeeId(principalObjectId)
             };
             result = await _userManager.CreateAsync(user);
 
@@ -140,30 +141,42 @@ internal partial class UserService
         }
     }
 
-    private async Task<Guid> GetOrCreatePersonId(string principalObjectId)
+    public async Task<Result> UpdateMissingEmployeeIds(CancellationToken cancellationToken)
+    {
+        var users = await _userManager.Users.Where(u => !u.EmployeeId.HasValue).ToListAsync(cancellationToken);
+
+        if (users.Any())
+        {
+            var employees = await _sender.Send(new GetEmployeeNumberMapQuery(), cancellationToken);
+            foreach (var user in users) 
+            {
+                var employeeId = employees.Where(e => e.EmployeeNumber == user.ObjectId).Select(e => (Guid?)e.Id ?? null).FirstOrDefault();
+                if (!employeeId.HasValue)
+                    continue;
+
+                user.EmployeeId = employeeId;
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeService.Now));
+                }
+                else
+                {
+                    _logger.LogError("Error updating employeeId on user {UserId}: {Errors}", user.Id, result.Errors.Select(e => e.Description));
+                }
+            }
+        }
+
+        return Result.Success();
+    }
+
+    private async Task<Guid?> GetEmployeeId(string principalObjectId)
     {
         // get the Person Id and if not null verify no existing user with that Id
-        var personId = await _sender.Send(new GetPersonIdByKeyQuery(principalObjectId));
-        if (personId.HasValue)
-        {
-            var existingUser = await _userManager.FindByIdAsync(personId.Value.ToString());
-            if (existingUser is not null)
-            {
-                _logger.LogError("Person with key {PrincipalObjectId} already exists.", principalObjectId);
-                throw new InternalServerException($"Person with key {principalObjectId} already exists.");
-            }
+        var employeeId = await _sender.Send(new GetEmployeeByEmployeeNumberQuery(principalObjectId));
+        if (employeeId is null)
+            _logger.LogWarning("Employee with EmployeeNumber {EmployeeNumber} not found.", principalObjectId);
 
-            return personId.Value;
-        }
-
-        // else, create new person
-        var result = await _sender.Send(new CreatePersonCommand(principalObjectId!));
-        if (result.IsFailure)
-        {
-            _logger.LogError("Create Person failed: {Error}", result.Error);
-            throw new InternalServerException("Create Person failed");
-        }
-
-        return result.Value;
+        return employeeId;
     }
 }

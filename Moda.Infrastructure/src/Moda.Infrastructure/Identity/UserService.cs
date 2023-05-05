@@ -48,6 +48,7 @@ internal partial class UserService : IUserService
     public async Task<IReadOnlyList<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)
     {
         var users = await _userManager.Users
+            .Include(u => u.Employee)
             .Where(u => u.IsActive == filter.IsActive)
             .ProjectToType<UserDetailsDto>()
             .ToListAsync(cancellationToken);
@@ -72,8 +73,9 @@ internal partial class UserService : IUserService
 
     public async Task<List<UserDetailsDto>> GetListAsync(CancellationToken cancellationToken) =>
         (await _userManager.Users
-                .AsNoTracking()
-                .ToListAsync(cancellationToken))
+            .Include(u => u.Employee)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken))
             .Adapt<List<UserDetailsDto>>();
 
     public Task<int> GetCountAsync(CancellationToken cancellationToken) =>
@@ -82,6 +84,7 @@ internal partial class UserService : IUserService
     public async Task<UserDetailsDto?> GetAsync(string userId, CancellationToken cancellationToken)
     {
         return await _userManager.Users
+            .Include(u => u.Employee)
             .AsNoTracking()
             .ProjectToType<UserDetailsDto>()
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);

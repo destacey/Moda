@@ -21,7 +21,6 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizat
     #region IOrganization
 
     public DbSet<Employee> Employees => Set<Employee>();
-    public DbSet<Person> People => Set<Person>();
     public DbSet<BaseTeam> BaseTeams => Set<BaseTeam>();
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<TeamOfTeams> TeamOfTeams => Set<TeamOfTeams>();

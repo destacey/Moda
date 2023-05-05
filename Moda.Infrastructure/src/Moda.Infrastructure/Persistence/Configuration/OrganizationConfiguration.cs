@@ -153,18 +153,3 @@ public class TeamMembershipConfig : IEntityTypeConfiguration<TeamMembership>
         builder.Property(o => o.IsDeleted);
     }
 }
-
-public class PersonConfig : IEntityTypeConfiguration<Person>
-{
-    public void Configure(EntityTypeBuilder<Person> builder)
-    {
-        builder.ToTable("People", SchemaNames.Organization);
-
-        builder.HasKey(p => p.Id);
-        builder.HasIndex(p => p.Key)
-            .IsUnique()
-            .IncludeProperties(p => new { p.Id });
-
-        builder.Property(p => p.Key).HasMaxLength(256).IsRequired();
-    }
-}

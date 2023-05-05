@@ -17,9 +17,8 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
 
     private Employee() { }
 
-    private Employee(Guid personId, PersonName personName, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)
+    private Employee(PersonName personName, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)
     {
-        Id = Guard.Against.Default(personId);
         Name = personName;
         EmployeeNumber = employeeNumber;
         HireDate = hireDate;
@@ -201,7 +200,6 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
     /// <summary>
     /// Creates an Employee and adds a domain event with the timestamp.
     /// </summary>
-    /// <param name="personId">The person identifier.</param>
     /// <param name="personName">Name of the person.</param>
     /// <param name="employeeNumber">The employee identifier.</param>
     /// <param name="hireDate">The hire date.</param>
@@ -213,7 +211,6 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
     /// <param name="timestamp">The timestamp for the domain event.</param>
     /// <returns>An Employee</returns>
     public static Employee Create(
-        Guid personId,
         PersonName personName,
         string employeeNumber,
         Instant? hireDate,
@@ -224,7 +221,7 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
         Guid? managerId,
         Instant timestamp)
     {
-        Employee employee = new(personId, personName, employeeNumber, hireDate, email, jobTitle, department, officeLocation, managerId);
+        Employee employee = new(personName, employeeNumber, hireDate, email, jobTitle, department, officeLocation, managerId);
         employee.AddDomainEvent(EntityCreatedEvent.WithEntity(employee, timestamp));
         return employee;
     }
