@@ -9,6 +9,7 @@ public sealed record CreateUserCommand
     public string Email { get; set; } = null!;
     public string UserName { get; set; } = null!;
     public string? PhoneNumber { get; set; }
+    public Guid? EmployeeId { get; set; }
 }
 
 public sealed class CreateUserCommandValidator : CustomValidator<CreateUserCommand>

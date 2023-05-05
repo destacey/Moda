@@ -1,3 +1,5 @@
+using Moda.Common.Application.Dtos;
+
 namespace Moda.Common.Application.Identity.Users;
 
 public sealed record UserDetailsDto
@@ -15,4 +17,6 @@ public sealed record UserDetailsDto
     public bool IsActive { get; set; } = true;
 
     public string? PhoneNumber { get; set; }
+
+    public NavigationDto? Employee { get; set; }
 }

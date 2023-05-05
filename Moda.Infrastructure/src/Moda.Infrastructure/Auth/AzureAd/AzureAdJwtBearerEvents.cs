@@ -49,14 +49,19 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
         var identity = principal.Identities.First();
 
         // Lookup local user or create one if none exist.
-        string userId = await context.HttpContext.RequestServices.GetRequiredService<IUserService>()
+        var userData = await context.HttpContext.RequestServices.GetRequiredService<IUserService>()
             .GetOrCreateFromPrincipalAsync(principal);
         // TODO: Call Graph here
 
         // We use the nameidentifier claim to store the user id.
         var idClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
         identity.TryRemoveClaim(idClaim);
-        identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId));
+        identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userData.Id));
+
+        if (!string.IsNullOrWhiteSpace(userData.EmployeeId))
+        {
+            identity.AddClaim(new Claim("EmployeeId", userData.EmployeeId));
+        }
 
         // And the email claim for the email.
         var emailClaim = principal.FindFirst(ClaimTypes.Email);
@@ -70,7 +75,7 @@ internal class AzureAdJwtBearerEvents : JwtBearerEvents
             else
             {
                 var email = await context.HttpContext.RequestServices.GetRequiredService<IUserService>()
-                    .GetEmailAsync(userId);
+                    .GetEmailAsync(userData.Id);
                 if (!string.IsNullOrWhiteSpace(email))
                 {
                     identity.AddClaim(new Claim(ClaimTypes.Email, email));

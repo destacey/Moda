@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Mapster;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -14,7 +15,8 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
-        //MapsterSettings.Configure();
+        var assembly = Assembly.GetExecutingAssembly();
+        TypeAdapterConfig.GlobalSettings.Scan(assembly);
 
         services.AddSingleton<IClock>(SystemClock.Instance);
 

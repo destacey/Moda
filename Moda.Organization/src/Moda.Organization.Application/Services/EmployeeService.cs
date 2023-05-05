@@ -1,25 +1,26 @@
-﻿namespace Moda.Organization.Application.Services;
+﻿using Moda.Common.Application.Identity.Users;
+
+namespace Moda.Organization.Application.Services;
 
 public sealed class EmployeeService : IEmployeeService
 {
     private readonly ILogger<EmployeeService> _logger;
     private readonly IExternalEmployeeDirectoryService _externalEmployeeDirectoryService;
     private readonly ISender _sender;
+    private readonly IUserService _userService;
 
-    public EmployeeService(ILogger<EmployeeService> logger, IExternalEmployeeDirectoryService externalEmployeeDirectoryService, ISender sender)
+    public EmployeeService(ILogger<EmployeeService> logger, IExternalEmployeeDirectoryService externalEmployeeDirectoryService, ISender sender, IUserService userService)
     {
         _logger = logger;
         _externalEmployeeDirectoryService = externalEmployeeDirectoryService;
         _sender = sender;
+        _userService = userService;
     }
 
     public async Task<Result> SyncExternalEmployees(CancellationToken cancellationToken)
     {
         try
         {
-            // TODO delete - this is for testing because the job runs so fast
-            await Task.Delay(10 * 1000);
-
             var getEmployeesResult = await _externalEmployeeDirectoryService.GetEmployees(cancellationToken);
 
             if (getEmployeesResult.IsSuccess)
@@ -31,7 +32,15 @@ public sealed class EmployeeService : IEmployeeService
                     return Result.Failure(message);
                 }
 
-                return await _sender.Send(new BulkUpsertEmployeesCommand(getEmployeesResult.Value), cancellationToken);
+                var upsertResult = await _sender.Send(new BulkUpsertEmployeesCommand(getEmployeesResult.Value), cancellationToken);
+                if (upsertResult.IsFailure)
+                    return upsertResult;
+
+                var userUpdateResult = await _userService.UpdateMissingEmployeeIds(cancellationToken);
+                if (upsertResult.IsFailure)
+                    return upsertResult;
+
+                return Result.Success();
             }
             else
             {
