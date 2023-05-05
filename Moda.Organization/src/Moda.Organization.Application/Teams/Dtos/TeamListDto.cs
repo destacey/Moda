@@ -2,7 +2,7 @@
 using Moda.Organization.Application.Models;
 
 namespace Moda.Organization.Application.Teams.Dtos;
-public class TeamListDto : IMapFrom<BaseTeam>
+public sealed record TeamListDto : IMapFrom<BaseTeam>
 {
     /// <summary>Gets or sets the identifier.</summary>
     /// <value>The identifier.</value>
@@ -13,7 +13,7 @@ public class TeamListDto : IMapFrom<BaseTeam>
     public int LocalId { get; set; }
 
     /// <summary>
-    /// The name of the workspace.
+    /// The name of the team.
     /// </summary>
     public required string Name { get; set; }
 

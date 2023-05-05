@@ -1,12 +1,12 @@
 ﻿global using CSharpFunctionalExtensions;
+global using FluentValidation;
 global using MediatR;
+global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Logging;
-global using Moda.Common.Application.Events;
 global using Moda.Common.Application.Exceptions;
 global using Moda.Common.Application.Interfaces;
 global using Moda.Common.Application.Persistence;
 global using Moda.Common.Application.Validation;
-global using Moda.Common.Domain.Events;
 global using Moda.Common.Extensions;
 global using Moda.Common.Models;
 global using Moda.Organization.Application.Employees.Commands;

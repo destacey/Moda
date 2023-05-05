@@ -14,10 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="ProgramIncrements\" />
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
         <ProjectReference Include="..\Moda.Planning.Domain\Moda.Planning.Domain.csproj" />
     </ItemGroup>

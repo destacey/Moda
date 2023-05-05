@@ -13,7 +13,7 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
 
     private ProgramIncrement() { }
 
-    private ProgramIncrement(string name, string description, LocalDateRange dateRange)
+    private ProgramIncrement(string name, string? description, LocalDateRange dateRange)
     {
         Name = name;
         Description = description;
@@ -54,7 +54,7 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
     /// <param name="dateRange">The date range.</param>
-    public Result Update(string name, string description, LocalDateRange dateRange)
+    public Result Update(string name, string? description, LocalDateRange dateRange)
     {
         try
         {
@@ -75,7 +75,7 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
     /// <param name="description">The description.</param>
     /// <param name="dateRange">The date range.</param>
     /// <returns></returns>
-    public static ProgramIncrement Create(string name, string description, LocalDateRange dateRange)
+    public static ProgramIncrement Create(string name, string? description, LocalDateRange dateRange)
     {
         return new ProgramIncrement(name, description, dateRange);
     }
