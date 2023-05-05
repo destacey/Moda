@@ -106,11 +106,6 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
     {
         try
         {
-            var personId = (await _organizationDbContext.People
-                .Where(p => p.Key == request.EmployeeNumber)
-                .Select(p => (Guid?)p.Id)
-                .FirstOrDefaultAsync(cancellationToken)) ?? Guid.NewGuid();
-
             // verify the manager exists
             var managerId = request.ManagerId;
             if (managerId.HasValue
@@ -120,7 +115,6 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
             }
 
             var employee = Employee.Create(
-                personId,
                 request.Name,
                 request.EmployeeNumber,
                 request.HireDate,
@@ -148,4 +142,3 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
         }
     }
 }
-

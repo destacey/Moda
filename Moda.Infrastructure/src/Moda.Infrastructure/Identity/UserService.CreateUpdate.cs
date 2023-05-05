@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
+using Moda.Organization.Application.Employees.Queries;
 using NotFoundException = Moda.Common.Application.Exceptions.NotFoundException;
 
 namespace Moda.Infrastructure.Identity;
@@ -81,10 +82,9 @@ internal partial class UserService
         }
         else
         {
-            Guid newUserId = await GetOrCreatePersonId(principalObjectId);
+            var employeeId = await GetEmployeeId(principalObjectId);
             user = new ApplicationUser
             {
-                Id = newUserId.ToString(),
                 ObjectId = principalObjectId,
                 FirstName = principal.FindFirstValue(ClaimTypes.GivenName) ?? Guard.Against.NullOrWhiteSpace(adUser?.GivenName),
                 LastName = principal.FindFirstValue(ClaimTypes.Surname) ?? Guard.Against.NullOrWhiteSpace(adUser?.Surname),
@@ -140,30 +140,13 @@ internal partial class UserService
         }
     }
 
-    private async Task<Guid> GetOrCreatePersonId(string principalObjectId)
+    private async Task<Guid?> GetEmployeeId(string principalObjectId)
     {
         // get the Person Id and if not null verify no existing user with that Id
-        var personId = await _sender.Send(new GetPersonIdByKeyQuery(principalObjectId));
-        if (personId.HasValue)
-        {
-            var existingUser = await _userManager.FindByIdAsync(personId.Value.ToString());
-            if (existingUser is not null)
-            {
-                _logger.LogError("Person with key {PrincipalObjectId} already exists.", principalObjectId);
-                throw new InternalServerException($"Person with key {principalObjectId} already exists.");
-            }
+        var employeeId = await _sender.Send(new GetEmployeeByEmployeeNumberQuery(principalObjectId));
+        if (employeeId is null)
+            _logger.LogWarning("Employee with EmployeeNumber {EmployeeNumber} not found.", principalObjectId);
 
-            return personId.Value;
-        }
-
-        // else, create new person
-        var result = await _sender.Send(new CreatePersonCommand(principalObjectId!));
-        if (result.IsFailure)
-        {
-            _logger.LogError("Create Person failed: {Error}", result.Error);
-            throw new InternalServerException("Create Person failed");
-        }
-
-        return result.Value;
+        return employeeId;
     }
 }
