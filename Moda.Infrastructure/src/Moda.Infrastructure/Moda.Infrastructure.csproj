@@ -62,6 +62,8 @@
     <ProjectReference Include="..\..\..\Moda.Integrations\src\Moda.Integrations.MicrosoftGraph\Moda.Integrations.MicrosoftGraph.csproj" />
     <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
     <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Domain\Moda.Organization.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Moda.Planning\src\Moda.Planning.Application\Moda.Planning.Application.csproj" />
+    <ProjectReference Include="..\..\..\Moda.Planning\src\Moda.Planning.Domain\Moda.Planning.Domain.csproj" />
     <ProjectReference Include="..\..\..\Moda.Work\src\Moda.Work.Application\Moda.Work.Application.csproj" />
     <ProjectReference Include="..\..\..\Moda.Work\src\Moda.Work.Domain\Moda.Work.Domain.csproj" />
   </ItemGroup>
