@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Moda.Work.Application.WorkTypes.Commands;
+﻿using Moda.Work.Application.WorkTypes.Commands;
 
 namespace Moda.Web.Api.Models.Work.WorkTypes;
 

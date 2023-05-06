@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Moda.Web.Api.Models.AppIntegrations.Connections;
+﻿namespace Moda.Web.Api.Models.AppIntegrations.Connections;
 
 public sealed record UpdateAzureDevOpsBoardConnectionRequest
 {

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace Moda.Organization.Application.Persistence;
+﻿namespace Moda.Organization.Application.Persistence;
 public interface IOrganizationDbContext : IModaDbContext
 {
     DbSet<Employee> Employees { get; }

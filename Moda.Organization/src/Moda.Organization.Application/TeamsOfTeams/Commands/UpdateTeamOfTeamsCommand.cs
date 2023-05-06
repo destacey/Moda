@@ -1,7 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-
-namespace Moda.Organization.Application.TeamsOfTeams.Commands;
+﻿namespace Moda.Organization.Application.TeamsOfTeams.Commands;
 public sealed record UpdateTeamOfTeamsCommand : ICommand<int>
 {
     public UpdateTeamOfTeamsCommand(Guid id, string name, TeamCode code, string? description)

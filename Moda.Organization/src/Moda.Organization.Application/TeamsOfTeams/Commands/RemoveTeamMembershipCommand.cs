@@ -1,7 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-
-namespace Moda.Organization.Application.TeamsOfTeams.Commands;
+﻿namespace Moda.Organization.Application.TeamsOfTeams.Commands;
 
 public sealed record RemoveTeamMembershipCommand(Guid TeamId, Guid TeamMembershipId) : ICommand;
 

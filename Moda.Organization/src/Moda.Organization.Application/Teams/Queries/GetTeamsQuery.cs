@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
 
 namespace Moda.Organization.Application.Teams.Queries;
 public sealed record GetTeamsQuery : IQuery<IReadOnlyList<TeamListDto>>

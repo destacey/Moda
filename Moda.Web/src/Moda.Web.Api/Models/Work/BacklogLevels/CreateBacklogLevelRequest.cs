@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Moda.Work.Application.BacklogLevels.Commands;
+﻿using Moda.Work.Application.BacklogLevels.Commands;
 
 namespace Moda.Web.Api.Models.Work.BacklogLevels;
 

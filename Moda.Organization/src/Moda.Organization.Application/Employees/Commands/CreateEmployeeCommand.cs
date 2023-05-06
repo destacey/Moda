@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using NodaTime;
+﻿using NodaTime;
 
 namespace Moda.Organization.Application.Employees.Commands;
 public sealed record CreateEmployeeCommand : ICommand<int>

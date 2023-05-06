@@ -1,8 +1,8 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Common.Domain.Data;
-using Moda.Common.Models;
-using Moda.Common.Extensions;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Data;
+using Moda.Common.Extensions;
+using Moda.Common.Models;
 
 namespace Moda.Planning.Domain.Models;
 public class ProgramIncrement : BaseAuditableEntity<Guid>

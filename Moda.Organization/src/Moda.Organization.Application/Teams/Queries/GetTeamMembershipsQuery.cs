@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Moda.Organization.Application.Models;
+﻿using Moda.Organization.Application.Models;
 
 namespace Moda.Organization.Application.Teams.Queries;
 public sealed record GetTeamMembershipsQuery : IQuery<IReadOnlyList<TeamMembershipsDto>>

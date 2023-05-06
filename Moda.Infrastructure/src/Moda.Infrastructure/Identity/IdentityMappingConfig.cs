@@ -15,13 +15,13 @@ public class IdentityMappingConfig : IRegister
                 .Map(dest => dest.Email, src => src.Email)
                 .Map(dest => dest.PhoneNumber, src => src.PhoneNumber)
                 .Map(dest => dest.IsActive, src => src.IsActive)
-                .Map(dest => dest.Employee, src => src.Employee == null 
-                    ? null 
-                    : new NavigationDto 
-                        { 
-                            Id = src.Employee.Id,
-                            LocalId = src.Employee.LocalId,
-                            Name = src.Employee.Name.FullName,
-                        });
+                .Map(dest => dest.Employee, src => src.Employee == null
+                    ? null
+                    : new NavigationDto
+                    {
+                        Id = src.Employee.Id,
+                        LocalId = src.Employee.LocalId,
+                        Name = src.Employee.Name.FullName,
+                    });
     }
 }

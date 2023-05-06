@@ -1,7 +1,4 @@
-﻿using FluentValidation;
-using NodaTime;
-
-namespace Moda.Web.Api.Models.Organizations.Employees;
+﻿namespace Moda.Web.Api.Models.Organizations.Employees;
 
 public sealed record CreateEmployeeRequest
 {

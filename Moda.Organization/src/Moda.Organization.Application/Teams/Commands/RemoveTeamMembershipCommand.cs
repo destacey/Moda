@@ -1,7 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-
-namespace Moda.Organization.Application.Teams.Commands;
+﻿namespace Moda.Organization.Application.Teams.Commands;
 
 public sealed record RemoveTeamMembershipCommand(Guid TeamId, Guid TeamMembershipId) : ICommand;
 
@@ -48,7 +45,7 @@ internal sealed class RemoveTeamMembershipCommandHandler : ICommandHandler<Remov
 
             /// Cleans up deleted team memberships.  This is needed because of a bug in EF Core 7.x.
             _organizationDbContext.Entry(result.Value).State = EntityState.Deleted;
-            
+
             await _organizationDbContext.SaveChangesAsync(cancellationToken);
 
             return Result.Success();

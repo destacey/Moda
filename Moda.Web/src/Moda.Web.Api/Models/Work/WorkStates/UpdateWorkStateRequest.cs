@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Moda.Web.Api.Models.Work.WorkStates;
+﻿namespace Moda.Web.Api.Models.Work.WorkStates;
 
 public sealed record UpdateWorkStateRequest
 {

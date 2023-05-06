@@ -1,1 +1,1 @@
-﻿global using Moda.Planning.Domain.Models;
+﻿
