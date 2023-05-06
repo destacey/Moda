@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moda.Planning.Application.Persistence;
 using Serilog;
 
 namespace Moda.Infrastructure.Persistence;
@@ -70,6 +71,7 @@ internal static class ConfigureServices
     {
         services.AddScoped<IAppIntegrationDbContext, ModaDbContext>();
         services.AddScoped<IOrganizationDbContext, ModaDbContext>();
+        services.AddScoped<IPlanningDbContext, ModaDbContext>();
         services.AddScoped<IWorkDbContext, ModaDbContext>();
 
         return services;

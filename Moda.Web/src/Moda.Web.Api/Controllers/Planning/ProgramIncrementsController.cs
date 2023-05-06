@@ -27,7 +27,7 @@ public class ProgramIncrementsController : ControllerBase
     public async Task<ActionResult<IReadOnlyList<ProgramIncrementListDto>>> GetList(CancellationToken cancellationToken)
     {
         var programIncrements = await _sender.Send(new GetProgramIncrementsQuery(), cancellationToken);
-        return Ok(programIncrements.OrderByDescending(e => e.Start));
+        return Ok(programIncrements);
     }
 
     [HttpGet("{id}")]

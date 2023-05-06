@@ -1,7 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
-using Moda.Planning.Application.Persistence;
-using Moda.Planning.Application.ProgramIncrements.Dtos;
+﻿using Moda.Planning.Application.ProgramIncrements.Dtos;
 
 namespace Moda.Planning.Application.ProgramIncrements.Queries;
 public sealed record GetProgramIncrementsQuery() : IQuery<IReadOnlyList<ProgramIncrementListDto>>;
