@@ -53,8 +53,6 @@ public class TeamsController : ControllerBase
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Teams)]
     [OpenApiOperation("Create a team.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult> Create([FromBody] CreateTeamRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateTeamCommand(), cancellationToken);

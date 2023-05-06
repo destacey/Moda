@@ -131,21 +131,21 @@
 
     private async Task CreateProgramIncrement()
     {
-    //    var dialogTitle = "Create Program Increment";
-    //    var dialogOptions = new DialogOptions()
-    //        {
-    //            DisableBackdropClick = true,
-    //            MaxWidth = MaxWidth.Small,
-    //            FullWidth = true
-    //        };
+        var dialogTitle = "Create Program Increment";
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
 
-    //    var dialog = DialogService.Show<CreateProgramIncrement_Dialog>(dialogTitle, dialogOptions);
+        var dialog = DialogService.Show<CreateProgramIncrement_Dialog>(dialogTitle, dialogOptions);
 
-    //    var result = await dialog.Result;
+        var result = await dialog.Result;
 
-    //    if (!result.Canceled)
-    //    {
-    //        await GetProgramIncrements();
-    //    }
+        if (!result.Canceled)
+        {
+            await GetProgramIncrements();
+        }
     }
 }

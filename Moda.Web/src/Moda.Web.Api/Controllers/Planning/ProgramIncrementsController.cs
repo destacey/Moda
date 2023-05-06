@@ -49,8 +49,6 @@ public class ProgramIncrementsController : ControllerBase
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.ProgramIncrements)]
     [OpenApiOperation("Create a program increment.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult> Create([FromBody] CreateProgramIncrementRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateProgramIncrementCommand(), cancellationToken);

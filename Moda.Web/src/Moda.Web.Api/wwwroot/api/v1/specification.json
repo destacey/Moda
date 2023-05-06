@@ -939,6 +939,9 @@
           "x-position": 1
         },
         "responses": {
+          "201": {
+            "description": ""
+          },
           "400": {
             "description": "",
             "content": {
@@ -2293,6 +2296,9 @@
           "x-position": 1
         },
         "responses": {
+          "201": {
+            "description": ""
+          },
           "400": {
             "description": "",
             "content": {
