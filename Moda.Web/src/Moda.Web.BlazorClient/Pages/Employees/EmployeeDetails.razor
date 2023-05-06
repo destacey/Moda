@@ -41,18 +41,40 @@ else
                             </CardHeaderActions>
                         </MudCardHeader>
                         <MudCardContent>
-                            <MudGrid Class="pa-0">
+                            <MudGrid Class="pa-1">
+                                <MudItem  xs="12">
+                                    <MudField Label="Manager" Variant="Variant.Text">
+                                        <MudLink Href="@(_employee.ManagerLocalId is null ? null : $"employees/{_employee.ManagerLocalId}")">@_employee.ManagerName</MudLink>
+                                    </MudField>
+                                </MudItem>
                                 <MudItem xs="12">
-                                    <ModaFieldGroup Label="Manager:" Text="@_employee.ManagerName" Link="@(_employee.ManagerLocalId is null ? null : $"/employees/{_employee.ManagerLocalId}")" />
-                                    <ModaFieldGroup Label="Department:" Text="@_employee.Department" />
-                                    <ModaFieldGroup Label="Job Title:" Text="@_employee.JobTitle" />
-                                    <ModaFieldGroup Label="Hire Date:" Text="@_employee.HireDate?.ToString("d")" />
-                                    <ModaFieldGroup Label="Office Location:" Text="@_employee.OfficeLocation" />
+                                    <MudField Label="Department" Variant="Variant.Text">@_employee.Department</MudField>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudField Label="Job Title" Variant="Variant.Text">@_employee.JobTitle</MudField>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudField Label="Hire Date" Variant="Variant.Text">@_employee.HireDate?.ToString("d")</MudField>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudField Label="Office Location" Variant="Variant.Text">@_employee.OfficeLocation</MudField>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudField Label="Is Active?" Variant="Variant.Text">@_employee.IsActive</MudField>
                                 </MudItem>
                                 <MudItem xs="12">
                                     <MudPaper Elevation="-1" hidden="@_hideAdvanced">
-                                        <ModaFieldGroup Label="Moda DB Row Id:" Text="@_employee.Id.ToString()" />
-                                        <ModaFieldGroup Label="External Source Employee Number:" Text="@_employee.EmployeeNumber" />
+                                        <MudGrid Class="pa-0">
+                                            <MudItem xs="12">
+                                                <MudField Label="Employee Number" Variant="Variant.Text">@_employee.EmployeeNumber</MudField>
+                                            </MudItem>
+                                            <MudItem xs="12">
+                                                <MudField Label="Id" Variant="Variant.Text">@_employee.Id</MudField>
+                                            </MudItem>
+                                            <MudItem xs="12">
+                                                <MudField Label="Local Id" Variant="Variant.Text">@_employee.LocalId</MudField>
+                                            </MudItem>
+                                        </MudGrid>
                                     </MudPaper>
                                 </MudItem>
                             </MudGrid>
@@ -68,9 +90,9 @@ else
                                     <MudText Typo="Typo.body1">Direct Reports</MudText>
                                 </CardHeaderContent>
                             </MudCardHeader>
-                            <MudCardContent>
+                            <MudCardContent Class="pa-1">
                                 <MudList Clickable="true">
-                                    @foreach(var report in _directReports)
+                                    @foreach (var report in _directReports)
                                     {
                                         <MudListItem Text="@($"{report.FirstName} {report.LastName}")" OnClick="@(() => ViewEmployeeDetails(report.LocalId))" />
                                     }
@@ -78,7 +100,7 @@ else
                             </MudCardContent>
                         </MudCard>
                     </MudItem>
-                }                
+                }
                 @*<MudItem xs="4">
             <MudCard>
             <MudCardHeader>

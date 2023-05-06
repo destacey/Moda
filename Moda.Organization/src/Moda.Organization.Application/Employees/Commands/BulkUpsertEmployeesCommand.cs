@@ -1,7 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-
-namespace Moda.Organization.Application.Employees.Commands;
+﻿namespace Moda.Organization.Application.Employees.Commands;
 public sealed record BulkUpsertEmployeesCommand : ICommand
 {
     public BulkUpsertEmployeesCommand(IEnumerable<IExternalEmployee> employees)

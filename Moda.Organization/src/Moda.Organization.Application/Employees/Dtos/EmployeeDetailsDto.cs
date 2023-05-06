@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using Mapster;
+﻿using Mapster;
 using Moda.Common.Helpers;
 using NodaTime;
 

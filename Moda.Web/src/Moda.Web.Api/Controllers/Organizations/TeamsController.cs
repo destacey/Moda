@@ -165,7 +165,7 @@ public class TeamsController : ControllerBase
     [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult> RemoveTeamMembership(Guid id, Guid teamMembershipId, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(new RemoveTeamMembershipCommand(id, teamMembershipId) , cancellationToken);
+        var result = await _sender.Send(new RemoveTeamMembershipCommand(id, teamMembershipId), cancellationToken);
 
         if (result.IsFailure)
         {

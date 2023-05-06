@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Moda.Planning.Application.Persistence;
+using Moda.Planning.Domain.Models;
 using Moda.Work.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Context;
 
-public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizationDbContext, IWorkDbContext
+public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizationDbContext, IPlanningDbContext, IWorkDbContext
 {
     public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeService dateTimeService, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
         : base(options, currentUser, dateTimeService, serializer, dbSettings, events)
@@ -26,6 +28,12 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizat
     public DbSet<TeamOfTeams> TeamOfTeams => Set<TeamOfTeams>();
 
     #endregion IOrganization
+
+    #region IPlanning
+
+    public DbSet<ProgramIncrement> ProgramIncrements => Set<ProgramIncrement>();
+
+    #endregion IPlanning
 
     #region IWork
 

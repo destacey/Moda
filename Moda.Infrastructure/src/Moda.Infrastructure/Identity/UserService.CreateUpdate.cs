@@ -148,7 +148,7 @@ internal partial class UserService
         if (users.Any())
         {
             var employees = await _sender.Send(new GetEmployeeNumberMapQuery(), cancellationToken);
-            foreach (var user in users) 
+            foreach (var user in users)
             {
                 var employeeId = employees.Where(e => e.EmployeeNumber == user.ObjectId).Select(e => (Guid?)e.Id ?? null).FirstOrDefault();
                 if (!employeeId.HasValue)

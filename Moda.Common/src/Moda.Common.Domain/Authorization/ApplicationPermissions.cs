@@ -31,6 +31,8 @@ public static class ApplicationResource
     public const string Employees = nameof(Employees);
     public const string Teams = nameof(Teams);
 
+    public const string ProgramIncrements = nameof(ProgramIncrements);
+
     public const string BacklogCategories = nameof(BacklogCategories);
     public const string BacklogLevels = nameof(BacklogLevels);
     public const string Workspaces = nameof(Workspaces);
@@ -96,6 +98,14 @@ public static class ApplicationPermissions
         new("Delete Teams", ApplicationAction.Delete, ApplicationResource.Teams),
     };
 
+    private static readonly ApplicationPermission[] _planning = new ApplicationPermission[]
+    {
+        new("View Program Increments", ApplicationAction.View, ApplicationResource.ProgramIncrements, IsBasic: true),
+        new("Create Program Increments", ApplicationAction.Create, ApplicationResource.ProgramIncrements),
+        new("Update Program Increments", ApplicationAction.Update, ApplicationResource.ProgramIncrements),
+        new("Delete Program Increments", ApplicationAction.Delete, ApplicationResource.ProgramIncrements),
+    };
+
     private static readonly ApplicationPermission[] _work = new ApplicationPermission[]
     {
         new("View BacklogCategories", ApplicationAction.View, ApplicationResource.BacklogCategories, IsBasic: true),
@@ -133,6 +143,7 @@ public static class ApplicationPermissions
         .Union(_identity)
         .Union(_appIntegration)
         .Union(_organization)
+        .Union(_planning)
         .Union(_work)
         .ToArray();
 

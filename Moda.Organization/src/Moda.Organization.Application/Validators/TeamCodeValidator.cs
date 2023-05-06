@@ -1,7 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-
-namespace Moda.Organization.Application.Validators;
+﻿namespace Moda.Organization.Application.Validators;
 public sealed class TeamCodeValidator : CustomValidator<TeamCode>
 {
     private readonly IOrganizationDbContext _organizationDbContext;

@@ -2,7 +2,7 @@
 using Moda.Organization.Application.Models;
 
 namespace Moda.Organization.Application.Teams.Dtos;
-public class TeamDetailsDto : IMapFrom<BaseTeam>
+public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
 {
     /// <summary>Gets or sets the identifier.</summary>
     /// <value>The identifier.</value>

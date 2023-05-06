@@ -18,7 +18,7 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
     public int LocalId { get; protected set; }
 
     /// <summary>
-    /// The name of the workspace.
+    /// The name of the team.
     /// </summary>
     public string Name
     {
@@ -35,7 +35,7 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
     }
 
     /// <summary>
-    /// The description of the workspace.
+    /// The description of the team.
     /// </summary>
     public string? Description
     {

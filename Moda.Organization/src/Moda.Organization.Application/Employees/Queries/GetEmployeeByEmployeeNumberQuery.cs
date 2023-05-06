@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace Moda.Organization.Application.Employees.Queries;
+﻿namespace Moda.Organization.Application.Employees.Queries;
 
 public sealed record GetEmployeeByEmployeeNumberQuery(string EmployeeNumber) : IQuery<Guid?>;
 

@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-using Moda.Organization.Domain.Models;
-using NodaTime;
+﻿using Moda.Organization.Domain.Models;
 
 namespace Moda.Web.Api.Models.Organizations;
 

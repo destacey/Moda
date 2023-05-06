@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Moda.Organization.Application.Validators;
+﻿namespace Moda.Organization.Application.Validators;
 public sealed class ExternalEmployeeValidator : CustomValidator<IExternalEmployee>
 {
     public ExternalEmployeeValidator()

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Moda.Web.BlazorClient;
 using Moda.Web.BlazorClient.Infrastructure;
-using Moda.Web.BlazorClient.Infrastructure.Auth.Graph;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

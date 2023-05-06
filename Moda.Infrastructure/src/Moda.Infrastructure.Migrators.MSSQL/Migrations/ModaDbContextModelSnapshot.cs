@@ -575,6 +575,64 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("TeamMemberships", "Organization");
                 });
 
+            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("LocalId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocalId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("LocalId");
+
+                    b.HasIndex("Id");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Name", "Description" });
+
+                    b.HasIndex("IsDeleted");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("ProgramIncrements", "Planning");
+                });
+
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevel", b =>
                 {
                     b.Property<int>("Id")
@@ -958,6 +1016,35 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Source");
 
                     b.Navigation("Target");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrement", b =>
+                {
+                    b.OwnsOne("Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
+                        {
+                            b1.Property<Guid>("ProgramIncrementId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTime>("End")
+                                .HasColumnType("date")
+                                .HasColumnName("End");
+
+                            b1.Property<DateTime>("Start")
+                                .HasColumnType("date")
+                                .HasColumnName("Start");
+
+                            b1.HasKey("ProgramIncrementId");
+
+                            b1.HasIndex("Start", "End");
+
+                            b1.ToTable("ProgramIncrements", "Planning");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProgramIncrementId");
+                        });
+
+                    b.Navigation("DateRange")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevel", b =>

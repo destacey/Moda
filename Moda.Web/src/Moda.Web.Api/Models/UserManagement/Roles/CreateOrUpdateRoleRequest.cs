@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Moda.Web.Api.Models.Identity.Roles;
+﻿namespace Moda.Web.Api.Models.Identity.Roles;
 
 public sealed record CreateOrUpdateRoleRequest
 {

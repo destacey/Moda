@@ -1,23 +1,24 @@
 ﻿
 <MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="teams" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Groups">Teams</MudNavLink>
-    <MudNavLink Href="employees" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">Employees</MudNavLink>
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home" title="Home">Home</MudNavLink>
+    <MudNavLink Href="teams" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Groups" title="Teams">Teams</MudNavLink>
+    <MudNavLink Href="employees" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person" title="Employees">Employees</MudNavLink>
+    <MudNavLink Href="program-increments" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Ballot" title="Program Increments">Program Increments</MudNavLink>
 
     @if (_canViewAdministrationGroup)
     {
         <MudDivider Class="my-1" />
         @if (_canViewUsers)
         {
-            <MudNavLink Match="NavLinkMatch.Prefix" Href="/users" Icon="@Icons.Material.Filled.SwitchAccount">Users</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.Prefix" Href="/users" Icon="@Icons.Material.Filled.SwitchAccount" title="Users">Users</MudNavLink>
         }
         @if (_canViewRoles)
         {
-            <MudNavLink Match="NavLinkMatch.Prefix" Href="/roles" Icon="@Icons.Material.Filled.LockPerson">Roles</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.Prefix" Href="/roles" Icon="@Icons.Material.Filled.LockPerson" title="Roles">Roles</MudNavLink>
         }
         @if (_canViewBackgroundJobs)
         {
-            <MudNavLink Match="NavLinkMatch.Prefix" Href="/background-jobs" Icon="@Icons.Material.Filled.Update">Background Jobs</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.Prefix" Href="/background-jobs" Icon="@Icons.Material.Filled.Update" title="Background Jobs">Background Jobs</MudNavLink>
         }
     }
 </MudNavMenu>
