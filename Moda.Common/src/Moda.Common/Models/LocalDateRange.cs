@@ -62,6 +62,42 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
             || (Start <= range.Start && range.Start <= End && End <= range.End);
     }
 
+    /// <summary>
+    /// Determines whether [is past on] [the specified date].
+    /// </summary>
+    /// <param name="date">The date.</param>
+    /// <returns>
+    ///   <c>true</c> if [is past on] [the specified date]; otherwise, <c>false</c>.
+    /// </returns>
+    public bool IsPastOn(LocalDate date)
+    {
+        return End < date;
+    }
+
+    /// <summary>
+    /// Determines whether [is active on] [the specified date].
+    /// </summary>
+    /// <param name="date">The date.</param>
+    /// <returns>
+    ///   <c>true</c> if [is active on] [the specified date]; otherwise, <c>false</c>.
+    /// </returns>
+    public bool IsActiveOn(LocalDate date)
+    {
+        return Includes(date);
+    }
+
+    /// <summary>
+    /// Determines whether [is future on] [the specified date].
+    /// </summary>
+    /// <param name="date">The date.</param>
+    /// <returns>
+    ///   <c>true</c> if [is future on] [the specified date]; otherwise, <c>false</c>.
+    /// </returns>
+    public bool IsFutureOn(LocalDate date)
+    {
+        return date < Start;
+    }
+
     /// <summary>Gets the equality components.</summary>
     /// <returns></returns>
     protected override IEnumerable<IComparable> GetEqualityComponents()

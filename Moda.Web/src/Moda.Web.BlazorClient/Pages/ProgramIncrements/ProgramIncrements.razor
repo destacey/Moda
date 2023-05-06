@@ -42,6 +42,7 @@
                 <MudLink Href="@($"/program-increments/{context.Item.LocalId}")">@context.Item.Name</MudLink>
             </CellTemplate>
         </PropertyColumn>
+        <PropertyColumn Property="x => x.State" Title="State" />
         <PropertyColumn Property="x => x.Start" Title="Start" Format="MM/dd/yyyy" />
         <PropertyColumn Property="x => x.End" Title="End" Format="MM/dd/yyyy" />
     </Columns>
@@ -68,6 +69,12 @@
     private bool _canUpdateProgramIncrements;
     private bool _showPageActions;
 
+    private static readonly List<String> stateSortOrder = new List<String> {
+        "Active",
+        "Future",
+        "Completed"
+    };
+
     protected override async Task OnInitializedAsync()
     {
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
@@ -89,6 +96,9 @@
             return true;
 
         if (!string.IsNullOrWhiteSpace(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.State) && x.State.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         if (x.Start.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
@@ -115,7 +125,10 @@
 
         if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetListAsync(), Snackbar) is List<ProgramIncrementListDto> result)
         {
-            _programIncrements = result;
+            _programIncrements = result
+                .OrderBy(p => stateSortOrder.IndexOf(p.State))
+                    .ThenBy(p => p.Start)
+                .ToList();
         }
 
         _isLoading = false;

@@ -4140,6 +4140,9 @@
           "end": {
             "type": "string",
             "format": "date"
+          },
+          "state": {
+            "type": "string"
           }
         }
       },
@@ -4169,6 +4172,9 @@
           "end": {
             "type": "string",
             "format": "date"
+          },
+          "state": {
+            "type": "string"
           }
         }
       },

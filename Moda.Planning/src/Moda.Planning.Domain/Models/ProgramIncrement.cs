@@ -3,6 +3,8 @@ using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Data;
 using Moda.Common.Extensions;
 using Moda.Common.Models;
+using Moda.Planning.Domain.Enums;
+using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
 public class ProgramIncrement : BaseAuditableEntity<Guid>
@@ -68,6 +70,16 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         {
             return Result.Failure(ex.ToString());
         }
+    }
+
+    /// <summary>States the on.</summary>
+    /// <param name="date">The date.</param>
+    /// <returns></returns>
+    public IterationState StateOn(LocalDate date)
+    {
+        if (DateRange.IsPastOn(date)) { return IterationState.Completed; }
+        if (DateRange.IsActiveOn(date)) { return IterationState.Active; };
+        return IterationState.Future;
     }
 
     /// <summary>Creates the specified name.</summary>

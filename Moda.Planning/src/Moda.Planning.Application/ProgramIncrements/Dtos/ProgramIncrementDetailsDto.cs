@@ -1,5 +1,8 @@
-﻿namespace Moda.Planning.Application.ProgramIncrements.Dtos;
-public sealed record ProgramIncrementDetailsDto : IMapFrom<ProgramIncrement>
+﻿using Moda.Common.Extensions;
+
+namespace Moda.Planning.Application.ProgramIncrements.Dtos;
+
+public sealed record ProgramIncrementDetailsDto
 {
     /// <summary>Gets or sets the identifier.</summary>
     /// <value>The identifier.</value>
@@ -26,10 +29,22 @@ public sealed record ProgramIncrementDetailsDto : IMapFrom<ProgramIncrement>
     /// <value>The end.</value>
     public LocalDate End { get; set; }
 
-    public void Register(TypeAdapterConfig config)
+    /// <summary>Gets or sets the state.</summary>
+    /// <value>The state.</value>
+    public required string State { get; set; }
+
+    // TODO: do this with Mapster
+    public static ProgramIncrementDetailsDto Create(ProgramIncrement programIncrement, IDateTimeService dateTimeService)
     {
-        config.NewConfig<ProgramIncrement, ProgramIncrementDetailsDto>()
-            .Map(dest => dest.Start, src => src.DateRange.Start)
-            .Map(dest => dest.End, src => src.DateRange.End);
+        return new ProgramIncrementDetailsDto()
+        {
+            Id = programIncrement.Id,
+            LocalId = programIncrement.LocalId,
+            Name = programIncrement.Name,
+            Description = programIncrement.Description,
+            Start = programIncrement.DateRange.Start,
+            End = programIncrement.DateRange.End,
+            State = programIncrement.StateOn(dateTimeService.Now.InUtc().Date).GetDisplayName()
+        };
     }
 }

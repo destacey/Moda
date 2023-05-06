@@ -6,16 +6,18 @@ public sealed record GetProgramIncrementsQuery() : IQuery<IReadOnlyList<ProgramI
 internal sealed class GetProgramIncrementsQueryHandler : IQueryHandler<GetProgramIncrementsQuery, IReadOnlyList<ProgramIncrementListDto>>
 {
     private readonly IPlanningDbContext _planningDbContext;
+    private readonly IDateTimeService _dateTimeService;
 
-    public GetProgramIncrementsQueryHandler(IPlanningDbContext planningDbContext)
+    public GetProgramIncrementsQueryHandler(IPlanningDbContext planningDbContext, IDateTimeService dateTimeService)
     {
         _planningDbContext = planningDbContext;
+        _dateTimeService = dateTimeService;
     }
 
     public async Task<IReadOnlyList<ProgramIncrementListDto>> Handle(GetProgramIncrementsQuery request, CancellationToken cancellationToken)
     {
         return await _planningDbContext.ProgramIncrements
-            .ProjectToType<ProgramIncrementListDto>()
+            .Select(p => ProgramIncrementListDto.Create(p, _dateTimeService))
             .ToListAsync(cancellationToken);
     }
 }

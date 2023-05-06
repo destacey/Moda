@@ -20,11 +20,13 @@ internal sealed class GetProgramIncrementQueryHandler : IQueryHandler<GetProgram
 {
     private readonly IPlanningDbContext _planningDbContext;
     private readonly ILogger<GetProgramIncrementQueryHandler> _logger;
+    private readonly IDateTimeService _dateTimeService;
 
-    public GetProgramIncrementQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetProgramIncrementQueryHandler> logger)
+    public GetProgramIncrementQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetProgramIncrementQueryHandler> logger, IDateTimeService dateTimeService)
     {
         _planningDbContext = planningDbContext;
         _logger = logger;
+        _dateTimeService = dateTimeService;
     }
 
     public async Task<ProgramIncrementDetailsDto?> Handle(GetProgramIncrementQuery request, CancellationToken cancellationToken)
@@ -49,7 +51,7 @@ internal sealed class GetProgramIncrementQueryHandler : IQueryHandler<GetProgram
         }
 
         return await query
-            .ProjectToType<ProgramIncrementDetailsDto>()
+            .Select(p => ProgramIncrementDetailsDto.Create(p, _dateTimeService))
             .FirstOrDefaultAsync(cancellationToken);
     }
 }
