@@ -14,15 +14,15 @@
 else
 {
     <ModaTitle Title="@_title" Description="@_description">
-        @*@if (_showPageActions)
-    {
-    <MudButtonGroup Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
-    @if (_canUpdateProgramIncrements)
-    {
-    <MudButton OnClick="@UpdateProgramIncrement">Edit</MudButton>
-    }
-    </MudButtonGroup>
-    }*@
+        @if (_showPageActions)
+        {
+            <MudButtonGroup Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
+                @if (_canUpdateProgramIncrements)
+                {
+                    <MudButton OnClick="@UpdateProgramIncrement">Edit</MudButton>
+                }
+            </MudButtonGroup>
+        }
     </ModaTitle>
 
     <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="px-3" @bind-ActivePanelIndex="@_activeTabIndex">
@@ -78,7 +78,7 @@ else
         // reset the page when the route changes
         _activeTabIndex = 0;
 
-        await GetProgramIncrements();
+        await GetProgramIncrement();
 
         var user = (await AuthState).User;
         _canUpdateProgramIncrements = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.ProgramIncrements);
@@ -87,7 +87,7 @@ else
         _loading = false;
     }
 
-    private async Task GetProgramIncrements()
+    private async Task GetProgramIncrement()
     {
         if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetByIdAsync(Id), Snackbar) is ProgramIncrementDetailsDto result)
         {
@@ -95,6 +95,27 @@ else
             _description = "Program Increment Details";
 
             _programIncrement = result;
+        }
+    }
+
+    private async Task UpdateProgramIncrement()
+    {
+        var dialogTitle = "Edit Program Increment";
+        var parameters = new DialogParameters { ["Id"] = _programIncrement.LocalId };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<UpdateProgramIncrement_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetProgramIncrement();
         }
     }
 }

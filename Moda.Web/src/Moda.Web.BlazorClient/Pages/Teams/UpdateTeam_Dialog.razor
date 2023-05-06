@@ -60,13 +60,13 @@ else
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; } = null!;
 
-    private bool _loading = true;
 
     private EditContext? _editContext;
     private ValidationMessageStore? _messageStore;
 
     private UpdateTeamRequest _model = new();
 
+    private bool _loading = true;
     private bool _isSaving = false;
 
     protected override async Task OnInitializedAsync()
