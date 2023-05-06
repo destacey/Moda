@@ -35,14 +35,30 @@ else
     <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="px-3" @bind-ActivePanelIndex="@_activeTabIndex">
         <MudTabPanel Text="Details">
             <MudGrid Class="px-4 py-1">
-                <MudItem xs="12" md="5">
-                    <ModaFieldGroup Label="Type:" Text="@_team?.Type" />
-                    <ModaFieldGroup Label="Code:" Text="@_team?.Code" />
-                    <ModaFieldGroup Label="Team of Teams:" Text="@_team?.TeamOfTeams?.Name" Link="@(_team?.TeamOfTeams is null ? null : $"teams-of-teams/{_team.TeamOfTeams.LocalId}")" />
-                    <ModaFieldGroup Label="Is Active?:" Text="@_team?.IsActive.ToString()" />
+                <MudItem Class="py-0" xs="12" md="5">
+                    <MudGrid Class="ma-0 pa-0">
+                        <MudItem xs="12">
+                            <MudField Label="Type" Variant="Variant.Text">@_team.Type</MudField>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudField Label="Code" Variant="Variant.Text">@_team.Code</MudField>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudField Label="Is Active?" Variant="Variant.Text">@_team.IsActive</MudField>
+                        </MudItem>
+                    </MudGrid>
                 </MudItem>
-                <MudItem xs="12" md="7">
-                    <ModaFieldGroup Label="Description:" Text="@_team?.Description" />
+                <MudItem Class="py-0" xs="12" md="7">
+                    <MudGrid Class="ma-0 pa-0">
+                        <MudItem xs="12">
+                            <MudField Label="Team of Teams" Variant="Variant.Text">
+                                <MudLink Href="@(_team.TeamOfTeams is null ? null : $"teams-of-teams/{_team.TeamOfTeams.LocalId}")">@_team.TeamOfTeams?.Name</MudLink>
+                            </MudField>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudField Label="Description" Variant="Variant.Text">@_team.Description</MudField>
+                        </MudItem>
+                    </MudGrid>
                 </MudItem>
             </MudGrid>
         </MudTabPanel>
@@ -72,7 +88,7 @@ else
         new BreadcrumbItem("Details", href: null, disabled: true)
     };
 
-    private TeamOfTeamsDetailsDto? _team;
+    private TeamOfTeamsDetailsDto _team = default!;
     private List<TeamMembershipsDto> _teamMemberships = new();
 
     private bool _loading = true;

@@ -1,0 +1,100 @@
+﻿@page "/program-increments/{Id:int}"
+@attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
+
+@inject IAuthorizationService AuthService
+@inject IProgramIncrementsClient ProgramIncrementsClient
+
+<PageTitle>Program Increments</PageTitle>
+<ModaPageBreadCrumbs Breadcrumbs="_breadcrumbs" />
+
+@if (_loading)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <ModaTitle Title="@_title" Description="@_description">
+        @*@if (_showPageActions)
+    {
+    <MudButtonGroup Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
+    @if (_canUpdateProgramIncrements)
+    {
+    <MudButton OnClick="@UpdateProgramIncrement">Edit</MudButton>
+    }
+    </MudButtonGroup>
+    }*@
+    </ModaTitle>
+
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="px-3" @bind-ActivePanelIndex="@_activeTabIndex">
+        <MudTabPanel Text="Details">
+            <MudGrid Class="px-4 py-1">
+                <MudItem Class="py-0" xs="12" md="5">
+                    <MudGrid Class="ma-0 pa-0">
+                        <MudItem xs="12" md="6">
+                            <MudField Label="Start" Variant="Variant.Text">@_programIncrement.Start.ToShortDateString()</MudField>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudField Label="End" Variant="Variant.Text">@_programIncrement.End.ToShortDateString()</MudField>
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+                <MudItem xs="12" md="7">
+                    <MudField Label="Description" Variant="Variant.Text">@_programIncrement.Description</MudField>
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+    </MudTabs>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; } // from route
+
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    private int _activeTabIndex = 0;
+
+    private List<BreadcrumbItem> _breadcrumbs = new()
+    {
+        new BreadcrumbItem("Program Increments", href: "/program-increments"),
+        new BreadcrumbItem("Details", href: null, disabled: true)
+    };
+
+    private ProgramIncrementDetailsDto _programIncrement = default!;
+
+    private bool _loading = true;
+
+    private string _title = string.Empty;
+    private string _description = string.Empty;
+
+    private bool _showPageActions;
+    private bool _canUpdateProgramIncrements;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+
+        // reset the page when the route changes
+        _activeTabIndex = 0;
+
+        await GetProgramIncrements();
+
+        var user = (await AuthState).User;
+        _canUpdateProgramIncrements = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.ProgramIncrements);
+        _showPageActions = _canUpdateProgramIncrements;
+
+        _loading = false;
+    }
+
+    private async Task GetProgramIncrements()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetByIdAsync(Id), Snackbar) is ProgramIncrementDetailsDto result)
+        {
+            _title = result.Name;
+            _description = "Program Increment Details";
+
+            _programIncrement = result;
+        }
+    }
+}
