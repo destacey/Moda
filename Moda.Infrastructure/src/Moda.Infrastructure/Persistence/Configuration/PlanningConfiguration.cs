@@ -10,20 +10,22 @@ public class ProgramIncrementConfig : IEntityTypeConfiguration<ProgramIncrement>
     {
         builder.ToTable("ProgramIncrements", SchemaNames.Planning);
 
-        builder.HasKey(e => e.Id);
-        builder.HasAlternateKey(e => e.LocalId);
+        builder.HasKey(p => p.Id);
+        builder.HasAlternateKey(p => p.LocalId);
 
-        builder.HasIndex(e => e.Id)
+        builder.HasIndex(p => p.Id)
             .IncludeProperties(p => new { p.Name, p.Description });
-        builder.HasIndex(e => e.IsDeleted);
+        builder.HasIndex(p => p.Name)
+            .IsUnique();
+        builder.HasIndex(p => p.IsDeleted);
 
-        builder.Property(e => e.LocalId).ValueGeneratedOnAdd();
+        builder.Property(p => p.LocalId).ValueGeneratedOnAdd();
 
-        builder.Property(e => e.Name).HasMaxLength(256);
-        builder.Property(e => e.Description).HasMaxLength(1024);
+        builder.Property(p => p.Name).HasMaxLength(128);
+        builder.Property(p => p.Description).HasMaxLength(1024);
 
         // Value Objects
-        builder.OwnsOne(m => m.DateRange, options =>
+        builder.OwnsOne(p => p.DateRange, options =>
         {
             options.HasIndex(i => new { i.Start, i.End });
 
@@ -32,12 +34,12 @@ public class ProgramIncrementConfig : IEntityTypeConfiguration<ProgramIncrement>
         });
 
         // Audit
-        builder.Property(o => o.Created);
-        builder.Property(o => o.CreatedBy);
-        builder.Property(o => o.LastModified);
-        builder.Property(o => o.LastModifiedBy);
-        builder.Property(o => o.Deleted);
-        builder.Property(o => o.DeletedBy);
-        builder.Property(o => o.IsDeleted);
+        builder.Property(p => p.Created);
+        builder.Property(p => p.CreatedBy);
+        builder.Property(p => p.LastModified);
+        builder.Property(p => p.LastModifiedBy);
+        builder.Property(p => p.Deleted);
+        builder.Property(p => p.DeletedBy);
+        builder.Property(p => p.IsDeleted);
     }
 }

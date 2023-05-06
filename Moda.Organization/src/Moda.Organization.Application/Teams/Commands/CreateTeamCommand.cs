@@ -1,7 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-
-namespace Moda.Organization.Application.Teams.Commands;
+﻿namespace Moda.Organization.Application.Teams.Commands;
 public sealed record CreateTeamCommand : ICommand<int>
 {
     public CreateTeamCommand(string name, TeamCode code, string? description)

@@ -13,4 +13,19 @@ public sealed record ProgramIncrementListDto : IMapFrom<ProgramIncrement>
     /// The name of the program increment.
     /// </summary>
     public required string Name { get; set; }
+
+    /// <summary>Gets or sets the start.</summary>
+    /// <value>The start.</value>
+    public LocalDate Start { get; set; }
+
+    /// <summary>Gets or sets the end.</summary>
+    /// <value>The end.</value>
+    public LocalDate End { get; set; }
+
+    public void Register(TypeAdapterConfig config)
+    {
+        config.NewConfig<ProgramIncrement, ProgramIncrementListDto>()
+            .Map(dest => dest.Start, src => src.DateRange.Start)
+            .Map(dest => dest.End, src => src.DateRange.End);
+    }
 }

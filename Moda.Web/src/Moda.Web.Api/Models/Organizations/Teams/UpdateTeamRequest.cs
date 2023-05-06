@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Moda.Organization.Application.Teams.Commands;
+﻿using Moda.Organization.Application.Teams.Commands;
 using Moda.Organization.Domain.Extensions;
 using Moda.Organization.Domain.Models;
 

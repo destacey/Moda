@@ -21,7 +21,7 @@ public partial class AddProgramIncrement : Migration
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 LocalId = table.Column<int>(type: "int", nullable: false)
                     .Annotation("SqlServer:Identity", "1, 1"),
-                Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                 Description = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: true),
                 Start = table.Column<DateTime>(type: "date", nullable: false),
                 End = table.Column<DateTime>(type: "date", nullable: false),
@@ -51,6 +51,13 @@ public partial class AddProgramIncrement : Migration
             schema: "Planning",
             table: "ProgramIncrements",
             column: "IsDeleted");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_ProgramIncrements_Name",
+            schema: "Planning",
+            table: "ProgramIncrements",
+            column: "Name",
+            unique: true);
 
         migrationBuilder.CreateIndex(
             name: "IX_ProgramIncrements_Start_End",

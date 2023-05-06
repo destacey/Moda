@@ -1,4 +1,5 @@
-﻿global using MediatR;
+﻿global using FluentValidation;
+global using MediatR;
 global using Microsoft.AspNetCore.Mvc;
 global using Moda.AppIntegration.Application.Connections.Commands;
 global using Moda.AppIntegration.Application.Connections.Dtos;
@@ -20,4 +21,5 @@ global using Moda.Organization.Application.Employees.Queries;
 global using Moda.Web.Api.Models.Identity.Roles;
 global using Moda.Web.Api.Models.Identity.Users;
 global using Moda.Work.Application.WorkStates.Commands;
+global using NodaTime;
 global using NSwag.Annotations;

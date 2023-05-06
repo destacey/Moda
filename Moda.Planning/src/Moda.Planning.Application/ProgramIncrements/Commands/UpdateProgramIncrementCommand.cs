@@ -3,19 +3,28 @@ public sealed record UpdateProgramIncrementCommand(Guid Id, string Name, string?
 
 public sealed class UpdateProgramIncrementCommandValidator : CustomValidator<UpdateProgramIncrementCommand>
 {
-    public UpdateProgramIncrementCommandValidator()
+    private readonly IPlanningDbContext _planningDbContext;
+    public UpdateProgramIncrementCommandValidator(IPlanningDbContext planningDbContext)
     {
+        _planningDbContext = planningDbContext;
+
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(e => e.Name)
             .NotEmpty()
-            .MaximumLength(256);
+            .MaximumLength(128)
+            .MustAsync(BeUniqueProgramIncrementName).WithMessage("The Program Increment name already exists."); ;
 
         RuleFor(e => e.Description)
             .MaximumLength(1024);
 
         RuleFor(e => e.DateRange)
             .NotNull();
+    }
+
+    public async Task<bool> BeUniqueProgramIncrementName(string name, CancellationToken cancellationToken)
+    {
+        return await _planningDbContext.ProgramIncrements.AllAsync(x => x.Name != name, cancellationToken);
     }
 }
 
