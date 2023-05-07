@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
+using Moda.Common.Extensions;
 using Moda.Organization.Application.Employees.Queries;
 using NotFoundException = Moda.Common.Application.Exceptions.NotFoundException;
 
@@ -28,15 +29,24 @@ internal partial class UserService
             throw new InternalServerException("Invalid objectId");
         }
 
+        var existingUsers = await _userManager.Users.Select(u => true).FirstOrDefaultAsync();
+
         var user = await _userManager.Users.Where(u => u.ObjectId == objectId).FirstOrDefaultAsync()
             ?? await CreateOrUpdateFromPrincipalAsync(principal);
 
-        if (principal.FindFirstValue(ClaimTypes.Role) is string role &&
-            await _roleManager.RoleExistsAsync(role) &&
-            !await _userManager.IsInRoleAsync(user, role))
+        if (!existingUsers)
         {
-            await _userManager.AddToRoleAsync(user, role);
+            await _userManager.AddToRoleAsync(user, "Admin");
             await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeService.Now, true));
+        }
+        else
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            if (roles is null || !roles.Any())
+            {
+                await _userManager.AddToRoleAsync(user, "Basic");
+                await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeService.Now, true));
+            }
         }
 
         return (user.Id, user.EmployeeId?.ToString());
@@ -174,8 +184,11 @@ internal partial class UserService
     {
         // get the Person Id and if not null verify no existing user with that Id
         var employeeId = await _sender.Send(new GetEmployeeByEmployeeNumberQuery(principalObjectId));
-        if (employeeId is null)
+        if (employeeId.IsNullEmptyOrDefault())
+        {
+            employeeId = null;
             _logger.LogWarning("Employee with EmployeeNumber {EmployeeNumber} not found.", principalObjectId);
+        }
 
         return employeeId;
     }
