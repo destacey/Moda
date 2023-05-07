@@ -24,7 +24,7 @@ else
                 @if (_canUpdateProgramIncrements)
                 {
                     <MudButton OnClick="@UpdateProgramIncrement">Edit</MudButton>
-                    <MudButton OnClick="@UpdateProgramIncrement">Manage Teams</MudButton>
+                    <MudButton OnClick="@ManageTeams">Manage Teams</MudButton>
                 }
             </MudButtonGroup>
         }
@@ -148,7 +148,7 @@ else
     private async Task ManageTeams()
     {
         var dialogTitle = "Manage Program Increment Teams";
-        var parameters = new DialogParameters { ["Id"] = _programIncrement.LocalId };
+        var parameters = new DialogParameters { ["Id"] = _programIncrement.Id };
         var dialogOptions = new DialogOptions()
             {
                 DisableBackdropClick = true,
@@ -162,7 +162,7 @@ else
 
         if (!result.Canceled)
         {
-            await GetProgramIncrement();
+            await GetTeams();
         }
     }
 }
