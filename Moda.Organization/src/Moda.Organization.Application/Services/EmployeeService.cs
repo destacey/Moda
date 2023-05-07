@@ -37,7 +37,7 @@ public sealed class EmployeeService : IEmployeeService
                     return upsertResult;
 
                 var userUpdateResult = await _userService.UpdateMissingEmployeeIds(cancellationToken);
-                if (upsertResult.IsFailure)
+                if (userUpdateResult.IsFailure)
                     return upsertResult;
 
                 return Result.Success();

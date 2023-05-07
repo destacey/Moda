@@ -139,10 +139,11 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
         {
             if (missingManagers.Any())
             {
+                List<Employee> updatedEmployees = await _organizationDbContext.Employees.ToListAsync(cancellationToken);
                 foreach (var item in missingManagers)
                 {
                     var managerId = GetManagerId(item.Value);
-                    var employee = employees.First(e => e.EmployeeNumber == item.Key);
+                    var employee = updatedEmployees.First(e => e.EmployeeNumber == item.Key);
                     employee.UpdateManagerId(managerId, _dateTimeService.Now);
                 }
 
