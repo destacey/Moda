@@ -1,6 +1,9 @@
 ﻿@typeparam TItem
 
-<MudText Class="ma-3" Typo="Typo.caption" Align="Align.Left">@_itemCountString2</MudText>
+@if (_itemCount > 0)
+{    
+    <MudText Class="ma-3" Typo="Typo.caption" Align="Align.Left">@_itemCountString2</MudText>
+}
 
 @code {
     [Parameter]
@@ -9,8 +12,8 @@
     [Parameter]
     public string UnitLabel { get; set; } = "";
 
-    int _filterCount => DataGrid?.GetFilteredItemsCount() ?? 0;
-    int _itemCount => DataGrid?.Items?.Count() ?? 0;
+    private int _filterCount => DataGrid?.GetFilteredItemsCount() ?? 0;
+    private int _itemCount => DataGrid?.Items?.Count() ?? 0;
 
     string _itemCountString2 => _itemCount == 0
         ? ""

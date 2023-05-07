@@ -1,0 +1,118 @@
+﻿@using System.ComponentModel.DataAnnotations;
+@using Moda.Web.BlazorClient.Models.Teams;
+
+@implements IDisposable
+
+@inject ISnackbar Snackbar
+@inject ITeamsClient TeamsClient
+@inject ITeamsOfTeamsClient TeamsOfTeamsClient
+
+@if (_loading)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    @*<MudDialog>
+        <DialogContent>
+            <EditForm id="updateTeamMembershipForm" EditContext="_editContext" OnValidSubmit="Update">
+                <MudTextField Label="Child Team" Variant="Variant.Text" Value="TeamMembership.Child.Name" />
+                <MudTextField Label="Parent Team" Variant="Variant.Text" Value="TeamMembership.Parent.Name" />
+
+                <DataAnnotationsValidator />
+                <MudDatePicker Label="Start" AnchorOrigin="Origin.BottomCenter" Editable="true" @bind-Date="_model.Start" For="@(() => _model.Start)" />
+
+                <DataAnnotationsValidator />
+                <MudDatePicker Label="End" AnchorOrigin="Origin.BottomCenter" Editable="true" @bind-Date="_model.End" For="@(() => _model.End)" />
+            </EditForm>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel">Cancel</MudButton>
+            <MudButton form="updateTeamMembershipForm" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_isSaving">
+                @if (_isSaving)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Saving</MudText>
+                }
+                else
+                {
+                    <MudText>Save</MudText>
+                }
+            </MudButton>
+        </DialogActions>
+    </MudDialog>*@
+}
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public Guid ProgramIncrementId { get; set; } = default!;
+
+    private bool _loading = true;
+
+    private ManageProgramIncrementTeamsRequest _model = new();
+
+    private bool _isSaving = false;
+
+    protected override Task OnInitializedAsync()
+    {
+        //_model = new UpdateTeamMembershipViewModel
+        //{
+        //    TeamMembershipId = TeamMembership.Id,
+        //    TeamId = TeamMembership.Child.Id,
+        //    Start = TeamMembership.Start,
+        //    End = TeamMembership.End
+        //};
+
+        //_editContext = new(_model);
+        //_editContext.OnValidationRequested += HandleValidationRequested;
+        //_messageStore = new(_editContext);
+
+        //_loading = false;
+
+        return Task.CompletedTask;
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Update()
+    {
+        _isSaving = true;
+        //try
+        //{
+
+        //    if (TeamMembership.Child.Type == "Team")
+        //    {
+        //        await TeamsClient.UpdateTeamMembershipAsync(_model.TeamId, _model.TeamMembershipId, _model.ToUpdateTeamMembershipRequest());
+        //    }
+        //    else if (TeamMembership.Child.Type == "Team of Teams")
+        //    {
+        //        await TeamsOfTeamsClient.UpdateTeamMembershipAsync(_model.TeamId, _model.TeamMembershipId, _model.ToUpdateTeamMembershipRequest());
+        //    }
+        //    else
+        //    {
+        //        throw new Exception();
+        //    }
+
+        //    Snackbar.Add("Program increment teams updated", MudBlazor.Severity.Success);
+
+        //    MudDialog.Close(DialogResult.Ok(true));
+        //}
+        //catch (ApiException<ErrorResult> ex)
+        //{
+        //    ErrorResult error = ex.Result;
+        //    Snackbar.Add($"Error updating program increment teams. {error.SupportMessage}", MudBlazor.Severity.Error);
+        //}
+        //catch (Exception)
+        //{
+        //    Snackbar.Add("Error updating program increment teams.", MudBlazor.Severity.Error);
+        //}
+        _isSaving = false;
+    }
+
+    public void Dispose()
+    {
+    }
+}

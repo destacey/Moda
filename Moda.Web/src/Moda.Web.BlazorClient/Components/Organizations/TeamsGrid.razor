@@ -1,0 +1,141 @@
+﻿@using Moda.Web.BlazorClient.Models.Teams;
+
+
+@if (_loading)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudDataGrid @ref="@_teamsGrid"
+             Items="@Teams"
+             Elevation="1"
+             Height="@_height"
+             Virtualize="true"
+             ColumnResizeMode="ResizeMode.Container"
+             SortMode="SortMode.Multiple" Filterable="true"
+             FixedHeader="true"
+             Loading="@_loading"
+             LoadingProgressColor="@Color.Secondary"
+             QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudSpacer />
+            <MudToolBar>
+                <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
+                <MudIconButton OnClick="@(() => RefreshData(_includeDisabled))" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
+            </MudToolBar>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.LocalId" Title="Id" />
+            <PropertyColumn Property="x => x.Name" Title="Name">
+                <CellTemplate>
+                    <MudLink Href="@(context.Item.DetailsUrl)">@context.Item.Name</MudLink>
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Code" />
+            <PropertyColumn Property="x => x.Type" />
+            <PropertyColumn Property="x => x.TeamOfTeamsName" Title="Team of Teams">
+                <CellTemplate>
+                    @if (context.Item.TeamOfTeams is not null)
+                    {
+                        <MudLink Href="@(context.Item.TeamOfTeamsDetailsUrl)">@context.Item.TeamOfTeamsName</MudLink>
+                    }
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.IsActive" Title="Active" Hidden="@(!_includeDisabled)" />
+        </Columns>
+        <LoadingContent>
+            <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading teams...</MudText>
+        </LoadingContent>
+        <NoRecordsContent>
+            <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No teams found.</MudText>
+        </NoRecordsContent>
+    </MudDataGrid>
+
+    <DataGridCountLabel DataGrid="@_teamsGrid" UnitLabel="teams" />
+    @if (AllowDisabledToggle)
+    {
+        <div class="d-flex flex-wrap mt-3">
+            <MudSwitch Checked="_includeDisabled" CheckedChanged="@((bool value) => RefreshData(value))" Color="Color.Primary" Label="Include Disabled" />
+        </div>
+    }
+}
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback GetTeams { get; set; }
+
+    [Parameter]
+    public List<TeamListViewModel> Teams { get; set; } = new();
+
+    [Parameter]
+    public bool AllowDisabledToggle { get; set; } = true;
+
+    [Parameter]
+    public int Height { get; set; } = 700;
+    private string _height => $"{Height}px";
+
+    private MudDataGrid<TeamListViewModel> _teamsGrid = new();
+
+    private string _searchString = "";
+    private bool _loading = true;
+    private bool _includeDisabled = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+
+        await GetTeams.InvokeAsync();
+
+        var user = (await AuthState).User;
+
+        if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
+        {
+            SetTablePreference(clientPreference.TablePreference);
+        }
+
+        _loading = false;
+    }
+
+    private Func<TeamListViewModel, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.TeamOfTeamsName) && x.TeamOfTeamsName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.Code) && x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrWhiteSpace(x.Type) && x.Type.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.LocalId.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+
+    private async Task RefreshData(bool includeDisabled)
+    {
+        _includeDisabled = includeDisabled;
+        _loading = true;
+        await GetTeams.InvokeAsync();
+        _loading = false;
+    }
+
+    private void SetTablePreference(ModaTablePreference tablePreference)
+    {
+        _teamsGrid.Dense = tablePreference.IsDense;
+        _teamsGrid.Striped = tablePreference.IsStriped;
+        _teamsGrid.Bordered = tablePreference.HasBorder;
+        _teamsGrid.Hover = tablePreference.IsHoverable;
+    }
+}

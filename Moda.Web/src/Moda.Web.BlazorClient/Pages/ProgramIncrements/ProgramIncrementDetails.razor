@@ -1,4 +1,8 @@
 ﻿@page "/program-increments/{Id:int}"
+
+@using Moda.Web.BlazorClient.Components.Organizations;
+@using Moda.Web.BlazorClient.Models.Teams;
+
 @attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
 
 @inject IAuthorizationService AuthService
@@ -20,6 +24,7 @@ else
                 @if (_canUpdateProgramIncrements)
                 {
                     <MudButton OnClick="@UpdateProgramIncrement">Edit</MudButton>
+                    <MudButton OnClick="@UpdateProgramIncrement">Manage Teams</MudButton>
                 }
             </MudButtonGroup>
         }
@@ -45,6 +50,15 @@ else
                     <MudField Label="Description" Variant="Variant.Text">@_programIncrement.Description</MudField>
                 </MudItem>
             </MudGrid>
+            <MudGrid Class="px-4 py-1">
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mb-1">Teams</MudText>
+                    <TeamsGrid Height="400"
+                        Teams="_piTeams"
+                        GetTeams="GetTeams"
+                        AllowDisabledToggle="false"/>
+                </MudItem>
+            </MudGrid>
         </MudTabPanel>
     </MudTabs>
 }
@@ -65,6 +79,7 @@ else
     };
 
     private ProgramIncrementDetailsDto _programIncrement = default!;
+    private List<TeamListViewModel> _piTeams = new();
 
     private bool _loading = true;
 
@@ -101,6 +116,14 @@ else
         }
     }
 
+    private async Task GetTeams()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetTeamsAsync(_programIncrement.Id), Snackbar) is List<ProgramIncrementTeamReponse> result)
+        {
+            _piTeams = result.Select(t => TeamListViewModel.FromProgramIncrementTeamResponse(t)).OrderBy(t => t.Name).ToList();
+        }
+    }
+
     private async Task UpdateProgramIncrement()
     {
         var dialogTitle = "Edit Program Increment";
@@ -113,6 +136,27 @@ else
             };
 
         var dialog = DialogService.Show<UpdateProgramIncrement_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetProgramIncrement();
+        }
+    }
+
+    private async Task ManageTeams()
+    {
+        var dialogTitle = "Manage Program Increment Teams";
+        var parameters = new DialogParameters { ["Id"] = _programIncrement.LocalId };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<ManageProgramIncrementTeams_Dialog>(dialogTitle, parameters, dialogOptions);
 
         var result = await dialog.Result;
 
