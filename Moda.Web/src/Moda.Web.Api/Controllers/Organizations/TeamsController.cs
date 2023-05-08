@@ -2,6 +2,8 @@
 using Moda.Organization.Application.Teams.Commands;
 using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
+using Moda.Planning.Application.Risks.Dtos;
+using Moda.Planning.Application.Risks.Queries;
 using Moda.Web.Api.Models.Organizations;
 using Moda.Web.Api.Models.Organizations.Teams;
 using Moda.Web.Api.Models.Planning.Risks;
@@ -180,6 +182,39 @@ public class TeamsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpGet("{id}/risks")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get team risks.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken)
+    {
+        var risks = await _sender.Send(new GetRisksQuery(id), cancellationToken);
+
+        // TODO get team names
+
+        return Ok(risks);
+    }
+
+    [HttpGet("{id}/risks/{riskId}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get a team risk using the localId.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<RiskDetailsDto>> GetRiskById(int id, int riskId)
+    {
+        var risk = await _sender.Send(new GetRiskQuery(riskId));
+
+        // TODO get team and verify teamId matches
+
+        return risk is not null
+            ? Ok(risk)
+            : NotFound();
     }
 
     [HttpPost("{id}/risks")]

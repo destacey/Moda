@@ -2832,6 +2832,277 @@
         ]
       }
     },
+    "/api/organization/teams/{id}/risks": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get team risks.",
+        "operationId": "Teams_GetRisks",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RiskListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Add a risk to a team.",
+        "operationId": "Teams_AddRisk",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRiskRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/organization/teams/{id}/risks/{riskId}": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get a team risk using the localId.",
+        "operationId": "Teams_GetRiskById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "riskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskDetailsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Update a team risk.",
+        "operationId": "Teams_UpdateRisk",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "riskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRiskRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/organization/teams-of-teams": {
       "get": {
         "tags": [
@@ -5299,6 +5570,269 @@
           "end": {
             "type": "string",
             "format": "date",
+            "nullable": true
+          }
+        }
+      },
+      "RiskListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "localId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "teamId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "reportedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reportedBy": {
+            "type": "string",
+            "format": "guid"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RiskStatus"
+          },
+          "category": {
+            "$ref": "#/components/schemas/RiskCategory"
+          },
+          "exposure": {
+            "$ref": "#/components/schemas/RiskGrade"
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "closedDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "RiskStatus": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Open",
+          "Closed"
+        ],
+        "enum": [
+          0,
+          1
+        ]
+      },
+      "RiskCategory": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Resolved",
+          "Owned",
+          "Accepted",
+          "Mitigated"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "RiskGrade": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Low",
+          "Medium",
+          "High"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "RiskDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "localId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "reportedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reportedBy": {
+            "type": "string",
+            "format": "guid"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RiskStatus"
+          },
+          "category": {
+            "$ref": "#/components/schemas/RiskCategory"
+          },
+          "impact": {
+            "$ref": "#/components/schemas/RiskGrade"
+          },
+          "likelihood": {
+            "$ref": "#/components/schemas/RiskGrade"
+          },
+          "exposure": {
+            "$ref": "#/components/schemas/RiskGrade"
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "response": {
+            "type": "string",
+            "nullable": true
+          },
+          "closedDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "CreateRiskRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "summary",
+          "category",
+          "impact",
+          "likelihood"
+        ],
+        "properties": {
+          "teamId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          },
+          "category": {
+            "nullable": false,
+            "$ref": "#/components/schemas/RiskCategory"
+          },
+          "impact": {
+            "nullable": false,
+            "$ref": "#/components/schemas/RiskGrade"
+          },
+          "likelihood": {
+            "nullable": false,
+            "$ref": "#/components/schemas/RiskGrade"
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "response": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UpdateRiskRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "riskId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "teamId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/RiskStatus"
+          },
+          "category": {
+            "$ref": "#/components/schemas/RiskCategory"
+          },
+          "impact": {
+            "$ref": "#/components/schemas/RiskGrade"
+          },
+          "likelihood": {
+            "$ref": "#/components/schemas/RiskGrade"
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "response": {
+            "type": "string",
             "nullable": true
           }
         }
