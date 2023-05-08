@@ -254,7 +254,7 @@ else
 
         for (var i = 0; i < _directReports.Count; i++)
         {
-            var directReportNode = GetEmployeeNode(_directReports[i].FirstName, (i * 150) + 50, 400);
+            var directReportNode = GetEmployeeNode($"{_directReports[i].FirstName} {_directReports[i].LastName}", (i * 150) + 50, 400);
             nodes.Add(directReportNode);
             links.Add(new LinkModel(meNode.GetPort(PortAlignment.Bottom), directReportNode.GetPort(PortAlignment.Top)));
         }
