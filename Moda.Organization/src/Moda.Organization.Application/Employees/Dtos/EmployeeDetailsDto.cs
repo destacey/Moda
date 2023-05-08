@@ -90,6 +90,6 @@ public sealed record EmployeeDetailsDto : IMapFrom<Employee>
             .Map(dest => dest.Email, src => src.Email.Value)
             .Map(dest => dest.ManagerLocalId, src => src.Manager!.LocalId)
             .Map(dest => dest.FullName, src => $"{StringHelpers.Concat(src.Name.Title, src.Name.FirstName, src.Name.MiddleName, src.Name.LastName, src.Name.Suffix)}")
-            .Map(dest => dest.ManagerName, src => $"{src.Manager!.Name.FirstName} {src.Manager!.Name.LastName}", srcCond => srcCond.ManagerId.HasValue);
+            .Map(dest => dest.ManagerName, src => $"{src.Manager!.Name.FirstName} {src.Manager!.Name.LastName}", srcCond => srcCond.ManagerId.HasValue && srcCond.Manager!.IsActive);
     }
 }
