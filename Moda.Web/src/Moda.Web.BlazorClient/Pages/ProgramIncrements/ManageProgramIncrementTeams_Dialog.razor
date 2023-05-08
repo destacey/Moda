@@ -1,0 +1,142 @@
+﻿@using System.ComponentModel.DataAnnotations;
+@using Moda.Web.BlazorClient.Models.Teams;
+
+@implements IDisposable
+
+@inject ISnackbar Snackbar
+@inject IProgramIncrementsClient ProgramIncrementsClient
+@inject ITeamsClient TeamsClient
+@inject ITeamsOfTeamsClient TeamsOfTeamsClient
+
+@if (_loading)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+            <MudSelect 
+                   Label="Teams"
+                   MultiSelection="true"
+                   @bind-SelectedValues="_selectedValues">
+                @foreach (var team in _teamOptions)
+                {
+                    // this works because BaseTeamViewModel ToString(), GetHashCode() and Equals() are overridden
+                    <MudSelectItem Value="@team">@team.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel">Cancel</MudButton>
+            <MudButton OnClick="Update" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_isSaving">
+                @if (_isSaving)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Saving</MudText>
+                }
+                else
+                {
+                    <MudText>Save</MudText>
+                }
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public Guid Id { get; set; } = default!;
+
+    private IEnumerable<BaseTeamViewModel> _selectedValues = new HashSet<BaseTeamViewModel>();
+
+    private List<BaseTeamViewModel> _teamOptions = new();
+
+    private bool _loading = true;
+    private bool _isSaving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+
+        await GetProgramIncrementTeams();
+        await GetTeams();
+
+        _loading = false;
+    }
+
+    private async Task GetProgramIncrementTeams()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetTeamsAsync(Id), Snackbar) is List<ProgramIncrementTeamReponse> result)
+        {
+            _selectedValues = result.Select(t => new BaseTeamViewModel(t)).ToHashSet();
+        }
+    }
+
+    private async Task GetTeams()
+    {
+        var getTeams = ApiHelper.ExecuteCallGuardedAsync(() => TeamsClient.GetListAsync(false), Snackbar);
+        var getTeamsOfTeams = ApiHelper.ExecuteCallGuardedAsync(() => TeamsOfTeamsClient.GetListAsync(false), Snackbar);
+
+        await Task.WhenAll(getTeams, getTeamsOfTeams);
+
+        List<BaseTeamViewModel> teams = new();
+        if (getTeams.Result is List<TeamListDto> teamsResult)
+        {
+            teams.AddRange(teamsResult.Select(t => new BaseTeamViewModel(t)));
+        }
+        if (getTeamsOfTeams.Result is List<TeamOfTeamsListDto> teamOfTeamsResult)
+        {
+            teams.AddRange(teamOfTeamsResult.Select(t => new BaseTeamViewModel(t)));
+        }
+
+        _teamOptions = teams.OrderBy(t => t.Name).ToList();
+    }
+
+    private string GetMultiSelectionText(List<BaseTeamViewModel> selectedValues)
+    {
+        if (_selectedValues.Any())
+            return string.Join(", ", _selectedValues.Select(x => x.Name));
+
+        return "No Teams Selected...";
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Update()
+    {
+        _isSaving = true;
+
+        try
+        {
+            var requestModel = new ManageProgramIncrementTeamsRequest
+            {
+                Id = Id,
+                TeamIds = _selectedValues.Select(t => t.Id).ToList()
+            };
+            await ProgramIncrementsClient.ManageTeamsAsync(Id, requestModel);
+
+            Snackbar.Add("Program increment teams updated", MudBlazor.Severity.Success);
+
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException<ErrorResult> ex)
+        {
+            ErrorResult error = ex.Result;
+            Snackbar.Add($"Error updating program increment teams. {error.SupportMessage}", MudBlazor.Severity.Error);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Error updating program increment teams.", MudBlazor.Severity.Error);
+        }
+
+        _isSaving = false;
+    }
+
+    public void Dispose()
+    {
+    }
+}

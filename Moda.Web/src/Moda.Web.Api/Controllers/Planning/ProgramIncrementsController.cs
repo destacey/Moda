@@ -1,5 +1,10 @@
-﻿using Moda.Planning.Application.ProgramIncrements.Dtos;
+﻿using Mapster;
+using Moda.Organization.Application.Teams.Dtos;
+using Moda.Organization.Application.Teams.Queries;
+using Moda.Organization.Application.TeamsOfTeams.Queries;
+using Moda.Planning.Application.ProgramIncrements.Dtos;
 using Moda.Planning.Application.ProgramIncrements.Queries;
+using Moda.Planning.Domain.Models;
 using Moda.Web.Api.Models.Planning.ProgramIncrements;
 
 namespace Moda.Web.Api.Controllers.Planning;
@@ -70,6 +75,47 @@ public class ProgramIncrementsController : ControllerBase
             return BadRequest();
 
         var result = await _sender.Send(request.ToUpdateProgramIncrementCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.Error);
+    }
+
+    [HttpGet("{id}/teams")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
+    [OpenApiOperation("Get a list of program increment teams.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<IReadOnlyList<ProgramIncrementTeamReponse>>> GetTeams(Guid id, CancellationToken cancellationToken)
+    {
+        List<ProgramIncrementTeamReponse> piTeams = new();
+        var teamIds = await _sender.Send(new GetProgramIncrementTeamsQuery(id), cancellationToken);
+        
+        if (teamIds.Any())
+        {
+            var teams = await _sender.Send(new GetTeamsQuery(true, teamIds), cancellationToken);
+            var teamOfTeams = await _sender.Send(new GetTeamOfTeamsListQuery(true, teamIds), cancellationToken);
+
+            piTeams.AddRange(teams.Adapt<List<ProgramIncrementTeamReponse>>());
+            piTeams.AddRange(teamOfTeams.Adapt<List<ProgramIncrementTeamReponse>>());
+        }
+
+        return Ok(piTeams);
+    }
+
+    [HttpPost("{id}/teams")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.ProgramIncrements)]
+    [OpenApiOperation("Manager program increment teams.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult> ManageTeams(Guid id, [FromBody] ManageProgramIncrementTeamsRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToManageProgramIncrementTeamsCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

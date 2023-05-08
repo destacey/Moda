@@ -3,12 +3,14 @@
 namespace Moda.Organization.Application.TeamsOfTeams.Queries;
 public sealed record GetTeamOfTeamsListQuery : IQuery<IReadOnlyList<TeamOfTeamsListDto>>
 {
-    public GetTeamOfTeamsListQuery(bool includeInactive = false)
+    public GetTeamOfTeamsListQuery(bool includeInactive = false, IEnumerable<Guid>? ids = null)
     {
         IncludeInactive = includeInactive;
+        TeamIds = ids?.ToList() ?? new List<Guid>();
     }
 
     public bool IncludeInactive { get; }
+    public List<Guid> TeamIds { get; }
 }
 
 internal sealed class GetTeamOfTeamsListQueryHandler : IQueryHandler<GetTeamOfTeamsListQuery, IReadOnlyList<TeamOfTeamsListDto>>
@@ -31,6 +33,9 @@ internal sealed class GetTeamOfTeamsListQueryHandler : IQueryHandler<GetTeamOfTe
 
         if (!request.IncludeInactive)
             query = query.Where(e => e.IsActive);
+
+        if (request.TeamIds.Any())
+            query = query.Where(e => request.TeamIds.Contains(e.Id));
 
         return await query.AsNoTrackingWithIdentityResolution()
             .ProjectToType<TeamOfTeamsListDto>()

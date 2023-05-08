@@ -1089,6 +1089,128 @@
         ]
       }
     },
+    "/api/planning/program-increments/{id}/teams": {
+      "get": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Get a list of program increment teams.",
+        "operationId": "ProgramIncrements_GetTeams",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProgramIncrementTeamReponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Manager program increment teams.",
+        "operationId": "ProgramIncrements_ManageTeams",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageProgramIncrementTeamsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/organization/team-types": {
       "get": {
         "tags": [
@@ -4257,6 +4379,79 @@
           }
         }
       },
+      "ProgramIncrementTeamReponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Gets or sets the identifier.",
+            "format": "guid"
+          },
+          "localId": {
+            "type": "integer",
+            "description": "Gets the local identifier.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the workspace."
+          },
+          "code": {
+            "type": "string",
+            "description": "Gets the code."
+          },
+          "type": {
+            "type": "string",
+            "description": "Gets the team type."
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Indicates whether the organization is active or not.  "
+          },
+          "teamOfTeams": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TeamNavigationDto"
+              }
+            ]
+          }
+        }
+      },
+      "TeamNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "ManageProgramIncrementTeamsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "teamIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        }
+      },
       "TeamTypeDto": {
         "type": "object",
         "additionalProperties": false,
@@ -4909,22 +5104,6 @@
             ]
           }
         }
-      },
-      "TeamNavigationDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/NavigationDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "type": {
-                "type": "string"
-              }
-            }
-          }
-        ]
       },
       "TeamDetailsDto": {
         "type": "object",

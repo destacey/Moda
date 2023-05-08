@@ -43,3 +43,24 @@ public class ProgramIncrementConfig : IEntityTypeConfiguration<ProgramIncrement>
         builder.Property(p => p.IsDeleted);
     }
 }
+
+public class ProgramIncrementTeamConfig : IEntityTypeConfiguration<ProgramIncrementTeam>
+{
+    public void Configure(EntityTypeBuilder<ProgramIncrementTeam> builder)
+    {
+        builder.ToTable("ProgramIncrementTeams", SchemaNames.Planning);
+
+        builder.HasKey(p => new { p.ProgramIncrementId, p.TeamId });
+
+        builder.HasIndex(p => p.ProgramIncrementId)
+            .IncludeProperties(p => p.TeamId);
+
+        builder.Property(p => p.ProgramIncrementId).IsRequired();
+        builder.Property(p => p.TeamId).IsRequired();
+
+        builder.HasOne<ProgramIncrement>()
+            .WithMany(p => p.ProgramIncrementTeams)
+            .HasForeignKey(p => p.ProgramIncrementId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}

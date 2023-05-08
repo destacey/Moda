@@ -52,4 +52,19 @@ public record TeamListViewModel
             TeamOfTeamsName = dto.TeamOfTeams?.Name
         };
     }
+
+    public static TeamListViewModel FromProgramIncrementTeamResponse(ProgramIncrementTeamReponse dto)
+    {
+        return new TeamListViewModel()
+        {
+            Id = dto.Id,
+            LocalId = dto.LocalId,
+            Name = dto.Name,
+            Code = dto.Code,
+            Type = dto.Type,
+            IsActive = dto.IsActive,
+            TeamOfTeams = dto.TeamOfTeams,
+            TeamOfTeamsName = dto.TeamOfTeams?.Name
+        };
+    }
 }
