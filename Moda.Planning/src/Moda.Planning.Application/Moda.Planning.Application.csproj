@@ -19,4 +19,9 @@
         <ProjectReference Include="..\Moda.Planning.Domain\Moda.Planning.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Risks\Dtos\" />
+      <Folder Include="Risks\Queries\" />
+    </ItemGroup>
+
 </Project>
