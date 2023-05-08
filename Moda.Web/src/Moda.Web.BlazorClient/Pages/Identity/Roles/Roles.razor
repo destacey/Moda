@@ -12,9 +12,15 @@
              Items="@_roles"
              Elevation="1"
              Height="600px"
-             SortMode="SortMode.Multiple" Filterable="true"
+             Dense="@_tablePreference.IsDense"
+             Striped="@_tablePreference.IsStriped"
+             Bordered="@_tablePreference.HasBorder"
+             Hover="@_tablePreference.IsHoverable"
+             SortMode="SortMode.Multiple"
+             Filterable="true"
+             FilterMode="DataGridFilterMode.ColumnFilterMenu"
              FixedHeader="true"
-             Loading="@_isLoading"
+             Loading="@_loading"
              LoadingProgressColor="@Color.Secondary"
              QuickFilter="@_quickFilter">
     <ToolBarContent>
@@ -60,20 +66,23 @@
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; } = default!;
 
-    MudDataGrid<RoleListDto> _grid = default!;
-    List<RoleListDto> _roles = new();
+    private MudDataGrid<RoleListDto> _grid = default!;
+    private List<RoleListDto> _roles = new();
 
-    string _searchString = "";
-    bool _isLoading = true;
-    bool _canViewRoleClaims;
-    bool _canUpdateRoleClaims;
+    private string _searchString = "";
+    private bool _loading = true;
+    private bool _canViewRoleClaims;
+    private bool _canUpdateRoleClaims;
     //bool _canDeleteRoleClaims;
+    private ModaTablePreference _tablePreference = new();
 
     protected override async Task OnInitializedAsync()
     {
+        _loading = true;
+
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
-            SetTablePreference(clientPreference.TablePreference);
+            _tablePreference = clientPreference.TablePreference;
         }
         
         await GetRoles();
@@ -83,7 +92,7 @@
         _canUpdateRoleClaims = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.RoleClaims);
         //_canDeleteRoleClaims = await AuthService.HasPermissionAsync(user, ApplicationAction.Delete, ApplicationResource.RoleClaims);
 
-        _isLoading = false;
+        _loading = false;
     }
 
     private void ManagePermissions(string? roleId)
@@ -108,9 +117,9 @@
 
     private async Task RefreshData()
     {
-        _isLoading = true;
+        _loading = true;
         await GetRoles();
-        _isLoading = false;
+        _loading = false;
     }
 
     private async Task GetRoles()
@@ -119,13 +128,5 @@
         {
             _roles = result;
         }
-    }
-
-    private void SetTablePreference(ModaTablePreference tablePreference)
-    {
-        _grid.Dense = tablePreference.IsDense;
-        _grid.Striped = tablePreference.IsStriped;
-        _grid.Bordered = tablePreference.HasBorder;
-        _grid.Hover = tablePreference.IsHoverable;
     }
 }

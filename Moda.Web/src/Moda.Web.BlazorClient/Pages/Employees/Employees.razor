@@ -13,7 +13,13 @@
                      Items="@_employees"
                      Elevation="1"
                      Height="600px"
-                     SortMode="SortMode.Multiple" Filterable="true"
+                     Dense="@_tablePreference.IsDense"
+                     Striped="@_tablePreference.IsStriped"
+                     Bordered="@_tablePreference.HasBorder"
+                     Hover="@_tablePreference.IsHoverable"
+                     SortMode="SortMode.Multiple" 
+                     Filterable="true"
+                     FilterMode="DataGridFilterMode.ColumnFilterMenu"
                      FixedHeader="true"
                      Loading="@_isLoading"
                      LoadingProgressColor="@Color.Secondary"
@@ -69,14 +75,15 @@
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; } = default!;
 
-    MudDataGrid<EmployeeListDto> _grid = default!;
-    List<EmployeeListDto> _employees = new();
+    private MudDataGrid<EmployeeListDto> _grid = default!;
+    private List<EmployeeListDto> _employees = new();
 
-    string _searchString = "";
-    bool _isLoading = true;
-    bool _includeDisabled = false;
-    bool _canCreateEmployees;
-    bool _canUpdateEmployees;
+    private string _searchString = "";
+    private bool _isLoading = true;
+    private bool _includeDisabled = false;
+    private bool _canCreateEmployees;
+    private bool _canUpdateEmployees;
+    private ModaTablePreference _tablePreference = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,7 +93,7 @@
 
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
-            SetTablePreference(clientPreference.TablePreference);
+            _tablePreference = clientPreference.TablePreference;
         }
 
         await GetEmployees();
@@ -140,13 +147,5 @@
         }
 
         _isLoading = false;
-    }
-
-    private void SetTablePreference(ModaTablePreference tablePreference)
-    {
-        _grid.Dense = tablePreference.IsDense;
-        _grid.Striped = tablePreference.IsStriped;
-        _grid.Bordered = tablePreference.HasBorder;
-        _grid.Hover = tablePreference.IsHoverable;
     }
 }

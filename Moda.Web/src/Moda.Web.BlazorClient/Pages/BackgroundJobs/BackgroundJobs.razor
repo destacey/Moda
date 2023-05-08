@@ -31,8 +31,13 @@
              Items="@_jobs"
              Elevation="1"
              Height="600px"
+             Dense="@_tablePreference.IsDense"
+             Striped="@_tablePreference.IsStriped"
+             Bordered="@_tablePreference.HasBorder"
+             Hover="@_tablePreference.IsHoverable"
              SortMode="SortMode.Multiple"
-             Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterRow"
+             Filterable="true"
+             FilterMode="DataGridFilterMode.ColumnFilterMenu"
              FixedHeader="true"
              Loading="@_loading"
              LoadingProgressColor="@Color.Secondary"
@@ -76,12 +81,13 @@
     bool _showPageActions;
     bool _canViewHangfire;
     bool _canRunBackgroundJobs;
+    ModaTablePreference _tablePreference = new();
 
     protected override async Task OnInitializedAsync()
     {
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
-            SetTablePreference(clientPreference.TablePreference);
+            _tablePreference = clientPreference.TablePreference;
         }
 
         await Task.WhenAll(new Task[] {
@@ -154,13 +160,5 @@
         await ApiHelper.ExecuteCallGuardedAsync(() => BackgroundJobsClient.RunAsync(jobTypeId), Snackbar);
 
         await GetRunningJobs();
-    }
-
-    private void SetTablePreference(ModaTablePreference tablePreference)
-    {
-        _grid.Dense = tablePreference.IsDense;
-        _grid.Striped = tablePreference.IsStriped;
-        _grid.Bordered = tablePreference.HasBorder;
-        _grid.Hover = tablePreference.IsHoverable;
     }
 }

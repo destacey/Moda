@@ -6,8 +6,13 @@
                  Items="@_claims"
                  Elevation="0"
                  Height="600px"
-                 SortMode="SortMode.Multiple" 
-                 Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterRow"
+                 Dense="@_tablePreference.IsDense"
+                 Striped="@_tablePreference.IsStriped"
+                 Bordered="@_tablePreference.HasBorder"
+                 Hover="@_tablePreference.IsHoverable"
+                 SortMode="SortMode.Multiple"
+                 Filterable="true"
+                 FilterMode="DataGridFilterMode.ColumnFilterMenu"
                  FixedHeader="true"
                  QuickFilter="@_quickFilter">
         <ToolBarContent>
@@ -29,16 +34,17 @@
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; } = default!;
 
-    MudDataGrid<Claim> _grid = default!;
-    List<Claim> _claims = new();
+    private MudDataGrid<Claim> _grid = default!;
+    private List<Claim> _claims = new();
 
-    string _searchString = "";
+    private string _searchString = "";
+    private ModaTablePreference _tablePreference = new();
 
     protected async override Task OnInitializedAsync()
     {
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
-            SetTablePreference(clientPreference.TablePreference);
+            _tablePreference = clientPreference.TablePreference;
         }
         
         _claims = (await AuthState).User.Claims.ToList();
@@ -57,12 +63,4 @@
 
         return false;
     };
-
-    private void SetTablePreference(ModaTablePreference tablePreference)
-    {
-        _grid.Dense = tablePreference.IsDense;
-        _grid.Striped = tablePreference.IsStriped;
-        _grid.Bordered = tablePreference.HasBorder;
-        _grid.Hover = tablePreference.IsHoverable;
-    }
 }

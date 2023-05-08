@@ -11,9 +11,15 @@ else
              Items="@Teams"
              Elevation="1"
              Height="@_height"
+             Dense="@_tablePreference.IsDense"
+             Striped="@_tablePreference.IsStriped"
+             Bordered="@_tablePreference.HasBorder"
+             Hover="@_tablePreference.IsHoverable"
              Virtualize="true"
              ColumnResizeMode="ResizeMode.Container"
-             SortMode="SortMode.Multiple" Filterable="true"
+             SortMode="SortMode.Multiple"
+             Filterable="true"
+             FilterMode="DataGridFilterMode.ColumnFilterMenu"
              FixedHeader="true"
              Loading="@_loading"
              LoadingProgressColor="@Color.Secondary"
@@ -83,6 +89,7 @@ else
     private string _searchString = "";
     private bool _loading = true;
     private bool _includeDisabled = true;
+    private ModaTablePreference _tablePreference = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,7 +101,7 @@ else
 
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
-            SetTablePreference(clientPreference.TablePreference);
+            _tablePreference = clientPreference.TablePreference;
         }
 
         _loading = false;
@@ -129,13 +136,5 @@ else
         _loading = true;
         await GetTeams.InvokeAsync();
         _loading = false;
-    }
-
-    private void SetTablePreference(ModaTablePreference tablePreference)
-    {
-        _teamsGrid.Dense = tablePreference.IsDense;
-        _teamsGrid.Striped = tablePreference.IsStriped;
-        _teamsGrid.Bordered = tablePreference.HasBorder;
-        _teamsGrid.Hover = tablePreference.IsHoverable;
     }
 }
