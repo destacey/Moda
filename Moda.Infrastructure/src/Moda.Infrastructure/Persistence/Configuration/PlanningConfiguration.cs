@@ -106,6 +106,7 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
         builder.Property(r => r.AssigneeId);
         builder.Property(r => r.FollowUpDate);
         builder.Property(r => r.Response);
+        builder.Property(r => r.ClosedDate);
 
         // Audit
         builder.Property(r => r.Created);

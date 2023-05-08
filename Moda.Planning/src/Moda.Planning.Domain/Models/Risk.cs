@@ -85,6 +85,8 @@ public class Risk : BaseAuditableEntity<Guid>
 
     public LocalDate? FollowUpDate { get; private set; }
 
+    public Instant? ClosedDate { get; private set; }
+
     /// <summary>
     /// What has been done to help prevent the risk from occurring.
     /// </summary>
@@ -109,8 +111,9 @@ public class Risk : BaseAuditableEntity<Guid>
     /// <param name="assigneeId"></param>
     /// <param name="followUpDate"></param>
     /// <param name="response"></param>
+    /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result Update(string summary, string? description, Guid? teamId, Instant reportedOn, Guid reportedBy, RiskStatus status, RiskCategory category, RiskGrade impact, RiskGrade likelihood, Guid? assigneeId, LocalDate followUpDate, string? response)
+    public Result Update(string summary, string? description, Guid? teamId, Instant reportedOn, Guid reportedBy, RiskStatus status, RiskCategory category, RiskGrade impact, RiskGrade likelihood, Guid? assigneeId, LocalDate followUpDate, string? response, Instant timestamp)
     {
         try
         {
@@ -119,7 +122,6 @@ public class Risk : BaseAuditableEntity<Guid>
             TeamId = teamId;
             ReportedOn = reportedOn;
             ReportedBy = reportedBy;
-            Status = status;
             Category = category;
             Impact = impact;
             Likelihood = likelihood;
@@ -127,12 +129,22 @@ public class Risk : BaseAuditableEntity<Guid>
             FollowUpDate = followUpDate;
             Response = response;
 
+            UpdateStatus(status, timestamp);
+
             return Result.Success();
         }
         catch (Exception ex)
         {
             return Result.Failure(ex.ToString());
         }
+    }
+
+    private void UpdateStatus(RiskStatus status, Instant timestamp)
+    {
+        if (Status == status) return;
+
+        ClosedDate = status == RiskStatus.Closed ? timestamp : null;
+        Status = status;
     }
 
     /// <summary>
