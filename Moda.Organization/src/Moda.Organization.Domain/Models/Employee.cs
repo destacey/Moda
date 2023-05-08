@@ -172,7 +172,7 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
 
             if (IsActive != isActive)
             {
-                var result = IsActive ? Activate(timestamp) : Deactivate(timestamp);
+                var result = isActive ? Activate(timestamp) : Deactivate(timestamp);
                 if (result.IsFailure)
                 {
                     return Result.Failure(result.Error);
