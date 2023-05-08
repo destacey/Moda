@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Moda.Organization.Domain.Enums;
+using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
@@ -21,7 +23,7 @@ public class ProgramIncrementConfig : IEntityTypeConfiguration<ProgramIncrement>
 
         builder.Property(p => p.LocalId).ValueGeneratedOnAdd();
 
-        builder.Property(p => p.Name).HasMaxLength(128);
+        builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
         builder.Property(p => p.Description).HasMaxLength(1024);
 
         // Value Objects
@@ -62,5 +64,56 @@ public class ProgramIncrementTeamConfig : IEntityTypeConfiguration<ProgramIncrem
             .WithMany(p => p.ProgramIncrementTeams)
             .HasForeignKey(p => p.ProgramIncrementId)
             .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class RiskConfig : IEntityTypeConfiguration<Risk>
+{
+    public void Configure(EntityTypeBuilder<Risk> builder)
+    {
+        builder.ToTable("Risks", SchemaNames.Planning);
+
+        builder.HasKey(r => r.Id);
+        builder.HasAlternateKey(r => r.LocalId);
+
+        builder.HasIndex(r => r.Id);
+        builder.HasIndex(r => r.IsDeleted);
+
+        builder.Property(r => r.LocalId).ValueGeneratedOnAdd();
+
+        builder.Property(r => r.Summary).HasMaxLength(256).IsRequired();
+        builder.Property(r => r.Description).HasMaxLength(1024);
+        builder.Property(r => r.TeamId);
+        builder.Property(r => r.ReportedOn).IsRequired();
+        builder.Property(r => r.ReportedBy).IsRequired();
+
+        builder.Property(r => r.Status).IsRequired()
+            .HasConversion<EnumConverter<RiskStatus>>()
+            .HasMaxLength(64);
+
+        builder.Property(r => r.Category).IsRequired()
+            .HasConversion<EnumConverter<RiskCategory>>()
+            .HasMaxLength(64);
+
+        builder.Property(r => r.Impact).IsRequired()
+            .HasConversion<EnumConverter<RiskGrade>>()
+            .HasMaxLength(64);
+
+        builder.Property(r => r.Likelihood).IsRequired()
+            .HasConversion<EnumConverter<RiskGrade>>()
+            .HasMaxLength(64);
+
+        builder.Property(r => r.AssigneeId);
+        builder.Property(r => r.FollowUpDate);
+        builder.Property(r => r.Response);
+
+        // Audit
+        builder.Property(r => r.Created);
+        builder.Property(r => r.CreatedBy);
+        builder.Property(r => r.LastModified);
+        builder.Property(r => r.LastModifiedBy);
+        builder.Property(r => r.Deleted);
+        builder.Property(r => r.DeletedBy);
+        builder.Property(r => r.IsDeleted);
     }
 }

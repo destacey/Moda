@@ -28,9 +28,15 @@
              Items="@_teams"
              Elevation="1"
              Height="600px"
+             Dense="@_tablePreference.IsDense"
+             Striped="@_tablePreference.IsStriped"
+             Bordered="@_tablePreference.HasBorder"
+             Hover="@_tablePreference.IsHoverable"
              Virtualize="true"
              ColumnResizeMode="ResizeMode.Container"
-             SortMode="SortMode.Multiple" Filterable="true"
+             SortMode="SortMode.Multiple"  
+             Filterable="true"
+             FilterMode="DataGridFilterMode.ColumnFilterMenu"
              FixedHeader="true"
              Loading="@_isLoading"
              LoadingProgressColor="@Color.Secondary"
@@ -89,12 +95,13 @@
     private bool _canCreateTeamsOfTeams;
     private bool _canUpdateTeamsOfTeams;
     private bool _showPageActions;
+    private ModaTablePreference _tablePreference = new();
 
     protected override async Task OnInitializedAsync()
     {
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
-            SetTablePreference(clientPreference.TablePreference);
+            _tablePreference = clientPreference.TablePreference;
         }
 
         await GetTeams();
@@ -161,14 +168,6 @@
         _teams = _latestTeams.OrderBy(t => t.Name).ToList();
 
         _isLoading = false;
-    }
-
-    private void SetTablePreference(ModaTablePreference tablePreference)
-    {
-        _grid.Dense = tablePreference.IsDense;
-        _grid.Striped = tablePreference.IsStriped;
-        _grid.Bordered = tablePreference.HasBorder;
-        _grid.Hover = tablePreference.IsHoverable;
     }
 
     private async Task CreateTeam()

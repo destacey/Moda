@@ -21,7 +21,10 @@
     }
 
 .mud-table {
-    padding: 20px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
     margin-bottom: 20px !important;
 }
 

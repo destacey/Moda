@@ -32,6 +32,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizat
     #region IPlanning
 
     public DbSet<ProgramIncrement> ProgramIncrements => Set<ProgramIncrement>();
+    public DbSet<Risk> Risks => Set<Risk>();
 
     #endregion IPlanning
 

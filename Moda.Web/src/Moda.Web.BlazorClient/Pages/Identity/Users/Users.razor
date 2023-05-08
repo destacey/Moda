@@ -11,7 +11,13 @@
              Items="@_users"
              Elevation="1"
              Height="600px"
-             SortMode="SortMode.Multiple" Filterable="true"
+             Dense="@_tablePreference.IsDense"
+             Striped="@_tablePreference.IsStriped"
+             Bordered="@_tablePreference.HasBorder"
+             Hover="@_tablePreference.IsHoverable"
+             SortMode="SortMode.Multiple"
+             Filterable="true"
+             FilterMode="DataGridFilterMode.ColumnFilterMenu"
              FixedHeader="true"
              Loading="@_isLoading"
              LoadingProgressColor="@Color.Secondary"
@@ -71,13 +77,14 @@
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; } = default!;
 
-    MudDataGrid<UserDetailsDto> _grid = default!;
-    List<UserDetailsDto> _users = new();
+    private MudDataGrid<UserDetailsDto> _grid = default!;
+    private List<UserDetailsDto> _users = new();
 
-    string _searchString = "";
-    bool _isLoading = true;
-    bool _canExportUsers;
-    bool _canViewRoles;
+    private string _searchString = "";
+    private bool _isLoading = true;
+    private bool _canExportUsers;
+    private bool _canViewRoles;
+    private ModaTablePreference _tablePreference = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -87,7 +94,7 @@
 
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
-            SetTablePreference(clientPreference.TablePreference);
+            _tablePreference = clientPreference.TablePreference;
         }
 
         await GetUsers();
@@ -134,13 +141,5 @@
         }
 
         _isLoading = false;
-    }
-
-    private void SetTablePreference(ModaTablePreference tablePreference)
-    {
-        _grid.Dense = tablePreference.IsDense;
-        _grid.Striped = tablePreference.IsStriped;
-        _grid.Bordered = tablePreference.HasBorder;
-        _grid.Hover = tablePreference.IsHoverable;
     }
 }

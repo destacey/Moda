@@ -30,7 +30,8 @@ else
                         <MudCardHeader>
                             <CardHeaderAvatar>
                                 <MudAvatar>
-                                    <MudImage Src="@_imageUri" Alt="@_employee.FullName" />
+                                    @_employee.FirstName[0]
+                                    @*<MudImage Src="@_imageUri" Alt="@_employee.FullName" />*@
                                 </MudAvatar>
                             </CardHeaderAvatar>
                             <CardHeaderContent>
@@ -230,7 +231,7 @@ else
     {
         if (await ApiHelper.ExecuteCallGuardedAsync(() => EmployeesClient.GetDirectReportsAsync(_employee.Id), Snackbar) is List<EmployeeListDto> result)
         {
-            _directReports = result;
+            _directReports = result.OrderBy(e => e.FirstName).ToList();
         }
     }
 
@@ -253,7 +254,7 @@ else
 
         for (var i = 0; i < _directReports.Count; i++)
         {
-            var directReportNode = GetEmployeeNode(_directReports[i].FirstName, (i * 150) + 50, 400);
+            var directReportNode = GetEmployeeNode($"{_directReports[i].FirstName} {_directReports[i].LastName}", (i * 150) + 50, 400);
             nodes.Add(directReportNode);
             links.Add(new LinkModel(meNode.GetPort(PortAlignment.Bottom), directReportNode.GetPort(PortAlignment.Top)));
         }

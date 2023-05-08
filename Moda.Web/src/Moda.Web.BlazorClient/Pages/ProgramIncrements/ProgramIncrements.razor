@@ -21,9 +21,15 @@
              Items="@_programIncrements"
              Elevation="1"
              Height="600px"
+             Dense="@_tablePreference.IsDense"
+             Striped="@_tablePreference.IsStriped"
+             Bordered="@_tablePreference.HasBorder"
+             Hover="@_tablePreference.IsHoverable"
              Virtualize="true"
              ColumnResizeMode="ResizeMode.Container"
-             SortMode="SortMode.Multiple" Filterable="true"
+             SortMode="SortMode.Multiple"  
+             Filterable="true"
+             FilterMode="DataGridFilterMode.ColumnFilterMenu"
              FixedHeader="true"
              Loading="@_isLoading"
              LoadingProgressColor="@Color.Secondary"
@@ -68,6 +74,7 @@
     private bool _canCreateProgramIncrements;
     private bool _canUpdateProgramIncrements;
     private bool _showPageActions;
+    private ModaTablePreference _tablePreference = new();
 
     private static readonly List<String> stateSortOrder = new List<String> {
         "Active",
@@ -79,7 +86,7 @@
     {
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
-            SetTablePreference(clientPreference.TablePreference);
+            _tablePreference = clientPreference.TablePreference;
         }
 
         await GetProgramIncrements();
@@ -132,14 +139,6 @@
         }
 
         _isLoading = false;
-    }
-
-    private void SetTablePreference(ModaTablePreference tablePreference)
-    {
-        _grid.Dense = tablePreference.IsDense;
-        _grid.Striped = tablePreference.IsStriped;
-        _grid.Bordered = tablePreference.HasBorder;
-        _grid.Hover = tablePreference.IsHoverable;
     }
 
     private async Task CreateProgramIncrement()
