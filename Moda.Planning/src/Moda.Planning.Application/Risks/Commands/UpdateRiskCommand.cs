@@ -18,6 +18,9 @@ public sealed class UpdateRiskCommandValidator : CustomValidator<UpdateRiskComma
         RuleFor(e => e.Description)
             .MaximumLength(1024);
 
+        RuleFor(e => e.Status)
+            .NotNull();
+
         RuleFor(e => e.Category)
             .NotNull();
 

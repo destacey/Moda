@@ -4,6 +4,7 @@ using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
 using Moda.Web.Api.Models.Organizations;
 using Moda.Web.Api.Models.Organizations.Teams;
+using Moda.Web.Api.Models.Planning.Risks;
 
 namespace Moda.Web.Api.Controllers.Organizations;
 
@@ -174,6 +175,62 @@ public class TeamsController : ControllerBase
                 StatusCode = 400,
                 SupportMessage = result.Error,
                 Source = "TeamsController.RemoveTeamMembership"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
+    [HttpPost("{id}/risks")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Add a risk to a team.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult> AddRisk(Guid id, [FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.TeamId)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToCreateRiskCommand(), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "TeamsController.AddRisk"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
+    [HttpPut("{id}/risks/{riskId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Update a team risk.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult> UpdateRisk(Guid id, Guid riskId, [FromBody] UpdateRiskRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.TeamId || riskId != request.RiskId)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToUpdateRiskCommand(), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "TeamsController.UpdateRisk"
             };
             return BadRequest(error);
         }
