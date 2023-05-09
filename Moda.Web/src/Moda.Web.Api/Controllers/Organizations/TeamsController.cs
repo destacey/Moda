@@ -206,7 +206,7 @@ public class TeamsController : ControllerBase
 
     [HttpGet("{id}/risks/{riskId}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
-    [OpenApiOperation("Get a team risk using the localId.", "")]
+    [OpenApiOperation("Get a team risk by Id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -226,7 +226,7 @@ public class TeamsController : ControllerBase
 
     [HttpPost("{id}/risks")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
-    [OpenApiOperation("Add a risk to a team.", "")]
+    [OpenApiOperation("Create a risk for a team.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]

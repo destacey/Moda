@@ -2,9 +2,12 @@
 using Moda.Organization.Application.TeamsOfTeams.Commands;
 using Moda.Organization.Application.TeamsOfTeams.Dtos;
 using Moda.Organization.Application.TeamsOfTeams.Queries;
+using Moda.Planning.Application.Risks.Dtos;
+using Moda.Planning.Application.Risks.Queries;
 using Moda.Web.Api.Models.Organizations;
 using Moda.Web.Api.Models.Organizations.TeamOfTeams;
 using Moda.Web.Api.Models.Organizations.TeamsOfTeams;
+using Moda.Web.Api.Models.Planning.Risks;
 
 namespace Moda.Web.Api.Controllers.Organizations;
 
@@ -64,7 +67,7 @@ public class TeamsOfTeamsController : ControllerBase
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
-    [OpenApiOperation("Update an team.", "")]
+    [OpenApiOperation("Update a team of teams.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
@@ -174,6 +177,108 @@ public class TeamsOfTeamsController : ControllerBase
                 StatusCode = 400,
                 SupportMessage = result.Error,
                 Source = "TeamsOfTeamsController.RemoveTeamMembership"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
+    [HttpGet("{id}/risks")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get team risks.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken)
+    {
+        var teamExists = await _sender.Send(new TeamOfTeamsExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
+
+        var risks = await _sender.Send(new GetRisksQuery(id), cancellationToken);
+
+        return Ok(risks);
+    }
+
+    [HttpGet("{id}/risks/{riskId}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get a team of teams risk by Id.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<RiskDetailsDto>> GetRiskById(Guid id, Guid riskId, CancellationToken cancellationToken)
+    {
+        var teamExists = await _sender.Send(new TeamOfTeamsExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
+
+        var risk = await _sender.Send(new GetRiskQuery(riskId));
+
+        return risk is not null && risk.TeamId == id
+            ? Ok(risk)
+            : NotFound();
+    }
+
+    [HttpPost("{id}/risks")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Create a risk for a team of teams.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult> AddRisk(Guid id, [FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.TeamId)
+            return BadRequest();
+
+        var teamExists = await _sender.Send(new TeamOfTeamsExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
+
+        var result = await _sender.Send(request.ToCreateRiskCommand(), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "TeamsController.AddRisk"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
+    [HttpPut("{id}/risks/{riskId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Update a team of teams risk.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult> UpdateRisk(Guid id, Guid riskId, [FromBody] UpdateRiskRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.TeamId || riskId != request.RiskId)
+            return BadRequest();
+
+        var teamExists = await _sender.Send(new TeamOfTeamsExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
+
+        var result = await _sender.Send(request.ToUpdateRiskCommand(), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "TeamsController.UpdateRisk"
             };
             return BadRequest(error);
         }
