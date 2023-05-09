@@ -1,9 +1,11 @@
-﻿using Moda.Organization.Application.Models;
+﻿using System.Threading;
+using Moda.Organization.Application.Models;
 using Moda.Organization.Application.Teams.Commands;
 using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
+using Moda.Planning.Domain.Models;
 using Moda.Web.Api.Models.Organizations;
 using Moda.Web.Api.Models.Organizations.Teams;
 using Moda.Web.Api.Models.Planning.Risks;
@@ -189,12 +191,15 @@ public class TeamsController : ControllerBase
     [OpenApiOperation("Get team risks.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken)
     {
-        var risks = await _sender.Send(new GetRisksQuery(id), cancellationToken);
+        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
 
-        // TODO get team names
+        var risks = await _sender.Send(new GetRisksQuery(id), cancellationToken);
 
         return Ok(risks);
     }
@@ -203,16 +208,18 @@ public class TeamsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
     [OpenApiOperation("Get a team risk using the localId.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult<RiskDetailsDto>> GetRiskById(int id, int riskId)
+    public async Task<ActionResult<RiskDetailsDto>> GetRiskById(Guid id, Guid riskId, CancellationToken cancellationToken)
     {
+        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
+
         var risk = await _sender.Send(new GetRiskQuery(riskId));
 
-        // TODO get team and verify teamId matches
-
-        return risk is not null
+        return risk is not null && risk.TeamId == id
             ? Ok(risk)
             : NotFound();
     }
@@ -228,6 +235,10 @@ public class TeamsController : ControllerBase
     {
         if (id != request.TeamId)
             return BadRequest();
+
+        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
 
         var result = await _sender.Send(request.ToCreateRiskCommand(), cancellationToken);
 
@@ -256,6 +267,10 @@ public class TeamsController : ControllerBase
     {
         if (id != request.TeamId || riskId != request.RiskId)
             return BadRequest();
+
+        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
+        if (!teamExists)
+            return NotFound();
 
         var result = await _sender.Send(request.ToUpdateRiskCommand(), cancellationToken);
 
