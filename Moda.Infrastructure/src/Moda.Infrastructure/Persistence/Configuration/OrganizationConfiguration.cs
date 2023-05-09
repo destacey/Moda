@@ -86,7 +86,8 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
             .IsUnique()
             .IncludeProperties(o => new { o.Id, o.LocalId, o.Name, o.IsActive, o.IsDeleted });
         builder.HasIndex(o => o.IsActive);
-        builder.HasIndex(o => o.IsDeleted);
+        builder.HasIndex(o => o.IsDeleted)
+            .IncludeProperties(o => new { o.Id, o.LocalId, o.Name, o.Code, o.Type, o.IsActive });
 
         builder.Property(o => o.LocalId).ValueGeneratedOnAdd();
 
