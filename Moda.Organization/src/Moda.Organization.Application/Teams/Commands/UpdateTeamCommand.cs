@@ -83,7 +83,8 @@ internal sealed class UpdateTeamCommandHandler : ICommandHandler<UpdateTeamComma
             var updateResult = team.Update(
                 request.Name,
                 request.Code,
-                request.Description
+                request.Description, 
+                _dateTimeService.Now
                 );
 
             if (updateResult.IsFailure)

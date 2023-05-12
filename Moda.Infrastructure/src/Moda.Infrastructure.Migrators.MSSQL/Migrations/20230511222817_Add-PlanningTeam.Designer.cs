@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Moda.Infrastructure.Persistence.Context;
 
@@ -11,9 +12,11 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    partial class ModaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230511222817_Add-PlanningTeam")]
+    partial class AddPlanningTeam
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -712,8 +715,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ProgramIncrementId"), new[] { "TeamId" });
 
-                    b.HasIndex("TeamId");
-
                     b.ToTable("ProgramIncrementTeams", "Planning");
                 });
 
@@ -1234,14 +1235,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("ProgramIncrementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", "Team")
-                        .WithMany("ProgramIncrementTeams")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.Risk", b =>
@@ -1271,11 +1264,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.Organization.Domain.Models.Employee", b =>
                 {
                     b.Navigation("DirectReports");
-                });
-
-            modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningTeam", b =>
-                {
-                    b.Navigation("ProgramIncrementTeams");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrement", b =>

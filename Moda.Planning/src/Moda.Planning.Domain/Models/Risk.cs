@@ -55,6 +55,8 @@ public class Risk : BaseAuditableEntity<Guid>
 
     public Guid? TeamId { get; private set; }
 
+    public PlanningTeam? Team { get; set; }
+
     public Instant ReportedOn { get; private set; }
 
     public Guid ReportedBy { get; private set; }

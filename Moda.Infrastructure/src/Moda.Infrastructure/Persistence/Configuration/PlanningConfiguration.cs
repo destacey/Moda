@@ -6,6 +6,56 @@ using Moda.Planning.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
+public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
+{
+    public void Configure(EntityTypeBuilder<PlanningTeam> builder)
+    {
+        builder.ToTable("PlanningTeams", SchemaNames.Planning);
+
+        builder.HasKey(t => t.Id);
+        builder.HasAlternateKey(t => t.LocalId);
+
+        builder.HasIndex(t => new { t.Id, t.IsDeleted })
+            .IncludeProperties(t => new { t.LocalId, t.Name, t.Code, t.Type, t.IsActive });
+        builder.HasIndex(t =>  new { t.LocalId, t.IsDeleted })
+            .IncludeProperties(t => new { t.Id, t.Name, t.Code, t.Type, t.IsActive });
+        builder.HasIndex(t => t.Code)
+            .IsUnique()
+            .IncludeProperties(t => new { t.Id, t.LocalId, t.Name, t.Type, t.IsActive });
+        builder.HasIndex(t => new { t.IsActive, t.IsDeleted })
+            .IncludeProperties(t => new { t.Id, t.LocalId, t.Name, t.Code, t.Type });
+        builder.HasIndex(t => t.IsDeleted)
+            .IncludeProperties(t => new { t.Id, t.LocalId, t.Name, t.Code, t.Type, t.IsActive });
+
+        builder.Property(t => t.Id).ValueGeneratedNever();
+        builder.Property(t => t.LocalId).ValueGeneratedNever();
+
+        builder.Property(t => t.Name).IsRequired().HasMaxLength(128);
+        builder.Property(t => t.Code).IsRequired()
+            .HasConversion(
+                t => t.Value,
+                t => new TeamCode(t))
+            .HasMaxLength(10);
+        builder.Property(t => t.Type).IsRequired()
+            .HasConversion<EnumConverter<TeamType>>()
+            .HasMaxLength(64);
+        builder.Property(t => t.IsActive);
+
+        // Audit
+        builder.Property(t => t.Deleted);
+        builder.Property(t => t.DeletedBy);
+        builder.Property(t => t.IsDeleted);
+
+        // Relationships
+        builder.HasMany<Risk>()
+            .WithOne(t => t.Team)
+            .HasForeignKey(t => t.TeamId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Ignore
+    }
+}
+
 public class ProgramIncrementConfig : IEntityTypeConfiguration<ProgramIncrement>
 {
     public void Configure(EntityTypeBuilder<ProgramIncrement> builder)
@@ -64,6 +114,11 @@ public class ProgramIncrementTeamConfig : IEntityTypeConfiguration<ProgramIncrem
             .WithMany(p => p.ProgramIncrementTeams)
             .HasForeignKey(p => p.ProgramIncrementId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(p => p.Team)
+            .WithMany(p => p.ProgramIncrementTeams)
+            .HasForeignKey(p => p.TeamId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
@@ -83,7 +138,6 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
 
         builder.Property(r => r.Summary).HasMaxLength(256).IsRequired();
         builder.Property(r => r.Description).HasMaxLength(1024);
-        builder.Property(r => r.TeamId);
         builder.Property(r => r.ReportedOn).IsRequired();
         builder.Property(r => r.ReportedBy).IsRequired();
 

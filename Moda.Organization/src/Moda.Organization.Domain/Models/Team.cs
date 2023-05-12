@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Events;
 using Moda.Organization.Domain.Enums;
 using NodaTime;
 
@@ -13,12 +14,12 @@ public sealed class Team : BaseTeam, IActivatable
 {
     private Team() { }
 
-    private Team(string name, TeamCode code, string? description, TeamType type)
+    private Team(string name, TeamCode code, string? description)
     {
         Name = name;
         Code = code;
         Description = description;
-        Type = type;
+        Type = TeamType.Team;
     }
 
     /// <summary>
@@ -32,7 +33,9 @@ public sealed class Team : BaseTeam, IActivatable
         {
             // TODO is there logic that would prevent activation?
             IsActive = true;
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
         }
+
 
         return Result.Success();
     }
@@ -52,6 +55,7 @@ public sealed class Team : BaseTeam, IActivatable
                 return Result.Failure("Cannot deactivate a team that has active team memberships.");
 
             IsActive = false;
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
@@ -65,13 +69,15 @@ public sealed class Team : BaseTeam, IActivatable
     /// <param name="description"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result Update(string name, TeamCode code, string? description)
+    public Result Update(string name, TeamCode code, string? description, Instant timestamp)
     {
         try
         {
             Name = name;
             Code = code;
             Description = description;
+
+            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();
         }
@@ -85,9 +91,13 @@ public sealed class Team : BaseTeam, IActivatable
     /// <param name="name">The name.</param>
     /// <param name="code">The code.</param>
     /// <param name="description">The description.</param>
+    /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public static Team Create(string name, TeamCode code, string? description)
+    public static Team Create(string name, TeamCode code, string? description, Instant timestamp)
     {
-        return new Team(name, code, description, TeamType.Team);
+        var team = new Team(name, code, description);
+
+        team.AddDomainEvent(EntityCreatedEvent.WithEntity(team, timestamp));
+        return team;
     }
 }
