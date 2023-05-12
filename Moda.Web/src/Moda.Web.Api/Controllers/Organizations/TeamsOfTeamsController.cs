@@ -217,7 +217,7 @@ public class TeamsOfTeamsController : ControllerBase
 
         var risk = await _sender.Send(new GetRiskQuery(riskId));
 
-        return risk is not null && risk.TeamId == id
+        return risk is not null && risk.Team.Id == id
             ? Ok(risk)
             : NotFound();
     }
@@ -229,7 +229,7 @@ public class TeamsOfTeamsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult> AddRisk(Guid id, [FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> CreateRisk(Guid id, [FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
     {
         if (id != request.TeamId)
             return BadRequest();
@@ -246,7 +246,7 @@ public class TeamsOfTeamsController : ControllerBase
             {
                 StatusCode = 400,
                 SupportMessage = result.Error,
-                Source = "TeamsController.AddRisk"
+                Source = "TeamsOfTeamsController.CreateRisk"
             };
             return BadRequest(error);
         }
@@ -266,10 +266,6 @@ public class TeamsOfTeamsController : ControllerBase
         if (id != request.TeamId || riskId != request.RiskId)
             return BadRequest();
 
-        var teamExists = await _sender.Send(new TeamOfTeamsExistsQuery(id), cancellationToken);
-        if (!teamExists)
-            return NotFound();
-
         var result = await _sender.Send(request.ToUpdateRiskCommand(), cancellationToken);
 
         if (result.IsFailure)
@@ -278,7 +274,7 @@ public class TeamsOfTeamsController : ControllerBase
             {
                 StatusCode = 400,
                 SupportMessage = result.Error,
-                Source = "TeamsController.UpdateRisk"
+                Source = "TeamsOfTeamsController.UpdateRisk"
             };
             return BadRequest(error);
         }

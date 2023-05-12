@@ -6121,14 +6121,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk for a team.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AddRiskAsync(System.Guid id, CreateRiskRequest request);
+        System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a risk for a team.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AddRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a team risk by Id.
@@ -7076,9 +7076,9 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk for a team.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task AddRiskAsync(System.Guid id, CreateRiskRequest request)
+        public virtual System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request)
         {
-            return AddRiskAsync(id, request, System.Threading.CancellationToken.None);
+            return CreateRiskAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -7086,7 +7086,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk for a team.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task AddRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -7607,14 +7607,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk for a team of teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AddRiskAsync(System.Guid id, CreateRiskRequest request);
+        System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a risk for a team of teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AddRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a team of teams risk by Id.
@@ -8552,9 +8552,9 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk for a team of teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task AddRiskAsync(System.Guid id, CreateRiskRequest request)
+        public virtual System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request)
         {
-            return AddRiskAsync(id, request, System.Threading.CancellationToken.None);
+            return CreateRiskAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -8562,7 +8562,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk for a team of teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task AddRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -11652,8 +11652,8 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("summary", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Summary { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("teamId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid TeamId { get; set; } = default!;
+        [Newtonsoft.Json.JsonProperty("team", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public TeamNavigationDto2 Team { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("reportedOn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTime ReportedOn { get; set; } = default!;
@@ -11679,6 +11679,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
 
         [Newtonsoft.Json.JsonProperty("closedDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTime? ClosedDate { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class TeamNavigationDto2 : NavigationDto
+    {
+        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Type { get; set; } = default!;
 
     }
 
@@ -11733,8 +11741,8 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string? Description { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("teamId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid TeamId { get; set; } = default!;
+        [Newtonsoft.Json.JsonProperty("team", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public TeamNavigationDto2 Team { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("reportedOn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTime ReportedOn { get; set; } = default!;

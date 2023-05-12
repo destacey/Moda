@@ -29,11 +29,13 @@ internal sealed class GetRisksQueryHandler : IQueryHandler<GetRisksQuery, IReadO
 
     public async Task<IReadOnlyList<RiskListDto>> Handle(GetRisksQuery request, CancellationToken cancellationToken)
     {
-        var query = _planningDbContext.Risks.AsQueryable();
+        var query = _planningDbContext.Risks
+            .Include(r => r.Team)
+            .AsQueryable();
 
         if (request.TeamIds.Any())
         {
-            query = query.Where(r => r.TeamId.HasValue && request.TeamIds.Contains((Guid)r.TeamId));
+            query = query.Where(r => r.TeamId.HasValue && request.TeamIds.Contains(r.TeamId.Value));
         }
 
         var risks = await query

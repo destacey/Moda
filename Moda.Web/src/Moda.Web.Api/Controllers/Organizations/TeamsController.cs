@@ -219,7 +219,7 @@ public class TeamsController : ControllerBase
 
         var risk = await _sender.Send(new GetRiskQuery(riskId));
 
-        return risk is not null && risk.TeamId == id
+        return risk is not null && risk.Team.Id == id
             ? Ok(risk)
             : NotFound();
     }
@@ -231,7 +231,7 @@ public class TeamsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult> AddRisk(Guid id, [FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> CreateRisk(Guid id, [FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
     {
         if (id != request.TeamId)
             return BadRequest();
@@ -248,7 +248,7 @@ public class TeamsController : ControllerBase
             {
                 StatusCode = 400,
                 SupportMessage = result.Error,
-                Source = "TeamsController.AddRisk"
+                Source = "TeamsController.CreateRisk"
             };
             return BadRequest(error);
         }
@@ -267,10 +267,6 @@ public class TeamsController : ControllerBase
     {
         if (id != request.TeamId || riskId != request.RiskId)
             return BadRequest();
-
-        var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
-        if (!teamExists)
-            return NotFound();
 
         var result = await _sender.Send(request.ToUpdateRiskCommand(), cancellationToken);
 

@@ -2907,7 +2907,7 @@
           "Teams"
         ],
         "summary": "Create a risk for a team.",
-        "operationId": "Teams_AddRisk",
+        "operationId": "Teams_CreateRisk",
         "parameters": [
           {
             "name": "id",
@@ -3670,7 +3670,7 @@
           "TeamsOfTeams"
         ],
         "summary": "Create a risk for a team of teams.",
-        "operationId": "TeamsOfTeams_AddRisk",
+        "operationId": "TeamsOfTeams_CreateRisk",
         "parameters": [
           {
             "name": "id",
@@ -5880,9 +5880,8 @@
           "summary": {
             "type": "string"
           },
-          "teamId": {
-            "type": "string",
-            "format": "guid"
+          "team": {
+            "$ref": "#/components/schemas/TeamNavigationDto2"
           },
           "reportedOn": {
             "type": "string",
@@ -5917,6 +5916,22 @@
             "nullable": true
           }
         }
+      },
+      "TeamNavigationDto2": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        ]
       },
       "RiskStatus": {
         "type": "integer",
@@ -5979,9 +5994,8 @@
             "type": "string",
             "nullable": true
           },
-          "teamId": {
-            "type": "string",
-            "format": "guid"
+          "team": {
+            "$ref": "#/components/schemas/TeamNavigationDto2"
           },
           "reportedOn": {
             "type": "string",

@@ -1,4 +1,5 @@
-﻿using Moda.Planning.Domain.Enums;
+﻿using Moda.Planning.Application.Models;
+using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.Risks.Dtos;
 public class RiskDetailsDto : IMapFrom<Risk>
@@ -7,7 +8,7 @@ public class RiskDetailsDto : IMapFrom<Risk>
     public int LocalId { get; set; }
     public string Summary { get; set; } = default!;
     public string? Description { get; set; }
-    public Guid TeamId { get; set; }
+    public TeamNavigationDto Team { get; set; } = default!;
     public Instant ReportedOn { get; set; }
     public Guid ReportedBy { get; set; }
     public RiskStatus Status { get; set; }

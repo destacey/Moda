@@ -29,7 +29,9 @@ internal sealed class GetRiskQueryHandler : IQueryHandler<GetRiskQuery, RiskDeta
 
     public async Task<RiskDetailsDto?> Handle(GetRiskQuery request, CancellationToken cancellationToken)
     {
-        var query = _planningDbContext.Risks.AsQueryable();
+        var query = _planningDbContext.Risks
+            .Include(r => r.Team)
+            .AsQueryable();
 
         if (request.RiskId.HasValue)
         {
