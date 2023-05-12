@@ -1,5 +1,6 @@
-﻿using Moda.Planning.Application.Models;
-using Moda.Planning.Domain.Enums;
+﻿using Moda.Common.Application.Dtos;
+using Moda.Common.Extensions;
+using Moda.Planning.Application.Models;
 
 namespace Moda.Planning.Application.Risks.Dtos;
 public class RiskListDto : IMapFrom<Risk>
@@ -9,11 +10,19 @@ public class RiskListDto : IMapFrom<Risk>
     public string Summary { get; set; } = default!;
     public TeamNavigationDto Team { get; set; } = default!;
     public Instant ReportedOn { get; set; }
-    public Guid ReportedBy { get; set; }
-    public RiskStatus Status { get; set; }
-    public RiskCategory Category { get; set; }
-    public RiskGrade Exposure { get; set; }
-    public Guid? AssigneeId { get; set; }
+    public NavigationDto ReportedBy { get; set; } = default!;
+    public required string Status { get; set; }
+    public required string Category { get; set; }
+    public required string Exposure { get; set; }
+    public NavigationDto? Assignee { get; set; }
     public LocalDate? FollowUpDate { get; set; }
     public Instant? ClosedDate { get; set; }
+
+    public void Register(TypeAdapterConfig config)
+    {
+        config.NewConfig<Risk, RiskListDto>()
+            .Map(dest => dest.Status, src => src.Status.GetDisplayName())
+            .Map(dest => dest.Category, src => src.Category.GetDisplayName())
+            .Map(dest => dest.Exposure, src => src.Exposure.GetDisplayName());
+    }
 }

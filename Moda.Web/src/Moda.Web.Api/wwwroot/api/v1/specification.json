@@ -5888,22 +5888,24 @@
             "format": "date-time"
           },
           "reportedBy": {
-            "type": "string",
-            "format": "guid"
+            "$ref": "#/components/schemas/NavigationDto"
           },
           "status": {
-            "$ref": "#/components/schemas/RiskStatus"
+            "type": "string"
           },
           "category": {
-            "$ref": "#/components/schemas/RiskCategory"
+            "type": "string"
           },
           "exposure": {
-            "$ref": "#/components/schemas/RiskGrade"
+            "type": "string"
           },
-          "assigneeId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
+          "assignee": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NavigationDto"
+              }
+            ]
           },
           "followUpDate": {
             "type": "string",
@@ -5933,48 +5935,6 @@
           }
         ]
       },
-      "RiskStatus": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Open",
-          "Closed"
-        ],
-        "enum": [
-          0,
-          1
-        ]
-      },
-      "RiskCategory": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Resolved",
-          "Owned",
-          "Accepted",
-          "Mitigated"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          3
-        ]
-      },
-      "RiskGrade": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Low",
-          "Medium",
-          "High"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ]
-      },
       "RiskDetailsDto": {
         "type": "object",
         "additionalProperties": false,
@@ -6002,28 +5962,30 @@
             "format": "date-time"
           },
           "reportedBy": {
-            "type": "string",
-            "format": "guid"
+            "$ref": "#/components/schemas/NavigationDto"
           },
           "status": {
-            "$ref": "#/components/schemas/RiskStatus"
+            "type": "string"
           },
           "category": {
-            "$ref": "#/components/schemas/RiskCategory"
+            "type": "string"
           },
           "impact": {
-            "$ref": "#/components/schemas/RiskGrade"
+            "type": "string"
           },
           "likelihood": {
-            "$ref": "#/components/schemas/RiskGrade"
+            "type": "string"
           },
           "exposure": {
-            "$ref": "#/components/schemas/RiskGrade"
+            "type": "string"
           },
-          "assigneeId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
+          "assignee": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NavigationDto"
+              }
+            ]
           },
           "followUpDate": {
             "type": "string",
@@ -6095,6 +6057,36 @@
           }
         }
       },
+      "RiskCategory": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Resolved",
+          "Owned",
+          "Accepted",
+          "Mitigated"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "RiskGrade": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Low",
+          "Medium",
+          "High"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
       "UpdateRiskRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -6141,6 +6133,18 @@
             "nullable": true
           }
         }
+      },
+      "RiskStatus": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "Open",
+          "Closed"
+        ],
+        "enum": [
+          0,
+          1
+        ]
       },
       "TeamOfTeamsListDto": {
         "type": "object",

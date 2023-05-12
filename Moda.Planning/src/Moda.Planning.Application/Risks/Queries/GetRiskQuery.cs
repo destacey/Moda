@@ -31,6 +31,8 @@ internal sealed class GetRiskQueryHandler : IQueryHandler<GetRiskQuery, RiskDeta
     {
         var query = _planningDbContext.Risks
             .Include(r => r.Team)
+            .Include(r => r.ReportedBy)
+            .Include(r => r.Assignee)
             .AsQueryable();
 
         if (request.RiskId.HasValue)

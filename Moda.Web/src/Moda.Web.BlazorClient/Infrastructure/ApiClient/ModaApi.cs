@@ -11659,19 +11659,19 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public System.DateTime ReportedOn { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("reportedBy", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid ReportedBy { get; set; } = default!;
+        public NavigationDto ReportedBy { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public RiskStatus Status { get; set; } = default!;
+        public string Status { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("category", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public RiskCategory Category { get; set; } = default!;
+        public string Category { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("exposure", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public RiskGrade Exposure { get; set; } = default!;
+        public string Exposure { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("assigneeId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid? AssigneeId { get; set; } = default!;
+        [Newtonsoft.Json.JsonProperty("assignee", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public NavigationDto? Assignee { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("followUpDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
@@ -11687,42 +11687,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     {
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Type { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum RiskStatus
-    {
-
-        Open = 0,
-
-        Closed = 1,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum RiskCategory
-    {
-
-        Resolved = 0,
-
-        Owned = 1,
-
-        Accepted = 2,
-
-        Mitigated = 3,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum RiskGrade
-    {
-
-        Low = 0,
-
-        Medium = 1,
-
-        High = 2,
 
     }
 
@@ -11748,25 +11712,25 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         public System.DateTime ReportedOn { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("reportedBy", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid ReportedBy { get; set; } = default!;
+        public NavigationDto ReportedBy { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public RiskStatus Status { get; set; } = default!;
+        public string Status { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("category", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public RiskCategory Category { get; set; } = default!;
+        public string Category { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("impact", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public RiskGrade Impact { get; set; } = default!;
+        public string Impact { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("likelihood", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public RiskGrade Likelihood { get; set; } = default!;
+        public string Likelihood { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("exposure", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public RiskGrade Exposure { get; set; } = default!;
+        public string Exposure { get; set; } = default!;
 
-        [Newtonsoft.Json.JsonProperty("assigneeId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid? AssigneeId { get; set; } = default!;
+        [Newtonsoft.Json.JsonProperty("assignee", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public NavigationDto? Assignee { get; set; } = default!;
 
         [Newtonsoft.Json.JsonProperty("followUpDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
@@ -11817,6 +11781,32 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RiskCategory
+    {
+
+        Resolved = 0,
+
+        Owned = 1,
+
+        Accepted = 2,
+
+        Mitigated = 3,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RiskGrade
+    {
+
+        Low = 0,
+
+        Medium = 1,
+
+        High = 2,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class UpdateRiskRequest
     {
         [Newtonsoft.Json.JsonProperty("riskId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -11852,6 +11842,16 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
 
         [Newtonsoft.Json.JsonProperty("response", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string? Response { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RiskStatus
+    {
+
+        Open = 0,
+
+        Closed = 1,
 
     }
 

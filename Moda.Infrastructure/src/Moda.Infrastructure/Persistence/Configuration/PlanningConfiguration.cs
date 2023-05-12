@@ -139,7 +139,7 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
         builder.Property(r => r.Summary).HasMaxLength(256).IsRequired();
         builder.Property(r => r.Description).HasMaxLength(1024);
         builder.Property(r => r.ReportedOn).IsRequired();
-        builder.Property(r => r.ReportedBy).IsRequired();
+        builder.Property(r => r.ReportedById).IsRequired();
 
         builder.Property(r => r.Status).IsRequired()
             .HasConversion<EnumConverter<RiskStatus>>()
@@ -170,5 +170,16 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
         builder.Property(r => r.Deleted);
         builder.Property(r => r.DeletedBy);
         builder.Property(r => r.IsDeleted);
+
+        // Relationships
+        builder.HasOne(p => p.ReportedBy)
+            .WithMany()
+            .HasForeignKey(p => p.ReportedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(p => p.Assignee)
+            .WithMany()
+            .HasForeignKey(p => p.AssigneeId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
