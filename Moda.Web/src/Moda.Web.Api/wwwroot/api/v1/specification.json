@@ -6091,14 +6091,16 @@
             "type": "string"
           },
           "team": {
-            "$ref": "#/components/schemas/TeamNavigationDto2"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlanningTeamNavigationDto"
+              }
+            ]
           },
           "reportedOn": {
             "type": "string",
             "format": "date-time"
-          },
-          "reportedBy": {
-            "$ref": "#/components/schemas/NavigationDto"
           },
           "status": {
             "type": "string"
@@ -6121,15 +6123,10 @@
             "type": "string",
             "format": "date",
             "nullable": true
-          },
-          "closedDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
           }
         }
       },
-      "TeamNavigationDto2": {
+      "PlanningTeamNavigationDto": {
         "allOf": [
           {
             "$ref": "#/components/schemas/NavigationDto"
@@ -6165,7 +6162,12 @@
             "nullable": true
           },
           "team": {
-            "$ref": "#/components/schemas/TeamNavigationDto2"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlanningTeamNavigationDto"
+              }
+            ]
           },
           "reportedOn": {
             "type": "string",

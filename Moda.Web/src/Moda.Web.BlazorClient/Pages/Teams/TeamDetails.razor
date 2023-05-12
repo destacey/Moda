@@ -1,5 +1,6 @@
 ﻿@page "/teams/{Id:int}"
 
+@using Moda.Web.BlazorClient.Components.Planning
 @using Moda.Web.BlazorClient.Models.Teams;
 @using Moda.Web.BlazorClient.Shared.Organizations;
 @using Moda.Web.BlazorClient.Components.Organizations;
@@ -61,6 +62,10 @@ else
                 </MudItem>
             </MudGrid>
         </MudTabPanel>
+        <MudTabPanel Text="Risks">
+            <RisksGrid Risks="_risks"
+                             GetRisks="GetRisks" />
+        </MudTabPanel>
         <MudTabPanel Text="Team Memberships">
             <TeamMembershipsGrid Memberships="_teamMemberships"
                              GetTeamMemberships="GetTeamMemberships"
@@ -88,6 +93,7 @@ else
 
     private TeamDetailsDto _team = default!;
     private List<TeamMembershipsDto> _teamMemberships = new();
+    private List<RiskListDto> _risks = new();
 
     private bool _loading = true;
 
@@ -103,6 +109,7 @@ else
 
         // reset the page when the route changes
         _activeTabIndex = 0;
+        _risks.Clear();
         _teamMemberships.Clear();
 
         await GetTeam();
@@ -145,6 +152,8 @@ else
             await GetTeam();
         }
     }
+
+    #region Team Memberships
 
     private async Task GetTeamMemberships()
     {
@@ -244,4 +253,18 @@ else
             Snackbar.Add("Error removing team membership.", MudBlazor.Severity.Error);
         }
     }
+
+    #endregion Team Memberships
+
+    #region Risks
+
+    private async Task GetRisks()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsClient.GetRisksAsync(_team.Id), Snackbar) is List<RiskListDto> result)
+        {
+            _risks = result.ToList();
+        }
+    }
+
+    #endregion Risks
 }

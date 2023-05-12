@@ -9,7 +9,7 @@ public class RiskDetailsDto : IMapFrom<Risk>
     public int LocalId { get; set; }
     public string Summary { get; set; } = default!;
     public string? Description { get; set; }
-    public TeamNavigationDto Team { get; set; } = default!;
+    public PlanningTeamNavigationDto? Team { get; set; } = default!;
     public Instant ReportedOn { get; set; }
     public NavigationDto ReportedBy { get; set; } = default!;
     public required string Status { get; set; }

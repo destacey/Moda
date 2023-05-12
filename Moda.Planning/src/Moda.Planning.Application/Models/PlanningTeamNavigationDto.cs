@@ -2,19 +2,19 @@
 using Moda.Common.Extensions;
 
 namespace Moda.Planning.Application.Models;
-public record TeamNavigationDto : NavigationDto, IMapFrom<PlanningTeam>
+public record PlanningTeamNavigationDto : NavigationDto, IMapFrom<PlanningTeam>
 {
     public required string Type { get; set; }
 
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<PlanningTeam, TeamNavigationDto>()
+        config.NewConfig<PlanningTeam, PlanningTeamNavigationDto>()
             .Map(dest => dest.Type, src => src.Type.GetDisplayName());
     }
 
-    public static TeamNavigationDto FromPlanningTeam(PlanningTeam team)
+    public static PlanningTeamNavigationDto FromPlanningTeam(PlanningTeam team)
     {
-        return new TeamNavigationDto()
+        return new PlanningTeamNavigationDto()
         {
             Id = team.Id,
             LocalId = team.LocalId,
