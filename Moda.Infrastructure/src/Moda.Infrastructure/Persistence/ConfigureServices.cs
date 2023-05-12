@@ -69,6 +69,7 @@ internal static class ConfigureServices
 
     private static IServiceCollection AddDomainDbContexts(this IServiceCollection services)
     {
+        services.AddScoped<IModaDbContext, ModaDbContext>();
         services.AddScoped<IAppIntegrationDbContext, ModaDbContext>();
         services.AddScoped<IOrganizationDbContext, ModaDbContext>();
         services.AddScoped<IPlanningDbContext, ModaDbContext>();

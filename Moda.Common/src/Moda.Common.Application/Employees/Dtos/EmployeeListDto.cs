@@ -1,9 +1,8 @@
 ﻿using Mapster;
-using Moda.Common.Helpers;
-using NodaTime;
+using Moda.Common.Domain.Models;
 
-namespace Moda.Organization.Application.Employees.Dtos;
-public sealed record EmployeeDetailsDto : IMapFrom<Employee>
+namespace Moda.Common.Application.Employees.Dtos;
+public sealed record EmployeeListDto : IMapFrom<Employee>
 {
     /// <summary>Gets the identifier.</summary>
     /// <value>The identifier.</value>
@@ -36,10 +35,6 @@ public sealed record EmployeeDetailsDto : IMapFrom<Employee>
     /// <summary>Gets the employee number.</summary>
     /// <value>The employee number.</value>
     public required string EmployeeNumber { get; set; }
-
-    /// <summary>Gets the hire date.</summary>
-    /// <value>The hire date.</value>
-    public Instant? HireDate { get; set; }
 
     /// <summary>Gets the email.</summary>
     /// <value>The email.</value>
@@ -74,14 +69,9 @@ public sealed record EmployeeDetailsDto : IMapFrom<Employee>
     /// </summary>
     public bool IsActive { get; set; }
 
-    /// <summary>
-    /// A single string to present the employee's full name
-    /// </summary>
-    public string? FullName { get; set; }
-
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<Employee, EmployeeDetailsDto>()
+        config.NewConfig<Employee, EmployeeListDto>()
             .Map(dest => dest.FirstName, src => src.Name.FirstName)
             .Map(dest => dest.MiddleName, src => src.Name.MiddleName)
             .Map(dest => dest.LastName, src => src.Name.LastName)
@@ -89,7 +79,6 @@ public sealed record EmployeeDetailsDto : IMapFrom<Employee>
             .Map(dest => dest.Title, src => src.Name.Title)
             .Map(dest => dest.Email, src => src.Email.Value)
             .Map(dest => dest.ManagerLocalId, src => src.Manager!.LocalId)
-            .Map(dest => dest.FullName, src => $"{StringHelpers.Concat(src.Name.Title, src.Name.FirstName, src.Name.MiddleName, src.Name.LastName, src.Name.Suffix)}")
             .Map(dest => dest.ManagerName, src => $"{src.Manager!.Name.FirstName} {src.Manager!.Name.LastName}", srcCond => srcCond.ManagerId.HasValue && srcCond.Manager!.IsActive);
     }
 }

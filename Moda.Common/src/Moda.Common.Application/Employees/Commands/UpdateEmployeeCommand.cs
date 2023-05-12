@@ -1,6 +1,8 @@
-﻿using NodaTime;
+﻿using Moda.Common.Application.Persistence;
+using Moda.Common.Application.Validators;
+using Moda.Common.Models;
 
-namespace Moda.Organization.Application.Employees.Commands;
+namespace Moda.Common.Application.Employees.Commands;
 public sealed record UpdateEmployeeCommand : ICommand<int>
 {
     public UpdateEmployeeCommand(Guid id, PersonName name, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)
@@ -55,11 +57,11 @@ public sealed record UpdateEmployeeCommand : ICommand<int>
 
 public sealed class UpdateEmployeeCommandValidator : CustomValidator<UpdateEmployeeCommand>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
+    private readonly IModaDbContext _modaDbContext;
 
-    public UpdateEmployeeCommandValidator(IOrganizationDbContext organizationDbContext)
+    public UpdateEmployeeCommandValidator(IModaDbContext modaDbContext)
     {
-        _organizationDbContext = organizationDbContext;
+        _modaDbContext = modaDbContext;
 
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -89,7 +91,7 @@ public sealed class UpdateEmployeeCommandValidator : CustomValidator<UpdateEmplo
 
     public async Task<bool> BeUniqueEmployeeNumber(Guid id, string employeeNumber, CancellationToken cancellationToken)
     {
-        return await _organizationDbContext.Employees
+        return await _modaDbContext.Employees
             .Where(e => e.Id != id)
             .AllAsync(e => e.EmployeeNumber != employeeNumber, cancellationToken);
     }
@@ -97,13 +99,13 @@ public sealed class UpdateEmployeeCommandValidator : CustomValidator<UpdateEmplo
 
 internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmployeeCommand, int>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
+    private readonly IModaDbContext _modaDbContext;
     private readonly IDateTimeService _dateTimeService;
     private readonly ILogger<UpdateEmployeeCommandHandler> _logger;
 
-    public UpdateEmployeeCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeService dateTimeService, ILogger<UpdateEmployeeCommandHandler> logger)
+    public UpdateEmployeeCommandHandler(IModaDbContext modaDbContext, IDateTimeService dateTimeService, ILogger<UpdateEmployeeCommandHandler> logger)
     {
-        _organizationDbContext = organizationDbContext;
+        _modaDbContext = modaDbContext;
         _dateTimeService = dateTimeService;
         _logger = logger;
     }
@@ -112,7 +114,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
     {
         try
         {
-            var employee = await _organizationDbContext.Employees
+            var employee = await _modaDbContext.Employees
                 .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
             if (employee is null)
                 return Result.Failure<int>("Employee not found.");
@@ -120,7 +122,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
             // verify the manager exists
             if (request.ManagerId.HasValue
                 && employee.ManagerId != request.ManagerId
-                && await _organizationDbContext.Employees.AllAsync(e => e.Id != request.ManagerId.Value, cancellationToken))
+                && await _modaDbContext.Employees.AllAsync(e => e.Id != request.ManagerId.Value, cancellationToken))
             {
                 _logger.LogWarning("Moda Request: Unable to find manager {ManagerId} while updating employee {EmployeeId}", request.ManagerId.Value, request.Id);
                 return Result.Failure<int>("Manager not found.");
@@ -142,7 +144,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
             if (updateResult.IsFailure)
             {
                 // Reset the entity
-                await _organizationDbContext.Entry(employee).ReloadAsync(cancellationToken);
+                await _modaDbContext.Entry(employee).ReloadAsync(cancellationToken);
                 employee.ClearDomainEvents();
 
                 var requestName = request.GetType().Name;
@@ -150,7 +152,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
                 return Result.Failure<int>(updateResult.Error);
             }
 
-            await _organizationDbContext.SaveChangesAsync(cancellationToken);
+            await _modaDbContext.SaveChangesAsync(cancellationToken);
 
             return Result.Success(employee.LocalId);
         }

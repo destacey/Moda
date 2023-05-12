@@ -1,4 +1,6 @@
-﻿namespace Moda.Organization.Application.Interfaces;
+﻿using CSharpFunctionalExtensions;
+
+namespace Moda.Common.Application.Interfaces;
 
 public interface IExternalEmployeeDirectoryService
 {

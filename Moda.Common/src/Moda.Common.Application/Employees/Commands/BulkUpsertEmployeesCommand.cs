@@ -1,4 +1,9 @@
-﻿namespace Moda.Organization.Application.Employees.Commands;
+﻿using Moda.Common.Application.Persistence;
+using Moda.Common.Application.Validators;
+using Moda.Common.Domain.Models;
+
+namespace Moda.Common.Application.Employees.Commands;
+
 public sealed record BulkUpsertEmployeesCommand : ICommand
 {
     public BulkUpsertEmployeesCommand(IEnumerable<IExternalEmployee> employees)
@@ -30,13 +35,13 @@ public sealed class BulkUpsertEmployeesCommandValidator : CustomValidator<BulkUp
 
 internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUpsertEmployeesCommand>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
+    private readonly IModaDbContext _modaDbContext;
     private readonly IDateTimeService _dateTimeService;
     private readonly ILogger<BulkUpsertEmployeesCommandHandler> _logger;
 
-    public BulkUpsertEmployeesCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeService dateTimeService, ILogger<BulkUpsertEmployeesCommandHandler> logger)
+    public BulkUpsertEmployeesCommandHandler(IModaDbContext modaDbContext, IDateTimeService dateTimeService, ILogger<BulkUpsertEmployeesCommandHandler> logger)
     {
-        _organizationDbContext = organizationDbContext;
+        _modaDbContext = modaDbContext;
         _dateTimeService = dateTimeService;
         _logger = logger;
     }
@@ -46,7 +51,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
         string requestName = request.GetType().Name;
         Dictionary<string, string> errors = new();
         Dictionary<string, string> missingManagers = new();
-        List<Employee> employees = await _organizationDbContext.Employees.ToListAsync(cancellationToken) ?? new();
+        List<Employee> employees = await _modaDbContext.Employees.ToListAsync(cancellationToken) ?? new();
 
         foreach (var externalEmployee in request.Employees)
         {
@@ -72,7 +77,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                     if (updateResult.IsFailure)
                     {
                         // Reset the entity
-                        await _organizationDbContext.Entry(employee).ReloadAsync(cancellationToken);
+                        await _modaDbContext.Entry(employee).ReloadAsync(cancellationToken);
                         employee.ClearDomainEvents();
 
                         _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
@@ -95,7 +100,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                         _dateTimeService.Now
                         );
 
-                    await _organizationDbContext.Employees.AddAsync(newEmployee);
+                    await _modaDbContext.Employees.AddAsync(newEmployee);
                 }
 
                 // check only when no errors on update or create
@@ -112,7 +117,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
 
         try
         {
-            await _organizationDbContext.SaveChangesAsync(cancellationToken);
+            await _modaDbContext.SaveChangesAsync(cancellationToken);
 
             await SetMissingManagers();
 
@@ -139,7 +144,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
         {
             if (missingManagers.Any())
             {
-                List<Employee> updatedEmployees = await _organizationDbContext.Employees.ToListAsync(cancellationToken);
+                List<Employee> updatedEmployees = await _modaDbContext.Employees.ToListAsync(cancellationToken);
                 foreach (var item in missingManagers)
                 {
                     var managerId = GetManagerId(item.Value);
@@ -147,7 +152,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                     employee.UpdateManagerId(managerId, _dateTimeService.Now);
                 }
 
-                await _organizationDbContext.SaveChangesAsync(cancellationToken);
+                await _modaDbContext.SaveChangesAsync(cancellationToken);
             }
         }
     }

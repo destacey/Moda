@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using Microsoft.Graph.Models;
+using Moda.Common.Application.Interfaces;
 using Moda.Common.Models;
-using Moda.Organization.Application.Interfaces;
 using NodaTime;
 
 namespace Moda.Integrations.MicrosoftGraph.Model;

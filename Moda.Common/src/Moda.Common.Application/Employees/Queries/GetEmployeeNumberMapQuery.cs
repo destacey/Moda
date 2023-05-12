@@ -1,6 +1,8 @@
 ﻿using Mapster;
+using Moda.Common.Application.Persistence;
+using Moda.Common.Domain.Models;
 
-namespace Moda.Organization.Application.Employees.Queries;
+namespace Moda.Common.Application.Employees.Queries;
 public sealed record GetEmployeeNumberMapQuery : IQuery<IReadOnlyList<EmployeeNumberMapDto>>
 {
     public GetEmployeeNumberMapQuery(bool includeInactive = false)
@@ -13,16 +15,16 @@ public sealed record GetEmployeeNumberMapQuery : IQuery<IReadOnlyList<EmployeeNu
 
 internal sealed class GetEmployeeNumberMapQueryHandler : IQueryHandler<GetEmployeeNumberMapQuery, IReadOnlyList<EmployeeNumberMapDto>>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
+    private readonly IModaDbContext _modaDbContext;
 
-    public GetEmployeeNumberMapQueryHandler(IOrganizationDbContext organizationDbContext)
+    public GetEmployeeNumberMapQueryHandler(IModaDbContext modaDbContext)
     {
-        _organizationDbContext = organizationDbContext;
+        _modaDbContext = modaDbContext;
     }
 
     public async Task<IReadOnlyList<EmployeeNumberMapDto>> Handle(GetEmployeeNumberMapQuery request, CancellationToken cancellationToken)
     {
-        var query = _organizationDbContext.Employees.AsQueryable();
+        var query = _modaDbContext.Employees.AsQueryable();
 
         if (!request.IncludeInactive)
             query = query.Where(e => e.IsActive);

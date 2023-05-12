@@ -13,4 +13,8 @@
         <PackageReference Include="NodaTime" Version="3.1.9" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Moda.Common\Moda.Common.csproj" />
+    </ItemGroup>
+
 </Project>

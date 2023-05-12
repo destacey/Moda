@@ -1,6 +1,8 @@
-﻿using Moda.Common.Application.Identity.Users;
+﻿using MediatR;
+using Moda.Common.Application.Employees.Commands;
+using Moda.Common.Application.Identity.Users;
 
-namespace Moda.Organization.Application.Services;
+namespace Moda.Common.Application.Services;
 
 public sealed class EmployeeService : IEmployeeService
 {

@@ -1,6 +1,9 @@
 ﻿using Mapster;
+using Moda.Common.Application.Employees.Dtos;
+using Moda.Common.Application.Exceptions;
+using Moda.Common.Application.Persistence;
 
-namespace Moda.Organization.Application.Employees.Queries;
+namespace Moda.Common.Application.Employees.Queries;
 public sealed record GetEmployeeQuery : IQuery<EmployeeDetailsDto?>
 {
     public GetEmployeeQuery(Guid employeeId)
@@ -18,18 +21,18 @@ public sealed record GetEmployeeQuery : IQuery<EmployeeDetailsDto?>
 
 internal sealed class GetEmployeeQueryHandler : IQueryHandler<GetEmployeeQuery, EmployeeDetailsDto?>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
+    private readonly IModaDbContext _modaDbContext;
     private readonly ILogger<GetEmployeeQueryHandler> _logger;
 
-    public GetEmployeeQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetEmployeeQueryHandler> logger)
+    public GetEmployeeQueryHandler(IModaDbContext modaDbContext, ILogger<GetEmployeeQueryHandler> logger)
     {
-        _organizationDbContext = organizationDbContext;
+        _modaDbContext = modaDbContext;
         _logger = logger;
     }
 
     public async Task<EmployeeDetailsDto?> Handle(GetEmployeeQuery request, CancellationToken cancellationToken)
     {
-        var query = _organizationDbContext.Employees.AsQueryable();
+        var query = _modaDbContext.Employees.AsQueryable();
 
         if (request.EmployeeId.HasValue)
         {

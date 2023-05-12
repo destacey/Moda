@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Moda.Common.Domain.Models;
 
 namespace Moda.Infrastructure.Identity;
 

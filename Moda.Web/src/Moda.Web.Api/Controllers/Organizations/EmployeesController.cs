@@ -1,4 +1,6 @@
-﻿using Moda.Web.Api.Models.Organizations.Employees;
+﻿using Moda.Common.Application.Employees.Dtos;
+using Moda.Common.Application.Employees.Queries;
+using Moda.Web.Api.Models.Organizations.Employees;
 
 namespace Moda.Web.Api.Controllers.Organizations;
 

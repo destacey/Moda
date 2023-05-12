@@ -1,9 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Data;
 using Moda.Common.Extensions;
+using Moda.Common.Models;
 using NodaTime;
 
-namespace Moda.Organization.Domain.Models;
+namespace Moda.Common.Domain.Models;
 public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
 {
     private readonly List<Employee> _directReports = new();

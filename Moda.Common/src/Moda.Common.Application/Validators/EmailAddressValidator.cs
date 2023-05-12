@@ -1,4 +1,7 @@
-﻿namespace Moda.Organization.Application.Validators;
+﻿using FluentValidation;
+using Moda.Common.Models;
+
+namespace Moda.Common.Application.Validators;
 public sealed class EmailAddressValidator : CustomValidator<EmailAddress>
 {
     public EmailAddressValidator()

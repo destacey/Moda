@@ -1,6 +1,9 @@
-﻿using NodaTime;
+﻿using Moda.Common.Application.Persistence;
+using Moda.Common.Application.Validators;
+using Moda.Common.Domain.Models;
+using Moda.Common.Models;
 
-namespace Moda.Organization.Application.Employees.Commands;
+namespace Moda.Common.Application.Employees.Commands;
 public sealed record CreateEmployeeCommand : ICommand<int>
 {
     public CreateEmployeeCommand(PersonName name, string employeeNumber, Instant? hireDate, EmailAddress email, string? jobTitle, string? department, string? officeLocation, Guid? managerId)
@@ -50,11 +53,11 @@ public sealed record CreateEmployeeCommand : ICommand<int>
 
 public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmployeeCommand>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
+    private readonly IModaDbContext _modaDbContext;
 
-    public CreateEmployeeCommandValidator(IOrganizationDbContext organizationDbContext)
+    public CreateEmployeeCommandValidator(IModaDbContext modaDbContext)
     {
-        _organizationDbContext = organizationDbContext;
+        _modaDbContext = modaDbContext;
 
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -83,19 +86,19 @@ public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmplo
 
     public async Task<bool> BeUniqueEmployeeNumber(string employeeNumber, CancellationToken cancellationToken)
     {
-        return await _organizationDbContext.Employees.AllAsync(x => x.EmployeeNumber != employeeNumber, cancellationToken);
+        return await _modaDbContext.Employees.AllAsync(x => x.EmployeeNumber != employeeNumber, cancellationToken);
     }
 }
 
 internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmployeeCommand, int>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
+    private readonly IModaDbContext _modaDbContext;
     private readonly IDateTimeService _dateTimeService;
     private readonly ILogger<CreateEmployeeCommandHandler> _logger;
 
-    public CreateEmployeeCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeService dateTimeService, ILogger<CreateEmployeeCommandHandler> logger)
+    public CreateEmployeeCommandHandler(IModaDbContext modaDbContext, IDateTimeService dateTimeService, ILogger<CreateEmployeeCommandHandler> logger)
     {
-        _organizationDbContext = organizationDbContext;
+        _modaDbContext = modaDbContext;
         _dateTimeService = dateTimeService;
         _logger = logger;
     }
@@ -107,7 +110,7 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
             // verify the manager exists
             var managerId = request.ManagerId;
             if (managerId.HasValue
-                && await _organizationDbContext.Employees.AllAsync(e => e.Id != request.ManagerId, cancellationToken))
+                && await _modaDbContext.Employees.AllAsync(e => e.Id != request.ManagerId, cancellationToken))
             {
                 managerId = null;
             }
@@ -124,9 +127,9 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
                 _dateTimeService.Now
                 );
 
-            await _organizationDbContext.Employees.AddAsync(employee, cancellationToken);
+            await _modaDbContext.Employees.AddAsync(employee, cancellationToken);
 
-            await _organizationDbContext.SaveChangesAsync(cancellationToken);
+            await _modaDbContext.SaveChangesAsync(cancellationToken);
 
             return Result.Success(employee.LocalId);
         }

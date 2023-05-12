@@ -1,6 +1,7 @@
-﻿using NodaTime;
+﻿using Moda.Common.Models;
+using NodaTime;
 
-namespace Moda.Organization.Application.Interfaces;
+namespace Moda.Common.Application.Interfaces;
 public interface IExternalEmployee
 {
     string EmployeeNumber { get; }

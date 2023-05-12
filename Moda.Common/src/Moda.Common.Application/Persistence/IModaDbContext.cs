@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Moda.Common.Domain.Models;
 
 namespace Moda.Common.Application.Persistence;
 public interface IModaDbContext
@@ -7,4 +8,7 @@ public interface IModaDbContext
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
     EntityEntry Entry(object entity);
+
+    // Common DbSets
+    DbSet<Employee> Employees { get; }
 }

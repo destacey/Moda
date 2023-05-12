@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moda.Integrations.MicrosoftGraph;
-using Moda.Organization.Application.Interfaces;
 using NodaTime;
 
 namespace Moda.Infrastructure;

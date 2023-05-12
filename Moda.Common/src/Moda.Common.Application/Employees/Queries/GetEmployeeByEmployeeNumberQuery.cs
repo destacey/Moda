@@ -1,19 +1,21 @@
-﻿namespace Moda.Organization.Application.Employees.Queries;
+﻿using Moda.Common.Application.Persistence;
+
+namespace Moda.Common.Application.Employees.Queries;
 
 public sealed record GetEmployeeByEmployeeNumberQuery(string EmployeeNumber) : IQuery<Guid?>;
 
 internal sealed class GetEmployeeByEmployeeNumberQueryHandler : IQueryHandler<GetEmployeeByEmployeeNumberQuery, Guid?>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
+    private readonly IModaDbContext _modaDbContext;
 
-    public GetEmployeeByEmployeeNumberQueryHandler(IOrganizationDbContext organizationDbContext)
+    public GetEmployeeByEmployeeNumberQueryHandler(IModaDbContext modaDbContext)
     {
-        _organizationDbContext = organizationDbContext;
+        _modaDbContext = modaDbContext;
     }
 
     public async Task<Guid?> Handle(GetEmployeeByEmployeeNumberQuery request, CancellationToken cancellationToken)
     {
-        return await _organizationDbContext.Employees
+        return await _modaDbContext.Employees
             .Where(e => e.EmployeeNumber == request.EmployeeNumber)
             .Select(e => e.Id)
             .FirstOrDefaultAsync(cancellationToken);
