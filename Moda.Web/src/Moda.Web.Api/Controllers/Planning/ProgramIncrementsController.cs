@@ -1,10 +1,8 @@
 ﻿using Mapster;
-using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
 using Moda.Organization.Application.TeamsOfTeams.Queries;
 using Moda.Planning.Application.ProgramIncrements.Dtos;
 using Moda.Planning.Application.ProgramIncrements.Queries;
-using Moda.Planning.Domain.Models;
 using Moda.Web.Api.Models.Planning.ProgramIncrements;
 
 namespace Moda.Web.Api.Controllers.Planning;

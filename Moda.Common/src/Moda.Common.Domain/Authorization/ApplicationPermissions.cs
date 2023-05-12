@@ -32,6 +32,7 @@ public static class ApplicationResource
     public const string Teams = nameof(Teams);
 
     public const string ProgramIncrements = nameof(ProgramIncrements);
+    public const string Risks = nameof(Risks);
 
     public const string BacklogCategories = nameof(BacklogCategories);
     public const string BacklogLevels = nameof(BacklogLevels);
@@ -104,6 +105,11 @@ public static class ApplicationPermissions
         new("Create Program Increments", ApplicationAction.Create, ApplicationResource.ProgramIncrements),
         new("Update Program Increments", ApplicationAction.Update, ApplicationResource.ProgramIncrements),
         new("Delete Program Increments", ApplicationAction.Delete, ApplicationResource.ProgramIncrements),
+
+        new("View Risks", ApplicationAction.View, ApplicationResource.Risks, IsBasic: true),
+        new("Create Risks", ApplicationAction.Create, ApplicationResource.Risks),
+        new("Update Risks", ApplicationAction.Update, ApplicationResource.Risks),
+        new("Delete Risks", ApplicationAction.Delete, ApplicationResource.Risks),
     };
 
     private static readonly ApplicationPermission[] _work = new ApplicationPermission[]

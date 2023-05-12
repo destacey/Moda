@@ -4,7 +4,7 @@ using Moda.Organization.Application.Models;
 using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.TeamsOfTeams.Dtos;
 
-namespace Moda.Web.Api.Controllers.Planning;
+namespace Moda.Web.Api.Models.Planning.ProgramIncrements;
 
 public class ProgramIncrementTeamReponse : IMapFrom<TeamListDto>, IMapFrom<TeamOfTeamsListDto>
 {
