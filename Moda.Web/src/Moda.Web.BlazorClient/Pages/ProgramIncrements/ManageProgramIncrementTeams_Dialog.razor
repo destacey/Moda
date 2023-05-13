@@ -10,7 +10,9 @@
 
 @if (_loading)
 {
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    <MudContainer>
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    </MudContainer>
 }
 else
 {
@@ -19,11 +21,14 @@ else
             <MudSelect 
                    Label="Teams"
                    MultiSelection="true"
+                   SelectAll="true"
+                   Dense="true"
+                   AnchorOrigin="Origin.BottomCenter"
+                   ToStringFunc="@(t => _teamOptions.First(o => o.Id == t).Name)"
                    @bind-SelectedValues="_selectedValues">
                 @foreach (var team in _teamOptions)
                 {
-                    // this works because BaseTeamViewModel ToString(), GetHashCode() and Equals() are overridden
-                    <MudSelectItem Value="@team">@team.Name</MudSelectItem>
+                    <MudSelectItem Value="@team.Id">@team.Name</MudSelectItem>
                 }
             </MudSelect>
         </DialogContent>
@@ -51,7 +56,7 @@ else
     [Parameter]
     public Guid Id { get; set; } = default!;
 
-    private IEnumerable<BaseTeamViewModel> _selectedValues = new HashSet<BaseTeamViewModel>();
+    private IEnumerable<Guid> _selectedValues = new HashSet<Guid>();
 
     private List<BaseTeamViewModel> _teamOptions = new();
 
@@ -72,7 +77,8 @@ else
     {
         if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetTeamsAsync(Id), Snackbar) is List<ProgramIncrementTeamReponse> result)
         {
-            _selectedValues = result.Select(t => new BaseTeamViewModel(t)).ToHashSet();
+            if (result.Any())
+                _selectedValues = result.Select(t => t.Id).ToHashSet();
         }
     }
 
@@ -96,14 +102,6 @@ else
         _teamOptions = teams.OrderBy(t => t.Name).ToList();
     }
 
-    private string GetMultiSelectionText(List<BaseTeamViewModel> selectedValues)
-    {
-        if (_selectedValues.Any())
-            return string.Join(", ", _selectedValues.Select(x => x.Name));
-
-        return "No Teams Selected...";
-    }
-
     private void Cancel() => MudDialog.Cancel();
 
     private async Task Update()
@@ -115,7 +113,7 @@ else
             var requestModel = new ManageProgramIncrementTeamsRequest
             {
                 Id = Id,
-                TeamIds = _selectedValues.Select(t => t.Id).ToList()
+                TeamIds = _selectedValues.ToList()
             };
             await ProgramIncrementsClient.ManageTeamsAsync(Id, requestModel);
 

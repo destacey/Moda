@@ -44,19 +44,6 @@ public class BaseTeamViewModel
     }
 
     public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
-    public string Type { get; set; } = null!;
-
-
-    // this is needed for the team MudSelect components
-    public override bool Equals(object? o)
-    {
-        var other = o as BaseTeamViewModel;
-        return other?.Id == Id;
-    }
-    public override int GetHashCode() => Id.GetHashCode();
-    public override string ToString()
-    {
-        return Name;
-    }
+    public string Name { get; set; } = default!;
+    public string Type { get; set; } = default!;
 }
