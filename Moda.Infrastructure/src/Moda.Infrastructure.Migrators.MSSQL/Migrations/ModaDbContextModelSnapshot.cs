@@ -1093,7 +1093,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.OwnsOne("Moda.Common.Domain.Models.Employee.Name#Moda.Common.Models.PersonName", "Name", b1 =>
+                    b.OwnsOne("Moda.Common.Models.PersonName", "Name", b1 =>
                         {
                             b1.Property<Guid>("EmployeeId")
                                 .HasColumnType("uniqueidentifier");
@@ -1172,7 +1172,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.OwnsOne("Moda.Organization.Domain.Models.TeamMembership.DateRange#Moda.Organization.Domain.Models.MembershipDateRange", "DateRange", b1 =>
+                    b.OwnsOne("Moda.Organization.Domain.Models.MembershipDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("TeamMembershipId")
                                 .HasColumnType("uniqueidentifier");
@@ -1205,7 +1205,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrement", b =>
                 {
-                    b.OwnsOne("Moda.Planning.Domain.Models.ProgramIncrement.DateRange#Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
+                    b.OwnsOne("Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("ProgramIncrementId")
                                 .HasColumnType("uniqueidentifier");
