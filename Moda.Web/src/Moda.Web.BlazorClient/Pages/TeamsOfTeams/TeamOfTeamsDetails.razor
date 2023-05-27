@@ -72,7 +72,8 @@ else
             <RisksGrid Risks="_risks"
                        GetRisks="GetRisks"
                        ShowTeamColumn="false"
-                       CanManageRisks="_canManageRisks" />
+                       CanManageRisks="_canManageRisks"
+                       UpdateRisk="UpdateRiskDialog" />
         </MudTabPanel>
         <MudTabPanel Text="Team Memberships">
             <TeamMembershipsGrid Memberships="_teamMemberships"
@@ -314,6 +315,43 @@ else
     private async Task CreateRisk(CreateRiskRequest createRiskRequest)
     {
         await TeamsOfTeamsClient.CreateRiskAsync(_team.Id, createRiskRequest);
+    }
+
+    private async Task UpdateRiskDialog(RiskListDto riskListDto)
+    {
+        var riskDto = await TeamsOfTeamsClient.GetRiskByIdAsync(_team.Id, riskListDto.Id);
+        if (riskDto == null)
+        {
+            Snackbar.Add("Error getting risk.", MudBlazor.Severity.Error);
+            return;
+        }
+
+        var dialogTitle = "Update Team Risk";
+        var parameters = new DialogParameters
+            {
+                ["Risk"] = riskDto,
+                ["UpdateRisk"] = EventCallback.Factory.Create<UpdateRiskRequest>(this, UpdateRisk)
+            };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<UpdateRisk_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetRisks();
+        }
+    }
+
+    private async Task UpdateRisk(UpdateRiskRequest updateRiskRequest)
+    {
+        await TeamsOfTeamsClient.UpdateRiskAsync(_team.Id, updateRiskRequest.RiskId, updateRiskRequest);
     }
 
     #endregion Risks

@@ -5737,19 +5737,19 @@
             "$ref": "#/components/schemas/NavigationDto"
           },
           "status": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "category": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "impact": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "likelihood": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "exposure": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "assignee": {
             "nullable": true,
@@ -5772,6 +5772,19 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          }
+        }
+      },
+      "SimpleNavigationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
           }
         }
       },

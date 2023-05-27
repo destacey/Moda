@@ -31,6 +31,11 @@ else
                     </MudToolBar>
                 </ToolBarContent>
                 <Columns>
+                    <TemplateColumn CellClass="d-flex" Sortable="false" Filterable="false" Hidden="@(!CanManageRisks)">
+                        <CellTemplate>
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="@(() => UpdateRisk.InvokeAsync(context.Item))" />
+                        </CellTemplate>
+                    </TemplateColumn>
                     <PropertyColumn Property="x => x.LocalId" Title="Id" />
                     <PropertyColumn Property="x => x.Summary" Title="Summary" />
                     @if (ShowTeamColumn)
@@ -79,8 +84,8 @@ else
     [Parameter]
     public EventCallback GetRisks { get; set; }
 
-    //[Parameter]
-    //public EventCallback<RiskDetailsDto> UpdateRisk { get; set; }
+    [Parameter]
+    public EventCallback<RiskListDto> UpdateRisk { get; set; }
 
     [Parameter]
     public List<RiskListDto> Risks { get; set; } = default!;

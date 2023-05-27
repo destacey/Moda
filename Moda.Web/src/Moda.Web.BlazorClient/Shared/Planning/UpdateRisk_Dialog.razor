@@ -18,7 +18,7 @@ else
 {
     <MudDialog>
         <DialogContent>
-            <EditForm id="createRiskForm" EditContext="_editContext" OnValidSubmit="Create">
+            <EditForm id="updateRiskForm" EditContext="_editContext" OnValidSubmit="Update">
                 <DataAnnotationsValidator />
 
                 <MudTextField Label="Summary"
@@ -32,6 +32,14 @@ else
                               MaxLength="1024" Counter="1024" Immediate="true"
                 @bind-Value="_model.Description"
                               For="@(() => _model.Description)" />
+
+                <MudInputLabel>Status</MudInputLabel>
+                <MudRadioGroup @bind-SelectedOption="@_model.StatusId" For="@(() => _model.StatusId)">
+                    @foreach (var opt in _statusOptions)
+                    {
+                        <MudRadio Dense="true" Option="@opt.Id">@opt.Name</MudRadio>
+                    }
+                </MudRadioGroup>
 
                 <MudInputLabel>Category</MudInputLabel>
                 <MudRadioGroup @bind-SelectedOption="@_model.CategoryId" For="@(() => _model.CategoryId)">
@@ -77,7 +85,7 @@ else
         </DialogContent>
         <DialogActions>
             <MudButton OnClick="Cancel">Cancel</MudButton>
-            <MudButton form="createRiskForm" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_saving">
+            <MudButton form="updateRiskForm" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_saving">
                 @if (_saving)
                 {
                     <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
@@ -97,16 +105,17 @@ else
     MudDialogInstance MudDialog { get; set; } = default!;
 
     [Parameter]
-    public Guid TeamId { get; set; } = default!;
+    public RiskDetailsDto Risk { get; set; } = default!;
 
     [Parameter]
-    public EventCallback<CreateRiskRequest> CreateRisk { get; set; }
+    public EventCallback<UpdateRiskRequest> UpdateRisk { get; set; }
 
     private EditContext? _editContext;
     private ValidationMessageStore? _messageStore;
 
-    private CreateRiskRequest _model = new();
+    private UpdateRiskRequest _model = new();
 
+    private List<SelectOptionsViewModel<int>> _statusOptions = new();
     private List<SelectOptionsViewModel<int>> _categoryOptions = new();
     private List<SelectOptionsViewModel<int>> _gradeOptions = new();
     private List<SelectOptionsViewModel<Guid?>> _employeeOptions = new();
@@ -118,16 +127,40 @@ else
     {
         _loading = true;
 
-        _model.TeamId = TeamId;
+        VerifyRiskModelState();
+
+        await GetRiskFormOptions();
+        await GetEmployeeOptions();
+
+        _model = new UpdateRiskRequest
+        {
+            RiskId = Risk.Id,
+            TeamId = Risk.Team!.Id,
+            Summary = Risk.Summary,
+            Description = Risk.Description,
+            StatusId = Risk.Status.Id,
+            CategoryId = Risk.Category.Id,
+            ImpactId = Risk.Impact.Id,
+            LikelihoodId = Risk.Likelihood.Id,
+            AssigneeId = Risk.Assignee?.Id,
+            FollowUpDate = Risk.FollowUpDate,
+            Response = Risk.Response
+        };
 
         _editContext = new(_model);
         _editContext.OnValidationRequested += HandleValidationRequested;
         _messageStore = new(_editContext);
 
-        await GetRiskFormOptions();
-        await GetEmployeeOptions();
-
         _loading = false;
+    }
+
+    private void VerifyRiskModelState()
+    {
+        if (Risk.Team is not null)
+            return;
+
+        Snackbar.Add("Unable to update risk without the team information..", MudBlazor.Severity.Error);
+        Cancel();
     }
 
     private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
@@ -137,6 +170,13 @@ else
 
     private async Task GetRiskFormOptions()
     {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => RisksClient.GetStatusesAsync(), Snackbar) is List<RiskStatusDto> statusResult)
+        {
+            _statusOptions = statusResult.OrderBy(c => c.Order)
+                .Select(c => new SelectOptionsViewModel<int>(c.Id, c.Name))
+                .ToList();
+        }
+
         if (await ApiHelper.ExecuteCallGuardedAsync(() => RisksClient.GetCategoriesAsync(), Snackbar) is List<RiskCategoryDto> categoryResult)
         {
             _categoryOptions = categoryResult.OrderBy(c => c.Order)
@@ -164,16 +204,16 @@ else
 
     private void Cancel() => MudDialog.Cancel();
 
-    private async Task Create()
+    private async Task Update()
     {
         _saving = true;
         _messageStore?.Clear();
 
         try
         {
-            await CreateRisk.InvokeAsync(_model);
+            await UpdateRisk.InvokeAsync(_model);
 
-            Snackbar.Add("Risk created", MudBlazor.Severity.Success);
+            Snackbar.Add("Risk updated", MudBlazor.Severity.Success);
 
             MudDialog.Close(DialogResult.Ok(true));
         }
@@ -188,7 +228,7 @@ else
         }
         catch (Exception)
         {
-            Snackbar.Add("Error creating risk.", MudBlazor.Severity.Error);
+            Snackbar.Add("Error updating risk.", MudBlazor.Severity.Error);
         }
 
         _saving = false;
