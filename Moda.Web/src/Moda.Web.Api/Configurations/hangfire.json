@@ -4,7 +4,7 @@
         "Dashboard": {
             "AppPath": null,
             "StatsPollingInterval": 2000,
-            "DashboardTitle": "Jobs"
+            "DashboardTitle": "Moda Jobs"
         },
         "Server": {
             "HeartbeatInterval": "00:00:30",
@@ -27,12 +27,13 @@
                 "QueuePollInterval": "00:00:01",
                 "UseRecommendedIsolationLevel": true,
                 "SlidingInvisibilityTimeout": "00:05:00",
-                "DisableGlobalLocks": true
+                "DisableGlobalLocks": true,
+                "EnableHeavyMigrations":  true
             }
         },
         "Credentials": {
-            "User": "Admin",
-            "Password": "S3(r3tP@55w0rd"
+            "User": "admin",
+            "Password": "Test123$"
         }
     }
 }
