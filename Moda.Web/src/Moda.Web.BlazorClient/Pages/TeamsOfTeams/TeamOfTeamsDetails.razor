@@ -73,7 +73,8 @@ else
                        GetRisks="GetRisks"
                        ShowTeamColumn="false"
                        CanManageRisks="_canManageRisks"
-                       UpdateRisk="UpdateRiskDialog" />
+                       UpdateRisk="UpdateRiskDialog" 
+                       IncludeClosed="_includeClosedRisks"/>
         </MudTabPanel>
         <MudTabPanel Text="Team Memberships">
             <TeamMembershipsGrid Memberships="_teamMemberships"
@@ -113,6 +114,8 @@ else
     private bool _showPageActions;
     private bool _canUpdateTeams;
     private bool _canManageRisks;
+
+    private bool _includeClosedRisks = false;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -279,9 +282,10 @@ else
 
     #region Risks
 
-    private async Task GetRisks()
+    private async Task GetRisks(bool includeClosed)
     {
-        if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsOfTeamsClient.GetRisksAsync(_team.Id), Snackbar) is List<RiskListDto> result)
+        _includeClosedRisks = includeClosed;
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsOfTeamsClient.GetRisksAsync(_team.Id, _includeClosedRisks), Snackbar) is List<RiskListDto> result)
         {
             _risks = result.ToList();
         }
@@ -308,7 +312,7 @@ else
 
         if (!result.Canceled)
         {
-            await GetRisks();
+            await GetRisks(_includeClosedRisks);
         }
     }
 
@@ -345,7 +349,7 @@ else
 
         if (!result.Canceled)
         {
-            await GetRisks();
+            await GetRisks(_includeClosedRisks);
         }
     }
 

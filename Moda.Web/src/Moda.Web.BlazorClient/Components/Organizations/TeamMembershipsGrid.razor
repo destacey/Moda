@@ -110,9 +110,11 @@ else
 
         _isLoading = false;
 
-        // TODO: cache instead of calling every time the tab is selected
-        await GetTeamMemberships.InvokeAsync();
-        Memberships.OrderByDescending(m => m.Start);
+        if (!Memberships.Any())
+        {
+            await GetTeamMemberships.InvokeAsync();
+            Memberships.OrderByDescending(m => m.Start);
+        }
     }
 
     private Func<TeamMembershipsDto, bool> _quickFilter => x =>

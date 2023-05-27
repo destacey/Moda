@@ -6474,14 +6474,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get team risks.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id, bool? includeClosed);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get team risks.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id, bool? includeClosed, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create a risk for a team.
@@ -7336,9 +7336,9 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get team risks.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id, bool? includeClosed)
         {
-            return GetRisksAsync(id, System.Threading.CancellationToken.None);
+            return GetRisksAsync(id, includeClosed, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -7346,14 +7346,19 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get team risks.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id, bool? includeClosed, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/organization/teams/{id}/risks");
+            urlBuilder_.Append("api/organization/teams/{id}/risks?");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+            if (includeClosed != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("includeClosed") + "=").Append(System.Uri.EscapeDataString(ConvertToString(includeClosed, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            urlBuilder_.Length--;
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -7974,14 +7979,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get team risks.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id, bool? includeClosed);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get team risks.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id, bool? includeClosed, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Create a risk for a team of teams.
@@ -8836,9 +8841,9 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get team risks.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id, bool? includeClosed)
         {
-            return GetRisksAsync(id, System.Threading.CancellationToken.None);
+            return GetRisksAsync(id, includeClosed, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -8846,14 +8851,19 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get team risks.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RiskListDto>> GetRisksAsync(System.Guid id, bool? includeClosed, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/organization/teams-of-teams/{id}/risks");
+            urlBuilder_.Append("api/organization/teams-of-teams/{id}/risks?");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+            if (includeClosed != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("includeClosed") + "=").Append(System.Uri.EscapeDataString(ConvertToString(includeClosed, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            urlBuilder_.Length--;
 
             var client_ = _httpClient;
             var disposeClient_ = false;

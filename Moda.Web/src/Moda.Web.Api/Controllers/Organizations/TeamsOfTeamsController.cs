@@ -192,13 +192,13 @@ public class TeamsOfTeamsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken, bool includeClosed = false)
     {
         var teamExists = await _sender.Send(new TeamOfTeamsExistsQuery(id), cancellationToken);
         if (!teamExists)
             return NotFound();
 
-        var risks = await _sender.Send(new GetRisksQuery(id), cancellationToken);
+        var risks = await _sender.Send(new GetRisksQuery(id, includeClosed), cancellationToken);
 
         return Ok(risks);
     }
