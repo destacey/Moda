@@ -19,16 +19,23 @@ public sealed class UpdateRiskCommandValidator : CustomValidator<UpdateRiskComma
             .MaximumLength(1024);
 
         RuleFor(e => e.Status)
-            .NotNull();
+            .IsInEnum()
+            .WithMessage("A valid status must be selected.");
 
         RuleFor(e => e.Category)
-            .NotNull();
+            .IsInEnum()
+            .WithMessage("A valid category must be selected.");
 
         RuleFor(e => e.Impact)
-            .NotNull();
+            .IsInEnum()
+            .WithMessage("A valid impact must be selected.");
 
         RuleFor(e => e.Likelihood)
-            .NotNull();
+            .IsInEnum()
+            .WithMessage("A valid likelihood must be selected.");
+
+        RuleFor(e => e.Response)
+            .MaximumLength(1024);
     }
 }
 

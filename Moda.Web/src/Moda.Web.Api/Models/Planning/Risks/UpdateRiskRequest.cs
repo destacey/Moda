@@ -9,23 +9,23 @@ public class UpdateRiskRequest
     public Guid TeamId { get; set; }
     public string Summary { get; set; } = default!;
     public string? Description { get; set; }
-    public RiskStatus Status { get; set; }
-    public RiskCategory Category { get; set; }
-    public RiskGrade Impact { get; set; }
-    public RiskGrade Likelihood { get; set; }
+    public int StatusId { get; set; }
+    public int CategoryId { get; set; }
+    public int ImpactId { get; set; }
+    public int LikelihoodId { get; set; }
     public Guid? AssigneeId { get; set; }
     public LocalDate? FollowUpDate { get; set; }
     public string? Response { get; set; }
 
     public UpdateRiskCommand ToUpdateRiskCommand()
     {
-        return new UpdateRiskCommand(RiskId, Summary, Description, TeamId, Status, Category, Impact, Likelihood, AssigneeId, FollowUpDate, Response);
+        return new UpdateRiskCommand(RiskId, Summary, Description, TeamId, (RiskStatus)StatusId, (RiskCategory)CategoryId, (RiskGrade)ImpactId, (RiskGrade)LikelihoodId, AssigneeId, FollowUpDate, Response);
     }
 }
 
-public sealed class UpdateRiskCommandValidator : CustomValidator<UpdateRiskCommand>
+public sealed class UpdateRiskRequestValidator : CustomValidator<UpdateRiskRequest>
 {
-    public UpdateRiskCommandValidator()
+    public UpdateRiskRequestValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -36,16 +36,23 @@ public sealed class UpdateRiskCommandValidator : CustomValidator<UpdateRiskComma
         RuleFor(e => e.Description)
             .MaximumLength(1024);
 
-        RuleFor(e => e.Status)
-            .NotNull();
+        RuleFor(r => (RiskStatus)r.StatusId)
+            .IsInEnum()
+            .WithMessage("A valid status must be selected.");
 
-        RuleFor(e => e.Category)
-            .NotNull();
+        RuleFor(r => (RiskCategory)r.CategoryId)
+            .IsInEnum()
+            .WithMessage("A valid category must be selected.");
 
-        RuleFor(e => e.Impact)
-            .NotNull();
+        RuleFor(r => (RiskGrade)r.ImpactId)
+            .IsInEnum()
+            .WithMessage("A valid impact must be selected.");
 
-        RuleFor(e => e.Likelihood)
-            .NotNull();
+        RuleFor(r => (RiskGrade)r.LikelihoodId)
+            .IsInEnum()
+            .WithMessage("A valid likelihood must be selected."); ;
+
+        RuleFor(e => e.Response)
+            .MaximumLength(1024);
     }
 }

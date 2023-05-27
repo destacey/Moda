@@ -1,4 +1,5 @@
 ﻿@using System.ComponentModel.DataAnnotations;
+@using Moda.Web.BlazorClient.Models.Common;
 @using Moda.Web.BlazorClient.Models.Teams;
 
 @implements IDisposable
@@ -18,24 +19,12 @@ else
 {
     <MudDialog>
         <DialogContent>
-            <MudSelect 
-                   Label="Teams"
-                   MultiSelection="true"
-                   SelectAll="true"
-                   Dense="true"
-                   AnchorOrigin="Origin.BottomCenter"
-                   ToStringFunc="@(t => _teamOptions.First(o => o.Id == t).Name)"
-                   @bind-SelectedValues="_selectedValues">
-                @foreach (var team in _teamOptions)
-                {
-                    <MudSelectItem Value="@team.Id">@team.Name</MudSelectItem>
-                }
-            </MudSelect>
+            <ModaSelect Label="Teams" IsMultiSelection="true" SelectViewModel="@_selectViewModel" />
         </DialogContent>
         <DialogActions>
             <MudButton OnClick="Cancel">Cancel</MudButton>
-            <MudButton OnClick="Update" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_isSaving">
-                @if (_isSaving)
+            <MudButton OnClick="Update" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_saving">
+                @if (_saving)
                 {
                     <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
                     <MudText Class="ms-2">Saving</MudText>
@@ -56,33 +45,31 @@ else
     [Parameter]
     public Guid Id { get; set; } = default!;
 
-    private IEnumerable<Guid> _selectedValues = new HashSet<Guid>();
-
-    private List<BaseTeamViewModel> _teamOptions = new();
+    private SelectViewModel<Guid> _selectViewModel = new();
 
     private bool _loading = true;
-    private bool _isSaving = false;
+    private bool _saving = false;
 
     protected override async Task OnInitializedAsync()
     {
         _loading = true;
 
-        await GetProgramIncrementTeams();
-        await GetTeams();
+        await SetProgramIncrementTeams();
+        await SetTeamOptions();
 
         _loading = false;
     }
 
-    private async Task GetProgramIncrementTeams()
+    private async Task SetProgramIncrementTeams()
     {
         if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetTeamsAsync(Id), Snackbar) is List<ProgramIncrementTeamReponse> result)
         {
             if (result.Any())
-                _selectedValues = result.Select(t => t.Id).ToHashSet();
+                _selectViewModel.SelectedValues = result.Select(t => t.Id).ToHashSet();
         }
     }
 
-    private async Task GetTeams()
+    private async Task SetTeamOptions()
     {
         var getTeams = ApiHelper.ExecuteCallGuardedAsync(() => TeamsClient.GetListAsync(false), Snackbar);
         var getTeamsOfTeams = ApiHelper.ExecuteCallGuardedAsync(() => TeamsOfTeamsClient.GetListAsync(false), Snackbar);
@@ -99,21 +86,21 @@ else
             teams.AddRange(teamOfTeamsResult.Select(t => new BaseTeamViewModel(t)));
         }
 
-        _teamOptions = teams.OrderBy(t => t.Name).ToList();
+        _selectViewModel.Options = teams.Select(t => new SelectOptionsViewModel<Guid>(t.Id, t.Name)).ToList();
     }
 
     private void Cancel() => MudDialog.Cancel();
 
     private async Task Update()
     {
-        _isSaving = true;
+        _saving = true;
 
         try
         {
             var requestModel = new ManageProgramIncrementTeamsRequest
             {
                 Id = Id,
-                TeamIds = _selectedValues.ToList()
+                    TeamIds = _selectViewModel.SelectedValues.ToList()
             };
             await ProgramIncrementsClient.ManageTeamsAsync(Id, requestModel);
 
@@ -131,7 +118,7 @@ else
             Snackbar.Add("Error updating program increment teams.", MudBlazor.Severity.Error);
         }
 
-        _isSaving = false;
+        _saving = false;
     }
 
     public void Dispose()

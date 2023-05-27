@@ -21,6 +21,7 @@ public class RiskListDto : IMapFrom<Risk>
         config.NewConfig<Risk, RiskListDto>()
             .Map(dest => dest.Status, src => src.Status.GetDisplayName())
             .Map(dest => dest.Category, src => src.Category.GetDisplayName())
-            .Map(dest => dest.Exposure, src => src.Exposure.GetDisplayName());
+            .Map(dest => dest.Exposure, src => src.Exposure.GetDisplayName())
+            .Map(dest => dest.Assignee, src => src.Assignee == null ? null : NavigationDto.Create(src.Assignee.Id, src.Assignee.LocalId, src.Assignee.Name.FullName));
     }
 }

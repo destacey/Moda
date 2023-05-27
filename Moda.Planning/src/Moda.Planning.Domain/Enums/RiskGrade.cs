@@ -3,12 +3,12 @@
 namespace Moda.Planning.Domain.Enums;
 public enum RiskGrade
 {
-    [Display(Name = "Low", Order = 0)]
-    Low = 0,
+    [Display(Name = "Low", Order = 1)]
+    Low = 1,
 
-    [Display(Name = "Medium", Order = 1)]
-    Medium = 1,
+    [Display(Name = "Medium", Order = 2)]
+    Medium = 2,
 
-    [Display(Name = "High", Order = 2)]
-    High = 2,
+    [Display(Name = "High", Order = 3)]
+    High = 3,
 }

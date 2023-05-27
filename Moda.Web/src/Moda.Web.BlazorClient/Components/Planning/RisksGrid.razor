@@ -7,22 +7,22 @@ else
     <MudGrid>
         <MudItem xs="12" Class="px-2 pt-2 pb-0">
             <MudDataGrid @ref="@_grid"
-                     Items="@Risks"
-                     Elevation="1"
-                     Height="500px"
-                     Dense="@_tablePreference.IsDense"
-                     Striped="@_tablePreference.IsStriped"
-                     Bordered="@_tablePreference.HasBorder"
-                     Hover="@_tablePreference.IsHoverable"
-                     Virtualize="true"
-                     ColumnResizeMode="ResizeMode.Container"
-                     SortMode="SortMode.Multiple"
-                     Filterable="true"
-                     FilterMode="DataGridFilterMode.ColumnFilterMenu"
-                     FixedHeader="true"
-                     Loading="@_loading"
-                     LoadingProgressColor="@Color.Secondary"
-                     QuickFilter="@_quickFilter">
+                         Items="@Risks"
+                         Elevation="0"
+                         Height="500px"
+                         Dense="@_tablePreference.IsDense"
+                         Striped="@_tablePreference.IsStriped"
+                         Bordered="@_tablePreference.HasBorder"
+                         Hover="@_tablePreference.IsHoverable"
+                         Virtualize="true"
+                         ColumnResizeMode="ResizeMode.Container"
+                         SortMode="SortMode.Multiple"
+                         Filterable="true"
+                         FilterMode="DataGridFilterMode.ColumnFilterMenu"
+                         FixedHeader="true"
+                         Loading="@_loading"
+                         LoadingProgressColor="@Color.Secondary"
+                         QuickFilter="@_quickFilter">
                 <ToolBarContent>
                     <MudSpacer />
                     <MudToolBar>
@@ -33,17 +33,20 @@ else
                 <Columns>
                     <PropertyColumn Property="x => x.LocalId" Title="Id" />
                     <PropertyColumn Property="x => x.Summary" Title="Summary" />
-                    <PropertyColumn Property="x => x.Team" Title="Team">
-                        <CellTemplate>
-                            @if (context.Item.Team is not null)
+                    @if (ShowTeamColumn)
+                    {
+                        <PropertyColumn Property="x => x.Team" Title="Team">
+                            <CellTemplate>
+                                @if (context.Item.Team is not null)
                             {
                                 <MudLink Href="@GetTeamDetailUrl(context.Item.Team)">@context.Item.Team.Name</MudLink>
                             }
-                        </CellTemplate>
-                    </PropertyColumn>
+                            </CellTemplate>
+                        </PropertyColumn>
+                    }
                     <PropertyColumn Property="x => x.Status" Title="Status" />
-                    <PropertyColumn Property="x => x.Exposure" Title="Exposure" />
                     <PropertyColumn Property="x => x.Category" Title="Category" />
+                    <PropertyColumn Property="x => x.Exposure" Title="Exposure" />
                     <PropertyColumn Property="x => x.ReportedOn" Title="Reported On" Format="MM/dd/yyyy" />
                     <PropertyColumn Property="x => x.Assignee" Title="Assignee">
                         <CellTemplate>
@@ -82,8 +85,11 @@ else
     [Parameter]
     public List<RiskListDto> Risks { get; set; } = default!;
 
-    //[Parameter]
-    //public bool CanUpdateRisks { get; set; }
+    [Parameter]
+    public bool CanManageRisks { get; set; }
+
+    [Parameter]
+    public bool ShowTeamColumn { get; set; } = true;
 
     private MudDataGrid<RiskListDto> _grid = default!;
     private string _searchString = "";
@@ -96,10 +102,6 @@ else
     {
         _loading = true;
 
-        // TODO: cache instead of calling every time the tab is selected
-        await GetRisks.InvokeAsync();
-        Risks.OrderByDescending(m => m.ReportedOn);
-
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
             _tablePreference = clientPreference.TablePreference;
@@ -108,6 +110,10 @@ else
         _showRiskActions = false;
 
         _loading = false;
+
+        // TODO: cache instead of calling every time the tab is selected
+        await GetRisks.InvokeAsync();
+        Risks.OrderByDescending(m => m.ReportedOn);
     }
 
     private Func<RiskListDto, bool> _quickFilter => x =>

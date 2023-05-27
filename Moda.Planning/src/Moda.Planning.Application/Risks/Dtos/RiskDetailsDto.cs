@@ -25,10 +25,12 @@ public class RiskDetailsDto : IMapFrom<Risk>
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<Risk, RiskDetailsDto>()
+            .Map(dest => dest.ReportedBy, src => src.ReportedBy.Name.FullName)
             .Map(dest => dest.Status, src => src.Status.GetDisplayName())
             .Map(dest => dest.Category, src => src.Category.GetDisplayName())
             .Map(dest => dest.Impact, src => src.Impact.GetDisplayName())
             .Map(dest => dest.Likelihood, src => src.Likelihood.GetDisplayName())
-            .Map(dest => dest.Exposure, src => src.Exposure.GetDisplayName());
+            .Map(dest => dest.Exposure, src => src.Exposure.GetDisplayName())
+            .Map(dest => dest.Assignee, src => src.Assignee == null ? null : NavigationDto.Create(src.Assignee.Id, src.Assignee.LocalId, src.Assignee.Name.FullName));
     }
 }

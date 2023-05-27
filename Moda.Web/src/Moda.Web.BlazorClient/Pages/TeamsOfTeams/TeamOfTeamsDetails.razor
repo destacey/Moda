@@ -3,7 +3,8 @@
 @using Moda.Web.BlazorClient.Components.Planning
 @using Moda.Web.BlazorClient.Models.Teams;
 @using Moda.Web.BlazorClient.Shared.Organizations;
-@using Moda.Web.BlazorClient.Components.Organizations;
+@using Moda.Web.BlazorClient.Components.Organizations;;
+@using Moda.Web.BlazorClient.Shared.Planning;
 
 @attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
 
@@ -28,6 +29,10 @@ else
                 {
                     <MudButton OnClick="@UpdateTeam">Edit</MudButton>
                     <MudButton OnClick="@AddTeamMembershipDialog">Add Team Membership</MudButton>
+                }
+                @if (_canManageRisks)
+                {
+                    <MudButton OnClick="@CreateRiskDialog">Add Risk</MudButton>
                 }
             </MudButtonGroup>
         }
@@ -65,14 +70,16 @@ else
         </MudTabPanel>
         <MudTabPanel Text="Risks">
             <RisksGrid Risks="_risks"
-                       GetRisks="GetRisks" />
+                       GetRisks="GetRisks"
+                       ShowTeamColumn="false"
+                       CanManageRisks="_canManageRisks" />
         </MudTabPanel>
         <MudTabPanel Text="Team Memberships">
             <TeamMembershipsGrid Memberships="_teamMemberships"
-                             GetTeamMemberships="GetTeamMemberships"
-                             CanUpdateTeamMemberships="_canUpdateTeams"
-                             UpdateTeamMembership="UpdateTeamMembershipDialog"
-                             RemoveTeamMembership="RemoveTeamMembershipDialog" />
+                    GetTeamMemberships="GetTeamMemberships"
+                    CanUpdateTeamMemberships="_canUpdateTeams"
+                    UpdateTeamMembership="UpdateTeamMembershipDialog"
+                    RemoveTeamMembership="RemoveTeamMembershipDialog" />
         </MudTabPanel>
     </MudTabs>
 }
@@ -104,7 +111,7 @@ else
 
     private bool _showPageActions;
     private bool _canUpdateTeams;
-
+    private bool _canManageRisks;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -112,11 +119,12 @@ else
         _activeTabIndex = 0;
         _teamMemberships.Clear();
 
-        await GetTeam();
-
         var user = (await AuthState).User;
         _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Teams);
-        _showPageActions = _canUpdateTeams;
+        _canManageRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
+        _showPageActions = _canUpdateTeams || _canManageRisks;
+
+        await GetTeam();
 
         _loading = false;
     }
@@ -276,6 +284,36 @@ else
         {
             _risks = result.ToList();
         }
+    }
+
+    private async Task CreateRiskDialog()
+    {
+        var dialogTitle = "Add Team Risk";
+        var parameters = new DialogParameters
+            {
+                ["TeamId"] = _team.Id,
+                ["CreateRisk"] = EventCallback.Factory.Create<CreateRiskRequest>(this, CreateRisk)
+            };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<CreateRisk_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetRisks();
+        }
+    }
+
+    private async Task CreateRisk(CreateRiskRequest createRiskRequest)
+    {
+        await TeamsOfTeamsClient.CreateRiskAsync(_team.Id, createRiskRequest);
     }
 
     #endregion Risks

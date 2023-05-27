@@ -10,7 +10,7 @@ internal sealed class GetRiskGradesQueryHandler : IQueryHandler<GetRiskGradesQue
 {
     public Task<IReadOnlyList<RiskGradeDto>> Handle(GetRiskGradesQuery request, CancellationToken cancellationToken)
     {
-        IReadOnlyList<RiskGradeDto> values = Enum.GetValues<RiskCategory>().Select(c => new RiskGradeDto
+        IReadOnlyList<RiskGradeDto> values = Enum.GetValues<RiskGrade>().Select(c => new RiskGradeDto
         {
             Id = (int)c,
             Name = c.GetDisplayName(),

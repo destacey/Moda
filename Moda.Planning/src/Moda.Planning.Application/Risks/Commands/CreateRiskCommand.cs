@@ -3,7 +3,7 @@
 namespace Moda.Planning.Application.Risks.Commands;
 public sealed record CreateRiskCommand(string Summary, string? Description, Guid TeamId, 
     RiskCategory Category, RiskGrade Impact, RiskGrade Likelihood, Guid? AssigneeId, 
-    LocalDate? FollowUpDate, string? Response) : ICommand<int>;
+    LocalDate? FollowUpDate, string? Response) : ICommand<Guid>;
 
 public sealed class CreateRiskCommandValidator : CustomValidator<CreateRiskCommand>
 {
@@ -19,17 +19,23 @@ public sealed class CreateRiskCommandValidator : CustomValidator<CreateRiskComma
             .MaximumLength(1024);
 
         RuleFor(e => e.Category)
-            .NotNull();
+            .IsInEnum()
+            .WithMessage("A valid category must be selected.");
 
         RuleFor(e => e.Impact)
-            .NotNull();
+            .IsInEnum()
+            .WithMessage("A valid impact must be selected.");
 
         RuleFor(e => e.Likelihood)
-            .NotNull();
+            .IsInEnum()
+            .WithMessage("A valid likelihood must be selected.");
+
+        RuleFor(e => e.Response)
+            .MaximumLength(1024);
     }
 }
 
-internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskCommand, int>
+internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskCommand, Guid>
 {
     private readonly IPlanningDbContext _planningDbContext;
     private readonly IDateTimeService _dateTimeService;
@@ -44,16 +50,20 @@ internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskComma
         _currentUser = currentUser;
     }
 
-    public async Task<Result<int>> Handle(CreateRiskCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateRiskCommand request, CancellationToken cancellationToken)
     {
         try
         {
+            Guid? currentUserEmployeeId = _currentUser.GetEmployeeId();
+            if (currentUserEmployeeId is null)
+                return Result.Failure<Guid>("Unable to determine current user's employee Id.");
+
             var risk = Risk.Create(
                 request.Summary,
                 request.Description,
                 request.TeamId,
                 _dateTimeService.Now,
-                _currentUser.GetUserId(),
+                currentUserEmployeeId.Value,
                 request.Category,
                 request.Impact,
                 request.Likelihood,
@@ -66,7 +76,7 @@ internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskComma
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(risk.LocalId);
+            return Result.Success(risk.Id);
         }
         catch (Exception ex)
         {
@@ -74,7 +84,7 @@ internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskComma
 
             _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
 
-            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<Guid>($"Moda Request: Exception for Request {requestName} {request}");
         }
     }
 }

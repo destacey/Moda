@@ -9,7 +9,7 @@ else
         <MudItem xs="12" Class="px-2 pt-2 pb-0">
             <MudDataGrid @ref="@_grid"
                      Items="@Memberships"
-                     Elevation="1"
+                     Elevation="0"
                      Height="500px"
                      Dense="@_tablePreference.IsDense"
                      Striped="@_tablePreference.IsStriped"
@@ -101,10 +101,6 @@ else
     {
         _isLoading = true;
 
-        // TODO: cache instead of calling every time the tab is selected
-        await GetTeamMemberships.InvokeAsync();
-        Memberships.OrderByDescending(m => m.Start);
-
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
             _tablePreference = clientPreference.TablePreference;
@@ -113,6 +109,10 @@ else
         _showMembershipActions = CanUpdateTeamMemberships;
 
         _isLoading = false;
+
+        // TODO: cache instead of calling every time the tab is selected
+        await GetTeamMemberships.InvokeAsync();
+        Memberships.OrderByDescending(m => m.Start);
     }
 
     private Func<TeamMembershipsDto, bool> _quickFilter => x =>

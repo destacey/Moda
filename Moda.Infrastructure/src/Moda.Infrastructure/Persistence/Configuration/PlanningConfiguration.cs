@@ -139,7 +139,6 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
         builder.Property(r => r.Summary).HasMaxLength(256).IsRequired();
         builder.Property(r => r.Description).HasMaxLength(1024);
         builder.Property(r => r.ReportedOn).IsRequired();
-        builder.Property(r => r.ReportedById).IsRequired();
 
         builder.Property(r => r.Status).IsRequired()
             .HasConversion<EnumConverter<RiskStatus>>()
@@ -157,9 +156,8 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
             .HasConversion<EnumConverter<RiskGrade>>()
             .HasMaxLength(64);
 
-        builder.Property(r => r.AssigneeId);
         builder.Property(r => r.FollowUpDate);
-        builder.Property(r => r.Response);
+        builder.Property(r => r.Response).HasMaxLength(1024);
         builder.Property(r => r.ClosedDate);
 
         // Audit

@@ -280,7 +280,7 @@
               }
             }
           },
-          "400": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -782,7 +782,7 @@
               }
             }
           },
-          "400": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -844,7 +844,7 @@
           "204": {
             "description": ""
           },
-          "400": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -942,7 +942,7 @@
           "201": {
             "description": ""
           },
-          "400": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -1516,7 +1516,7 @@
           "201": {
             "description": ""
           },
-          "400": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -1803,7 +1803,7 @@
           "201": {
             "description": ""
           },
-          "400": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -2041,7 +2041,7 @@
           "201": {
             "description": ""
           },
-          "400": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -2279,7 +2279,7 @@
           "201": {
             "description": ""
           },
-          "400": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -2568,7 +2568,7 @@
           "201": {
             "description": ""
           },
-          "400": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -2622,16 +2622,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TeamDetailsDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -2702,17 +2692,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                  "$ref": "#/components/schemas/ErrorResult"
                 }
               }
             }
           },
-          "default": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -2759,16 +2749,6 @@
             }
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          },
-          "default": {
             "description": "",
             "content": {
               "application/json": {
@@ -2829,12 +2809,12 @@
               }
             }
           },
-          "default": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -2902,12 +2882,12 @@
               }
             }
           },
-          "default": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -2952,16 +2932,6 @@
             "description": ""
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          },
-          "default": {
             "description": "",
             "content": {
               "application/json": {
@@ -3031,16 +3001,6 @@
                 }
               }
             }
-          },
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
           }
         },
         "security": [
@@ -3080,7 +3040,7 @@
           "x-position": 2
         },
         "responses": {
-          "204": {
+          "201": {
             "description": ""
           },
           "400": {
@@ -3093,12 +3053,22 @@
               }
             }
           },
-          "default": {
+          "404": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -3170,16 +3140,6 @@
                 }
               }
             }
-          },
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
           }
         },
         "security": [
@@ -3242,12 +3202,12 @@
               }
             }
           },
-          "default": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -3341,7 +3301,7 @@
           "201": {
             "description": ""
           },
-          "400": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -3465,17 +3425,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                  "$ref": "#/components/schemas/ErrorResult"
                 }
               }
             }
           },
-          "default": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -3522,16 +3482,6 @@
             }
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          },
-          "default": {
             "description": "",
             "content": {
               "application/json": {
@@ -3592,12 +3542,12 @@
               }
             }
           },
-          "default": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -3665,12 +3615,12 @@
               }
             }
           },
-          "default": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -3715,16 +3665,6 @@
             "description": ""
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          },
-          "default": {
             "description": "",
             "content": {
               "application/json": {
@@ -3794,16 +3734,6 @@
                 }
               }
             }
-          },
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
           }
         },
         "security": [
@@ -3843,7 +3773,7 @@
           "x-position": 2
         },
         "responses": {
-          "204": {
+          "201": {
             "description": ""
           },
           "400": {
@@ -3856,12 +3786,22 @@
               }
             }
           },
-          "default": {
+          "404": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -3933,16 +3873,6 @@
                 }
               }
             }
-          },
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
           }
         },
         "security": [
@@ -4005,12 +3935,12 @@
               }
             }
           },
-          "default": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -4104,7 +4034,7 @@
           "201": {
             "description": ""
           },
-          "400": {
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -6219,10 +6149,7 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "summary",
-          "category",
-          "impact",
-          "likelihood"
+          "summary"
         ],
         "properties": {
           "teamId": {
@@ -6241,17 +6168,17 @@
             "minLength": 0,
             "nullable": true
           },
-          "category": {
-            "nullable": false,
-            "$ref": "#/components/schemas/RiskCategory"
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
           },
-          "impact": {
-            "nullable": false,
-            "$ref": "#/components/schemas/RiskGrade"
+          "impactId": {
+            "type": "integer",
+            "format": "int32"
           },
-          "likelihood": {
-            "nullable": false,
-            "$ref": "#/components/schemas/RiskGrade"
+          "likelihoodId": {
+            "type": "integer",
+            "format": "int32"
           },
           "assigneeId": {
             "type": "string",
@@ -6265,43 +6192,18 @@
           },
           "response": {
             "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
             "nullable": true
           }
         }
       },
-      "RiskCategory": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Resolved",
-          "Owned",
-          "Accepted",
-          "Mitigated"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          3
-        ]
-      },
-      "RiskGrade": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Low",
-          "Medium",
-          "High"
-        ],
-        "enum": [
-          0,
-          1,
-          2
-        ]
-      },
       "UpdateRiskRequest": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "summary"
+        ],
         "properties": {
           "riskId": {
             "type": "string",
@@ -6312,23 +6214,32 @@
             "format": "guid"
           },
           "summary": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
           },
           "description": {
             "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
             "nullable": true
           },
-          "status": {
-            "$ref": "#/components/schemas/RiskStatus"
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
           },
-          "category": {
-            "$ref": "#/components/schemas/RiskCategory"
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
           },
-          "impact": {
-            "$ref": "#/components/schemas/RiskGrade"
+          "impactId": {
+            "type": "integer",
+            "format": "int32"
           },
-          "likelihood": {
-            "$ref": "#/components/schemas/RiskGrade"
+          "likelihoodId": {
+            "type": "integer",
+            "format": "int32"
           },
           "assigneeId": {
             "type": "string",
@@ -6342,21 +6253,11 @@
           },
           "response": {
             "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
             "nullable": true
           }
         }
-      },
-      "RiskStatus": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Open",
-          "Closed"
-        ],
-        "enum": [
-          0,
-          1
-        ]
       },
       "TeamOfTeamsListDto": {
         "type": "object",

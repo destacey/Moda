@@ -37,8 +37,8 @@ else
         </DialogContent>
         <DialogActions>
             <MudButton OnClick="Cancel">Cancel</MudButton>
-            <MudButton form="updateProgramIncrementForm" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_isSaving">
-                @if (_isSaving)
+            <MudButton form="updateProgramIncrementForm" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_saving">
+                @if (_saving)
                 {
                     <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
                     <MudText Class="ms-2">Saving</MudText>
@@ -65,7 +65,7 @@ else
     private UpdateProgramIncrementViewModel _model = new();
 
     private bool _loading = true;
-    private bool _isSaving = false;
+    private bool _saving = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -110,7 +110,7 @@ else
     {
         try
         {
-            _isSaving = true;
+            _saving = true;
             _messageStore?.Clear();
             await ProgramIncrementsClient.UpdateAsync(_model.Id, _model.ToRequestModel());
             Snackbar.Add("Program Increment updated", MudBlazor.Severity.Success);
@@ -130,7 +130,7 @@ else
         {
             Snackbar.Add($"Error updating program increment.", MudBlazor.Severity.Error);
         }
-        _isSaving = false;
+        _saving = false;
     }
 
     public void Dispose()

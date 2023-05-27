@@ -1,0 +1,205 @@
+﻿@using System.ComponentModel.DataAnnotations;
+@using Moda.Web.BlazorClient.Models.Common;
+@using Moda.Web.BlazorClient.Models.Teams;
+
+@implements IDisposable
+
+@inject ISnackbar Snackbar
+@inject IRisksClient RisksClient
+@inject IEmployeesClient EmployeesClient
+
+@if (_loading)
+{
+    <MudContainer>
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    </MudContainer>
+}
+else
+{
+    <MudDialog>
+        <DialogContent>
+            <EditForm id="createRiskForm" EditContext="_editContext" OnValidSubmit="Create">
+                <DataAnnotationsValidator />
+
+                <MudTextField Label="Summary"
+                              Lines="2"
+                              MaxLength="256" Counter="256" Immediate="true"
+                @bind-Value="_model.Summary"
+                              For="@(() => _model.Summary)" />
+
+                <MudTextField Label="Description"
+                              Lines="8"
+                              MaxLength="1024" Counter="1024" Immediate="true"
+                @bind-Value="_model.Description"
+                              For="@(() => _model.Description)" />
+
+                <MudInputLabel>Category</MudInputLabel>
+                <MudRadioGroup @bind-SelectedOption="@_model.CategoryId" For="@(() => _model.CategoryId)">
+                    @foreach (var opt in _categoryOptions)
+                    {
+                        <MudRadio Dense="true" Option="@opt.Id">@opt.Name</MudRadio>
+                    }
+                </MudRadioGroup>
+
+                <MudInputLabel>Impact</MudInputLabel>
+                <MudRadioGroup @bind-SelectedOption="@_model.ImpactId" For="@(() => _model.ImpactId)">
+                    @foreach (var opt in _gradeOptions)
+                    {
+                        <MudRadio Dense="true" Option="@opt.Id">@opt.Name</MudRadio>
+                    }
+                </MudRadioGroup>
+
+                <MudInputLabel>Likelihood</MudInputLabel>
+                <MudRadioGroup @bind-SelectedOption="@_model.LikelihoodId" For="@(() => _model.LikelihoodId)">
+                    @foreach (var opt in _gradeOptions)
+                    {
+                        <MudRadio Dense="true" Option="@opt.Id">@opt.Name</MudRadio>
+                    }
+                </MudRadioGroup>
+
+                <MudSelect Dense="true" Label="Assignee" Variant="Variant.Text" AnchorOrigin="Origin.BottomCenter"
+                @bind-Value="_model.AssigneeId" For="@(() => _model.AssigneeId)">
+                    @*<MudSelectItem Value="@Guid.Empty">Select Assignee</MudSelectItem>*@
+                    @foreach (var item in _employeeOptions)
+                    {
+                        <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudDatePicker Label="Follow Up" Editable="true" @bind-Date="_model.FollowUpDate" For="@(() => _model.FollowUpDate)" />
+
+                <MudTextField Label="Response"
+                              Lines="8"
+                              MaxLength="1024" Counter="1024" Immediate="true"
+                @bind-Value="_model.Response"
+                              For="@(() => _model.Response)" />
+            </EditForm>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel">Cancel</MudButton>
+            <MudButton form="createRiskForm" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_saving">
+                @if (_saving)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Saving</MudText>
+                }
+                else
+                {
+                    <MudText>Save</MudText>
+                }
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public Guid TeamId { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<CreateRiskRequest> CreateRisk { get; set; }
+
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+
+    private CreateRiskRequest _model = new();
+
+    private List<SelectOptionsViewModel<int>> _categoryOptions = new();
+    private List<SelectOptionsViewModel<int>> _gradeOptions = new();
+    private List<SelectOptionsViewModel<Guid?>> _employeeOptions = new();
+
+    private bool _loading = true;
+    private bool _saving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+
+        _model.TeamId = TeamId;
+        //_model.AssigneeId = null;
+
+        _editContext = new(_model);
+        _editContext.OnValidationRequested += HandleValidationRequested;
+        _messageStore = new(_editContext);
+
+        await GetRiskFormOptions();
+        await GetEmployeeOptions();
+
+        _loading = false;
+    }
+
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+    {
+        _messageStore?.Clear();
+    }
+
+    private async Task GetRiskFormOptions()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => RisksClient.GetCategoriesAsync(), Snackbar) is List<RiskCategoryDto> categoryResult)
+        {
+            _categoryOptions = categoryResult.OrderBy(c => c.Order)
+                .Select(c => new SelectOptionsViewModel<int>(c.Id, c.Name))
+                .ToList();
+        }
+
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => RisksClient.GetGradesAsync(), Snackbar) is List<RiskGradeDto> gradeResult)
+        {
+            _gradeOptions = gradeResult.OrderBy(c => c.Order)
+                .Select(c => new SelectOptionsViewModel<int>(c.Id, c.Name))
+                .ToList();
+        }
+    }
+
+    private async Task GetEmployeeOptions()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => EmployeesClient.GetListAsync(false), Snackbar) is List<EmployeeListDto> employeeResult)
+        {
+            _employeeOptions = employeeResult.OrderBy(e => e.FirstName)
+                .Select(e => new SelectOptionsViewModel<Guid?>(e.Id, $"{e.FirstName} {e.LastName}"))
+                .ToList();
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Create()
+    {
+        _saving = true;
+        _messageStore?.Clear();
+
+        try
+        {
+            await CreateRisk.InvokeAsync(_model);
+
+            Snackbar.Add("Risk created", MudBlazor.Severity.Success);
+
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch (ApiException<HttpValidationProblemDetails> ex)
+        {
+            foreach (var error in ex.Result.Errors)
+            {
+                var key = error.Key.Substring(0, 1).ToUpper() + error.Key.Substring(1);
+                _messageStore?.Add(_editContext!.Field(key), error.Value);
+            }
+            _editContext!.NotifyValidationStateChanged();
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Error creating risk.", MudBlazor.Severity.Error);
+        }
+
+        _saving = false;
+    }
+
+    public void Dispose()
+    {
+        if (_editContext is not null)
+        {
+            _editContext.OnValidationRequested -= HandleValidationRequested;
+        }
+    }
+}
