@@ -33,7 +33,7 @@ try
         {
             var problemDetails = new ValidationProblemDetails(context.ModelState)
             {
-                Type = "https://httpstatuses.com/422",
+                Type = "https://developer.mozilla.org/en-US/docs/web/http/status/422",
                 Title = "One or more validation errors occurred.",
                 Status = StatusCodes.Status422UnprocessableEntity,
                 Detail = "See the errors property for details.",
@@ -42,7 +42,7 @@ try
 
             return new UnprocessableEntityObjectResult(problemDetails)
             {
-                ContentTypes = { "application/problem+json", "application/problem+xml" }
+                ContentTypes = { "application/problem+json" }
             };
         };
     });
