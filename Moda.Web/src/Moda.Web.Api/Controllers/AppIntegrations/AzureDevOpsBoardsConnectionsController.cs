@@ -21,8 +21,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
     [OpenApiOperation("Get a list of all Azure DevOps Boards connections.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<ConnectionListDto>>> GetList(CancellationToken cancellationToken, bool includeDisabled = false)
     {
         var connections = await _sender.Send(new GetConnectionsQuery(includeDisabled, _connector), cancellationToken);
@@ -33,9 +32,8 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
     [OpenApiOperation("Get Azure DevOps Boards connection based on id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<IReadOnlyList<ConnectionListDto>>> GetById(Guid id, CancellationToken cancellationToken)
     {
         var connection = await _sender.Send(new GetConnectionQuery(id), cancellationToken);
@@ -49,9 +47,8 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
     [OpenApiOperation("Get Azure DevOps Boards connection based on id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<AzureDevOpsBoardsConnectionConfigurationDto>> GetConfig(Guid id, CancellationToken cancellationToken)
     {
         var config = await _sender.Send(new GetAzureDevOpsBoardsConnectionConfigurationQuery(id), cancellationToken);
@@ -78,8 +75,8 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
     [OpenApiOperation("Update an Azure DevOps Boards connection.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(Guid id, UpdateAzureDevOpsBoardConnectionRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
@@ -96,8 +93,8 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
     [OpenApiOperation("Update an Azure DevOps Boards connection.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> UpdateConfig(Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request, CancellationToken cancellationToken)
     {
         if (id != request.ConnectionId)

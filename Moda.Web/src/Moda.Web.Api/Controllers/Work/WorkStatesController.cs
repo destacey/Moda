@@ -22,8 +22,7 @@ public class WorkStatesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkStates)]
     [OpenApiOperation("Get a list of all work states.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<WorkStateDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var workStates = await _sender.Send(new GetWorkStatesQuery(includeInactive), cancellationToken);
@@ -34,9 +33,8 @@ public class WorkStatesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkStates)]
     [OpenApiOperation("Get work state details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<WorkStateDto>> GetById(int id)
     {
         var workState = await _sender.Send(new GetWorkStateQuery(id));
@@ -63,8 +61,8 @@ public class WorkStatesController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkStates)]
     [OpenApiOperation("Update a work state.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(int id, UpdateWorkStateRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)

@@ -18,8 +18,7 @@ public class RisksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get a list of all risk statuses.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<RiskStatusDto>>> GetStatuses(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetRiskStatusesQuery(), cancellationToken);
@@ -30,8 +29,7 @@ public class RisksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get a list of all risk categories.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<RiskCategoryDto>>> GetCategories(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetRiskCategoriesQuery(), cancellationToken);
@@ -42,8 +40,7 @@ public class RisksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get a list of all risk grades.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<RiskGradeDto>>> GetGrades(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetRiskGradesQuery(), cancellationToken);

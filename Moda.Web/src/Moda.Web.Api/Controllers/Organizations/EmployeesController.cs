@@ -22,8 +22,7 @@ public class EmployeesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
     [OpenApiOperation("Get a list of all employees.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<EmployeeListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var employees = await _sender.Send(new GetEmployeesQuery(includeInactive), cancellationToken);
@@ -34,8 +33,7 @@ public class EmployeesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
     [OpenApiOperation("Get employee details using the localId.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<EmployeeDetailsDto>> GetById(int id)
     {
         var employee = await _sender.Send(new GetEmployeeQuery(id));
@@ -62,8 +60,7 @@ public class EmployeesController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Employees)]
     [OpenApiOperation("Update an employee.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Update(Guid id, UpdateEmployeeRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
@@ -88,8 +85,7 @@ public class EmployeesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
     [OpenApiOperation("Get a list of direct reports for an employee.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<EmployeeListDto>>> GetDirectReports(Guid id, CancellationToken cancellationToken)
     {
         var directReports = await _sender.Send(new GetDirectReportsQuery(id), cancellationToken);

@@ -13,7 +13,9 @@ public sealed class UpdateProgramIncrementCommandValidator : CustomValidator<Upd
         RuleFor(e => e.Name)
             .NotEmpty()
             .MaximumLength(128)
-            .MustAsync(BeUniqueProgramIncrementName).WithMessage("The Program Increment name already exists."); ;
+            .MustAsync(async (model, name, cancellationToken) 
+                => await BeUniqueProgramIncrementName(model.Id, name, cancellationToken))
+                .WithMessage("The Program Increment name already exists."); ;
 
         RuleFor(e => e.Description)
             .MaximumLength(1024);
@@ -22,9 +24,9 @@ public sealed class UpdateProgramIncrementCommandValidator : CustomValidator<Upd
             .NotNull();
     }
 
-    public async Task<bool> BeUniqueProgramIncrementName(string name, CancellationToken cancellationToken)
+    public async Task<bool> BeUniqueProgramIncrementName(Guid id, string name, CancellationToken cancellationToken)
     {
-        return await _planningDbContext.ProgramIncrements.AllAsync(x => x.Name != name, cancellationToken);
+        return await _planningDbContext.ProgramIncrements.Where(t => t.Id != id).AllAsync(x => x.Name != name, cancellationToken);
     }
 }
 

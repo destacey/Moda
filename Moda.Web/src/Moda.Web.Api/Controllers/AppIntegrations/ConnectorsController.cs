@@ -18,8 +18,7 @@ public class ConnectorsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Connectors)]
     [OpenApiOperation("Get a list of all connectors.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<ConnectorListDto>>> GetList(CancellationToken cancellationToken)
     {
         var connectors = await _sender.Send(new GetConnectorsQuery(), cancellationToken);

@@ -29,7 +29,7 @@ public class TeamsOfTeamsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
     [OpenApiOperation("Get a list of team of teams.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<IReadOnlyList<TeamOfTeamsListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {

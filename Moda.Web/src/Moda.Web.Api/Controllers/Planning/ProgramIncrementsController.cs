@@ -25,8 +25,7 @@ public class ProgramIncrementsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
     [OpenApiOperation("Get a list of program increments.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<ProgramIncrementListDto>>> GetList(CancellationToken cancellationToken)
     {
         var programIncrements = await _sender.Send(new GetProgramIncrementsQuery(), cancellationToken);
@@ -37,8 +36,7 @@ public class ProgramIncrementsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
     [OpenApiOperation("Get program increment details using the localId.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProgramIncrementDetailsDto>> GetById(int id)
     {
         var programIncrement = await _sender.Send(new GetProgramIncrementQuery(id));
@@ -65,8 +63,8 @@ public class ProgramIncrementsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.ProgramIncrements)]
     [OpenApiOperation("Update a program increment.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdateProgramIncrementRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
@@ -83,8 +81,7 @@ public class ProgramIncrementsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
     [OpenApiOperation("Get a list of program increment teams.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<ProgramIncrementTeamReponse>>> GetTeams(Guid id, CancellationToken cancellationToken)
     {
         List<ProgramIncrementTeamReponse> piTeams = new();
@@ -106,8 +103,7 @@ public class ProgramIncrementsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.ProgramIncrements)]
     [OpenApiOperation("Manager program increment teams.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> ManageTeams(Guid id, [FromBody] ManageProgramIncrementTeamsRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
