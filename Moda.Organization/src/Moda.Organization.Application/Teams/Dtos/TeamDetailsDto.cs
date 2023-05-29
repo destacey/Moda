@@ -13,7 +13,7 @@ public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
     public int LocalId { get; set; }
 
     /// <summary>
-    /// The name of the workspace.
+    /// The name of the team.
     /// </summary>
     public required string Name { get; set; }
 
@@ -22,7 +22,7 @@ public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
     public required string Code { get; set; }
 
     /// <summary>
-    /// The description of the workspace.
+    /// The description of the team.
     /// </summary>
     public string? Description { get; set; }
 

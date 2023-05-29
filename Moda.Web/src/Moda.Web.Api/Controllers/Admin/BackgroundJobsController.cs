@@ -1,5 +1,5 @@
 ﻿using Moda.Common.Application.BackgroundJobs;
-using Moda.Organization.Application.Interfaces;
+using Moda.Common.Application.Interfaces;
 
 namespace Moda.Web.Api.Controllers.Admin;
 
@@ -25,8 +25,7 @@ public class BackgroundJobsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BackgroundJobs)]
     [OpenApiOperation("Get a list of all job types.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<BackgroundJobTypeDto>>> GetJobTypes(CancellationToken cancellationToken)
     {
         // TODO how do we determine what is active rather than returning all types
@@ -38,8 +37,7 @@ public class BackgroundJobsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BackgroundJobs)]
     [OpenApiOperation("Get a list of running jobs.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public ActionResult<IReadOnlyList<BackgroundJobDto>> GetRunningJobs()
     {
         var jobs = _jobService.GetRunningJobs();
@@ -50,8 +48,7 @@ public class BackgroundJobsController : ControllerBase
     [MustHavePermission(ApplicationAction.Run, ApplicationResource.BackgroundJobs)]
     [OpenApiOperation("Run a background job.", "")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public IActionResult Run(int jobTypeId, CancellationToken cancellationToken)
     {
         switch ((BackgroundJobType)jobTypeId)

@@ -67,7 +67,7 @@ internal sealed class CreateTeamCommandHandler : ICommandHandler<CreateTeamComma
     {
         try
         {
-            var team = Team.Create(request.Name, request.Code, request.Description);
+            var team = Team.Create(request.Name, request.Code, request.Description, _dateTimeService.Now);
             await _organizationDbContext.Teams.AddAsync((Team)team, cancellationToken);
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);

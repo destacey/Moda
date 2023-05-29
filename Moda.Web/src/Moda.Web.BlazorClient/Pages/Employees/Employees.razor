@@ -21,7 +21,7 @@
                      Filterable="true"
                      FilterMode="DataGridFilterMode.ColumnFilterMenu"
                      FixedHeader="true"
-                     Loading="@_isLoading"
+                     Loading="@_loading"
                      LoadingProgressColor="@Color.Secondary"
                      QuickFilter="@_quickFilter">
             <ToolBarContent>
@@ -79,7 +79,7 @@
     private List<EmployeeListDto> _employees = new();
 
     private string _searchString = "";
-    private bool _isLoading = true;
+    private bool _loading = true;
     private bool _includeDisabled = false;
     private bool _canCreateEmployees;
     private bool _canUpdateEmployees;
@@ -139,13 +139,13 @@
 
     private async Task GetEmployees()
     {
-        _isLoading = true;
+        _loading = true;
 
         if (await ApiHelper.ExecuteCallGuardedAsync(() => EmployeesClient.GetListAsync(_includeDisabled), Snackbar) is List<EmployeeListDto> result)
         {
             _employees = result;
         }
 
-        _isLoading = false;
+        _loading = false;
     }
 }

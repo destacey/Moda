@@ -44,36 +44,36 @@ else
                         <MudCardContent>
                             <MudGrid Class="pa-1">
                                 <MudItem  xs="12">
-                                    <MudField Label="Manager" Variant="Variant.Text">
+                                    <MudField Label="Manager">
                                         <MudLink Href="@(_employee.ManagerLocalId is null ? null : $"employees/{_employee.ManagerLocalId}")">@_employee.ManagerName</MudLink>
                                     </MudField>
                                 </MudItem>
                                 <MudItem xs="12">
-                                    <MudField Label="Department" Variant="Variant.Text">@_employee.Department</MudField>
+                                    <MudField Label="Department">@_employee.Department</MudField>
                                 </MudItem>
                                 <MudItem xs="12">
-                                    <MudField Label="Job Title" Variant="Variant.Text">@_employee.JobTitle</MudField>
+                                    <MudField Label="Job Title">@_employee.JobTitle</MudField>
                                 </MudItem>
                                 <MudItem xs="12">
-                                    <MudField Label="Hire Date" Variant="Variant.Text">@_employee.HireDate?.ToString("d")</MudField>
+                                    <MudField Label="Hire Date">@_employee.HireDate?.ToString("d")</MudField>
                                 </MudItem>
                                 <MudItem xs="12">
-                                    <MudField Label="Office Location" Variant="Variant.Text">@_employee.OfficeLocation</MudField>
+                                    <MudField Label="Office Location">@_employee.OfficeLocation</MudField>
                                 </MudItem>
                                 <MudItem xs="12">
-                                    <MudField Label="Is Active?" Variant="Variant.Text">@_employee.IsActive</MudField>
+                                    <MudField Label="Is Active?">@_employee.IsActive</MudField>
                                 </MudItem>
                                 <MudItem xs="12">
                                     <MudPaper Elevation="-1" hidden="@_hideAdvanced">
                                         <MudGrid Class="pa-0">
                                             <MudItem xs="12">
-                                                <MudField Label="Employee Number" Variant="Variant.Text">@_employee.EmployeeNumber</MudField>
+                                                <MudField Label="Employee Number">@_employee.EmployeeNumber</MudField>
                                             </MudItem>
                                             <MudItem xs="12">
-                                                <MudField Label="Id" Variant="Variant.Text">@_employee.Id</MudField>
+                                                <MudField Label="Id">@_employee.Id</MudField>
                                             </MudItem>
                                             <MudItem xs="12">
-                                                <MudField Label="Local Id" Variant="Variant.Text">@_employee.LocalId</MudField>
+                                                <MudField Label="Local Id">@_employee.LocalId</MudField>
                                             </MudItem>
                                         </MudGrid>
                                     </MudPaper>
@@ -123,7 +123,7 @@ else
     </MudPaper>
     </MudTabPanel>*@
         <MudTabPanel Text="Org Chart">
-            <MudPaper Class="my-3" Height="800px" Width="100%">
+            <MudPaper Elevation="0" Class="my-3" Height="800px" Width="100%">
                 <CascadingValue Value="_orgChart">
                     <DiagramCanvas></DiagramCanvas>
                 </CascadingValue>

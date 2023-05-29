@@ -1,7 +1,6 @@
 ﻿@using Moda.Web.BlazorClient.Models.Teams;
 
-
-@if (_loading)
+@if (_isLoading)
 {
     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
@@ -21,7 +20,7 @@ else
              Filterable="true"
              FilterMode="DataGridFilterMode.ColumnFilterMenu"
              FixedHeader="true"
-             Loading="@_loading"
+             Loading="@_isLoading"
              LoadingProgressColor="@Color.Secondary"
              QuickFilter="@_quickFilter">
         <ToolBarContent>
@@ -87,13 +86,13 @@ else
     private MudDataGrid<TeamListViewModel> _teamsGrid = new();
 
     private string _searchString = "";
-    private bool _loading = true;
+    private bool _isLoading = true;
     private bool _includeDisabled = true;
     private ModaTablePreference _tablePreference = new();
 
     protected override async Task OnInitializedAsync()
     {
-        _loading = true;
+        _isLoading = true;
 
         await GetTeams.InvokeAsync();
 
@@ -104,7 +103,7 @@ else
             _tablePreference = clientPreference.TablePreference;
         }
 
-        _loading = false;
+        _isLoading = false;
     }
 
     private Func<TeamListViewModel, bool> _quickFilter => x =>
@@ -133,8 +132,8 @@ else
     private async Task RefreshData(bool includeDisabled)
     {
         _includeDisabled = includeDisabled;
-        _loading = true;
+        _isLoading = true;
         await GetTeams.InvokeAsync();
-        _loading = false;
+        _isLoading = false;
     }
 }

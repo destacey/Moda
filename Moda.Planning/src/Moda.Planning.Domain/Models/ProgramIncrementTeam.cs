@@ -10,4 +10,5 @@ public class ProgramIncrementTeam
 
     public Guid ProgramIncrementId { get; private set; }
     public Guid TeamId { get; private set; }
+    public PlanningTeam Team { get; private set; } = default!;
 }

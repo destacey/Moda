@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Data;
+using Moda.Common.Domain.Models;
 using Moda.Common.Extensions;
 using Moda.Planning.Domain.Enums;
 using NodaTime;
@@ -14,13 +15,13 @@ public class Risk : BaseAuditableEntity<Guid>
 
     private Risk() { }
 
-    private Risk(string summary, string? description, Guid? teamId, Instant reportedOn, Guid reportedBy, RiskCategory category, RiskGrade impact, RiskGrade likelihood, Guid? assigneeId, LocalDate followUpDate, string? response)
+    private Risk(string summary, string? description, Guid? teamId, Instant reportedOn, Guid reportedById, RiskCategory category, RiskGrade impact, RiskGrade likelihood, Guid? assigneeId, LocalDate? followUpDate, string? response)
     {
         Summary = summary;
         Description = description;
         TeamId = teamId;
         ReportedOn = reportedOn;
-        ReportedBy = reportedBy;
+        ReportedById = reportedById;
         Category = category;
         Impact = impact;
         Likelihood = likelihood;
@@ -53,11 +54,16 @@ public class Risk : BaseAuditableEntity<Guid>
         private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
+    // TODO: switch TeamId to ObjectId and Context
     public Guid? TeamId { get; private set; }
+
+    public PlanningTeam? Team { get; set; }
 
     public Instant ReportedOn { get; private set; }
 
-    public Guid ReportedBy { get; private set; }
+    public Guid ReportedById { get; private set; }
+
+    public Employee ReportedBy { get; private set; } = default!;
 
     public RiskStatus Status { get; private set; }
 
@@ -83,7 +89,11 @@ public class Risk : BaseAuditableEntity<Guid>
 
     public Guid? AssigneeId { get; private set; }
 
+    public Employee? Assignee { get; private set; }
+
     public LocalDate? FollowUpDate { get; private set; }
+
+    public Instant? ClosedDate { get; private set; }
 
     /// <summary>
     /// What has been done to help prevent the risk from occurring.
@@ -99,9 +109,6 @@ public class Risk : BaseAuditableEntity<Guid>
     /// </summary>
     /// <param name="summary"></param>
     /// <param name="description"></param>
-    /// <param name="teamId"></param>
-    /// <param name="reportedOn"></param>
-    /// <param name="reportedBy"></param>
     /// <param name="status"></param>
     /// <param name="category"></param>
     /// <param name="impact"></param>
@@ -109,23 +116,23 @@ public class Risk : BaseAuditableEntity<Guid>
     /// <param name="assigneeId"></param>
     /// <param name="followUpDate"></param>
     /// <param name="response"></param>
+    /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result Update(string summary, string? description, Guid? teamId, Instant reportedOn, Guid reportedBy, RiskStatus status, RiskCategory category, RiskGrade impact, RiskGrade likelihood, Guid? assigneeId, LocalDate followUpDate, string? response)
+    public Result Update(string summary, string? description, RiskStatus status, RiskCategory category, RiskGrade impact, RiskGrade likelihood, Guid? assigneeId, LocalDate? followUpDate, string? response, Instant timestamp)
     {
         try
         {
+            //TeamId isn't updatable at this time
             Summary = summary;
             Description = description;
-            TeamId = teamId;
-            ReportedOn = reportedOn;
-            ReportedBy = reportedBy;
-            Status = status;
             Category = category;
             Impact = impact;
             Likelihood = likelihood;
             AssigneeId = assigneeId;
             FollowUpDate = followUpDate;
             Response = response;
+
+            UpdateStatus(status, timestamp);
 
             return Result.Success();
         }
@@ -135,6 +142,14 @@ public class Risk : BaseAuditableEntity<Guid>
         }
     }
 
+    private void UpdateStatus(RiskStatus status, Instant timestamp)
+    {
+        if (Status == status) return;
+
+        ClosedDate = status == RiskStatus.Closed ? timestamp : null;
+        Status = status;
+    }
+
     /// <summary>
     /// Create a new risk.
     /// </summary>
@@ -142,7 +157,7 @@ public class Risk : BaseAuditableEntity<Guid>
     /// <param name="description"></param>
     /// <param name="teamId"></param>
     /// <param name="reportedOn"></param>
-    /// <param name="reportedBy"></param>
+    /// <param name="reportedById"></param>
     /// <param name="category"></param>
     /// <param name="impact"></param>
     /// <param name="likelihood"></param>
@@ -150,8 +165,8 @@ public class Risk : BaseAuditableEntity<Guid>
     /// <param name="followUpDate"></param>
     /// <param name="response"></param>
     /// <returns></returns>
-    public static Risk Create(string summary, string? description, Guid? teamId, Instant reportedOn, Guid reportedBy, RiskCategory category, RiskGrade impact, RiskGrade likelihood, Guid? assigneeId, LocalDate followUpDate, string? response)
+    public static Risk Create(string summary, string? description, Guid? teamId, Instant reportedOn, Guid reportedById, RiskCategory category, RiskGrade impact, RiskGrade likelihood, Guid? assigneeId, LocalDate? followUpDate, string? response)
     {
-        return new Risk(summary, description, teamId, reportedOn, reportedBy, category, impact, likelihood, assigneeId, followUpDate, response);
+        return new Risk(summary, description, teamId, reportedOn, reportedById, category, impact, likelihood, assigneeId, followUpDate, response);
     }
 }

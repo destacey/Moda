@@ -1,8 +1,8 @@
 using Hangfire;
 using Hangfire.Console;
 using Hangfire.Console.Extensions;
+using Hangfire.Dashboard.BasicAuthorization;
 using Hangfire.SqlServer;
-using HangfireBasicAuthenticationFilter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +30,7 @@ internal static class ConfigureServices
         services.AddSingleton<JobActivator, ModaJobActivator>();
 
         services.AddHangfire((provider, hangfireConfig) => hangfireConfig
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
             .UseDatabase(storageSettings.StorageProvider, storageSettings.ConnectionString, config)
             .UseFilter(new ModaJobFilter(provider))
             .UseFilter(new LogJobFilter())
@@ -56,11 +57,20 @@ internal static class ConfigureServices
 
         dashboardOptions.Authorization = new[]
         {
-           new HangfireCustomBasicAuthenticationFilter
-           {
-                User = config.GetSection("HangfireSettings:Credentials:User").Value,
-                Pass = config.GetSection("HangfireSettings:Credentials:Password").Value
-           }
+            new BasicAuthAuthorizationFilter(new BasicAuthAuthorizationFilterOptions
+            {
+                SslRedirect = false,
+                RequireSsl = false,
+                LoginCaseSensitive = true,
+                Users = new[]
+                {
+                    new BasicAuthAuthorizationUser
+                    {
+                        Login = config.GetSection("HangfireSettings:Credentials:User").Value,
+                        PasswordClear = config.GetSection("HangfireSettings:Credentials:Password").Value
+                    }
+                }
+            })
         };
 
         return app.UseHangfireDashboard(config["HangfireSettings:Route"], dashboardOptions);

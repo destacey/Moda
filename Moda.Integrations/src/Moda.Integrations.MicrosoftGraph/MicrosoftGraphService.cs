@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
+using Moda.Common.Application.Interfaces;
 using Moda.Integrations.MicrosoftGraph.Model;
-using Moda.Organization.Application.Interfaces;
 
 namespace Moda.Integrations.MicrosoftGraph;
 

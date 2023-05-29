@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
+using Moda.Common.Application.Employees.Queries;
 using Moda.Common.Extensions;
-using Moda.Organization.Application.Employees.Queries;
 using NotFoundException = Moda.Common.Application.Exceptions.NotFoundException;
 
 namespace Moda.Infrastructure.Identity;

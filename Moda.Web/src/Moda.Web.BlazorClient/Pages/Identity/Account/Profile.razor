@@ -54,20 +54,19 @@
                         <CustomValidation @ref="_customValidation" />
                         <MudItem xs="12" md="6">
                             <MudTextField @bind-Value="@_profileModel.FirstName" For="@(() => _profileModel.FirstName)"
-                                Label="First Name" Variant="Variant.Text" />
+                                Label="First Name" />
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MudTextField @bind-Value="@_profileModel.LastName" For="@(() => _profileModel.LastName)"
-                                Label="Last Name" Variant="Variant.Text" />
+                                Label="Last Name" />
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MudTextField @bind-Value="@_profileModel.PhoneNumber"
-                                For="@(() => _profileModel.PhoneNumber)" Label="Phone Number"
-                                Variant="Variant.Text" />
+                                For="@(() => _profileModel.PhoneNumber)" Label="Phone Number" />
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MudTextField @bind-Value="@_profileModel.Email" Label="Email"
-                                          For="@(() => _profileModel.Email)" Variant="Variant.Text"
+                                          For="@(() => _profileModel.Email)"
                                 InputType="InputType.Email" Disabled=true />
                         </MudItem>
                     </MudGrid>

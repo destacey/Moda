@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Serilog.Context;
 
@@ -37,17 +38,21 @@ internal class ExceptionMiddleware : IMiddleware
             LogContext.PushProperty("ErrorId", errorId);
             LogContext.PushProperty("StackTrace", ex.StackTrace);
 
-            var details = new HttpValidationProblemDetails(ex.Errors)
+            var problemDetails = new ValidationProblemDetails(ex.Errors)
             {
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+                Type = "https://developer.mozilla.org/en-US/docs/web/http/status/422",
+                Title = "One or more validation errors occurred.",
+                Status = StatusCodes.Status422UnprocessableEntity,
+                Detail = "See the errors property for details.",
+                Instance = context.Request.Path
             };
 
             var response = context.Response;
-            response.ContentType = "application/json";
-            response.StatusCode = StatusCodes.Status400BadRequest;
+            response.ContentType = "application/problem+json";
+            response.StatusCode = StatusCodes.Status422UnprocessableEntity;
 
             Log.Error($"{ex.Message.Trim()} Request failed with Status Code {context.Response.StatusCode} and Error Id {errorId}.");
-            await response.WriteAsync(_jsonSerializer.Serialize(details));
+            await response.WriteAsync(_jsonSerializer.Serialize(problemDetails));
         }
         catch (Exception exception)
         {

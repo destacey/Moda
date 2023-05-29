@@ -1,0 +1,27 @@
+﻿@using Moda.Web.BlazorClient.Models.Common;
+
+@typeparam TKey
+
+<MudSelect Label="@Label"
+           MultiSelection="@IsMultiSelection"
+           SelectAll="@IsMultiSelection"
+           Dense="true"
+           AnchorOrigin="Origin.BottomCenter"
+           ToStringFunc="@(v => SelectViewModel.Options.First(o => o.Id.Equals(v)).Name)"
+           @bind-SelectedValues="SelectViewModel.SelectedValues">
+    @foreach (var opt in SelectViewModel.Options)
+    {
+        <MudSelectItem Value="@opt.Id">@opt.Name</MudSelectItem>
+    }
+</MudSelect>
+
+@code {
+    [Parameter]
+    public SelectViewModel<TKey> SelectViewModel { get; set; } = default!;
+
+    [Parameter]
+    public string Label { get; set; } = default!;
+
+    [Parameter]
+    public bool IsMultiSelection { get; set; }
+}

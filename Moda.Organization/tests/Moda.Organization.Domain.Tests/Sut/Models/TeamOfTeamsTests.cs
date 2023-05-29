@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using FluentAssertions;
+using Moda.Common.Domain.Events;
 using Moda.Organization.Domain.Enums;
 using Moda.Organization.Domain.Models;
 using Moda.Organization.Domain.Tests.Extensions;
@@ -15,7 +16,7 @@ public class TeamOfTeamsTests
     {
         int localId = RandomNumberGenerator.GetInt32(1, 100000);
 
-        var team = TeamOfTeams.Create("Test Team of Teams", _genericTeamCode, null);
+        var team = TeamOfTeams.Create("Test Team of Teams", _genericTeamCode, null, _now);
         team.SetPrivate(t => t.Id, Guid.NewGuid());
         team.SetPrivate(t => t.LocalId, localId);
 
@@ -39,7 +40,7 @@ public class TeamOfTeamsTests
         var description = "Test Team Description";
 
         // Act
-        var sut = TeamOfTeams.Create(name, _genericTeamCode, description);
+        var sut = TeamOfTeams.Create(name, _genericTeamCode, description, _now);
 
         // Assert
         sut.Type.Should().Be(TeamType.TeamOfTeams);
@@ -49,6 +50,9 @@ public class TeamOfTeamsTests
         sut.IsActive.Should().BeTrue();
         sut.ParentMemberships.Should().BeEmpty();
         sut.ChildMemberships.Should().BeEmpty();
+
+        sut.DomainEvents.Should().NotBeEmpty();
+        sut.DomainEvents.Should().ContainSingle(e => e is EntityCreatedEvent<TeamOfTeams>);
     }
 
     [Fact]
@@ -58,7 +62,7 @@ public class TeamOfTeamsTests
         string? name = null;
 
         // Act
-        Action action = () => TeamOfTeams.Create(name!, _genericTeamCode, null);
+        Action action = () => TeamOfTeams.Create(name!, _genericTeamCode, null, _now);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Value cannot be null. (Parameter 'Name')");
@@ -70,7 +74,7 @@ public class TeamOfTeamsTests
     public void Create_WithInvalidName_Throws(string name)
     {
         // Act
-        Action action = () => TeamOfTeams.Create(name, _genericTeamCode, null);
+        Action action = () => TeamOfTeams.Create(name, _genericTeamCode, null, _now);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Required input Name was empty. (Parameter 'Name')");
@@ -83,7 +87,7 @@ public class TeamOfTeamsTests
         TeamCode code = null!;
 
         // Act
-        Action action = () => TeamOfTeams.Create("Test", code, null);
+        Action action = () => TeamOfTeams.Create("Test", code, null, _now);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Value cannot be null. (Parameter 'Code')");
@@ -96,7 +100,7 @@ public class TeamOfTeamsTests
     public void Create_WithInvalidDescription_IsNull(string? description)
     {
         // Act
-        var sut = TeamOfTeams.Create("Team", _genericTeamCode, description);
+        var sut = TeamOfTeams.Create("Team", _genericTeamCode, description, _now);
 
         // Assert
         sut.Description.Should().BeNull();
@@ -118,7 +122,7 @@ public class TeamOfTeamsTests
         var description = "New Description ";
 
         // Act
-        team.Update(name, code, description);
+        team.Update(name, code, description, _now);
 
         // Assert
         team.Type.Should().Be(TeamType.TeamOfTeams);
@@ -126,6 +130,9 @@ public class TeamOfTeamsTests
         team.Name.Should().Be(name.Trim());
         team.Description.Should().Be(description.Trim());
         team.IsActive.Should().BeTrue();
+
+        team.DomainEvents.Should().NotBeEmpty();
+        team.DomainEvents.Should().ContainSingle(e => e is EntityUpdatedEvent<TeamOfTeams>);
     }
 
     [Fact]
@@ -136,11 +143,13 @@ public class TeamOfTeamsTests
         string name = null!;
 
         // Act
-        var result = team.Update(name, team.Code, team.Description);
+        var result = team.Update(name, team.Code, team.Description, _now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().StartWith("System.ArgumentNullException: Value cannot be null. (Parameter 'Name')");
+
+        team.DomainEvents.Should().BeEmpty();
     }
 
     [Theory]
@@ -152,11 +161,13 @@ public class TeamOfTeamsTests
         TeamOfTeams team = GenerateTeamOfTeams(true);
 
         // Act
-        var result = team.Update(name, team.Code, team.Description);
+        var result = team.Update(name, team.Code, team.Description, _now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().StartWith("System.ArgumentException: Required input Name was empty. (Parameter 'Name')");
+
+        team.DomainEvents.Should().BeEmpty();
     }
 
     [Fact]
@@ -167,11 +178,13 @@ public class TeamOfTeamsTests
         TeamCode code = null!;
 
         // Act
-        var result = team.Update(team.Name, code, team.Description);
+        var result = team.Update(team.Name, code, team.Description, _now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().StartWith("System.ArgumentNullException: Value cannot be null. (Parameter 'Code')");
+
+        team.DomainEvents.Should().BeEmpty();
     }
 
     [Theory]
@@ -184,11 +197,14 @@ public class TeamOfTeamsTests
         TeamOfTeams team = GenerateTeamOfTeams(true);
 
         // Act
-        var result = team.Update(team.Name, team.Code, description);
+        var result = team.Update(team.Name, team.Code, description, _now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
         team.Description.Should().BeNull();
+
+        team.DomainEvents.Should().NotBeEmpty();
+        team.DomainEvents.Should().ContainSingle(e => e is EntityUpdatedEvent<TeamOfTeams>);
     }
 
     #endregion Update
@@ -207,6 +223,9 @@ public class TeamOfTeamsTests
 
         // Assert
         team.IsActive.Should().BeFalse();
+
+        team.DomainEvents.Should().NotBeEmpty();
+        team.DomainEvents.Should().ContainSingle(e => e is EntityDeactivatedEvent<TeamOfTeams>);
     }
 
     [Fact]
@@ -220,6 +239,9 @@ public class TeamOfTeamsTests
 
         // Assert
         team.IsActive.Should().BeTrue();
+
+        team.DomainEvents.Should().NotBeEmpty();
+        team.DomainEvents.Should().ContainSingle(e => e is EntityActivatedEvent<TeamOfTeams>);
     }
 
     #endregion IActivatable

@@ -35,7 +35,9 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
         if (!IsActive)
         {
             IsActive = true;
+            AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
         }
+
 
         return Result.Success();
     }
@@ -55,25 +57,28 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
                 return Result.Failure("Cannot deactivate a team of teams that has active team memberships.");
 
             IsActive = false;
+
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
     }
 
-    /// <summary>
-    /// Update team of teams.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="code"></param>
-    /// <param name="description"></param>
+    /// <summary>Update team of teams.</summary>
+    /// <param name="name">The name.</param>
+    /// <param name="code">The code.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public Result Update(string name, TeamCode code, string? description)
+    public Result Update(string name, TeamCode code, string? description, Instant timestamp)
     {
         try
         {
             Name = name;
             Code = code;
             Description = description;
+
+            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();
         }
@@ -113,9 +118,13 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
     /// <param name="name">The name.</param>
     /// <param name="code">The code.</param>
     /// <param name="description">The description.</param>
+    /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public static TeamOfTeams Create(string name, TeamCode code, string? description)
+    public static TeamOfTeams Create(string name, TeamCode code, string? description, Instant timestamp)
     {
-        return new TeamOfTeams(name, code, description);
+        var team = new TeamOfTeams(name, code, description);
+
+        team.AddDomainEvent(EntityCreatedEvent.WithEntity(team, timestamp));
+        return team;
     }
 }

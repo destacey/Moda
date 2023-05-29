@@ -1,9 +1,15 @@
 ﻿@using Moda.Web.BlazorClient.Models.Teams;
-<MudGrid>
-    <MudItem xs="12" Class="px-2 pt-2 pb-0">
-        <MudDataGrid @ref="@_grid"
+@if (_isLoading)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudGrid>
+        <MudItem xs="12" Class="px-2 pt-2 pb-0">
+            <MudDataGrid @ref="@_grid"
                      Items="@Memberships"
-                     Elevation="1"
+                     Elevation="0"
                      Height="500px"
                      Dense="@_tablePreference.IsDense"
                      Striped="@_tablePreference.IsStriped"
@@ -18,57 +24,58 @@
                      Loading="@_isLoading"
                      LoadingProgressColor="@Color.Secondary"
                      QuickFilter="@_quickFilter">
-            <ToolBarContent>
-                <MudSpacer />
-                <MudToolBar>
-                    <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
-                </MudToolBar>
-            </ToolBarContent>
-            <Columns>
-                <PropertyColumn Property="x => x.Child.Name" Title="Child">
-                    <CellTemplate>
-                        <MudLink Href="@GetTeamDetailUrl(context.Item.Child)">@context.Item.Child.Name</MudLink>
-                    </CellTemplate>
-                </PropertyColumn>
-                <PropertyColumn Property="x => x.Parent.Name" Title="Parent">
-                    <CellTemplate>
-                        <MudLink Href="@GetTeamDetailUrl(context.Item.Parent)">@context.Item.Parent.Name</MudLink>
-                    </CellTemplate>
-                </PropertyColumn>
-                <PropertyColumn Property="x => x.State" Title="State" />
-                <PropertyColumn Property="x => x.Start" Title="Start" Format="MM/dd/yyyy" />
-                <PropertyColumn Property="x => x.End" Title="End" Format="MM/dd/yyyy" />
-                    
-                <TemplateColumn Title="Actions" CellClass="d-flex justify-end" Sortable="false" Filterable="false" Hidden="@(!_showMembershipActions)">
-                    <CellTemplate>
-                        <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true" Size="Size.Small" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
-                            @if (CanUpdateTeamMemberships)
-                            {
-                                <MudMenuItem OnClick="@(() => UpdateTeamMembership.InvokeAsync(context.Item))">Update Membership</MudMenuItem>
-                                <MudMenuItem OnClick="@(() => RemoveTeamMembership.InvokeAsync(context.Item))">Remove Membership</MudMenuItem>
-                            }
-                        </MudMenu>
-                    </CellTemplate>
-                </TemplateColumn>
-            </Columns>
-            <LoadingContent>
-                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading team memberships...</MudText>
-            </LoadingContent>
-            <NoRecordsContent>
-                <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No team memberships found.</MudText>
-            </NoRecordsContent>
-        </MudDataGrid>
-    </MudItem>
-    <MudItem xs="12" Class="pt-0">
-        <DataGridCountLabel DataGrid="@_grid" UnitLabel="memberships" />
-    </MudItem>
-</MudGrid>
+                <ToolBarContent>
+                    <MudSpacer />
+                    <MudToolBar>
+                        <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
+                    </MudToolBar>
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.Child.Name" Title="Child">
+                        <CellTemplate>
+                            <MudLink Href="@StringHelpers.GetTeamDetailsUrl(context.Item.Child.Type, context.Item.Child.LocalId)">@context.Item.Child.Name</MudLink>
+                        </CellTemplate>
+                    </PropertyColumn>
+                    <PropertyColumn Property="x => x.Parent.Name" Title="Parent">
+                        <CellTemplate>
+                            <MudLink Href="@StringHelpers.GetTeamDetailsUrl(context.Item.Parent.Type, context.Item.Parent.LocalId)">@context.Item.Parent.Name</MudLink>
+                        </CellTemplate>
+                    </PropertyColumn>
+                    <PropertyColumn Property="x => x.State" Title="State" />
+                    <PropertyColumn Property="x => x.Start" Title="Start" Format="MM/dd/yyyy" />
+                    <PropertyColumn Property="x => x.End" Title="End" Format="MM/dd/yyyy" />
+
+                    <TemplateColumn Title="Actions" CellClass="d-flex justify-end" Sortable="false" Filterable="false" Hidden="@(!_showMembershipActions)">
+                        <CellTemplate>
+                            <MudMenu Label="Actions" Variant="Variant.Filled" DisableElevation="true" Dense="true" Size="Size.Small" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
+                                @if (CanUpdateTeamMemberships)
+                                {
+                                    <MudMenuItem OnClick="@(() => UpdateTeamMembership.InvokeAsync(context.Item))">Update Membership</MudMenuItem>
+                                    <MudMenuItem OnClick="@(() => RemoveTeamMembership.InvokeAsync(context.Item))">Remove Membership</MudMenuItem>
+                                }
+                            </MudMenu>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+                <LoadingContent>
+                    <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">Loading team memberships...</MudText>
+                </LoadingContent>
+                <NoRecordsContent>
+                    <MudText Class="ma-3" Typo="Typo.body1" Align="Align.Left">No team memberships found.</MudText>
+                </NoRecordsContent>
+            </MudDataGrid>
+        </MudItem>
+        <MudItem xs="12" Class="pt-0">
+            <DataGridCountLabel DataGrid="@_grid" UnitLabel="memberships" />
+        </MudItem>
+    </MudGrid>
+}
 
 @code {
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; } = default!;
 
-    [Parameter] 
+    [Parameter]
     public EventCallback GetTeamMemberships { get; set; }
 
     [Parameter]
@@ -92,9 +99,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // TODO: cache instead of calling every time the tab is selected
-        await GetTeamMemberships.InvokeAsync();
-        Memberships.OrderByDescending(m => m.Start);
+        _isLoading = true;
 
         if (await ClientPreferences.GetPreference() is ClientPreference clientPreference)
         {
@@ -104,6 +109,12 @@
         _showMembershipActions = CanUpdateTeamMemberships;
 
         _isLoading = false;
+
+        if (!Memberships.Any())
+        {
+            await GetTeamMemberships.InvokeAsync();
+            Memberships.OrderByDescending(m => m.Start);
+        }
     }
 
     private Func<TeamMembershipsDto, bool> _quickFilter => x =>
@@ -128,11 +139,4 @@
 
         return false;
     };
-
-    private string GetTeamDetailUrl(TeamNavigationDto team)
-    {
-        return team.Type == "Team"
-            ? $"teams/{team.LocalId}"
-            : $"teams-of-teams/{team.LocalId}";
-    }
 }

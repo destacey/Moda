@@ -31,8 +31,8 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton form="createProgramIncrementForm" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_isSaving">
-            @if (_isSaving)
+        <MudButton form="createProgramIncrementForm" ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="@_saving">
+            @if (_saving)
             {
                 <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
                 <MudText Class="ms-2">Saving</MudText>
@@ -54,7 +54,7 @@
 
     private CreateProgramIncrementViewModel _model = new();
 
-    private bool _isSaving = false;
+    private bool _saving = false;
 
     protected override void OnInitialized()
     {
@@ -74,7 +74,7 @@
     {
         try
         {
-            _isSaving = true;
+            _saving = true;
             _messageStore?.Clear();
             await ProgramIncrementsClient.CreateAsync(_model.ToCreateProgramIncrementRequest());
             Snackbar.Add("Program Increment created", MudBlazor.Severity.Success);
@@ -94,7 +94,7 @@
         {
             Snackbar.Add($"Error creating program increment.", MudBlazor.Severity.Error);
         }
-        _isSaving = false;
+        _saving = false;
     }
 
     public void Dispose()

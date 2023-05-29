@@ -15,6 +15,18 @@ public class CurrentUser : ICurrentUser, ICurrentUserInitializer
             ? Guid.Parse(_user?.GetUserId() ?? Guid.Empty.ToString())
             : _userId;
 
+    public Guid? GetEmployeeId()
+    {
+        if (IsAuthenticated())
+        {
+            var employeeId = _user?.GetEmployeeId();
+            if (Guid.TryParse(employeeId, out var employeeGuid))
+                return employeeGuid;
+        }
+
+        return null;
+    }
+
     public string? GetUserEmail() =>
         IsAuthenticated()
             ? _user!.GetEmail()

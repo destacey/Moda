@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Moda.Common.Domain.Models;
 using Moda.Planning.Application.Persistence;
 using Moda.Planning.Domain.Models;
 using Moda.Work.Domain.Models;
@@ -13,6 +14,11 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizat
     {
     }
 
+    #region Common
+    public DbSet<Employee> Employees => Set<Employee>();
+
+    #endregion Common
+
     #region IAppIntegration
 
     public DbSet<Connection> Connections => Set<Connection>();
@@ -22,7 +28,6 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizat
 
     #region IOrganization
 
-    public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<BaseTeam> BaseTeams => Set<BaseTeam>();
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<TeamOfTeams> TeamOfTeams => Set<TeamOfTeams>();
@@ -33,6 +38,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizat
 
     public DbSet<ProgramIncrement> ProgramIncrements => Set<ProgramIncrement>();
     public DbSet<Risk> Risks => Set<Risk>();
+    public DbSet<PlanningTeam> PlanningTeams => Set<PlanningTeam>();
 
     #endregion IPlanning
 

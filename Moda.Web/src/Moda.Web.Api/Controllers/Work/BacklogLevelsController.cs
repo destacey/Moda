@@ -22,8 +22,7 @@ public class BacklogLevelsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BacklogLevels)]
     [OpenApiOperation("Get a list of all backlog levels.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<BacklogLevelDto>>> GetList(CancellationToken cancellationToken)
     {
         var backlogLevels = await _sender.Send(new GetBacklogLevelsQuery(), cancellationToken);
@@ -35,9 +34,8 @@ public class BacklogLevelsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BacklogLevels)]
     [OpenApiOperation("Get backlog level details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<BacklogLevelDto>> GetById(int id)
     {
         var backlogLevel = await _sender.Send(new GetBacklogLevelQuery(id));
@@ -64,8 +62,8 @@ public class BacklogLevelsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.BacklogLevels)]
     [OpenApiOperation("Update a backlog level.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(HttpValidationProblemDetails))]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(int id, UpdateBacklogLevelRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)

@@ -9,7 +9,7 @@
     @if (_showPageActions)
     {
         <MudMenu Label="Actions" Color="Color.Primary" Variant="Variant.Filled" Dense="true" Size="Size.Small"
-             EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
+                 EndIcon="@Icons.Material.Filled.KeyboardArrowDown" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter">
             @if (_canViewHangfire)
             {
                 <MudMenuItem Href="@_hangfireUrl" Target="_blank">Hangfire Dashboard</MudMenuItem>
@@ -90,11 +90,6 @@
             _tablePreference = clientPreference.TablePreference;
         }
 
-        await Task.WhenAll(new Task[] {
-            GetRunningJobs(),
-            GetJobTypes()
-    });
-
         _hangfireUrl = Config[ConfigNames.ApiBaseUrl] + "jobs";
 
         var user = (await AuthState).User;
@@ -104,6 +99,11 @@
         _showPageActions = _canViewHangfire || _canRunBackgroundJobs;
 
         _loading = false;
+
+        await Task.WhenAll(new Task[] {
+            GetRunningJobs(),
+            GetJobTypes()
+        });
     }
 
     private Func<BackgroundJobDto, bool> _quickFilter => x =>

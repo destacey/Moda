@@ -5,6 +5,9 @@ public static class ClaimsPrincipalExtensions
     public static string? GetEmail(this ClaimsPrincipal principal)
         => principal.FindFirstValue(ClaimTypes.Email);
 
+    public static string? GetEmployeeId(this ClaimsPrincipal principal)
+        => principal.FindFirstValue("EmployeeId");
+
     public static string? GetFullName(this ClaimsPrincipal principal)
         => principal?.FindFirst(ApplicationClaims.Fullname)?.Value;
 

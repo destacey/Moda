@@ -96,9 +96,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AEA8F168-063
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C7667C91-8900-4EA2-AE93-D0E8A044414C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Planning.Domain", "Moda.Planning\src\Moda.Planning.Domain\Moda.Planning.Domain.csproj", "{BD83D8B0-82F6-4350-B83A-300F3FD3F141}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Planning.Domain", "Moda.Planning\src\Moda.Planning.Domain\Moda.Planning.Domain.csproj", "{BD83D8B0-82F6-4350-B83A-300F3FD3F141}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Planning.Application", "Moda.Planning\src\Moda.Planning.Application\Moda.Planning.Application.csproj", "{D2FA2C83-348F-48F5-8032-CF13B543EC65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Planning.Application", "Moda.Planning\src\Moda.Planning.Application\Moda.Planning.Application.csproj", "{D2FA2C83-348F-48F5-8032-CF13B543EC65}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

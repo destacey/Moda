@@ -8,6 +8,8 @@ public interface ICurrentUser
 
     Guid GetUserId();
 
+    Guid? GetEmployeeId();
+
     string? GetUserEmail();
 
     bool IsAuthenticated();

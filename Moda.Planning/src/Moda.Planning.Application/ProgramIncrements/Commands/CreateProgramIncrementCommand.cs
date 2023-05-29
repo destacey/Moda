@@ -13,7 +13,7 @@ public sealed class CreateProgramIncrementCommandValidator : CustomValidator<Cre
         RuleFor(e => e.Name)
             .NotEmpty()
             .MaximumLength(128)
-            .MustAsync(BeUniqueProgramIncrementName).WithMessage("The Program Increment name already exists."); ;
+            .MustAsync(BeUniqueProgramIncrementName).WithMessage("The Program Increment name already exists.");
 
         RuleFor(e => e.Description)
             .MaximumLength(1024);

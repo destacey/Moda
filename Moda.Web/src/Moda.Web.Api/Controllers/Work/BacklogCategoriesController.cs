@@ -19,8 +19,7 @@ public class BacklogCategoriesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BacklogCategories)]
     [OpenApiOperation("Get a list of all backlog categories.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<BacklogCategoryDto>>> GetList(CancellationToken cancellationToken)
     {
         var categories = await _sender.Send(new GetBacklogCategoriesQuery(), cancellationToken);

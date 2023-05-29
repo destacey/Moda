@@ -1,4 +1,6 @@
-﻿namespace Moda.Web.Api.Models.Organizations.Employees;
+﻿using Moda.Common.Application.Employees.Commands;
+
+namespace Moda.Web.Api.Models.Organizations.Employees;
 
 public sealed record UpdateEmployeeRequest
 {

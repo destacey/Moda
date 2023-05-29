@@ -1,8 +1,10 @@
 ﻿@page "/teams-of-teams/{Id:int}"
 
+@using Moda.Web.BlazorClient.Components.Planning
 @using Moda.Web.BlazorClient.Models.Teams;
 @using Moda.Web.BlazorClient.Shared.Organizations;
 @using Moda.Web.BlazorClient.Components.Organizations;
+@using Moda.Web.BlazorClient.Shared.Planning;
 
 @attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
 
@@ -28,6 +30,10 @@ else
                     <MudButton OnClick="@UpdateTeam">Edit</MudButton>
                     <MudButton OnClick="@AddTeamMembershipDialog">Add Team Membership</MudButton>
                 }
+                @if (_canManageRisks)
+                {
+                    <MudButton OnClick="@CreateRiskDialog">Add Risk</MudButton>
+                }
             </MudButtonGroup>
         }
     </ModaTitle>
@@ -38,36 +44,44 @@ else
                 <MudItem Class="py-0" xs="12" md="5">
                     <MudGrid Class="ma-0 pa-0">
                         <MudItem xs="12">
-                            <MudField Label="Type" Variant="Variant.Text">@_team.Type</MudField>
+                            <MudField Label="Type">@_team.Type</MudField>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudField Label="Code" Variant="Variant.Text">@_team.Code</MudField>
+                            <MudField Label="Code">@_team.Code</MudField>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudField Label="Is Active?" Variant="Variant.Text">@_team.IsActive</MudField>
+                            <MudField Label="Is Active?">@_team.IsActive</MudField>
                         </MudItem>
                     </MudGrid>
                 </MudItem>
                 <MudItem Class="py-0" xs="12" md="7">
                     <MudGrid Class="ma-0 pa-0">
                         <MudItem xs="12">
-                            <MudField Label="Team of Teams" Variant="Variant.Text">
+                            <MudField Label="Team of Teams">
                                 <MudLink Href="@(_team.TeamOfTeams is null ? null : $"teams-of-teams/{_team.TeamOfTeams.LocalId}")">@_team.TeamOfTeams?.Name</MudLink>
                             </MudField>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudField Label="Description" Variant="Variant.Text">@_team.Description</MudField>
+                            <MudField Label="Description">@_team.Description</MudField>
                         </MudItem>
                     </MudGrid>
                 </MudItem>
             </MudGrid>
         </MudTabPanel>
+        <MudTabPanel Text="Risks">
+            <RisksGrid Risks="_risks"
+                       GetRisks="GetRisks"
+                       ShowTeamColumn="false"
+                       CanManageRisks="_canManageRisks"
+                       UpdateRisk="UpdateRiskDialog" 
+                       IncludeClosed="_includeClosedRisks"/>
+        </MudTabPanel>
         <MudTabPanel Text="Team Memberships">
             <TeamMembershipsGrid Memberships="_teamMemberships"
-                             GetTeamMemberships="GetTeamMemberships"
-                             CanUpdateTeamMemberships="_canUpdateTeams"
-                             UpdateTeamMembership="UpdateTeamMembershipDialog"
-                             RemoveTeamMembership="RemoveTeamMembershipDialog" />
+                    GetTeamMemberships="GetTeamMemberships"
+                    CanUpdateTeamMemberships="_canUpdateTeams"
+                    UpdateTeamMembership="UpdateTeamMembershipDialog"
+                    RemoveTeamMembership="RemoveTeamMembershipDialog" />
         </MudTabPanel>
     </MudTabs>
 }
@@ -90,6 +104,7 @@ else
 
     private TeamOfTeamsDetailsDto _team = default!;
     private List<TeamMembershipsDto> _teamMemberships = new();
+    private List<RiskListDto> _risks = new();
 
     private bool _loading = true;
 
@@ -98,7 +113,9 @@ else
 
     private bool _showPageActions;
     private bool _canUpdateTeams;
+    private bool _canManageRisks;
 
+    private bool _includeClosedRisks = false;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -106,11 +123,12 @@ else
         _activeTabIndex = 0;
         _teamMemberships.Clear();
 
-        await GetTeam();
-
         var user = (await AuthState).User;
         _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Teams);
-        _showPageActions = _canUpdateTeams;
+        _canManageRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
+        _showPageActions = _canUpdateTeams || _canManageRisks;
+
+        await GetTeam();
 
         _loading = false;
     }
@@ -146,6 +164,8 @@ else
             await GetTeam();
         }
     }
+
+    #region Team Memberships
 
     private async Task GetTeamMemberships()
     {
@@ -257,4 +277,86 @@ else
             Snackbar.Add("Error removing team membership.", MudBlazor.Severity.Error);
         }
     }
+
+    #endregion Team Memberships
+
+    #region Risks
+
+    private async Task GetRisks(bool includeClosed)
+    {
+        _includeClosedRisks = includeClosed;
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsOfTeamsClient.GetRisksAsync(_team.Id, _includeClosedRisks), Snackbar) is List<RiskListDto> result)
+        {
+            _risks = result.ToList();
+        }
+    }
+
+    private async Task CreateRiskDialog()
+    {
+        var dialogTitle = "Add Team Risk";
+        var parameters = new DialogParameters
+            {
+                ["TeamId"] = _team.Id,
+                ["CreateRisk"] = EventCallback.Factory.Create<CreateRiskRequest>(this, CreateRisk)
+            };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<CreateRisk_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetRisks(_includeClosedRisks);
+        }
+    }
+
+    private async Task CreateRisk(CreateRiskRequest createRiskRequest)
+    {
+        await TeamsOfTeamsClient.CreateRiskAsync(_team.Id, createRiskRequest);
+    }
+
+    private async Task UpdateRiskDialog(RiskListDto riskListDto)
+    {
+        var riskDto = await TeamsOfTeamsClient.GetRiskByIdAsync(_team.Id, riskListDto.Id);
+        if (riskDto == null)
+        {
+            Snackbar.Add("Error getting risk.", MudBlazor.Severity.Error);
+            return;
+        }
+
+        var dialogTitle = "Update Team Risk";
+        var parameters = new DialogParameters
+            {
+                ["Risk"] = riskDto,
+                ["UpdateRisk"] = EventCallback.Factory.Create<UpdateRiskRequest>(this, UpdateRisk)
+            };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<UpdateRisk_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetRisks(_includeClosedRisks);
+        }
+    }
+
+    private async Task UpdateRisk(UpdateRiskRequest updateRiskRequest)
+    {
+        await TeamsOfTeamsClient.UpdateRiskAsync(_team.Id, updateRiskRequest.RiskId, updateRiskRequest);
+    }
+
+    #endregion Risks
 }
