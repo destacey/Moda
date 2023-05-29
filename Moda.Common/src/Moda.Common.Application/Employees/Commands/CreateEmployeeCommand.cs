@@ -1,6 +1,6 @@
 ﻿using Moda.Common.Application.Persistence;
 using Moda.Common.Application.Validators;
-using Moda.Common.Domain.Models;
+using Moda.Common.Domain.Employees;
 using Moda.Common.Models;
 
 namespace Moda.Common.Application.Employees.Commands;

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Moda.Common.Domain.Models;
+using Moda.Common.Domain.Employees;
 using Moda.Planning.Application.Persistence;
 using Moda.Planning.Domain.Models;
 using Moda.Work.Domain.Models;
@@ -16,6 +16,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizat
 
     #region Common
     public DbSet<Employee> Employees => Set<Employee>();
+    public DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems => Set<ExternalEmployeeBlacklistItem>();
 
     #endregion Common
 

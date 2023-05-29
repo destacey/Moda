@@ -5,7 +5,7 @@ using Moda.Common.Extensions;
 using Moda.Common.Models;
 using NodaTime;
 
-namespace Moda.Common.Domain.Models;
+namespace Moda.Common.Domain.Employees;
 public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
 {
     private readonly List<Employee> _directReports = new();

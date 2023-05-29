@@ -1,5 +1,5 @@
 ﻿using Mapster;
-using Moda.Common.Domain.Models;
+using Moda.Common.Domain.Employees;
 
 namespace Moda.Common.Application.Employees.Dtos;
 public sealed record EmployeeListDto : IMapFrom<Employee>
