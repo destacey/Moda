@@ -54,6 +54,7 @@ public class Risk : BaseAuditableEntity<Guid>
         private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
+    // TODO: switch TeamId to ObjectId and Context
     public Guid? TeamId { get; private set; }
 
     public PlanningTeam? Team { get; set; }
@@ -108,7 +109,6 @@ public class Risk : BaseAuditableEntity<Guid>
     /// </summary>
     /// <param name="summary"></param>
     /// <param name="description"></param>
-    /// <param name="teamId"></param>
     /// <param name="status"></param>
     /// <param name="category"></param>
     /// <param name="impact"></param>
@@ -118,13 +118,13 @@ public class Risk : BaseAuditableEntity<Guid>
     /// <param name="response"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result Update(string summary, string? description, Guid? teamId, RiskStatus status, RiskCategory category, RiskGrade impact, RiskGrade likelihood, Guid? assigneeId, LocalDate? followUpDate, string? response, Instant timestamp)
+    public Result Update(string summary, string? description, RiskStatus status, RiskCategory category, RiskGrade impact, RiskGrade likelihood, Guid? assigneeId, LocalDate? followUpDate, string? response, Instant timestamp)
     {
         try
         {
+            //TeamId isn't updatable at this time
             Summary = summary;
             Description = description;
-            TeamId = teamId;
             Category = category;
             Impact = impact;
             Likelihood = likelihood;

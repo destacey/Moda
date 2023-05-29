@@ -36,7 +36,11 @@ else
                             <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="@(() => UpdateRisk.InvokeAsync(context.Item))" />
                         </CellTemplate>
                     </TemplateColumn>
-                    <PropertyColumn Property="x => x.LocalId" Title="Id" />
+                    <PropertyColumn Property="x => x.LocalId" Title="Id">
+                        <CellTemplate>
+                            <MudLink Href="@($"/risks/{context.Item.LocalId}")">@context.Item.LocalId</MudLink>
+                        </CellTemplate>
+                    </PropertyColumn>
                     <PropertyColumn Property="x => x.Summary" Title="Summary" />
                     @if (ShowTeamColumn)
                     {
@@ -44,7 +48,7 @@ else
                             <CellTemplate>
                                 @if (context.Item.Team is not null)
                             {
-                                <MudLink Href="@GetTeamDetailUrl(context.Item.Team)">@context.Item.Team.Name</MudLink>
+                                <MudLink Href="@StringHelpers.GetTeamDetailsUrl(context.Item.Team.Type, context.Item.Team.LocalId)">@context.Item.Team.Name</MudLink>
                             }
                             </CellTemplate>
                         </PropertyColumn>
@@ -101,6 +105,9 @@ else
 
     [Parameter]
     public bool IncludeClosed { get; set; }
+
+    [Parameter]
+    public BreadcrumbItem? DetailsReturnBreadcrumb { get; set; }
 
     private MudDataGrid<RiskListDto> _grid = default!;
     private string _searchString = "";
@@ -162,13 +169,6 @@ else
 
         return false;
     };
-
-    private string GetTeamDetailUrl(PlanningTeamNavigationDto team)
-    {
-        return team.Type == "Team"
-            ? $"teams/{team.LocalId}"
-            : $"teams-of-teams/{team.LocalId}";
-    }
 
     private async Task RefreshData(bool includeClosed)
     {

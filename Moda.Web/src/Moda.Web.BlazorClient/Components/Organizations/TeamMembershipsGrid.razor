@@ -33,12 +33,12 @@ else
                 <Columns>
                     <PropertyColumn Property="x => x.Child.Name" Title="Child">
                         <CellTemplate>
-                            <MudLink Href="@GetTeamDetailUrl(context.Item.Child)">@context.Item.Child.Name</MudLink>
+                            <MudLink Href="@StringHelpers.GetTeamDetailsUrl(context.Item.Child.Type, context.Item.Child.LocalId)">@context.Item.Child.Name</MudLink>
                         </CellTemplate>
                     </PropertyColumn>
                     <PropertyColumn Property="x => x.Parent.Name" Title="Parent">
                         <CellTemplate>
-                            <MudLink Href="@GetTeamDetailUrl(context.Item.Parent)">@context.Item.Parent.Name</MudLink>
+                            <MudLink Href="@StringHelpers.GetTeamDetailsUrl(context.Item.Parent.Type, context.Item.Parent.LocalId)">@context.Item.Parent.Name</MudLink>
                         </CellTemplate>
                     </PropertyColumn>
                     <PropertyColumn Property="x => x.State" Title="State" />
@@ -139,11 +139,4 @@ else
 
         return false;
     };
-
-    private string GetTeamDetailUrl(TeamNavigationDto team)
-    {
-        return team.Type == "Team"
-            ? $"teams/{team.LocalId}"
-            : $"teams-of-teams/{team.LocalId}";
-    }
 }

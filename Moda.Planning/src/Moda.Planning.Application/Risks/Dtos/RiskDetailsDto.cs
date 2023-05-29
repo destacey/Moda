@@ -1,5 +1,4 @@
 ﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Extensions;
 using Moda.Planning.Application.Models;
 
 namespace Moda.Planning.Application.Risks.Dtos;

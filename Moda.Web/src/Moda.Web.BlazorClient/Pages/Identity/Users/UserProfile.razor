@@ -7,7 +7,7 @@
 <ModaPageBreadCrumbs Breadcrumbs="_breadcrumbs" />
 
 <ModaTitle Title="@Title" Description="@Description" />
-@if (!_loaded)
+@if (_loading)
 {
     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
@@ -121,7 +121,8 @@ else
     private UserDetailsDto _user = default!;
 
     private char? _firstLetterOfName;
-    private bool _loaded;
+
+    private bool _loading = true;
     private bool _canToggleUserStatus;
 
     private List<BreadcrumbItem> _breadcrumbs = new()
@@ -142,11 +143,14 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+        _loading = true;
+
         await GetUser();
 
         var state = await AuthState;
         _canToggleUserStatus = await AuthService.HasPermissionAsync(state.User, ApplicationAction.Update, ApplicationResource.Users);
-        _loaded = true;
+
+        _loading = false;
     }
 
     private async Task GetUser()

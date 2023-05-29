@@ -16,9 +16,7 @@ public record TeamListViewModel
     public string? TeamOfTeamsName { get; set; }
 
     public string DetailsUrl
-        => Type == "Team"
-            ? $"teams/{LocalId}"
-            : $"teams-of-teams/{LocalId}";
+        => StringHelpers.GetTeamDetailsUrl(Type, LocalId);
 
     public string? TeamOfTeamsDetailsUrl
         => TeamOfTeams is not null ? $"teams-of-teams/{TeamOfTeams.LocalId}" : null;

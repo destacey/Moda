@@ -96,11 +96,11 @@ else
         // reset the page when the route changes
         _activeTabIndex = 0;
 
-        await GetProgramIncrement();
-
         var user = (await AuthState).User;
         _canUpdateProgramIncrements = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.ProgramIncrements);
         _showPageActions = _canUpdateProgramIncrements;
+
+        await GetProgramIncrement();
 
         _loading = false;
     }

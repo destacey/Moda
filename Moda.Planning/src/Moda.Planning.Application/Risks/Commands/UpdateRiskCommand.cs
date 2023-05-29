@@ -57,14 +57,13 @@ internal sealed class UpdateRiskCommandHandler : ICommandHandler<UpdateRiskComma
         try
         {
             var risk = await _planningDbContext.Risks
-                .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
+                .FirstOrDefaultAsync(r => r.Id == request.Id && r.TeamId == request.TeamId,  cancellationToken);
             if (risk is null)
                 return Result.Failure<int>("Risk not found.");
 
             var updateResult = risk.Update(
                 request.Summary,
                 request.Description,
-                request.TeamId,
                 request.Status,
                 request.Category,
                 request.Impact,
