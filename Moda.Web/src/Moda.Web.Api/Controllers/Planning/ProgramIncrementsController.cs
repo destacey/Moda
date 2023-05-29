@@ -3,6 +3,8 @@ using Moda.Organization.Application.Teams.Queries;
 using Moda.Organization.Application.TeamsOfTeams.Queries;
 using Moda.Planning.Application.ProgramIncrements.Dtos;
 using Moda.Planning.Application.ProgramIncrements.Queries;
+using Moda.Planning.Application.Risks.Dtos;
+using Moda.Planning.Application.Risks.Queries;
 using Moda.Web.Api.Models.Planning.ProgramIncrements;
 
 namespace Moda.Web.Api.Controllers.Planning;
@@ -115,4 +117,20 @@ public class ProgramIncrementsController : ControllerBase
             ? NoContent()
             : BadRequest(result.Error);
     }
+
+    #region Risks
+
+    [HttpGet("{id}/risks")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
+    [OpenApiOperation("Get program increment risks.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken, bool includeClosed = false)
+    {
+        var risks = await _sender.Send(new GetRisksByProgramIncrementQuery(id, includeClosed), cancellationToken);
+
+        return Ok(risks);
+    }
+
+    #endregion Risks
 }
