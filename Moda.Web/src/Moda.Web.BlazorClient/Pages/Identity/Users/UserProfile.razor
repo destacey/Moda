@@ -78,21 +78,21 @@ else
                 <MudCardContent>
                     <MudGrid>
                         <MudItem xs="12" md="6">
-                            <MudField Label="First Name" Variant="Variant.Text">@_user.FirstName</MudField>
+                            <MudField Label="First Name">@_user.FirstName</MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudField Label="Last Name" Variant="Variant.Text">@_user.LastName</MudField>
+                            <MudField Label="Last Name">@_user.LastName</MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudField Label="Phone Number" Variant="Variant.Text">
+                            <MudField Label="Phone Number">
                                 @_user.PhoneNumber
                             </MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
-                                <MudField Label="Email" Variant="Variant.Text">@_user.Email</MudField>
+                                <MudField Label="Email">@_user.Email</MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
-                            <MudField Label="Employee" Variant="Variant.Text">
+                            <MudField Label="Employee">
                                 @if (_user.Employee is not null)
                                 {
                                     <MudLink Href="@($"/employees/{@_user.Employee.LocalId}")">@_user.Employee.Name</MudLink>

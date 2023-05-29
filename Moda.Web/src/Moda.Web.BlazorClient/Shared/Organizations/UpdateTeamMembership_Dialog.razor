@@ -16,8 +16,8 @@ else
     <MudDialog>
         <DialogContent>
             <EditForm id="updateTeamMembershipForm" EditContext="_editContext" OnValidSubmit="Update">
-                <MudTextField Label="Child Team" Variant="Variant.Text" Value="TeamMembership.Child.Name" />
-                <MudTextField Label="Parent Team" Variant="Variant.Text" Value="TeamMembership.Parent.Name" />
+                <MudTextField Label="Child Team" Value="TeamMembership.Child.Name" />
+                <MudTextField Label="Parent Team" Value="TeamMembership.Parent.Name" />
 
                 <DataAnnotationsValidator />
                 <MudDatePicker Label="Start" AnchorOrigin="Origin.BottomCenter" Editable="true" @bind-Date="_model.Start" For="@(() => _model.Start)" />

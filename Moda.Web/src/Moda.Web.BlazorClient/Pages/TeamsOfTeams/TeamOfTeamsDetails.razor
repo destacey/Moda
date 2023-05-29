@@ -44,25 +44,25 @@ else
                 <MudItem Class="py-0" xs="12" md="5">
                     <MudGrid Class="ma-0 pa-0">
                         <MudItem xs="12">
-                            <MudField Label="Type" Variant="Variant.Text">@_team.Type</MudField>
+                            <MudField Label="Type">@_team.Type</MudField>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudField Label="Code" Variant="Variant.Text">@_team.Code</MudField>
+                            <MudField Label="Code">@_team.Code</MudField>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudField Label="Is Active?" Variant="Variant.Text">@_team.IsActive</MudField>
+                            <MudField Label="Is Active?">@_team.IsActive</MudField>
                         </MudItem>
                     </MudGrid>
                 </MudItem>
                 <MudItem Class="py-0" xs="12" md="7">
                     <MudGrid Class="ma-0 pa-0">
                         <MudItem xs="12">
-                            <MudField Label="Team of Teams" Variant="Variant.Text">
+                            <MudField Label="Team of Teams">
                                 <MudLink Href="@(_team.TeamOfTeams is null ? null : $"teams-of-teams/{_team.TeamOfTeams.LocalId}")">@_team.TeamOfTeams?.Name</MudLink>
                             </MudField>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudField Label="Description" Variant="Variant.Text">@_team.Description</MudField>
+                            <MudField Label="Description">@_team.Description</MudField>
                         </MudItem>
                     </MudGrid>
                 </MudItem>
