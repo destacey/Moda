@@ -1,12 +1,15 @@
 ﻿@page "/program-increments/{Id:int}"
 
 @using Moda.Web.BlazorClient.Components.Organizations;
+@using Moda.Web.BlazorClient.Components.Planning;
 @using Moda.Web.BlazorClient.Models.Teams;
+@using Moda.Web.BlazorClient.Shared.Planning;
 
 @attribute [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
 
 @inject IAuthorizationService AuthService
 @inject IProgramIncrementsClient ProgramIncrementsClient
+@inject IRisksClient RisksClient
 
 <PageTitle>Program Increments</PageTitle>
 <ModaPageBreadCrumbs Breadcrumbs="_breadcrumbs" />
@@ -60,6 +63,14 @@ else
                 </MudItem>
             </MudGrid>
         </MudTabPanel>
+        <MudTabPanel Text="Risk Management">
+            <RisksGrid Risks="_risks"
+                       GetRisks="GetRisks"
+                       ShowTeamColumn="true"
+                       CanManageRisks="_canManageRisks"
+                       UpdateRisk="UpdateRiskDialog"
+                       IncludeClosed="_includeClosedRisks" />
+        </MudTabPanel>
     </MudTabs>
 }
 
@@ -80,6 +91,7 @@ else
 
     private ProgramIncrementDetailsDto _programIncrement = default!;
     private List<TeamListViewModel> _piTeams = new();
+    private List<RiskListDto> _risks = new();
 
     private bool _loading = true;
 
@@ -88,6 +100,9 @@ else
 
     private bool _showPageActions;
     private bool _canUpdateProgramIncrements;
+    private bool _canManageRisks;
+
+    private bool _includeClosedRisks = false;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -95,10 +110,13 @@ else
 
         // reset the page when the route changes
         _activeTabIndex = 0;
+        _piTeams.Clear();
+        _risks.Clear();
 
         var user = (await AuthState).User;
         _canUpdateProgramIncrements = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.ProgramIncrements);
-        _showPageActions = _canUpdateProgramIncrements;
+        _canManageRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
+        _showPageActions = _canUpdateProgramIncrements || _canManageRisks;
 
         await GetProgramIncrement();
 
@@ -163,6 +181,58 @@ else
         if (!result.Canceled)
         {
             await GetTeams();
+            _risks.Clear();
         }
     }
+
+
+    #region Risks
+
+    private async Task GetRisks(bool includeClosed)
+    {
+        _includeClosedRisks = includeClosed;
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetRisksAsync(_programIncrement.Id, _includeClosedRisks), Snackbar) is List<RiskListDto> result)
+        {
+            _risks = result.OrderByDescending(r => r.ReportedOn).ToList();
+        }
+    }
+
+    private async Task UpdateRiskDialog(RiskListDto riskListDto)
+    {
+        var riskDto = await RisksClient.GetByIdAsync(riskListDto.LocalId);
+        if (riskDto == null)
+        {
+            Snackbar.Add("Error getting risk.", MudBlazor.Severity.Error);
+            return;
+        }
+
+        var dialogTitle = "Update Risk";
+        var parameters = new DialogParameters
+            {
+                ["Risk"] = riskDto,
+                ["UpdateRisk"] = EventCallback.Factory.Create<UpdateRiskRequest>(this, UpdateRisk)
+            };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<UpdateRisk_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetRisks(_includeClosedRisks);
+        }
+    }
+
+    private async Task UpdateRisk(UpdateRiskRequest updateRiskRequest)
+    {
+        await RisksClient.UpdateAsync(updateRiskRequest.RiskId, updateRiskRequest);
+    }
+
+    #endregion Risks
 }
