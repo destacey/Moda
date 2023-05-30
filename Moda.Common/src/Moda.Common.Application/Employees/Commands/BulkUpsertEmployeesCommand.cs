@@ -52,8 +52,9 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
         Dictionary<string, string> errors = new();
         Dictionary<string, string> missingManagers = new();
         List<Employee> employees = await _modaDbContext.Employees.ToListAsync(cancellationToken) ?? new();
+        var blacklist = await _modaDbContext.ExternalEmployeeBlacklistItems.Select(b => b.ObjectId).ToListAsync(cancellationToken);
 
-        foreach (var externalEmployee in request.Employees)
+        foreach (var externalEmployee in request.Employees.Where(e => !blacklist.Contains(e.EmployeeNumber)))
         {
             try
             {
