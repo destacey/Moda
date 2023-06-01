@@ -1,5 +1,5 @@
 ﻿using Mapster;
-using Moda.Common.Domain.Models;
+using Moda.Common.Domain.Employees;
 using Moda.Common.Helpers;
 
 namespace Moda.Common.Application.Employees.Dtos;

@@ -1,4 +1,5 @@
-﻿using Moda.Common.Application.Employees.Dtos;
+﻿using Moda.Common.Application.Employees.Commands;
+using Moda.Common.Application.Employees.Dtos;
 using Moda.Common.Application.Employees.Queries;
 using Moda.Web.Api.Models.Organizations.Employees;
 
@@ -90,5 +91,20 @@ public class EmployeesController : ControllerBase
     {
         var directReports = await _sender.Send(new GetDirectReportsQuery(id), cancellationToken);
         return Ok(directReports.OrderBy(e => e.LastName));
+    }
+
+
+    [HttpPost("{id}/remove-invalid")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Employees)]
+    [OpenApiOperation("Remove invalid employee record from employee list.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> RemoveInvalid(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new RemoveInvalidEmployeeCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.Error);
     }
 }

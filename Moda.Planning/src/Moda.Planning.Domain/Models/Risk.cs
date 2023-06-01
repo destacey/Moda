@@ -1,7 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Data;
-using Moda.Common.Domain.Models;
+using Moda.Common.Domain.Employees;
 using Moda.Common.Extensions;
 using Moda.Planning.Domain.Enums;
 using NodaTime;

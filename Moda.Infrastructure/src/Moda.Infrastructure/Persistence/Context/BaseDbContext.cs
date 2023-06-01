@@ -24,6 +24,10 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         _serializer = serializer;
         _dbSettings = dbSettings.Value;
         _events = events;
+
+        // this is need so that the owned entities are soft deleted correctly
+        ChangeTracker.CascadeDeleteTiming = CascadeTiming.OnSaveChanges;
+        ChangeTracker.DeleteOrphansTiming = CascadeTiming.OnSaveChanges;
     }
 
     // Used by Dapper
@@ -55,7 +59,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         // optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
 
         optionsBuilder.UseDatabase(_dbSettings.DBProvider!, _dbSettings.ConnectionString!);
-    }
+    }    
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {

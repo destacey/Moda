@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Moda.Common.Domain.Models;
+using Moda.Common.Domain.Employees;
 using Moda.Common.Models;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
@@ -60,5 +60,16 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
 
         // Relationships
         builder.HasOne(e => e.Manager).WithMany(m => m.DirectReports).HasForeignKey(e => e.ManagerId).OnDelete(DeleteBehavior.NoAction);
+    }
+}
+
+public class ExternalEmployeeBlacklistItemConfig : IEntityTypeConfiguration<ExternalEmployeeBlacklistItem>
+{
+    public void Configure(EntityTypeBuilder<ExternalEmployeeBlacklistItem> builder)
+    {
+        builder.ToTable("ExternalEmployeeBlacklistItems", SchemaNames.Organization);
+
+        builder.HasKey(e => e.ObjectId);
+        builder.HasIndex(e => e.ObjectId);
     }
 }

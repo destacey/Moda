@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using Moda.Common.Domain.Models;
+using Moda.Common.Domain.Employees;
 
 namespace Moda.Infrastructure.Identity;
 

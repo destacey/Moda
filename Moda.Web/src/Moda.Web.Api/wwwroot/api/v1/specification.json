@@ -2426,6 +2426,47 @@
         ]
       }
     },
+    "/api/organization/employees/{id}/remove-invalid": {
+      "post": {
+        "tags": [
+          "Employees"
+        ],
+        "summary": "Remove invalid employee record from employee list.",
+        "operationId": "Employees_RemoveInvalid",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/organization/teams": {
       "get": {
         "tags": [

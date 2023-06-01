@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Models;
 
 namespace Moda.Common.Application.Persistence;
@@ -11,4 +12,5 @@ public interface IModaDbContext
 
     // Common DbSets
     DbSet<Employee> Employees { get; }
+    DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems { get; }
 }
