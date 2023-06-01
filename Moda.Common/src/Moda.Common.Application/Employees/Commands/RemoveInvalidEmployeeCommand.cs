@@ -22,6 +22,7 @@ internal sealed class RemoveInvalidEmployeeCommandHandler : ICommandHandler<Remo
         try
         {
             var employee = await _modaDbContext.Employees
+                .Include(e => e.DirectReports)
                 .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
             if (employee is null || string.IsNullOrWhiteSpace(employee.EmployeeNumber))
                 return Result.Failure<int>("Employee not found.");
@@ -52,12 +53,17 @@ internal sealed class RemoveInvalidEmployeeCommandHandler : ICommandHandler<Remo
                 return Result.Failure<int>(updateResult.Error);
             }
 
+            foreach (var report in employee.DirectReports)
+            {
+                report.UpdateManagerId(null, _dateTimeService.Now);
+            }
+
             await _modaDbContext.SaveChangesAsync(cancellationToken);
 
             _modaDbContext.Employees.Remove(employee);
 
-            await _modaDbContext.SaveChangesAsync(cancellationToken);
             _modaDbContext.ExternalEmployeeBlacklistItems.Add(new ExternalEmployeeBlacklistItem { ObjectId = objectId });
+            await _modaDbContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("The invalid employee {EmployeeId} with employee number {EmployeeNumber} has been deleted", request.Id, objectId);
             _logger.LogInformation("Object Id {EmployeeNumber} has been added to the ExternalEmployeeBlacklistItems list.", objectId);

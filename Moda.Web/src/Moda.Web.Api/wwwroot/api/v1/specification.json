@@ -2454,7 +2454,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
