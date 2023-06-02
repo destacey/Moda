@@ -2978,6 +2978,19 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         System.Threading.Tasks.Task UpdateAsync(System.Guid id, UpdateRiskRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
+        /// Import risks from a csv file.
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ImportRiskRequest>> ImportAsync(string? contentType, string? contentDisposition, IHeaderDictionary? headers, long? length, string? name, string? fileName);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Import risks from a csv file.
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ImportRiskRequest>> ImportAsync(string? contentType, string? contentDisposition, IHeaderDictionary? headers, long? length, string? name, string? fileName, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
         /// Get a list of all risk statuses.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -3300,6 +3313,142 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         if (status_ == 204)
                         {
                             return;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ErrorResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ErrorResult>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 422)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Import risks from a csv file.
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ImportRiskRequest>> ImportAsync(string? contentType, string? contentDisposition, IHeaderDictionary? headers, long? length, string? name, string? fileName)
+        {
+            return ImportAsync(contentType, contentDisposition, headers, length, name, fileName, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Import risks from a csv file.
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ImportRiskRequest>> ImportAsync(string? contentType, string? contentDisposition, IHeaderDictionary? headers, long? length, string? name, string? fileName, System.Threading.CancellationToken cancellationToken)
+        {
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("api/planning/risks/import");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var boundary_ = System.Guid.NewGuid().ToString();
+                    var content_ = new System.Net.Http.MultipartFormDataContent(boundary_);
+                    content_.Headers.Remove("Content-Type");
+                    content_.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=" + boundary_);
+
+                    if (contentType != null)
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(contentType, System.Globalization.CultureInfo.InvariantCulture)), "ContentType");
+                    }
+
+                    if (contentDisposition != null)
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(contentDisposition, System.Globalization.CultureInfo.InvariantCulture)), "ContentDisposition");
+                    }
+
+                    if (headers != null)
+                    {
+                        var json_ = Newtonsoft.Json.JsonConvert.SerializeObject(headers, _settings.Value);
+                        content_.Add(new System.Net.Http.StringContent(json_), "Headers");
+                    }
+
+                    if (length == null)
+                        throw new System.ArgumentNullException("length");
+                    else
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(length, System.Globalization.CultureInfo.InvariantCulture)), "Length");
+                    }
+
+                    if (name != null)
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(name, System.Globalization.CultureInfo.InvariantCulture)), "Name");
+                    }
+
+                    if (fileName != null)
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(fileName, System.Globalization.CultureInfo.InvariantCulture)), "FileName");
+                    }
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<ImportRiskRequest>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 400)
@@ -12005,6 +12154,338 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("response", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
         public string? Response { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ImportRiskRequest
+    {
+        [Newtonsoft.Json.JsonProperty("importId", Required = Newtonsoft.Json.Required.Always)]
+        public int ImportId { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("teamId", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public System.Guid TeamId { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("summary", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
+        public string Summary { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(1024)]
+        public string? Description { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("reportedOnUtc", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public System.DateTime ReportedOnUtc { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("reportedById", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public System.Guid ReportedById { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("statusId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int StatusId { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("categoryId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int CategoryId { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("impactId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int ImpactId { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("likelihoodId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int LikelihoodId { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("assigneeId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid? AssigneeId { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("followUpDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime? FollowUpDate { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("response", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(1024)]
+        public string? Response { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("closedDateUtc", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime? ClosedDateUtc { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public abstract partial class IHeaderDictionary
+    {
+        [Newtonsoft.Json.JsonProperty("Item", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Item { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ContentLength", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long? ContentLength { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Accept", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Accept { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AcceptCharset", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AcceptCharset { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AcceptEncoding", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AcceptEncoding { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AcceptLanguage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AcceptLanguage { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AcceptRanges", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AcceptRanges { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AccessControlAllowCredentials", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AccessControlAllowCredentials { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AccessControlAllowHeaders", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AccessControlAllowHeaders { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AccessControlAllowMethods", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AccessControlAllowMethods { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AccessControlAllowOrigin", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AccessControlAllowOrigin { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AccessControlExposeHeaders", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AccessControlExposeHeaders { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AccessControlMaxAge", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AccessControlMaxAge { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AccessControlRequestHeaders", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AccessControlRequestHeaders { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AccessControlRequestMethod", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AccessControlRequestMethod { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Age", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Age { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Allow", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Allow { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("AltSvc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> AltSvc { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Authorization", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Authorization { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Baggage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Baggage { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("CacheControl", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> CacheControl { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Connection", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Connection { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ContentDisposition", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ContentDisposition { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ContentEncoding", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ContentEncoding { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ContentLanguage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ContentLanguage { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ContentLocation", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ContentLocation { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ContentMD5", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ContentMD5 { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ContentRange", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ContentRange { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ContentSecurityPolicy", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ContentSecurityPolicy { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ContentSecurityPolicyReportOnly", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ContentSecurityPolicyReportOnly { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ContentType", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ContentType { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("CorrelationContext", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> CorrelationContext { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Cookie", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Cookie { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Date", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Date { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ETag", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ETag { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Expires", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Expires { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Expect", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Expect { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("From", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> From { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("GrpcAcceptEncoding", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> GrpcAcceptEncoding { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("GrpcEncoding", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> GrpcEncoding { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("GrpcMessage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> GrpcMessage { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("GrpcStatus", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> GrpcStatus { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("GrpcTimeout", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> GrpcTimeout { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Host", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Host { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("KeepAlive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> KeepAlive { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("IfMatch", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> IfMatch { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("IfModifiedSince", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> IfModifiedSince { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("IfNoneMatch", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> IfNoneMatch { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("IfRange", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> IfRange { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("IfUnmodifiedSince", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> IfUnmodifiedSince { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("LastModified", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> LastModified { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Link", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Link { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Location", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Location { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("MaxForwards", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> MaxForwards { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Origin", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Origin { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Pragma", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Pragma { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ProxyAuthenticate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ProxyAuthenticate { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ProxyAuthorization", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ProxyAuthorization { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("ProxyConnection", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> ProxyConnection { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Range", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Range { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Referer", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Referer { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("RetryAfter", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> RetryAfter { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("RequestId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> RequestId { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("SecWebSocketAccept", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> SecWebSocketAccept { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("SecWebSocketKey", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> SecWebSocketKey { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("SecWebSocketProtocol", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> SecWebSocketProtocol { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("SecWebSocketVersion", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> SecWebSocketVersion { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("SecWebSocketExtensions", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> SecWebSocketExtensions { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Server", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Server { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("SetCookie", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> SetCookie { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("StrictTransportSecurity", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> StrictTransportSecurity { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("TE", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> TE { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Trailer", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Trailer { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("TransferEncoding", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> TransferEncoding { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Translate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Translate { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("TraceParent", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> TraceParent { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("TraceState", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> TraceState { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Upgrade", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Upgrade { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("UpgradeInsecureRequests", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> UpgradeInsecureRequests { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("UserAgent", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> UserAgent { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Vary", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Vary { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Via", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Via { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("Warning", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> Warning { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("WebSocketSubProtocols", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> WebSocketSubProtocols { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("WWWAuthenticate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> WWWAuthenticate { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("XContentTypeOptions", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> XContentTypeOptions { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("XFrameOptions", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> XFrameOptions { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("XPoweredBy", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> XPoweredBy { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("XRequestedWith", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> XRequestedWith { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("XUACompatible", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> XUACompatible { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("XXSSProtection", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<object> XXSSProtection { get; set; } = default!;
 
     }
 
