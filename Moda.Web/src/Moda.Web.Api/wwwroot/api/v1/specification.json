@@ -1300,6 +1300,93 @@
         ]
       }
     },
+    "/api/planning/risks/import": {
+      "post": {
+        "tags": [
+          "Risks"
+        ],
+        "summary": "Import risks from a csv file.",
+        "operationId": "Risks_Import",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "ContentType": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "ContentDisposition": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Headers": {
+                    "nullable": true,
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/IHeaderDictionary"
+                      }
+                    ]
+                  },
+                  "Length": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "Name": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "FileName": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ImportRiskRequest"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/risks/statuses": {
       "get": {
         "tags": [
@@ -5230,6 +5317,464 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
+          }
+        }
+      },
+      "ImportRiskRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "importId",
+          "teamId",
+          "summary",
+          "reportedOnUtc",
+          "reportedById"
+        ],
+        "properties": {
+          "importId": {
+            "type": "integer",
+            "format": "int32",
+            "minLength": 1,
+            "nullable": false
+          },
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          },
+          "reportedOnUtc": {
+            "type": "string",
+            "format": "date-time",
+            "minLength": 1,
+            "nullable": false
+          },
+          "reportedById": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "impactId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "likelihoodId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "response": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          },
+          "closedDateUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "IHeaderDictionary": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "Item": {
+            "type": "array",
+            "items": {}
+          },
+          "ContentLength": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "Accept": {
+            "type": "array",
+            "items": {}
+          },
+          "AcceptCharset": {
+            "type": "array",
+            "items": {}
+          },
+          "AcceptEncoding": {
+            "type": "array",
+            "items": {}
+          },
+          "AcceptLanguage": {
+            "type": "array",
+            "items": {}
+          },
+          "AcceptRanges": {
+            "type": "array",
+            "items": {}
+          },
+          "AccessControlAllowCredentials": {
+            "type": "array",
+            "items": {}
+          },
+          "AccessControlAllowHeaders": {
+            "type": "array",
+            "items": {}
+          },
+          "AccessControlAllowMethods": {
+            "type": "array",
+            "items": {}
+          },
+          "AccessControlAllowOrigin": {
+            "type": "array",
+            "items": {}
+          },
+          "AccessControlExposeHeaders": {
+            "type": "array",
+            "items": {}
+          },
+          "AccessControlMaxAge": {
+            "type": "array",
+            "items": {}
+          },
+          "AccessControlRequestHeaders": {
+            "type": "array",
+            "items": {}
+          },
+          "AccessControlRequestMethod": {
+            "type": "array",
+            "items": {}
+          },
+          "Age": {
+            "type": "array",
+            "items": {}
+          },
+          "Allow": {
+            "type": "array",
+            "items": {}
+          },
+          "AltSvc": {
+            "type": "array",
+            "items": {}
+          },
+          "Authorization": {
+            "type": "array",
+            "items": {}
+          },
+          "Baggage": {
+            "type": "array",
+            "items": {}
+          },
+          "CacheControl": {
+            "type": "array",
+            "items": {}
+          },
+          "Connection": {
+            "type": "array",
+            "items": {}
+          },
+          "ContentDisposition": {
+            "type": "array",
+            "items": {}
+          },
+          "ContentEncoding": {
+            "type": "array",
+            "items": {}
+          },
+          "ContentLanguage": {
+            "type": "array",
+            "items": {}
+          },
+          "ContentLocation": {
+            "type": "array",
+            "items": {}
+          },
+          "ContentMD5": {
+            "type": "array",
+            "items": {}
+          },
+          "ContentRange": {
+            "type": "array",
+            "items": {}
+          },
+          "ContentSecurityPolicy": {
+            "type": "array",
+            "items": {}
+          },
+          "ContentSecurityPolicyReportOnly": {
+            "type": "array",
+            "items": {}
+          },
+          "ContentType": {
+            "type": "array",
+            "items": {}
+          },
+          "CorrelationContext": {
+            "type": "array",
+            "items": {}
+          },
+          "Cookie": {
+            "type": "array",
+            "items": {}
+          },
+          "Date": {
+            "type": "array",
+            "items": {}
+          },
+          "ETag": {
+            "type": "array",
+            "items": {}
+          },
+          "Expires": {
+            "type": "array",
+            "items": {}
+          },
+          "Expect": {
+            "type": "array",
+            "items": {}
+          },
+          "From": {
+            "type": "array",
+            "items": {}
+          },
+          "GrpcAcceptEncoding": {
+            "type": "array",
+            "items": {}
+          },
+          "GrpcEncoding": {
+            "type": "array",
+            "items": {}
+          },
+          "GrpcMessage": {
+            "type": "array",
+            "items": {}
+          },
+          "GrpcStatus": {
+            "type": "array",
+            "items": {}
+          },
+          "GrpcTimeout": {
+            "type": "array",
+            "items": {}
+          },
+          "Host": {
+            "type": "array",
+            "items": {}
+          },
+          "KeepAlive": {
+            "type": "array",
+            "items": {}
+          },
+          "IfMatch": {
+            "type": "array",
+            "items": {}
+          },
+          "IfModifiedSince": {
+            "type": "array",
+            "items": {}
+          },
+          "IfNoneMatch": {
+            "type": "array",
+            "items": {}
+          },
+          "IfRange": {
+            "type": "array",
+            "items": {}
+          },
+          "IfUnmodifiedSince": {
+            "type": "array",
+            "items": {}
+          },
+          "LastModified": {
+            "type": "array",
+            "items": {}
+          },
+          "Link": {
+            "type": "array",
+            "items": {}
+          },
+          "Location": {
+            "type": "array",
+            "items": {}
+          },
+          "MaxForwards": {
+            "type": "array",
+            "items": {}
+          },
+          "Origin": {
+            "type": "array",
+            "items": {}
+          },
+          "Pragma": {
+            "type": "array",
+            "items": {}
+          },
+          "ProxyAuthenticate": {
+            "type": "array",
+            "items": {}
+          },
+          "ProxyAuthorization": {
+            "type": "array",
+            "items": {}
+          },
+          "ProxyConnection": {
+            "type": "array",
+            "items": {}
+          },
+          "Range": {
+            "type": "array",
+            "items": {}
+          },
+          "Referer": {
+            "type": "array",
+            "items": {}
+          },
+          "RetryAfter": {
+            "type": "array",
+            "items": {}
+          },
+          "RequestId": {
+            "type": "array",
+            "items": {}
+          },
+          "SecWebSocketAccept": {
+            "type": "array",
+            "items": {}
+          },
+          "SecWebSocketKey": {
+            "type": "array",
+            "items": {}
+          },
+          "SecWebSocketProtocol": {
+            "type": "array",
+            "items": {}
+          },
+          "SecWebSocketVersion": {
+            "type": "array",
+            "items": {}
+          },
+          "SecWebSocketExtensions": {
+            "type": "array",
+            "items": {}
+          },
+          "Server": {
+            "type": "array",
+            "items": {}
+          },
+          "SetCookie": {
+            "type": "array",
+            "items": {}
+          },
+          "StrictTransportSecurity": {
+            "type": "array",
+            "items": {}
+          },
+          "TE": {
+            "type": "array",
+            "items": {}
+          },
+          "Trailer": {
+            "type": "array",
+            "items": {}
+          },
+          "TransferEncoding": {
+            "type": "array",
+            "items": {}
+          },
+          "Translate": {
+            "type": "array",
+            "items": {}
+          },
+          "TraceParent": {
+            "type": "array",
+            "items": {}
+          },
+          "TraceState": {
+            "type": "array",
+            "items": {}
+          },
+          "Upgrade": {
+            "type": "array",
+            "items": {}
+          },
+          "UpgradeInsecureRequests": {
+            "type": "array",
+            "items": {}
+          },
+          "UserAgent": {
+            "type": "array",
+            "items": {}
+          },
+          "Vary": {
+            "type": "array",
+            "items": {}
+          },
+          "Via": {
+            "type": "array",
+            "items": {}
+          },
+          "Warning": {
+            "type": "array",
+            "items": {}
+          },
+          "WebSocketSubProtocols": {
+            "type": "array",
+            "items": {}
+          },
+          "WWWAuthenticate": {
+            "type": "array",
+            "items": {}
+          },
+          "XContentTypeOptions": {
+            "type": "array",
+            "items": {}
+          },
+          "XFrameOptions": {
+            "type": "array",
+            "items": {}
+          },
+          "XPoweredBy": {
+            "type": "array",
+            "items": {}
+          },
+          "XRequestedWith": {
+            "type": "array",
+            "items": {}
+          },
+          "XUACompatible": {
+            "type": "array",
+            "items": {}
+          },
+          "XXSSProtection": {
+            "type": "array",
+            "items": {}
           }
         }
       },

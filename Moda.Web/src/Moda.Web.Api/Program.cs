@@ -2,11 +2,13 @@ using System.Reflection;
 using FluentValidation.AspNetCore;
 using Moda.AppIntegration.Application;
 using Moda.Common.Application;
+using Moda.Common.Application.Interfaces;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
 using Moda.Organization.Application;
 using Moda.Planning.Application;
 using Moda.Web.Api.Configurations;
+using Moda.Web.Api.Services;
 using Moda.Work.Application;
 using NodaTime.Serialization.SystemTextJson;
 using Serilog;
@@ -57,6 +59,8 @@ try
     builder.Services.AddPlanningApplication();
     builder.Services.AddWorkApplication();
     builder.Services.AddAppIntegrationApplication();
+
+    builder.Services.AddScoped<ICsvService, CsvService>();
 
     var app = builder.Build();
 

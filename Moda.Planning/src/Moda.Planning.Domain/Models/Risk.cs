@@ -169,4 +169,41 @@ public class Risk : BaseAuditableEntity<Guid>
     {
         return new Risk(summary, description, teamId, reportedOn, reportedById, category, impact, likelihood, assigneeId, followUpDate, response);
     }
+
+    /// <summary>
+    /// Create a new risk.
+    /// </summary>
+    /// <param name="summary"></param>
+    /// <param name="description"></param>
+    /// <param name="teamId"></param>
+    /// <param name="reportedOn"></param>
+    /// <param name="reportedById"></param>
+    /// <param name="status"></param>
+    /// <param name="category"></param>
+    /// <param name="impact"></param>
+    /// <param name="likelihood"></param>
+    /// <param name="assigneeId"></param>
+    /// <param name="followUpDate"></param>
+    /// <param name="response"></param>
+    /// <param name="closedDate"></param>
+    /// <returns></returns>
+    public static Risk Import(string summary, string? description, Guid? teamId, Instant reportedOn, Guid reportedById, RiskStatus status, RiskCategory category, RiskGrade impact, RiskGrade likelihood, Guid? assigneeId, LocalDate? followUpDate, string? response, Instant? closedDate)
+    {
+        return new Risk()
+        {
+            Summary = summary,
+            Description = description,
+            TeamId = teamId,
+            ReportedOn = reportedOn,
+            ReportedById = reportedById,
+            Status = status,
+            Category = category,
+            Impact = impact,
+            Likelihood = likelihood,
+            AssigneeId = assigneeId,
+            FollowUpDate = followUpDate,
+            Response = response,
+            ClosedDate = closedDate,
+        };
+    }
 }
