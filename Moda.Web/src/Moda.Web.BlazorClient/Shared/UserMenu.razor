@@ -1,4 +1,6 @@
-﻿<MudMenu AnchorOrigin="Origin.BottomRight" LockScroll="true" TransformOrigin="Origin.TopRight">
+﻿@inject GlobalSettings GlobalSettings
+
+<MudMenu AnchorOrigin="Origin.BottomRight" LockScroll="true" TransformOrigin="Origin.TopRight">
     <ActivatorContent>
         <MudIconButton Icon="@Icons.Material.Filled.Person" />
     </ActivatorContent>
@@ -27,6 +29,17 @@
                 </div>
             </MudMenuItem>
 
+            @if (GlobalSettings.IsDocUrlEnabled)
+            {
+                <MudDivider />
+
+                <MudMenuItem Href="@GlobalSettings.DocsUrl" Target="_blank">
+                    <div class="d-flex">
+                        <MudIcon Class="mx-2" Icon="@Icons.Material.Filled.AutoStories" />
+                        <MudText>Docs</MudText>
+                    </div>
+                </MudMenuItem>
+            }
             <div class="mt-4 mx-4">
                 <MudButton Color="Color.Error" FullWidth="true" StartIcon="@Icons.Material.Filled.Logout"
                            Variant="Variant.Filled" OnClick="Logout">

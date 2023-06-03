@@ -7,6 +7,9 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+var globalSettings = GlobalSettings.GetConfig(builder.Configuration);
+builder.Services.AddSingleton(globalSettings);
+
 builder.Services.AddClientServices(builder.Configuration);
 //builder.Services.AddHttpClient("GraphAPI",
 //        client => client.BaseAddress = new Uri("https://graph.microsoft.com"))

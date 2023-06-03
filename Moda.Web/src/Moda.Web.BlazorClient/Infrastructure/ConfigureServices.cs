@@ -13,7 +13,8 @@ public static class ConfigureServices
 {
     private const string ClientName = "Moda.API";
 
-    public static IServiceCollection AddClientServices(this IServiceCollection services, IConfiguration config) =>
+    public static IServiceCollection AddClientServices(this IServiceCollection services, IConfiguration config)
+    {
         services
             .AddBlazoredLocalStorage()
             .AddMudServices(configuration =>
@@ -43,6 +44,9 @@ public static class ConfigureServices
                 .AddAuthenticationHandler(config)
                 .Services
             .AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient(ClientName));
+
+        return services;
+    }
 
     private static void RegisterPermissionClaims(AuthorizationOptions options)
     {
