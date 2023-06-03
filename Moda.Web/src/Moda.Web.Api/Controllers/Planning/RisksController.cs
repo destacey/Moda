@@ -36,11 +36,26 @@ public class RisksController : ControllerBase
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
+    [OpenApiOperation("Get risk details by Id.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<RiskDetailsDto>> GetById(Guid id)
+    {
+        var risk = await _sender.Send(new GetRiskQuery(id));
+
+        return risk is not null
+            ? Ok(risk)
+            : NotFound();
+    }
+
+    [HttpGet("local-id/{id}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get risk details using the localId.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult<RiskDetailsDto>> GetById(int id)
+    public async Task<ActionResult<RiskDetailsDto>> GetByLocalId(int id)
     {
         var risk = await _sender.Send(new GetRiskQuery(id));
 

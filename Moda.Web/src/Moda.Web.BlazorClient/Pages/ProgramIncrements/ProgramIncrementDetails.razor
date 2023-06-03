@@ -67,7 +67,8 @@ else
             <RisksGrid Risks="_risks"
                        GetRisks="GetRisks"
                        ShowTeamColumn="true"
-                       CanManageRisks="_canManageRisks"
+                       CanCreateRisks="false"
+                       CanUpdateRisks="_canUpdateRisks"
                        UpdateRisk="UpdateRiskDialog"
                        IncludeClosed="_includeClosedRisks" />
         </MudTabPanel>
@@ -100,7 +101,8 @@ else
 
     private bool _showPageActions;
     private bool _canUpdateProgramIncrements;
-    private bool _canManageRisks;
+    private bool _canCreateRisks;
+    private bool _canUpdateRisks;
 
     private bool _includeClosedRisks = false;
 
@@ -115,8 +117,9 @@ else
 
         var user = (await AuthState).User;
         _canUpdateProgramIncrements = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.ProgramIncrements);
-        _canManageRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
-        _showPageActions = _canUpdateProgramIncrements || _canManageRisks;
+        _canCreateRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
+        _canUpdateRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
+        _showPageActions = _canUpdateProgramIncrements;
 
         await GetProgramIncrement();
 
@@ -197,9 +200,9 @@ else
         }
     }
 
-    private async Task UpdateRiskDialog(RiskListDto riskListDto)
+    private async Task UpdateRiskDialog(Guid riskId)
     {
-        var riskDto = await RisksClient.GetByIdAsync(riskListDto.LocalId);
+        var riskDto = await RisksClient.GetByIdAsync(riskId);
         if (riskDto == null)
         {
             Snackbar.Add("Error getting risk.", MudBlazor.Severity.Error);

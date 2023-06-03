@@ -142,7 +142,7 @@ else
 
     private async Task GetRisk()
     {
-        if (await ApiHelper.ExecuteCallGuardedAsync(() => RisksClient.GetByIdAsync(Id), Snackbar) is RiskDetailsDto result)
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => RisksClient.GetByLocalIdAsync(Id), Snackbar) is RiskDetailsDto result)
         {
             _title = $"{result.Summary}";
             _description = "Risk Details";
@@ -160,7 +160,7 @@ else
 
     private async Task UpdateRiskDialog()
     {
-        var riskDto = await RisksClient.GetByIdAsync(_risk.LocalId);
+        var riskDto = await RisksClient.GetByIdAsync(_risk.Id);
         if (riskDto == null)
         {
             Snackbar.Add("Error getting risk.", MudBlazor.Severity.Error);

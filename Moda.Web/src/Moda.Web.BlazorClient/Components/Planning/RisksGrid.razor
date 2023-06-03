@@ -24,6 +24,12 @@ else
                          LoadingProgressColor="@Color.Secondary"
                          QuickFilter="@_quickFilter">
                 <ToolBarContent>
+                    <MudButtonGroup Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
+                        @if (CanCreateRisks)
+                        {
+                            <MudButton OnClick="@CreateRisk">Create Risk</MudButton>
+                        }
+                    </MudButtonGroup>
                     <MudSpacer />
                     <MudToolBar>
                         <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
@@ -34,9 +40,9 @@ else
                     </MudToolBar>
                 </ToolBarContent>
                 <Columns>
-                    <TemplateColumn Sortable="false" Filterable="false" Hidden="@(!CanManageRisks)">
+                    <TemplateColumn Sortable="false" Filterable="false" Hidden="@(!CanUpdateRisks)">
                         <CellTemplate>
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="@(() => UpdateRisk.InvokeAsync(context.Item))" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="@(() => UpdateRisk.InvokeAsync(context.Item.Id))" />
                         </CellTemplate>
                     </TemplateColumn>
                     <PropertyColumn Property="x => x.LocalId" Title="Id">
@@ -89,13 +95,19 @@ else
     public EventCallback<bool> GetRisks { get; set; }
 
     [Parameter]
-    public EventCallback<RiskListDto> UpdateRisk { get; set; }
+    public EventCallback CreateRisk { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> UpdateRisk { get; set; }
 
     [Parameter]
     public List<RiskListDto> Risks { get; set; } = default!;
 
     [Parameter]
-    public bool CanManageRisks { get; set; }
+    public bool CanCreateRisks { get; set; }
+
+    [Parameter]
+    public bool CanUpdateRisks { get; set; }
 
     [Parameter]
     public bool ShowTeamColumn { get; set; } = true;
@@ -128,7 +140,6 @@ else
         if (!Risks.Any())
         {
             await GetRisks.InvokeAsync();
-            Risks.OrderByDescending(m => m.ReportedOn);
         }
     }
 
