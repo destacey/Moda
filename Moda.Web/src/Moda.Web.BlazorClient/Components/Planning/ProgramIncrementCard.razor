@@ -1,0 +1,25 @@
+﻿<MudCard Elevation="2">
+    <MudCardContent>
+        <MudText Typo="Typo.h6">@ProgramIncrement.Name</MudText>
+        <MudText Typo="Typo.body2">@($"{ProgramIncrement.Start.ToShortDateString()} - {ProgramIncrement.End.ToShortDateString()} ({CalculateDaysLeft()} days left)")</MudText>
+    </MudCardContent>
+    <MudCardActions>
+            <MudButton OnClick="@(() => NavigateToProgramIncrement(ProgramIncrement.LocalId))" Variant="Variant.Text" Color="Color.Primary">View Details</MudButton>
+    </MudCardActions>
+</MudCard>
+
+    @code {
+    [Parameter]
+    public ProgramIncrementListDto ProgramIncrement { get; set; } = default!;
+
+    private void NavigateToProgramIncrement(int id)
+    {
+        Navigation.NavigateTo($"/program-increments/{id}");
+    }
+
+    private int CalculateDaysLeft()
+    {
+        var daysLeft = (ProgramIncrement.End.AddDays(1) - DateTime.Now).Days;
+        return daysLeft >= 0 ? daysLeft : 0;
+    }
+}
