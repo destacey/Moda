@@ -1,6 +1,5 @@
 ﻿using CsvHelper;
 using Moda.Common.Application.Interfaces;
-using Moda.Organization.Application.Teams.Queries;
 using Moda.Planning.Application.Risks.Commands;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
@@ -63,6 +62,18 @@ public class RisksController : ControllerBase
         return risk is not null
             ? Ok(risk)
             : NotFound();
+    }
+
+    [HttpGet("me")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
+    [OpenApiOperation("Get a list of open risks assigned to me.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetMyRisks(CancellationToken cancellationToken)
+    {
+        var risks = await _sender.Send(new GetMyRisksQuery(), cancellationToken);
+        return Ok(risks);
     }
 
     [HttpPost()]

@@ -21,8 +21,8 @@ public sealed record GetRisksQuery : IQuery<IReadOnlyList<RiskListDto>>
         IncludeClosed = includeClosed;
     }
 
-    public List<Guid> TeamIds { get; set; } = new();
-    public bool IncludeClosed { get; set; }
+    public List<Guid> TeamIds { get; private set; } = new();
+    public bool IncludeClosed { get; private set; }
 }
 
 internal sealed class GetRisksQueryHandler : IQueryHandler<GetRisksQuery, IReadOnlyList<RiskListDto>>

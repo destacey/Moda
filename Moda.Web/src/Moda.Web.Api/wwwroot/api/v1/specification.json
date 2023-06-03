@@ -1417,6 +1417,55 @@
         ]
       }
     },
+    "/api/planning/risks/me": {
+      "get": {
+        "tags": [
+          "Risks"
+        ],
+        "summary": "Get a list of open risks assigned to me.",
+        "operationId": "Risks_GetMyRisks",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RiskListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/risks/import": {
       "post": {
         "tags": [

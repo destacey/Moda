@@ -2,22 +2,33 @@
 @using Moda.Web.BlazorClient.Components.Planning
 
 @inject IProgramIncrementsClient ProgramIncrementsClient
+@inject IRisksClient RisksClient
 
 <MudGrid>
-    <MudItem xs="12">
-        @if (_programIncrements.Any())
-        {
+    @if (_programIncrements.Any())
+    {
+        <MudItem xs="12">
             <MudText Typo="Typo.h5" Class="mb-4">Active Program Increments</MudText>
             <MudGrid>
                 @foreach (var programIncrement in _programIncrements)
                 {
-                    <MudItem xs="12" md="3">
-                        <ProgramIncrementCard ProgramIncrement="@programIncrement"></ProgramIncrementCard>
+                    <MudItem xs="12" md="4">
+                        <ProgramIncrementCard ProgramIncrement="@programIncrement" />
                     </MudItem>
                 }
             </MudGrid>
-        }
-    </MudItem>
+        </MudItem>
+    }
+    @if (_showDivider)
+    {        
+        <MudDivider />
+    }
+    @if (_myRisks.Any())
+    {
+        <MudItem xs="12" md="4">
+            <MyRisks Risks="@_myRisks" />
+        </MudItem>
+    }
 </MudGrid>
 
 @code {
@@ -26,7 +37,10 @@
 
     public IEnumerable<Claim>? Claims { get; set; }
 
+    private bool _showDivider = false;
+
     private List<ProgramIncrementListDto> _programIncrements = new();
+    private List<RiskListDto> _myRisks = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -34,6 +48,9 @@
         Claims = authState.User.Claims;
 
         await GetActiveProgramIncrements();
+        await GetMyRisks();
+
+        _showDivider = _programIncrements.Any() && _myRisks.Any();
     }
 
     private async Task GetActiveProgramIncrements()
@@ -44,6 +61,17 @@
             _programIncrements = result
                 .Where(p => p.State == "Active")
                 .OrderBy(p => p.Start)
+                .ToList();
+        }
+    }
+
+    private async Task GetMyRisks()
+    {
+        // TODO: update the API to get just active PIs back
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => RisksClient.GetMyRisksAsync(), Snackbar) is List<RiskListDto> result)
+        {
+            _myRisks = result
+                .OrderBy(p => p.FollowUpDate)
                 .ToList();
         }
     }
