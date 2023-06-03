@@ -21,6 +21,18 @@ else
             <EditForm id="createRiskForm" EditContext="_editContext" OnValidSubmit="Create">
                 <DataAnnotationsValidator />
 
+                @if (!TeamId.HasValue)
+                {
+                    <MudSelect Dense="true" Label="Team" Variant="Variant.Text" AnchorOrigin="Origin.BottomCenter"
+                    @bind-Value="_model.TeamId" For="@(() => _model.TeamId)">
+                        <MudSelectItem Value="@Guid.Empty">Select Team</MudSelectItem>
+                        @foreach (var item in TeamOptions ?? new())
+                        {
+                            <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+
                 <MudTextField Label="Summary"
                               Lines="2"
                               MaxLength="256" Counter="256" Immediate="true"
@@ -101,16 +113,20 @@ else
     MudDialogInstance MudDialog { get; set; } = default!;
 
     [Parameter]
-    public Guid TeamId { get; set; } = default!;
+    public Guid? TeamId { get; set; }
 
     [Parameter]
     public EventCallback<CreateRiskRequest> CreateRisk { get; set; }
+
+    [Parameter]
+    public List<SelectOptionsViewModel<Guid>>? TeamOptions { get; set; }
 
     private EditContext? _editContext;
     private ValidationMessageStore? _messageStore;
 
     private CreateRiskRequest _model = new();
 
+    private List<SelectOptionsViewModel<Guid>> _teamOptions = new();
     private List<SelectOptionsViewModel<int>> _categoryOptions = new();
     private List<SelectOptionsViewModel<int>> _gradeOptions = new();
     private List<SelectOptionsViewModel<Guid?>> _employeeOptions = new();
@@ -122,7 +138,8 @@ else
     {
         _loading = true;
 
-        _model.TeamId = TeamId;
+        if (TeamId.HasValue)
+            _model.TeamId = TeamId.Value;
 
         _editContext = new(_model);
         _editContext.OnValidationRequested += HandleValidationRequested;

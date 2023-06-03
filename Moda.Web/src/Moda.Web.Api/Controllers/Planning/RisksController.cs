@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using Moda.Common.Application.Interfaces;
+using Moda.Organization.Application.Teams.Queries;
 using Moda.Planning.Application.Risks.Commands;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
@@ -62,6 +63,31 @@ public class RisksController : ControllerBase
         return risk is not null
             ? Ok(risk)
             : NotFound();
+    }
+
+    [HttpPost()]
+    [MustHavePermission(ApplicationAction.Create, ApplicationResource.Risks)]
+    [OpenApiOperation("Create a risk.", "")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> CreateRisk([FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToCreateRiskCommand(), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "RisksController.Create"
+            };
+            return BadRequest(error);
+        }
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
     }
 
     [HttpPut("{id}")]

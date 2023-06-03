@@ -2,6 +2,7 @@
 
 @using Moda.Web.BlazorClient.Components.Organizations;
 @using Moda.Web.BlazorClient.Components.Planning;
+@using Moda.Web.BlazorClient.Models.Common;
 @using Moda.Web.BlazorClient.Models.Teams;
 @using Moda.Web.BlazorClient.Shared.Planning;
 
@@ -67,8 +68,9 @@ else
             <RisksGrid Risks="_risks"
                        GetRisks="GetRisks"
                        ShowTeamColumn="true"
-                       CanCreateRisks="false"
+                       CanCreateRisks="_canCreateRisks"
                        CanUpdateRisks="_canUpdateRisks"
+                       CreateRisk="CreateRiskDialog"
                        UpdateRisk="UpdateRiskDialog"
                        IncludeClosed="_includeClosedRisks" />
         </MudTabPanel>
@@ -123,6 +125,9 @@ else
 
         await GetProgramIncrement();
 
+        // don't allow creating risks if the PI is completed
+        _canCreateRisks = _programIncrement.State == "Completed" ? false : _canCreateRisks;
+
         _loading = false;
     }
 
@@ -143,6 +148,14 @@ else
         {
             _piTeams = result.Select(t => TeamListViewModel.FromProgramIncrementTeamResponse(t)).OrderBy(t => t.Name).ToList();
         }
+    }
+
+    private List<SelectOptionsViewModel<Guid>> GetTeamOptions()
+    {
+       return _piTeams.Where(t => t.IsActive)
+            .OrderBy(t => t.Name)
+            .Select(t => new SelectOptionsViewModel<Guid>(t.Id, t.Name))
+            .ToList();
     }
 
     private async Task UpdateProgramIncrement()
@@ -198,6 +211,37 @@ else
         {
             _risks = result.OrderByDescending(r => r.ReportedOn).ToList();
         }
+    }
+
+    private async Task CreateRiskDialog()
+    {
+        var dialogTitle = "Add Team Risk";
+        var teamOptions = GetTeamOptions();
+        var parameters = new DialogParameters
+            {
+                ["TeamOptions"] = teamOptions,
+                ["CreateRisk"] = EventCallback.Factory.Create<CreateRiskRequest>(this, CreateRisk)
+            };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<CreateRisk_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetRisks(_includeClosedRisks);
+        }
+    }
+
+    private async Task CreateRisk(CreateRiskRequest createRiskRequest)
+    {
+        await RisksClient.CreateRiskAsync(createRiskRequest);
     }
 
     private async Task UpdateRiskDialog(Guid riskId)
