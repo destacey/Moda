@@ -99,4 +99,4 @@ The work state category is an enum that helps sort and normalize work states acr
 4. Removed - The work has been removed from the backlog without being completed.
 
 # ERD
-![work domain erd](/work-domain-erd.drawio.svg)
+![work domain erd](./work-domain-erd.drawio.svg)
