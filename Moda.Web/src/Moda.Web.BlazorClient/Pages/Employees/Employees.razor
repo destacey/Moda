@@ -29,6 +29,9 @@
                 <MudToolBar>
                     <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
                     <MudIconButton OnClick="@(() => RefreshData(_includeDisabled))" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
+                    <MudMenu Icon="@Icons.Material.Filled.Tune" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                        <MudSwitch Class="mx-3" Checked="_includeDisabled" CheckedChanged="@((bool value) => RefreshData(value))" Color="Color.Primary" Label="Include Disabled" />
+                    </MudMenu>
                 </MudToolBar>
             </ToolBarContent>
             <Columns>
@@ -61,10 +64,6 @@
             </NoRecordsContent>
         </MudDataGrid>
         <DataGridCountLabel DataGrid="@_grid" UnitLabel="employees" />
-
-        <div class="d-flex flex-wrap mt-3">
-            <MudSwitch CheckedChanged="@((bool value) => RefreshData(value))" Color="Color.Primary" Label="Include Disabled" />
-        </div>
     </ChildContent>
     <ErrorContent>
         <ModaCustomError />
@@ -143,7 +142,7 @@
 
         if (await ApiHelper.ExecuteCallGuardedAsync(() => EmployeesClient.GetListAsync(_includeDisabled), Snackbar) is List<EmployeeListDto> result)
         {
-            _employees = result;
+            _employees = result.OrderBy(e => e.FirstName).ToList();
         }
 
         _loading = false;

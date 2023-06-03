@@ -19,7 +19,7 @@
              Filterable="true"
              FilterMode="DataGridFilterMode.ColumnFilterMenu"
              FixedHeader="true"
-             Loading="@_isLoading"
+             Loading="@_loading"
              LoadingProgressColor="@Color.Secondary"
              QuickFilter="@_quickFilter">
     <ToolBarContent>
@@ -65,14 +65,6 @@
 </MudDataGrid>
 <DataGridCountLabel DataGrid="@_grid" UnitLabel="users" />
 
-@*    <ExtraActions>
-        <MudMenuItem OnClick="(() => ViewProfile(context.Id))">View Profile</MudMenuItem>
-        @if (_canViewRoles)
-        {
-            <MudMenuItem OnClick="(() => ManageRoles(context.Id))">Manage Roles</MudMenuItem>
-        }
-    </ExtraActions>*@
-
 @code {
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; } = default!;
@@ -81,7 +73,7 @@
     private List<UserDetailsDto> _users = new();
 
     private string _searchString = "";
-    private bool _isLoading = true;
+    private bool _loading = true;
     private bool _canExportUsers;
     private bool _canViewRoles;
     private ModaTablePreference _tablePreference = new();
@@ -133,13 +125,13 @@
 
     private async Task GetUsers()
     {
-        _isLoading = true;
+        _loading = true;
 
         if (await ApiHelper.ExecuteCallGuardedAsync(() => UsersClient.GetListAsync(), Snackbar) is List<UserDetailsDto> result)
         {
-            _users = result;
+            _users = result.OrderBy(u => u.FirstName).ToList();
         }
 
-        _isLoading = false;
+        _loading = false;
     }
 }

@@ -39,13 +39,13 @@ else
                 <MudItem Class="py-0" xs="12" md="5">
                     <MudGrid Class="ma-0 pa-0">
                         <MudItem xs="12" md="6">
-                            <MudField Label="State">@_programIncrement.State</MudField>
-                        </MudItem>
-                        <MudItem xs="12" md="6">
                             <MudField Label="Start">@_programIncrement.Start.ToShortDateString()</MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MudField Label="End">@_programIncrement.End.ToShortDateString()</MudField>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudField Label="State">@_programIncrement.State</MudField>
                         </MudItem>
                     </MudGrid>
                 </MudItem>
@@ -59,7 +59,7 @@ else
                     <TeamsGrid Height="400"
                         Teams="_piTeams"
                         GetTeams="GetTeams"
-                        AllowDisabledToggle="false"/>
+                        AllowDisabledToggle="false" />
                 </MudItem>
             </MudGrid>
         </MudTabPanel>

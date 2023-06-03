@@ -5,7 +5,7 @@
 
 <ModaTitle Title="@_title" Description="@_description" />
 
-@if (!_loaded)
+@if (_loading)
 {
     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
