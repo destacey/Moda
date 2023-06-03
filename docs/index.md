@@ -4,9 +4,8 @@ Moda is a work management system used to plan, manage, and create associations a
 ## Domains
 - [Work](./work.md)
 - [Organization](./organization.md)
-- Planning
-- Delivery
-- Product
+- [Planning](./planning.md)
+- Product Delivery
 - Project Portfolio Management
 - [App Integration](./app-integration.md)
 
