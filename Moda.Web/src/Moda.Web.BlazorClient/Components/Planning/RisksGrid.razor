@@ -34,7 +34,7 @@ else
                     </MudToolBar>
                 </ToolBarContent>
                 <Columns>
-                    <TemplateColumn CellClass="d-flex" Sortable="false" Filterable="false" Hidden="@(!CanManageRisks)">
+                    <TemplateColumn Sortable="false" Filterable="false" Hidden="@(!CanManageRisks)">
                         <CellTemplate>
                             <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="@(() => UpdateRisk.InvokeAsync(context.Item))" />
                         </CellTemplate>
@@ -45,18 +45,15 @@ else
                         </CellTemplate>
                     </PropertyColumn>
                     <PropertyColumn Property="x => x.Summary" Title="Summary" />
-                    @if (ShowTeamColumn)
-                    {
-                        <PropertyColumn Property="x => x.Team" Title="Team">
-                            <CellTemplate>
-                                @if (context.Item.Team is not null)
+                    <PropertyColumn Property="x => x.Team" Title="Team" Hidden="@(!ShowTeamColumn)">
+                        <CellTemplate>
+                            @if (context.Item.Team is not null)
                             {
                                 <MudLink Href="@StringHelpers.GetTeamDetailsUrl(context.Item.Team.Type, context.Item.Team.LocalId)">@context.Item.Team.Name</MudLink>
                             }
                         </CellTemplate>
                     </PropertyColumn>
-                    }
-                    <PropertyColumn Property="x => x.Status" Title="Status" />
+                    <PropertyColumn Property="x => x.Status" Title="Status" Hidden="@(!IncludeClosed)" />
                     <PropertyColumn Property="x => x.Category" Title="Category" />
                     <PropertyColumn Property="x => x.Exposure" Title="Exposure" />
                     <PropertyColumn Property="x => x.ReportedOn" Title="Reported On" Format="MM/dd/yyyy" />
@@ -152,7 +149,7 @@ else
         if (x.ReportedOn.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (x.Status.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (IncludeClosed && x.Status.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         if (x.Category.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
@@ -172,8 +169,6 @@ else
 
     private async Task RefreshData(bool includeClosed)
     {
-        _loading = true;
         await GetRisks.InvokeAsync(includeClosed);
-        _loading = false;
     }
 }

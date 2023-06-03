@@ -88,12 +88,12 @@
             _tablePreference = clientPreference.TablePreference;
         }
 
-        await GetProgramIncrements();
-
         var user = (await AuthState).User;
         _canCreateProgramIncrements = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.ProgramIncrements);
         _canUpdateProgramIncrements = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.ProgramIncrements);
         _showPageActions = _canCreateProgramIncrements;
+
+        await GetProgramIncrements();
     }
 
     private Func<ProgramIncrementListDto, bool> _quickFilter => x =>
@@ -132,7 +132,7 @@
         {
             _programIncrements = result
                 .OrderBy(p => stateSortOrder.IndexOf(p.State))
-                    .ThenBy(p => p.Start)
+                    .ThenByDescending(p => p.Start)
                 .ToList();
         }
 
