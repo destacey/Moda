@@ -1,12 +1,9 @@
 ﻿using CsvHelper;
-using FluentValidation;
-using FluentValidation.Results;
 using Moda.Common.Application.Interfaces;
 using Moda.Planning.Application.Risks.Commands;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
 using Moda.Web.Api.Models.Planning.Risks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Moda.Web.Api.Controllers.Planning;
 [Route("api/planning/risks")]
@@ -82,7 +79,7 @@ public class RisksController : ControllerBase
     [HttpPost("import")]
     [MustHavePermission(ApplicationAction.Import, ApplicationResource.Risks)]
     [OpenApiOperation("Import risks from a csv file.", "")]
-    [ProducesResponseType(typeof(IEnumerable<ImportRiskRequest>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Import([FromForm] IFormFile file, CancellationToken cancellationToken)
@@ -130,7 +127,7 @@ public class RisksController : ControllerBase
                 return BadRequest(error);
             }
 
-            return Ok(risks);
+            return NoContent();
         }
         catch (CsvHelperException ex)
         {

@@ -1346,18 +1346,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ImportRiskRequest"
-                  }
-                }
-              }
-            }
+          "204": {
+            "description": ""
           },
           "400": {
             "description": "",
@@ -5316,92 +5306,6 @@
             "type": "string",
             "maxLength": 1024,
             "minLength": 0,
-            "nullable": true
-          }
-        }
-      },
-      "ImportRiskRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "importId",
-          "teamId",
-          "summary",
-          "reportedOnUtc",
-          "reportedById"
-        ],
-        "properties": {
-          "importId": {
-            "type": "integer",
-            "format": "int32",
-            "minLength": 1,
-            "nullable": false
-          },
-          "teamId": {
-            "type": "string",
-            "format": "guid",
-            "minLength": 1,
-            "nullable": false
-          },
-          "summary": {
-            "type": "string",
-            "maxLength": 256,
-            "minLength": 1,
-            "nullable": false
-          },
-          "description": {
-            "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          },
-          "reportedOnUtc": {
-            "type": "string",
-            "format": "date-time",
-            "minLength": 1,
-            "nullable": false
-          },
-          "reportedById": {
-            "type": "string",
-            "format": "guid",
-            "minLength": 1,
-            "nullable": false
-          },
-          "statusId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "categoryId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "impactId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "likelihoodId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "assigneeId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "followUpDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "response": {
-            "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          },
-          "closedDateUtc": {
-            "type": "string",
-            "format": "date-time",
             "nullable": true
           }
         }

@@ -2981,14 +2981,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Import risks from a csv file.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ImportRiskRequest>> ImportAsync(string? contentType, string? contentDisposition, IHeaderDictionary? headers, long? length, string? name, string? fileName);
+        System.Threading.Tasks.Task ImportAsync(string? contentType, string? contentDisposition, IHeaderDictionary? headers, long? length, string? name, string? fileName);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Import risks from a csv file.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ImportRiskRequest>> ImportAsync(string? contentType, string? contentDisposition, IHeaderDictionary? headers, long? length, string? name, string? fileName, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task ImportAsync(string? contentType, string? contentDisposition, IHeaderDictionary? headers, long? length, string? name, string? fileName, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a list of all risk statuses.
@@ -3358,7 +3358,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Import risks from a csv file.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ImportRiskRequest>> ImportAsync(string? contentType, string? contentDisposition, IHeaderDictionary? headers, long? length, string? name, string? fileName)
+        public virtual System.Threading.Tasks.Task ImportAsync(string? contentType, string? contentDisposition, IHeaderDictionary? headers, long? length, string? name, string? fileName)
         {
             return ImportAsync(contentType, contentDisposition, headers, length, name, fileName, System.Threading.CancellationToken.None);
         }
@@ -3368,7 +3368,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Import risks from a csv file.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ImportRiskRequest>> ImportAsync(string? contentType, string? contentDisposition, IHeaderDictionary? headers, long? length, string? name, string? fileName, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task ImportAsync(string? contentType, string? contentDisposition, IHeaderDictionary? headers, long? length, string? name, string? fileName, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("api/planning/risks/import");
@@ -3418,7 +3418,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     }
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -3441,14 +3440,9 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
+                        if (status_ == 204)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<ImportRiskRequest>>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
+                            return;
                         }
                         else
                         if (status_ == 400)
@@ -12154,60 +12148,6 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("response", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.StringLength(1024)]
         public string? Response { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ImportRiskRequest
-    {
-        [Newtonsoft.Json.JsonProperty("importId", Required = Newtonsoft.Json.Required.Always)]
-        public int ImportId { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("teamId", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Guid TeamId { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("summary", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
-        public string Summary { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string? Description { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("reportedOnUtc", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.DateTime ReportedOnUtc { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("reportedById", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Guid ReportedById { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("statusId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int StatusId { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("categoryId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int CategoryId { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("impactId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int ImpactId { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("likelihoodId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int LikelihoodId { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("assigneeId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid? AssigneeId { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("followUpDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTime? FollowUpDate { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("response", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [System.ComponentModel.DataAnnotations.StringLength(1024)]
-        public string? Response { get; set; } = default!;
-
-        [Newtonsoft.Json.JsonProperty("closedDateUtc", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTime? ClosedDateUtc { get; set; } = default!;
 
     }
 
