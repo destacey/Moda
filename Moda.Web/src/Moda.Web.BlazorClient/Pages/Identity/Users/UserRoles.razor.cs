@@ -25,13 +25,15 @@ public partial class UserRoles
     private string _description = string.Empty;
 
     private string _searchString = string.Empty;
+    private bool _loading;
 
     private bool _canEditUsers;
     private bool _canSearchRoles;
-    private bool _loaded;
 
     protected override async Task OnInitializedAsync()
     {
+        _loading = true;
+
         var state = await AuthState;
         _canEditUsers = await AuthService.HasPermissionAsync(state.User, ApplicationAction.Update, ApplicationResource.Users);
         _canSearchRoles = await AuthService.HasPermissionAsync(state.User, ApplicationAction.View, ApplicationResource.UserRoles);
@@ -51,7 +53,7 @@ public partial class UserRoles
             }
         }
 
-        _loaded = true;
+        _loading = false;
     }
 
     private async Task SaveAsync()

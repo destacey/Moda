@@ -84,13 +84,13 @@
         {
             _tablePreference = clientPreference.TablePreference;
         }
-        
-        await GetRoles();
 
         var user = (await AuthState).User;
         _canViewRoleClaims = await AuthService.HasPermissionAsync(user, ApplicationAction.View, ApplicationResource.RoleClaims);
         _canUpdateRoleClaims = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.RoleClaims);
         //_canDeleteRoleClaims = await AuthService.HasPermissionAsync(user, ApplicationAction.Delete, ApplicationResource.RoleClaims);
+
+        await GetRoles();
 
         _loading = false;
     }

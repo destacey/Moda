@@ -31,14 +31,14 @@
              Filterable="true"
              FilterMode="DataGridFilterMode.ColumnFilterMenu"
              FixedHeader="true"
-             Loading="@_isLoading"
+             Loading="@_loading"
              LoadingProgressColor="@Color.Secondary"
              QuickFilter="@_quickFilter">
     <ToolBarContent>
         <MudSpacer />
         <MudToolBar>
             <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
-            <MudIconButton OnClick="@(() => RefreshData(_includeDisabled))" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
+            <MudIconButton OnClick="@(() => RefreshData())" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
         </MudToolBar>
     </ToolBarContent>
     <Columns>
@@ -69,8 +69,7 @@
     private List<ProgramIncrementListDto> _programIncrements = new();
 
     private string _searchString = "";
-    private bool _isLoading = true;
-    private bool _includeDisabled;
+    private bool _loading = true;
     private bool _canCreateProgramIncrements;
     private bool _canUpdateProgramIncrements;
     private bool _showPageActions;
@@ -89,12 +88,12 @@
             _tablePreference = clientPreference.TablePreference;
         }
 
-        await GetProgramIncrements();
-
         var user = (await AuthState).User;
         _canCreateProgramIncrements = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.ProgramIncrements);
         _canUpdateProgramIncrements = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.ProgramIncrements);
         _showPageActions = _canCreateProgramIncrements;
+
+        await GetProgramIncrements();
     }
 
     private Func<ProgramIncrementListDto, bool> _quickFilter => x =>
@@ -120,25 +119,24 @@
         return false;
     };
 
-    private async Task RefreshData(bool includeDisabled)
+    private async Task RefreshData()
     {
-        _includeDisabled = includeDisabled;
         await GetProgramIncrements();
     }
 
     private async Task GetProgramIncrements()
     {
-        _isLoading = true;
+        _loading = true;
 
         if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetListAsync(), Snackbar) is List<ProgramIncrementListDto> result)
         {
             _programIncrements = result
                 .OrderBy(p => stateSortOrder.IndexOf(p.State))
-                    .ThenBy(p => p.Start)
+                    .ThenByDescending(p => p.Start)
                 .ToList();
         }
 
-        _isLoading = false;
+        _loading = false;
     }
 
     private async Task CreateProgramIncrement()

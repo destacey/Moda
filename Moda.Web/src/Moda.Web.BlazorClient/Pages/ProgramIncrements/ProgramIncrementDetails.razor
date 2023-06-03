@@ -2,6 +2,7 @@
 
 @using Moda.Web.BlazorClient.Components.Organizations;
 @using Moda.Web.BlazorClient.Components.Planning;
+@using Moda.Web.BlazorClient.Models.Common;
 @using Moda.Web.BlazorClient.Models.Teams;
 @using Moda.Web.BlazorClient.Shared.Planning;
 
@@ -39,13 +40,13 @@ else
                 <MudItem Class="py-0" xs="12" md="5">
                     <MudGrid Class="ma-0 pa-0">
                         <MudItem xs="12" md="6">
-                            <MudField Label="State">@_programIncrement.State</MudField>
-                        </MudItem>
-                        <MudItem xs="12" md="6">
                             <MudField Label="Start">@_programIncrement.Start.ToShortDateString()</MudField>
                         </MudItem>
                         <MudItem xs="12" md="6">
                             <MudField Label="End">@_programIncrement.End.ToShortDateString()</MudField>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudField Label="State">@_programIncrement.State</MudField>
                         </MudItem>
                     </MudGrid>
                 </MudItem>
@@ -59,7 +60,7 @@ else
                     <TeamsGrid Height="400"
                         Teams="_piTeams"
                         GetTeams="GetTeams"
-                        AllowDisabledToggle="false"/>
+                        AllowDisabledToggle="false" />
                 </MudItem>
             </MudGrid>
         </MudTabPanel>
@@ -67,7 +68,9 @@ else
             <RisksGrid Risks="_risks"
                        GetRisks="GetRisks"
                        ShowTeamColumn="true"
-                       CanManageRisks="_canManageRisks"
+                       CanCreateRisks="_canCreateRisks"
+                       CanUpdateRisks="_canUpdateRisks"
+                       CreateRisk="CreateRiskDialog"
                        UpdateRisk="UpdateRiskDialog"
                        IncludeClosed="_includeClosedRisks" />
         </MudTabPanel>
@@ -100,7 +103,8 @@ else
 
     private bool _showPageActions;
     private bool _canUpdateProgramIncrements;
-    private bool _canManageRisks;
+    private bool _canCreateRisks;
+    private bool _canUpdateRisks;
 
     private bool _includeClosedRisks = false;
 
@@ -115,10 +119,14 @@ else
 
         var user = (await AuthState).User;
         _canUpdateProgramIncrements = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.ProgramIncrements);
-        _canManageRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
-        _showPageActions = _canUpdateProgramIncrements || _canManageRisks;
+        _canCreateRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
+        _canUpdateRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
+        _showPageActions = _canUpdateProgramIncrements;
 
         await GetProgramIncrement();
+
+        // don't allow creating risks if the PI is completed
+        _canCreateRisks = _programIncrement.State == "Completed" ? false : _canCreateRisks;
 
         _loading = false;
     }
@@ -140,6 +148,14 @@ else
         {
             _piTeams = result.Select(t => TeamListViewModel.FromProgramIncrementTeamResponse(t)).OrderBy(t => t.Name).ToList();
         }
+    }
+
+    private List<SelectOptionsViewModel<Guid>> GetTeamOptions()
+    {
+       return _piTeams.Where(t => t.IsActive)
+            .OrderBy(t => t.Name)
+            .Select(t => new SelectOptionsViewModel<Guid>(t.Id, t.Name))
+            .ToList();
     }
 
     private async Task UpdateProgramIncrement()
@@ -197,9 +213,40 @@ else
         }
     }
 
-    private async Task UpdateRiskDialog(RiskListDto riskListDto)
+    private async Task CreateRiskDialog()
     {
-        var riskDto = await RisksClient.GetByIdAsync(riskListDto.LocalId);
+        var dialogTitle = "Add Team Risk";
+        var teamOptions = GetTeamOptions();
+        var parameters = new DialogParameters
+            {
+                ["TeamOptions"] = teamOptions,
+                ["CreateRisk"] = EventCallback.Factory.Create<CreateRiskRequest>(this, CreateRisk)
+            };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<CreateRisk_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetRisks(_includeClosedRisks);
+        }
+    }
+
+    private async Task CreateRisk(CreateRiskRequest createRiskRequest)
+    {
+        await RisksClient.CreateRiskAsync(createRiskRequest);
+    }
+
+    private async Task UpdateRiskDialog(Guid riskId)
+    {
+        var riskDto = await RisksClient.GetByIdAsync(riskId);
         if (riskDto == null)
         {
             Snackbar.Add("Error getting risk.", MudBlazor.Severity.Error);

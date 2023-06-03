@@ -1,12 +1,10 @@
 ﻿using CsvHelper;
-using FluentValidation;
-using FluentValidation.Results;
 using Moda.Common.Application.Interfaces;
+using Moda.Organization.Application.Teams.Queries;
 using Moda.Planning.Application.Risks.Commands;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
 using Moda.Web.Api.Models.Planning.Risks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Moda.Web.Api.Controllers.Planning;
 [Route("api/planning/risks")]
@@ -39,17 +37,57 @@ public class RisksController : ControllerBase
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
-    [OpenApiOperation("Get risk details using the localId.", "")]
+    [OpenApiOperation("Get risk details by Id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult<RiskDetailsDto>> GetById(int id)
+    public async Task<ActionResult<RiskDetailsDto>> GetById(Guid id)
     {
         var risk = await _sender.Send(new GetRiskQuery(id));
 
         return risk is not null
             ? Ok(risk)
             : NotFound();
+    }
+
+    [HttpGet("local-id/{id}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
+    [OpenApiOperation("Get risk details using the localId.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<RiskDetailsDto>> GetByLocalId(int id)
+    {
+        var risk = await _sender.Send(new GetRiskQuery(id));
+
+        return risk is not null
+            ? Ok(risk)
+            : NotFound();
+    }
+
+    [HttpPost()]
+    [MustHavePermission(ApplicationAction.Create, ApplicationResource.Risks)]
+    [OpenApiOperation("Create a risk.", "")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> CreateRisk([FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToCreateRiskCommand(), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "RisksController.Create"
+            };
+            return BadRequest(error);
+        }
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
     }
 
     [HttpPut("{id}")]
@@ -82,7 +120,7 @@ public class RisksController : ControllerBase
     [HttpPost("import")]
     [MustHavePermission(ApplicationAction.Import, ApplicationResource.Risks)]
     [OpenApiOperation("Import risks from a csv file.", "")]
-    [ProducesResponseType(typeof(IEnumerable<ImportRiskRequest>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Import([FromForm] IFormFile file, CancellationToken cancellationToken)
@@ -130,7 +168,7 @@ public class RisksController : ControllerBase
                 return BadRequest(error);
             }
 
-            return Ok(risks);
+            return NoContent();
         }
         catch (CsvHelperException ex)
         {

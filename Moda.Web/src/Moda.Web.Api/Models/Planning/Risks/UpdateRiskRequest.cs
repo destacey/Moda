@@ -29,11 +29,14 @@ public sealed class UpdateRiskRequestValidator : CustomValidator<UpdateRiskReque
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
-        RuleFor(e => e.Summary)
+        RuleFor(r => r.TeamId)
+            .NotEmpty();
+
+        RuleFor(r => r.Summary)
             .NotEmpty()
             .MaximumLength(256);
 
-        RuleFor(e => e.Description)
+        RuleFor(r => r.Description)
             .MaximumLength(1024);
 
         RuleFor(r => (RiskStatus)r.StatusId)
@@ -52,7 +55,7 @@ public sealed class UpdateRiskRequestValidator : CustomValidator<UpdateRiskReque
             .IsInEnum()
             .WithMessage("A valid likelihood must be selected."); ;
 
-        RuleFor(e => e.Response)
+        RuleFor(r => r.Response)
             .MaximumLength(1024);
     }
 }

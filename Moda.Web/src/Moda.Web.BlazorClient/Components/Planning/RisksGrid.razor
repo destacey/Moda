@@ -1,6 +1,6 @@
 ﻿@if (_loading)
 {
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" Class="ma-3" />
 }
 else
 {
@@ -24,16 +24,25 @@ else
                          LoadingProgressColor="@Color.Secondary"
                          QuickFilter="@_quickFilter">
                 <ToolBarContent>
+                    <MudButtonGroup Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
+                        @if (CanCreateRisks)
+                        {
+                            <MudButton OnClick="@CreateRisk">Create Risk</MudButton>
+                        }
+                    </MudButtonGroup>
                     <MudSpacer />
                     <MudToolBar>
                         <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Clearable="true"></MudTextField>
                         <MudIconButton OnClick="@(() => RefreshData(IncludeClosed))" Icon="@Icons.Material.Outlined.Refresh" Title="Refresh Data" />
+                        <MudMenu Icon="@Icons.Material.Filled.Tune" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                            <MudSwitch Class="mx-3" Checked="IncludeClosed" CheckedChanged="@((bool value) => RefreshData(value))" Color="Color.Primary" Label="Include Closed" />
+                        </MudMenu>
                     </MudToolBar>
                 </ToolBarContent>
                 <Columns>
-                    <TemplateColumn CellClass="d-flex" Sortable="false" Filterable="false" Hidden="@(!CanManageRisks)">
+                    <TemplateColumn Sortable="false" Filterable="false" Hidden="@(!CanUpdateRisks)">
                         <CellTemplate>
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="@(() => UpdateRisk.InvokeAsync(context.Item))" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="@(() => UpdateRisk.InvokeAsync(context.Item.Id))" />
                         </CellTemplate>
                     </TemplateColumn>
                     <PropertyColumn Property="x => x.LocalId" Title="Id">
@@ -42,18 +51,15 @@ else
                         </CellTemplate>
                     </PropertyColumn>
                     <PropertyColumn Property="x => x.Summary" Title="Summary" />
-                    @if (ShowTeamColumn)
-                    {
-                        <PropertyColumn Property="x => x.Team" Title="Team">
-                            <CellTemplate>
-                                @if (context.Item.Team is not null)
+                    <PropertyColumn Property="x => x.Team" Title="Team" Hidden="@(!ShowTeamColumn)">
+                        <CellTemplate>
+                            @if (context.Item.Team is not null)
                             {
                                 <MudLink Href="@StringHelpers.GetTeamDetailsUrl(context.Item.Team.Type, context.Item.Team.LocalId)">@context.Item.Team.Name</MudLink>
                             }
-                            </CellTemplate>
-                        </PropertyColumn>
-                    }
-                    <PropertyColumn Property="x => x.Status" Title="Status" />
+                        </CellTemplate>
+                    </PropertyColumn>
+                    <PropertyColumn Property="x => x.Status" Title="Status" Hidden="@(!IncludeClosed)" />
                     <PropertyColumn Property="x => x.Category" Title="Category" />
                     <PropertyColumn Property="x => x.Exposure" Title="Exposure" />
                     <PropertyColumn Property="x => x.ReportedOn" Title="Reported On" Format="MM/dd/yyyy" />
@@ -78,9 +84,6 @@ else
         <MudItem xs="12" Class="pt-0">
             <DataGridCountLabel DataGrid="@_grid" UnitLabel="risks" />
         </MudItem>
-        <MudItem xs="12" Class="pt-0">
-            <MudSwitch Checked="IncludeClosed" CheckedChanged="@((bool value) => RefreshData(value))" Color="Color.Primary" Label="Include Closed" />
-        </MudItem>
     </MudGrid>
 }
 
@@ -92,13 +95,19 @@ else
     public EventCallback<bool> GetRisks { get; set; }
 
     [Parameter]
-    public EventCallback<RiskListDto> UpdateRisk { get; set; }
+    public EventCallback CreateRisk { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> UpdateRisk { get; set; }
 
     [Parameter]
     public List<RiskListDto> Risks { get; set; } = default!;
 
     [Parameter]
-    public bool CanManageRisks { get; set; }
+    public bool CanCreateRisks { get; set; }
+
+    [Parameter]
+    public bool CanUpdateRisks { get; set; }
 
     [Parameter]
     public bool ShowTeamColumn { get; set; } = true;
@@ -131,7 +140,6 @@ else
         if (!Risks.Any())
         {
             await GetRisks.InvokeAsync();
-            Risks.OrderByDescending(m => m.ReportedOn);
         }
     }
 
@@ -152,7 +160,7 @@ else
         if (x.ReportedOn.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (x.Status.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (IncludeClosed && x.Status.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         if (x.Category.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
@@ -172,8 +180,6 @@ else
 
     private async Task RefreshData(bool includeClosed)
     {
-        _loading = true;
         await GetRisks.InvokeAsync(includeClosed);
-        _loading = false;
     }
 }

@@ -11,26 +11,29 @@ public sealed class CreateRiskCommandValidator : CustomValidator<CreateRiskComma
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
-        RuleFor(e => e.Summary)
+        RuleFor(r => r.TeamId)
+            .NotEmpty();
+
+        RuleFor(r => r.Summary)
             .NotEmpty()
             .MaximumLength(256);
 
-        RuleFor(e => e.Description)
+        RuleFor(r => r.Description)
             .MaximumLength(1024);
 
-        RuleFor(e => e.Category)
+        RuleFor(r => r.Category)
             .IsInEnum()
             .WithMessage("A valid category must be selected.");
 
-        RuleFor(e => e.Impact)
+        RuleFor(r => r.Impact)
             .IsInEnum()
             .WithMessage("A valid impact must be selected.");
 
-        RuleFor(e => e.Likelihood)
+        RuleFor(r => r.Likelihood)
             .IsInEnum()
             .WithMessage("A valid likelihood must be selected.");
 
-        RuleFor(e => e.Response)
+        RuleFor(r => r.Response)
             .MaximumLength(1024);
     }
 }

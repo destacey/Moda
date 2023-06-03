@@ -27,11 +27,14 @@ public sealed class CreateRiskRequestValidator : CustomValidator<CreateRiskReque
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
-        RuleFor(e => e.Summary)
+        RuleFor(r => r.TeamId)
+            .NotEmpty();
+
+        RuleFor(r => r.Summary)
             .NotEmpty()
             .MaximumLength(256);
 
-        RuleFor(e => e.Description)
+        RuleFor(r => r.Description)
             .MaximumLength(1024);
 
         RuleFor(r => (RiskCategory)r.CategoryId)
@@ -46,7 +49,7 @@ public sealed class CreateRiskRequestValidator : CustomValidator<CreateRiskReque
             .IsInEnum()
             .WithMessage("A valid likelihood must be selected.");
 
-        RuleFor(e => e.Response)
+        RuleFor(r => r.Response)
             .MaximumLength(1024);
     }
 }

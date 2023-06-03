@@ -27,11 +27,6 @@ else
                 @if (_canUpdateTeams)
                 {
                     <MudButton OnClick="@UpdateTeam">Edit</MudButton>
-                    <MudButton OnClick="@AddTeamMembershipDialog">Add Team Membership</MudButton>
-                }
-                @if (_canManageRisks)
-                {
-                    <MudButton OnClick="@CreateRiskDialog">Add Risk</MudButton>
                 }
             </MudButtonGroup>
         }
@@ -61,7 +56,9 @@ else
                             </MudField>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudField Label="Description">@_team.Description</MudField>
+                            <MudField Label="Description">
+                                <MudMarkdown Value="@_team.Description" />
+                            </MudField>
                         </MudItem>
                     </MudGrid>
                 </MudItem>
@@ -71,7 +68,9 @@ else
             <RisksGrid Risks="_risks"
                        GetRisks="GetRisks"
                        ShowTeamColumn="false"
-                       CanManageRisks="_canManageRisks"
+                       CanCreateRisks="_canCreateRisks"
+                       CanUpdateRisks="_canUpdateRisks"
+                       CreateRisk="CreateRiskDialog"
                        UpdateRisk="UpdateRiskDialog"
                        IncludeClosed="_includeClosedRisks" />
         </MudTabPanel>
@@ -79,6 +78,7 @@ else
             <TeamMembershipsGrid Memberships="_teamMemberships"
                         GetTeamMemberships="GetTeamMemberships"
                         CanUpdateTeamMemberships="_canUpdateTeams"
+                        AddTeamMembership="AddTeamMembershipDialog"
                         UpdateTeamMembership="UpdateTeamMembershipDialog"
                         RemoveTeamMembership="RemoveTeamMembershipDialog" />
         </MudTabPanel>
@@ -111,7 +111,8 @@ else
 
     private bool _showPageActions;
     private bool _canUpdateTeams;
-    private bool _canManageRisks;
+    private bool _canCreateRisks;
+    private bool _canUpdateRisks;
 
     private bool _includeClosedRisks = false;
 
@@ -126,8 +127,9 @@ else
 
         var user = (await AuthState).User;
         _canUpdateTeams = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Teams);
-        _canManageRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
-        _showPageActions = _canUpdateTeams || _canManageRisks;
+        _canCreateRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Create, ApplicationResource.Risks);
+        _canUpdateRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
+        _showPageActions = _canUpdateTeams || _canUpdateRisks;
 
         await GetTeam();
 
@@ -172,7 +174,7 @@ else
     {
         if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsClient.GetTeamMembershipsAsync(_team!.Id), Snackbar) is List<TeamMembershipsDto> result)
         {
-            _teamMemberships = result.ToList();
+            _teamMemberships = result.OrderByDescending(m => m.Start).ToList();
         }
     }
 
@@ -276,7 +278,7 @@ else
         _includeClosedRisks = includeClosed;
         if (await ApiHelper.ExecuteCallGuardedAsync(() => TeamsClient.GetRisksAsync(_team.Id, _includeClosedRisks), Snackbar) is List<RiskListDto> result)
         {
-            _risks = result.ToList();
+            _risks = result.OrderByDescending(m => m.ReportedOn).ToList();
         }
     }
 
@@ -310,9 +312,9 @@ else
         await TeamsClient.CreateRiskAsync(_team.Id, createRiskRequest);
     }
 
-    private async Task UpdateRiskDialog(RiskListDto riskListDto)
+    private async Task UpdateRiskDialog(Guid riskId)
     {
-        var riskDto = await TeamsClient.GetRiskByIdAsync(_team.Id, riskListDto.Id);
+        var riskDto = await TeamsClient.GetRiskByIdAsync(_team.Id, riskId);
         if (riskDto == null)
         {
             Snackbar.Add("Error getting risk.", MudBlazor.Severity.Error);

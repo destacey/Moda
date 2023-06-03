@@ -1179,6 +1179,65 @@
             "Bearer": []
           }
         ]
+      },
+      "post": {
+        "tags": [
+          "Risks"
+        ],
+        "summary": "Create a risk.",
+        "operationId": "Risks_CreateRisk",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRiskRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/planning/risks/{id}": {
@@ -1186,7 +1245,7 @@
         "tags": [
           "Risks"
         ],
-        "summary": "Get risk details using the localId.",
+        "summary": "Get risk details by Id.",
         "operationId": "Risks_GetById",
         "parameters": [
           {
@@ -1194,8 +1253,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "guid"
             },
             "x-position": 1
           }
@@ -1300,6 +1359,64 @@
         ]
       }
     },
+    "/api/planning/risks/local-id/{id}": {
+      "get": {
+        "tags": [
+          "Risks"
+        ],
+        "summary": "Get risk details using the localId.",
+        "operationId": "Risks_GetByLocalId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/risks/import": {
       "post": {
         "tags": [
@@ -1346,18 +1463,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ImportRiskRequest"
-                  }
-                }
-              }
-            }
+          "204": {
+            "description": ""
           },
           "400": {
             "description": "",
@@ -5259,10 +5366,67 @@
           }
         }
       },
+      "CreateRiskRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "teamId",
+          "summary"
+        ],
+        "properties": {
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "impactId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "likelihoodId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "response": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
       "UpdateRiskRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "teamId",
           "summary"
         ],
         "properties": {
@@ -5272,7 +5436,9 @@
           },
           "teamId": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
           },
           "summary": {
             "type": "string",
@@ -5316,92 +5482,6 @@
             "type": "string",
             "maxLength": 1024,
             "minLength": 0,
-            "nullable": true
-          }
-        }
-      },
-      "ImportRiskRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "importId",
-          "teamId",
-          "summary",
-          "reportedOnUtc",
-          "reportedById"
-        ],
-        "properties": {
-          "importId": {
-            "type": "integer",
-            "format": "int32",
-            "minLength": 1,
-            "nullable": false
-          },
-          "teamId": {
-            "type": "string",
-            "format": "guid",
-            "minLength": 1,
-            "nullable": false
-          },
-          "summary": {
-            "type": "string",
-            "maxLength": 256,
-            "minLength": 1,
-            "nullable": false
-          },
-          "description": {
-            "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          },
-          "reportedOnUtc": {
-            "type": "string",
-            "format": "date-time",
-            "minLength": 1,
-            "nullable": false
-          },
-          "reportedById": {
-            "type": "string",
-            "format": "guid",
-            "minLength": 1,
-            "nullable": false
-          },
-          "statusId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "categoryId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "impactId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "likelihoodId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "assigneeId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "followUpDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "response": {
-            "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          },
-          "closedDateUtc": {
-            "type": "string",
-            "format": "date-time",
             "nullable": true
           }
         }
@@ -6688,59 +6768,6 @@
           "end": {
             "type": "string",
             "format": "date",
-            "nullable": true
-          }
-        }
-      },
-      "CreateRiskRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "summary"
-        ],
-        "properties": {
-          "teamId": {
-            "type": "string",
-            "format": "guid"
-          },
-          "summary": {
-            "type": "string",
-            "maxLength": 256,
-            "minLength": 1,
-            "nullable": false
-          },
-          "description": {
-            "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          },
-          "categoryId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "impactId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "likelihoodId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "assigneeId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "followUpDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "response": {
-            "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
             "nullable": true
           }
         }

@@ -26,6 +26,7 @@ public static class ConfigureServices
                 configuration.SnackbarConfiguration.NewestOnTop = true;
                 configuration.SnackbarConfiguration.PreventDuplicates = false;
             })
+            .AddMudMarkdownServices()
             .AddScoped<IClientPreferenceManager, ClientPreferenceManager>()
             .AutoRegisterInterfaces<IAppService>()
             .AutoRegisterInterfaces<IApiService>()

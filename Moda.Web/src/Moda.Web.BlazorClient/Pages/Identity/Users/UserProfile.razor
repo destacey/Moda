@@ -112,7 +112,7 @@ else
     public Task<AuthenticationState> AuthState { get; set; } = default!;
 
     [Parameter]
-    public string? Id { get; set; }
+    public string Id { get; set; } = default!;
     [Parameter]
     public string? Title { get; set; }
     [Parameter]
@@ -211,7 +211,6 @@ else
     
     public class CustomStringToBoolConverter : BoolConverter<string>
     {
-
         public CustomStringToBoolConverter()
         {
             SetFunc = OnSet;
@@ -253,6 +252,5 @@ else
                 return null;
             }
         }
-
     }
 }
