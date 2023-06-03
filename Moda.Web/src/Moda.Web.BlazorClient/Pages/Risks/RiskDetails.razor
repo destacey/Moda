@@ -33,10 +33,14 @@ else
                 <MudItem Class="py-0" xs="12" md="6">
                     <MudGrid Class="ma-0 pa-0">
                         <MudItem xs="12">
-                            <MudField Label="Description">@_risk.Description</MudField>
+                            <MudField Label="Description">
+                                <MudMarkdown Value="@_risk.Description" />
+                            </MudField>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudField Label="Response">@_risk.Response</MudField>
+                            <MudField Label="Response">
+                                <MudMarkdown Value="@_risk.Response" />
+                            </MudField>
                         </MudItem>
                     </MudGrid>
                 </MudItem>

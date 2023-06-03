@@ -61,7 +61,9 @@ else
                             </MudField>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudField Label="Description">@_team.Description</MudField>
+                            <MudField Label="Description">
+                                <MudMarkdown Value="@_team.Description" />
+                            </MudField>
                         </MudItem>
                     </MudGrid>
                 </MudItem>

@@ -28,42 +28,47 @@ else
                               For="@(() => _model.Summary)" />
 
                 <MudTextField Label="Description"
+                              HelperText="Markdown enabled"
                               Lines="8"
                               MaxLength="1024" Counter="1024" Immediate="true"
                 @bind-Value="_model.Description"
                               For="@(() => _model.Description)" />
 
-                <MudInputLabel>Status</MudInputLabel>
-                <MudRadioGroup @bind-SelectedOption="@_model.StatusId" For="@(() => _model.StatusId)">
-                    @foreach (var opt in _statusOptions)
-                    {
-                        <MudRadio Dense="true" Option="@opt.Id">@opt.Name</MudRadio>
-                    }
-                </MudRadioGroup>
+                <MudField Label="Status">
+                    <MudRadioGroup @bind-SelectedOption="@_model.StatusId" For="@(() => _model.StatusId)">
+                        @foreach (var opt in _statusOptions)
+                        {
+                            <MudRadio Dense="true" Option="@opt.Id">@opt.Name</MudRadio>
+                        }
+                    </MudRadioGroup>
+                </MudField>
 
-                <MudInputLabel>Category</MudInputLabel>
-                <MudRadioGroup @bind-SelectedOption="@_model.CategoryId" For="@(() => _model.CategoryId)">
-                    @foreach (var opt in _categoryOptions)
-                    {
-                        <MudRadio Dense="true" Option="@opt.Id">@opt.Name</MudRadio>
-                    }
-                </MudRadioGroup>
+                <MudField Label="Category">
+                    <MudRadioGroup @bind-SelectedOption="@_model.CategoryId" For="@(() => _model.CategoryId)">
+                        @foreach (var opt in _categoryOptions)
+                        {
+                            <MudRadio Dense="true" Option="@opt.Id">@opt.Name</MudRadio>
+                        }
+                    </MudRadioGroup>
+                </MudField>
 
-                <MudInputLabel>Impact</MudInputLabel>
-                <MudRadioGroup @bind-SelectedOption="@_model.ImpactId" For="@(() => _model.ImpactId)">
-                    @foreach (var opt in _gradeOptions)
-                    {
-                        <MudRadio Dense="true" Option="@opt.Id">@opt.Name</MudRadio>
-                    }
-                </MudRadioGroup>
+                <MudField Label="Impact">
+                    <MudRadioGroup @bind-SelectedOption="@_model.ImpactId" For="@(() => _model.ImpactId)">
+                        @foreach (var opt in _gradeOptions)
+                        {
+                            <MudRadio Dense="true" Option="@opt.Id">@opt.Name</MudRadio>
+                        }
+                    </MudRadioGroup>
+                </MudField>
 
-                <MudInputLabel>Likelihood</MudInputLabel>
-                <MudRadioGroup @bind-SelectedOption="@_model.LikelihoodId" For="@(() => _model.LikelihoodId)">
-                    @foreach (var opt in _gradeOptions)
-                    {
-                        <MudRadio Dense="true" Option="@opt.Id">@opt.Name</MudRadio>
-                    }
-                </MudRadioGroup>
+                <MudField Label="Likelihood">
+                    <MudRadioGroup @bind-SelectedOption="@_model.LikelihoodId" For="@(() => _model.LikelihoodId)">
+                        @foreach (var opt in _gradeOptions)
+                        {
+                            <MudRadio Dense="true" Option="@opt.Id">@opt.Name</MudRadio>
+                        }
+                    </MudRadioGroup>
+                </MudField>
 
                 <MudSelect Dense="true" Label="Assignee" Variant="Variant.Text" AnchorOrigin="Origin.BottomCenter"
                 @bind-Value="_model.AssigneeId" For="@(() => _model.AssigneeId)">
@@ -133,19 +138,19 @@ else
         await GetEmployeeOptions();
 
         _model = new UpdateRiskRequest
-        {
-            RiskId = Risk.Id,
-            TeamId = Risk.Team!.Id,
-            Summary = Risk.Summary,
-            Description = Risk.Description,
-            StatusId = Risk.Status.Id,
-            CategoryId = Risk.Category.Id,
-            ImpactId = Risk.Impact.Id,
-            LikelihoodId = Risk.Likelihood.Id,
-            AssigneeId = Risk.Assignee?.Id,
-            FollowUpDate = Risk.FollowUpDate,
-            Response = Risk.Response
-        };
+            {
+                RiskId = Risk.Id,
+                TeamId = Risk.Team!.Id,
+                Summary = Risk.Summary,
+                Description = Risk.Description,
+                StatusId = Risk.Status.Id,
+                CategoryId = Risk.Category.Id,
+                ImpactId = Risk.Impact.Id,
+                LikelihoodId = Risk.Likelihood.Id,
+                AssigneeId = Risk.Assignee?.Id,
+                FollowUpDate = Risk.FollowUpDate,
+                Response = Risk.Response
+            };
 
         _editContext = new(_model);
         _editContext.OnValidationRequested += HandleValidationRequested;
