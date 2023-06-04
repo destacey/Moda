@@ -1,4 +1,5 @@
 # Work Domain
+The work domain provides the capabilities to manage your teams work items.
 
 # Models
 - [Workspace](#workspace)
