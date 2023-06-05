@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using Moda.AppIntegration.Application;
 using Moda.Common.Application;
 using Moda.Common.Application.Interfaces;
+using Moda.Goals.Application;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
 using Moda.Organization.Application;
@@ -57,6 +58,7 @@ try
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddOrganizationApplication();
     builder.Services.AddPlanningApplication();
+    builder.Services.AddGoalsApplication();
     builder.Services.AddWorkApplication();
     builder.Services.AddAppIntegrationApplication();
 

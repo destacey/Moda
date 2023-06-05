@@ -9,12 +9,13 @@ public class Objective : BaseAuditableEntity<Guid>
 
     private Objective() { }
 
-    public Objective(string name, string? description, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate)
+    public Objective(string name, string? description, ObjectiveType type, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate)
     {
         Status = ObjectiveStatus.NotStarted;
 
         Name = name;
         Description = description;
+        Type = type;
         OwnerId = ownerId;
         PlanId = planId;
         StartDate = startDate;
@@ -23,7 +24,7 @@ public class Objective : BaseAuditableEntity<Guid>
 
     /// <summary>Gets the local identifier.</summary>
     /// <value>The local identifier.</value>
-    public int LocalId { get; private set; }
+    public int LocalId { get; init; }
 
     /// <summary>
     /// The name of the Objective.
@@ -42,6 +43,10 @@ public class Objective : BaseAuditableEntity<Guid>
         get => _description;
         protected set => _description = value.NullIfWhiteSpacePlusTrim();
     }
+
+    /// <summary>Gets or sets the type.</summary>
+    /// <value>The type.</value>
+    public ObjectiveType Type { get; init; }
 
     /// <summary>Gets or sets the status.</summary>
     /// <value>The status.</value>
@@ -113,8 +118,8 @@ public class Objective : BaseAuditableEntity<Guid>
     /// <param name="startDate">The start date.</param>
     /// <param name="targetDate">The target date.</param>
     /// <returns></returns>
-    public static Objective Create(string name, string? description, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate)
+    public static Objective Create(string name, string? description, ObjectiveType type, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate)
     {
-        return new Objective(name, description, ownerId, planId, startDate, targetDate);
+        return new Objective(name, description, type, ownerId, planId, startDate, targetDate);
     }
 }

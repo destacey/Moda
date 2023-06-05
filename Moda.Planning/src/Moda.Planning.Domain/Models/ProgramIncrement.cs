@@ -10,7 +10,8 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
     private string? _description;
     private LocalDateRange _dateRange = default!;
 
-    protected readonly List<ProgramIncrementTeam> _programIncrementTeams = new();
+    protected readonly List<ProgramIncrementTeam> _teams = new();
+    protected readonly List<ProgramIncrementObjective> _objectives = new();
 
     private ProgramIncrement() { }
 
@@ -51,7 +52,13 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         protected set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
     }
 
-    public IReadOnlyCollection<ProgramIncrementTeam> ProgramIncrementTeams => _programIncrementTeams.AsReadOnly();
+    /// <summary>Gets the teams.</summary>
+    /// <value>The PI teams.</value>
+    public IReadOnlyCollection<ProgramIncrementTeam> Teams => _teams.AsReadOnly();
+
+    /// <summary>Gets the objectives.</summary>
+    /// <value>The PI objectives.</value>
+    public IReadOnlyCollection<ProgramIncrementObjective> Objectives => _objectives.AsReadOnly();
 
     /// <summary>Updates the specified name.</summary>
     /// <param name="name">The name.</param>
@@ -83,21 +90,23 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         return IterationState.Future;
     }
 
-    // manage program increment teams
+    /// <summary>Manages the program increment teams.</summary>
+    /// <param name="teamIds">The team ids.</param>
+    /// <returns></returns>
     public Result ManageProgramIncrementTeams(IEnumerable<Guid> teamIds)
     {
         try
         {
-            var removedTeams = _programIncrementTeams.Where(x => !teamIds.Contains(x.TeamId)).ToList();
+            var removedTeams = _teams.Where(x => !teamIds.Contains(x.TeamId)).ToList();
             foreach (var removedTeam in removedTeams)
             {
-                _programIncrementTeams.Remove(removedTeam);
+                _teams.Remove(removedTeam);
             }
 
-            var addedTeams = teamIds.Where(x => !_programIncrementTeams.Any(y => y.TeamId == x)).ToList();
+            var addedTeams = teamIds.Where(x => !_teams.Any(y => y.TeamId == x)).ToList();
             foreach (var addedTeam in addedTeams)
             {
-                _programIncrementTeams.Add(new ProgramIncrementTeam(Id, addedTeam));
+                _teams.Add(new ProgramIncrementTeam(Id, addedTeam));
             }
 
             return Result.Success();

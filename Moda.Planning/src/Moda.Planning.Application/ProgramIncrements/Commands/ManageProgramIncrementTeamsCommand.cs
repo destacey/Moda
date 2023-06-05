@@ -18,7 +18,7 @@ internal sealed class ManageProgramIncrementTeamsCommandHandler : ICommandHandle
         try
         {
             var programIncrement = await _planningDbContext.ProgramIncrements
-                .Include(x => x.ProgramIncrementTeams)
+                .Include(x => x.Teams)
                 .SingleOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (programIncrement == null)

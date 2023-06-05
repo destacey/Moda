@@ -96,6 +96,58 @@ public class ProgramIncrementConfig : IEntityTypeConfiguration<ProgramIncrement>
     }
 }
 
+public class ProgramIncrementObjectiveConfig : IEntityTypeConfiguration<ProgramIncrementObjective>
+{
+    public void Configure(EntityTypeBuilder<ProgramIncrementObjective> builder)
+    {
+        builder.ToTable("ProgramIncrementObjectives", SchemaNames.Planning);
+
+        builder.HasKey(o => o.Id);
+        builder.HasAlternateKey(o => o.LocalId);
+
+        builder.HasIndex(o => new { o.Id, o.IsDeleted })
+            .IncludeProperties(o => new { o.LocalId, o.ProgramIncrementId, o.ObjectiveId, o.Type, o.IsStretch });
+        builder.HasIndex(o => new { o.LocalId, o.IsDeleted })
+            .IncludeProperties(o => new { o.Id, o.ProgramIncrementId, o.ObjectiveId, o.Type, o.IsStretch });
+        builder.HasIndex(o => new { o.ProgramIncrementId, o.IsDeleted })
+            .IncludeProperties(o => new { o.Id, o.LocalId, o.ObjectiveId, o.Type, o.IsStretch });
+        builder.HasIndex(o => new { o.ObjectiveId, o.IsDeleted })
+            .IncludeProperties(o => new { o.Id, o.LocalId, o.ProgramIncrementId, o.Type, o.IsStretch });
+        builder.HasIndex(o => o.IsDeleted)
+            .IncludeProperties(o => new { o.Id, o.LocalId, o.ProgramIncrementId, o.ObjectiveId, o.Type, o.IsStretch });
+
+        builder.Property(o => o.LocalId).ValueGeneratedOnAdd();
+
+        builder.Property(o => o.ObjectiveId).IsRequired();
+        builder.Property(o => o.Type).IsRequired()
+            .HasConversion<EnumConverter<ProgramIncrementObjectiveType>>()
+            .HasMaxLength(64);
+        builder.Property(o => o.IsStretch).IsRequired();
+
+        // Audit
+        builder.Property(o => o.Created);
+        builder.Property(o => o.CreatedBy);
+        builder.Property(o => o.LastModified);
+        builder.Property(o => o.LastModifiedBy);
+        builder.Property(o => o.Deleted);
+        builder.Property(o => o.DeletedBy);
+        builder.Property(o => o.IsDeleted);
+
+        // Relationships
+        builder.HasOne<ProgramIncrement>()
+            .WithMany(p => p.Objectives)
+            .HasForeignKey(o => o.ProgramIncrementId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne<PlanningTeam>()
+            .WithMany()
+            .HasForeignKey(p => p.TeamId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Ignore
+    }
+}
+
 public class ProgramIncrementTeamConfig : IEntityTypeConfiguration<ProgramIncrementTeam>
 {
     public void Configure(EntityTypeBuilder<ProgramIncrementTeam> builder)
@@ -111,7 +163,7 @@ public class ProgramIncrementTeamConfig : IEntityTypeConfiguration<ProgramIncrem
         builder.Property(p => p.TeamId).IsRequired();
 
         builder.HasOne<ProgramIncrement>()
-            .WithMany(p => p.ProgramIncrementTeams)
+            .WithMany(p => p.Teams)
             .HasForeignKey(p => p.ProgramIncrementId)
             .OnDelete(DeleteBehavior.Cascade);
 

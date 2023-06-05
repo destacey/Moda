@@ -16,9 +16,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
-        <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
-        <ProjectReference Include="..\Moda.Planning.Domain\Moda.Planning.Domain.csproj" />
+      <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj" />
+      <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
+      <ProjectReference Include="..\Moda.Goals.Domain\Moda.Goals.Domain.csproj" />
     </ItemGroup>
 
 </Project>
