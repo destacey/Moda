@@ -21,10 +21,9 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     builder.Host.AddConfigurations();
-    builder.Host.UseSerilog((_, config) =>
+    builder.Host.UseSerilog((context, config) =>
     {
-        config.WriteTo.Console()
-            .ReadFrom.Configuration(builder.Configuration);
+        config.ReadFrom.Configuration(context.Configuration);
     });
 
     builder.Services.AddControllers()

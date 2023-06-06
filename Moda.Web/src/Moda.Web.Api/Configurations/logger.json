@@ -1,70 +1,61 @@
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Hangfire": "Warning",
-      "Microsoft": "Warning",
-      "Microsoft.Hosting.Lifetime": "Information"
-    }
-  },
-  "Serilog": {
-    "Using": [
-        "Serilog.Sinks.Console",
-        "Serilog.Sinks.ApplicationInsights"
-    ],
-    "Enrich": [
-        "FromLogContext",
-        "WithAssemblyName",
-        "WithAssemblyVersion",
-        "WithMachineName",
-        "WithProcessId",
-        "WithThreadId",
-        "WithHangfireContext",
-        "WithExceptionDetails",
-        {
-            "Name": "WithSpan",
-            "Args": {
-                "spanOptions": {
-                    "IncludeTags": "true",
-                    "IncludeBaggage": "true",
-                    "IncludeOperationName": "true",
-                    "IncludeTraceFlags": "true"
+    "Serilog": {
+        "Using": [
+            "Serilog.Sinks.Console",
+            "Serilog.Sinks.File",
+            "Serilog.Sinks.ApplicationInsights"
+        ],
+        "Enrich": [
+            "FromLogContext",
+            "WithAssemblyName",
+            "WithAssemblyVersion",
+            "WithMachineName",
+            "WithProcessId",
+            "WithThreadId",
+            "WithHangfireContext",
+            "WithExceptionDetails",
+            {
+                "Name": "WithSpan",
+                "Args": {
+                    "spanOptions": {
+                        "IncludeTags": "true",
+                        "IncludeBaggage": "true",
+                        "IncludeOperationName": "true",
+                        "IncludeTraceFlags": "true"
+                    }
                 }
             }
-        }
-    ],
-    "MinimumLevel": {
-      "Default": "Information",
-      "Override": {
-        "Hangfire": "Warning",
-        "Microsoft": "Error",
-        "Microsoft.Hosting.Lifetime": "Information",
-        "System": "Information"
-      }
-    },
-    "Properties": {
-      "Application": "Moda"
-    },
-    "WriteTo": [
-        {
-            "Name": "ApplicationInsights",
-            "Args": {
-                "telemetryConverter": "Serilog.Sinks.ApplicationInsights.TelemetryConverters.TraceTelemetryConverter, Serilog.Sinks.ApplicationInsights"
+        ],
+        "MinimumLevel": {
+            "Default": "Information",
+            "Override": {
+                "Hangfire": "Warning",
+                "Microsoft": "Error",
+                "Microsoft.Hosting.Lifetime": "Information",
+                "System": "Information"
             }
         },
-        {
-            "Args": {
-                "path": "Logs/logs.json",
-                "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog",
-                "rollingInterval": "Day",
-                "restrictedToMinimumLevel": "Information",
-                "retainedFileCountLimit": 5
-            },
-            "Name": "File"
+        "Properties": {
+            "Application": "Moda"
         },
-        {
-            "Name": "Hangfire"
-        }
-    ]
-  }
+        "WriteTo": [
+            { "Name": "Console" },
+            {
+                "Name": "ApplicationInsights",
+                "Args": {
+                    "telemetryConverter": "Serilog.Sinks.ApplicationInsights.TelemetryConverters.TraceTelemetryConverter, Serilog.Sinks.ApplicationInsights"
+                }
+            },
+            {
+                "Name": "File",
+                "Args": {
+                    "path": "Logs/log-.json",
+                    "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog",
+                    "rollingInterval": "Day",
+                    "restrictedToMinimumLevel": "Information",
+                    "retainedFileCountLimit": 5
+                }
+            }
+        ]
+    }
 }
