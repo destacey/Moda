@@ -12,7 +12,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20230605042843_Add-Objectives-and-ProgramIncrementObjectives")]
+    [Migration("20230607013656_Add-Objectives-and-ProgramIncrementObjectives")]
     partial class AddObjectivesandProgramIncrementObjectives
     {
         /// <inheritdoc />
@@ -1428,11 +1428,13 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", null)
+                    b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", "Team")
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrementTeam", b =>

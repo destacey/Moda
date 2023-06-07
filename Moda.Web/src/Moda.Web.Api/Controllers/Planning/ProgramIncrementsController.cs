@@ -36,10 +36,26 @@ public class ProgramIncrementsController : ControllerBase
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
+    [OpenApiOperation("Get program increment details.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<ProgramIncrementDetailsDto>> GetById(Guid id)
+    {
+        var programIncrement = await _sender.Send(new GetProgramIncrementQuery(id));
+
+        return programIncrement is not null
+            ? Ok(programIncrement)
+            : NotFound();
+    }
+
+    [HttpGet("local-id/{id}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
     [OpenApiOperation("Get program increment details using the localId.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ProgramIncrementDetailsDto>> GetById(int id)
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<ProgramIncrementDetailsDto>> GetByLocalId(int id)
     {
         var programIncrement = await _sender.Send(new GetProgramIncrementQuery(id));
 
@@ -131,6 +147,62 @@ public class ProgramIncrementsController : ControllerBase
 
         return Ok(objectives);
     }
+
+    [HttpGet("{id}/objectives/{objectiveId}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrementObjectives)]
+    [OpenApiOperation("Get a program increment objective.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveListDto>>> GetObjectiveById(Guid id, Guid objectiveId, CancellationToken cancellationToken)
+    {
+        var objective = await _sender.Send(new GetProgramIncrementObjectiveQuery(id, objectiveId), cancellationToken);
+
+        return objective is not null
+            ? Ok(objective)
+            : NotFound();
+    }
+
+    [HttpGet("local-id/{id}/objectives/{objectiveId}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrementObjectives)]
+    [OpenApiOperation("Get a program increment objective using the PI and Objective local Ids.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveListDto>>> GetObjectiveByLocalId(int id, int objectiveId, CancellationToken cancellationToken)
+    {
+        var objective = await _sender.Send(new GetProgramIncrementObjectiveQuery(id, objectiveId), cancellationToken);
+
+        return objective is not null
+            ? Ok(objective)
+            : NotFound();
+    }
+
+
+    //[HttpPost("{id}/objectives")]
+    //[MustHavePermission(ApplicationAction.Manage, ApplicationResource.ProgramIncrementObjectives)]
+    //[OpenApiOperation("Create a program increment objective.", "")]
+    //[ProducesResponseType(StatusCodes.Status201Created)]
+    //[ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //[ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    //public async Task<ActionResult> CreateObjective([FromBody] CreateProgramIncrementObjectiveRequest request, CancellationToken cancellationToken)
+    //{
+    //    var result = await _sender.Send(request.ToCreateProgramIncrementObjectiveCommand(), cancellationToken);
+
+    //    if (result.IsFailure)
+    //    {
+    //        var error = new ErrorResult
+    //        {
+    //            StatusCode = 400,
+    //            SupportMessage = result.Error,
+    //            Source = "ProgramIncrementsController.CreateObjective"
+    //        };
+    //        return BadRequest(error);
+    //    }
+
+    //    return CreatedAtAction(nameof(GetObjectiveById), new { id = result.Value }, result.Value);
+    //}
 
     #endregion Objectives
 

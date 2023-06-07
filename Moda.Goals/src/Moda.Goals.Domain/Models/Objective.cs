@@ -68,6 +68,8 @@ public class Objective : BaseAuditableEntity<Guid>
     /// <value>The target date.</value>
     public LocalDate? TargetDate { get; private set; }
 
+    /// <summary>Gets the closed date.</summary>
+    /// <value>The closed date.</value>
     public Instant? ClosedDate { get; private set; }
 
     /// <summary>Updates the specified objective.</summary>
