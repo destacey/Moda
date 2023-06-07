@@ -47,13 +47,13 @@ public sealed class ImportObjectiveCommandValidator : CustomValidator<ImportObje
                 .WithMessage("The start date must be before the target date.");
         });
 
-        When(o => o.Status is ObjectiveStatus.Completed or ObjectiveStatus.Canceled or ObjectiveStatus.Incomplete,
+        When(o => o.Status is ObjectiveStatus.Closed or ObjectiveStatus.Canceled,
             () => RuleFor(o => o.ClosedDate)
                 .NotEmpty()
-                    .WithMessage("The ClosedDateUtc can not be empty if the status is Completed, Canceled, or Incomplete."))
+                    .WithMessage("The ClosedDateUtc can not be empty if the status is Closed or Canceled."))
             .Otherwise(() => RuleFor(o => o.ClosedDate)
                 .Empty()
-                    .WithMessage("The ClosedDateUtc must be empty if the status is not Completed, Canceled, or Incomplete."));
+                    .WithMessage("The ClosedDateUtc must be empty if the status is not Closed or Canceled"));
     }
 }
 

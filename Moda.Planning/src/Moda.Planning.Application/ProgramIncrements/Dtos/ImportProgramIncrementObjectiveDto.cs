@@ -41,12 +41,12 @@ public sealed class ImportProgramIncrementObjectiveDtoValidator : CustomValidato
                 .WithMessage("The start date must be before the target date.");
         });
 
-        When(o => o.Status is ObjectiveStatus.Completed or ObjectiveStatus.Canceled or ObjectiveStatus.Incomplete,
+        When(o => o.Status is ObjectiveStatus.Closed or ObjectiveStatus.Canceled,
             () => RuleFor(o => o.ClosedDateUtc)
                 .NotEmpty()
-                    .WithMessage("The ClosedDateUtc can not be empty if the status is Completed, Canceled, or Incomplete."))
+                    .WithMessage("The ClosedDateUtc can not be empty if the status is Completed or Canceled."))
             .Otherwise(() => RuleFor(o => o.ClosedDateUtc)
                 .Empty()
-                    .WithMessage("The ClosedDateUtc must be empty if the status is not Completed, Canceled, or Incomplete."));
+                    .WithMessage("The ClosedDateUtc must be empty if the status is not Completed or Canceled."));
     }
 }

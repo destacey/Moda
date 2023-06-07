@@ -77,12 +77,11 @@ public class Objective : BaseAuditableEntity<Guid>
     /// <param name="description">The description.</param>
     /// <param name="status">The status.</param>
     /// <param name="ownerId">The owner identifier.</param>
-    /// <param name="planId">The plan identifier.</param>
     /// <param name="startDate">The start date.</param>
     /// <param name="targetDate">The target date.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public Result Update(string name, string? description, ObjectiveStatus status, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate, Instant timestamp)
+    public Result Update(string name, string? description, ObjectiveStatus status, Guid? ownerId, LocalDate? startDate, LocalDate? targetDate, Instant timestamp)
     {
         try
         {
@@ -91,7 +90,6 @@ public class Objective : BaseAuditableEntity<Guid>
             Name = name;
             Description = description;
             OwnerId = ownerId;
-            PlanId = planId;
             StartDate = startDate;
             TargetDate = targetDate;
 
@@ -106,8 +104,16 @@ public class Objective : BaseAuditableEntity<Guid>
     private void ChangeStatus(ObjectiveStatus status, Instant timestamp)
     {
         if (Status == status) return;
-        
-        ClosedDate = status is ObjectiveStatus.Completed or ObjectiveStatus.Canceled ? timestamp : null;
+
+        if (Status is ObjectiveStatus.Closed or ObjectiveStatus.Canceled 
+            && status is not ObjectiveStatus.Closed or ObjectiveStatus.Canceled)
+        {
+            ClosedDate = null;
+        }
+        else if (status is ObjectiveStatus.Closed or ObjectiveStatus.Canceled)
+        {
+            ClosedDate = timestamp;
+        }
 
         Status = status;
     }

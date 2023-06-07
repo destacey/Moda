@@ -24,21 +24,21 @@ public sealed class CreateProgramIncrementObjectiveRequestValidator : CustomVali
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
-        RuleFor(r => r.TeamId)
+        RuleFor(o => o.TeamId)
             .NotEmpty()
             .WithMessage("A plan must be selected.");
 
-        RuleFor(r => r.Name)
+        RuleFor(o => o.Name)
             .NotEmpty()
             .MaximumLength(256);
 
-        RuleFor(r => r.Description)
+        RuleFor(o => o.Description)
             .MaximumLength(1024);
 
         When(o => o.StartDate.HasValue && o.TargetDate.HasValue, () =>
         {
-            RuleFor(r => r.StartDate)
-                .LessThan(r => r.TargetDate)
+            RuleFor(o => o.StartDate)
+                .LessThan(o => o.TargetDate)
                 .WithMessage("The start date must be before the target date.");
         });
     }

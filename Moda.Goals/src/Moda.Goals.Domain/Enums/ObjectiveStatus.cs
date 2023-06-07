@@ -9,12 +9,12 @@ public enum ObjectiveStatus
     [Display(Name = "In Progress", Description = "The objective is in progress.", Order = 2)]
     InProgress = 2,
 
-    [Display(Name = "Completed", Description = "The objective has been completed.", Order = 3)]
-    Completed = 3,
+    [Display(Name = "Closed", Description = "The objective has been closed.", Order = 3)]
+    Closed = 3,
 
     [Display(Name = "Canceled", Description = "The objective was canceled.", Order = 4)]
     Canceled = 4,
 
-    [Display(Name = "Incomplete", Description = "The objective was not completed.", Order = 5)]
-    Incomplete = 5
+    //[Display(Name = "Incomplete", Description = "The objective was not completed.", Order = 5)]
+    //Incomplete = 5
 }

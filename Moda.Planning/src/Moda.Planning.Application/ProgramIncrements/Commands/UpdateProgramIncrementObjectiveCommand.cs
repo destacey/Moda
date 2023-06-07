@@ -1,0 +1,100 @@
+﻿using MediatR;
+using Moda.Goals.Application.Objectives.Commands;
+using Moda.Goals.Application.Objectives.Queries;
+using Moda.Goals.Domain.Enums;
+
+namespace Moda.Planning.Application.ProgramIncrements.Commands;
+public sealed record UpdateProgramIncrementObjectiveCommand(Guid ProgramIncrementId, Guid ProgramIncrementObjectiveId, string Name, string? Description, ObjectiveStatus Status, LocalDate? StartDate, LocalDate? TargetDate, bool IsStretch) : ICommand<int>;
+
+public sealed class UpdateProgramIncrementObjectiveCommandValidator : CustomValidator<UpdateProgramIncrementObjectiveCommand>
+{
+    public UpdateProgramIncrementObjectiveCommandValidator()
+    {
+        RuleLevelCascadeMode = CascadeMode.Stop;
+
+        RuleFor(o => o.Name)
+            .NotEmpty()
+            .MaximumLength(256);
+
+        RuleFor(o => o.Description)
+            .MaximumLength(1024);
+
+        RuleFor(o => o.Status)
+            .IsInEnum()
+            .WithMessage("A valid objective status must be selected.");
+
+        When(o => o.StartDate.HasValue && o.TargetDate.HasValue, () =>
+        {
+            RuleFor(o => o.StartDate)
+                .LessThan(o => o.TargetDate)
+                .WithMessage("The start date must be before the target date.");
+        });
+    }
+}
+
+internal sealed class UpdateProgramIncrementObjectiveCommandHandler : ICommandHandler<UpdateProgramIncrementObjectiveCommand, int>
+{
+    private readonly IPlanningDbContext _planningDbContext;
+    private readonly ISender _sender;
+    private readonly ILogger<UpdateProgramIncrementObjectiveCommandHandler> _logger;
+
+    public UpdateProgramIncrementObjectiveCommandHandler(IPlanningDbContext planningDbContext, ISender sender, ILogger<UpdateProgramIncrementObjectiveCommandHandler> logger)
+    {
+        _planningDbContext = planningDbContext;
+        _sender = sender;
+        _logger = logger;
+    }
+
+    public async Task<Result<int>> Handle(UpdateProgramIncrementObjectiveCommand request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var programIncrement = await _planningDbContext.ProgramIncrements
+                .Include(pi => pi.Objectives.Where(o => o.Id == request.ProgramIncrementObjectiveId))
+                .FirstOrDefaultAsync(p => p.Id == request.ProgramIncrementId, cancellationToken);
+            if (programIncrement is null)
+                return Result.Failure<int>($"Program Increment {request.ProgramIncrementId} not found.");
+
+            var updatePiObjectiveResult = programIncrement.UpdateObjective(request.ProgramIncrementObjectiveId, request.IsStretch);
+            if (updatePiObjectiveResult.IsFailure)
+            {
+                _logger.LogError("Unable to update PI objective.  Error: {Error}", updatePiObjectiveResult.Error);
+                return Result.Failure<int>($"Unable to PI create objective.  Error: {updatePiObjectiveResult.Error}");
+            }
+
+            await _planningDbContext.SaveChangesAsync(cancellationToken);
+
+            var objectiveName = request.Name;
+            if (programIncrement.ObjectivesLocked)
+            {
+                var currentObjective = await _sender.Send(new GetObjectiveForProgramIncrementQuery(updatePiObjectiveResult.Value.ObjectiveId, programIncrement.Id), cancellationToken);
+                if (currentObjective is null)
+                    return Result.Failure<int>($"Objective {request.ProgramIncrementObjectiveId} not found.");
+
+                objectiveName = currentObjective.Name;
+            }            
+            
+            var objectiveResult = await _sender.Send(new UpdateObjectiveCommand(
+                updatePiObjectiveResult.Value.ObjectiveId,
+                request.Name, 
+                request.Description,
+                request.Status,
+                updatePiObjectiveResult.Value.TeamId,
+                request.StartDate, 
+                request.TargetDate), cancellationToken);
+            if (objectiveResult.IsFailure)
+                return Result.Failure<int>($"Unable to update the underlying objective.  Error: {objectiveResult.Error}");
+            // TODO: isStretch is still updated in this scenario.
+
+            return Result.Success(updatePiObjectiveResult.Value.LocalId);
+        }
+        catch (Exception ex)
+        {
+            var requestName = request.GetType().Name;
+
+            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
+
+            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+        }
+    }
+}

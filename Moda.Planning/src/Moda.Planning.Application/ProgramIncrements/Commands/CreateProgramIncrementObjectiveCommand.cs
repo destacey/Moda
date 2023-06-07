@@ -10,10 +10,6 @@ public sealed class CreateProgramIncrementObjectiveCommandValidator : CustomVali
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
-        RuleFor(o => o.TeamId)
-            .NotEmpty()
-            .WithMessage("A plan must be selected.");
-
         RuleFor(o => o.Name)
             .NotEmpty()
             .MaximumLength(256);

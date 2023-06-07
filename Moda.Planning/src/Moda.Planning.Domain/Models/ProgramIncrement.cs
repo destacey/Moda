@@ -145,8 +145,8 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
             if (!CanCreateObjectives())
                 return Result.Failure("Objectives are locked for this Program Increment.");
 
-            var objectiveType = team.Type == TeamType.Team 
-                ? ProgramIncrementObjectiveType.Team 
+            var objectiveType = team.Type == TeamType.Team
+                ? ProgramIncrementObjectiveType.Team
                 : ProgramIncrementObjectiveType.TeamOfTeams;
 
             var objective = new ProgramIncrementObjective(Id, team.Id, objectiveId, objectiveType, isStretch);
@@ -157,6 +157,29 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         catch (Exception ex)
         {
             return Result.Failure(ex.ToString());
+        }
+    }
+
+    public Result<ProgramIncrementObjective> UpdateObjective(Guid piObjectiveId, bool isStretch)
+    {
+        try
+        {
+            var existingObjective = _objectives.FirstOrDefault(x => x.Id == piObjectiveId);
+            if (existingObjective == null)
+                return Result.Failure<ProgramIncrementObjective>($"Objective {piObjectiveId} not found.");
+
+            if (ObjectivesLocked)
+                isStretch = existingObjective.IsStretch;
+
+            var updateResult = existingObjective.Update(isStretch);
+            if (updateResult.IsFailure)
+                return Result.Failure<ProgramIncrementObjective>(updateResult.Error);
+
+            return Result.Success(existingObjective);
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<ProgramIncrementObjective>(ex.ToString());
         }
     }
 

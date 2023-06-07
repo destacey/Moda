@@ -211,6 +211,34 @@ public class ProgramIncrementsController : ControllerBase
         return CreatedAtAction(nameof(GetObjectiveByLocalId), new { id = result.Value }, result.Value);
     }
 
+    [HttpPut("{id}/objectives/{objectiveId}")]
+    [MustHavePermission(ApplicationAction.Manage, ApplicationResource.ProgramIncrementObjectives)]
+    [OpenApiOperation("Update a program increment objective.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> UpdateObjective(Guid id, [FromBody] UpdateProgramIncrementObjectiveRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.ProgramIncrementId)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToUpdateProgramIncrementObjectiveCommand(), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "ProgramIncrementsController.UpdateObjective"
+            };
+            return BadRequest(error);
+        }
+
+        return CreatedAtAction(nameof(GetObjectiveByLocalId), new { id = result.Value }, result.Value);
+    }
+
     [HttpPost("{id}/objectives/import")]
     [MustHavePermission(ApplicationAction.Import, ApplicationResource.ProgramIncrementObjectives)]
     [OpenApiOperation("Import objectives for a program increment from a csv file.", "")]
