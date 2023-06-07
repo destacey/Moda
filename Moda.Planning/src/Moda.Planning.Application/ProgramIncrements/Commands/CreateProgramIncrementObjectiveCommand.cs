@@ -10,21 +10,21 @@ public sealed class CreateProgramIncrementObjectiveCommandValidator : CustomVali
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
-        RuleFor(r => r.TeamId)
+        RuleFor(o => o.TeamId)
             .NotEmpty()
             .WithMessage("A plan must be selected.");
 
-        RuleFor(r => r.Name)
+        RuleFor(o => o.Name)
             .NotEmpty()
             .MaximumLength(256);
 
-        RuleFor(r => r.Description)
+        RuleFor(o => o.Description)
             .MaximumLength(1024);
 
         When(o => o.StartDate.HasValue && o.TargetDate.HasValue, () =>
         {
-            RuleFor(r => r.StartDate)
-                .LessThan(r => r.TargetDate)
+            RuleFor(o => o.StartDate)
+                .LessThan(o => o.TargetDate)
                 .WithMessage("The start date must be before the target date.");
         });
     }
@@ -48,18 +48,18 @@ internal sealed class CreateProgramIncrementObjectiveCommandHandler : ICommandHa
         try
         {
             var programIncrement = await _planningDbContext.ProgramIncrements
-                .FirstOrDefaultAsync(p => p.Id == request.ProgramIncrementId);
+                .FirstOrDefaultAsync(p => p.Id == request.ProgramIncrementId, cancellationToken);
             if (programIncrement is null)
                 return Result.Failure<int>($"Program Increment {request.ProgramIncrementId} not found.");
 
-            var team = await _planningDbContext.PlanningTeams
-                .AsNoTracking()
-                .FirstOrDefaultAsync(t => t.Id == request.TeamId);
-            if (team is null)
-                return Result.Failure<int>($"Team {request.TeamId} not found.");
-
             if (programIncrement.ObjectivesLocked)
                 return Result.Failure<int>($"Objectives are locked for Program Increment {request.ProgramIncrementId}");
+
+            var team = await _planningDbContext.PlanningTeams
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == request.TeamId, cancellationToken);
+            if (team is null)
+                return Result.Failure<int>($"Team {request.TeamId} not found.");
 
             var objectiveResult = await _sender.Send(new CreateObjectiveCommand(
                 request.Name, 

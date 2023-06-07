@@ -44,8 +44,8 @@ else
                     </TemplateColumn>
                     <PropertyColumn Property="x => x.LocalId" Title="Id" />
                     <PropertyColumn Property="x => x.Name" />
-                    <PropertyColumn Property="x => x.Status" />
-                    <PropertyColumn Property="x => x.Type" />
+                    <PropertyColumn Property="x => x.Status.Name" Title="Status" />
+                    <PropertyColumn Property="x => x.Type.Name" Title="Type" />
                     <PropertyColumn Property="x => x.Team" Title="Team" Hidden="@(!ShowTeamColumn)">
                         <CellTemplate>
                             @if (context.Item.Team is not null)
@@ -143,7 +143,7 @@ else
         if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (x.Status.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (x.Status.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         if (x.ProgramIncrement != null && x.ProgramIncrement.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
@@ -152,7 +152,7 @@ else
         if (x.Team != null && x.Team.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (x.Type.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (x.Type.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         if (x.TargetDate != null && x.TargetDate.Value.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))

@@ -21,7 +21,7 @@ public sealed record ProgramIncrementObjectiveListDto
 
     /// <summary>Gets or sets the status.</summary>
     /// <value>The status.</value>
-    public required string Status { get; set; }
+    public required SimpleNavigationDto Status { get; set; }
 
     public required NavigationDto ProgramIncrement { get; set; }
 
@@ -29,7 +29,7 @@ public sealed record ProgramIncrementObjectiveListDto
 
     /// <summary>Gets or sets the type.</summary>
     /// <value>The PI objective type.</value>
-    public required string Type { get; set; }
+    public required SimpleNavigationDto Type { get; set; }
 
     /// <summary>Gets or sets the target date.</summary>
     /// <value>The target date.</value>
@@ -49,7 +49,7 @@ public sealed record ProgramIncrementObjectiveListDto
             ProgramIncrement = piNavigationDto,
             Status = objective.Status,
             Team = PlanningTeamNavigationDto.FromPlanningTeam(piObjective.Team),
-            Type = piObjective.Type.GetDisplayName(),
+            Type = SimpleNavigationDto.FromEnum(piObjective.Type),
             TargetDate = objective.TargetDate,
             IsStretch = piObjective.IsStretch
         };

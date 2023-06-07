@@ -50,7 +50,13 @@ internal sealed class GetProgramIncrementObjectivesQueryHandler : IQueryHandler<
                 ThrowAndLogException(request, $"Program increment {request.Id} does not have team {request.TeamId}.");
             }
 
-            query = query.Include(p => p.Objectives.Where(o => o.TeamId == request.TeamId.Value));
+            query = query.Include(p => p.Objectives.Where(o => o.TeamId == request.TeamId.Value))
+                .ThenInclude(o => o.Team);
+        }
+        else
+        {
+            query = query.Include(p => p.Objectives)
+                .ThenInclude(o => o.Team);
         }
 
         if (request.Id.HasValue)

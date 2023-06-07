@@ -1,14 +1,14 @@
 ﻿using CsvHelper;
 using Mapster;
+using Moda.Common.Application.Interfaces;
 using Moda.Organization.Application.Teams.Queries;
 using Moda.Organization.Application.TeamsOfTeams.Queries;
+using Moda.Planning.Application.ProgramIncrements.Commands;
 using Moda.Planning.Application.ProgramIncrements.Dtos;
 using Moda.Planning.Application.ProgramIncrements.Queries;
-using Moda.Planning.Application.Risks.Commands;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
 using Moda.Web.Api.Models.Planning.ProgramIncrements;
-using Moda.Web.Api.Models.Planning.Risks;
 
 namespace Moda.Web.Api.Controllers.Planning;
 
@@ -19,11 +19,13 @@ public class ProgramIncrementsController : ControllerBase
 {
     private readonly ILogger<ProgramIncrementsController> _logger;
     private readonly ISender _sender;
+    private readonly ICsvService _csvService;
 
-    public ProgramIncrementsController(ILogger<ProgramIncrementsController> logger, ISender sender)
+    public ProgramIncrementsController(ILogger<ProgramIncrementsController> logger, ISender sender, ICsvService csvService)
     {
         _logger = logger;
         _sender = sender;
+        _csvService = csvService;
     }
 
     [HttpGet]
@@ -188,8 +190,11 @@ public class ProgramIncrementsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> CreateObjective([FromBody] CreateProgramIncrementObjectiveRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> CreateObjective(Guid id, [FromBody] CreateProgramIncrementObjectiveRequest request, CancellationToken cancellationToken)
     {
+        if (id != request.ProgramIncrementId)
+            return BadRequest();
+
         var result = await _sender.Send(request.ToCreateProgramIncrementObjectiveCommand(), cancellationToken);
 
         if (result.IsFailure)
@@ -204,6 +209,76 @@ public class ProgramIncrementsController : ControllerBase
         }
 
         return CreatedAtAction(nameof(GetObjectiveByLocalId), new { id = result.Value }, result.Value);
+    }
+
+    [HttpPost("{id}/objectives/import")]
+    [MustHavePermission(ApplicationAction.Import, ApplicationResource.ProgramIncrementObjectives)]
+    [OpenApiOperation("Import objectives for a program increment from a csv file.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ImportObjectives(Guid id, [FromForm] IFormFile file, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var importedObjectives = _csvService.ReadCsv<ImportProgramIncrementObjectivesRequest>(file.OpenReadStream());
+
+            List<ImportProgramIncrementObjectiveDto> objectives = new();
+            var validator = new ImportProgramIncrementObjectivesRequestValidator();
+            foreach (var objective in importedObjectives)
+            {
+                // TODO: allow importing of objectives for multiple PIs at once
+                if (id != objective.ProgramIncrementId)
+                    return BadRequest();
+
+                var validationResults = await validator.ValidateAsync(objective, cancellationToken);
+                if (!validationResults.IsValid)
+                {
+                    foreach (var error in validationResults.Errors)
+                    {
+                        if (error.PropertyName != "RecordId")
+                        {
+                            error.ErrorMessage = $"{error.ErrorMessage} (Record Id: {objective.ImportId})";
+                            ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                        }
+                    }
+                    return UnprocessableEntity(validationResults);
+                }
+                else
+                {
+                    objectives.Add(objective.ToImportProgramIncrementObjectiveDto());
+                }
+            }
+
+            if (!objectives.Any())
+                return BadRequest("No PI objectives imported.");
+
+            var result = await _sender.Send(new ImportProgramIncrementObjectivesCommand(objectives), cancellationToken);
+
+            if (result.IsFailure)
+            {
+                var error = new ErrorResult
+                {
+                    StatusCode = 400,
+                    SupportMessage = result.Error,
+                    Source = "ProgramIncrementsController.ImportObjectives"
+                };
+                return BadRequest(error);
+            }
+
+            return NoContent();
+        }
+        catch (CsvHelperException ex)
+        {
+            // TODO: Convert this to a validation problem details
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = ex.ToString(),
+                Source = "ProgramIncrementsController.ImportObjectives"
+            };
+            return BadRequest(error);
+        }
     }
 
     #endregion Objectives

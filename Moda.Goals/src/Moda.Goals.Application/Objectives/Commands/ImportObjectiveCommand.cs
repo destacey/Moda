@@ -3,11 +3,11 @@ using Moda.Goals.Domain.Enums;
 using Moda.Goals.Domain.Models;
 
 namespace Moda.Goals.Application.Objectives.Commands;
-public sealed record CreateObjectiveCommand(string Name, string? Description, ObjectiveType Type, Guid? OwnerId, Guid? PlanId, LocalDate? StartDate, LocalDate? TargetDate) : ICommand<Guid>;
+public sealed record ImportObjectiveCommand(string Name, string? Description, ObjectiveType Type, ObjectiveStatus Status, Guid? OwnerId, Guid? PlanId, LocalDate? StartDate, LocalDate? TargetDate, Instant? ClosedDate) : ICommand<Guid>;
 
-public sealed class CreateObjectiveCommandValidator : CustomValidator<CreateObjectiveCommand>
+public sealed class ImportObjectiveCommandValidator : CustomValidator<ImportObjectiveCommand>
 {
-    public CreateObjectiveCommandValidator()
+    public ImportObjectiveCommandValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -21,6 +21,10 @@ public sealed class CreateObjectiveCommandValidator : CustomValidator<CreateObje
         RuleFor(o => o.Type)
             .IsInEnum()
             .WithMessage("A valid objective type must be selected.");
+
+        RuleFor(o => o.Status)
+            .IsInEnum()
+            .WithMessage("A valid objective status must be selected.");
 
         When(o => o.OwnerId.HasValue, () =>
         {
@@ -42,32 +46,42 @@ public sealed class CreateObjectiveCommandValidator : CustomValidator<CreateObje
                 .LessThan(o => o.TargetDate)
                 .WithMessage("The start date must be before the target date.");
         });
+
+        When(o => o.Status is ObjectiveStatus.Completed or ObjectiveStatus.Canceled or ObjectiveStatus.Incomplete,
+            () => RuleFor(o => o.ClosedDate)
+                .NotEmpty()
+                    .WithMessage("The ClosedDateUtc can not be empty if the status is Completed, Canceled, or Incomplete."))
+            .Otherwise(() => RuleFor(o => o.ClosedDate)
+                .Empty()
+                    .WithMessage("The ClosedDateUtc must be empty if the status is not Completed, Canceled, or Incomplete."));
     }
 }
 
-internal sealed class CreateObjectiveCommandHandler : ICommandHandler<CreateObjectiveCommand, Guid>
+internal sealed class ImportObjectiveCommandHandler : ICommandHandler<ImportObjectiveCommand, Guid>
 {
     private readonly IGoalsDbContext _goalsDbContext;
-    private readonly ILogger<CreateObjectiveCommandHandler> _logger;
+    private readonly ILogger<ImportObjectiveCommandHandler> _logger;
 
-    public CreateObjectiveCommandHandler(IGoalsDbContext goalsDbContext, ILogger<CreateObjectiveCommandHandler> logger)
+    public ImportObjectiveCommandHandler(IGoalsDbContext goalsDbContext, ILogger<ImportObjectiveCommandHandler> logger)
     {
         _goalsDbContext = goalsDbContext;
         _logger = logger;
     }
 
-    public async Task<Result<Guid>> Handle(CreateObjectiveCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(ImportObjectiveCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var objective = Objective.Create(
+            var objective = Objective.Import(
                 request.Name,
                 request.Description,
                 request.Type,
+                request.Status,
                 request.OwnerId,
                 request.PlanId,
                 request.StartDate,
-                request.TargetDate
+                request.TargetDate,
+                request.ClosedDate
                 );
 
             await _goalsDbContext.Objectives.AddAsync(objective, cancellationToken);

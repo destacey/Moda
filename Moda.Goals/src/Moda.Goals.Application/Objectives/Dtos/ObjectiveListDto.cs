@@ -1,4 +1,5 @@
-﻿using Moda.Goals.Domain.Models;
+﻿using Moda.Common.Application.Dtos;
+using Moda.Goals.Domain.Models;
 
 namespace Moda.Goals.Application.Objectives.Dtos;
 public sealed record ObjectiveListDto : IMapFrom<Objective>
@@ -18,11 +19,11 @@ public sealed record ObjectiveListDto : IMapFrom<Objective>
 
     /// <summary>Gets or sets the type.</summary>
     /// <value>The PI objective type.</value>
-    public required string Type { get; set; }
+    public required SimpleNavigationDto Type { get; set; }
 
     /// <summary>Gets or sets the status.</summary>
     /// <value>The status.</value>
-    public required string Status { get; set; }
+    public required SimpleNavigationDto Status { get; set; }
 
     /// <summary>Gets or sets the owner identifier.</summary>
     /// <value>The owner identifier.</value>
@@ -35,4 +36,11 @@ public sealed record ObjectiveListDto : IMapFrom<Objective>
     /// <summary>Gets or sets the target date.</summary>
     /// <value>The target date.</value>
     public LocalDate? TargetDate { get; set; }
+
+    public void Register(TypeAdapterConfig config)
+    {
+        config.NewConfig<Objective, ObjectiveListDto>()
+            .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))
+            .Map(dest => dest.Type, src => SimpleNavigationDto.FromEnum(src.Type));
+    }
 }

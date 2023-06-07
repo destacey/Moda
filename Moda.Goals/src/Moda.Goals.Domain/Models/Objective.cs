@@ -124,4 +124,31 @@ public class Objective : BaseAuditableEntity<Guid>
     {
         return new Objective(name, description, type, ownerId, planId, startDate, targetDate);
     }
+
+    /// <summary>Creates an objective.</summary>
+    /// <param name="name">The name.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="type">The type.</param>
+    /// <param name="status">The status.</param>
+    /// <param name="ownerId">The owner identifier.</param>
+    /// <param name="planId">The plan identifier.</param>
+    /// <param name="startDate">The start date.</param>
+    /// <param name="targetDate">The target date.</param>
+    /// <param name="closedDate">The closed date.</param>
+    /// <returns></returns>
+    public static Objective Import(string name, string? description, ObjectiveType type, ObjectiveStatus status, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate, Instant? closedDate)
+    {
+        return new Objective()
+        { 
+            Name = name, 
+            Description = description,
+            Type = type,
+            Status = status,
+            OwnerId = ownerId,
+            PlanId = planId,
+            StartDate = startDate,
+            TargetDate = targetDate,
+            ClosedDate = closedDate
+        };
+    }
 }

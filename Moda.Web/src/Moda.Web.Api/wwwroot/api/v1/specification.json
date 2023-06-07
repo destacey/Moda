@@ -1201,9 +1201,10 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "guid"
             },
-            "x-position": 2
+            "x-position": 1
           }
         ],
         "requestBody": {
@@ -1216,7 +1217,7 @@
             }
           },
           "required": true,
-          "x-position": 1
+          "x-position": 2
         },
         "responses": {
           "201": {
@@ -1390,6 +1391,95 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/program-increments/{id}/objectives/import": {
+      "post": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Import objectives for a program increment from a csv file.",
+        "operationId": "ProgramIncrements_ImportObjectives",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "ContentType": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "ContentDisposition": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Headers": {
+                    "nullable": true,
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/IHeaderDictionary"
+                      }
+                    ]
+                  },
+                  "Length": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "Name": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "FileName": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -5619,7 +5709,7 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "programIncrement": {
             "$ref": "#/components/schemas/NavigationDto"
@@ -5628,7 +5718,7 @@
             "$ref": "#/components/schemas/PlanningTeamNavigationDto"
           },
           "type": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "targetDate": {
             "type": "string",
@@ -5637,6 +5727,19 @@
           },
           "isStretch": {
             "type": "boolean"
+          }
+        }
+      },
+      "SimpleNavigationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
           }
         }
       },
@@ -5698,263 +5801,6 @@
           },
           "isStretch": {
             "type": "boolean"
-          }
-        }
-      },
-      "RiskListDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid"
-          },
-          "localId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "summary": {
-            "type": "string"
-          },
-          "team": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/PlanningTeamNavigationDto"
-              }
-            ]
-          },
-          "reportedOn": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "status": {
-            "type": "string"
-          },
-          "category": {
-            "type": "string"
-          },
-          "exposure": {
-            "type": "string"
-          },
-          "assignee": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/NavigationDto"
-              }
-            ]
-          },
-          "followUpDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          }
-        }
-      },
-      "RiskDetailsDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid"
-          },
-          "localId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "summary": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "team": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/PlanningTeamNavigationDto"
-              }
-            ]
-          },
-          "reportedOn": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "reportedBy": {
-            "$ref": "#/components/schemas/NavigationDto"
-          },
-          "status": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "category": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "impact": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "likelihood": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "exposure": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "assignee": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/NavigationDto"
-              }
-            ]
-          },
-          "followUpDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "response": {
-            "type": "string",
-            "nullable": true
-          },
-          "closedDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          }
-        }
-      },
-      "SimpleNavigationDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          }
-        }
-      },
-      "CreateRiskRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "teamId",
-          "summary"
-        ],
-        "properties": {
-          "teamId": {
-            "type": "string",
-            "format": "guid",
-            "minLength": 1,
-            "nullable": false
-          },
-          "summary": {
-            "type": "string",
-            "maxLength": 256,
-            "minLength": 1,
-            "nullable": false
-          },
-          "description": {
-            "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          },
-          "categoryId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "impactId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "likelihoodId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "assigneeId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "followUpDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "response": {
-            "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          }
-        }
-      },
-      "UpdateRiskRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "teamId",
-          "summary"
-        ],
-        "properties": {
-          "riskId": {
-            "type": "string",
-            "format": "guid"
-          },
-          "teamId": {
-            "type": "string",
-            "format": "guid",
-            "minLength": 1,
-            "nullable": false
-          },
-          "summary": {
-            "type": "string",
-            "maxLength": 256,
-            "minLength": 1,
-            "nullable": false
-          },
-          "description": {
-            "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          },
-          "statusId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "categoryId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "impactId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "likelihoodId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "assigneeId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "followUpDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "response": {
-            "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
           }
         }
       },
@@ -6327,6 +6173,250 @@
           "XXSSProtection": {
             "type": "array",
             "items": {}
+          }
+        }
+      },
+      "RiskListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "localId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlanningTeamNavigationDto"
+              }
+            ]
+          },
+          "reportedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "exposure": {
+            "type": "string"
+          },
+          "assignee": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NavigationDto"
+              }
+            ]
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        }
+      },
+      "RiskDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "localId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlanningTeamNavigationDto"
+              }
+            ]
+          },
+          "reportedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reportedBy": {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "category": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "impact": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "likelihood": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "exposure": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "assignee": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NavigationDto"
+              }
+            ]
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "response": {
+            "type": "string",
+            "nullable": true
+          },
+          "closedDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "CreateRiskRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "teamId",
+          "summary"
+        ],
+        "properties": {
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "impactId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "likelihoodId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "response": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
+      "UpdateRiskRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "teamId",
+          "summary"
+        ],
+        "properties": {
+          "riskId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          },
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "impactId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "likelihoodId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "response": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
           }
         }
       },
