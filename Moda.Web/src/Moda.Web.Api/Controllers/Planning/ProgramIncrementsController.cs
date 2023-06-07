@@ -1,11 +1,14 @@
-﻿using Mapster;
+﻿using CsvHelper;
+using Mapster;
 using Moda.Organization.Application.Teams.Queries;
 using Moda.Organization.Application.TeamsOfTeams.Queries;
 using Moda.Planning.Application.ProgramIncrements.Dtos;
 using Moda.Planning.Application.ProgramIncrements.Queries;
+using Moda.Planning.Application.Risks.Commands;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
 using Moda.Web.Api.Models.Planning.ProgramIncrements;
+using Moda.Web.Api.Models.Planning.Risks;
 
 namespace Moda.Web.Api.Controllers.Planning;
 
@@ -178,31 +181,30 @@ public class ProgramIncrementsController : ControllerBase
             : NotFound();
     }
 
+    [HttpPost("{id}/objectives")]
+    [MustHavePermission(ApplicationAction.Manage, ApplicationResource.ProgramIncrementObjectives)]
+    [OpenApiOperation("Create a program increment objective.", "")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> CreateObjective([FromBody] CreateProgramIncrementObjectiveRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToCreateProgramIncrementObjectiveCommand(), cancellationToken);
 
-    //[HttpPost("{id}/objectives")]
-    //[MustHavePermission(ApplicationAction.Manage, ApplicationResource.ProgramIncrementObjectives)]
-    //[OpenApiOperation("Create a program increment objective.", "")]
-    //[ProducesResponseType(StatusCodes.Status201Created)]
-    //[ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    //[ProducesResponseType(StatusCodes.Status404NotFound)]
-    //[ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    //public async Task<ActionResult> CreateObjective([FromBody] CreateProgramIncrementObjectiveRequest request, CancellationToken cancellationToken)
-    //{
-    //    var result = await _sender.Send(request.ToCreateProgramIncrementObjectiveCommand(), cancellationToken);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "ProgramIncrementsController.CreateObjective"
+            };
+            return BadRequest(error);
+        }
 
-    //    if (result.IsFailure)
-    //    {
-    //        var error = new ErrorResult
-    //        {
-    //            StatusCode = 400,
-    //            SupportMessage = result.Error,
-    //            Source = "ProgramIncrementsController.CreateObjective"
-    //        };
-    //        return BadRequest(error);
-    //    }
-
-    //    return CreatedAtAction(nameof(GetObjectiveById), new { id = result.Value }, result.Value);
-    //}
+        return CreatedAtAction(nameof(GetObjectiveByLocalId), new { id = result.Value }, result.Value);
+    }
 
     #endregion Objectives
 

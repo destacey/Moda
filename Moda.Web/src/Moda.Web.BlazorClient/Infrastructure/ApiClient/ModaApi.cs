@@ -2159,6 +2159,19 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ProgramIncrementObjectiveListDto>> GetObjectivesAsync(System.Guid id, System.Guid? teamId, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
+        /// Create a program increment objective.
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task CreateObjectiveAsync(string id, CreateProgramIncrementObjectiveRequest request);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Create a program increment objective.
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task CreateObjectiveAsync(string id, CreateProgramIncrementObjectiveRequest request, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
         /// Get a program increment objective.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -2963,6 +2976,119 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             throw new ApiException<ErrorResult>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Create a program increment objective.
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task CreateObjectiveAsync(string id, CreateProgramIncrementObjectiveRequest request)
+        {
+            return CreateObjectiveAsync(id, request, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Create a program increment objective.
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task CreateObjectiveAsync(string id, CreateProgramIncrementObjectiveRequest request, System.Threading.CancellationToken cancellationToken)
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            if (request == null)
+                throw new System.ArgumentNullException("request");
+
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("api/planning/program-increments/{id}/objectives");
+            urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = Newtonsoft.Json.JsonConvert.SerializeObject(request, _settings.Value);
+                    var content_ = new System.Net.Http.StringContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 201)
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ErrorResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ErrorResult>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 422)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -12834,6 +12960,38 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     {
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Type { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class CreateProgramIncrementObjectiveRequest
+    {
+        [Newtonsoft.Json.JsonProperty("programIncrementId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid ProgramIncrementId { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("teamId", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public System.Guid TeamId { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.StringLength(256, MinimumLength = 1)]
+        public string Name { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(1024)]
+        public string? Description { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("startDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
+        public System.DateTime? StartDate { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("targetDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
+        public System.DateTime? TargetDate { get; set; } = default!;
+
+        [Newtonsoft.Json.JsonProperty("isStretch", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsStretch { get; set; } = default!;
 
     }
 

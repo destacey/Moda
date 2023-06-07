@@ -87,7 +87,7 @@ else
 
     private async Task GetProgramIncrement()
     {
-        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetByIdAsync(Id), Snackbar) is ProgramIncrementDetailsDto result)
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetByLocalIdAsync(Id), Snackbar) is ProgramIncrementDetailsDto result)
         {
             _model = new UpdateProgramIncrementViewModel
                 {

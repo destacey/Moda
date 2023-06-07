@@ -1188,6 +1188,76 @@
             "Bearer": []
           }
         ]
+      },
+      "post": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Create a program increment objective.",
+        "operationId": "ProgramIncrements_CreateObjective",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProgramIncrementObjectiveRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/planning/program-increments/{id}/objectives/{objectiveId}": {
@@ -5585,6 +5655,51 @@
             }
           }
         ]
+      },
+      "CreateProgramIncrementObjectiveRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "teamId",
+          "name"
+        ],
+        "properties": {
+          "programIncrementId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "targetDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "isStretch": {
+            "type": "boolean"
+          }
+        }
       },
       "RiskListDto": {
         "type": "object",

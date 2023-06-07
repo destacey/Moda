@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Organization.Domain.Enums;
 using Moda.Planning.Domain.Enums;
 using NodaTime;
 
@@ -20,6 +21,8 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         Name = name;
         Description = description;
         DateRange = dateRange;
+
+        ObjectivesLocked = false;
     }
 
     /// <summary>Gets the local identifier.</summary>
@@ -51,6 +54,8 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         get => _dateRange;
         protected set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
     }
+
+    public bool ObjectivesLocked { get; private set; } = false;
 
     /// <summary>Gets the teams.</summary>
     /// <value>The PI teams.</value>
@@ -90,6 +95,17 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         return IterationState.Future;
     }
 
+    /// <summary>
+    /// Determines whether this program increment can create objectives.
+    /// </summary>
+    /// <returns>
+    ///   <c>true</c> if this program increment can create objectives; otherwise, <c>false</c>.
+    /// </returns>
+    public bool CanCreateObjectives()
+    {
+        return !ObjectivesLocked;
+    }
+
     /// <summary>Manages the program increment teams.</summary>
     /// <param name="teamIds">The team ids.</param>
     /// <returns></returns>
@@ -108,6 +124,33 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
             {
                 _teams.Add(new ProgramIncrementTeam(Id, addedTeam));
             }
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
+    /// <summary>Creates a PI objective.</summary>
+    /// <param name="team">The team.</param>
+    /// <param name="objectiveId">The objective identifier.</param>
+    /// <param name="isStretch">if set to <c>true</c> [is stretch].</param>
+    /// <returns></returns>
+    public Result CreateObjective(PlanningTeam team, Guid objectiveId, bool isStretch)
+    {
+        try
+        {
+            if (!CanCreateObjectives())
+                return Result.Failure("Objectives are locked for this Program Increment.");
+
+            var objectiveType = team.Type == TeamType.Team 
+                ? ProgramIncrementObjectiveType.Team 
+                : ProgramIncrementObjectiveType.TeamOfTeams;
+
+            var objective = new ProgramIncrementObjective(Id, team.Id, objectiveId, objectiveType, isStretch);
+            _objectives.Add(objective);
 
             return Result.Success();
         }
