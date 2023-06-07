@@ -320,6 +320,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid?>("PlanId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<double>("Progress")
+                        .HasColumnType("float");
+
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("date");
 

@@ -25,6 +25,10 @@ public sealed record ObjectiveListDto : IMapFrom<Objective>
     /// <value>The status.</value>
     public required SimpleNavigationDto Status { get; set; }
 
+    /// <summary>Gets or sets the progress.</summary>
+    /// <value>The progress.</value>
+    public double Progress { get; set; }
+
     /// <summary>Gets or sets the owner identifier.</summary>
     /// <value>The owner identifier.</value>
     public Guid? OwnerId { get; set; }

@@ -6,12 +6,14 @@ public class Objective : BaseAuditableEntity<Guid>
 {
     private string _name = default!;
     private string? _description;
+    private double _progress;
 
     private Objective() { }
 
     public Objective(string name, string? description, ObjectiveType type, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate)
     {
         Status = ObjectiveStatus.NotStarted;
+        Progress = 0.0d;
 
         Name = name;
         Description = description;
@@ -52,6 +54,18 @@ public class Objective : BaseAuditableEntity<Guid>
     /// <value>The status.</value>
     public ObjectiveStatus Status { get; private set; }
 
+    /// <summary>Gets the progress percentage.</summary>
+    /// <value>The progress percentage.</value>
+    public double Progress 
+    { 
+        get => _progress; 
+        private set => _progress = value < 0 
+            ? 0.0d
+            : value > 100
+                ? 100.0d
+                : value; 
+    }
+
     /// <summary>Gets or sets the owner identifier.</summary>
     /// <value>The owner identifier.</value>
     public Guid? OwnerId { get; private set; }
@@ -81,7 +95,7 @@ public class Objective : BaseAuditableEntity<Guid>
     /// <param name="targetDate">The target date.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public Result Update(string name, string? description, ObjectiveStatus status, Guid? ownerId, LocalDate? startDate, LocalDate? targetDate, Instant timestamp)
+    public Result Update(string name, string? description, ObjectiveStatus status, double progress, Guid? ownerId, LocalDate? startDate, LocalDate? targetDate, Instant timestamp)
     {
         try
         {
@@ -89,6 +103,7 @@ public class Objective : BaseAuditableEntity<Guid>
 
             Name = name;
             Description = description;
+            Progress = progress;
             OwnerId = ownerId;
             StartDate = startDate;
             TargetDate = targetDate;
@@ -142,7 +157,7 @@ public class Objective : BaseAuditableEntity<Guid>
     /// <param name="targetDate">The target date.</param>
     /// <param name="closedDate">The closed date.</param>
     /// <returns></returns>
-    public static Objective Import(string name, string? description, ObjectiveType type, ObjectiveStatus status, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate, Instant? closedDate)
+    public static Objective Import(string name, string? description, ObjectiveType type, ObjectiveStatus status, double progress, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate, Instant? closedDate)
     {
         return new Objective()
         { 
@@ -150,6 +165,7 @@ public class Objective : BaseAuditableEntity<Guid>
             Description = description,
             Type = type,
             Status = status,
+            Progress = progress,
             OwnerId = ownerId,
             PlanId = planId,
             StartDate = startDate,

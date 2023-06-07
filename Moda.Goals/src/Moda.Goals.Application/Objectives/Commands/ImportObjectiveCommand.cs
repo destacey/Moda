@@ -3,7 +3,7 @@ using Moda.Goals.Domain.Enums;
 using Moda.Goals.Domain.Models;
 
 namespace Moda.Goals.Application.Objectives.Commands;
-public sealed record ImportObjectiveCommand(string Name, string? Description, ObjectiveType Type, ObjectiveStatus Status, Guid? OwnerId, Guid? PlanId, LocalDate? StartDate, LocalDate? TargetDate, Instant? ClosedDate) : ICommand<Guid>;
+public sealed record ImportObjectiveCommand(string Name, string? Description, ObjectiveType Type, ObjectiveStatus Status, double Progress, Guid? OwnerId, Guid? PlanId, LocalDate? StartDate, LocalDate? TargetDate, Instant? ClosedDate) : ICommand<Guid>;
 
 public sealed class ImportObjectiveCommandValidator : CustomValidator<ImportObjectiveCommand>
 {
@@ -25,6 +25,10 @@ public sealed class ImportObjectiveCommandValidator : CustomValidator<ImportObje
         RuleFor(o => o.Status)
             .IsInEnum()
             .WithMessage("A valid objective status must be selected.");
+
+        RuleFor(o => o.Progress)
+            .InclusiveBetween(0.0d, 100.0d)
+            .WithMessage("The progress must be between 0 and 100.");
 
         When(o => o.OwnerId.HasValue, () =>
         {
@@ -72,11 +76,14 @@ internal sealed class ImportObjectiveCommandHandler : ICommandHandler<ImportObje
     {
         try
         {
-            var objective = Objective.Import(
+            var objective = Objective.
+                
+                Import(
                 request.Name,
                 request.Description,
                 request.Type,
                 request.Status,
+                request.Progress,
                 request.OwnerId,
                 request.PlanId,
                 request.StartDate,

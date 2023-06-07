@@ -4,7 +4,7 @@ using Moda.Goals.Application.Objectives.Queries;
 using Moda.Goals.Domain.Enums;
 
 namespace Moda.Planning.Application.ProgramIncrements.Commands;
-public sealed record UpdateProgramIncrementObjectiveCommand(Guid ProgramIncrementId, Guid ProgramIncrementObjectiveId, string Name, string? Description, ObjectiveStatus Status, LocalDate? StartDate, LocalDate? TargetDate, bool IsStretch) : ICommand<int>;
+public sealed record UpdateProgramIncrementObjectiveCommand(Guid ProgramIncrementId, Guid ProgramIncrementObjectiveId, string Name, string? Description, ObjectiveStatus Status, double Progress, LocalDate? StartDate, LocalDate? TargetDate, bool IsStretch) : ICommand<int>;
 
 public sealed class UpdateProgramIncrementObjectiveCommandValidator : CustomValidator<UpdateProgramIncrementObjectiveCommand>
 {
@@ -22,6 +22,10 @@ public sealed class UpdateProgramIncrementObjectiveCommandValidator : CustomVali
         RuleFor(o => o.Status)
             .IsInEnum()
             .WithMessage("A valid objective status must be selected.");
+
+        RuleFor(o => o.Progress)
+            .InclusiveBetween(0.0d, 100.0d)
+            .WithMessage("The progress must be between 0 and 100.");
 
         When(o => o.StartDate.HasValue && o.TargetDate.HasValue, () =>
         {
@@ -79,6 +83,7 @@ internal sealed class UpdateProgramIncrementObjectiveCommandHandler : ICommandHa
                 request.Name, 
                 request.Description,
                 request.Status,
+                request.Progress,
                 updatePiObjectiveResult.Value.TeamId,
                 request.StartDate, 
                 request.TargetDate), cancellationToken);

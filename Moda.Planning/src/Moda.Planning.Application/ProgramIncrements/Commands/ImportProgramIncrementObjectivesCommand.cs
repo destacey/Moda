@@ -73,6 +73,7 @@ internal sealed class ImportProgramIncrementObjectivesCommandHandler : ICommandH
                     importedObjective.Description,
                     Goals.Domain.Enums.ObjectiveType.ProgramIncrement,
                     importedObjective.Status,
+                    importedObjective.Progress,
                     importedObjective.TeamId,
                     importedObjective.ProgramIncrementId,
                     importedObjective.StartDate,

@@ -159,7 +159,7 @@ public class ProgramIncrementsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveListDto>>> GetObjectiveById(Guid id, Guid objectiveId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveDetailsDto>>> GetObjectiveById(Guid id, Guid objectiveId, CancellationToken cancellationToken)
     {
         var objective = await _sender.Send(new GetProgramIncrementObjectiveQuery(id, objectiveId), cancellationToken);
 
@@ -174,7 +174,7 @@ public class ProgramIncrementsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveListDto>>> GetObjectiveByLocalId(int id, int objectiveId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveDetailsDto>>> GetObjectiveByLocalId(int id, int objectiveId, CancellationToken cancellationToken)
     {
         var objective = await _sender.Send(new GetProgramIncrementObjectiveQuery(id, objectiveId), cancellationToken);
 

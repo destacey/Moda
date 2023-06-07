@@ -8,6 +8,7 @@ public sealed record ImportProgramIncrementObjectiveDto(
     string Name, 
     string? Description, 
     ObjectiveStatus Status,
+    double Progress,
     LocalDate? StartDate,
     LocalDate? TargetDate, 
     bool IsStretch,
@@ -33,6 +34,10 @@ public sealed class ImportProgramIncrementObjectiveDtoValidator : CustomValidato
         RuleFor(o => o.Status)
             .IsInEnum()
             .WithMessage("A valid status must be selected.");
+
+        RuleFor(o => o.Progress)
+            .InclusiveBetween(0.0d, 100.0d)
+            .WithMessage("The progress must be between 0 and 100.");
 
         When(o => o.StartDate.HasValue && o.TargetDate.HasValue, () =>
         {

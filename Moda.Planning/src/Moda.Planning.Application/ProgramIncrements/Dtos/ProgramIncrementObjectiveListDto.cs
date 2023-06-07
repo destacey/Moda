@@ -27,6 +27,8 @@ public sealed record ProgramIncrementObjectiveListDto
 
     public required PlanningTeamNavigationDto Team { get; set; }
 
+    public double Progress { get; set; }
+
     /// <summary>Gets or sets the type.</summary>
     /// <value>The PI objective type.</value>
     public required SimpleNavigationDto Type { get; set; }
@@ -48,6 +50,7 @@ public sealed record ProgramIncrementObjectiveListDto
             Name = objective.Name,
             ProgramIncrement = piNavigationDto,
             Status = objective.Status,
+            Progress = objective.Progress,
             Team = PlanningTeamNavigationDto.FromPlanningTeam(piObjective.Team),
             Type = SimpleNavigationDto.FromEnum(piObjective.Type),
             TargetDate = objective.TargetDate,

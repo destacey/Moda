@@ -12,8 +12,8 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20230607035258_Add-ProgramIncrement-ObjectivesLocked")]
-    partial class AddProgramIncrementObjectivesLocked
+    [Migration("20230607174549_Add-Objectives-and-ProgramIncrementObjectives")]
+    partial class AddObjectivesandProgramIncrementObjectives
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -322,6 +322,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.Property<Guid?>("PlanId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("Progress")
+                        .HasColumnType("float");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("date");

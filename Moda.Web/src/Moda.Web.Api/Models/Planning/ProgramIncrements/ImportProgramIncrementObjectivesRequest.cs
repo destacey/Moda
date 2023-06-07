@@ -12,6 +12,7 @@ public class ImportProgramIncrementObjectivesRequest
     public required string Name { get; set; }
     public string? Description { get; set; }
     public int StatusId { get; set; }
+    public double Progress { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? TargetDate { get; set; }
     public bool IsStretch { get; set; }
@@ -22,7 +23,7 @@ public class ImportProgramIncrementObjectivesRequest
         LocalDate? startDate = StartDate?.ToLocalDateTime().Date;
         LocalDate? targetDate = TargetDate?.ToLocalDateTime().Date; 
         Instant? closedDateUtc = ClosedDateUtc.HasValue ? Instant.FromDateTimeUtc(DateTime.SpecifyKind(ClosedDateUtc.Value, DateTimeKind.Utc)) : null;
-        return new ImportProgramIncrementObjectiveDto(ImportId, ProgramIncrementId, TeamId, Name, Description, (ObjectiveStatus)StatusId, startDate, targetDate, IsStretch, closedDateUtc);
+        return new ImportProgramIncrementObjectiveDto(ImportId, ProgramIncrementId, TeamId, Name, Description, (ObjectiveStatus)StatusId, Progress, startDate, targetDate, IsStretch, closedDateUtc);
     }
 }
 
@@ -46,6 +47,10 @@ public sealed class ImportProgramIncrementObjectivesRequestValidator : CustomVal
         RuleFor(o => (ObjectiveStatus)o.StatusId)
             .IsInEnum()
             .WithMessage("A valid status must be selected.");
+
+        RuleFor(o => o.Progress)
+            .InclusiveBetween(0.0d, 100.0d)
+            .WithMessage("The progress must be between 0 and 100.");
 
         When(o => o.StartDate.HasValue && o.TargetDate.HasValue, () =>
         {

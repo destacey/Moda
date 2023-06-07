@@ -34,6 +34,7 @@ public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
         builder.Property(o => o.Status).IsRequired()
             .HasConversion<EnumConverter<ObjectiveStatus>>()
             .HasMaxLength(64);
+        builder.Property(o => o.Progress).IsRequired();
         builder.Property(o => o.OwnerId);
         builder.Property(o => o.PlanId);
         builder.Property(o => o.StartDate);

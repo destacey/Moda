@@ -2,7 +2,7 @@
 using Moda.Goals.Domain.Enums;
 
 namespace Moda.Goals.Application.Objectives.Commands;
-public sealed record UpdateObjectiveCommand(Guid Id, string Name, string? Description, ObjectiveStatus Status, Guid? OwnerId, LocalDate? StartDate, LocalDate? TargetDate) : ICommand<Guid>;
+public sealed record UpdateObjectiveCommand(Guid Id, string Name, string? Description, ObjectiveStatus Status, double Progress, Guid? OwnerId, LocalDate? StartDate, LocalDate? TargetDate) : ICommand<Guid>;
 
 public sealed class UpdateObjectiveCommandValidator : CustomValidator<UpdateObjectiveCommand>
 {
@@ -20,6 +20,10 @@ public sealed class UpdateObjectiveCommandValidator : CustomValidator<UpdateObje
         RuleFor(o => o.Status)
             .IsInEnum()
             .WithMessage("A valid objective status must be selected.");
+
+        RuleFor(o => o.Progress)
+            .InclusiveBetween(0.0d, 100.0d)
+            .WithMessage("The progress must be between 0 and 100.");
 
         When(o => o.OwnerId.HasValue, () =>
         {
@@ -63,6 +67,7 @@ internal sealed class UpdateObjectiveCommandHandler : ICommandHandler<UpdateObje
                 request.Name,
                 request.Description,
                 request.Status,
+                request.Progress,
                 request.OwnerId,
                 request.StartDate,
                 request.TargetDate,

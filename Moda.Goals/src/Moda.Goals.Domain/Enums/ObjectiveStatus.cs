@@ -14,7 +14,4 @@ public enum ObjectiveStatus
 
     [Display(Name = "Canceled", Description = "The objective was canceled.", Order = 4)]
     Canceled = 4,
-
-    //[Display(Name = "Incomplete", Description = "The objective was not completed.", Order = 5)]
-    //Incomplete = 5
 }
