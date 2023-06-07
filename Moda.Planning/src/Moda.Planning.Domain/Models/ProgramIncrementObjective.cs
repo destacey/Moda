@@ -27,6 +27,10 @@ public class ProgramIncrementObjective : BaseAuditableEntity<Guid>
     /// <value>The team identifier.</value>
     public Guid TeamId { get; init; }
 
+    /// <summary>Gets the team.</summary>
+    /// <value>The team.</value>
+    public PlanningTeam Team { get; private set; } = default!;
+
     /// <summary>Gets the objective identifier.</summary>
     /// <value>The objective identifier.</value>
     public Guid ObjectiveId { get; init; }

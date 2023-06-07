@@ -9,6 +9,7 @@ public static class ApplicationAction
     public const string Create = nameof(Create);
     public const string Update = nameof(Update);
     public const string Delete = nameof(Delete);
+    public const string Manage = nameof(Manage);
     public const string Import = nameof(Import);
     public const string Export = nameof(Export);
     public const string Generate = nameof(Generate);
@@ -33,6 +34,7 @@ public static class ApplicationResource
     public const string Teams = nameof(Teams);
 
     public const string ProgramIncrements = nameof(ProgramIncrements);
+    public const string ProgramIncrementObjectives = nameof(ProgramIncrementObjectives);
     public const string Risks = nameof(Risks);
 
     public const string BacklogCategories = nameof(BacklogCategories);
@@ -106,6 +108,9 @@ public static class ApplicationPermissions
         new("Create Program Increments", ApplicationAction.Create, ApplicationResource.ProgramIncrements),
         new("Update Program Increments", ApplicationAction.Update, ApplicationResource.ProgramIncrements),
         new("Delete Program Increments", ApplicationAction.Delete, ApplicationResource.ProgramIncrements),
+
+        new("View Program Increment Objectives", ApplicationAction.View, ApplicationResource.ProgramIncrementObjectives, IsBasic: true),
+        new("Create Program Increments", ApplicationAction.Manage, ApplicationResource.ProgramIncrementObjectives, IsBasic: true),
 
         new("View Risks", ApplicationAction.View, ApplicationResource.Risks, IsBasic: true),
         new("Create Risks", ApplicationAction.Create, ApplicationResource.Risks, IsBasic: true),

@@ -139,7 +139,7 @@ public class ProgramIncrementObjectiveConfig : IEntityTypeConfiguration<ProgramI
             .HasForeignKey(o => o.ProgramIncrementId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<PlanningTeam>()
+        builder.HasOne(o => o.Team)
             .WithMany()
             .HasForeignKey(p => p.TeamId)
             .OnDelete(DeleteBehavior.Cascade);

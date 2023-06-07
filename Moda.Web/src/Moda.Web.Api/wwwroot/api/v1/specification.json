@@ -1061,6 +1061,67 @@
         ]
       }
     },
+    "/api/planning/program-increments/{id}/objectives": {
+      "get": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Get a list of program increment teams.",
+        "operationId": "ProgramIncrements_GetObjectives",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "teamId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProgramIncrementObjectiveListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/program-increments/{id}/risks": {
       "get": {
         "tags": [
@@ -5262,6 +5323,59 @@
           }
         }
       },
+      "ProgramIncrementObjectiveListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "localId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "programIncrement": {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          "team": {
+            "$ref": "#/components/schemas/PlanningTeamNavigationDto"
+          },
+          "type": {
+            "type": "string"
+          },
+          "targetDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "isStretch": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PlanningTeamNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
       "RiskListDto": {
         "type": "object",
         "additionalProperties": false,
@@ -5312,22 +5426,6 @@
             "nullable": true
           }
         }
-      },
-      "PlanningTeamNavigationDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/NavigationDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "type": {
-                "type": "string"
-              }
-            }
-          }
-        ]
       },
       "RiskDetailsDto": {
         "type": "object",

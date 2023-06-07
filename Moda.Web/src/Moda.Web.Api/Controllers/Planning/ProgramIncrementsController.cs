@@ -118,6 +118,22 @@ public class ProgramIncrementsController : ControllerBase
             : BadRequest(result.Error);
     }
 
+    #region Objectives
+
+    [HttpGet("{id}/objectives")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrementObjectives)]
+    [OpenApiOperation("Get a list of program increment teams.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveListDto>>> GetObjectives(Guid id, Guid? teamId, CancellationToken cancellationToken)
+    {
+        var objectives = await _sender.Send(new GetProgramIncrementObjectivesQuery(id, teamId), cancellationToken);
+
+        return Ok(objectives);
+    }
+
+    #endregion Objectives
+
     #region Risks
 
     [HttpGet("{id}/risks")]
