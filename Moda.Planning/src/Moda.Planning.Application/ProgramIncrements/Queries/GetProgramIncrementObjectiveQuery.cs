@@ -45,11 +45,13 @@ internal sealed class GetProgramIncrementObjectiveQueryHandler : IQueryHandler<G
         if (request.Id.HasValue && request.ObjectiveId.HasValue)
         {
             query = query.Include(p => p.Objectives.Where(o => o.Id == request.ObjectiveId.Value))
+                .ThenInclude(o => o.Team)
                 .Where(p => p.Id == request.Id.Value);
         }
         else if (request.LocalId.HasValue && request.ObjectiveLocalId.HasValue)
         {
             query = query.Include(p => p.Objectives.Where(o => o.LocalId == request.ObjectiveLocalId.Value))
+                .ThenInclude(o => o.Team)
                 .Where(p => p.LocalId == request.LocalId.Value);
         }
         else

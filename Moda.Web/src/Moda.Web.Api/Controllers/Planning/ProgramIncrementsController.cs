@@ -159,7 +159,7 @@ public class ProgramIncrementsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveDetailsDto>>> GetObjectiveById(Guid id, Guid objectiveId, CancellationToken cancellationToken)
+    public async Task<ActionResult<ProgramIncrementObjectiveDetailsDto>> GetObjectiveById(Guid id, Guid objectiveId, CancellationToken cancellationToken)
     {
         var objective = await _sender.Send(new GetProgramIncrementObjectiveQuery(id, objectiveId), cancellationToken);
 
@@ -174,7 +174,7 @@ public class ProgramIncrementsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveDetailsDto>>> GetObjectiveByLocalId(int id, int objectiveId, CancellationToken cancellationToken)
+    public async Task<ActionResult<ProgramIncrementObjectiveDetailsDto>> GetObjectiveByLocalId(int id, int objectiveId, CancellationToken cancellationToken)
     {
         var objective = await _sender.Send(new GetProgramIncrementObjectiveQuery(id, objectiveId), cancellationToken);
 
@@ -218,9 +218,9 @@ public class ProgramIncrementsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> UpdateObjective(Guid id, [FromBody] UpdateProgramIncrementObjectiveRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateObjective(Guid id, Guid objectiveId, [FromBody] UpdateProgramIncrementObjectiveRequest request, CancellationToken cancellationToken)
     {
-        if (id != request.ProgramIncrementId)
+        if (id != request.ProgramIncrementId || objectiveId != request.ObjectiveId)
             return BadRequest();
 
         var result = await _sender.Send(request.ToUpdateProgramIncrementObjectiveCommand(), cancellationToken);
@@ -236,7 +236,7 @@ public class ProgramIncrementsController : ControllerBase
             return BadRequest(error);
         }
 
-        return CreatedAtAction(nameof(GetObjectiveByLocalId), new { id = result.Value }, result.Value);
+        return NoContent();
     }
 
     [HttpPost("{id}/objectives/import")]
@@ -307,6 +307,17 @@ public class ProgramIncrementsController : ControllerBase
             };
             return BadRequest(error);
         }
+    }
+
+    [HttpGet("objective-statuses")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrementObjectives)]
+    [OpenApiOperation("Get a list of all PI objective statuses.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveStatusDto>>> GetObjectiveStatuses(CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetProgramIncrementObjectiveStatusesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
     }
 
     #endregion Objectives

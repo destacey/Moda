@@ -42,7 +42,11 @@ else
                             <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="@(() => UpdateObjective.InvokeAsync(context.Item.Id))" />
                         </CellTemplate>
                     </TemplateColumn>
-                    <PropertyColumn Property="x => x.LocalId" Title="Id" />
+                    <PropertyColumn Property="x => x.LocalId" Title="Id">
+                        <CellTemplate>
+                            <MudLink Href="@($"/program-increments/{context.Item.ProgramIncrement.LocalId}/objectives/{context.Item.LocalId}")">@context.Item.LocalId</MudLink>
+                        </CellTemplate>
+                    </PropertyColumn>
                     <PropertyColumn Property="x => x.Name" />
                     <PropertyColumn Property="x => x.Status.Name" Title="Status" />
                     <PropertyColumn Property="x => x.Type.Name" Title="Type" />
@@ -59,6 +63,7 @@ else
                             <MudLink Href="@($"/program-increments/{context.Item.ProgramIncrement.LocalId}")">@context.Item.ProgramIncrement.Name</MudLink>
                         </CellTemplate>
                     </PropertyColumn>
+                    <PropertyColumn Property="x => x.Progress" Format="F0" />
                     <PropertyColumn Property="x => x.TargetDate" Title="Target" Format="MM/dd/yyyy" />
                     <PropertyColumn Property="x => x.IsStretch" Title="Stretch" />
                 </Columns>
@@ -146,10 +151,13 @@ else
         if (x.Status.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (x.ProgramIncrement != null && x.ProgramIncrement.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (x.Type.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (x.Team != null && x.Team.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (ShowProgramIncrementColumn && x.ProgramIncrement != null && x.ProgramIncrement.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (ShowTeamColumn && x.Team != null && x.Team.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         if (x.Type.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))

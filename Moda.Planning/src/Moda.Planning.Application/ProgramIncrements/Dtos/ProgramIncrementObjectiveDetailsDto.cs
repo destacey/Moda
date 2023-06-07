@@ -27,6 +27,8 @@ public sealed record ProgramIncrementObjectiveDetailsDto
     /// <value>The status.</value>
     public required SimpleNavigationDto Status { get; set; }
 
+    public double Progress { get; set; }
+
     public required NavigationDto ProgramIncrement { get; set; }
 
     public required PlanningTeamNavigationDto Team { get; set; }
@@ -37,7 +39,7 @@ public sealed record ProgramIncrementObjectiveDetailsDto
 
     /// <summary>Gets or sets the start date.</summary>
     /// <value>The start date.</value>
-    public LocalDate? StartDate { get; private set; }
+    public LocalDate? StartDate { get; set; }
 
     /// <summary>Gets or sets the target date.</summary>
     /// <value>The target date.</value>
@@ -45,7 +47,7 @@ public sealed record ProgramIncrementObjectiveDetailsDto
 
     /// <summary>Gets the closed date.</summary>
     /// <value>The closed date.</value>
-    public Instant? ClosedDate { get; private set; }
+    public Instant? ClosedDate { get; set; }
 
     /// <summary>Gets a value indicating whether this instance is stretch.</summary>
     /// <value><c>true</c> if this instance is stretch; otherwise, <c>false</c>.</value>
@@ -61,6 +63,7 @@ public sealed record ProgramIncrementObjectiveDetailsDto
             Description = objective.Description,
             ProgramIncrement = piNavigationDto,
             Status = objective.Status,
+            Progress = objective.Progress,
             Team = PlanningTeamNavigationDto.FromPlanningTeam(piObjective.Team),
             Type = SimpleNavigationDto.FromEnum(piObjective.Type),
             StartDate = objective.StartDate,

@@ -1296,10 +1296,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProgramIncrementObjectiveDetailsDto"
-                  }
+                  "$ref": "#/components/schemas/ProgramIncrementObjectiveDetailsDto"
                 }
               }
             }
@@ -1353,9 +1350,10 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "guid"
             },
-            "x-position": 3
+            "x-position": 2
           }
         ],
         "requestBody": {
@@ -1368,7 +1366,7 @@
             }
           },
           "required": true,
-          "x-position": 2
+          "x-position": 3
         },
         "responses": {
           "204": {
@@ -1447,10 +1445,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProgramIncrementObjectiveDetailsDto"
-                  }
+                  "$ref": "#/components/schemas/ProgramIncrementObjectiveDetailsDto"
                 }
               }
             }
@@ -1560,6 +1555,45 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/program-increments/objective-statuses": {
+      "get": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Get a list of all PI objective statuses.",
+        "operationId": "ProgramIncrements_GetObjectiveStatuses",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProgramIncrementObjectiveStatusDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
                 }
               }
             }
@@ -5865,6 +5899,10 @@
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
+          "progress": {
+            "type": "number",
+            "format": "double"
+          },
           "programIncrement": {
             "$ref": "#/components/schemas/NavigationDto"
           },
@@ -6360,6 +6398,27 @@
           "XXSSProtection": {
             "type": "array",
             "items": {}
+          }
+        }
+      },
+      "ProgramIncrementObjectiveStatusDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
