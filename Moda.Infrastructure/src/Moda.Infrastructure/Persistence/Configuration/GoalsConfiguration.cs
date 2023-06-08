@@ -26,7 +26,7 @@ public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
 
         builder.Property(o => o.LocalId).ValueGeneratedOnAdd();
 
-        builder.Property(o => o.Name).IsRequired().HasMaxLength(128);
+        builder.Property(o => o.Name).IsRequired().HasMaxLength(256);
         builder.Property(o => o.Description).HasMaxLength(1024);
         builder.Property(o => o.Type).IsRequired()
             .HasConversion<EnumConverter<ObjectiveType>>()
