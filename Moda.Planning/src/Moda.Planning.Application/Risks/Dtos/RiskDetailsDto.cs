@@ -6,16 +6,16 @@ public class RiskDetailsDto : IMapFrom<Risk>
 {
     public Guid Id { get; set; }
     public int LocalId { get; set; }
-    public string Summary { get; set; } = default!;
+    public required string Summary { get; set; }
     public string? Description { get; set; }
-    public PlanningTeamNavigationDto? Team { get; set; } = default!;
+    public PlanningTeamNavigationDto? Team { get; set; }
     public Instant ReportedOn { get; set; }
-    public NavigationDto ReportedBy { get; set; } = default!;
-    public SimpleNavigationDto Status { get; set; } = default!;
-    public SimpleNavigationDto Category { get; set; } = default!;
-    public SimpleNavigationDto Impact { get; set; } = default!;
-    public SimpleNavigationDto Likelihood { get; set; } = default!;
-    public SimpleNavigationDto Exposure { get; set; } = default!;
+    public required NavigationDto ReportedBy { get; set; }
+    public required SimpleNavigationDto Status { get; set; }
+    public required SimpleNavigationDto Category { get; set; }
+    public required SimpleNavigationDto Impact { get; set; }
+    public required SimpleNavigationDto Likelihood { get; set; }
+    public required SimpleNavigationDto Exposure { get; set; }
     public NavigationDto? Assignee { get; set; }
     public LocalDate? FollowUpDate { get; set; }
     public string? Response { get; set; }

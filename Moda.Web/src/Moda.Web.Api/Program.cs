@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using Moda.AppIntegration.Application;
 using Moda.Common.Application;
 using Moda.Common.Application.Interfaces;
+using Moda.Goals.Application;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
 using Moda.Organization.Application;
@@ -20,10 +21,9 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     builder.Host.AddConfigurations();
-    builder.Host.UseSerilog((_, config) =>
+    builder.Host.UseSerilog((context, config) =>
     {
-        config.WriteTo.Console()
-            .ReadFrom.Configuration(builder.Configuration);
+        config.ReadFrom.Configuration(context.Configuration);
     });
 
     builder.Services.AddControllers()
@@ -57,6 +57,7 @@ try
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddOrganizationApplication();
     builder.Services.AddPlanningApplication();
+    builder.Services.AddGoalsApplication();
     builder.Services.AddWorkApplication();
     builder.Services.AddAppIntegrationApplication();
 

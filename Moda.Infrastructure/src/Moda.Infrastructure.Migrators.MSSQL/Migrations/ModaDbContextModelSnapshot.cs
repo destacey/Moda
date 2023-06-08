@@ -269,6 +269,103 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ExternalEmployeeBlacklistItems", "Organization");
                 });
 
+            modelBuilder.Entity("Moda.Goals.Domain.Models.Objective", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ClosedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("LocalId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocalId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<Guid?>("OwnerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("Progress")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("TargetDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("LocalId");
+
+                    b.HasIndex("IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsDeleted"), new[] { "Id", "LocalId", "Name", "Type", "Status", "OwnerId", "PlanId" });
+
+                    b.HasIndex("Id", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "IsDeleted"), new[] { "LocalId", "Name", "Type", "Status", "OwnerId", "PlanId" });
+
+                    b.HasIndex("LocalId", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("LocalId", "IsDeleted"), new[] { "Id", "Name", "Type", "Status", "OwnerId", "PlanId" });
+
+                    b.HasIndex("OwnerId", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("OwnerId", "IsDeleted"), new[] { "Id", "LocalId", "Name", "Type", "Status", "PlanId" });
+
+                    b.HasIndex("PlanId", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("PlanId", "IsDeleted"), new[] { "Id", "LocalId", "Name", "Type", "Status", "OwnerId" });
+
+                    b.ToTable("Objectives", "Goals");
+                });
+
             modelBuilder.Entity("Moda.Infrastructure.Auditing.Trail", b =>
                 {
                     b.Property<Guid>("Id")
@@ -694,6 +791,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
+                    b.Property<bool>("ObjectivesLocked")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasAlternateKey("LocalId");
@@ -708,6 +808,85 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsUnique();
 
                     b.ToTable("ProgramIncrements", "Planning");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrementObjective", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsStretch")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("LocalId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocalId"));
+
+                    b.Property<Guid>("ObjectiveId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProgramIncrementId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("LocalId");
+
+                    b.HasIndex("IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsDeleted"), new[] { "Id", "LocalId", "ProgramIncrementId", "ObjectiveId", "Type", "IsStretch" });
+
+                    b.HasIndex("TeamId");
+
+                    b.HasIndex("Id", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "IsDeleted"), new[] { "LocalId", "ProgramIncrementId", "ObjectiveId", "Type", "IsStretch" });
+
+                    b.HasIndex("LocalId", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("LocalId", "IsDeleted"), new[] { "Id", "ProgramIncrementId", "ObjectiveId", "Type", "IsStretch" });
+
+                    b.HasIndex("ObjectiveId", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ObjectiveId", "IsDeleted"), new[] { "Id", "LocalId", "ProgramIncrementId", "Type", "IsStretch" });
+
+                    b.HasIndex("ProgramIncrementId", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ProgramIncrementId", "IsDeleted"), new[] { "Id", "LocalId", "ObjectiveId", "Type", "IsStretch" });
+
+                    b.ToTable("ProgramIncrementObjectives", "Planning");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrementTeam", b =>
@@ -1244,10 +1423,27 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrementObjective", b =>
+                {
+                    b.HasOne("Moda.Planning.Domain.Models.ProgramIncrement", null)
+                        .WithMany("Objectives")
+                        .HasForeignKey("ProgramIncrementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Planning.Domain.Models.PlanningTeam", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
+                });
+
             modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrementTeam", b =>
                 {
                     b.HasOne("Moda.Planning.Domain.Models.ProgramIncrement", null)
-                        .WithMany("ProgramIncrementTeams")
+                        .WithMany("Teams")
                         .HasForeignKey("ProgramIncrementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1312,7 +1508,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrement", b =>
                 {
-                    b.Navigation("ProgramIncrementTeams");
+                    b.Navigation("Objectives");
+
+                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevelScheme", b =>

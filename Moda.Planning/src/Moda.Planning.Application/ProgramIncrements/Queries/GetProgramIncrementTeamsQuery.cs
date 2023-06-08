@@ -15,7 +15,7 @@ internal sealed class GetProgramIncrementTeamsQueryHandler : IQueryHandler<GetPr
     {
         return await _planningDbContext.ProgramIncrements
             .Where(p => p.Id == request.Id)
-            .SelectMany(p => p.ProgramIncrementTeams.Select(t => t.TeamId))
+            .SelectMany(p => p.Teams.Select(t => t.TeamId))
             .ToListAsync(cancellationToken);
     }
 }

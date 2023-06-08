@@ -51,7 +51,9 @@ else
                     </MudGrid>
                 </MudItem>
                 <MudItem xs="12" md="7">
-                    <MudField Label="Description">@_programIncrement.Description</MudField>
+                    <MudField Label="Description">
+                        <MudMarkdown Value="@_programIncrement.Description" />
+                    </MudField>
                 </MudItem>
             </MudGrid>
             <MudGrid Class="px-4 py-1">
@@ -63,6 +65,16 @@ else
                         AllowDisabledToggle="false" />
                 </MudItem>
             </MudGrid>
+        </MudTabPanel>
+        <MudTabPanel Text="Objectives">
+            <ProgramIncrementObjectivesGrid Objectives="_objectives"
+                       GetObjectives="GetObjectives"
+                       ShowProgramIncrementColumn="false"
+                       ShowTeamColumn="true"
+                       CanCreateObjectives="_canCreateObjectives"
+                       CanUpdateObjectives="_canUpdateObjectives"
+                       CreateObjective="CreateObjectiveDialog"
+                       UpdateObjective="UpdateObjectiveDialog" />
         </MudTabPanel>
         <MudTabPanel Text="Risk Management">
             <RisksGrid Risks="_risks"
@@ -94,6 +106,7 @@ else
 
     private ProgramIncrementDetailsDto _programIncrement = default!;
     private List<TeamListViewModel> _piTeams = new();
+    private List<ProgramIncrementObjectiveListDto> _objectives = new();
     private List<RiskListDto> _risks = new();
 
     private bool _loading = true;
@@ -105,6 +118,8 @@ else
     private bool _canUpdateProgramIncrements;
     private bool _canCreateRisks;
     private bool _canUpdateRisks;
+    private bool _canCreateObjectives;
+    private bool _canUpdateObjectives;
 
     private bool _includeClosedRisks = false;
 
@@ -121,19 +136,21 @@ else
         _canUpdateProgramIncrements = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.ProgramIncrements);
         _canCreateRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
         _canUpdateRisks = await AuthService.HasPermissionAsync(user, ApplicationAction.Update, ApplicationResource.Risks);
+        _canUpdateObjectives = await AuthService.HasPermissionAsync(user, ApplicationAction.Manage, ApplicationResource.ProgramIncrementObjectives);
         _showPageActions = _canUpdateProgramIncrements;
 
         await GetProgramIncrement();
 
-        // don't allow creating risks if the PI is completed
+        // don't allow creating if the PI is completed
         _canCreateRisks = _programIncrement.State == "Completed" ? false : _canCreateRisks;
+        _canCreateObjectives = _programIncrement.State == "Completed" ? false : _canUpdateObjectives;
 
         _loading = false;
     }
 
     private async Task GetProgramIncrement()
     {
-        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetByIdAsync(Id), Snackbar) is ProgramIncrementDetailsDto result)
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetByLocalIdAsync(Id), Snackbar) is ProgramIncrementDetailsDto result)
         {
             _title = result.Name;
             _description = "Program Increment Details";
@@ -200,6 +217,87 @@ else
             _risks.Clear();
         }
     }
+
+    #region Objectives
+
+    private async Task GetObjectives()
+    {
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetObjectivesAsync(_programIncrement.Id, null), Snackbar) is List<ProgramIncrementObjectiveListDto> result)
+        {
+            _objectives = result.OrderBy(o => o.Team.Name).ThenBy(o => o.Name).ToList();
+        }
+    }
+
+    private async Task CreateObjectiveDialog()
+    {
+        //var dialogTitle = "Add Team Risk";
+        //var teamOptions = GetTeamOptions();
+        //var parameters = new DialogParameters
+        //    {
+        //        ["TeamOptions"] = teamOptions,
+        //        ["CreateRisk"] = EventCallback.Factory.Create<CreateRiskRequest>(this, CreateRisk)
+        //    };
+        //var dialogOptions = new DialogOptions()
+        //    {
+        //        DisableBackdropClick = true,
+        //        MaxWidth = MaxWidth.Medium,
+        //        FullWidth = true
+        //    };
+
+        //var dialog = DialogService.Show<CreateRisk_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        //var result = await dialog.Result;
+
+        //if (!result.Canceled)
+        //{
+        //    await GetRisks(_includeClosedRisks);
+        //}
+    }
+
+    private async Task CreateObjective(CreateProgramIncrementObjectiveRequest createObjective)
+    {
+        await ProgramIncrementsClient.CreateObjectiveAsync(createObjective.ProgramIncrementId, createObjective);
+    }
+
+    private async Task UpdateObjectiveDialog(ProgramIncrementObjectiveListDto objective)
+    {
+        var objectiveDto = await ProgramIncrementsClient.GetObjectiveByIdAsync(objective.ProgramIncrement.Id, objective.Id);
+        if (objectiveDto is null)
+        {
+            Snackbar.Add("Error getting PI Objective.", MudBlazor.Severity.Error);
+            return;
+        }
+
+        var dialogTitle = "Update Program Increment Objective";
+        var parameters = new DialogParameters
+            {
+                ["Objective"] = objectiveDto,
+                ["UpdateObjective"] = EventCallback.Factory.Create<UpdateProgramIncrementObjectiveRequest>(this, UpdateObjective)
+            };
+        var dialogOptions = new DialogOptions()
+            {
+                DisableBackdropClick = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+        var dialog = DialogService.Show<UpdateProgramIncrementObjective_Dialog>(dialogTitle, parameters, dialogOptions);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await GetObjectives();
+        }
+    }
+
+    private async Task UpdateObjective(UpdateProgramIncrementObjectiveRequest updateObjectiveRequest)
+    {
+        await ProgramIncrementsClient.UpdateObjectiveAsync(updateObjectiveRequest.ProgramIncrementId, updateObjectiveRequest.ObjectiveId, updateObjectiveRequest);
+    }
+
+
+    #endregion Objectives
 
 
     #region Risks

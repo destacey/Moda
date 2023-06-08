@@ -37,8 +37,7 @@ internal sealed class GetTeamsQueryHandler : IQueryHandler<GetTeamsQuery, IReadO
         if (request.TeamIds.Any())
             query = query.Where(e => request.TeamIds.Contains(e.Id));
 
-        return await query.AsNoTrackingWithIdentityResolution()
-            .AsNoTrackingWithIdentityResolution()
+        return await query
             .ProjectToType<TeamListDto>()
             .ToListAsync(cancellationToken);
     }

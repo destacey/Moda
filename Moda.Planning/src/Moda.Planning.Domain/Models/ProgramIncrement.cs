@@ -1,8 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Data;
-using Moda.Common.Extensions;
-using Moda.Common.Models;
+using Moda.Organization.Domain.Enums;
 using Moda.Planning.Domain.Enums;
 using NodaTime;
 
@@ -13,7 +11,8 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
     private string? _description;
     private LocalDateRange _dateRange = default!;
 
-    protected readonly List<ProgramIncrementTeam> _programIncrementTeams = new();
+    protected readonly List<ProgramIncrementTeam> _teams = new();
+    protected readonly List<ProgramIncrementObjective> _objectives = new();
 
     private ProgramIncrement() { }
 
@@ -22,6 +21,8 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         Name = name;
         Description = description;
         DateRange = dateRange;
+
+        ObjectivesLocked = false;
     }
 
     /// <summary>Gets the local identifier.</summary>
@@ -54,7 +55,15 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         protected set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
     }
 
-    public IReadOnlyCollection<ProgramIncrementTeam> ProgramIncrementTeams => _programIncrementTeams.AsReadOnly();
+    public bool ObjectivesLocked { get; private set; } = false;
+
+    /// <summary>Gets the teams.</summary>
+    /// <value>The PI teams.</value>
+    public IReadOnlyCollection<ProgramIncrementTeam> Teams => _teams.AsReadOnly();
+
+    /// <summary>Gets the objectives.</summary>
+    /// <value>The PI objectives.</value>
+    public IReadOnlyCollection<ProgramIncrementObjective> Objectives => _objectives.AsReadOnly();
 
     /// <summary>Updates the specified name.</summary>
     /// <param name="name">The name.</param>
@@ -86,21 +95,34 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         return IterationState.Future;
     }
 
-    // manage program increment teams
+    /// <summary>
+    /// Determines whether this program increment can create objectives.
+    /// </summary>
+    /// <returns>
+    ///   <c>true</c> if this program increment can create objectives; otherwise, <c>false</c>.
+    /// </returns>
+    public bool CanCreateObjectives()
+    {
+        return !ObjectivesLocked;
+    }
+
+    /// <summary>Manages the program increment teams.</summary>
+    /// <param name="teamIds">The team ids.</param>
+    /// <returns></returns>
     public Result ManageProgramIncrementTeams(IEnumerable<Guid> teamIds)
     {
         try
         {
-            var removedTeams = _programIncrementTeams.Where(x => !teamIds.Contains(x.TeamId)).ToList();
+            var removedTeams = _teams.Where(x => !teamIds.Contains(x.TeamId)).ToList();
             foreach (var removedTeam in removedTeams)
             {
-                _programIncrementTeams.Remove(removedTeam);
+                _teams.Remove(removedTeam);
             }
 
-            var addedTeams = teamIds.Where(x => !_programIncrementTeams.Any(y => y.TeamId == x)).ToList();
+            var addedTeams = teamIds.Where(x => !_teams.Any(y => y.TeamId == x)).ToList();
             foreach (var addedTeam in addedTeams)
             {
-                _programIncrementTeams.Add(new ProgramIncrementTeam(Id, addedTeam));
+                _teams.Add(new ProgramIncrementTeam(Id, addedTeam));
             }
 
             return Result.Success();
@@ -108,6 +130,56 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         catch (Exception ex)
         {
             return Result.Failure(ex.ToString());
+        }
+    }
+
+    /// <summary>Creates a PI objective.</summary>
+    /// <param name="team">The team.</param>
+    /// <param name="objectiveId">The objective identifier.</param>
+    /// <param name="isStretch">if set to <c>true</c> [is stretch].</param>
+    /// <returns></returns>
+    public Result CreateObjective(PlanningTeam team, Guid objectiveId, bool isStretch)
+    {
+        try
+        {
+            if (!CanCreateObjectives())
+                return Result.Failure("Objectives are locked for this Program Increment.");
+
+            var objectiveType = team.Type == TeamType.Team
+                ? ProgramIncrementObjectiveType.Team
+                : ProgramIncrementObjectiveType.TeamOfTeams;
+
+            var objective = new ProgramIncrementObjective(Id, team.Id, objectiveId, objectiveType, isStretch);
+            _objectives.Add(objective);
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
+    public Result<ProgramIncrementObjective> UpdateObjective(Guid piObjectiveId, bool isStretch)
+    {
+        try
+        {
+            var existingObjective = _objectives.FirstOrDefault(x => x.Id == piObjectiveId);
+            if (existingObjective == null)
+                return Result.Failure<ProgramIncrementObjective>($"Objective {piObjectiveId} not found.");
+
+            if (ObjectivesLocked)
+                isStretch = existingObjective.IsStretch;
+
+            var updateResult = existingObjective.Update(isStretch);
+            if (updateResult.IsFailure)
+                return Result.Failure<ProgramIncrementObjective>(updateResult.Error);
+
+            return Result.Success(existingObjective);
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<ProgramIncrementObjective>(ex.ToString());
         }
     }
 

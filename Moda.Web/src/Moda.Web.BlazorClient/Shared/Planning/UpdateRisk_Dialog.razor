@@ -24,14 +24,14 @@ else
                 <MudTextField Label="Summary"
                               Lines="2"
                               MaxLength="256" Counter="256" Immediate="true"
-                @bind-Value="_model.Summary"
+                              @bind-Value="_model.Summary"
                               For="@(() => _model.Summary)" />
 
                 <MudTextField Label="Description"
                               HelperText="Markdown enabled"
                               Lines="8"
                               MaxLength="1024" Counter="1024" Immediate="true"
-                @bind-Value="_model.Description"
+                              @bind-Value="_model.Description"
                               For="@(() => _model.Description)" />
 
                 <MudField Label="Status">

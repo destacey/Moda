@@ -855,7 +855,7 @@
         "tags": [
           "ProgramIncrements"
         ],
-        "summary": "Get program increment details using the localId.",
+        "summary": "Get program increment details.",
         "operationId": "ProgramIncrements_GetById",
         "parameters": [
           {
@@ -863,8 +863,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "guid"
             },
             "x-position": 1
           }
@@ -880,7 +880,17 @@
               }
             }
           },
-          "400": {
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
             "description": "",
             "content": {
               "application/json": {
@@ -947,6 +957,64 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/program-increments/local-id/{id}": {
+      "get": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Get program increment details using the localId.",
+        "operationId": "ProgramIncrements_GetByLocalId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgramIncrementDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
                 }
               }
             }
@@ -1042,6 +1110,483 @@
         "responses": {
           "204": {
             "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/program-increments/{id}/objectives": {
+      "get": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Get a list of program increment teams.",
+        "operationId": "ProgramIncrements_GetObjectives",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "teamId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProgramIncrementObjectiveListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Create a program increment objective.",
+        "operationId": "ProgramIncrements_CreateObjective",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProgramIncrementObjectiveRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/program-increments/{id}/objectives/{objectiveId}": {
+      "get": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Get a program increment objective.",
+        "operationId": "ProgramIncrements_GetObjectiveById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "objectiveId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgramIncrementObjectiveDetailsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Update a program increment objective.",
+        "operationId": "ProgramIncrements_UpdateObjective",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "objectiveId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProgramIncrementObjectiveRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/program-increments/local-id/{id}/objectives/{objectiveId}": {
+      "get": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Get a program increment objective using the PI and Objective local Ids.",
+        "operationId": "ProgramIncrements_GetObjectiveByLocalId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "objectiveId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgramIncrementObjectiveDetailsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/program-increments/{id}/objectives/import": {
+      "post": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Import objectives for a program increment from a csv file.",
+        "operationId": "ProgramIncrements_ImportObjectives",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "ContentType": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "ContentDisposition": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Headers": {
+                    "nullable": true,
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/IHeaderDictionary"
+                      }
+                    ]
+                  },
+                  "Length": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "Name": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "FileName": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/program-increments/objective-statuses": {
+      "get": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Get a list of all PI objective statuses.",
+        "operationId": "ProgramIncrements_GetObjectiveStatuses",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProgramIncrementObjectiveStatusDto"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "",
@@ -5262,7 +5807,7 @@
           }
         }
       },
-      "RiskListDto": {
+      "ProgramIncrementObjectiveListDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -5274,42 +5819,45 @@
             "type": "integer",
             "format": "int32"
           },
-          "summary": {
+          "name": {
             "type": "string"
-          },
-          "team": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/PlanningTeamNavigationDto"
-              }
-            ]
-          },
-          "reportedOn": {
-            "type": "string",
-            "format": "date-time"
           },
           "status": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
-          "category": {
-            "type": "string"
+          "programIncrement": {
+            "$ref": "#/components/schemas/NavigationDto"
           },
-          "exposure": {
-            "type": "string"
+          "team": {
+            "$ref": "#/components/schemas/PlanningTeamNavigationDto"
           },
-          "assignee": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/NavigationDto"
-              }
-            ]
+          "progress": {
+            "type": "number",
+            "format": "double"
           },
-          "followUpDate": {
+          "type": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "targetDate": {
             "type": "string",
             "format": "date",
             "nullable": true
+          },
+          "isStretch": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SimpleNavigationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
           }
         }
       },
@@ -5329,7 +5877,7 @@
           }
         ]
       },
-      "RiskDetailsDto": {
+      "ProgramIncrementObjectiveDetailsDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -5341,95 +5889,68 @@
             "type": "integer",
             "format": "int32"
           },
-          "summary": {
+          "name": {
             "type": "string"
           },
           "description": {
             "type": "string",
             "nullable": true
           },
-          "team": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/PlanningTeamNavigationDto"
-              }
-            ]
-          },
-          "reportedOn": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "reportedBy": {
-            "$ref": "#/components/schemas/NavigationDto"
-          },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
-          "category": {
+          "progress": {
+            "type": "number",
+            "format": "double"
+          },
+          "programIncrement": {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          "team": {
+            "$ref": "#/components/schemas/PlanningTeamNavigationDto"
+          },
+          "type": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
-          "impact": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "likelihood": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "exposure": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "assignee": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/NavigationDto"
-              }
-            ]
-          },
-          "followUpDate": {
+          "startDate": {
             "type": "string",
             "format": "date",
             "nullable": true
           },
-          "response": {
+          "targetDate": {
             "type": "string",
+            "format": "date",
             "nullable": true
           },
           "closedDate": {
             "type": "string",
             "format": "date-time",
             "nullable": true
-          }
-        }
-      },
-      "SimpleNavigationDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
           },
-          "name": {
-            "type": "string"
+          "isStretch": {
+            "type": "boolean"
           }
         }
       },
-      "CreateRiskRequest": {
+      "CreateProgramIncrementObjectiveRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "teamId",
-          "summary"
+          "name"
         ],
         "properties": {
+          "programIncrementId": {
+            "type": "string",
+            "format": "guid"
+          },
           "teamId": {
             "type": "string",
             "format": "guid",
             "minLength": 1,
             "nullable": false
           },
-          "summary": {
+          "name": {
             "type": "string",
             "maxLength": 256,
             "minLength": 1,
@@ -5441,55 +5962,37 @@
             "minLength": 0,
             "nullable": true
           },
-          "categoryId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "impactId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "likelihoodId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "assigneeId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "followUpDate": {
+          "startDate": {
             "type": "string",
             "format": "date",
             "nullable": true
           },
-          "response": {
+          "targetDate": {
             "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
+            "format": "date",
             "nullable": true
+          },
+          "isStretch": {
+            "type": "boolean"
           }
         }
       },
-      "UpdateRiskRequest": {
+      "UpdateProgramIncrementObjectiveRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "teamId",
-          "summary"
+          "name"
         ],
         "properties": {
-          "riskId": {
+          "programIncrementId": {
             "type": "string",
             "format": "guid"
           },
-          "teamId": {
+          "objectiveId": {
             "type": "string",
-            "format": "guid",
-            "minLength": 1,
-            "nullable": false
+            "format": "guid"
           },
-          "summary": {
+          "name": {
             "type": "string",
             "maxLength": 256,
             "minLength": 1,
@@ -5505,33 +6008,24 @@
             "type": "integer",
             "format": "int32"
           },
-          "categoryId": {
-            "type": "integer",
-            "format": "int32"
+          "progress": {
+            "type": "number",
+            "format": "double",
+            "maximum": 100.0,
+            "minimum": 0.0
           },
-          "impactId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "likelihoodId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "assigneeId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true
-          },
-          "followUpDate": {
+          "startDate": {
             "type": "string",
             "format": "date",
             "nullable": true
           },
-          "response": {
+          "targetDate": {
             "type": "string",
-            "maxLength": 1024,
-            "minLength": 0,
+            "format": "date",
             "nullable": true
+          },
+          "isStretch": {
+            "type": "boolean"
           }
         }
       },
@@ -5904,6 +6398,271 @@
           "XXSSProtection": {
             "type": "array",
             "items": {}
+          }
+        }
+      },
+      "ProgramIncrementObjectiveStatusDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "RiskListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "localId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlanningTeamNavigationDto"
+              }
+            ]
+          },
+          "reportedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "exposure": {
+            "type": "string"
+          },
+          "assignee": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NavigationDto"
+              }
+            ]
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        }
+      },
+      "RiskDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "localId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlanningTeamNavigationDto"
+              }
+            ]
+          },
+          "reportedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reportedBy": {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "category": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "impact": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "likelihood": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "exposure": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "assignee": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NavigationDto"
+              }
+            ]
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "response": {
+            "type": "string",
+            "nullable": true
+          },
+          "closedDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "CreateRiskRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "teamId",
+          "summary"
+        ],
+        "properties": {
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "impactId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "likelihoodId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "response": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
+      "UpdateRiskRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "teamId",
+          "summary"
+        ],
+        "properties": {
+          "riskId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          },
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "impactId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "likelihoodId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
+          "followUpDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "response": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
           }
         }
       },

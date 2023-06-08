@@ -1,13 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moda.Common.Domain.Employees;
+using Moda.Goals.Application.Persistence;
+using Moda.Goals.Domain.Models;
 using Moda.Planning.Application.Persistence;
 using Moda.Planning.Domain.Models;
 using Moda.Work.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Context;
 
-public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizationDbContext, IPlanningDbContext, IWorkDbContext
+public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, IOrganizationDbContext, IPlanningDbContext, IWorkDbContext
 {
     public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeService dateTimeService, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
         : base(options, currentUser, dateTimeService, serializer, dbSettings, events)
@@ -27,6 +29,12 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizat
 
     #endregion IAppIntegration
 
+    #region IGoals
+
+    public DbSet<Objective> Objectives => Set<Objective>();
+
+    #endregion IGoals
+
     #region IOrganization
 
     public DbSet<BaseTeam> BaseTeams => Set<BaseTeam>();
@@ -38,6 +46,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IOrganizat
     #region IPlanning
 
     public DbSet<ProgramIncrement> ProgramIncrements => Set<ProgramIncrement>();
+    public DbSet<ProgramIncrementObjective> ProgramIncrementObjectives => Set<ProgramIncrementObjective>();
     public DbSet<Risk> Risks => Set<Risk>();
     public DbSet<PlanningTeam> PlanningTeams => Set<PlanningTeam>();
 

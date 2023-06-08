@@ -15,7 +15,7 @@ public sealed record ImportRiskDto(
     Guid? AssigneeId,
     LocalDate? FollowUpDate,
     string? Response,
-    Instant? ClosedDate) : ICommand;
+    Instant? ClosedDate);
 
 public sealed class ImportRiskDtoValidator : CustomValidator<ImportRiskDto>
 {

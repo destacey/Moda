@@ -1,5 +1,4 @@
-﻿using System;
-using Moda.Common.Application.Interfaces;
+﻿using Moda.Common.Application.Interfaces;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Domain.Enums;
 using NodaTime.Extensions;
