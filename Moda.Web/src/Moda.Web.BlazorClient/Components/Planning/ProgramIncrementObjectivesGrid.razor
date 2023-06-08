@@ -25,10 +25,10 @@ else
                          QuickFilter="@_quickFilter">
                 <ToolBarContent>
                     <MudButtonGroup Size="Size.Small" Color="Color.Primary" Variant="Variant.Filled">
-                        @if (CanCreateObjectives)
+                        @*@if (CanCreateObjectives)
                         {
                             <MudButton OnClick="@CreateObjective">Create Objective</MudButton>
-                        }
+                        }*@
                     </MudButtonGroup>
                     <MudSpacer />
                     <MudToolBar>
@@ -39,7 +39,7 @@ else
                 <Columns>
                     <TemplateColumn Sortable="false" Filterable="false" Hidden="@(!CanUpdateObjectives)">
                         <CellTemplate>
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="@(() => UpdateObjective.InvokeAsync(context.Item.Id))" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="@(() => UpdateObjective.InvokeAsync(context.Item))" />
                         </CellTemplate>
                     </TemplateColumn>
                     <PropertyColumn Property="x => x.LocalId" Title="Id">
@@ -92,7 +92,7 @@ else
     public EventCallback CreateObjective { get; set; }
 
     [Parameter]
-    public EventCallback<Guid> UpdateObjective { get; set; }
+    public EventCallback<ProgramIncrementObjectiveListDto> UpdateObjective { get; set; }
 
     [Parameter]
     public List<ProgramIncrementObjectiveListDto> Objectives { get; set; } = default!;

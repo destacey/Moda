@@ -51,7 +51,9 @@ else
                     </MudGrid>
                 </MudItem>
                 <MudItem xs="12" md="7">
-                    <MudField Label="Description">@_programIncrement.Description</MudField>
+                    <MudField Label="Description">
+                        <MudMarkdown Value="@_programIncrement.Description" />
+                    </MudField>
                 </MudItem>
             </MudGrid>
             <MudGrid Class="px-4 py-1">
@@ -228,49 +230,49 @@ else
 
     private async Task CreateObjectiveDialog()
     {
-        var dialogTitle = "Add Team Risk";
-        var teamOptions = GetTeamOptions();
-        var parameters = new DialogParameters
-            {
-                ["TeamOptions"] = teamOptions,
-                ["CreateRisk"] = EventCallback.Factory.Create<CreateRiskRequest>(this, CreateRisk)
-            };
-        var dialogOptions = new DialogOptions()
-            {
-                DisableBackdropClick = true,
-                MaxWidth = MaxWidth.Medium,
-                FullWidth = true
-            };
+        //var dialogTitle = "Add Team Risk";
+        //var teamOptions = GetTeamOptions();
+        //var parameters = new DialogParameters
+        //    {
+        //        ["TeamOptions"] = teamOptions,
+        //        ["CreateRisk"] = EventCallback.Factory.Create<CreateRiskRequest>(this, CreateRisk)
+        //    };
+        //var dialogOptions = new DialogOptions()
+        //    {
+        //        DisableBackdropClick = true,
+        //        MaxWidth = MaxWidth.Medium,
+        //        FullWidth = true
+        //    };
 
-        var dialog = DialogService.Show<CreateRisk_Dialog>(dialogTitle, parameters, dialogOptions);
+        //var dialog = DialogService.Show<CreateRisk_Dialog>(dialogTitle, parameters, dialogOptions);
 
-        var result = await dialog.Result;
+        //var result = await dialog.Result;
 
-        if (!result.Canceled)
-        {
-            await GetRisks(_includeClosedRisks);
-        }
+        //if (!result.Canceled)
+        //{
+        //    await GetRisks(_includeClosedRisks);
+        //}
     }
 
-    private async Task CreateObjective(CreateRiskRequest createRiskRequest)
+    private async Task CreateObjective(CreateProgramIncrementObjectiveRequest createObjective)
     {
-        await RisksClient.CreateRiskAsync(createRiskRequest);
+        await ProgramIncrementsClient.CreateObjectiveAsync(createObjective.ProgramIncrementId, createObjective);
     }
 
-    private async Task UpdateObjectiveDialog(Guid riskId)
+    private async Task UpdateObjectiveDialog(ProgramIncrementObjectiveListDto objective)
     {
-        var riskDto = await RisksClient.GetByIdAsync(riskId);
-        if (riskDto == null)
+        var objectiveDto = await ProgramIncrementsClient.GetObjectiveByIdAsync(objective.ProgramIncrement.Id, objective.Id);
+        if (objectiveDto is null)
         {
-            Snackbar.Add("Error getting risk.", MudBlazor.Severity.Error);
+            Snackbar.Add("Error getting PI Objective.", MudBlazor.Severity.Error);
             return;
         }
 
-        var dialogTitle = "Update Risk";
+        var dialogTitle = "Update Program Increment Objective";
         var parameters = new DialogParameters
             {
-                ["Risk"] = riskDto,
-                ["UpdateRisk"] = EventCallback.Factory.Create<UpdateRiskRequest>(this, UpdateRisk)
+                ["Objective"] = objectiveDto,
+                ["UpdateObjective"] = EventCallback.Factory.Create<UpdateProgramIncrementObjectiveRequest>(this, UpdateObjective)
             };
         var dialogOptions = new DialogOptions()
             {
@@ -279,19 +281,19 @@ else
                 FullWidth = true
             };
 
-        var dialog = DialogService.Show<UpdateRisk_Dialog>(dialogTitle, parameters, dialogOptions);
+        var dialog = DialogService.Show<UpdateProgramIncrementObjective_Dialog>(dialogTitle, parameters, dialogOptions);
 
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            await GetRisks(_includeClosedRisks);
+            await GetObjectives();
         }
     }
 
-    private async Task UpdateObjective(UpdateRiskRequest updateRiskRequest)
+    private async Task UpdateObjective(UpdateProgramIncrementObjectiveRequest updateObjectiveRequest)
     {
-        await RisksClient.UpdateAsync(updateRiskRequest.RiskId, updateRiskRequest);
+        await ProgramIncrementsClient.UpdateObjectiveAsync(updateObjectiveRequest.ProgramIncrementId, updateObjectiveRequest.ObjectiveId, updateObjectiveRequest);
     }
 
 

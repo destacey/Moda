@@ -37,7 +37,7 @@ else
         <MudTabPanel Text="Details">
             <MudGrid Class="px-4 py-1">
                 <MudItem Class="py-0" xs="12" >
-                    <MudProgressLinear Class="my-5" Color="Color.Primary" Rounded="true" Size="Size.Large" Value="@_objective.Progress" title="Objective Progress" >
+                    <MudProgressLinear Class="my-5" Color="Color.Primary" Size="Size.Large" Value="@_objective.Progress" title="Objective Progress" >
                         <MudText Typo="Typo.subtitle1">
                             <b>@_objective.Progress.ToString("F0")%</b>
                         </MudText>
@@ -74,7 +74,9 @@ else
                     </MudGrid>
                 </MudItem>
                 <MudItem xs="12" md="7">
-                    <MudField Label="Description">@_objective.Description</MudField>
+                    <MudField Label="Description">
+                        <MudMarkdown Value="@_objective.Description" />
+                    </MudField>
                 </MudItem>
             </MudGrid>
         </MudTabPanel>

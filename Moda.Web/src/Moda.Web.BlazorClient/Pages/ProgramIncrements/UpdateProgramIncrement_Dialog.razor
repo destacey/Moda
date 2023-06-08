@@ -17,16 +17,17 @@ else
             <EditForm id="updateProgramIncrementForm" EditContext="_editContext" OnValidSubmit="Create">
                 <DataAnnotationsValidator />
                 <MudTextField Label="Name"
-                          MaxLength="128" Counter="128" Immediate="true"
-                          @bind-Value="_model.Name"
-                          For="@(() => _model.Name)" />
+                              MaxLength="128" Counter="128" Immediate="true"
+                              @bind-Value="_model.Name"
+                              For="@(() => _model.Name)" />
 
                 <DataAnnotationsValidator />
                 <MudTextField Label="Description"
-                          Lines="6"
-                          MaxLength="1024" Counter="1024" Immediate="true"
-                          @bind-Value="_model.Description"
-                          For="@(() => _model.Description)" />
+                              HelperText="Markdown enabled"
+                              Lines="8"
+                              MaxLength="1024" Counter="1024" Immediate="true"
+                              @bind-Value="_model.Description"
+                              For="@(() => _model.Description)" />
 
                 <DataAnnotationsValidator />
                 <MudDatePicker Label="Start" AnchorOrigin="Origin.BottomCenter" Editable="true" @bind-Date="_model.Start" For="@(() => _model.Start)" />
