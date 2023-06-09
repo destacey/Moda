@@ -4,7 +4,7 @@ namespace Moda.Web.BlazorClient.Models.Teams;
 
 public record TeamListViewModel
 {
-    public System.Guid Id { get; set; } = default!;
+    public Guid Id { get; set; } = default!;
     public int LocalId { get; set; } = default!;
     public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;

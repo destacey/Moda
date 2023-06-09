@@ -106,9 +106,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2483A2F4-154
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{26A25A3E-1E9F-4687-A611-457F6F3C8F85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Goals.Domain", "Moda.Goals\src\Moda.Goals.Domain\Moda.Goals.Domain.csproj", "{02E4BD84-FF5E-4A4A-B9F4-736C44B5D5D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Goals.Domain", "Moda.Goals\src\Moda.Goals.Domain\Moda.Goals.Domain.csproj", "{02E4BD84-FF5E-4A4A-B9F4-736C44B5D5D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Goals.Application", "Moda.Goals\src\Moda.Goals.Application\Moda.Goals.Application.csproj", "{F270ADA4-BFF3-43B4-BE64-BF7D80410B4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Goals.Application", "Moda.Goals\src\Moda.Goals.Application\Moda.Goals.Application.csproj", "{F270ADA4-BFF3-43B4-BE64-BF7D80410B4E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

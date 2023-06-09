@@ -56,15 +56,12 @@ else
                     </MudField>
                 </MudItem>
             </MudGrid>
-            <MudGrid Class="px-4 py-1">
-                <MudItem xs="12">
-                    <MudText Typo="Typo.h6" Class="mb-1">Teams</MudText>
-                    <TeamsGrid Height="400"
-                        Teams="_piTeams"
-                        GetTeams="GetTeams"
-                        AllowDisabledToggle="false" />
-                </MudItem>
-            </MudGrid>
+        </MudTabPanel>
+        <MudTabPanel Text="Teams">
+            <TeamsGrid Height="500"
+                       Teams="_piTeams"
+                       GetTeams="GetTeams"
+                       AllowDisabledToggle="false" />
         </MudTabPanel>
         <MudTabPanel Text="Objectives">
             <ProgramIncrementObjectivesGrid Objectives="_objectives"
