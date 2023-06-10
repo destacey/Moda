@@ -51,19 +51,19 @@ export default function RootLayout({
 }) {
   theme.useToken();
   const [currentTheme, setCurrentTheme] = useState('light');
+  const [collapsed, setCollapsed] = useState(false);
   return (
     <html lang="en">
       <body className={inter.className}>
         <ConfigProvider theme={{ token: currentTheme === 'light' ? lightTheme : darkTheme }}>
           <ThemeProvider>
-            <Layout className="layout" style={{ height: '100vh' }}>
+            <Layout className="layout" style={{ minHeight: '100vh' }}>
               <Header style={{ display: 'flex', alignItems: 'center', backgroundColor: currentTheme === 'dark' ? '#262a2c' : '#2196f3' }}>
-                
                 <h2>Moda</h2>
                 <label><input type="checkbox" checked={currentTheme === 'dark'} onChange={() => setCurrentTheme(currentTheme === 'dark' ? 'light' : 'dark')} /> Dark Mode</label>
               </Header>
               <Layout>
-                <Sider width={200}>
+                <Sider width={200} collapsedWidth={50} collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
                   <Menu
                     mode="inline"
                     defaultSelectedKeys={['1']}
