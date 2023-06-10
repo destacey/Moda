@@ -4,12 +4,11 @@ import './globals.css'
 import React, { useState } from 'react';
 import { Inter } from 'next/font/google'
 import type { MenuProps } from 'antd';
-import { Breadcrumb, Layout, Menu, Button, ConfigProvider, theme } from 'antd'
+import { Breadcrumb, Layout, Menu, Button, ConfigProvider, theme, Switch, Space } from 'antd'
 import { LaptopOutlined, NotificationOutlined, UserOutlined, VideoCameraOutlined, UploadOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons'
 import lightTheme from './config/theme/light-theme';
 import darkTheme from './config/theme/dark-theme';
 import ThemeProvider from './config/theme/theme-provider';
-import Icon from '@ant-design/icons/lib/components/Icon';
 
 const { Header, Sider, Content } = Layout;
 const inter = Inter({ subsets: ['latin'] });
@@ -59,8 +58,13 @@ export default function RootLayout({
           <ThemeProvider>
             <Layout className="layout" style={{ minHeight: '100vh' }}>
               <Header style={{ display: 'flex', alignItems: 'center', backgroundColor: currentTheme === 'dark' ? '#262a2c' : '#2196f3' }}>
-                <h2>Moda</h2>
-                <label><input type="checkbox" checked={currentTheme === 'dark'} onChange={() => setCurrentTheme(currentTheme === 'dark' ? 'light' : 'dark')} /> Dark Mode</label>
+                <Space size={10} >
+                  <h2>Moda</h2>
+                  <Switch checked={currentTheme === 'dark'}
+                    onChange={() => setCurrentTheme(currentTheme === 'dark' ? 'light' : 'dark')}
+                    checkedChildren="Dark"
+                    unCheckedChildren="Light" />
+                </Space>
               </Header>
               <Layout>
                 <Sider width={200} collapsedWidth={50} collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -73,11 +77,7 @@ export default function RootLayout({
                   />
                 </Sider>
                 <Layout style={{ padding: '0 24px 24px' }}>
-                  <Breadcrumb style={{ margin: '16px 0' }}>
-                    <Breadcrumb.Item>Home</Breadcrumb.Item>
-                    <Breadcrumb.Item>List</Breadcrumb.Item>
-                    <Breadcrumb.Item>App</Breadcrumb.Item>
-                  </Breadcrumb>
+                  <Breadcrumb separator='>' style={{ margin: '16px 0' }} items={[{ title: 'Home', href: '/' }]} />
                   <Content
                     style={{
                       padding: 24,
@@ -85,7 +85,7 @@ export default function RootLayout({
                       minHeight: 280,
                     }}
                   >
-                    Content
+                    {children}
                   </Content>
                 </Layout>
               </Layout>
