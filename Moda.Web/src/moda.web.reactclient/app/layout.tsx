@@ -2,14 +2,16 @@
 
 import '../styles/globals.css'
 import React, { useEffect, useState } from 'react';
-import { Breadcrumb, Layout, ConfigProvider, theme} from 'antd'
+import { Layout, ConfigProvider } from 'antd'
 import lightTheme from './config/theme/light-theme';
 import darkTheme from './config/theme/dark-theme';
 import { Metadata } from 'next';
+import { usePathname } from 'next/navigation';
 import { AuthenticatedTemplate, MsalProvider } from '@azure/msal-react';
 import { msalInstance } from './services/auth';
 import AppHeader from './components/common/app-header';
 import NavMenu from './components/common/nav-menu';
+import AppBreadcrumb from './components/common/app-breadcrumb';
 
 const { Content } = Layout;
 
@@ -25,8 +27,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  theme.useToken();
+
   const [currentTheme, setCurrentTheme] = useState('light');
+  const pathname = usePathname();
 
   useEffect(() => {
     async function initialize() {
@@ -50,7 +53,7 @@ export default function RootLayout({
                 <Layout>
                   <NavMenu />
                   <Layout style={{ padding: '0 24px 24px' }}>
-                    <Breadcrumb separator='>' style={{ margin: '16px 0' }} items={[{ title: 'Home', href: '/' }]} />
+                    <AppBreadcrumb pathname={pathname} />
                     <Content
                       style={{
                         padding: 24,

@@ -3,7 +3,7 @@ import { Avatar, Button, Dropdown, Space } from "antd";
 import { acquireToken, msalInstance } from "../services/auth";
 import { HighlightFilled, HighlightOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { createElement, useEffect, useState } from "react";
-
+import { useRouter } from "next/navigation";
 
 export interface ProfileProps {
   currentTheme: string;
@@ -14,6 +14,7 @@ export default function Profile(
   {currentTheme, setTheme}: ProfileProps
 ) {
   const [themeIcon, setThemeIcon] = useState(createElement(HighlightOutlined));
+  const router = useRouter();
 
   const handleLogout = () => {
     msalInstance.logoutRedirect()
@@ -59,12 +60,16 @@ export default function Profile(
     ];
 
   const handleMenuItemClicked = (info: any) => {
-      if(info.key === "theme") {
+    switch(info.key) {
+      case "profile":
+        router.push('/account/profile');
+        break;
+      case "theme":
         toggleTheme();
-      }
-      else if(info.key === "logout") {
+        break;
+      case "logout":
         handleLogout();
-      }
+    }
   };
 
   const authTemplate = () => {
