@@ -1,8 +1,8 @@
-import { AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
-import { Avatar, Dropdown, Menu, Space } from "antd";
+import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from "@azure/msal-react";
+import { Avatar, Button, Dropdown, Menu, Space } from "antd";
 import { acquireToken, msalInstance } from "../services/auth";
-import { EditFilled, EditOutlined, HighlightFilled, HighlightOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
-import React, { useEffect } from "react";
+import { HighlightFilled, HighlightOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { createElement, useEffect, useState } from "react";
 
 
 export interface ProfileProps {
@@ -13,18 +13,27 @@ export interface ProfileProps {
 export default function Profile(
   {currentTheme, setTheme}: ProfileProps
 ) {
-  const [themeIcon, setThemeIcon] =  React.useState(React.createElement(HighlightOutlined));
+  const [themeIcon, setThemeIcon] = useState(createElement(HighlightOutlined));
 
   const handleLogout = () => {
-    msalInstance.logoutPopup();
+    msalInstance.logoutRedirect()
+      .catch((e) => { console.error(`logoutRedirect failed: ${e}`) });
   }
 
   const handleLogin = async () => {
     if(!msalInstance.getActiveAccount()){
-      const response = await msalInstance.loginPopup();
+      await msalInstance.loginRedirect()
+        .catch((e) => { console.error(`loginRedirect failed: ${e}`) });
     }
+
     const token = await acquireToken();
     console.log(token);
+  }
+
+  function WelcomeUser() {
+    const { accounts } = useMsal();
+    const username = accounts[0].name;
+    return username && username.trim() ? <p>Welcome, {username}</p> : null;
   }
 
   const toggleTheme = () => {
@@ -37,21 +46,24 @@ export default function Profile(
 
   useEffect(() => {
     if(currentTheme === 'light'){
-      setThemeIcon(React.createElement(HighlightOutlined));
+      setThemeIcon(createElement(HighlightOutlined));
     } else {
-      setThemeIcon(React.createElement(HighlightFilled));
+      setThemeIcon(createElement(HighlightFilled));
     }
   }, [currentTheme]);
 
   const menuItems = [
-      { key: 'profile', label: 'Account', icon: React.createElement(UserOutlined) },
-      { key: 'theme', label: 'Theme', icon: themeIcon},
-      { key: 'logout', label: 'Logout', icon: React.createElement(LogoutOutlined) }
+      { key: 'profile', label: 'Account', icon: createElement(UserOutlined) },
+      { key: 'theme', label: 'Theme', icon: themeIcon },
+      { key: 'logout', label: 'Logout', icon: createElement(LogoutOutlined) }
     ];
 
   const handleMenuItemClicked = (info: any) => {
       if(info.key === "theme") {
         toggleTheme();
+      }
+      else if(info.key === "logout") {
+        handleLogout();
       }
   };
 
@@ -59,6 +71,7 @@ export default function Profile(
     return (
       <AuthenticatedTemplate>
         <Space>
+          <WelcomeUser />
           <Dropdown menu={{items: menuItems, onClick: handleMenuItemClicked}}>
             <Avatar icon={<UserOutlined />} />
           </Dropdown>
@@ -72,7 +85,7 @@ export default function Profile(
       <UnauthenticatedTemplate>
         <Space>
           <div>Unauthenticated</div>
-          <button onClick={handleLogin}>Login</button>
+          <Button onClick={handleLogin}>Login</Button>
         </Space>
       </UnauthenticatedTemplate>
     )
