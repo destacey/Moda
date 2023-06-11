@@ -1,77 +1,13 @@
-const lightTheme = {
-    "colorPrimaryBg": "#f0fbff",
-    "colorPrimaryBgHover": "#c7edff",
-    "colorPrimaryBorder": "#9eddff",
-    "colorPrimaryBorderHover": "#75caff",
-    "colorPrimaryHover": "#4db5ff",
-    "colorPrimary": "#2196f3",
-    "colorPrimaryActive": "#1272cc",
-    "colorPrimaryTextHover": "#4db5ff",
-    "colorPrimaryText": "#2196f3",
-    "colorPrimaryTextActive": "#1272cc",
+import { ThemeConfig, theme } from "antd";
 
-    "colorSuccessBg": "#e1f0e7",
-    "colorSuccessBgHover": "#d5e3db",
-    "colorSuccessBorder": "#b2d6c2",
-    "colorSuccessBorderHover": "#87c9a7",
-    "colorSuccessHover": "#87c9a7",
-    "colorSuccess": "#3eaf7c",
-    "colorSuccessActive": "#298a62",
-    "colorSuccessTextHover": "#60bd90",
-    "colorSuccessText": "#3eaf7c",
-    "colorSuccessTextActive": "#298a62",
+const lightTheme: ThemeConfig = {
+  token: {
+    fontFamily: 'Montserrat',
+    colorPrimary: '#2196f3',
+    borderRadius: 4,
+    wireframe: false
+  },
+  algorithm: theme.defaultAlgorithm,
+};
 
-    "colorWarningBg": "#fffbe6",
-    "colorWarningBgHover": "#fff1b8",
-    "colorWarningBorder": "#ffe58f",
-    "colorWarningBorderHover": "#ffd666",
-    "colorWarningHover": "#ffd666",
-    "colorWarning": "#faad14",
-    "colorWarningActive": "#d48806",
-    "colorWarningTextHover": "#ffc53d",
-    "colorWarningText": "#faad14",
-    "colorWarningTextActive": "#d48806",
-
-    "colorErrorBg": "#fff2f0",
-    "colorErrorBgHover": "#fff1f0",
-    "colorErrorBorder": "#ffccc7",
-    "colorErrorBorderHover": "#ffa39e",
-    "colorErrorHover": "#ff7875",
-    "colorError": "#ff4d4f",
-    "colorErrorActive": "#d9363e",
-    "colorErrorTextHover": "#ff7875",
-    "colorErrorText": "#ff4d4f",
-    "colorErrorTextActive": "#d9363e",
-
-    "colorInfoBg": "#e6f4ff",
-    "colorInfoBgHover": "#bae0ff",
-    "colorInfoBorder": "#91caff",
-    "colorInfoBorderHover": "#69b1ff",
-    "colorInfoHover": "#69b1ff",
-    "colorInfo": "#1677ff",
-    "colorInfoActive": "#0958d9",
-    "colorInfoTextHover": "#4096ff",
-    "colorInfoText": "#1677ff",
-    "colorInfoTextActive": "#0958d9",
-
-    "colorText": "rgba(0, 0, 0, 0.88)",
-    "colorTextSecondary": "rgba(0, 0, 0, 0.65)",
-    "colorTextTertiary": "rgba(0, 0, 0, 0.45)",
-    "colorTextQuaternary": "rgba(0, 0, 0, 0.25)",
-    "colorBorder": "#d9d9d9",
-    "colorBorderSecondary": "#f0f0f0",
-    "colorFill": "rgba(0, 0, 0, 0.15)",
-    "colorFillSecondary": "rgba(0, 0, 0, 0.06)",
-    "colorFillTertiary": "rgba(0, 0, 0, 0.04)",
-    "colorFillQuaternary": "rgba(0, 0, 0, 0.02)",
-    "colorBgContainer": "#eaeaea",
-    "colorBgElevated": "#ffffff",
-    "colorBgLayout": "#f5f5f5",
-    "colorBgSpotlight": "rgba(0, 0, 0, 0.85)",
-    "colorBgMask": "rgba(0, 0, 0, 0.45)",
-
-    "borderRadius": 4,
-    "wireframe": false
-  };
-
-  export default lightTheme;
+export default lightTheme;

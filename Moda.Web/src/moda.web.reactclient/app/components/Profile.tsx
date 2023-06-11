@@ -1,5 +1,5 @@
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from "@azure/msal-react";
-import { Avatar, Button, Dropdown, Menu, Space } from "antd";
+import { Avatar, Button, Dropdown, Space } from "antd";
 import { acquireToken, msalInstance } from "../services/auth";
 import { HighlightFilled, HighlightOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { createElement, useEffect, useState } from "react";
