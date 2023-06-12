@@ -1,15 +1,18 @@
 'use client'
 
-import { Breadcrumb } from "antd";
-import { Content } from "antd/es/layout/layout";
+import { Metadata } from "next";
+import PageTitle from "@/app/components/common/page-title";
 
-export default function Page() {
+export const metadata: Metadata = {
+  title: 'Teams',
+}
+
+const Page = () => {
   return (
     <>
-      {/* <Breadcrumb style={{ padding: '0 24px 24px' }} separator='>' style={{ margin: '16px 0' }} items={[{ title: 'Home', href: '/' }, { title: 'Teams' }]} /> */}
-      <Content>
-        <h1>Welcome to Teams</h1>
-      </Content>
+      <PageTitle title="Teams"/>
     </>
   );
 }
+
+export default Page;
