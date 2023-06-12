@@ -1,13 +1,18 @@
 'use client'
 
 import { Metadata } from "next";
+import PageTitle from "./components/common/page-title";
 
 export const metadata: Metadata = {
   title: 'Home',
 }
 
-export default function Home() {
+const Page = () => {
   return (
-      <h1>Home</h1>
-  )
+    <>
+      <PageTitle title="Home"/>
+    </>
+  );
 }
+
+export default Page;

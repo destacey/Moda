@@ -24,7 +24,7 @@ const items2: MenuProps['items'] = [UserOutlined, LaptopOutlined, NotificationOu
     },
 );
 
-export default function NavMenu() {
+export default function AppMenu() {
     const [collapsed, setCollapsed] = useState(false);
     return (
         <Sider width={200} collapsedWidth={50} collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>

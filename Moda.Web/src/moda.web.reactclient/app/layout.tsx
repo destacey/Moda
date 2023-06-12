@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation';
 import { AuthenticatedTemplate, MsalProvider } from '@azure/msal-react';
 import { msalInstance } from './services/auth';
 import AppHeader from './components/common/app-header';
-import NavMenu from './components/common/nav-menu';
+import AppMenu from './components/common/app-menu';
 import AppBreadcrumb from './components/common/app-breadcrumb';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
 
@@ -52,7 +52,7 @@ export default function RootLayout({
               <Layout className="layout" style={{ minHeight: '100vh' }}>
                 <AppHeader currentTheme={currentTheme} setTheme={setCurrentTheme} />
                 <Layout>
-                  <NavMenu />
+                  <AppMenu />
                   <Layout style={{ padding: '0 24px 24px' }}>
                     <AppBreadcrumb pathname={pathname} />
                     <Content
