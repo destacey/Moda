@@ -12,6 +12,7 @@ import { msalInstance } from './services/auth';
 import AppHeader from './components/common/app-header';
 import NavMenu from './components/common/nav-menu';
 import AppBreadcrumb from './components/common/app-breadcrumb';
+import { useLocalStorageState } from './hooks/use-local-storage-state';
 
 const { Content } = Layout;
 
@@ -28,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
 
-  const [currentTheme, setCurrentTheme] = useState('light');
+  const [currentTheme, setCurrentTheme] = useLocalStorageState('modaTheme','light');
   const pathname = usePathname();
 
   useEffect(() => {
@@ -56,7 +57,6 @@ export default function RootLayout({
                     <AppBreadcrumb pathname={pathname} />
                     <Content
                       style={{
-                        padding: 24,
                         margin: 0,
                         minHeight: 280,
                       }}
