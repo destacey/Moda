@@ -1,4 +1,4 @@
-import { Configuration } from "@azure/msal-browser";
+import { Configuration, LogLevel } from "@azure/msal-browser";
 
 export const msalConfig: Configuration = {
   auth: {
@@ -11,6 +11,27 @@ export const msalConfig: Configuration = {
     cacheLocation: "sessionStorage",
     storeAuthStateInCookie: false,
   },
+  system: {
+    allowNativeBroker: false, // Disables WAM Broker
+    loggerOptions: {
+      loggerCallback: (level, message, containsPii) => {
+        switch (level) {
+          case LogLevel.Error:
+            console.error(message);
+            return;
+          case LogLevel.Info:
+            console.info(message);
+            return;
+          case LogLevel.Verbose:
+            console.debug(message);
+            return;
+          case LogLevel.Warning:
+            console.warn(message);
+            return;
+        }
+      }
+    }
+  }
 }
 
 export const tokenRequest = {
