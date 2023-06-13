@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
 import { Layout, ConfigProvider } from 'antd'
 import lightTheme from './config/theme/light-theme';
 import darkTheme from './config/theme/dark-theme';
-import { Metadata } from 'next';
 import { usePathname } from 'next/navigation';
 import { AuthenticatedTemplate, MsalProvider } from '@azure/msal-react';
 import { msalInstance } from './services/auth';
@@ -16,13 +15,14 @@ import { useLocalStorageState } from './hooks/use-local-storage-state';
 
 const { Content } = Layout;
 
-export const metadata: Metadata = {
-  title: {
-    template: 'Moda | {{title}}',
-    default: 'Moda'
-  },
-  description: 'Moda is a work management system used to plan, manage, and create associations across work items, projects, teams, planning and products. It helps track, align, and deliver work across organizations.',
-}
+//export const metadata: Metadata = {
+//  title: {
+//    template: 'Moda | {{title}}',
+//    default: 'Moda'
+//  },
+//  description: 'Moda is a work management system used to plan, manage, and create associations across work items, projects, teams, planning and products. It helps track, align, and deliver work across organizations.',
+//}
+
 export default function RootLayout({
   children,
 }: {

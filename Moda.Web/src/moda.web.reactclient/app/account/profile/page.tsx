@@ -2,14 +2,9 @@
 
 import React from "react"
 import { Card } from "antd"
-import { Metadata } from "next"
 import PageTitle from "@/app/components/common/page-title"
 import ProfileForm from "./profile-form"
 import ClaimsGrid from "./claims-grid"
-
-export const metadata: Metadata = {
-  title: 'Account Profile',
-}
 
 const tabs = [
   {key: 'profile', tab: 'Profile', content: React.createElement(ProfileForm)},
