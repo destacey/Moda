@@ -9,14 +9,14 @@ export interface AppHeaderProps {
     setTheme: (theme: string) => void;
 }
 
-export default function AppHeader({currentTheme, setTheme}: AppHeaderProps) {
+export default function AppHeader({ currentTheme, setTheme }: AppHeaderProps) {
     return (
-        <Header style={{ height: 50, display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-            backgroundColor: currentTheme === 'dark' ? '#262a2c' : '#2196f3' }}>
-            <Title level={3}>Moda</Title>
-            <Space>
-                <Profile currentTheme={currentTheme} setTheme={setTheme} />
-            </Space>
+        <Header style={{
+            height: 50, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            backgroundColor: currentTheme === 'dark' ? '#262a2c' : '#2196f3'
+        }}>
+            <Title level={3} className="pb-2">Moda</Title>
+            <Profile currentTheme={currentTheme} setTheme={setTheme} />
         </Header>
     )
 }
