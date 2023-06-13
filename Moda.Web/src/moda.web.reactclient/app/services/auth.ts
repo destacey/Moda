@@ -15,15 +15,15 @@ export async function acquireToken(request?: any) {
     ...request
   };
 
-  let tokenResponse: AuthenticationResult | null = null;
+  let tokenResponse: string | null = null;
   try {
-    tokenResponse = await msalInstance.acquireTokenSilent(acquireRequest);
+    tokenResponse = (await msalInstance.acquireTokenSilent(acquireRequest)).accessToken;
   }
   catch (error) {
     console.warn(error);
     if(error instanceof InteractionRequiredAuthError) {
       try {
-        tokenResponse = await msalInstance.acquireTokenPopup(acquireRequest);
+        tokenResponse = (await msalInstance.acquireTokenPopup(acquireRequest)).accessToken;
       }
       catch (err) {
         console.error(err);

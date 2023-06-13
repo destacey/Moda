@@ -7,11 +7,12 @@ import lightTheme from './config/theme/light-theme';
 import darkTheme from './config/theme/dark-theme';
 import { usePathname } from 'next/navigation';
 import { AuthenticatedTemplate, MsalProvider } from '@azure/msal-react';
-import { msalInstance } from './services/auth';
+import { acquireToken, msalInstance } from './services/auth';
 import AppHeader from './components/common/app-header';
 import AppMenu from './components/common/app-menu';
 import AppBreadcrumb from './components/common/app-breadcrumb';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
+import axios from 'axios';
 
 const { Content } = Layout;
 
@@ -22,6 +23,12 @@ const { Content } = Layout;
 //  },
 //  description: 'Moda is a work management system used to plan, manage, and create associations across work items, projects, teams, planning and products. It helps track, align, and deliver work across organizations.',
 //}
+
+axios.interceptors.request.use(async (config) => {
+  const token = await acquireToken();
+  config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 export default function RootLayout({
   children,
@@ -37,7 +44,7 @@ export default function RootLayout({
       await msalInstance.initialize();
       if (!msalInstance.getActiveAccount()) {
         await msalInstance.loginRedirect()
-          .catch((e) => { console.error(`loginRedirect failed: ${e}`) });;
+          .catch((e) => { console.error(`loginRedirect failed: ${e}`) });
       }
     }
     initialize();
