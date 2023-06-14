@@ -1,5 +1,5 @@
 {
     "CorsSettings": {
-        "WebClient": "https://localhost:5001; http://localhost:3000;"
+        "WebClient": "https://localhost:5001;http://localhost:3000;"
     }
 }

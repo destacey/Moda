@@ -14,7 +14,7 @@ import AppBreadcrumb from './components/common/app-breadcrumb';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
 import axios from 'axios';
 
-const { Content } = Layout;
+const { Content } = Layout
 
 //export const metadata: Metadata = {
 //  title: {
@@ -24,11 +24,9 @@ const { Content } = Layout;
 //  description: 'Moda is a work management system used to plan, manage, and create associations across work items, projects, teams, planning and products. It helps track, align, and deliver work across organizations.',
 //}
 
-axios.interceptors.request.use(async (config) => {
-  const token = await acquireToken();
-  config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+const setAxiosDefaults = () => {
+  axios.defaults.baseURL = 'https://localhost:44317'
+}
 
 export default function RootLayout({
   children,
@@ -36,18 +34,19 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
 
-  const [currentTheme, setCurrentTheme] = useLocalStorageState('modaTheme','light');
-  const pathname = usePathname();
+  const [currentTheme, setCurrentTheme] = useLocalStorageState('modaTheme','light')
+  const pathname = usePathname()
 
   useEffect(() => {
     async function initialize() {
       await msalInstance.initialize();
       if (!msalInstance.getActiveAccount()) {
         await msalInstance.loginRedirect()
-          .catch((e) => { console.error(`loginRedirect failed: ${e}`) });
+          .catch((e) => { console.error(`loginRedirect failed: ${e}`) })
       }
     }
-    initialize();
+    initialize()
+    setAxiosDefaults()
   }, []);
 
   return (

@@ -185,12 +185,7 @@ export class ProfileClient {
             }
         }
         if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<string[]>(result200);
-
+            return Promise.resolve<string[]>(response.data);
         } else if (status === 400) {
             const _responseText = response.data;
             let result400: any = null;

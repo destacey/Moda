@@ -5,10 +5,12 @@ import { Card } from "antd"
 import PageTitle from "@/app/components/common/page-title"
 import ProfileForm from "./profile-form"
 import ClaimsGrid from "./claims-grid"
+import PermissionsList from "./permissions-list"
 
 const tabs = [
   {key: 'profile', tab: 'Profile', content: React.createElement(ProfileForm)},
-  {key: 'claims', tab: 'Claims', content: React.createElement(ClaimsGrid)}
+  {key: 'claims', tab: 'Claims', content: React.createElement(ClaimsGrid)},
+  {key: 'permissions', tab: 'Permissions', content: React.createElement(PermissionsList)},
 ]
 
 const Page = () => {
