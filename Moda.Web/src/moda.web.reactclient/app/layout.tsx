@@ -24,10 +24,6 @@ const { Content } = Layout
 //  description: 'Moda is a work management system used to plan, manage, and create associations across work items, projects, teams, planning and products. It helps track, align, and deliver work across organizations.',
 //}
 
-const setAxiosDefaults = () => {
-  axios.defaults.baseURL = 'https://localhost:44317'
-}
-
 export default function RootLayout({
   children,
 }: {
@@ -46,7 +42,6 @@ export default function RootLayout({
       }
     }
     initialize()
-    setAxiosDefaults()
   }, []);
 
   return (

@@ -8,7 +8,9 @@ export async function acquireToken(request?: any) {
     ...tokenRequest,
     ...request
   };
-
+  if (!msalInstance.getActiveAccount()) {
+    msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
+  }
   let tokenResponse: string | null = null;
   try {
     tokenResponse = (await msalInstance.acquireTokenSilent(acquireRequest)).accessToken;
