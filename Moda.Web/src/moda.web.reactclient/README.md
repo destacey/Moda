@@ -1,8 +1,15 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
+First, create a .env.local file in the root of this project with the following variables:
 
-First, run the development server:
+```
+NEXT_PUBLIC_API_BASE_URL='Get this from the launch settings of Moda.Web.Api (ex: https://localhost:7021)'
+NEXT_PUBLIC_AZURE_AD_CLIENT_ID='Get from another developer'
+NEXT_PUBLIC_AZURE_AD_TENANT_ID='Get from another developer'
+```
+
+Second, run the development server:
 
 ```bash
 npm run dev
@@ -14,13 +21,10 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
 ## Core Libraries
 - Next.js (13.x)
 - React (18.x)
-- Typescript
-- Ant Design
+- Typescript (5.x)
+- Ant Design (5.x)
 - MSAL - Microsoft Authentication Library
+- Axios
