@@ -7,12 +7,11 @@ import lightTheme from './config/theme/light-theme';
 import darkTheme from './config/theme/dark-theme';
 import { usePathname } from 'next/navigation';
 import { AuthenticatedTemplate, MsalProvider } from '@azure/msal-react';
-import { acquireToken, msalInstance } from './services/auth';
+import { msalInstance } from './services/auth';
 import AppHeader from './components/common/app-header';
 import AppMenu from './components/common/app-menu';
 import AppBreadcrumb from './components/common/app-breadcrumb';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
-import axios from 'axios';
 
 const { Content } = Layout
 

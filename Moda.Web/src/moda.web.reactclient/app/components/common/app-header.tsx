@@ -15,7 +15,7 @@ export default function AppHeader({ currentTheme, setTheme }: AppHeaderProps) {
             height: 50, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             backgroundColor: currentTheme === 'dark' ? '#262a2c' : '#2196f3'
         }}>
-            <Title level={3} className="pb-2">Moda</Title>
+            <Title level={3}>Moda</Title>
             <Profile currentTheme={currentTheme} setTheme={setTheme} />
         </Header>
     )

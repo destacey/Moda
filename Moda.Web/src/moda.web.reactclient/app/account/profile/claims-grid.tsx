@@ -5,9 +5,6 @@ import jwt_decode from "jwt-decode";
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
-import { tokenRequest } from "@/authConfig";
-import { ProfileClient } from "@/app/services/moda-api";
-import axios from "axios";
 import { acquireToken } from "@/app/services/auth";
 
 interface Claim {
@@ -40,14 +37,12 @@ const ClaimsGrid = () => {
           key: key,
           value: decodedClaims[key]
         }
-      })     
+      })
       setRowData(claims)
     }
 
     getTokenClaims()
   }, [instance])
-
-
 
   return (
     <div className="ag-theme-balham" style={{ height: 600, width: 700 }}>
