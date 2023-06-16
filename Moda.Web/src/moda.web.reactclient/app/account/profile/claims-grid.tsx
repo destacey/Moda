@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import { useContext, useEffect, useState } from "react";
 import jwt_decode from "jwt-decode";
 import { acquireToken } from "@/app/services/auth";
-import { ThemeContext } from "@/app/layout";
+import { ThemeContext } from "@/app/components/contexts/theme-context";
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
@@ -25,8 +25,7 @@ const defaultColDef = {
 }
 
 const ClaimsGrid = () => {
-  const [currentThemeName, _] = useContext(ThemeContext)
-  const agGridTheme = currentThemeName === 'light' ? 'ag-theme-balham' : 'ag-theme-balham-dark';
+  const [currentThemeName, setCurrentThemeName, appBarColor, agGridTheme] = useContext(ThemeContext)
   const { instance } = useMsal()
   const [rowData, setRowData] = useState<Claim[]>([])
 

@@ -1,22 +1,17 @@
 'use client'
 
 import '../styles/globals.css'
-import React, { createContext, use, useEffect, useState } from 'react';
-import { Layout, ConfigProvider } from 'antd'
-import lightTheme from './config/theme/light-theme';
-import darkTheme from './config/theme/dark-theme';
+import React, { useEffect } from 'react';
+import { Layout } from 'antd'
 import { usePathname } from 'next/navigation';
 import { AuthenticatedTemplate, MsalProvider } from '@azure/msal-react';
 import { msalInstance } from './services/auth';
 import AppHeader from './components/common/app-header';
 import AppMenu from './components/common/app-menu';
 import AppBreadcrumb from './components/common/app-breadcrumb';
-import { useLocalStorageState } from './hooks/use-local-storage-state';
+import { ThemeProvider } from './components/contexts/theme-context';
 
 const { Content } = Layout
-
-
-export const ThemeContext = createContext([]);
 
 //export const metadata: Metadata = {
 //  title: {
@@ -31,15 +26,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-
-
-  const [currentThemeName, setCurrentThemeName] = useLocalStorageState('modaTheme', 'light')
-  const [currentTheme, setCurrentTheme] = useState(currentThemeName === 'light' ? lightTheme : darkTheme)
   const pathname = usePathname()
-
-  useEffect(() => {
-    setCurrentTheme(currentThemeName === 'light' ? lightTheme : darkTheme)
-  }, [currentThemeName])
 
   useEffect(() => {
     async function initialize() {
@@ -55,31 +42,29 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ConfigProvider theme={currentTheme}>
-          <ThemeContext.Provider value={[ currentThemeName, setCurrentThemeName ]}>
-            <MsalProvider instance={msalInstance}>
-              <AuthenticatedTemplate>
-                <Layout className="layout" style={{ minHeight: '100vh' }}>
-                  <AppHeader />
-                  <Layout>
-                    <AppMenu />
-                    <Layout style={{ padding: '0 24px 24px' }}>
-                      <AppBreadcrumb pathname={pathname} />
-                      <Content
-                        style={{
-                          margin: 0,
-                          minHeight: 280,
-                        }}
-                      >
-                        {children}
-                      </Content>
-                    </Layout>
+        <ThemeProvider>
+          <MsalProvider instance={msalInstance}>
+            <AuthenticatedTemplate>
+              <Layout className="layout" style={{ minHeight: '100vh' }}>
+                <AppHeader />
+                <Layout>
+                  <AppMenu />
+                  <Layout style={{ padding: '0 24px 24px' }}>
+                    <AppBreadcrumb pathname={pathname} />
+                    <Content
+                      style={{
+                        margin: 0,
+                        minHeight: 280,
+                      }}
+                    >
+                      {children}
+                    </Content>
                   </Layout>
                 </Layout>
-              </AuthenticatedTemplate>
-            </MsalProvider>
-          </ThemeContext.Provider>
-        </ConfigProvider>
+              </Layout>
+            </AuthenticatedTemplate>
+          </MsalProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

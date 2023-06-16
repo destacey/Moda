@@ -4,10 +4,10 @@ import { acquireToken, msalInstance } from "../services/auth";
 import { HighlightFilled, HighlightOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { createElement, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ThemeContext } from "../layout";
+import { ThemeContext } from "@/app/components/contexts/theme-context";
 
 export default function Profile() {
-  const [currentThemeName, setCurrentThemeName] = useContext(ThemeContext)
+  const [currentThemeName, setCurrentThemeName, appBarColor, agGridTheme] = useContext(ThemeContext)
   const [themeIcon, setThemeIcon] = useState(createElement(HighlightOutlined));
   const router = useRouter();
 
@@ -23,7 +23,6 @@ export default function Profile() {
     }
 
     const token = await acquireToken();
-    console.log(token);
   }
 
   function WelcomeUser() {
