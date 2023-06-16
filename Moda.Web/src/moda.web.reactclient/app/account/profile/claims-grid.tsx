@@ -1,14 +1,12 @@
 import { useMsal } from "@azure/msal-react"
 import { AgGridReact } from "ag-grid-react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import jwt_decode from "jwt-decode";
+import { acquireToken } from "@/app/services/auth";
+import { ThemeContext } from "@/app/components/contexts/theme-context";
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
-import { tokenRequest } from "@/authConfig";
-import { ProfileClient } from "@/app/services/moda-api";
-import axios from "axios";
-import { acquireToken } from "@/app/services/auth";
 
 interface Claim {
   key: string;
@@ -27,7 +25,7 @@ const defaultColDef = {
 }
 
 const ClaimsGrid = () => {
-
+  const [currentThemeName, setCurrentThemeName, appBarColor, agGridTheme] = useContext(ThemeContext)
   const { instance } = useMsal()
   const [rowData, setRowData] = useState<Claim[]>([])
 
@@ -40,17 +38,15 @@ const ClaimsGrid = () => {
           key: key,
           value: decodedClaims[key]
         }
-      })     
+      })
       setRowData(claims)
     }
 
     getTokenClaims()
   }, [instance])
 
-
-
   return (
-    <div className="ag-theme-balham" style={{ height: 600, width: 700 }}>
+    <div className={agGridTheme} style={{ height: 600, width: 700 }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}

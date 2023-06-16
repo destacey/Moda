@@ -1,18 +1,15 @@
 'use client'
 
 import '../styles/globals.css'
-import React, { useEffect, useState } from 'react';
-import { Layout, ConfigProvider } from 'antd'
-import lightTheme from './config/theme/light-theme';
-import darkTheme from './config/theme/dark-theme';
+import React, { useEffect } from 'react';
+import { Layout } from 'antd'
 import { usePathname } from 'next/navigation';
 import { AuthenticatedTemplate, MsalProvider } from '@azure/msal-react';
-import { acquireToken, msalInstance } from './services/auth';
+import { msalInstance } from './services/auth';
 import AppHeader from './components/common/app-header';
 import AppMenu from './components/common/app-menu';
 import AppBreadcrumb from './components/common/app-breadcrumb';
-import { useLocalStorageState } from './hooks/use-local-storage-state';
-import axios from 'axios';
+import { ThemeProvider } from './components/contexts/theme-context';
 
 const { Content } = Layout
 
@@ -29,8 +26,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-
-  const [currentTheme, setCurrentTheme] = useLocalStorageState('modaTheme','light')
   const pathname = usePathname()
 
   useEffect(() => {
@@ -42,16 +37,16 @@ export default function RootLayout({
       }
     }
     initialize()
-  }, []);
+  }, [])
 
   return (
     <html lang="en">
       <body>
-        <ConfigProvider theme={ currentTheme === 'light' ? lightTheme : darkTheme }>
+        <ThemeProvider>
           <MsalProvider instance={msalInstance}>
             <AuthenticatedTemplate>
               <Layout className="layout" style={{ minHeight: '100vh' }}>
-                <AppHeader currentTheme={currentTheme} setTheme={setCurrentTheme} />
+                <AppHeader />
                 <Layout>
                   <AppMenu />
                   <Layout style={{ padding: '0 24px 24px' }}>
@@ -69,7 +64,7 @@ export default function RootLayout({
               </Layout>
             </AuthenticatedTemplate>
           </MsalProvider>
-        </ConfigProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
