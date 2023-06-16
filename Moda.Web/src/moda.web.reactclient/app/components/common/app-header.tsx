@@ -1,22 +1,20 @@
-import { Space, Typography } from "antd";
+import { Typography } from "antd";
 import { Header } from "antd/es/layout/layout";
 import Profile from "../Profile";
+import { useContext } from "react";
+import { ThemeContext } from "@/app/layout";
 
 const { Title } = Typography;
 
-export interface AppHeaderProps {
-    currentTheme: string;
-    setTheme: (theme: string) => void;
-}
-
-export default function AppHeader({ currentTheme, setTheme }: AppHeaderProps) {
+export default function AppHeader() {
+    const [currentThemeName, _] = useContext(ThemeContext)
     return (
         <Header style={{
             height: 50, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            backgroundColor: currentTheme === 'dark' ? '#262a2c' : '#2196f3'
+            backgroundColor: currentThemeName === 'dark' ? '#262a2c' : '#2196f3'
         }}>
             <Title level={3}>Moda</Title>
-            <Profile currentTheme={currentTheme} setTheme={setTheme} />
+            <Profile />
         </Header>
     )
 }

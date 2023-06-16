@@ -1,7 +1,7 @@
 'use client'
 
 import '../styles/globals.css'
-import React, { useEffect, useState } from 'react';
+import React, { createContext, use, useEffect, useState } from 'react';
 import { Layout, ConfigProvider } from 'antd'
 import lightTheme from './config/theme/light-theme';
 import darkTheme from './config/theme/dark-theme';
@@ -14,6 +14,9 @@ import AppBreadcrumb from './components/common/app-breadcrumb';
 import { useLocalStorageState } from './hooks/use-local-storage-state';
 
 const { Content } = Layout
+
+
+export const ThemeContext = createContext([]);
 
 //export const metadata: Metadata = {
 //  title: {
@@ -29,8 +32,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
 
-  const [currentTheme, setCurrentTheme] = useLocalStorageState('modaTheme','light')
+
+  const [currentThemeName, setCurrentThemeName] = useLocalStorageState('modaTheme', 'light')
+  const [currentTheme, setCurrentTheme] = useState(currentThemeName === 'light' ? lightTheme : darkTheme)
   const pathname = usePathname()
+
+  useEffect(() => {
+    setCurrentTheme(currentThemeName === 'light' ? lightTheme : darkTheme)
+  }, [currentThemeName])
 
   useEffect(() => {
     async function initialize() {
@@ -41,33 +50,35 @@ export default function RootLayout({
       }
     }
     initialize()
-  }, []);
+  }, [])
 
   return (
     <html lang="en">
       <body>
-        <ConfigProvider theme={ currentTheme === 'light' ? lightTheme : darkTheme }>
-          <MsalProvider instance={msalInstance}>
-            <AuthenticatedTemplate>
-              <Layout className="layout" style={{ minHeight: '100vh' }}>
-                <AppHeader currentTheme={currentTheme} setTheme={setCurrentTheme} />
-                <Layout>
-                  <AppMenu />
-                  <Layout style={{ padding: '0 24px 24px' }}>
-                    <AppBreadcrumb pathname={pathname} />
-                    <Content
-                      style={{
-                        margin: 0,
-                        minHeight: 280,
-                      }}
-                    >
-                      {children}
-                    </Content>
+        <ConfigProvider theme={currentTheme}>
+          <ThemeContext.Provider value={[ currentThemeName, setCurrentThemeName ]}>
+            <MsalProvider instance={msalInstance}>
+              <AuthenticatedTemplate>
+                <Layout className="layout" style={{ minHeight: '100vh' }}>
+                  <AppHeader />
+                  <Layout>
+                    <AppMenu />
+                    <Layout style={{ padding: '0 24px 24px' }}>
+                      <AppBreadcrumb pathname={pathname} />
+                      <Content
+                        style={{
+                          margin: 0,
+                          minHeight: 280,
+                        }}
+                      >
+                        {children}
+                      </Content>
+                    </Layout>
                   </Layout>
                 </Layout>
-              </Layout>
-            </AuthenticatedTemplate>
-          </MsalProvider>
+              </AuthenticatedTemplate>
+            </MsalProvider>
+          </ThemeContext.Provider>
         </ConfigProvider>
       </body>
     </html>
