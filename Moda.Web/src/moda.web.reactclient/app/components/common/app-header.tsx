@@ -7,11 +7,11 @@ import { ThemeContext } from "@/app/components/contexts/theme-context";
 const { Title } = Typography;
 
 export default function AppHeader() {
-    const [currentThemeName, setCurrentThemeName, appBarColor, agGridTheme] = useContext(ThemeContext)
+    const themeContext = useContext(ThemeContext)
     return (
         <Header style={{
             height: 50, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            backgroundColor: appBarColor
+            backgroundColor: themeContext?.appBarColor
         }}>
             <Title level={3}>Moda</Title>
             <Profile />

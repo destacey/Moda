@@ -25,7 +25,7 @@ const defaultColDef = {
 }
 
 const ClaimsGrid = () => {
-  const [currentThemeName, setCurrentThemeName, appBarColor, agGridTheme] = useContext(ThemeContext)
+  const themeContext = useContext(ThemeContext)
   const { instance } = useMsal()
   const [rowData, setRowData] = useState<Claim[]>([])
 
@@ -46,7 +46,7 @@ const ClaimsGrid = () => {
   }, [instance])
 
   return (
-    <div className={agGridTheme} style={{ height: 600, width: 700 }}>
+    <div className={themeContext?.agGridTheme} style={{ height: 600, width: 700 }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}

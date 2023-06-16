@@ -4,7 +4,14 @@ import lightTheme from "@/app/config/theme/light-theme";
 import darkTheme from "@/app/config/theme/dark-theme";
 import { ConfigProvider } from "antd";
 
-export const ThemeContext = createContext([]);
+interface ThemeContextType {
+    currentThemeName: string;
+    setCurrentThemeName: (themeName: string) => void;
+    appBarColor: string;
+    agGridTheme: string;
+}
+
+export const ThemeContext = createContext<ThemeContextType | null>(null)
 
 export const ThemeProvider = ({ children }) => {
 
@@ -20,7 +27,7 @@ export const ThemeProvider = ({ children }) => {
     }, [currentThemeName])
 
     return (
-        <ThemeContext.Provider value={[currentThemeName, setCurrentThemeName, appBarColor, agGridTheme]}>
+        <ThemeContext.Provider value={{currentThemeName, setCurrentThemeName, appBarColor, agGridTheme}}>
             <ConfigProvider theme={currentTheme}>
                 {children}
             </ConfigProvider>
