@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { ThemeContext } from "@/app/components/contexts/theme-context";
 
 export default function Profile() {
-  const [currentThemeName, setCurrentThemeName, appBarColor, agGridTheme] = useContext(ThemeContext)
+  const themeContext = useContext(ThemeContext)
   const [themeIcon, setThemeIcon] = useState(createElement(HighlightOutlined));
   const router = useRouter();
 
@@ -32,12 +32,12 @@ export default function Profile() {
   }
 
   const toggleTheme = () => {
-    setCurrentThemeName(currentThemeName === 'light' ? 'dark' : 'light')
+    themeContext?.setCurrentThemeName(themeContext?.currentThemeName === 'light' ? 'dark' : 'light')
   }
 
   useEffect(() => {
-    setThemeIcon(createElement(currentThemeName === 'light' ? HighlightOutlined : HighlightFilled))
-  }, [currentThemeName]);
+    setThemeIcon(createElement(themeContext?.currentThemeName === 'light' ? HighlightOutlined : HighlightFilled))
+  }, [themeContext?.currentThemeName]);
 
   const menuItems = [
       { key: 'profile', label: 'Account', icon: createElement(UserOutlined) },
