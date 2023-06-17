@@ -14,7 +14,7 @@ const columnDefs = [
   { field: 'lastName' },
   { field: 'email' },
   { field: 'employee.name', headerName: 'Employee' },
-  { field: 'isActive' }
+  { field: 'isActive' } // TODO: convert to yes/no
 ]
 
 const Page = () => {
