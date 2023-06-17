@@ -2,7 +2,6 @@ import { Header } from "antd/es/layout/layout";
 import Profile from "../Profile";
 import { useContext } from "react";
 import { ThemeContext } from "@/app/components/contexts/theme-context";
-import "@/app/globals.css";
 
 export default function AppHeader() {
     const themeContext = useContext(ThemeContext)
