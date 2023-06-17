@@ -9,10 +9,10 @@ import AppHeader from './components/common/app-header';
 import AppMenu from './components/common/app-menu';
 import AppBreadcrumb from './components/common/app-breadcrumb';
 import { ThemeProvider } from './components/contexts/theme-context';
-import { msalInstance } from '../services/auth';
+import auth from '../services/auth';
 
 const { Content } = Layout
-
+const { msalInstance } = auth
 //export const metadata: Metadata = {
 //  title: {
 //    template: 'Moda | {{title}}',
@@ -30,7 +30,7 @@ export default function RootLayout({
 
   useEffect(() => {
     async function initialize() {
-      await msalInstance.initialize();
+      await msalInstance.initialize()
       if (!msalInstance.getActiveAccount()) {
         await msalInstance.loginRedirect()
           .catch((e) => { console.error(`loginRedirect failed: ${e}`) })

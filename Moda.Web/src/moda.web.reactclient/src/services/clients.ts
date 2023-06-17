@@ -1,13 +1,14 @@
 import axios from "axios";
-import { BackgroundJobsClient, EmployeesClient, ProfileClient, ProgramIncrementsClient, RisksClient, RolesClient, TeamsClient, TeamsOfTeamsClient, UsersClient } from "./moda-api";
-import { acquireToken } from "./auth";
+import { BackgroundJobsClient, EmployeesClient, ProfileClient, ProgramIncrementsClient, 
+  RisksClient, RolesClient, TeamsClient, TeamsOfTeamsClient, UsersClient } from "./moda-api";
+import auth from "./auth";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const createDefaultAxiosInstance = async () => axios.create({
   baseURL: apiUrl,
   headers: {
-    Authorization: `Bearer ${await acquireToken()}`
+    Authorization: `Bearer ${await auth.acquireToken()}`
   },
   //Removing the transformResponse will cause the response to be a string instead of an object
   transformResponse: data => data

@@ -16,11 +16,13 @@ const PermissionsList = () => {
   },[])
 
   return (
-    <List
-      bordered
-      dataSource={permissions}
-      renderItem={item => <List.Item>{item}</List.Item>}
-    />
+    <div style={{height:700, overflow:'auto'}}>
+      <List
+        bordered
+        dataSource={permissions}
+        renderItem={item => <List.Item>{item}</List.Item>}
+      />
+    </div>
   )
 }
 

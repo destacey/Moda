@@ -4,7 +4,9 @@ import { HighlightFilled, HighlightOutlined, LogoutOutlined, UserOutlined } from
 import { createElement, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ThemeContext } from "./contexts/theme-context";
-import { acquireToken, msalInstance } from "@/src/services/auth";
+import auth from "@/src/services/auth";
+
+const { msalInstance } = auth
 
 export default function Profile() {
   const themeContext = useContext(ThemeContext)
@@ -21,8 +23,6 @@ export default function Profile() {
       await msalInstance.loginRedirect()
         .catch((e) => { console.error(`loginRedirect failed: ${e}`) });
     }
-
-    const token = await acquireToken();
   }
 
   function WelcomeUser() {

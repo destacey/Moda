@@ -1,7 +1,7 @@
 import { useMsal } from "@azure/msal-react"
 import { useEffect, useState } from "react";
 import jwt_decode from "jwt-decode";
-import { acquireToken } from "@/src/services/auth";
+import auth from "@/src/services/auth";
 import ModaGrid from "../../components/common/moda-grid";
 
 interface Claim {
@@ -20,7 +20,7 @@ const ClaimsGrid = () => {
 
   useEffect(() => {
     const getTokenClaims = async () => {
-      const token = await acquireToken()
+      const token = await auth.acquireToken()
       const decodedClaims = jwt_decode(token ?? '') as { [key: string]: string }
       const claims = Object.keys(decodedClaims).map(key => {
         return {
