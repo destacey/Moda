@@ -1,11 +1,11 @@
 import { AgGridReact, AgGridReactProps } from "ag-grid-react";
 import { useCallback, useContext, useRef } from "react";
 import { ThemeContext } from "../contexts/theme-context";
+import { Button, Input, Space, Tooltip } from "antd";
+import { ExportOutlined } from "@ant-design/icons";
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
-import { Button, Input, Space, Tooltip } from "antd";
-import { ExportOutlined } from "@ant-design/icons";
 
 interface ModaGridProps extends AgGridReactProps {
     height?: number
@@ -18,6 +18,7 @@ const modaDefaultColDef = {
     sortable: true,
     filter: true,
     resizable: true,
+    floatingFilter: true,
 }
 
 const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, defaultColDef, ...props }: ModaGridProps) => {
@@ -27,6 +28,13 @@ const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, def
     const showToolbar = showGlobalSearch || showExportButton
 
     const gridRef = useRef<AgGridReact>(null)
+
+    // TODO: add refresh button
+    // TODO: add count label based on the current filter (e.g. 17 of 34)
+
+    const onGridReady = useCallback(() => {
+        gridRef.current?.api.sizeColumnsToFit();
+    }, []);
 
     const onBtnExport = useCallback(() => {
         gridRef.current.api.exportDataAsCsv();
@@ -54,6 +62,7 @@ const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, def
                     <AgGridReact
                         ref={gridRef}
                         defaultColDef={defaultColDef ?? modaDefaultColDef}
+                        onGridReady={onGridReady}
                         animateRows={true}
                         {...props}>
                     </AgGridReact>
