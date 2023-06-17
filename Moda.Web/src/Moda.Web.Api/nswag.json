@@ -123,7 +123,7 @@
       "enumNameGeneratorType": null,
       "serviceHost": null,
       "serviceSchemes": null,
-      "output": "../moda.web.reactclient/app/services/moda-api.ts",
+      "output": "../moda.web.reactclient/src/services/moda-api.ts",
       "newLineBehavior": "Auto"
     }
   }
