@@ -50,9 +50,9 @@ const items: MenuProps['items'] = [
     // ]),
     { type: 'divider' },
     getItem('Settings', 'set1', <SettingOutlined />, [
-        getItem(<Link href='/settings/users'>Users</Link>, 'set1.1', null),
-        getItem(<Link href='/settings/roles'>Roles</Link>, 'set1.2', null),
-        getItem(<Link href='/settings/background-jobs'>Background Jobs</Link>, 'set1.3', null),
+        getItem(<Link href='/settings/users'>Users</Link>, 'set1.1', null),  // TODO: check permissions
+        getItem(<Link href='/settings/roles'>Roles</Link>, 'set1.2', null),  // TODO: check permissions
+        getItem(<Link href='/settings/background-jobs'>Background Jobs</Link>, 'set1.3', null),  // TODO: check permissions
     ]),
 ];
 
