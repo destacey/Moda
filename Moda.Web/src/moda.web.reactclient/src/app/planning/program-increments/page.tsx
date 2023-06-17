@@ -21,8 +21,8 @@ const Page = () => {
   useEffect(() => {
     const getProgramIncrements = async () => {
       const programIncrementClient = await getProgramIncrementsClient()
-      const programIncrements = await programIncrementClient.getList()
-      setProgramIncrements(programIncrements) // TODO: add sorting: by state: active, future, completed, then by start date
+      const programIncrementDtos = await programIncrementClient.getList()
+      setProgramIncrements(programIncrementDtos) // TODO: add sorting: by state: active, future, completed, then by start date
     }
 
     getProgramIncrements()
