@@ -23,8 +23,8 @@ const Page = () => {
   useEffect(() => {
     const getRunningJobs = async () => {
       const backgroundJobsClient = await getBackgroundJobsClient()
-      const jobs = await backgroundJobsClient.getRunningJobs()
-      setBackgroundJobs(jobs)
+      const jobDtos = await backgroundJobsClient.getRunningJobs()
+      setBackgroundJobs(jobDtos)
     }
 
     getRunningJobs()
