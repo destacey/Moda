@@ -1,6 +1,6 @@
 import { useMsal } from "@azure/msal-react"
 import { AgGridReact } from "ag-grid-react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import jwt_decode from "jwt-decode";
 import { acquireToken } from "@/app/services/auth";
 import { ThemeContext } from "@/app/components/contexts/theme-context";
@@ -29,6 +29,8 @@ const ClaimsGrid = () => {
   const { instance } = useMsal()
   const [rowData, setRowData] = useState<Claim[]>([])
 
+  const gridRef = useRef<AgGridReact>(null);
+
   useEffect(() => {
     const getTokenClaims = async () => {
       const token = await acquireToken()
@@ -48,6 +50,7 @@ const ClaimsGrid = () => {
   return (
     <div className={themeContext?.agGridTheme} style={{ height: 600, width: 700 }}>
         <AgGridReact
+          ref={gridRef}
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
