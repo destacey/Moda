@@ -1,10 +1,11 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
-First, create a .env.local file in the root of this project with the following variables:
+First, create a .env.local file in the root of this project with the following variables, without quotes:
 
 ```
 NEXT_PUBLIC_API_BASE_URL='Get this from the launch settings of Moda.Web.Api (ex: https://localhost:7021)'
+NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY='Value of logon authority (ex: https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef)'
 NEXT_PUBLIC_AZURE_AD_CLIENT_ID='Get from another developer'
 NEXT_PUBLIC_AZURE_AD_TENANT_ID='Get from another developer'
 ```
