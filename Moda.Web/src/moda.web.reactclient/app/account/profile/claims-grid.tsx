@@ -1,12 +1,8 @@
 import { useMsal } from "@azure/msal-react"
-import { AgGridReact } from "ag-grid-react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import jwt_decode from "jwt-decode";
 import { acquireToken } from "@/app/services/auth";
-import { ThemeContext } from "@/app/components/contexts/theme-context";
-
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-balham.css';
+import ModaGrid from "@/app/components/common/moda-grid";
 
 interface Claim {
   key: string;
@@ -18,18 +14,9 @@ const columnDefs = [
   { field: 'value', width: 500 }
 ]
 
-const defaultColDef = {
-  sortable: true,
-  filter: true,
-  resizable: true,
-}
-
 const ClaimsGrid = () => {
-  const themeContext = useContext(ThemeContext)
   const { instance } = useMsal()
   const [rowData, setRowData] = useState<Claim[]>([])
-
-  const gridRef = useRef<AgGridReact>(null);
 
   useEffect(() => {
     const getTokenClaims = async () => {
@@ -48,15 +35,9 @@ const ClaimsGrid = () => {
   }, [instance])
 
   return (
-    <div className={themeContext?.agGridTheme} style={{ height: 600, width: 700 }}>
-        <AgGridReact
-          ref={gridRef}
-          rowData={rowData}
-          columnDefs={columnDefs}
-          defaultColDef={defaultColDef}
-          animateRows={true}>
-        </AgGridReact>
-      </div>
+    <ModaGrid columnDefs={columnDefs}
+      rowData={rowData}
+      width={700} />
   )
 }
 

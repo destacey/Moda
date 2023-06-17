@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ProfileClient } from "./moda-api";
+import { ProfileClient, ProgramIncrementsClient } from "./moda-api";
 import { acquireToken } from "./auth";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -14,3 +14,4 @@ const createDefaultAxiosInstance = async () => axios.create({
 })
 
 export const getProfileClient = async () => new ProfileClient('', await createDefaultAxiosInstance())
+export const getProgramIncrementsClient = async () => new ProgramIncrementsClient('', await createDefaultAxiosInstance())
