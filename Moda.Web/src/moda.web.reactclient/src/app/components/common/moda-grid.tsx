@@ -1,8 +1,8 @@
 import { AgGridReact, AgGridReactProps } from "ag-grid-react";
-import { useCallback, useContext, useRef } from "react";
+import { useCallback, useContext, useRef, useState } from "react";
 import { ThemeContext } from "../contexts/theme-context";
-import { Button, Dropdown, Input, MenuProps, Space, Switch, Tooltip } from "antd";
-import { ControlOutlined, DropboxCircleFilled, ExportOutlined } from "@ant-design/icons";
+import { Button, Dropdown, Input, Space, Tooltip, Typography } from "antd";
+import { ControlOutlined, ExportOutlined } from "@ant-design/icons";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 
 import 'ag-grid-community/styles/ag-grid.css';
@@ -23,20 +23,25 @@ const modaDefaultColDef = {
     floatingFilter: true,
 }
 
-const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, gridControlMenuItems, defaultColDef, ...props }: ModaGridProps) => {
+const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, gridControlMenuItems, defaultColDef, rowData, ...props }: ModaGridProps) => {
     const themeContext = useContext(ThemeContext)
+    const [displayedRowCount, setDisplayedRowCount] = useState(0)
     const showGlobalSearch = includeGlobalSearch ?? true
     const showExportButton = includeExportButton ?? true
-    const showGridControls = gridControlMenuItems.length > 0
-    const showToolbar = showGlobalSearch || showGridControls || showExportButton
+    const showGridControls = gridControlMenuItems?.length > 0
 
     const gridRef = useRef<AgGridReact>(null)
 
+    const rowCount = rowData?.length ?? 0
+
     // TODO: add refresh button
-    // TODO: add count label based on the current filter (e.g. 17 of 34)
 
     const onGridReady = useCallback(() => {
         gridRef.current?.api.sizeColumnsToFit()
+    }, [])
+
+    const onModelUpdated = useCallback(() => {
+        setDisplayedRowCount(gridRef.current?.api.getDisplayedRowCount() ?? 0)
     }, [])
 
     const onGlobalSearchChange = useCallback((e) => {
@@ -50,27 +55,26 @@ const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, gri
     return (
         <div style={{ width: width }}>
             <Space direction="vertical" style={{ width: '100%' }}>
-                {showToolbar ? (
-                    <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        {showGlobalSearch ? (
-                            <Input placeholder="Search"
-                                allowClear={true}
-                                onChange={onGlobalSearchChange} />
-                        ) : null}
-                        {showGridControls ? (
-                            <Tooltip title="Grid Controls">
-                                <Dropdown menu={{ items: gridControlMenuItems }} trigger={['click']}>
-                                    <Button type='text' shape="circle" icon={<ControlOutlined />} />
-                                </Dropdown>
-                            </Tooltip>
-                        ) : null}
-                        {showExportButton ? (
-                            <Tooltip title="Export to CSV">
-                                <Button type='text' shape="circle" icon={<ExportOutlined />} onClick={onBtnExport} />
-                            </Tooltip>
-                        ) : null}
-                    </Space>
-                ) : null}
+                <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Typography.Text>{displayedRowCount} of {rowCount}</Typography.Text>
+                    {showGlobalSearch ? (
+                        <Input placeholder="Search"
+                            allowClear={true}
+                            onChange={onGlobalSearchChange} />
+                    ) : null}
+                    {showGridControls ? (
+                        <Tooltip title="Grid Controls">
+                            <Dropdown menu={{ items: gridControlMenuItems }} trigger={['click']}>
+                                <Button type='text' shape="circle" icon={<ControlOutlined />} />
+                            </Dropdown>
+                        </Tooltip>
+                    ) : null}
+                    {showExportButton ? (
+                        <Tooltip title="Export to CSV">
+                            <Button type='text' shape="circle" icon={<ExportOutlined />} onClick={onBtnExport} />
+                        </Tooltip>
+                    ) : null}
+                </Space>
 
                 <div className={themeContext?.agGridTheme} style={{ height: height ?? 700 }}>
                     <AgGridReact
@@ -78,6 +82,8 @@ const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, gri
                         defaultColDef={defaultColDef ?? modaDefaultColDef}
                         onGridReady={onGridReady}
                         animateRows={true}
+                        rowData={rowData}
+                        onModelUpdated={onModelUpdated}
                         {...props}>
                     </AgGridReact>
                 </div>
