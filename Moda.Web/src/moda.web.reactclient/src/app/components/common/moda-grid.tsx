@@ -1,8 +1,9 @@
 import { AgGridReact, AgGridReactProps } from "ag-grid-react";
 import { useCallback, useContext, useRef } from "react";
 import { ThemeContext } from "../contexts/theme-context";
-import { Button, Input, Space, Tooltip } from "antd";
-import { ExportOutlined } from "@ant-design/icons";
+import { Button, Dropdown, Input, MenuProps, Space, Switch, Tooltip } from "antd";
+import { ControlOutlined, DropboxCircleFilled, ExportOutlined } from "@ant-design/icons";
+import { ItemType } from "antd/es/menu/hooks/useItems";
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
@@ -11,7 +12,8 @@ interface ModaGridProps extends AgGridReactProps {
     height?: number
     width?: number
     includeGlobalSearch?: boolean
-    includeExportButton?: boolean
+    includeExportButton?: boolean,
+    gridControlMenuItems?: ItemType[]
 }
 
 const modaDefaultColDef = {
@@ -21,11 +23,12 @@ const modaDefaultColDef = {
     floatingFilter: true,
 }
 
-const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, defaultColDef, ...props }: ModaGridProps) => {
+const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, gridControlMenuItems, defaultColDef, ...props }: ModaGridProps) => {
     const themeContext = useContext(ThemeContext)
     const showGlobalSearch = includeGlobalSearch ?? true
     const showExportButton = includeExportButton ?? true
-    const showToolbar = showGlobalSearch || showExportButton
+    const showGridControls = gridControlMenuItems.length > 0
+    const showToolbar = showGlobalSearch || showGridControls || showExportButton
 
     const gridRef = useRef<AgGridReact>(null)
 
@@ -33,12 +36,16 @@ const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, def
     // TODO: add count label based on the current filter (e.g. 17 of 34)
 
     const onGridReady = useCallback(() => {
-        gridRef.current?.api.sizeColumnsToFit();
-    }, []);
+        gridRef.current?.api.sizeColumnsToFit()
+    }, [])
+
+    const onGlobalSearchChange = useCallback((e) => {
+        gridRef.current?.api.setQuickFilter(e.target.value)
+    }, [])
 
     const onBtnExport = useCallback(() => {
-        gridRef.current.api.exportDataAsCsv();
-    }, []);
+        gridRef.current.api.exportDataAsCsv()
+    }, [])
 
     return (
         <div style={{ width: width }}>
@@ -48,11 +55,18 @@ const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, def
                         {showGlobalSearch ? (
                             <Input placeholder="Search"
                                 allowClear={true}
-                                onChange={(e) => gridRef.current?.api.setQuickFilter(e.target.value)} />
+                                onChange={onGlobalSearchChange} />
+                        ) : null}
+                        {showGridControls ? (
+                            <Tooltip title="Grid Controls">
+                                <Dropdown menu={{ items: gridControlMenuItems }} trigger={['click']}>
+                                    <Button type='text' shape="circle" icon={<ControlOutlined />} />
+                                </Dropdown>
+                            </Tooltip>
                         ) : null}
                         {showExportButton ? (
                             <Tooltip title="Export to CSV">
-                                <Button shape="circle" icon={<ExportOutlined />} onClick={onBtnExport} />
+                                <Button type='text' shape="circle" icon={<ExportOutlined />} onClick={onBtnExport} />
                             </Tooltip>
                         ) : null}
                     </Space>
