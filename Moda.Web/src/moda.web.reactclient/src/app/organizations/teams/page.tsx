@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import ModaGrid from "../../components/common/moda-grid";
 import { getTeamsClient, getTeamsOfTeamsClient } from "@/src/services/clients";
 import { TeamNavigationDto } from "@/src/services/moda-api";
+import { ItemType } from "antd/es/menu/hooks/useItems";
+import { Space, Switch } from "antd";
 
 interface TeamListViewModel {
   id: string,
@@ -17,16 +19,30 @@ interface TeamListViewModel {
 }
 
 const columnDefs = [
-  { field: 'localId', headerName: 'Id' },
+  { field: 'localId', headerName: '#', width: 75 },
   { field: 'name' },
-  { field: 'code' },
+  { field: 'code', width: 125 },
   { field: 'type' },
-  { field: 'teamOfTeams.name', headerName: 'Manager' },
+  { field: 'teamOfTeams.name', headerName: 'Team of Teams' },
   { field: 'isActive' } // TODO: convert to yes/no
 ]
 
 const Page = () => {
   const [teams, setTeams] = useState<TeamListViewModel[]>([])
+  const [includeDisabled, setIncludeDisabled] = useState<boolean>(false)
+
+  const onIncludeDisabledChange = (checked: boolean) => {
+    setIncludeDisabled(checked)
+  }
+
+  const controlItems: ItemType[] = [
+    {
+      label: <Space><Switch size="small" 
+                            checked={includeDisabled} 
+                            onChange={onIncludeDisabledChange} />Include Disabled</Space>,
+      key: '0',
+    }
+  ];
 
   useEffect(() => {
     const getTeams = async () => {
@@ -39,13 +55,12 @@ const Page = () => {
     }
 
     getTeams()
-  }, [])
+  }, [includeDisabled])
 
   return (
     <>
       <PageTitle title="Teams" />
-
-      <ModaGrid columnDefs={columnDefs}
+      <ModaGrid columnDefs={columnDefs} gridControlMenuItems={controlItems}
         rowData={teams} />
     </>
   );
