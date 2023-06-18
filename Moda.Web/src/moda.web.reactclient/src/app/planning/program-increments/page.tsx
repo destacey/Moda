@@ -7,8 +7,8 @@ import { ProgramIncrementListDto } from "@/src/services/moda-api";
 import { useEffect, useState } from "react";
 
 const columnDefs = [
-  { field: 'id', headerName: 'Full Id', hide: true },
-  { field: 'localId', headerName: 'Id', width: 75 },
+  { field: 'id', hide: true },
+  { field: 'localId', headerName: '#', width: 75 },
   { field: 'name' },
   { field: 'state', width: 125 },
   { field: 'start' },
@@ -31,7 +31,6 @@ const Page = () => {
   return (
     <>
       <PageTitle title="Program Increments" />
-
       <ModaGrid columnDefs={columnDefs}
         rowData={programIncrements} />
     </>

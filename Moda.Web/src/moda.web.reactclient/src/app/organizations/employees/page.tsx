@@ -9,7 +9,7 @@ import { ItemType } from "antd/es/menu/hooks/useItems";
 import { Space, Switch } from "antd";
 
 const columnDefs = [
-  { field: 'localId', headerName: '#' },
+  { field: 'localId', headerName: '#', width: 75 },
   { field: 'firstName' },
   { field: 'lastName' },
   { field: 'department' },
