@@ -2,24 +2,24 @@
 
 import PageTitle from "@/src/app/components/common/page-title";
 import ModaGrid from "../../components/common/moda-grid";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BackgroundJobDto } from "@/src/services/moda-api";
 import { getBackgroundJobsClient } from "@/src/services/clients";
 import { withAuthorization } from "../../components/hoc";
 
 // TODO: check permissions
 
-const columnDefs = [
-  { field: 'id' },
-  { field: 'action' },
-  { field: 'status' },
-  { field: 'type' },
-  { field: 'namespace' },
-  { field: 'startedAt', headerName: 'Start (UTC)' }
-]
-
 const Page = () => {
   const [backgroundJobs, setBackgroundJobs] = useState<BackgroundJobDto[]>([])
+
+  const columnDefs = useMemo(() => [
+    { field: 'id' },
+    { field: 'action' },
+    { field: 'status' },
+    { field: 'type' },
+    { field: 'namespace' },
+    { field: 'startedAt', headerName: 'Start (UTC)' }
+  ], []);
 
   useEffect(() => {
     const getRunningJobs = async () => {

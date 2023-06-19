@@ -1,21 +1,20 @@
 'use client'
 
 import PageTitle from "@/src/app/components/common/page-title";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ModaGrid from "../../components/common/moda-grid";
 import { RoleListDto } from "@/src/services/moda-api";
 import { getRolesClient } from "@/src/services/clients";
 import { withAuthorization } from "../../components/hoc";
 
 // TODO: check permissions
-
-const columnDefs = [
-  { field: 'name' },
-  { field: 'description' },
-]
-
 const Page = () => {
   const [roles, setRoles] = useState<RoleListDto[]>([])
+
+  const columnDefs = useMemo(() => [
+    { field: 'name' },
+    { field: 'description' },
+  ], []);
 
   useEffect(() => {
     const getRoles = async () => {

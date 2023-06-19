@@ -4,19 +4,19 @@ import ModaGrid from "@/src/app/components/common/moda-grid";
 import PageTitle from "@/src/app/components/common/page-title";
 import { getProgramIncrementsClient } from "@/src/services/clients";
 import { ProgramIncrementListDto } from "@/src/services/moda-api";
-import { useEffect, useState } from "react";
-
-const columnDefs = [
-  { field: 'id', hide: true },
-  { field: 'localId', headerName: '#', width: 75 },
-  { field: 'name' },
-  { field: 'state', width: 125 },
-  { field: 'start' },
-  { field: 'end' }
-]
+import { useEffect, useMemo, useState } from "react";
 
 const Page = () => {
   const [programIncrements, setProgramIncrements] = useState<ProgramIncrementListDto[]>([])
+
+  const columnDefs = useMemo(() => [
+    { field: 'id', hide: true },
+    { field: 'localId', headerName: '#', width: 75 },
+    { field: 'name' },
+    { field: 'state', width: 125 },
+    { field: 'start' },
+    { field: 'end' }
+  ], []);
 
   useEffect(() => {
     const getProgramIncrements = async () => {

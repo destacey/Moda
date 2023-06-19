@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from "@/src/app/components/common/page-title";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ModaGrid from "../../components/common/moda-grid";
 import { getTeamsClient, getTeamsOfTeamsClient } from "@/src/services/clients";
 import { TeamNavigationDto } from "@/src/services/moda-api";
@@ -18,18 +18,18 @@ interface TeamListViewModel {
   teamOfTeams?: TeamNavigationDto | undefined
 }
 
-const columnDefs = [
-  { field: 'localId', headerName: '#', width: 75 },
-  { field: 'name' },
-  { field: 'code', width: 125 },
-  { field: 'type' },
-  { field: 'teamOfTeams.name', headerName: 'Team of Teams' },
-  { field: 'isActive' } // TODO: convert to yes/no
-]
-
 const Page = () => {
   const [teams, setTeams] = useState<TeamListViewModel[]>([])
   const [includeDisabled, setIncludeDisabled] = useState<boolean>(false)
+
+  const columnDefs = useMemo(() => [
+    { field: 'localId', headerName: '#', width: 75 },
+    { field: 'name' },
+    { field: 'code', width: 125 },
+    { field: 'type' },
+    { field: 'teamOfTeams.name', headerName: 'Team of Teams' },
+    { field: 'isActive' } // TODO: convert to yes/no
+  ], []);
 
   const onIncludeDisabledChange = (checked: boolean) => {
     setIncludeDisabled(checked)
