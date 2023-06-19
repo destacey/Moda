@@ -5,6 +5,7 @@ import ModaGrid from "../../components/common/moda-grid";
 import { useEffect, useState } from "react";
 import { BackgroundJobDto } from "@/src/services/moda-api";
 import { getBackgroundJobsClient } from "@/src/services/clients";
+import { withAuthorization } from "../../components/hoc";
 
 // TODO: check permissions
 
@@ -40,4 +41,6 @@ const Page = () => {
   );
 }
 
-export default Page;
+const PageWithAuthorization = withAuthorization(Page, "Permission", "Permissions.BackgroundJobs.View")
+
+export default PageWithAuthorization;
