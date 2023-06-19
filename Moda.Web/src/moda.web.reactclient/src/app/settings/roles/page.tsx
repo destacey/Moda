@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import ModaGrid from "../../components/common/moda-grid";
 import { RoleListDto } from "@/src/services/moda-api";
 import { getRolesClient } from "@/src/services/clients";
+import { withAuthorization } from "../../components/hoc";
 
 // TODO: check permissions
 
@@ -36,4 +37,6 @@ const Page = () => {
   );
 }
 
-export default Page;
+const PageWithAuthorization = withAuthorization(Page, "Permission", "Permissions.Roles.View")
+
+export default PageWithAuthorization;

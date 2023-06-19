@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { useLocalStorageState } from '../../../hooks/use-local-storage-state';
+import { useLocalStorageState } from '@/src/app/hooks';
 import { ConfigProvider, ThemeConfig, theme } from "antd";
 import lightTheme from "@/src/config/theme/light-theme";
 import darkTheme from "@/src/config/theme/dark-theme";

@@ -4,9 +4,9 @@ import '../../styles/globals.css'
 import React from 'react';
 import { Layout } from 'antd'
 import { usePathname } from 'next/navigation';
-import { AuthenticatedTemplate, MsalProvider } from '@azure/msal-react';
+import { AuthenticatedTemplate } from '@azure/msal-react';
 import AppHeader from './components/common/app-header';
-import AppMenu from './components/common/app-menu';
+import AppMenu from './components/common/menu';
 import AppBreadcrumb from './components/common/app-breadcrumb';
 import { ThemeProvider } from './components/contexts/theme';
 import { AuthProvider } from './components/contexts/auth';

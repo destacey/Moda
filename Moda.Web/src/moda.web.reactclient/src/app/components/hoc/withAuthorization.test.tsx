@@ -76,4 +76,16 @@ describe("withAuthorization", () => {
     expect(queryByText("Authorized", {exact: false})).toBeNull()
     expect(mockHasClaim).toHaveBeenCalledWith("TestType", "TestValue")
   })
+
+  it("does not render a component if the user does not have the required default claim", () => {
+    mockHasClaim.mockReturnValue(false)  
+
+    const WrappedComponent = withAuthorization(MockComponent, "TestType", "TestValue");
+    const { queryByText } = renderComponent(
+        <WrappedComponent notAuthorizedBehavior="DoNotRender" />
+      )
+
+    expect(queryByText("Authorized", {exact: false})).toBeNull()
+    expect(mockHasClaim).toHaveBeenCalledWith("TestType", "TestValue")
+  })
 })

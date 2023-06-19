@@ -4,7 +4,7 @@ import { createContext, useEffect } from "react"
 import jwt_decode from "jwt-decode"
 import auth from "@/src/services/auth"
 import { getProfileClient } from "@/src/services/clients"
-import { useLocalStorageState } from "@/src/app/hooks/use-local-storage-state"
+import { useLocalStorageState } from "@/src/app/hooks"
 import { AuthContextType, Claim, User } from "./types"
 
 export const AuthContext = createContext<AuthContextType | null>(null)
