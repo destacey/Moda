@@ -1,24 +1,19 @@
 import { createContext, useEffect, useState } from "react";
-import { useLocalStorageState } from '../../hooks/use-local-storage-state';
-import { ConfigProvider } from "antd";
+import { useLocalStorageState } from '../../../hooks/use-local-storage-state';
+import { ConfigProvider, ThemeConfig, theme } from "antd";
 import lightTheme from "@/src/config/theme/light-theme";
 import darkTheme from "@/src/config/theme/dark-theme";
-
-interface ThemeContextType {
-    currentThemeName: string;
-    setCurrentThemeName: (themeName: string) => void;
-    appBarColor: string;
-    agGridTheme: string;
-}
+import { ThemeContextType } from "./types";
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
 export const ThemeProvider = ({ children }) => {
 
     const [currentThemeName, setCurrentThemeName] = useLocalStorageState('modaTheme', 'light')
-    const [currentTheme, setCurrentTheme] = useState(undefined)
+    const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(undefined)
     const [appBarColor, setAppBarColor] = useState('')
     const [agGridTheme, setAgGridTheme] = useState('')
+    const { token } = theme.useToken()
 
     useEffect(() => {
         setCurrentTheme(currentThemeName === 'light' ? lightTheme : darkTheme)
@@ -27,7 +22,7 @@ export const ThemeProvider = ({ children }) => {
     }, [currentThemeName])
 
     return (
-        <ThemeContext.Provider value={{currentThemeName, setCurrentThemeName, appBarColor, agGridTheme}}>
+        <ThemeContext.Provider value={{currentThemeName, setCurrentThemeName, appBarColor, agGridTheme, token}}>
             <ConfigProvider theme={currentTheme}>
                 {children}
             </ConfigProvider>

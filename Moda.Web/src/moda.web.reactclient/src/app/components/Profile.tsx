@@ -1,14 +1,14 @@
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from "@azure/msal-react";
 import { Avatar, Button, Dropdown, Space } from "antd";
 import { HighlightFilled, HighlightOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
-import { createElement, useContext, useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ThemeContext } from "./contexts/theme-context";
+import useTheme from "./contexts/theme";
 import useAuth from "./contexts/auth";
 
 
 export default function Profile() {
-  const themeContext = useContext(ThemeContext)
+  const {setCurrentThemeName, currentThemeName} = useTheme()
   const {login, logout, user} = useAuth()
   const [themeIcon, setThemeIcon] = useState(createElement(HighlightOutlined));
   const router = useRouter();
@@ -30,12 +30,12 @@ export default function Profile() {
   }
 
   const toggleTheme = () => {
-    themeContext?.setCurrentThemeName(themeContext?.currentThemeName === 'light' ? 'dark' : 'light')
+    setCurrentThemeName(currentThemeName === 'light' ? 'dark' : 'light')
   }
 
   useEffect(() => {
-    setThemeIcon(createElement(themeContext?.currentThemeName === 'light' ? HighlightOutlined : HighlightFilled))
-  }, [themeContext?.currentThemeName]);
+    setThemeIcon(createElement(currentThemeName === 'light' ? HighlightOutlined : HighlightFilled))
+  }, [currentThemeName]);
 
   const menuItems = [
       { key: 'profile', label: 'Account', icon: createElement(UserOutlined) },

@@ -1,14 +1,14 @@
 'use client'
 
 import '../../styles/globals.css'
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Layout } from 'antd'
 import { usePathname } from 'next/navigation';
 import { AuthenticatedTemplate, MsalProvider } from '@azure/msal-react';
 import AppHeader from './components/common/app-header';
 import AppMenu from './components/common/app-menu';
 import AppBreadcrumb from './components/common/app-breadcrumb';
-import { ThemeProvider } from './components/contexts/theme-context';
+import { ThemeProvider } from './components/contexts/theme';
 import { AuthProvider } from './components/contexts/auth';
 
 const { Content } = Layout
