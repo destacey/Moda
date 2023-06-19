@@ -1,20 +1,28 @@
 'use client'
 
-import React from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { Card } from "antd"
 import PageTitle from "../../components/common/page-title";
 import ProfileForm from "./profile-form"
 import ClaimsGrid from "./claims-grid"
-import PermissionsList from "./permissions-list"
+import useAuth from "../../components/contexts/auth";
 
 const tabs = [
   {key: 'profile', tab: 'Profile', content: React.createElement(ProfileForm)},
   {key: 'claims', tab: 'Claims', content: React.createElement(ClaimsGrid)},
-  {key: 'permissions', tab: 'Permissions', content: React.createElement(PermissionsList)},
 ]
 
 const Page = () => {
-  const [activeTab, setActiveTab] = React.useState('profile')
+  const {refreshUser} = useAuth()
+  const [activeTab, setActiveTab] = useState('profile')
+
+  useEffect(() => {
+    const reloadUserPermissions = async () => {
+      await refreshUser()
+    }
+    reloadUserPermissions()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <>

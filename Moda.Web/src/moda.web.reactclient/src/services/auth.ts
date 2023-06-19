@@ -12,9 +12,6 @@ const auth = {
     };
     let tokenResponse: string | null = null;
     try {
-      if (!msalInstance.getActiveAccount()) {
-        msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
-      }
       tokenResponse = (await msalInstance.acquireTokenSilent(acquireRequest)).accessToken;
     }
     catch (error) {

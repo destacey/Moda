@@ -1,43 +1,79 @@
-import { render, screen } from "@testing-library/react"
+import { render } from "@testing-library/react"
 import '@testing-library/jest-dom'
-import auth from "@/src/services/auth";
 import withAuthorization, { WithAuthorizationProps } from "./withAuthorization"
-
-jest.mock("../../../services/auth")
-const mockedAuth = auth as jest.Mocked<typeof auth>
+import { AuthContext } from "../contexts/auth"
 
 describe("withAuthorization", () => {
-  const MockComponent = () => <div>Authorized</div>;
+  const MockComponent = () => <div>Authorized</div>
+
+  const mockHasClaim = jest.fn()
+
+  jest.mock('../contexts/auth', () => ({
+    __esModule: true,
+    default: () => ({ hasClaim: mockHasClaim }),
+  }));
+
+  jest.mock('')
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
 
   const mockProps: WithAuthorizationProps = {
     claimValue: "testClaim",
-  };
+  }
+
+  const renderComponent = (component) => {
+    const authContext = {
+      user: null,
+      acquireToken: () => Promise.resolve("token"),
+      refreshUser: () => Promise.resolve(),
+      login: () => Promise.resolve(),
+      logout: () => Promise.resolve(),
+      hasClaim: mockHasClaim,
+    }
+
+    return render(
+      <AuthContext.Provider value={authContext}>
+        {component}
+      </AuthContext.Provider>
+    )
+  }
 
   it("renders the wrapped component if the user has the required claim", () => {
+    mockHasClaim.mockReturnValue(true)
 
-    mockedAuth.hasClaim.mockReturnValue(true)
+    const WrappedComponent = withAuthorization(MockComponent)
 
-    const WrappedComponent = withAuthorization(MockComponent);
-    const { getByText } = render(<WrappedComponent {...mockProps} />);
+    const { getByText } = renderComponent(
+      <WrappedComponent {...mockProps} />
+    )
 
-    expect(getByText("Authorized")).toBeInTheDocument();
-  });
+    expect(getByText("Authorized")).toBeInTheDocument()
+    expect(mockHasClaim).toHaveBeenCalledWith("Permission", mockProps.claimValue)
+  })
 
   it("renders the NotAuthorized component if the user does not have the required claim", () => {
-    mockedAuth.hasClaim.mockReturnValue(false)  
+    mockHasClaim.mockReturnValue(false)  
 
     const WrappedComponent = withAuthorization(MockComponent);
-    const { getByText } = render(<WrappedComponent {...mockProps} />);
+    const { getByText } = renderComponent(
+      <WrappedComponent {...mockProps} />
+    )
 
-    expect(getByText("Not Authorized")).toBeInTheDocument();
-  });
+    expect(getByText("Not Authorized")).toBeInTheDocument()
+    expect(mockHasClaim).toHaveBeenCalledWith("Permission", mockProps.claimValue)
+  })
 
   it("does not render a component if the user does not have the required claim", () => {
-    mockedAuth.hasClaim.mockReturnValue(false)  
+    mockHasClaim.mockReturnValue(false)  
 
     const WrappedComponent = withAuthorization(MockComponent);
-    const { queryByText } = render(<WrappedComponent {...mockProps} doNotRenderOnNotAuthorized={true} />);
+    const { queryByText } = renderComponent(
+        <WrappedComponent claimType="TestType" claimValue="TestValue" notAuthorizedBehavior="DoNotRender" />
+      )
 
-    expect(queryByText("Authorized", {exact: false})).toBeNull();
-  });
-});
+    expect(queryByText("Authorized", {exact: false})).toBeNull()
+    expect(mockHasClaim).toHaveBeenCalledWith("TestType", "TestValue")
+  })
+})

@@ -1,17 +1,17 @@
 import { ComponentType, FC } from "react"
-import auth from "@/src/services/auth"
 import NotAuthorized from "../common/not-authorized"
+import useAuth from "../contexts/auth"
 
 /**
  * Props for the withAuthorization higher-order component.
  * @param claimType - The type of claim to check. Default is "Permission".
  * @param claimValue - The value of the claim to check.
- * @param doNotRenderOnNotAuthorized - Component will not be rendered if set to true. Default is to render "Not Authorized"
+ * @param notAuthorizedBehavior - Component will not be rendered if set to true. Default is to render "Not Authorized"
  */
 export interface WithAuthorizationProps {
   claimType?: string // The type of claim to check. Default is "Permission".
   claimValue: string // The value of the claim to check.
-  doNotRenderOnNotAuthorized?: boolean // Component will not be rendered if set to true. Default is to render "Not Authorized"
+  notAuthorizedBehavior?: "NotAuthorized" | "DoNotRender" // Component will not be rendered if set to true. Default is to render "Not Authorized"
 }
 
 /**
@@ -23,10 +23,11 @@ const withAuthorization = <P extends object>(WrappedComponent: ComponentType<P>)
   const WithAuthorization: ComponentType<P & WithAuthorizationProps> = ({
     claimType, 
     claimValue, 
-    doNotRenderOnNotAuthorized,
+    notAuthorizedBehavior: notAuthroizedBehavior,
     ...props
   }) => {
 
+    const { hasClaim } = useAuth()
     const wrappedComponentName = WrappedComponent.displayName 
       || WrappedComponent.name 
       || 'Component'
@@ -34,9 +35,9 @@ const withAuthorization = <P extends object>(WrappedComponent: ComponentType<P>)
     WithAuthorization.displayName = `withAuthorization(${wrappedComponentName})`
     
     return (
-      auth.hasClaim(claimType ?? "Permission", claimValue)
+      hasClaim(claimType ?? "Permission", claimValue)
       ? <WrappedComponent {...props as P} />
-      : doNotRenderOnNotAuthorized === true
+      : notAuthroizedBehavior === "DoNotRender"
         ? <></> 
         : <NotAuthorized/>
     )

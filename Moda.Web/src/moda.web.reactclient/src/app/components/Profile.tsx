@@ -4,31 +4,29 @@ import { HighlightFilled, HighlightOutlined, LogoutOutlined, UserOutlined } from
 import { createElement, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ThemeContext } from "./contexts/theme-context";
-import auth from "@/src/services/auth";
+import useAuth from "./contexts/auth";
 
-const { msalInstance } = auth
 
 export default function Profile() {
   const themeContext = useContext(ThemeContext)
+  const {login, logout, user} = useAuth()
   const [themeIcon, setThemeIcon] = useState(createElement(HighlightOutlined));
   const router = useRouter();
 
   const handleLogout = () => {
-    msalInstance.logoutRedirect()
+    logout()
       .catch((e) => { console.error(`logoutRedirect failed: ${e}`) });
   }
 
   const handleLogin = async () => {
-    if(!msalInstance.getActiveAccount()){
-      await msalInstance.loginRedirect()
+    if(!user.isAuthenticated){
+      await login()
         .catch((e) => { console.error(`loginRedirect failed: ${e}`) });
     }
   }
 
   function WelcomeUser() {
-    const { accounts } = useMsal();
-    const username = accounts[0].name;
-    return username && username.trim() ? <p>Welcome, {username}</p> : null;
+    return user.name && user.name.trim() ? <p>Welcome, {user.name}</p> : null;
   }
 
   const toggleTheme = () => {

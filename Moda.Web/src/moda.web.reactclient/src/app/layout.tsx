@@ -9,10 +9,9 @@ import AppHeader from './components/common/app-header';
 import AppMenu from './components/common/app-menu';
 import AppBreadcrumb from './components/common/app-breadcrumb';
 import { ThemeProvider } from './components/contexts/theme-context';
-import auth from '../services/auth';
+import { AuthProvider } from './components/contexts/auth';
 
 const { Content } = Layout
-const { msalInstance } = auth
 //export const metadata: Metadata = {
 //  title: {
 //    template: 'Moda | {{title}}',
@@ -28,22 +27,11 @@ export default function RootLayout({
 }) {
   const pathname = usePathname()
 
-  useEffect(() => {
-    async function initialize() {
-      await msalInstance.initialize()
-      if (!msalInstance.getActiveAccount()) {
-        await msalInstance.loginRedirect()
-          .catch((e) => { console.error(`loginRedirect failed: ${e}`) })
-      }
-    }
-    initialize()
-  }, [])
-
   return (
     <html lang="en">
       <body>
-        <ThemeProvider>
-          <MsalProvider instance={msalInstance}>
+        <AuthProvider>
+          <ThemeProvider>
             <AuthenticatedTemplate>
               <Layout className="layout" style={{ minHeight: '100vh' }}>
                 <AppHeader />
@@ -63,8 +51,8 @@ export default function RootLayout({
                 </Layout>
               </Layout>
             </AuthenticatedTemplate>
-          </MsalProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );
