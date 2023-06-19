@@ -1,18 +1,17 @@
 'use client'
 
 import '../../styles/globals.css'
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Layout } from 'antd'
 import { usePathname } from 'next/navigation';
-import { AuthenticatedTemplate, MsalProvider } from '@azure/msal-react';
+import { AuthenticatedTemplate } from '@azure/msal-react';
 import AppHeader from './components/common/app-header';
-import AppMenu from './components/common/app-menu';
+import AppMenu from './components/common/menu';
 import AppBreadcrumb from './components/common/app-breadcrumb';
-import { ThemeProvider } from './components/contexts/theme-context';
-import { msalInstance } from '../services/auth';
+import { ThemeProvider } from './components/contexts/theme';
+import { AuthProvider } from './components/contexts/auth';
 
 const { Content } = Layout
-
 //export const metadata: Metadata = {
 //  title: {
 //    template: 'Moda | {{title}}',
@@ -28,22 +27,11 @@ export default function RootLayout({
 }) {
   const pathname = usePathname()
 
-  useEffect(() => {
-    async function initialize() {
-      await msalInstance.initialize();
-      if (!msalInstance.getActiveAccount()) {
-        await msalInstance.loginRedirect()
-          .catch((e) => { console.error(`loginRedirect failed: ${e}`) })
-      }
-    }
-    initialize()
-  }, [])
-
   return (
     <html lang="en">
       <body>
-        <ThemeProvider>
-          <MsalProvider instance={msalInstance}>
+        <AuthProvider>
+          <ThemeProvider>
             <AuthenticatedTemplate>
               <Layout className="layout" style={{ minHeight: '100vh' }}>
                 <AppHeader />
@@ -63,8 +51,8 @@ export default function RootLayout({
                 </Layout>
               </Layout>
             </AuthenticatedTemplate>
-          </MsalProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

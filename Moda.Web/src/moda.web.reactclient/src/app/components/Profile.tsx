@@ -1,43 +1,41 @@
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from "@azure/msal-react";
 import { Avatar, Button, Dropdown, Space } from "antd";
 import { HighlightFilled, HighlightOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
-import { createElement, useContext, useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ThemeContext } from "./contexts/theme-context";
-import { acquireToken, msalInstance } from "@/src/services/auth";
+import useTheme from "./contexts/theme";
+import useAuth from "./contexts/auth";
+
 
 export default function Profile() {
-  const themeContext = useContext(ThemeContext)
+  const {setCurrentThemeName, currentThemeName} = useTheme()
+  const {login, logout, user} = useAuth()
   const [themeIcon, setThemeIcon] = useState(createElement(HighlightOutlined));
   const router = useRouter();
 
   const handleLogout = () => {
-    msalInstance.logoutRedirect()
+    logout()
       .catch((e) => { console.error(`logoutRedirect failed: ${e}`) });
   }
 
   const handleLogin = async () => {
-    if(!msalInstance.getActiveAccount()){
-      await msalInstance.loginRedirect()
+    if(!user.isAuthenticated){
+      await login()
         .catch((e) => { console.error(`loginRedirect failed: ${e}`) });
     }
-
-    const token = await acquireToken();
   }
 
   function WelcomeUser() {
-    const { accounts } = useMsal();
-    const username = accounts[0].name;
-    return username && username.trim() ? <p>Welcome, {username}</p> : null;
+    return user.name && user.name.trim() ? <p>Welcome, {user.name}</p> : null;
   }
 
   const toggleTheme = () => {
-    themeContext?.setCurrentThemeName(themeContext?.currentThemeName === 'light' ? 'dark' : 'light')
+    setCurrentThemeName(currentThemeName === 'light' ? 'dark' : 'light')
   }
 
   useEffect(() => {
-    setThemeIcon(createElement(themeContext?.currentThemeName === 'light' ? HighlightOutlined : HighlightFilled))
-  }, [themeContext?.currentThemeName]);
+    setThemeIcon(createElement(currentThemeName === 'light' ? HighlightOutlined : HighlightFilled))
+  }, [currentThemeName]);
 
   const menuItems = [
       { key: 'profile', label: 'Account', icon: createElement(UserOutlined) },

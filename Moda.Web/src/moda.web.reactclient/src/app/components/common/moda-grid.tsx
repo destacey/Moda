@@ -1,12 +1,12 @@
 import { AgGridReact, AgGridReactProps } from "ag-grid-react";
-import { useCallback, useContext, useRef, useState } from "react";
-import { ThemeContext } from "../contexts/theme-context";
+import { useCallback, useRef, useState } from "react";
 import { Button, Dropdown, Input, Space, Tooltip, Typography } from "antd";
 import { ControlOutlined, ExportOutlined } from "@ant-design/icons";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
+import useTheme from "../contexts/theme";
 
 interface ModaGridProps extends AgGridReactProps {
     height?: number
@@ -24,7 +24,7 @@ const modaDefaultColDef = {
 }
 
 const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, gridControlMenuItems, defaultColDef, rowData, ...props }: ModaGridProps) => {
-    const themeContext = useContext(ThemeContext)
+    const { agGridTheme } = useTheme()
     const [displayedRowCount, setDisplayedRowCount] = useState(0)
     const showGlobalSearch = includeGlobalSearch ?? true
     const showExportButton = includeExportButton ?? true
@@ -76,7 +76,7 @@ const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, gri
                     ) : null}
                 </Space>
 
-                <div className={themeContext?.agGridTheme} style={{ height: height ?? 700 }}>
+                <div className={agGridTheme} style={{ height: height ?? 700 }}>
                     <AgGridReact
                         ref={gridRef}
                         defaultColDef={defaultColDef ?? modaDefaultColDef}

@@ -1,9 +1,12 @@
 import { Configuration, LogLevel } from "@azure/msal-browser";
 
+const microsoftLogonAuthority = process.env.NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY ?? '';
+const azureAdClientId = process.env.NEXT_PUBLIC_AZURE_AD_CLIENT_ID ?? '';
+
 export const msalConfig: Configuration = {
   auth: {
-    authority: "https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef",
-    clientId: "4d566fb3-7966-4c77-9864-113020fd646f",
+    authority: microsoftLogonAuthority,
+    clientId: azureAdClientId,
     redirectUri: "/",
     postLogoutRedirectUri: "/",
   },

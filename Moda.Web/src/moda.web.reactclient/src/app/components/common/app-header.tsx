@@ -1,14 +1,14 @@
 import { Header } from "antd/es/layout/layout";
 import Profile from "../Profile";
-import { useContext } from "react";
-import { ThemeContext } from "../contexts/theme-context";
+import useTheme from "../contexts/theme";
+
 
 export default function AppHeader() {
-    const themeContext = useContext(ThemeContext)
+    const { appBarColor } = useTheme()
     return (
         <Header style={{
             height: 50, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            backgroundColor: themeContext?.appBarColor
+            backgroundColor: appBarColor
         }}>
             <h1 style={{ fontSize: 24, fontWeight: 400 }}>Moda</h1>
             <Profile />
