@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from "@/src/app/components/common/page-title";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import ModaGrid from "../../components/common/moda-grid";
 import { UserDetailsDto } from "@/src/services/moda-api";
 import { getUsersClient } from "@/src/services/clients";
@@ -21,22 +21,18 @@ const Page = () => {
     { field: 'isActive' } // TODO: convert to yes/no
   ], []);
 
-  useEffect(() => {
-    const getUsers = async () => {
-      const usersClient = await getUsersClient()
-      const userDtos = await usersClient.getList()
-      setUsers(userDtos)
-    }
-
-    getUsers()
-  }, [])
+  const getUsers = useCallback(async () => {
+    const usersClient = await getUsersClient()
+    const userDtos = await usersClient.getList()
+    setUsers(userDtos)
+  },[])
 
   return (
     <>
       <PageTitle title="Users" />
 
       <ModaGrid columnDefs={columnDefs}
-        rowData={users} />
+        rowData={users} loadData={getUsers}/>
     </>
   );
 }
