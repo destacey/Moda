@@ -5,6 +5,7 @@ import { ReactMarkdown } from "react-markdown/lib/react-markdown"
 const { Item } = Descriptions
 
 const RiskDetails = (risk: RiskDetailsDto) => {
+    const followUpDate = risk.followUpDate ? new Date(risk.followUpDate)?.toLocaleDateString() : null
     return (
         <>
             <Row>
@@ -21,7 +22,7 @@ const RiskDetails = (risk: RiskDetailsDto) => {
                         <Item label="Status">{risk.status?.name}</Item>
                         <Item label="Team">{risk.team?.name}</Item>
                         <Item label="Category">{risk.category?.name}</Item>
-                        <Item label="Follow-Up Date">{new Date(risk.followUpDate).toLocaleDateString()}</Item>
+                        <Item label="Follow-Up Date">{followUpDate}</Item>
                         <Item label="Assignee">{risk.assignee?.name}</Item>
                         <Item label="exposure">{risk.exposure?.name}</Item>
                         <Item label="Impact">{risk.impact?.name}</Item>

@@ -3,25 +3,24 @@
 import PageTitle from "@/src/app/components/common/page-title";
 import { getRisksClient } from "@/src/services/clients";
 import { RiskDetailsDto } from "@/src/services/moda-api";
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import RiskDetails from "./risk-details";
-import React from "react";
 import { Card } from "antd";
 
 const Page = ({ params }) => {
-    const [activeTab, setActiveTab] = React.useState('details')
+    const [activeTab, setActiveTab] = useState('details')
     const [risk, setRisk] = useState<RiskDetailsDto | null>(null)
     const { id } = params
 
     const tabs = [
-        { key: 'details', tab: 'Details', content: React.createElement(RiskDetails, risk) },
+        { key: 'details', tab: 'Details', content: createElement(RiskDetails, risk) },
     ]
 
     useEffect(() => {
         const getRisk = async () => {
             const risksClient = await getRisksClient()
             const riskDto = await risksClient.getByLocalId(id)
-            setRisk(riskDto) // TODO: add sorting: by state: active, future, completed, then by start date
+            setRisk(riskDto)
         }
 
         getRisk()
