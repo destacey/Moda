@@ -1,0 +1,54 @@
+name: docker
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - "main"
+  #   tags:
+  #     - "v*"
+  # pull_request:
+  #   branches:
+  #     - "main"
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: ./Moda.Web/src/Moda.Web.Api/Dockerfile
+            image: awaldow/moda-api
+            contextDir: .
+          - dockerfile: ./Moda.Web/src/moda.web.reactclient/Dockerfile
+            image: awaldow/moda-client
+            contextDir: ./Moda.Web/src/moda.web.reactclient
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+  
+      - name: Log in to the Container registry
+        uses: docker/login-action
+        with:
+          username: awaldow
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+  
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action
+        with:
+          images: ${{ matrix.image }}
+  
+      - name: Build and push Docker image
+        uses: docker/build-push-action
+        with:
+          context: ${{ matrix.contextDir }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
