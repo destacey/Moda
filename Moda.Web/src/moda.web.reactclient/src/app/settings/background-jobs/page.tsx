@@ -2,7 +2,7 @@
 
 import PageTitle from "@/src/app/components/common/page-title";
 import ModaGrid from "../../components/common/moda-grid";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { BackgroundJobDto } from "@/src/services/moda-api";
 import { getBackgroundJobsClient } from "@/src/services/clients";
 import { withAuthorization } from "../../components/hoc";
@@ -21,22 +21,18 @@ const Page = () => {
     { field: 'startedAt', headerName: 'Start (UTC)' }
   ], []);
 
-  useEffect(() => {
-    const getRunningJobs = async () => {
-      const backgroundJobsClient = await getBackgroundJobsClient()
-      const jobDtos = await backgroundJobsClient.getRunningJobs()
-      setBackgroundJobs(jobDtos)
-    }
-
-    getRunningJobs()
-  }, [])
+  const getRunningJobs = useCallback(async () => {
+    const backgroundJobsClient = await getBackgroundJobsClient()
+    const jobDtos = await backgroundJobsClient.getRunningJobs()
+    setBackgroundJobs(jobDtos)
+  },[])
 
   return (
     <>
       <PageTitle title="Background Jobs" />
 
       <ModaGrid columnDefs={columnDefs}
-        rowData={backgroundJobs} />
+        rowData={backgroundJobs} loadData={getRunningJobs}/>
     </>
   );
 }
