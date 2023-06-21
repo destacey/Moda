@@ -16,7 +16,7 @@ const ProgramIncrementDetails = (programIncrement: ProgramIncrementDetailsDto) =
                     </Descriptions>
                 </Col>
                 <Col xs={24} md={12}>
-                    <Descriptions>
+                    <Descriptions layout="vertical">
                         <Item label="Description"><ReactMarkdown>{programIncrement.description}</ReactMarkdown></Item>
                     </Descriptions>
                 </Col>
