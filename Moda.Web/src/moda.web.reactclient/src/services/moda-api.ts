@@ -6924,6 +6924,7 @@ export interface UpdateWorkTypeRequest {
 export interface EmployeeListDto {
     id?: string;
     localId?: number;
+    displayName?: string;
     firstName?: string;
     middleName?: string | undefined;
     lastName?: string;
@@ -6943,6 +6944,8 @@ export interface EmployeeListDto {
 export interface EmployeeDetailsDto {
     id?: string;
     localId?: number;
+    displayName?: string;
+    fullName?: string;
     firstName?: string;
     middleName?: string | undefined;
     lastName?: string;
@@ -6958,7 +6961,6 @@ export interface EmployeeDetailsDto {
     managerLocalId?: number | undefined;
     managerName?: string | undefined;
     isActive?: boolean;
-    fullName?: string | undefined;
 }
 
 export interface CreateEmployeeRequest {

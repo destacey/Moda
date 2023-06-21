@@ -7024,6 +7024,9 @@
             "type": "integer",
             "format": "int32"
           },
+          "displayName": {
+            "type": "string"
+          },
           "firstName": {
             "type": "string"
           },
@@ -7091,6 +7094,12 @@
             "type": "integer",
             "format": "int32"
           },
+          "displayName": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
           "firstName": {
             "type": "string"
           },
@@ -7148,10 +7157,6 @@
           },
           "isActive": {
             "type": "boolean"
-          },
-          "fullName": {
-            "type": "string",
-            "nullable": true
           }
         }
       },
