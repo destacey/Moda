@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Helpers;
 
 namespace Moda.Common.Application.Employees.Dtos;
 public sealed record EmployeeListDto : IMapFrom<Employee>
@@ -11,6 +12,10 @@ public sealed record EmployeeListDto : IMapFrom<Employee>
     /// <summary>Gets the local identifier.</summary>
     /// <value>The local identifier.</value>
     public int LocalId { get; set; }
+
+    /// <summary>Gets the full name.</summary>
+    /// <value>The full name.</value>
+    public required string DisplayName { get; set; }
 
     /// <summary>Gets the first name.</summary>
     /// <value>The first name.</value>
@@ -72,6 +77,7 @@ public sealed record EmployeeListDto : IMapFrom<Employee>
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<Employee, EmployeeListDto>()
+            .Map(dest => dest.DisplayName, src => $"{StringHelpers.Concat(src.Name.FirstName, src.Name.LastName)}")
             .Map(dest => dest.FirstName, src => src.Name.FirstName)
             .Map(dest => dest.MiddleName, src => src.Name.MiddleName)
             .Map(dest => dest.LastName, src => src.Name.LastName)
