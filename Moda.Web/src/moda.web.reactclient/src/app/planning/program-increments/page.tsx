@@ -7,7 +7,7 @@ import { ProgramIncrementListDto } from "@/src/services/moda-api";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 
-const ProgramIncrementCellRenderer = ({ value, data }) => {
+const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
     return (
         <Link href={`/planning/program-increments/${data.localId}`}>
             {value}
@@ -23,7 +23,7 @@ const Page = () => {
     const columnDefs = useMemo(
         () => [
             { field: "localId", headerName: "#", width: 75 },
-            { field: "name", cellRenderer: ProgramIncrementCellRenderer },
+            { field: "name", cellRenderer: ProgramIncrementLinkCellRenderer },
             { field: "state", width: 125 },
             { field: "start" },
             { field: "end" },
