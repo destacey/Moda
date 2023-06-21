@@ -9,8 +9,8 @@ import useAuth from "../contexts/auth"
  * @param notAuthorizedBehavior - Component will not be rendered if set to true. Default is to render "Not Authorized"
  */
 export interface WithAuthorizationProps {
-  claimType?: string // The type of claim to check. Default is "Permission".
-  claimValue?: string // The value of the claim to check.
+  claimType?: string | never // The type of claim to check. Default is "Permission".
+  claimValue?: string | never // The value of the claim to check.
   notAuthorizedBehavior?: "NotAuthorized" | "DoNotRender" // Component will not be rendered if set to true. Default is to render "Not Authorized"
 }
 
@@ -25,7 +25,7 @@ const withAuthorization = <P extends object>(WrappedComponent: ComponentType<P>,
   const WithAuthorization: ComponentType<P & WithAuthorizationProps> = ({
     claimType, 
     claimValue, 
-    notAuthorizedBehavior: notAuthroizedBehavior,
+    notAuthorizedBehavior,
     ...props
   }) => {
 
@@ -39,7 +39,7 @@ const withAuthorization = <P extends object>(WrappedComponent: ComponentType<P>,
     return (
       hasClaim(claimType ?? defaultClaimType ?? "Permission", claimValue ?? defaultClaimValue)
       ? <WrappedComponent {...props as P} />
-      : notAuthroizedBehavior === "DoNotRender"
+      : notAuthorizedBehavior === "DoNotRender"
         ? <></> 
         : <NotAuthorized/>
     )

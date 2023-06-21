@@ -35,9 +35,17 @@ const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, gri
 
     const rowCount = rowData?.length ?? 0
 
-    const onGridReady = useCallback(() => {
+    const onRefreshData = useCallback(async () => {
+        if (!loadData) return
+        gridRef.current?.api?.showLoadingOverlay()
+        await loadData()
+        gridRef.current?.api?.hideOverlay()
+    }, [loadData])
+
+    const onGridReady = useCallback(async () => {
+        await onRefreshData()
         gridRef.current?.api.sizeColumnsToFit()
-    }, [])
+    }, [onRefreshData])
 
     const onModelUpdated = useCallback(() => {
         setDisplayedRowCount(gridRef.current?.api.getDisplayedRowCount() ?? 0)
@@ -51,14 +59,9 @@ const ModaGrid = ({ height, width, includeGlobalSearch, includeExportButton, gri
         gridRef.current?.api.exportDataAsCsv()
     }, [])
 
-    const onRefreshData = useCallback(async () => {
-        if (!loadData) return
-        gridRef.current?.api?.showLoadingOverlay()
-        await loadData()
-        gridRef.current?.api?.hideOverlay()
-    }, [loadData])
-
     useEffect(() => {
+        // When the grid is first rendered or if the onRefreshData function changes, load the data if the grid is ready
+        if(!gridRef.current?.api) return
         const loadGridData = async() => {
             await onRefreshData()
         }
