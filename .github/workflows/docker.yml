@@ -57,6 +57,7 @@ jobs:
 
   build-and-push-image:
     runs-on: ubuntu-latest
+    needs: [build-and-test-api, build-and-test-client]
     strategy:
       fail-fast: false
       matrix:
