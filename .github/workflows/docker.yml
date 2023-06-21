@@ -37,7 +37,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./Moda.Web/src/moda.web.reactclient
+        working-directory: Moda.Web/src/moda.web.reactclient
     steps:
       - uses: actions/setup-node@v3
         with:
