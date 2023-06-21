@@ -11,6 +11,7 @@ import { Card } from "antd";
 const Page = ({ params }) => {
     const [activeTab, setActiveTab] = React.useState('details')
     const [risk, setRisk] = useState<RiskDetailsDto | null>(null)
+    const { id } = params
 
     const tabs = [
         { key: 'details', tab: 'Details', content: React.createElement(RiskDetails, risk) },
@@ -19,12 +20,12 @@ const Page = ({ params }) => {
     useEffect(() => {
         const getRisk = async () => {
             const risksClient = await getRisksClient()
-            const riskDto = await risksClient.getByLocalId(params.id)
+            const riskDto = await risksClient.getByLocalId(id)
             setRisk(riskDto) // TODO: add sorting: by state: active, future, completed, then by start date
         }
 
         getRisk()
-    }, [])
+    }, [id])
 
     return (
         <>
