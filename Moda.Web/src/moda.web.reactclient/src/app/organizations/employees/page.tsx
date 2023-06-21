@@ -2,7 +2,7 @@
 
 import PageTitle from "@/src/app/components/common/page-title";
 import ModaGrid from "../../components/common/moda-grid";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { EmployeeListDto } from "@/src/services/moda-api";
 import { getEmployeesClient } from "@/src/services/clients";
 import { ItemType } from "antd/es/menu/hooks/useItems";

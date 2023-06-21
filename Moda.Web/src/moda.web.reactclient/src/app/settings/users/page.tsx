@@ -6,8 +6,15 @@ import ModaGrid from "../../components/common/moda-grid";
 import { UserDetailsDto } from "@/src/services/moda-api";
 import { getUsersClient } from "@/src/services/clients";
 import { authorizePage } from "../../components/hoc";
+import Link from "next/link";
 
-// TODO: check permissions
+const EmployeeLinkCellRenderer = ({ value, data }) => {
+  return (
+      <Link href={`/organizations/employees/${data.employee?.localId}`}>
+          {value}
+      </Link>
+  );
+};
 
 const Page = () => {
   const [users, setUsers] = useState<UserDetailsDto[]>([])
@@ -17,7 +24,7 @@ const Page = () => {
     { field: 'firstName' },
     { field: 'lastName' },
     { field: 'email' },
-    { field: 'employee.name', headerName: 'Employee' },
+    { field: 'employee.name', headerName: 'Employee', cellRenderer: EmployeeLinkCellRenderer },
     { field: 'isActive' } // TODO: convert to yes/no
   ], []);
 
