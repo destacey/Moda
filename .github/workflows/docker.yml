@@ -14,12 +14,13 @@ on:
 jobs:
   build-and-test-api:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: Moda.Web/src/Moda.Web.Api
     steps:
       - name: checkout
         uses: actions/checkout@v2
-
-      - name: debug
-        run: ls -asl .
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
