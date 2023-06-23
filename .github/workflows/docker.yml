@@ -43,6 +43,9 @@ jobs:
         shell: bash
         working-directory: Moda.Web/src/Moda.Web.ReactClient
     steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        
       - uses: actions/setup-node@v3
         with:
           node-version: 18
