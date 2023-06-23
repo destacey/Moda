@@ -110,7 +110,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Goals.Domain", "Moda.G
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Goals.Application", "Moda.Goals\src\Moda.Goals.Application\Moda.Goals.Application.csproj", "{F270ADA4-BFF3-43B4-BE64-BF7D80410B4E}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "moda.web.reactclient", "Moda.Web\src\Moda.Web.ReactClient\moda.web.reactclient.esproj", "{D566A94B-2FAB-4B43-8889-1844C2E0BC86}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "moda.web.reactclient", "Moda.Web\src\moda.web.reactclient\moda.web.reactclient.esproj", "{D566A94B-2FAB-4B43-8889-1844C2E0BC86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
