@@ -22,8 +22,6 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
 
-      - run: pwd
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -43,7 +41,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: Moda.Web/src/moda.web.reactclient
+        working-directory: Moda.Web/src/Moda.Web.ReactClient
     steps:
       - uses: actions/setup-node@v3
         with:
