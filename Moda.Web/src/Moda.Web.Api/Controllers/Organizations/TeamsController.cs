@@ -222,7 +222,7 @@ public class TeamsController : ControllerBase
     }
 
     [HttpPost("{id}/risks")]
-    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [MustHavePermission(ApplicationAction.Create, ApplicationResource.Risks)]
     [OpenApiOperation("Create a risk for a team.", "")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
@@ -254,7 +254,7 @@ public class TeamsController : ControllerBase
     }
 
     [HttpPut("{id}/risks/{riskId}")]
-    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Risks)]
     [OpenApiOperation("Update a team risk.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
