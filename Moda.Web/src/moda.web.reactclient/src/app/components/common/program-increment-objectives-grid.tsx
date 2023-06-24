@@ -5,7 +5,6 @@ import ModaGrid from "./moda-grid";
 import { Progress, Space, Switch } from "antd";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 
-// props
 export interface ProgramIncrementObjectivesGridProps {
     objectives: ProgramIncrementObjectiveListDto[];
     hideProgramIncrementColumn?: boolean;
