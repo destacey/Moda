@@ -20,13 +20,14 @@ const Page = () => {
         ProgramIncrementListDto[]
     >([]);
 
+    // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
     const columnDefs = useMemo(
         () => [
             { field: "localId", headerName: "#", width: 90 },
             { field: "name", cellRenderer: ProgramIncrementLinkCellRenderer },
             { field: "state", width: 125 },
-            { field: "start" },
-            { field: "end" },
+            { field: "start", valueGetter: (params) => new Date(params.data.start).toLocaleDateString() },
+            { field: "end", valueGetter: (params) => new Date(params.data.end).toLocaleDateString() },
         ],
         []
     );

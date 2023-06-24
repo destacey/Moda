@@ -2,13 +2,14 @@
 
 import PageTitle from "@/src/app/components/common/page-title";
 import { getProgramIncrementsClient } from "@/src/services/clients";
-import { ProgramIncrementDetailsDto, ProgramIncrementObjectiveListDto } from "@/src/services/moda-api";
+import { ProgramIncrementDetailsDto, ProgramIncrementObjectiveListDto, RiskListDto } from "@/src/services/moda-api";
 import { Card } from "antd";
 import { createElement, useEffect, useState } from "react";
 import ProgramIncrementDetails from "./program-increment-details";
 import ProgramIncrementObjectivesGrid from "@/src/app/components/common/program-increment-objectives-grid";
 import { TeamListItem } from "@/src/app/organizations/types";
 import TeamsGrid from "@/src/app/components/common/teams-grid";
+import RisksGrid from "@/src/app/components/common/risks-grid";
 
 const Page = ({ params }) => {
     const [activeTab, setActiveTab] = useState("details");
@@ -16,6 +17,7 @@ const Page = ({ params }) => {
         useState<ProgramIncrementDetailsDto | null>(null);
     const [teams, setTeams] = useState<TeamListItem[]>([]);
     const [objectives, setObjectives] = useState<ProgramIncrementObjectiveListDto[]>([]);
+    const [risks, setRisks] = useState<RiskListDto[]>([]);
 
     const tabs = [
         {
@@ -38,6 +40,11 @@ const Page = ({ params }) => {
                     hideTeamColumn: false
                 }),
         },
+        {
+            key: "risk-management",
+            tab: "Risk Management",
+            content: createElement(RisksGrid, {risks: risks}),
+        },
     ];
 
     useEffect(() => {
@@ -54,6 +61,10 @@ const Page = ({ params }) => {
 
             const objectiveDtos = await programIncrementsClient.getObjectives(programIncrementDto.id, null);
             setObjectives(objectiveDtos);
+
+            // TODO: setup the ability to change whether or not to show risks that are closed
+            const riskDtos = await programIncrementsClient.getRisks(programIncrementDto.id, true);
+            setRisks(riskDtos);
         };
 
         getProgramIncrement();
