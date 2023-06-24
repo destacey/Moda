@@ -1,13 +1,20 @@
-'use client'
+"use client";
 
-import PageTitle from "./components/common/page-title";
+import { Col, Row } from "antd";
+import ActiveProgramIncrements from "./components/common/planning/active-program-increments";
+import MyAssignedRisks from "./components/common/planning/my-assigned-risks";
 
 const Page = () => {
-  return (
-    <>
-      <PageTitle title="Home"/>
-    </>
-  );
-}
+    return (
+        <>
+            <ActiveProgramIncrements />
+            <Row>
+                <Col>
+                    <MyAssignedRisks />
+                </Col>
+            </Row>
+        </>
+    );
+};
 
 export default Page;

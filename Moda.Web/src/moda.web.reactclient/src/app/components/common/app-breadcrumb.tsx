@@ -34,7 +34,10 @@ const AppBreadcrumb = ({pathname}: AppBreadcrumbProps) => {
     )
   };
 
+  const isHome = pathname === '/';
+
   return (
+    !isHome &&
     <Breadcrumb separator='>' style={{ margin: '16px 0' }} itemRender={itemRender} items={pathItems} />
   )
 }
