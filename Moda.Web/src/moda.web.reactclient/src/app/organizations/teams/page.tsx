@@ -4,20 +4,10 @@ import PageTitle from "@/src/app/components/common/page-title";
 import { useCallback, useMemo, useState } from "react";
 import ModaGrid from "../../components/common/moda-grid";
 import { getTeamsClient, getTeamsOfTeamsClient } from "@/src/services/clients";
-import { TeamNavigationDto } from "@/src/services/moda-api";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import { Space, Switch } from "antd";
 import Link from "next/link";
-
-interface TeamListViewModel {
-  id: string,
-  localId: number,
-  name: string,
-  code: string,
-  type: string,
-  isActive: boolean,
-  teamOfTeams?: TeamNavigationDto | undefined
-}
+import { TeamListItem } from "../types";
 
 const TeamLinkCellRenderer = ({ value, data }) => {
     const teamRoute = data.type === 'Team' ? 'teams' : 'team-of-teams'
@@ -37,7 +27,7 @@ const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {
 };
 
 const Page = () => {
-  const [teams, setTeams] = useState<TeamListViewModel[]>([])
+  const [teams, setTeams] = useState<TeamListItem[]>([])
   const [includeDisabled, setIncludeDisabled] = useState<boolean>(false)
 
   const columnDefs = useMemo(() => [
@@ -67,7 +57,7 @@ const Page = () => {
     const teamsDtos = await teamsClient.getList(includeDisabled)
     const teamOfTeamsClient = await getTeamsOfTeamsClient()
     const teamOfTeamsDtos = await teamOfTeamsClient.getList(includeDisabled)
-    const teamVMs = [...teamsDtos as TeamListViewModel[], ...teamOfTeamsDtos as TeamListViewModel[]]
+    const teamVMs = [...teamsDtos as TeamListItem[], ...teamOfTeamsDtos as TeamListItem[]]
     setTeams(teamVMs)
   },[includeDisabled])
 

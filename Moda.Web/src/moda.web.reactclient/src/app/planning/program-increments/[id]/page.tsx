@@ -7,11 +7,14 @@ import { Card } from "antd";
 import { createElement, useEffect, useState } from "react";
 import ProgramIncrementDetails from "./program-increment-details";
 import ProgramIncrementObjectivesGrid from "@/src/app/components/common/program-increment-objectives-grid";
+import { TeamListItem } from "@/src/app/organizations/types";
+import TeamsGrid from "@/src/app/components/common/teams-grid";
 
 const Page = ({ params }) => {
     const [activeTab, setActiveTab] = useState("details");
     const [programIncrement, setProgramIncrement] =
         useState<ProgramIncrementDetailsDto | null>(null);
+    const [teams, setTeams] = useState<TeamListItem[]>([]);
     const [objectives, setObjectives] = useState<ProgramIncrementObjectiveListDto[]>([]);
 
     const tabs = [
@@ -19,6 +22,11 @@ const Page = ({ params }) => {
             key: "details",
             tab: "Details",
             content: createElement(ProgramIncrementDetails, programIncrement),
+        },
+        {
+            key: "teams",
+            tab: "Teams",
+            content: createElement(TeamsGrid, {teams: teams}),
         },
         {
             key: "objectives",
@@ -40,7 +48,10 @@ const Page = ({ params }) => {
 
             if (!programIncrementDto) return;
 
-            // TODO: move this to an onclick event based on when the user clicks the tab
+            // TODO: move these to an onclick event based on when the user clicks the tab
+            const teamDtos = await programIncrementsClient.getTeams(programIncrementDto.id);
+            setTeams(teamDtos as TeamListItem[]);
+
             const objectiveDtos = await programIncrementsClient.getObjectives(programIncrementDto.id, null);
             setObjectives(objectiveDtos);
         };
