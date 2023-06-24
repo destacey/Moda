@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import PageTitle from "./components/common/page-title";
-import { getProgramIncrementsClient } from "../services/clients";
+import { Col, Row } from "antd";
 import ActiveProgramIncrements from "./components/common/planning/active-program-increments";
+import MyAssignedRisks from "./components/common/planning/my-assigned-risks";
 
 const Page = () => {
     return (
         <>
             <ActiveProgramIncrements />
+            <Row>
+                <Col>
+                    <MyAssignedRisks />
+                </Col>
+            </Row>
         </>
     );
 };

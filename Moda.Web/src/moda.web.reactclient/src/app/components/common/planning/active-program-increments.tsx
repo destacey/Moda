@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PageTitle from "../page-title";
 import { getProgramIncrementsClient } from "@/src/services/clients";
-import { Col, Row } from "antd";
+import { Col, Divider, Row } from "antd";
 import ProgramIncrementCard from "./program-increment-card";
 
 const ActiveProgramIncrements = () => {
@@ -24,19 +24,19 @@ const ActiveProgramIncrements = () => {
 
     function RenderContent() {
         if (hasActiveProgramIncrements) {
-            let i = 0;
             return (
                 <>
-                    <PageTitle title="Active Program Increments" />
                     <Row>
-                            {activeProgramIncrements.map((pi) => (
-                                <Col key={i++} xs={24} sm={12} md={6} lg={4} >
-                                    <ProgramIncrementCard
-                                        programIncrement={pi}
-                                    />
-                                </Col>
-                            ))}
+                        <PageTitle title="Active Program Increments" />
                     </Row>
+                    <Row>
+                        {activeProgramIncrements.map((pi) => (
+                            <Col key={pi.localId} xs={24} sm={12} md={6} lg={4}>
+                                <ProgramIncrementCard programIncrement={pi} />
+                            </Col>
+                        ))}
+                    </Row>
+                    <Divider />
                 </>
             );
         }
