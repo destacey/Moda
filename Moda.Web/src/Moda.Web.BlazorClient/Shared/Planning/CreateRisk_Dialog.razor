@@ -85,6 +85,7 @@ else
                 <MudDatePicker Label="Follow Up" Editable="true" @bind-Date="_model.FollowUpDate" For="@(() => _model.FollowUpDate)" />
 
                 <MudTextField Label="Response"
+                              HelperText="Markdown enabled"
                               Lines="8"
                               MaxLength="1024" Counter="1024" Immediate="true"
                 @bind-Value="_model.Response"

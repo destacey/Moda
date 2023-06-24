@@ -1,15 +1,17 @@
-'use client'
+"use client";
 
 import PageTitle from "@/src/app/components/common/page-title";
-import { TeamDetailsDto } from "@/src/services/moda-api";
+import { RiskListDto, TeamDetailsDto } from "@/src/services/moda-api";
 import { Card } from "antd";
 import { createElement, useEffect, useState } from "react";
 import TeamDetails from "./team-details";
 import { getTeamsClient } from "@/src/services/clients";
+import RisksGrid from "@/src/app/components/common/risks-grid";
 
 const Page = ({ params }) => {
     const [activeTab, setActiveTab] = useState("details");
-    const [team, setTeam] = useState<TeamDetailsDto | null>(null)
+    const [team, setTeam] = useState<TeamDetailsDto | null>(null);
+    const [risks, setRisks] = useState<RiskListDto[]>([]);
     const { id } = params;
 
     const tabs = [
@@ -18,14 +20,23 @@ const Page = ({ params }) => {
             tab: "Details",
             content: createElement(TeamDetails, team),
         },
+        {
+            key: "risk-management",
+            tab: "Risk Management",
+            content: createElement(RisksGrid, { risks: risks, hideTeamColumn: true }),
+        },
     ];
 
     useEffect(() => {
         const getTeam = async () => {
             const teamsClient = await getTeamsClient();
-            const teamDto =
-                await teamsClient.getById(id);
-                setTeam(teamDto);
+            const teamDto = await teamsClient.getById(id);
+            setTeam(teamDto);
+
+            // TODO: move these to an onclick event based on when the user clicks the tab
+            // TODO: setup the ability to change whether or not to show risks that are closed
+            const riskDtos = await teamsClient.getRisks(teamDto.id, true);
+            setRisks(riskDtos);
         };
 
         getTeam();
@@ -33,10 +44,7 @@ const Page = ({ params }) => {
 
     return (
         <>
-            <PageTitle
-                title={team?.name}
-                subtitle="Team Details"
-            />
+            <PageTitle title={team?.name} subtitle="Team Details" />
             <Card
                 style={{ width: "100%" }}
                 tabList={tabs}

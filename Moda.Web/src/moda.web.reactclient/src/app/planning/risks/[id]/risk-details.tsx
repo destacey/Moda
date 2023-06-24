@@ -6,6 +6,11 @@ import { ReactMarkdown } from "react-markdown/lib/react-markdown";
 const { Item } = Descriptions;
 
 const RiskDetails = (risk: RiskDetailsDto) => {
+    const teamLink =
+        risk.team?.type === "Team"
+            ? `/organizations/teams/${risk.team?.localId}`
+            : `/organizations/team-of-teams/${risk.team?.localId}`;
+
     const followUpDate = risk.followUpDate
         ? new Date(risk.followUpDate)?.toLocaleDateString()
         : null;
@@ -27,7 +32,9 @@ const RiskDetails = (risk: RiskDetailsDto) => {
                 <Col xs={24} md={14}>
                     <Descriptions>
                         <Item label="Status">{risk.status?.name}</Item>
-                        <Item label="Team">{risk.team?.name}</Item>
+                        <Item label="Team">
+                            <Link href={teamLink}>{risk.team?.name}</Link>
+                        </Item>
                         <Item label="Category">{risk.category?.name}</Item>
                         <Item label="Follow-Up Date">{followUpDate}</Item>
                         <Item label="Assignee">
