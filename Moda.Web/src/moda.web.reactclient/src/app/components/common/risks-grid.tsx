@@ -5,7 +5,6 @@ import { RiskListDto } from "@/src/services/moda-api";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import { Space, Switch } from "antd";
 
-// props
 export interface RisksGridProps {
     risks: RiskListDto[];
     hideTeamColumn?: boolean;
