@@ -41,7 +41,7 @@ const Page = () => {
   const [includeDisabled, setIncludeDisabled] = useState<boolean>(false)
 
   const columnDefs = useMemo(() => [
-    { field: 'localId', headerName: '#', width: 75 },
+    { field: 'localId', headerName: '#', width: 90 },
     { field: 'name', cellRenderer: TeamLinkCellRenderer },
     { field: 'code', width: 125 },
     { field: 'type' },

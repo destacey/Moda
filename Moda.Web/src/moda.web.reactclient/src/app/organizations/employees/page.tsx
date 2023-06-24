@@ -31,7 +31,7 @@ const Page = () => {
 
     const columnDefs = useMemo(
         () => [
-            { field: "localId", headerName: "#", width: 75 },
+            { field: "localId", headerName: "#", width: 90 },
             { field: "displayName", headerName: "Name", cellRenderer: EmployeeLinkCellRenderer },
             { field: "jobTitle" },
             { field: "department" },

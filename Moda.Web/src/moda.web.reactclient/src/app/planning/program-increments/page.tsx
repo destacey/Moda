@@ -22,7 +22,7 @@ const Page = () => {
 
     const columnDefs = useMemo(
         () => [
-            { field: "localId", headerName: "#", width: 75 },
+            { field: "localId", headerName: "#", width: 90 },
             { field: "name", cellRenderer: ProgramIncrementLinkCellRenderer },
             { field: "state", width: 125 },
             { field: "start" },

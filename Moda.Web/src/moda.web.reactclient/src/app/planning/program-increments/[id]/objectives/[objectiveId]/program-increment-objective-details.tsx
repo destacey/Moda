@@ -33,16 +33,19 @@ const ProgramIncrementObjectiveDetails = (
             <Row>
                 <Col xs={24} md={12}>
                     <Descriptions>
-                        <Item label="Status">{objective.status?.name}</Item>
-                        <Item label="Is Stretch?">{objective.isStretch}</Item>
-                        <Item label="Team">
+                        <Item label="PI">
                             <Link
-                                href={teamLink}
+                                href={`/planning/program-increments/${objective.programIncrement?.localId}`}
                             >
-                                {objective.team?.name}
+                                {objective.programIncrement?.name}
                             </Link>
                         </Item>
+                        <Item label="Status">{objective.status?.name}</Item>
                         <Item label="Type">{objective.type?.name}</Item>
+                        <Item label="Is Stretch?">{objective.isStretch?.toString()}</Item>
+                        <Item label="Team">
+                            <Link href={teamLink}>{objective.team?.name}</Link>
+                        </Item>
                         <Item label="Start">{startDate}</Item>
                         <Item label="Target">{targetDate}</Item>
                     </Descriptions>
