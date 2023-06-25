@@ -6,7 +6,7 @@ import { Card } from "antd";
 import { createElement, useEffect, useState } from "react";
 import TeamOfTeamsDetails from "./team-of-teams-details";
 import { getTeamsOfTeamsClient } from "@/src/services/clients";
-import RisksGrid from "@/src/app/components/common/risks-grid";
+import RisksGrid from "@/src/app/components/common/planning/risks-grid";
 
 const Page = ({ params }) => {
     const [activeTab, setActiveTab] = useState("details");

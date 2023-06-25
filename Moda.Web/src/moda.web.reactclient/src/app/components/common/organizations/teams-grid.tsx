@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import ModaGrid from "./moda-grid";
-import { TeamListItem } from "../../organizations/types";
+import ModaGrid from "../moda-grid";
+import { TeamListItem } from "../../../organizations/types";
 
 // props
 export interface TeamsGridProps {
