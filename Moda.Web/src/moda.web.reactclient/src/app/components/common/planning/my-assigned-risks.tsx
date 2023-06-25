@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { getRisksClient } from "@/src/services/clients";
 import { Card, List } from "antd";
-import Title from "antd/es/typography/Title";
 import { RiskListDto } from "@/src/services/moda-api";
 import Link from "next/link";
 
@@ -19,11 +18,6 @@ const MyAssignedRisks = () => {
     }, []);
 
     const hasAssignedRisks = risks.length > 0;
-
-//     var followUp = risk.FollowUpDate.HasValue
-//     ? $" (follow-up: {risk.FollowUpDate?.ToString("d")})"
-//     : string.Empty;
-// return $"{risk.Summary}{followUp}";
 
     const riskMessage = (risk: RiskListDto) => {
         if (risk.followUpDate) {
