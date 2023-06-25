@@ -6,10 +6,10 @@ import { ProgramIncrementDetailsDto, ProgramIncrementObjectiveListDto, RiskListD
 import { Card } from "antd";
 import { createElement, useEffect, useState } from "react";
 import ProgramIncrementDetails from "./program-increment-details";
-import ProgramIncrementObjectivesGrid from "@/src/app/components/common/program-increment-objectives-grid";
+import ProgramIncrementObjectivesGrid from "@/src/app/components/common/planning/program-increment-objectives-grid";
 import { TeamListItem } from "@/src/app/organizations/types";
-import TeamsGrid from "@/src/app/components/common/teams-grid";
-import RisksGrid from "@/src/app/components/common/risks-grid";
+import TeamsGrid from "@/src/app/components/common/organizations/teams-grid";
+import RisksGrid from "@/src/app/components/common/planning/risks-grid";
 
 const Page = ({ params }) => {
     const [activeTab, setActiveTab] = useState("details");
