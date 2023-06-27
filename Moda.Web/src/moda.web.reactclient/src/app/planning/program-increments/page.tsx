@@ -6,6 +6,7 @@ import { getProgramIncrementsClient } from "@/src/services/clients";
 import { ProgramIncrementListDto } from "@/src/services/moda-api";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
+import { useDocumentTitle } from "../../hooks/use-document-title";
 
 const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
     return (
@@ -15,7 +16,8 @@ const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
     );
 };
 
-const Page = () => {
+const ProgramIncrementListPage = () => {
+    useDocumentTitle('Program Increments')
     const [programIncrements, setProgramIncrements] = useState<
         ProgramIncrementListDto[]
     >([]);
@@ -50,4 +52,4 @@ const Page = () => {
     );
 };
 
-export default Page;
+export default ProgramIncrementListPage;

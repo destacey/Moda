@@ -8,6 +8,7 @@ import { ItemType } from "antd/es/menu/hooks/useItems";
 import { Space, Switch } from "antd";
 import Link from "next/link";
 import { TeamListItem } from "../types";
+import { useDocumentTitle } from "../../hooks/use-document-title";
 
 const TeamLinkCellRenderer = ({ value, data }) => {
     const teamRoute = data.type === 'Team' ? 'teams' : 'team-of-teams'
@@ -26,7 +27,8 @@ const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {
     );
 };
 
-const Page = () => {
+const TeamListPage = () => {
+  useDocumentTitle('Teams')
   const [teams, setTeams] = useState<TeamListItem[]>([])
   const [includeDisabled, setIncludeDisabled] = useState<boolean>(false)
 
@@ -70,4 +72,4 @@ const Page = () => {
   );
 }
 
-export default Page;
+export default TeamListPage;

@@ -6,13 +6,15 @@ import PageTitle from "../../components/common/page-title";
 import ProfileForm from "./profile-form"
 import ClaimsGrid from "./claims-grid"
 import useAuth from "../../components/contexts/auth";
+import { useDocumentTitle } from "../../hooks/use-document-title";
 
 const tabs = [
   {key: 'profile', tab: 'Profile', content: React.createElement(ProfileForm)},
   {key: 'claims', tab: 'Claims', content: React.createElement(ClaimsGrid)},
 ]
 
-const Page = () => {
+const AccountProfilePage = () => {
+  useDocumentTitle('Account Profile')
   const {refreshUser} = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
 
@@ -21,8 +23,7 @@ const Page = () => {
       await refreshUser()
     }
     reloadUserPermissions()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [refreshUser])
 
   return (
     <>
@@ -38,4 +39,4 @@ const Page = () => {
   )
 }
 
-export default Page;
+export default AccountProfilePage;

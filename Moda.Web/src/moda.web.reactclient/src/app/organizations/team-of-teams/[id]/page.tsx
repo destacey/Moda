@@ -8,8 +8,10 @@ import TeamOfTeamsDetails from "./team-of-teams-details";
 import { getTeamsOfTeamsClient } from "@/src/services/clients";
 import RisksGrid from "@/src/app/components/common/planning/risks-grid";
 import TeamMembershipsGrid from "@/src/app/components/common/organizations/team-memberships-grid";
+import { useDocumentTitle } from "@/src/app/hooks/use-document-title";
 
-const Page = ({ params }) => {
+const TeamOfTeamsDetailsPage = ({ params }) => {
+    useDocumentTitle("Team of Teams Details");
     const [activeTab, setActiveTab] = useState("details");
     const [team, setTeam] = useState<TeamOfTeamsDetailsDto | null>(null);
     const [risks, setRisks] = useState<RiskListDto[]>([]);
@@ -67,4 +69,4 @@ const Page = ({ params }) => {
     );
 };
 
-export default Page;
+export default TeamOfTeamsDetailsPage;
