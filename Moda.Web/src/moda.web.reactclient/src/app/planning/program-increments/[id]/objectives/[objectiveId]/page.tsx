@@ -6,8 +6,10 @@ import { ProgramIncrementObjectiveDetailsDto } from "@/src/services/moda-api";
 import { Card } from "antd";
 import { createElement, useEffect, useState } from "react";
 import ProgramIncrementObjectiveDetails from "./program-increment-objective-details";
+import { useDocumentTitle } from "@/src/app/hooks/use-document-title";
 
-const Page = ({ params }) => {
+const ObjectiveDetailsPage = ({ params }) => {
+    useDocumentTitle("PI Objective Details");
     const [activeTab, setActiveTab] = useState("details");
     const [objective, setObjective] =
         useState<ProgramIncrementObjectiveDetailsDto | null>(null);
@@ -49,4 +51,4 @@ const Page = ({ params }) => {
     );
 };
 
-export default Page;
+export default ObjectiveDetailsPage;

@@ -3,11 +3,13 @@
 import PageTitle from "@/src/app/components/common/page-title";
 import { getRisksClient } from "@/src/services/clients";
 import { RiskDetailsDto } from "@/src/services/moda-api";
-import { createElement, useEffect, useState } from "react";
+import { createElement, use, useEffect, useState } from "react";
 import RiskDetails from "./risk-details";
 import { Card } from "antd";
+import { useDocumentTitle } from "@/src/app/hooks/use-document-title";
 
-const Page = ({ params }) => {
+const RiskDetailsPage = ({ params }) => {
+    useDocumentTitle('Risk Details')
     const [activeTab, setActiveTab] = useState('details')
     const [risk, setRisk] = useState<RiskDetailsDto | null>(null)
     const { id } = params
@@ -40,4 +42,4 @@ const Page = ({ params }) => {
     );
 }
 
-export default Page;
+export default RiskDetailsPage;

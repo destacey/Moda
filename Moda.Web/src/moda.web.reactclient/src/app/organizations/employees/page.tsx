@@ -8,6 +8,7 @@ import { getEmployeesClient } from "@/src/services/clients";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import { Space, Switch } from "antd";
 import Link from "next/link";
+import { useDocumentTitle } from "../../hooks/use-document-title";
 
 const EmployeeLinkCellRenderer = ({ value, data }) => {
     return (
@@ -25,10 +26,11 @@ const ManagerLinkCellRenderer = ({ value, data }) => {
     );
 };
 
-const Page = () => {
+const EmployeeListPage = () => {
+    useDocumentTitle('Employees')
     const [employees, setEmployees] = useState<EmployeeListDto[]>([]);
     const [includeInactive, setIncludeInactive] = useState<boolean>(false);
-
+    
     const columnDefs = useMemo(
         () => [
             { field: "localId", headerName: "#", width: 90 },
@@ -82,4 +84,4 @@ const Page = () => {
     );
 };
 
-export default Page;
+export default EmployeeListPage;

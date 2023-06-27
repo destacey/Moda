@@ -10,8 +10,10 @@ import ProgramIncrementObjectivesGrid from "@/src/app/components/common/planning
 import { TeamListItem } from "@/src/app/organizations/types";
 import TeamsGrid from "@/src/app/components/common/organizations/teams-grid";
 import RisksGrid from "@/src/app/components/common/planning/risks-grid";
+import { useDocumentTitle } from "@/src/app/hooks/use-document-title";
 
-const Page = ({ params }) => {
+const ProgramIncrementDetailsPage = ({ params }) => {
+    useDocumentTitle("PI Details");
     const [activeTab, setActiveTab] = useState("details");
     const [programIncrement, setProgramIncrement] =
         useState<ProgramIncrementDetailsDto | null>(null);
@@ -88,4 +90,4 @@ const Page = ({ params }) => {
     );
 };
 
-export default Page;
+export default ProgramIncrementDetailsPage;
