@@ -1,4 +1,4 @@
-import { GlobalToken } from "antd";
+import { GlobalToken } from 'antd'
 
 export interface ThemeContextType {
   currentThemeName: string

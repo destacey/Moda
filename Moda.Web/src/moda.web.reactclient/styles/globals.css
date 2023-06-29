@@ -12,7 +12,7 @@ body {
   transition: color 0.3s;
 }
 
- .trigger:hover {
+.trigger:hover {
   color: #1890ff;
 }
 
