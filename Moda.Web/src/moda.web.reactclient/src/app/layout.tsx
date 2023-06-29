@@ -1,15 +1,15 @@
 'use client'
 
 import '../../styles/globals.css'
-import React from 'react';
+import React from 'react'
 import { Layout } from 'antd'
-import { usePathname } from 'next/navigation';
-import { AuthenticatedTemplate } from '@azure/msal-react';
-import AppHeader from './components/common/app-header';
-import AppMenu from './components/common/menu';
-import AppBreadcrumb from './components/common/app-breadcrumb';
-import { ThemeProvider } from './components/contexts/theme';
-import { AuthProvider } from './components/contexts/auth';
+import { usePathname } from 'next/navigation'
+import { AuthenticatedTemplate } from '@azure/msal-react'
+import AppHeader from './components/common/app-header'
+import AppMenu from './components/common/menu'
+import AppBreadcrumb from './components/common/app-breadcrumb'
+import { ThemeProvider } from './components/contexts/theme'
+import { AuthProvider } from './components/contexts/auth'
 
 const { Content } = Layout
 //export const metadata: Metadata = {
@@ -55,5 +55,5 @@ export default function RootLayout({
         </AuthProvider>
       </body>
     </html>
-  );
-};
+  )
+}

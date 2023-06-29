@@ -1,9 +1,9 @@
 'use client'
 
-import { Col, Row } from "antd";
-import ActiveProgramIncrements from "./components/common/planning/active-program-increments";
-import MyAssignedRisks from "./components/common/planning/my-assigned-risks";
-import { useDocumentTitle } from "./hooks/use-document-title";
+import { Col, Row } from 'antd'
+import ActiveProgramIncrements from './components/common/planning/active-program-increments'
+import MyAssignedRisks from './components/common/planning/my-assigned-risks'
+import { useDocumentTitle } from './hooks/use-document-title'
 
 export const metadata = {
   title: {
@@ -12,18 +12,18 @@ export const metadata = {
 }
 
 const HomePage = () => {
-    useDocumentTitle("Home");
+  useDocumentTitle('Home')
 
-    return (
-        <>
-            <ActiveProgramIncrements />
-            <Row>
-                <Col>
-                    <MyAssignedRisks />
-                </Col>
-            </Row>
-        </>
-    );
-};
+  return (
+    <>
+      <ActiveProgramIncrements />
+      <Row>
+        <Col>
+          <MyAssignedRisks />
+        </Col>
+      </Row>
+    </>
+  )
+}
 
-export default HomePage;
+export default HomePage

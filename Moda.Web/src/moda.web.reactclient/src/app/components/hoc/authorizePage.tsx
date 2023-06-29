@@ -1,7 +1,6 @@
-import { ComponentType, FC } from "react"
-import NotAuthorized from "../common/not-authorized"
-import useAuth from "../contexts/auth"
-
+import { ComponentType, FC } from 'react'
+import NotAuthorized from '../common/not-authorized'
+import useAuth from '../contexts/auth'
 
 /**
  * A higher-order component that wraps a page component and checks if the user has the required claim to access the page.
@@ -11,20 +10,22 @@ import useAuth from "../contexts/auth"
  * @param {string} [requiredClaimValue] - The value of the claim required to access the page.
  * @returns {React.FC<P>} - A new component that either renders the wrapped page component or a "NotAuthorized" component based on the user's claim.
  */
-const authorizePage = <P extends object>(WrappedPage: ComponentType<P>, requiredClaimType?: string, requiredClaimValue?: string): FC<P> => {
-  const AuthorizePage: ComponentType<P> = ({...props }) => {
-
+const authorizePage = <P extends object>(
+  WrappedPage: ComponentType<P>,
+  requiredClaimType?: string,
+  requiredClaimValue?: string
+): FC<P> => {
+  const AuthorizePage: ComponentType<P> = ({ ...props }) => {
     const { hasClaim } = useAuth()
-    const wrappedPageName = WrappedPage.displayName 
-      || WrappedPage.name 
-      || 'Component'
-    
-      AuthorizePage.displayName = `authorizedPage(${wrappedPageName})`
-    
-    return (
-      hasClaim(requiredClaimType ?? "Permission", requiredClaimValue)
-      ? <WrappedPage {...props as P} />
-      : <NotAuthorized/>
+    const wrappedPageName =
+      WrappedPage.displayName || WrappedPage.name || 'Component'
+
+    AuthorizePage.displayName = `authorizedPage(${wrappedPageName})`
+
+    return hasClaim(requiredClaimType ?? 'Permission', requiredClaimValue) ? (
+      <WrappedPage {...(props as P)} />
+    ) : (
+      <NotAuthorized />
     )
   }
   return AuthorizePage
