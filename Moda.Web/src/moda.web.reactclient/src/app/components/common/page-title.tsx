@@ -1,7 +1,4 @@
-import { Button, Col, Row, Space, Typography } from 'antd'
-import Profile from '../Profile'
-import { Header } from 'antd/es/layout/layout'
-import { RightCircleFilled } from '@ant-design/icons'
+import { Col, Row, Typography } from 'antd'
 
 const { Title, Text } = Typography
 

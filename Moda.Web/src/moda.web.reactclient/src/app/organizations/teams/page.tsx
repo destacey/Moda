@@ -5,10 +5,11 @@ import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../../components/common/moda-grid'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
-import { Space, Switch } from 'antd'
+import { Button, Modal, Space, Switch } from 'antd'
 import Link from 'next/link'
 import { TeamListItem } from '../types'
 import { useDocumentTitle } from '../../hooks/use-document-title'
+import CreateTeamModal from '../../components/common/organizations/create-team-modal'
 
 const TeamLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.type === 'Team' ? 'teams' : 'team-of-teams'
@@ -29,6 +30,7 @@ const TeamListPage = () => {
   useDocumentTitle('Teams')
   const [teams, setTeams] = useState<TeamListItem[]>([])
   const [includeDisabled, setIncludeDisabled] = useState<boolean>(false)
+  const [openCreateTeamModal, setOpenCreateTeamModal] = useState<boolean>(false)
 
   const columnDefs = useMemo(
     () => [
@@ -45,6 +47,19 @@ const TeamListPage = () => {
     ],
     []
   )
+
+  const showCreateTeamModal = () => {
+    setOpenCreateTeamModal(true)
+    console.log('showCreateTeamModal:  ' + openCreateTeamModal)
+  }
+
+  const Actions = () => {
+    return (
+      <>
+        <Button onClick={showCreateTeamModal}>Create Team</Button>
+      </>
+    )
+  }
 
   const onIncludeDisabledChange = (checked: boolean) => {
     setIncludeDisabled(checked)
@@ -80,13 +95,22 @@ const TeamListPage = () => {
 
   return (
     <>
-      <PageTitle title="Teams" />
+      <PageTitle title="Teams" actions={<Actions />} />
       <ModaGrid
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
         rowData={teams}
         loadData={getTeams}
       />
+      <CreateTeamModal isOpen={openCreateTeamModal} />
+      {/* <Modal
+        title="Test modal"
+        open={openCreateTeamModal}
+        onOk={() => setOpenCreateTeamModal(false)}
+        onCancel={() => setOpenCreateTeamModal(false)}
+      >
+        <p>This is a test</p>
+      </Modal> */}
     </>
   )
 }
