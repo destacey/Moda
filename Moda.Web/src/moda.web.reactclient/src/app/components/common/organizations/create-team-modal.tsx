@@ -1,35 +1,42 @@
 'use client'
 
 import { Modal } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export interface CreateTeamModalProps {
-  isOpen: boolean
+  showModal: boolean
+  onModalClose: () => void
 }
 
-const CreateTeamModal = ({ isOpen }: CreateTeamModalProps) => {
-  const [open, setOpen] = useState(isOpen)
+const CreateTeamModal = ({ showModal, onModalClose }: CreateTeamModalProps) => {
+  const [isOpen, setIsOpen] = useState(false)
   const [confirmLoading, setConfirmLoading] = useState(false)
 
-  console.log('modal open state:  ' + open)
+  console.log('modal open state:  ' + isOpen)
+
+  useEffect(() => {
+    setIsOpen(showModal)
+  }, [showModal])
 
   const handleOk = () => {
     setConfirmLoading(true)
     setTimeout(() => {
-      setOpen(false)
+      setIsOpen(false)
+      onModalClose()
       setConfirmLoading(false)
     }, 2000)
   }
 
   const handleCancel = () => {
     console.log('Clicked cancel button')
-    setOpen(false)
+    setIsOpen(false)
+    onModalClose()
   }
 
   return (
     <Modal
       title="Create Team"
-      open={open}
+      open={isOpen}
       onOk={handleOk}
       confirmLoading={confirmLoading}
       onCancel={handleCancel}

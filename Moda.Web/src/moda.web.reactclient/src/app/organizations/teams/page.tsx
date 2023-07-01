@@ -102,15 +102,7 @@ const TeamListPage = () => {
         rowData={teams}
         loadData={getTeams}
       />
-      <CreateTeamModal isOpen={openCreateTeamModal} />
-      {/* <Modal
-        title="Test modal"
-        open={openCreateTeamModal}
-        onOk={() => setOpenCreateTeamModal(false)}
-        onCancel={() => setOpenCreateTeamModal(false)}
-      >
-        <p>This is a test</p>
-      </Modal> */}
+      <CreateTeamModal showModal={openCreateTeamModal} onModalClose={() => setOpenCreateTeamModal(false)} />
     </>
   )
 }
