@@ -1,4 +1,4 @@
-import { Col, Row, Typography } from 'antd'
+import { Col, Row, Space, Typography } from 'antd'
 
 const { Title, Text } = Typography
 
@@ -12,9 +12,9 @@ export interface PageTitleProps {
 const PageTitle = ({ title, subtitle, actions }: PageTitleProps) => {
   return (
     <>
-      <Row align="middle" style={{ marginBottom: '12px' }}>
+      <Row align={'middle'} style={{ marginBottom: '12px' }}>
         <Col sm={24} md={12}>
-          <Title level={2} style={{ marginBottom: '0px', fontWeight: '400' }}>
+          <Title level={2} style={{ margin: '0px', fontWeight: '400' }}>
             {title}
           </Title>
           {subtitle && <Text>{subtitle}</Text>}
