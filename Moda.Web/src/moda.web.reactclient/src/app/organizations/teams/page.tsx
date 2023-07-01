@@ -9,7 +9,7 @@ import { Button, Modal, Space, Switch } from 'antd'
 import Link from 'next/link'
 import { TeamListItem } from '../types'
 import { useDocumentTitle } from '../../hooks/use-document-title'
-import CreateTeamModal from '../../components/common/organizations/create-team-modal'
+import CreateTeamForm from '../../components/common/organizations/create-team-form'
 
 const TeamLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.type === 'Team' ? 'teams' : 'team-of-teams'
@@ -48,15 +48,12 @@ const TeamListPage = () => {
     []
   )
 
-  const showCreateTeamModal = () => {
-    setOpenCreateTeamModal(true)
-    console.log('showCreateTeamModal:  ' + openCreateTeamModal)
-  }
-
   const Actions = () => {
     return (
       <>
-        <Button onClick={showCreateTeamModal}>Create Team</Button>
+        <Button onClick={() => setOpenCreateTeamModal(true)}>
+          Create Team
+        </Button>
       </>
     )
   }
@@ -93,6 +90,13 @@ const TeamListPage = () => {
     setTeams(teamVMs)
   }, [includeDisabled])
 
+  const onCreateTeamFormClosed = (wasCreated: boolean) => {
+    setOpenCreateTeamModal(false)
+    if (wasCreated) {
+      // TODO: refresh grid, what dependency is needed for the useCallback to trigger this?
+    }
+  }
+
   return (
     <>
       <PageTitle title="Teams" actions={<Actions />} />
@@ -102,7 +106,11 @@ const TeamListPage = () => {
         rowData={teams}
         loadData={getTeams}
       />
-      <CreateTeamModal showModal={openCreateTeamModal} onModalClose={() => setOpenCreateTeamModal(false)} />
+      <CreateTeamForm
+        showForm={openCreateTeamModal}
+        onFormCreate={() => onCreateTeamFormClosed(true)}
+        onFormCancel={() => onCreateTeamFormClosed(false)}
+      />
     </>
   )
 }
