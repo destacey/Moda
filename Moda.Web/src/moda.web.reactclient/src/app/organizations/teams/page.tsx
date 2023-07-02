@@ -31,6 +31,7 @@ const TeamListPage = () => {
   const [teams, setTeams] = useState<TeamListItem[]>([])
   const [includeDisabled, setIncludeDisabled] = useState<boolean>(false)
   const [openCreateTeamModal, setOpenCreateTeamModal] = useState<boolean>(false)
+  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
 
   const columnDefs = useMemo(
     () => [
@@ -88,12 +89,14 @@ const TeamListPage = () => {
       ...(teamOfTeamsDtos as TeamListItem[]),
     ]
     setTeams(teamVMs)
-  }, [includeDisabled])
+  // Disabling warning because we want to refresh the list when the lastRefresh value changes even though it is not used in the callback
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [includeDisabled, lastRefresh])
 
   const onCreateTeamFormClosed = (wasCreated: boolean) => {
     setOpenCreateTeamModal(false)
     if (wasCreated) {
-      // TODO: refresh grid, what dependency is needed for the useCallback to trigger this?
+      setLastRefresh(Date.now())
     }
   }
 
