@@ -9,7 +9,7 @@ import { Button, Modal, Space, Switch } from 'antd'
 import Link from 'next/link'
 import { TeamListItem } from '../types'
 import { useDocumentTitle } from '../../hooks/use-document-title'
-import CreateTeamForm from '../../components/common/organizations/create-team-form'
+import CreateTeamForm from '../components/create-team-form'
 import useAuth from '../../components/contexts/auth'
 
 const TeamLinkCellRenderer = ({ value, data }) => {
