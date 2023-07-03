@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { TeamListItem } from '../types'
 import { useDocumentTitle } from '../../hooks/use-document-title'
 import CreateTeamForm from '../../components/common/organizations/create-team-form'
+import useAuth from '../../components/contexts/auth'
 
 const TeamLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.type === 'Team' ? 'teams' : 'team-of-teams'
@@ -33,6 +34,10 @@ const TeamListPage = () => {
   const [openCreateTeamModal, setOpenCreateTeamModal] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
 
+  const { hasClaim } = useAuth()
+  const canCreateTeam = hasClaim('Permission', 'Permissions.Teams.Create')
+  const showActions = canCreateTeam
+
   const columnDefs = useMemo(
     () => [
       { field: 'localId', headerName: '#', width: 90 },
@@ -52,9 +57,11 @@ const TeamListPage = () => {
   const Actions = () => {
     return (
       <>
-        <Button onClick={() => setOpenCreateTeamModal(true)}>
-          Create Team
-        </Button>
+        {canCreateTeam && (
+          <Button onClick={() => setOpenCreateTeamModal(true)}>
+            Create Team
+          </Button>
+        )}
       </>
     )
   }
@@ -89,8 +96,8 @@ const TeamListPage = () => {
       ...(teamOfTeamsDtos as TeamListItem[]),
     ]
     setTeams(teamVMs)
-  // Disabling warning because we want to refresh the list when the lastRefresh value changes even though it is not used in the callback
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Disabling warning because we want to refresh the list when the lastRefresh value changes even though it is not used in the callback
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [includeDisabled, lastRefresh])
 
   const onCreateTeamFormClosed = (wasCreated: boolean) => {
@@ -102,7 +109,7 @@ const TeamListPage = () => {
 
   return (
     <>
-      <PageTitle title="Teams" actions={<Actions />} />
+      <PageTitle title="Teams" actions={showActions && <Actions />} />
       <ModaGrid
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}

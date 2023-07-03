@@ -2,6 +2,7 @@
 
 import { Form, Input, Modal, Radio } from 'antd'
 import { useEffect, useState } from 'react'
+import useAuth from '../../contexts/auth'
 
 export interface CreateTeamFormProps {
   showForm: boolean
@@ -18,9 +19,18 @@ const CreateTeamForm = ({
   const [isSaving, setIsSaving] = useState(false)
   const [form] = Form.useForm()
 
+  const { hasClaim } = useAuth()
+  const canCreateTeam = hasClaim('Permission', 'Permissions.Teams.Create')
+
   useEffect(() => {
-    setIsOpen(showForm)
-  }, [showForm])
+    if (canCreateTeam) {
+      setIsOpen(showForm)
+    } else {
+      onFormCancel()
+      console.log('User does not have permission to create teams.')
+      // TODO: show an antd error message
+    }
+  }, [canCreateTeam, onFormCancel, showForm])
 
   const onCreate = (values) => {
     console.log('Received values of form: ', values)
