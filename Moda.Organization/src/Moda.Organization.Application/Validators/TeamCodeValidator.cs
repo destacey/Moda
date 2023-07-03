@@ -12,9 +12,9 @@ public sealed class TeamCodeValidator : CustomValidator<TeamCode>
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(x => x.Value)
-            .MinimumLength(2)
-            .MaximumLength(10)
-            .MustAsync(BeUniqueTeamCode).WithMessage("The Team code already exists.");
+            .MinimumLength(2).OverridePropertyName(string.Empty)
+            .MaximumLength(10).OverridePropertyName(string.Empty)
+            .MustAsync(BeUniqueTeamCode).OverridePropertyName(string.Empty).WithMessage("The Team code already exists.");
     }
 
     public async Task<bool> BeUniqueTeamCode(string code, CancellationToken cancellationToken)

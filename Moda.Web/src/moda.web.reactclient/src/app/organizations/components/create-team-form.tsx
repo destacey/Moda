@@ -122,6 +122,7 @@ const CreateTeamForm = ({
         <Form.Item
           label="Code"
           name="code"
+          help="Team codes are uppercase letters and numbers only, 2-10 characters."
           rules={[
             { required: true, message: 'The Code field is required.' },
             {
