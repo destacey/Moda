@@ -1,13 +1,25 @@
 'use client'
 
-import { Form, Input, Modal, Radio } from 'antd'
+import { Form, Input, Modal, Radio, message } from 'antd'
 import { useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
+import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
+import {
+  CreateTeamOfTeamsRequest,
+  CreateTeamRequest,
+} from '@/src/services/moda-api'
 
 export interface CreateTeamFormProps {
   showForm: boolean
   onFormCreate: () => void
   onFormCancel: () => void
+}
+
+interface CreateTeamFormValues {
+  type: 'Team' | 'TeamOfTeams'
+  name: string
+  code: string
+  description: string
 }
 
 const CreateTeamForm = ({
@@ -32,26 +44,46 @@ const CreateTeamForm = ({
     }
   }, [canCreateTeam, onFormCancel, showForm])
 
-  const onCreate = (values) => {
+  const onCreate = async (values: CreateTeamFormValues) => {
     console.log('Received values of form: ', values)
+    if (values.type === 'Team') {
+      await createTeam(values)
+    } else if (values.type === 'TeamOfTeams') {
+      await createTeamOfTeams(values)
+    }
+  }
+
+  const createTeam = async (values: CreateTeamFormValues) => {
+    const teamsClient = await getTeamsClient()
+    const response = await teamsClient.create(values as CreateTeamRequest)
+    console.log('createTeam response', response)
+  }
+
+  const createTeamOfTeams = async (values: CreateTeamFormValues) => {
+    const teamsOfTeamsClient = await getTeamsOfTeamsClient()
+    const response = await teamsOfTeamsClient.create(
+      values as CreateTeamOfTeamsRequest
+    )
+    console.log('createTeamOfTeams response', response)
   }
 
   const handleOk = () => {
     setIsSaving(true)
     form
       .validateFields()
-      .then((values) => {
-        form.resetFields()
-        onCreate(values)
+      .then(async (values) => {
+        await onCreate(values)
 
-        setTimeout(() => {
-          setIsOpen(false)
-          onFormCreate()
-          setIsSaving(false)
-        }, 2000)
+        setIsOpen(false)
+        setIsSaving(false)
+        form.resetFields()
+
+        onFormCreate()
       })
       .catch((info) => {
         console.log('Validate Failed:', info)
+        // TODO: handle 422 status code and show validation errors
+        message.error('Please correct the errors and try again.')
         setIsSaving(false)
       })
   }
@@ -76,8 +108,8 @@ const CreateTeamForm = ({
       <Form form={form} size="small" layout="vertical" name="create-team-form">
         <Form.Item label="Team Type" name="type" rules={[{ required: true }]}>
           <Radio.Group>
-            <Radio value="team">Team</Radio>
-            <Radio value="teamOfTeams">Team of Teams</Radio>
+            <Radio value="Team">Team</Radio>
+            <Radio value="TeamOfTeams">Team of Teams</Radio>
           </Radio.Group>
         </Form.Item>
         <Form.Item
@@ -114,7 +146,11 @@ const CreateTeamForm = ({
             }
           />
         </Form.Item>
-        <Form.Item name="description" label="Description">
+        <Form.Item
+          name="description"
+          label="Description"
+          help="Markdown enabled"
+        >
           <Input.TextArea
             autoSize={{ minRows: 6 }}
             showCount
