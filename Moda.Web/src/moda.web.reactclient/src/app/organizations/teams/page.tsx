@@ -5,10 +5,12 @@ import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../../components/common/moda-grid'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
-import { Space, Switch } from 'antd'
+import { Button, Modal, Space, Switch } from 'antd'
 import Link from 'next/link'
 import { TeamListItem } from '../types'
 import { useDocumentTitle } from '../../hooks/use-document-title'
+import CreateTeamForm from '../components/create-team-form'
+import useAuth from '../../components/contexts/auth'
 
 const TeamLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.type === 'Team' ? 'teams' : 'team-of-teams'
@@ -29,6 +31,12 @@ const TeamListPage = () => {
   useDocumentTitle('Teams')
   const [teams, setTeams] = useState<TeamListItem[]>([])
   const [includeDisabled, setIncludeDisabled] = useState<boolean>(false)
+  const [openCreateTeamModal, setOpenCreateTeamModal] = useState<boolean>(false)
+  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
+
+  const { hasClaim } = useAuth()
+  const canCreateTeam = hasClaim('Permission', 'Permissions.Teams.Create')
+  const showActions = canCreateTeam
 
   const columnDefs = useMemo(
     () => [
@@ -45,6 +53,18 @@ const TeamListPage = () => {
     ],
     []
   )
+
+  const Actions = () => {
+    return (
+      <>
+        {canCreateTeam && (
+          <Button onClick={() => setOpenCreateTeamModal(true)}>
+            Create Team
+          </Button>
+        )}
+      </>
+    )
+  }
 
   const onIncludeDisabledChange = (checked: boolean) => {
     setIncludeDisabled(checked)
@@ -76,16 +96,30 @@ const TeamListPage = () => {
       ...(teamOfTeamsDtos as TeamListItem[]),
     ]
     setTeams(teamVMs)
-  }, [includeDisabled])
+    // Disabling warning because we want to refresh the list when the lastRefresh value changes even though it is not used in the callback
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [includeDisabled, lastRefresh])
+
+  const onCreateTeamFormClosed = (wasCreated: boolean) => {
+    setOpenCreateTeamModal(false)
+    if (wasCreated) {
+      setLastRefresh(Date.now())
+    }
+  }
 
   return (
     <>
-      <PageTitle title="Teams" />
+      <PageTitle title="Teams" actions={showActions && <Actions />} />
       <ModaGrid
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
         rowData={teams}
         loadData={getTeams}
+      />
+      <CreateTeamForm
+        showForm={openCreateTeamModal}
+        onFormCreate={() => onCreateTeamFormClosed(true)}
+        onFormCancel={() => onCreateTeamFormClosed(false)}
       />
     </>
   )
