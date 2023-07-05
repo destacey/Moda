@@ -1,15 +1,15 @@
 'use client'
 
 import '../../styles/globals.css'
-import React from 'react'
+import React, { use, useEffect } from 'react'
 import { Layout } from 'antd'
-import { usePathname } from 'next/navigation'
 import { AuthenticatedTemplate } from '@azure/msal-react'
 import AppHeader from './components/common/app-header'
 import AppMenu from './components/common/menu'
 import AppBreadcrumb from './components/common/app-breadcrumb'
 import { ThemeProvider } from './components/contexts/theme'
 import { AuthProvider } from './components/contexts/auth'
+import { BreadcrumbsProvider } from './components/contexts/breadcrumbs/breadcrumbs-context'
 
 const { Content } = Layout
 //export const metadata: Metadata = {
@@ -25,8 +25,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const pathname = usePathname()
-
   return (
     <html lang="en">
       <body>
@@ -38,15 +36,17 @@ export default function RootLayout({
                 <Layout>
                   <AppMenu />
                   <Layout style={{ padding: '0 24px 24px' }}>
-                    <AppBreadcrumb pathname={pathname} />
-                    <Content
-                      style={{
-                        margin: 0,
-                        minHeight: 280,
-                      }}
-                    >
-                      {children}
-                    </Content>
+                    <BreadcrumbsProvider>
+                      <AppBreadcrumb />
+                      <Content
+                        style={{
+                          margin: 0,
+                          minHeight: 280,
+                        }}
+                      >
+                        {children}
+                      </Content>
+                    </BreadcrumbsProvider>
                   </Layout>
                 </Layout>
               </Layout>

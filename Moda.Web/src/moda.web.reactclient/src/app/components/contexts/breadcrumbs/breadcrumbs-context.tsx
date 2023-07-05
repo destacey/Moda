@@ -1,4 +1,4 @@
-import { createContext, use, useEffect, useState } from 'react'
+import { createContext, useState } from 'react'
 import { BreadcrumbsContextType, BreadcrumbModel } from './types'
 
 export const BreadcrumbsContext = createContext<BreadcrumbsContextType | null>(
