@@ -1,7 +1,6 @@
 'use client'
 
 import { Form, Input, Modal, Radio, message } from 'antd'
-import { FieldData } from 'rc-field-form/lib/interface'
 import { useEffect, useState } from 'react'
 import useAuth from '../../../components/contexts/auth'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
@@ -9,6 +8,7 @@ import {
   CreateTeamOfTeamsRequest,
   CreateTeamRequest,
 } from '@/src/services/moda-api'
+import { toFormErrors } from '@/src/utils'
 
 export interface CreateTeamFormProps {
   showForm: boolean
@@ -68,11 +68,7 @@ const CreateTeamForm = ({
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
-        const formErrors: FieldData[] = Object.keys(error.errors).map((key) => {
-          // Make the first letter of the key lowercase
-          const name = key.charAt(0).toLowerCase() + key.slice(1)
-          return { name, errors: [error.errors[key]] }
-        })
+        const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
         messageApi.error('Correct the validation error(s) to continue.')
       }
@@ -156,7 +152,7 @@ const CreateTeamForm = ({
             rules={[
               { required: true, message: 'The Code field is required.' },
               {
-                min: 1,
+                min: 2,
                 max: 10,
                 message: 'The Code field must be between 2-10 characters.',
               },
