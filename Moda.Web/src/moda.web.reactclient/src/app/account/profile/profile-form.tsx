@@ -1,11 +1,5 @@
-
-
 const ProfileForm = () => {
-  return (
-    <div>
-      Profile Form
-    </div>
-  )
+  return <div>Profile Form</div>
 }
 
 export default ProfileForm

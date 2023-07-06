@@ -1,12 +1,12 @@
-import { ThemeConfig, theme } from "antd";
+import { ThemeConfig, theme } from 'antd'
 
 const darkTheme: ThemeConfig = {
   token: {
     colorPrimary: '#1f83d2',
     borderRadius: 4,
-    wireframe: false
+    wireframe: false,
   },
-  algorithm: theme.darkAlgorithm
-};
+  algorithm: theme.darkAlgorithm,
+}
 
-  export default darkTheme;
+export default darkTheme

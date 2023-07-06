@@ -1,19 +1,32 @@
-import { Typography } from "antd";
+import { Col, Row, Space, Typography } from 'antd'
 
-const { Title, Text } = Typography;
+const { Title, Text } = Typography
 
 export interface PageTitleProps {
-  title: string;
-  subtitle?: string;
+  title: string
+  subtitle?: string
+  actions?: React.ReactNode | null
 }
 
-const PageTitle = ({ title, subtitle }: PageTitleProps) => {
+// TODO: align actions to the right/end when not the xs or sm breakpoint
+const PageTitle = ({ title, subtitle, actions }: PageTitleProps) => {
   return (
-    <div style={{marginBottom:'12px'}}>
-      <Title level={2} style={{marginTop:'8px', marginBottom:'0px', fontWeight:'400'}}>{title}</Title>
-      {subtitle && <Text>{subtitle}</Text>}
-    </div>
+    <>
+      <Row align={'middle'} style={{ marginBottom: '12px' }}>
+        <Col sm={24} md={12}>
+          <Title level={2} style={{ margin: '0px', fontWeight: '400' }}>
+            {title}
+          </Title>
+          {subtitle && <Text>{subtitle}</Text>}
+        </Col>
+        {actions && (
+          <Col sm={24} md={12}>
+            {actions}
+          </Col>
+        )}
+      </Row>
+    </>
   )
 }
 
-export default PageTitle;
+export default PageTitle

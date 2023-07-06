@@ -15,13 +15,13 @@
 	<ItemGroup>
 		<PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
 		<PackageReference Include="Mapster" Version="7.3.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.7" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.7" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="7.0.7" />
+		<PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="7.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-        <PackageReference Include="MudBlazor" Version="6.4.1" />
+        <PackageReference Include="MudBlazor" Version="6.6.0" />
         <PackageReference Include="MudBlazor.Markdown" Version="0.1.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="NSwag.MSBuild" Version="13.19.0">

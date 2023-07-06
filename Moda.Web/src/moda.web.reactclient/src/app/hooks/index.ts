@@ -1,2 +1,2 @@
-
-export { useLocalStorageState } from './use-local-storage-state';
+export { useLocalStorageState } from './use-local-storage-state'
+export { useDocumentTitle } from './use-document-title'
