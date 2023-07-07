@@ -1,5 +1,6 @@
-// import useBreadcrumbs from './use-breadcrumbs'
+import useBreadcrumbs from './use-breadcrumbs'
 
-// export { BreadcrumbsProvider, BreadcrumbsContext } from './breadcrumbs-context'
-// export type { BreadcrumbsContextType } from './types'
-// export default useBreadcrumbs
+export { BreadcrumbsProvider, BreadcrumbsContext } from './breadcrumbs-context'
+export { default as BreadcrumbSegment } from './breadcrumb-segment'
+export type { BreadcrumbContextType } from './types'
+export default useBreadcrumbs

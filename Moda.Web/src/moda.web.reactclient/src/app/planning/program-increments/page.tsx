@@ -5,9 +5,8 @@ import PageTitle from '@/src/app/components/common/page-title'
 import { getProgramIncrementsClient } from '@/src/services/clients'
 import { ProgramIncrementListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useDocumentTitle } from '../../hooks/use-document-title'
-import useBreadcrumbs from '../../components/contexts/breadcrumbs/use-breadcrumbs'
 
 const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
   return (
@@ -20,11 +19,6 @@ const ProgramIncrementListPage = () => {
   const [programIncrements, setProgramIncrements] = useState<
     ProgramIncrementListDto[]
   >([])
-  const { setBreadcrumbs } = useBreadcrumbs()
-
-  useEffect(() => {
-    setBreadcrumbs([])
-  }, [setBreadcrumbs])
 
   // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
   const columnDefs = useMemo(
