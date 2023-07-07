@@ -7,12 +7,14 @@ import EmployeeDetails from "./employee-details";
 import { getEmployeesClient } from "@/src/services/clients";
 import { Card } from "antd";
 import { useDocumentTitle } from "@/src/app/hooks/use-document-title";
+import useBreadcrumb from "@/src/app/components/contexts/breadcrumbs";
 
 const EmployeeDetailsPage = ({ params }) => {
     useDocumentTitle('Employee Details')
     const [activeTab, setActiveTab] = useState("details");
     const [employee, setEmployee] = useState<EmployeeDetailsDto | null>(null);
     const { id } = params;
+    const { setBreadcrumbTitle } = useBreadcrumb();
 
     const tabs = [
         {
@@ -27,10 +29,12 @@ const EmployeeDetailsPage = ({ params }) => {
             const employeesClient = await getEmployeesClient();
             const employeeDto = await employeesClient.getById(id);
             setEmployee(employeeDto);
+            setBreadcrumbTitle(employeeDto.displayName)
         };
 
         getEmployee();
-    }, [id]);
+        
+    }, [id, setBreadcrumbTitle]);
 
     return (
         <>

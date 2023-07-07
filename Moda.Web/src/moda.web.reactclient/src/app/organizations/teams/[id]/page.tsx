@@ -7,12 +7,13 @@ import {
   TeamMembershipsDto,
 } from '@/src/services/moda-api'
 import { Card } from 'antd'
-import { createElement, useEffect, useState } from 'react'
+import { createElement, use, useEffect, useState } from 'react'
 import TeamDetails from './team-details'
 import { getTeamsClient } from '@/src/services/clients'
 import RisksGrid from '@/src/app/components/common/planning/risks-grid'
 import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-memberships-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
+import useBreadcrumb from '@/src/app/components/contexts/breadcrumbs'
 
 const TeamDetailsPage = ({ params }) => {
   useDocumentTitle('Team Details')
@@ -23,6 +24,7 @@ const TeamDetailsPage = ({ params }) => {
     []
   )
   const { id } = params
+  const {setBreadcrumbTitle} = useBreadcrumb()
 
   const tabs = [
     {
@@ -59,10 +61,11 @@ const TeamDetailsPage = ({ params }) => {
         teamDto.id
       )
       setTeamMemberships(teamMembershipDtos)
+      setBreadcrumbTitle(teamDto.name)
     }
 
     getTeam()
-  }, [id])
+  }, [id, setBreadcrumbTitle])
 
   return (
     <>

@@ -13,6 +13,7 @@ import { getTeamsOfTeamsClient } from '@/src/services/clients'
 import RisksGrid from '@/src/app/components/common/planning/risks-grid'
 import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-memberships-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
+import useBreadcrumb from '@/src/app/components/contexts/breadcrumbs'
 
 const TeamOfTeamsDetailsPage = ({ params }) => {
   useDocumentTitle('Team of Teams Details')
@@ -23,6 +24,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     []
   )
   const { id } = params
+  const { setBreadcrumbTitle } = useBreadcrumb()
 
   const tabs = [
     {
@@ -59,10 +61,11 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
         teamDto.id
       )
       setTeamMemberships(teamMembershipDtos)
+      setBreadcrumbTitle(teamDto.name)
     }
 
     getTeam()
-  }, [id])
+  }, [id, setBreadcrumbTitle])
 
   return (
     <>

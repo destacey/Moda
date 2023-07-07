@@ -3,16 +3,18 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import { getRisksClient } from '@/src/services/clients'
 import { RiskDetailsDto } from '@/src/services/moda-api'
-import { createElement, use, useEffect, useState } from 'react'
+import { createElement, useEffect, useState } from 'react'
 import RiskDetails from './risk-details'
 import { Card } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
+import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 
 const RiskDetailsPage = ({ params }) => {
   useDocumentTitle('Risk Details')
   const [activeTab, setActiveTab] = useState('details')
   const [risk, setRisk] = useState<RiskDetailsDto | null>(null)
   const { id } = params
+  const {setBreadcrumbTitle} = useBreadcrumbs()
 
   const tabs = [
     {
@@ -27,10 +29,11 @@ const RiskDetailsPage = ({ params }) => {
       const risksClient = await getRisksClient()
       const riskDto = await risksClient.getByLocalId(id)
       setRisk(riskDto)
+      setBreadcrumbTitle(riskDto.summary)
     }
 
     getRisk()
-  }, [id])
+  }, [id, setBreadcrumbTitle])
 
   return (
     <>
