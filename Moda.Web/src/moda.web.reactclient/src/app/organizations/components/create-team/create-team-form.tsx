@@ -17,7 +17,7 @@ export interface CreateTeamFormProps {
 }
 
 interface CreateTeamFormValues {
-  type: 'Team' | 'TeamOfTeams'
+  type: 'Team' | 'Team of Teams'
   name: string
   code: string
   description: string
@@ -48,21 +48,19 @@ const CreateTeamForm = ({
   }, [canCreateTeam, onFormCancel, showForm, messageApi])
 
   useEffect(() => {
-    form.validateFields({validateOnly: true})
-      .then(
-        () => setIsValid(true && form.isFieldsTouched()),
-        () => setIsValid(false)
-      )
+    form.validateFields({ validateOnly: true }).then(
+      () => setIsValid(true && form.isFieldsTouched()),
+      () => setIsValid(false)
+    )
   }, [form, formValues])
 
   const create = async (values: CreateTeamFormValues): Promise<boolean> => {
     try {
       if (values.type === 'Team') {
         await createTeam(values)
-      } else if (values.type === 'TeamOfTeams') {
+      } else if (values.type === 'Team of Teams') {
         await createTeamOfTeams(values)
-      }
-      else {
+      } else {
         throw new Error(`Invalid team type: ${values.type}`)
       }
       return true
@@ -71,12 +69,13 @@ const CreateTeamForm = ({
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
         messageApi.error('Correct the validation error(s) to continue.')
-      }
-      else {
-        messageApi.error(`An unexpected error occurred while creating the ${values.type}.`)
+      } else {
+        messageApi.error(
+          `An unexpected error occurred while creating the ${values.type}.`
+        )
         console.error(error)
       }
-    
+
       return false
     }
   }
@@ -88,23 +87,20 @@ const CreateTeamForm = ({
 
   const createTeamOfTeams = async (values: CreateTeamFormValues) => {
     const teamsOfTeamsClient = await getTeamsOfTeamsClient()
-    await teamsOfTeamsClient.create(
-      values as CreateTeamOfTeamsRequest
-    )
+    await teamsOfTeamsClient.create(values as CreateTeamOfTeamsRequest)
   }
 
   const handleOk = async () => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values)){
+      if (await create(values)) {
         setIsOpen(false)
         setIsSaving(false)
         form.resetFields()
         onFormCreate()
         messageApi.success(`Successfully created ${values.type}.`)
-      }
-      else {
+      } else {
         setIsSaving(false)
       }
     } catch (errorInfo) {
@@ -125,25 +121,27 @@ const CreateTeamForm = ({
         title="Create Team"
         open={isOpen}
         onOk={handleOk}
-        okButtonProps={{disabled: !isValid}}
+        okButtonProps={{ disabled: !isValid }}
         okText="Create"
         confirmLoading={isSaving}
         onCancel={handleCancel}
+        maskClosable={false}
         closable={false}
         destroyOnClose={true}
       >
-        <Form form={form} size="small" layout="vertical" name="create-team-form">
+        <Form
+          form={form}
+          size="small"
+          layout="vertical"
+          name="create-team-form"
+        >
           <Form.Item label="Team Type" name="type" rules={[{ required: true }]}>
             <Radio.Group>
               <Radio value="Team">Team</Radio>
-              <Radio value="TeamOfTeams">Team of Teams</Radio>
+              <Radio value="Team of Teams">Team of Teams</Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true }]}
-          >
+          <Form.Item label="Name" name="name" rules={[{ required: true }]}>
             <Input showCount maxLength={128} />
           </Form.Item>
           <Form.Item
@@ -179,7 +177,7 @@ const CreateTeamForm = ({
             help="Markdown enabled"
           >
             <Input.TextArea
-              autoSize={{ minRows: 6 }}
+              autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={1024}
             />
