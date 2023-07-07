@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  moda.web.api:
+    image: ${DOCKER_REGISTRY-}modawebapi
+    build:
+      context: .
+      dockerfile: Moda.Web/src/Moda.Web.Api/Dockerfile
+
+  moda.web.client:
+    image: ${DOCKER_REGISTRY-}modawebclient
+    build:
+      context: Moda.Web/src/moda.web.reactclient
+      dockerfile: Dockerfile
