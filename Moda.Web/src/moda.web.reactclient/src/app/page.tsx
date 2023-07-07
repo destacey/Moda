@@ -8,6 +8,7 @@ import { useDocumentTitle } from './hooks/use-document-title'
 const HomePage = () => {
   useDocumentTitle('Home')
 
+  // TODO: have these load after the page is loaded
   return (
     <>
       <ActiveProgramIncrements />
