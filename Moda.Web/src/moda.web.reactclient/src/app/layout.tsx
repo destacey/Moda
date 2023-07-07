@@ -3,29 +3,21 @@
 import '../../styles/globals.css'
 import React from 'react'
 import { Layout } from 'antd'
-import { usePathname } from 'next/navigation'
 import { AuthenticatedTemplate } from '@azure/msal-react'
 import AppHeader from './components/common/app-header'
 import AppMenu from './components/common/menu'
 import AppBreadcrumb from './components/common/app-breadcrumb'
 import { ThemeProvider } from './components/contexts/theme'
 import { AuthProvider } from './components/contexts/auth'
+import { BreadcrumbsProvider } from './components/contexts/breadcrumbs'
 
 const { Content } = Layout
-//export const metadata: Metadata = {
-//  title: {
-//    template: 'Moda | {{title}}',
-//    default: 'Moda'
-//  },
-//  description: 'Moda is a work management system used to plan, manage, and create associations across work items, projects, teams, planning and products. It helps track, align, and deliver work across organizations.',
-//}
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const pathname = usePathname()
 
   return (
     <html lang="en">
@@ -38,15 +30,17 @@ export default function RootLayout({
                 <Layout>
                   <AppMenu />
                   <Layout style={{ padding: '0 24px 24px' }}>
-                    <AppBreadcrumb pathname={pathname} />
-                    <Content
-                      style={{
-                        margin: 0,
-                        minHeight: 280,
-                      }}
-                    >
-                      {children}
-                    </Content>
+                  <BreadcrumbsProvider>
+                      <AppBreadcrumb />
+                      <Content
+                        style={{
+                          margin: 0,
+                          minHeight: 280,
+                        }}
+                      >
+                        {children}
+                      </Content>
+                    </BreadcrumbsProvider>
                   </Layout>
                 </Layout>
               </Layout>

@@ -1,31 +1,36 @@
 import { Breadcrumb } from 'antd'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Typography } from 'antd'
-import { capitalize } from '@/src/utils/strings'
+import useBreadcrumbs, { BreadcrumbSegment } from '../contexts/breadcrumbs'
+import { usePathname } from 'next/navigation'
 
-const { Text } = Typography
 export interface AppBreadcrumbProps {
-  pathname: string
 }
 
-const AppBreadcrumb = ({ pathname }: AppBreadcrumbProps) => {
+const AppBreadcrumb = () => {
   const [pathItems, setPathItems] = useState<ItemType[]>([])
+  const pathname = usePathname()
+  const { breadcrumbRoute } = useBreadcrumbs()
 
   useEffect(() => {
-    const pathItems = [
-      'home',
-      ...pathname.split('/').filter((item) => item !== ''),
-    ].map((item) => {
-      return {
-        title: capitalize(item),
-        path: item === 'home' ? '/' : '/' + item,
-      }
-    })
-
-    setPathItems(pathItems)
-  }, [pathname])
+    // Only use the breadcrumbRoute if the pathname matches the current route
+    if (pathname === breadcrumbRoute?.pathname && breadcrumbRoute?.fullRoute) {
+        setPathItems(breadcrumbRoute.fullRoute)
+    }
+    else {
+      const title = pathname === breadcrumbRoute?.pathname ? breadcrumbRoute?.title : null
+      const pathSegments = pathname.split('/').filter((item) => item !== '')
+      const pathItems: ItemType[] = pathSegments.map((item, index) => {
+        return {
+          path: item,
+          breadcrumbName: title && index === pathSegments.length - 1 ? title : null,
+          href: '/' + pathSegments.slice(0, index + 1).join('/'),
+        }
+      })
+  
+      setPathItems(pathItems)
+    }
+  }, [pathname, breadcrumbRoute])
 
   const itemRender = (
     route: ItemType,
@@ -34,11 +39,7 @@ const AppBreadcrumb = ({ pathname }: AppBreadcrumbProps) => {
     paths: string[]
   ) => {
     const last = routes.indexOf(route) === routes.length - 1
-    return last ? (
-      <Text>{route.title}</Text>
-    ) : (
-      <Link href={paths.join('/') || '/'}>{route.title}</Link>
-    )
+    return <BreadcrumbSegment route={route} paths={paths} last={last} />
   }
 
   const isHome = pathname === '/'

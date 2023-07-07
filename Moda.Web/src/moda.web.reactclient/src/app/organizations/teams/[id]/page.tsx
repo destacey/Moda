@@ -15,6 +15,7 @@ import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import UpdateTeamForm from '../../components/create-team/update-team-form'
 import useAuth from '@/src/app/components/contexts/auth'
+import useBreadcrumb from '@/src/app/components/contexts/breadcrumbs'
 
 const TeamDetailsPage = ({ params }) => {
   useDocumentTitle('Team Details')
@@ -27,6 +28,7 @@ const TeamDetailsPage = ({ params }) => {
   const [openUpdateTeamModal, setOpenUpdateTeamModal] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
   const { id } = params
+  const { setBreadcrumbTitle } = useBreadcrumb()
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
@@ -79,10 +81,11 @@ const TeamDetailsPage = ({ params }) => {
         teamDto.id
       )
       setTeamMemberships(teamMembershipDtos)
+      setBreadcrumbTitle(teamDto.name)
     }
 
     getTeam()
-  }, [id, lastRefresh])
+  }, [id, setBreadcrumbTitle, lastRefresh])
 
   const onUpdateTeamFormClosed = (wasUpdated: boolean) => {
     setOpenUpdateTeamModal(false)

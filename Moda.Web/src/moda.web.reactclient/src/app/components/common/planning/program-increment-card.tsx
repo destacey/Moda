@@ -20,7 +20,7 @@ const ProgramIncrementCard = ({
       size="small"
       title={programIncrement.name}
       extra={
-        <Link href={`/planning/program-increments/${programIncrement.id}`}>
+        <Link href={`/planning/program-increments/${programIncrement.localId}`}>
           Details
         </Link>
       }
