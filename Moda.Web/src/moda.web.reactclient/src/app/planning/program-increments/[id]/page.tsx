@@ -15,6 +15,7 @@ import { TeamListItem } from '@/src/app/organizations/types'
 import TeamsGrid from '@/src/app/components/common/organizations/teams-grid'
 import RisksGrid from '@/src/app/components/common/planning/risks-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
+import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 
 const ProgramIncrementDetailsPage = ({ params }) => {
   useDocumentTitle('PI Details')
@@ -26,6 +27,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     ProgramIncrementObjectiveListDto[]
   >([])
   const [risks, setRisks] = useState<RiskListDto[]>([])
+  const { setBreadcrumbTitle } = useBreadcrumbs()
 
   const tabs = [
     {
@@ -61,6 +63,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
         params.id
       )
       setProgramIncrement(programIncrementDto)
+      setBreadcrumbTitle(programIncrementDto.name)
 
       if (!programIncrementDto) return
 
@@ -85,7 +88,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     }
 
     getProgramIncrement()
-  }, [params.id])
+  }, [params.id, setBreadcrumbTitle])
 
   return (
     <>

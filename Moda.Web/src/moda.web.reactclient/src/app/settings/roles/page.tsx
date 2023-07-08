@@ -7,7 +7,6 @@ import { RoleListDto } from '@/src/services/moda-api'
 import { getRolesClient } from '@/src/services/clients'
 import { authorizePage } from '../../components/hoc'
 
-// TODO: check permissions
 const Page = () => {
   const [roles, setRoles] = useState<RoleListDto[]>([])
 

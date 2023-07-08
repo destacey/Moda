@@ -6,13 +6,16 @@ import {
   TeamMembershipsDto,
   TeamOfTeamsDetailsDto,
 } from '@/src/services/moda-api'
-import { Card } from 'antd'
+import { Button, Card } from 'antd'
 import { createElement, useEffect, useState } from 'react'
 import TeamOfTeamsDetails from './team-of-teams-details'
 import { getTeamsOfTeamsClient } from '@/src/services/clients'
 import RisksGrid from '@/src/app/components/common/planning/risks-grid'
 import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-memberships-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
+import UpdateTeamForm from '../../components/create-team/update-team-form'
+import useAuth from '@/src/app/components/contexts/auth'
+import useBreadcrumb from '@/src/app/components/contexts/breadcrumbs'
 
 const TeamOfTeamsDetailsPage = ({ params }) => {
   useDocumentTitle('Team of Teams Details')
@@ -22,7 +25,26 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   const [teamMemberships, setTeamMemberships] = useState<TeamMembershipsDto[]>(
     []
   )
+  const [openUpdateTeamModal, setOpenUpdateTeamModal] = useState<boolean>(false)
+  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
   const { id } = params
+  const { setBreadcrumbTitle } = useBreadcrumb()
+
+  const { hasClaim } = useAuth()
+  const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
+  const showActions = canUpdateTeam
+
+  const Actions = () => {
+    return (
+      <>
+        {canUpdateTeam && (
+          <Button onClick={() => setOpenUpdateTeamModal(true)}>
+            Edit Team
+          </Button>
+        )}
+      </>
+    )
+  }
 
   const tabs = [
     {
@@ -59,14 +81,27 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
         teamDto.id
       )
       setTeamMemberships(teamMembershipDtos)
+      setBreadcrumbTitle(teamDto.name)
     }
 
     getTeam()
-  }, [id])
+  }, [id, setBreadcrumbTitle, lastRefresh])
+
+  const onUpdateTeamFormClosed = (wasUpdated: boolean) => {
+    setOpenUpdateTeamModal(false)
+    if (wasUpdated) {
+      // TODO: refresh the team details only
+      setLastRefresh(Date.now())
+    }
+  }
 
   return (
     <>
-      <PageTitle title={team?.name} subtitle="Team of Teams Details" />
+      <PageTitle
+        title={team?.name}
+        subtitle="Team of Teams Details"
+        actions={showActions && <Actions />}
+      />
       <Card
         style={{ width: '100%' }}
         tabList={tabs}
@@ -75,6 +110,15 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
+      {team && (
+        <UpdateTeamForm
+          showForm={openUpdateTeamModal}
+          localId={team.localId}
+          type={team.type}
+          onFormUpdate={() => onUpdateTeamFormClosed(true)}
+          onFormCancel={() => onUpdateTeamFormClosed(false)}
+        />
+      )}
     </>
   )
 }

@@ -16,6 +16,8 @@ import {
   menuItem,
   restrictedMenuItem,
 } from './menu-helper'
+import useMenuToggle from '../../contexts/menu-toggle'
+import useTheme from '../../contexts/theme'
 
 const menu: (Item | MenuItem)[] = [
   menuItem('Home', 'home', '/', <HomeOutlined />),
@@ -74,8 +76,9 @@ const menu: (Item | MenuItem)[] = [
 ]
 
 export default function AppMenu() {
-  const [collapsed, setCollapsed] = useState(false)
+  const { menuCollapsed } = useMenuToggle()
   const [menuItems, setMenuItems] = useState<ItemType<MenuItemType>[]>([])
+  const { currentThemeName } = useTheme()
   const { hasClaim } = useAuth()
 
   useEffect(() => {
@@ -89,17 +92,16 @@ export default function AppMenu() {
 
   return (
     <Sider
-      width={200}
+      theme={currentThemeName} // without this the menu displays weird faint lines on the left side below the menu items
+      width={235}
       collapsedWidth={50}
-      collapsible
-      collapsed={collapsed}
-      onCollapse={(value) => setCollapsed(value)}
+      collapsed={menuCollapsed}
     >
       <Menu
         mode="inline"
         defaultSelectedKeys={['1']}
         defaultOpenKeys={['sub1']}
-        style={{ height: '100%', borderRight: 0 }}
+        style={{ height: '100vh' }}
         items={menuItems}
       />
     </Sider>
