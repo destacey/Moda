@@ -14,14 +14,14 @@ const PageTitle = ({ title, subtitle, actions }: PageTitleProps) => {
   return (
     <>
       <Row align={'middle'} style={{ marginBottom: '12px' }}>
-        <Col sm={24} md={mdSize}>
+        <Col xs={24} sm={24} md={mdSize}>
           <Title level={2} style={{ margin: '0px', fontWeight: '400' }}>
             {title}
           </Title>
           {subtitle && <Text>{subtitle}</Text>}
         </Col>
         {actions && (
-          <Col sm={24} md={mdSize}>
+          <Col xs={24} sm={24} md={mdSize}>
             {actions}
           </Col>
         )}
