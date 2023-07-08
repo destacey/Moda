@@ -41,7 +41,8 @@ const TeamsGrid = ({ teams }: TeamsGridProps) => {
 
   return (
     <>
-      <ModaGrid columnDefs={columnDefs} rowData={teams} />
+      {/* TODO:  setup dynamic height */}
+      <ModaGrid height={550} columnDefs={columnDefs} rowData={teams} />
     </>
   )
 }
