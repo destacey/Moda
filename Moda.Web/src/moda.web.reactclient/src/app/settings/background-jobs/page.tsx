@@ -7,8 +7,6 @@ import { BackgroundJobDto } from '@/src/services/moda-api'
 import { getBackgroundJobsClient } from '@/src/services/clients'
 import { authorizePage } from '../../components/hoc'
 
-// TODO: check permissions
-
 const Page = () => {
   const [backgroundJobs, setBackgroundJobs] = useState<BackgroundJobDto[]>([])
 

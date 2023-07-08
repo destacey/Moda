@@ -1,9 +1,15 @@
-import { Typography } from 'antd'
+import { Result, Typography } from 'antd'
 
 const { Title } = Typography
 
 const NotAuthorized = () => {
-  return <Title level={2}>Not Authorized</Title>
+  return (
+    <Result
+      status="403"
+      title="403"
+      subTitle="Sorry, you are not authorized to access this page."
+    />
+  )
 }
 
 export default NotAuthorized
