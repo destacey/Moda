@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Mapster;
+using Microsoft.ApplicationInsights.DependencyCollector;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -21,6 +22,7 @@ public static class ConfigureServices
 
         // INTEGRATIONS
         services.AddScoped<IExternalEmployeeDirectoryService, MicrosoftGraphService>();
+        services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, o) => { module.EnableSqlCommandTextInstrumentation = true; });
 
         return services
             .AddApiVersioning()

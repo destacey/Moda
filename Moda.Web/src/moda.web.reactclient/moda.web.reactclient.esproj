@@ -2,10 +2,14 @@
   <PropertyGroup>
     <StartupCommand>set BROWSER=none&amp;&amp;npm run dev</StartupCommand>
     <!-- Command to run on project build -->
-    <BuildCommand></BuildCommand>
+    <BuildCommand>
+    </BuildCommand>
     <!-- Command to create an optimized build of the project that's ready for publishing -->
     <ProductionBuildCommand>npm run build</ProductionBuildCommand>
     <!-- Folder where production build objects will be placed -->
     <BuildOutputFolder>$(MSBuildProjectDirectory)\build</BuildOutputFolder>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include=".docker\Dockerfile" />
+  </ItemGroup>
 </Project>
