@@ -3,15 +3,13 @@ import { useLocalStorageState } from '@/src/app/hooks'
 import { ConfigProvider, ThemeConfig, theme } from 'antd'
 import lightTheme from '@/src/config/theme/light-theme'
 import darkTheme from '@/src/config/theme/dark-theme'
-import { ThemeContextType } from './types'
+import { ThemeContextType, ThemeName } from './types'
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
 export const ThemeProvider = ({ children }) => {
-  const [currentThemeName, setCurrentThemeName] = useLocalStorageState(
-    'modaTheme',
-    'light'
-  )
+  const [currentThemeName, setCurrentThemeName] =
+    useLocalStorageState<ThemeName>('modaTheme', 'light')
   const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(undefined)
   const [appBarColor, setAppBarColor] = useState('')
   const [agGridTheme, setAgGridTheme] = useState('')
