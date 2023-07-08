@@ -60,7 +60,10 @@ describe('withAuthorization', () => {
     const WrappedComponent = withAuthorization(MockComponent)
     const { getByText } = renderComponent(<WrappedComponent {...mockProps} />)
 
-    expect(getByText('Not Authorized')).toBeInTheDocument()
+    expect(getByText('403')).toBeInTheDocument()
+    expect(
+      getByText('Sorry, you are not authorized to access this page.')
+    ).toBeInTheDocument()
     expect(mockHasClaim).toHaveBeenCalledWith(
       'Permission',
       mockProps.claimValue
