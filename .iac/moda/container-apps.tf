@@ -210,12 +210,7 @@ resource "azurerm_container_app" "moda_backend" {
 
       env {
         name  = "CorsSettings__WebClient"
-        value = azurerm_container_app.moda_frontend.ingress.0.fqdn
-      }
-
-      env {
-        name  = "CorsSettings__WebClient"
-        value = "https://${azurerm_static_site.moda_swa.default_host_name}"
+        value = "https://${azurerm_static_site.moda_swa.default_host_name},https://${azurerm_container_app.moda_frontend.ingress.0.fqdn}"
       }
     }
   }
