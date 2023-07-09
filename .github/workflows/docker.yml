@@ -123,7 +123,7 @@ jobs:
     terraform:
         name: "Terraform"
         runs-on: ubuntu-latest
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev/tf-action-deploy')
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
         needs: [build-and-push-image]
         defaults:
             run:
