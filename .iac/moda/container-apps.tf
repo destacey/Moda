@@ -55,23 +55,23 @@ resource "azurerm_container_app" "moda_frontend" {
       #   initial_delay           = 15
       # }
 
-      # readiness_probe {
-      #   port                    = 8080
-      #   transport               = "HTTP"
-      #   path                    = "/health"
-      #   timeout                 = 3
-      #   failure_count_threshold = 5
-      #   interval_seconds        = 30
-      # }
+      readiness_probe {
+        port                    = 8080
+        transport               = "HTTP"
+        path                    = "/api/health"
+        timeout                 = 3
+        failure_count_threshold = 5
+        interval_seconds        = 30
+      }
 
-      # startup_probe {
-      #   port                    = 8080
-      #   transport               = "HTTP"
-      #   path                    = "/startup"
-      #   timeout                 = 2
-      #   failure_count_threshold = 5
-      #   interval_seconds        = 10
-      # }
+      startup_probe {
+        port                    = 8080
+        transport               = "HTTP"
+        path                    = "/api/health"
+        timeout                 = 2
+        failure_count_threshold = 5
+        interval_seconds        = 10
+      }
     }
   }
 }
@@ -128,7 +128,7 @@ resource "azurerm_container_app" "moda_backend" {
       readiness_probe {
         port                    = 8080
         transport               = "HTTP"
-        path                    = "/api/health"
+        path                    = "/startup"
         timeout                 = 3
         failure_count_threshold = 5
         interval_seconds        = 30
