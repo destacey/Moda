@@ -7,6 +7,10 @@ output "api_hostname" {
   value = azurerm_container_app.moda_backend.ingress.0.fqdn
 }
 
+output "client_hostname" {
+  value = azurerm_container_app.moda_frontend.ingress.0.fqdn
+}
+
 output "swa_token" {
   value     = azurerm_static_site.moda_swa.api_key
   sensitive = true
