@@ -24,7 +24,7 @@ resource "azurerm_container_app" "moda_frontend" {
 
   ingress {
     external_enabled = true
-    target_port      = 8080
+    target_port      = 3000
 
     traffic_weight {
       percentage      = 100
@@ -56,7 +56,7 @@ resource "azurerm_container_app" "moda_frontend" {
       # }
 
       readiness_probe {
-        port                    = 8080
+        port                    = 3000
         transport               = "HTTP"
         path                    = "/api/health"
         timeout                 = 3
@@ -65,7 +65,7 @@ resource "azurerm_container_app" "moda_frontend" {
       }
 
       startup_probe {
-        port                    = 8080
+        port                    = 3000
         transport               = "HTTP"
         path                    = "/api/health"
         timeout                 = 2
