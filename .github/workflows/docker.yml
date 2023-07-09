@@ -174,7 +174,9 @@ jobs:
             dotnet-version: 7.0.x
 
         - name: Workload restore
-          run: dotnet workload restore
+          run: |
+            cd Moda.Web/src/Moda.Web.BlazorClient
+            dotnet workload restore
 
         - name: Restore dependencies
           run: dotnet restore
