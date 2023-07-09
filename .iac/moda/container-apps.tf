@@ -208,10 +208,10 @@ resource "azurerm_container_app" "moda_backend" {
         value = "https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef/oauth2/v2.0/token"
       }
 
-      # env {
-      #   name  = "CorsSettings__WebClient"
-      #   value = "https://moda.ahstech.com"
-      # }
+      env {
+        name  = "CorsSettings__WebClient"
+        value = azurerm_container_app.moda_frontend.ingress.0.fqdn
+      }
 
       env {
         name  = "CorsSettings__WebClient"
