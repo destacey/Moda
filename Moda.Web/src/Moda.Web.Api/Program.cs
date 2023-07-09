@@ -69,6 +69,7 @@ try
 
     app.UseInfrastructure(builder.Configuration);
     app.MapEndpoints();
+    app.MapGet("/startup", () => Results.Ok());
     app.Run();
 }
 catch (Exception ex) when (!ex.GetType().Name.Equals("HostAbortedException", StringComparison.Ordinal))
