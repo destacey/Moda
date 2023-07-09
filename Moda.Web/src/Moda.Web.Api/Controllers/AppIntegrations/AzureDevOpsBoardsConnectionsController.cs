@@ -61,7 +61,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Connections)]
     [OpenApiOperation("Create an Azure DevOps Boards connection.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Guid))]
     public async Task<ActionResult> Create(CreateAzureDevOpsBoardConnectionRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateConnectionCommand(), cancellationToken);

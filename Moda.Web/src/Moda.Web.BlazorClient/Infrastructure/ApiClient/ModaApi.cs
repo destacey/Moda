@@ -2071,14 +2071,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a program increment.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateProgramIncrementRequest request);
+        System.Threading.Tasks.Task<System.Guid> CreateAsync(CreateProgramIncrementRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a program increment.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateProgramIncrementRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Guid> CreateAsync(CreateProgramIncrementRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get program increment details.
@@ -2162,14 +2162,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a program increment objective.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateObjectiveAsync(System.Guid id, CreateProgramIncrementObjectiveRequest request);
+        System.Threading.Tasks.Task<int> CreateObjectiveAsync(System.Guid id, CreateProgramIncrementObjectiveRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a program increment objective.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateObjectiveAsync(System.Guid id, CreateProgramIncrementObjectiveRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<int> CreateObjectiveAsync(System.Guid id, CreateProgramIncrementObjectiveRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a program increment objective.
@@ -2370,7 +2370,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a program increment.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateAsync(CreateProgramIncrementRequest request)
+        public virtual System.Threading.Tasks.Task<System.Guid> CreateAsync(CreateProgramIncrementRequest request)
         {
             return CreateAsync(request, System.Threading.CancellationToken.None);
         }
@@ -2380,7 +2380,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a program increment.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateAsync(CreateProgramIncrementRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Guid> CreateAsync(CreateProgramIncrementRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -2399,6 +2399,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -2423,7 +2424,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Guid>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 422)
@@ -3040,7 +3046,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a program increment objective.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateObjectiveAsync(System.Guid id, CreateProgramIncrementObjectiveRequest request)
+        public virtual System.Threading.Tasks.Task<int> CreateObjectiveAsync(System.Guid id, CreateProgramIncrementObjectiveRequest request)
         {
             return CreateObjectiveAsync(id, request, System.Threading.CancellationToken.None);
         }
@@ -3050,7 +3056,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a program increment objective.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateObjectiveAsync(System.Guid id, CreateProgramIncrementObjectiveRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<int> CreateObjectiveAsync(System.Guid id, CreateProgramIncrementObjectiveRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -3073,6 +3079,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -3097,7 +3104,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<int>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 400)
@@ -3920,14 +3932,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateRiskAsync(CreateRiskRequest request);
+        System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(CreateRiskRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a risk.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateRiskAsync(CreateRiskRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(CreateRiskRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get risk details by Id.
@@ -4163,7 +4175,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateRiskAsync(CreateRiskRequest request)
+        public virtual System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(CreateRiskRequest request)
         {
             return CreateRiskAsync(request, System.Threading.CancellationToken.None);
         }
@@ -4173,7 +4185,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateRiskAsync(CreateRiskRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(CreateRiskRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -4192,6 +4204,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -4216,7 +4229,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Guid>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 400)
@@ -5644,14 +5662,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateBacklogLevelRequest request);
+        System.Threading.Tasks.Task<int> CreateAsync(CreateBacklogLevelRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<int> CreateAsync(CreateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get backlog level details using the id.
@@ -5800,7 +5818,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateAsync(CreateBacklogLevelRequest request)
+        public virtual System.Threading.Tasks.Task<int> CreateAsync(CreateBacklogLevelRequest request)
         {
             return CreateAsync(request, System.Threading.CancellationToken.None);
         }
@@ -5810,7 +5828,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a backlog level.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateAsync(CreateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<int> CreateAsync(CreateBacklogLevelRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -5829,6 +5847,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -5853,7 +5872,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<int>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 422)
@@ -6453,14 +6477,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateWorkStateRequest request);
+        System.Threading.Tasks.Task<int> CreateAsync(CreateWorkStateRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateWorkStateRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<int> CreateAsync(CreateWorkStateRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get work state details using the id.
@@ -6614,7 +6638,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateAsync(CreateWorkStateRequest request)
+        public virtual System.Threading.Tasks.Task<int> CreateAsync(CreateWorkStateRequest request)
         {
             return CreateAsync(request, System.Threading.CancellationToken.None);
         }
@@ -6624,7 +6648,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a work state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateAsync(CreateWorkStateRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<int> CreateAsync(CreateWorkStateRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -6643,6 +6667,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -6667,7 +6692,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<int>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 422)
@@ -7031,14 +7061,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateWorkTypeRequest request);
+        System.Threading.Tasks.Task<int> CreateAsync(CreateWorkTypeRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<int> CreateAsync(CreateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get work type details using the id.
@@ -7192,7 +7222,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateAsync(CreateWorkTypeRequest request)
+        public virtual System.Threading.Tasks.Task<int> CreateAsync(CreateWorkTypeRequest request)
         {
             return CreateAsync(request, System.Threading.CancellationToken.None);
         }
@@ -7202,7 +7232,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a work type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateAsync(CreateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<int> CreateAsync(CreateWorkTypeRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -7221,6 +7251,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -7245,7 +7276,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<int>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 422)
@@ -7609,14 +7645,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateEmployeeRequest request);
+        System.Threading.Tasks.Task<int> CreateAsync(CreateEmployeeRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateEmployeeRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<int> CreateAsync(CreateEmployeeRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get employee details using the localId.
@@ -7796,7 +7832,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateAsync(CreateEmployeeRequest request)
+        public virtual System.Threading.Tasks.Task<int> CreateAsync(CreateEmployeeRequest request)
         {
             return CreateAsync(request, System.Threading.CancellationToken.None);
         }
@@ -7806,7 +7842,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create an employee.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateAsync(CreateEmployeeRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<int> CreateAsync(CreateEmployeeRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -7825,6 +7861,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -7849,7 +7886,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<int>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 422)
@@ -8372,14 +8414,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a team.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateTeamRequest request);
+        System.Threading.Tasks.Task<int> CreateAsync(CreateTeamRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a team.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateTeamRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<int> CreateAsync(CreateTeamRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get team details using the localId.
@@ -8476,14 +8518,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk for a team.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request);
+        System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(System.Guid id, CreateRiskRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a risk for a team.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a team risk by Id.
@@ -8641,7 +8683,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a team.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateAsync(CreateTeamRequest request)
+        public virtual System.Threading.Tasks.Task<int> CreateAsync(CreateTeamRequest request)
         {
             return CreateAsync(request, System.Threading.CancellationToken.None);
         }
@@ -8651,7 +8693,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a team.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateAsync(CreateTeamRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<int> CreateAsync(CreateTeamRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -8670,6 +8712,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -8694,7 +8737,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<int>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 422)
@@ -9432,7 +9480,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk for a team.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request)
+        public virtual System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(System.Guid id, CreateRiskRequest request)
         {
             return CreateRiskAsync(id, request, System.Threading.CancellationToken.None);
         }
@@ -9442,7 +9490,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk for a team.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -9465,6 +9513,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -9489,7 +9538,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Guid>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 400)
@@ -9877,14 +9931,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a team of teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateTeamOfTeamsRequest request);
+        System.Threading.Tasks.Task<int> CreateAsync(CreateTeamOfTeamsRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a team of teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateTeamOfTeamsRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<int> CreateAsync(CreateTeamOfTeamsRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get team of teams details using the localId.
@@ -9981,14 +10035,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk for a team of teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request);
+        System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(System.Guid id, CreateRiskRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a risk for a team of teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a team of teams risk by Id.
@@ -10146,7 +10200,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a team of teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateAsync(CreateTeamOfTeamsRequest request)
+        public virtual System.Threading.Tasks.Task<int> CreateAsync(CreateTeamOfTeamsRequest request)
         {
             return CreateAsync(request, System.Threading.CancellationToken.None);
         }
@@ -10156,7 +10210,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a team of teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateAsync(CreateTeamOfTeamsRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<int> CreateAsync(CreateTeamOfTeamsRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -10175,6 +10229,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -10199,7 +10254,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<int>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 422)
@@ -10937,7 +10997,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk for a team of teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request)
+        public virtual System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(System.Guid id, CreateRiskRequest request)
         {
             return CreateRiskAsync(id, request, System.Threading.CancellationToken.None);
         }
@@ -10947,7 +11007,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk for a team of teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(System.Guid id, CreateRiskRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -10970,6 +11030,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -10994,7 +11055,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Guid>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 400)
@@ -11382,14 +11448,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateAzureDevOpsBoardConnectionRequest request);
+        System.Threading.Tasks.Task<System.Guid> CreateAsync(CreateAzureDevOpsBoardConnectionRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateAsync(CreateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Guid> CreateAsync(CreateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get Azure DevOps Boards connection based on id.
@@ -11569,7 +11635,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateAsync(CreateAzureDevOpsBoardConnectionRequest request)
+        public virtual System.Threading.Tasks.Task<System.Guid> CreateAsync(CreateAzureDevOpsBoardConnectionRequest request)
         {
             return CreateAsync(request, System.Threading.CancellationToken.None);
         }
@@ -11579,7 +11645,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create an Azure DevOps Boards connection.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateAsync(CreateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Guid> CreateAsync(CreateAzureDevOpsBoardConnectionRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -11598,6 +11664,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -11622,7 +11689,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Guid>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 422)

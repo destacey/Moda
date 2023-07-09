@@ -47,7 +47,7 @@ public class WorkStatesController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.WorkStates)]
     [OpenApiOperation("Create a work state.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Int))]
     public async Task<ActionResult> Create(CreateWorkStateRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateWorkStateCommand(), cancellationToken);

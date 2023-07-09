@@ -48,7 +48,7 @@ public class BacklogLevelsController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.BacklogLevels)]
     [OpenApiOperation("Create a backlog level.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Int))]
     public async Task<ActionResult> Create(CreateBacklogLevelRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateBacklogLevelCommand(), cancellationToken);
