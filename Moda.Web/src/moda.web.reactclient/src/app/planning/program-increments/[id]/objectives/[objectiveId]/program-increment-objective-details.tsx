@@ -40,14 +40,14 @@ const ProgramIncrementObjectiveDetails = (
                 {objective.programIncrement?.name}
               </Link>
             </Item>
-            <Item label="Status">{objective.status?.name}</Item>
-            <Item label="Type">{objective.type?.name}</Item>
-            <Item label="Is Stretch?">{objective.isStretch?.toString()}</Item>
             <Item label="Team">
               <Link href={teamLink}>{objective.team?.name}</Link>
             </Item>
+            <Item label="Status">{objective.status?.name}</Item>
+            <Item label="Is Stretch?">{objective.isStretch?.toString()}</Item>
             <Item label="Start">{startDate}</Item>
             <Item label="Target">{targetDate}</Item>
+            <Item label="Type">{objective.type?.name}</Item>
           </Descriptions>
         </Col>
         <Col xs={24} md={12}>
