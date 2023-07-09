@@ -1,0 +1,84 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Moda API on Host",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Moda.Web/src/Moda.Web.Api/bin/Debug/net7.0/Moda.Web.Api.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Moda.Web/src/Moda.Web.Api",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+                "uriFormat": "%s/swagger"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "Next.js: debug client-side",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:3000"
+          },
+        {
+            "name": "Next.js: debug full stack",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run dev",
+            "cwd": "${workspaceFolder}/Moda.Web/src/moda.web.reactclient",
+            "serverReadyAction": {
+                "pattern": "started server on .+, url: (https?://.+)",
+                "uriFormat": "%s",
+                "action": "debugWithChrome"
+            }
+        },
+        {
+            "name": "Docker: Attach to API in Docker",
+            "type": "docker",
+            "request": "attach",
+            "platform": "netCore",
+            "sourceFileMap": {
+                "/src": "${workspaceFolder}"
+            },
+            "netCore": {
+                "debuggerPath": "/remote_debugger/vsdbg",
+            },
+            "containerName": "moda.web.api",
+            // "preLaunchTask": "Compose Up",
+            "postDebugTask": "Compose Down"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Browser: Launch Moda React Client in Chrome",
+            "url": "http://localhost:5002"
+        },
+    ],
+    "compounds": [
+        {
+            "name": "Compound: Launch Moda on Host",
+            "configurations": [
+                "Debug Moda API on Host",
+                "Next.js: debug client side"
+            ],
+            "stopAll": true
+        },
+        {
+            "name": "Compound: Launch Moda with Compose",
+            "configurations": [
+                "Attach to API in Docker",
+                "Launch Moda React Client in Chrome"
+            ],
+            "preLaunchTask": "Compose and Wait",
+            "stopAll": true
+        },
+    ]
+}

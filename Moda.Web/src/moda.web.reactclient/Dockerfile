@@ -7,7 +7,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
+COPY Moda.Web/src/moda.web.reactclient/package.json Moda.Web/src/moda.web.reactclient/package-lock.json* ./
 RUN npm ci
 
 
@@ -15,7 +15,7 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY Moda.Web/src/moda.web.reactclient/ .
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
