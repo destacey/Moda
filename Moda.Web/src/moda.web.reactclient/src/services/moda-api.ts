@@ -6643,6 +6643,7 @@ export interface ProgramIncrementObjectiveListDto {
     team?: PlanningTeamNavigationDto;
     progress?: number;
     type?: SimpleNavigationDto;
+    startDate?: Date | undefined;
     targetDate?: Date | undefined;
     isStretch?: boolean;
 }

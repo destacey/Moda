@@ -37,6 +37,10 @@ public sealed record ObjectiveListDto : IMapFrom<Objective>
     /// <value>The plan identifier.</value>
     public Guid? PlanId { get; set; }
 
+    /// <summary>Gets or sets the start date.</summary>
+    /// <value>The start date.</value>
+    public LocalDate? StartDate { get; set; }
+
     /// <summary>Gets or sets the target date.</summary>
     /// <value>The target date.</value>
     public LocalDate? TargetDate { get; set; }

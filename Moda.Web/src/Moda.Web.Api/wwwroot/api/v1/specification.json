@@ -5934,6 +5934,11 @@
           "type": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
           "targetDate": {
             "type": "string",
             "format": "date",

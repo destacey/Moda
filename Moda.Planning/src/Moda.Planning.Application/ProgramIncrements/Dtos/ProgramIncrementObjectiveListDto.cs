@@ -33,6 +33,10 @@ public sealed record ProgramIncrementObjectiveListDto
     /// <value>The PI objective type.</value>
     public required SimpleNavigationDto Type { get; set; }
 
+    /// <summary>Gets or sets the start date.</summary>
+    /// <value>The start date.</value>
+    public LocalDate? StartDate { get; set; }
+
     /// <summary>Gets or sets the target date.</summary>
     /// <value>The target date.</value>
     public LocalDate? TargetDate { get; set; }
@@ -53,6 +57,7 @@ public sealed record ProgramIncrementObjectiveListDto
             Progress = objective.Progress,
             Team = PlanningTeamNavigationDto.FromPlanningTeam(piObjective.Team),
             Type = SimpleNavigationDto.FromEnum(piObjective.Type),
+            StartDate = objective.StartDate,
             TargetDate = objective.TargetDate,
             IsStretch = piObjective.IsStretch
         };

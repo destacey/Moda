@@ -13399,6 +13399,10 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public SimpleNavigationDto Type { get; set; } = default!;
 
+        [Newtonsoft.Json.JsonProperty("startDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
+        public System.DateTime? StartDate { get; set; } = default!;
+
         [Newtonsoft.Json.JsonProperty("targetDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
         public System.DateTime? TargetDate { get; set; } = default!;
