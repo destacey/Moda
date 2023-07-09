@@ -1,14 +1,18 @@
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
-import { Progress, Space, Switch } from 'antd'
+import { Button, Progress, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
+import useAuth from '../../contexts/auth'
+import CreateProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[id]/create-program-increment-objective-form'
 
 export interface ProgramIncrementObjectivesGridProps {
   objectives: ProgramIncrementObjectiveListDto[]
   hideProgramIncrementColumn?: boolean
   hideTeamColumn?: boolean
+  newObjectivesAllowed?: boolean
+  programIncrementId?: string // needed for create objective form. may not stay this way.
 }
 
 const ProgramIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
@@ -48,11 +52,25 @@ const ProgramIncrementObjectivesGrid = ({
   objectives,
   hideProgramIncrementColumn = false,
   hideTeamColumn = false,
+  newObjectivesAllowed = false,
+  programIncrementId,
 }: ProgramIncrementObjectivesGridProps) => {
   const [hideProgramIncrement, setHideProgramIncrement] = useState<boolean>(
     hideProgramIncrementColumn
   )
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
+  const [openCreateObjectiveModal, setOpenCreateObjectiveModal] =
+    useState<boolean>(false)
+  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
+
+  const { hasClaim } = useAuth()
+  const canManageObjectives = hasClaim(
+    'Permission',
+    'Permissions.ProgramIncrementObjectives.Manage'
+  )
+  const canCreateObjectives =
+    newObjectivesAllowed && programIncrementId && canManageObjectives
+  const showActions = canCreateObjectives
 
   const columnDefs = useMemo(
     () => [
@@ -74,8 +92,8 @@ const ProgramIncrementObjectivesGrid = ({
         hide: hideTeam,
       },
       { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
-      { field: 'start' },
-      { field: 'target' },
+      { field: 'startDate' },
+      { field: 'targetDate' },
       { field: 'isStretch' },
     ],
     [hideProgramIncrement, hideTeam]
@@ -87,6 +105,18 @@ const ProgramIncrementObjectivesGrid = ({
 
   const onHideTeamChange = (checked: boolean) => {
     setHideTeam(checked)
+  }
+
+  const Actions = () => {
+    return (
+      <>
+        {canCreateObjectives && (
+          <Button onClick={() => setOpenCreateObjectiveModal(true)}>
+            Create Objective
+          </Button>
+        )}
+      </>
+    )
   }
 
   const controlItems: ItemType[] = [
@@ -117,12 +147,26 @@ const ProgramIncrementObjectivesGrid = ({
     },
   ]
 
+  const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
+    setOpenCreateObjectiveModal(false)
+    if (wasCreated) {
+      setLastRefresh(Date.now())
+    }
+  }
+
   return (
     <>
       <ModaGrid
         columnDefs={columnDefs}
         rowData={objectives}
+        actions={showActions && <Actions />}
         gridControlMenuItems={controlItems}
+      />
+      <CreateProgramIncrementObjectiveForm
+        programIncrementId={programIncrementId}
+        showForm={openCreateObjectiveModal}
+        onFormCreate={() => onCreateObjectiveFormClosed(true)}
+        onFormCancel={() => onCreateObjectiveFormClosed(false)}
       />
     </>
   )
