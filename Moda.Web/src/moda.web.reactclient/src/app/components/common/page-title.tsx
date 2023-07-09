@@ -22,7 +22,9 @@ const PageTitle = ({ title, subtitle, actions }: PageTitleProps) => {
         </Col>
         {actions && (
           <Col xs={24} sm={24} md={mdSize}>
-            {actions}
+            <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              {actions}
+            </Space>
           </Col>
         )}
       </Row>
