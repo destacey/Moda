@@ -8,7 +8,8 @@ output "api_hostname" {
 }
 
 output "swa_token" {
-  value = azurerm_static_site.moda_swa.api_key
+  value     = azurerm_static_site.moda_swa.api_key
+  sensitive = true
 }
 
 output "swa_hostname" {

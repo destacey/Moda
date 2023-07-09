@@ -2,7 +2,7 @@ locals {
   sql_conn_string = "Server=tcp:${azurerm_mssql_server.moda_sql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.moda_db.name};Persist Security Info=False;User ID=modaadmin;Password=${var.sql_admin_pass};MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 }
 
-resource "azurerm_container_app_environment" "argo_cae" {
+resource "azurerm_container_app_environment" "moda_cae" {
   name                       = "cae-moda"
   resource_group_name        = azurerm_resource_group.moda_dev_rg.name
   location                   = azurerm_resource_group.moda_dev_rg.location
@@ -18,7 +18,7 @@ resource "azurerm_log_analytics_workspace" "moda" {
 
 resource "azurerm_container_app" "moda_frontend" {
   name                         = "moda-client"
-  container_app_environment_id = azurerm_container_app_environment.argo_cae.id
+  container_app_environment_id = azurerm_container_app_environment.moda_cae.id
   resource_group_name          = azurerm_resource_group.moda_dev_rg.name
   revision_mode                = "Single"
 
@@ -78,7 +78,7 @@ resource "azurerm_container_app" "moda_frontend" {
 
 resource "azurerm_container_app" "moda_backend" {
   name                         = "moda-api"
-  container_app_environment_id = azurerm_container_app_environment.argo_cae.id
+  container_app_environment_id = azurerm_container_app_environment.moda_cae.id
   resource_group_name          = azurerm_resource_group.moda_dev_rg.name
   revision_mode                = "Single"
 
