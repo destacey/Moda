@@ -109,7 +109,7 @@ jobs:
                   echo "NEXT_PUBLIC_AZURE_AD_CLIENT_ID='4d566fb3-7966-4c77-9864-113020fd646f'" >> Moda.Web/src/moda.web.reactclient/.env
                   echo "NEXT_PUBLIC_AZURE_AD_TENANT_ID='f399216f-be6b-4062-8700-54952e44e7ef'" >> Moda.Web/src/moda.web.reactclient/.env
                   echo "NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY='https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef'" >> Moda.Web/src/moda.web.reactclient/.env
-                  echo "NEXT_PUBLIC_API_BASE_URL='https://moda-api.wittymushroom-f5574241.westus3.azurecontainerapps.io'" >> Moda.Web/src/moda.web.reactclient/.env
+                  echo "NEXT_PUBLIC_API_BASE_URL='https://moda-api.ashysea-bf348877.westus3.azurecontainerapps.io'" >> Moda.Web/src/moda.web.reactclient/.env
                   cat Moda.Web/src/moda.web.reactclient/.env
 
             - name: Build and push Docker image
