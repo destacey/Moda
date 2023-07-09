@@ -74,7 +74,7 @@ jobs:
                       contextDir: .
                     - dockerfile: ./Moda.Web/src/moda.web.reactclient/Dockerfile
                       image: awaldow/moda-client
-                      contextDir: ./Moda.Web/src/moda.web.reactclient
+                      contextDir: .
         permissions:
             contents: read
             packages: write
