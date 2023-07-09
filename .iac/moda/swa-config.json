@@ -1,0 +1,40 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "staticSiteName": {
+        "type": "String"
+      },
+      "apiBaseUrl": {
+        "type": "String"
+      },
+      "apiScope": {
+        "type": "String"
+      },
+      "tenantId": {
+        "type": "String"
+      },
+      "clientId": {
+        "type": "String"
+      }
+    },
+    "variables": {},
+    "resources": [
+      {
+        "type": "Microsoft.Web/staticSites/config",
+        "apiVersion": "2020-10-01",
+        "name": "[concat(parameters('staticSiteName'), '/appsettings')]",
+        "kind": "string",
+        "properties": {
+          "AzureAd__Authority": "[concat('https://login.microsoftonline.com/', parameters('tenantId'))]",
+          "AzureAd__ClientId": "[parameters('clientId')]",
+          "AzureAd__ValidateAuthority": "true",
+          "AzureAd__Scope": "[parameters('apiScope')]",
+          "ApiBaseUrl": "[concat('https://', parameters('apiBaseUrl'), '/')]",
+          "AuthProvider": "AzureAd"
+        }
+      }
+    ],
+    "outputs": {}
+  }
+  

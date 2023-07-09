@@ -1,105 +1,231 @@
 name: docker
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - "main"
-    tags:
-      - "v*"
-  pull_request:
-    branches:
-      - "main"
+    workflow_dispatch:
+    push:
+        branches:
+            - "main"
+        tags:
+            - "v*"
+    pull_request:
+        branches:
+            - "main"
 
 jobs:
-  build-and-test-api:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: Moda.Web/src/Moda.Web.Api
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
+    build-and-test-api:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                shell: bash
+                working-directory: Moda.Web/src/Moda.Web.Api
+        steps:
+            - name: checkout
+              uses: actions/checkout@v2
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 7.0.x
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v3
+              with:
+                  dotnet-version: 7.0.x
 
-      - name: Restore dependencies
-        run: dotnet restore
+            - name: Restore dependencies
+              run: dotnet restore
 
-      - name: Build
-        run: dotnet build --no-restore
+            - name: Build
+              run: dotnet build --no-restore
 
-      - name: Test
-        run: dotnet test --no-build --verbosity normal
-        
-  build-and-test-client:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: Moda.Web/src/moda.web.reactclient
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
+            - name: Test
+              run: dotnet test --no-build --verbosity normal
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
+    build-and-test-client:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                shell: bash
+                working-directory: Moda.Web/src/moda.web.reactclient
+        steps:
+            - name: checkout
+              uses: actions/checkout@v2
 
-      - name: npm ci
-        run: npm ci
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
 
-      - name: npm run lint
-        run: npm run lint
+            - name: npm ci
+              run: npm ci
 
-      - name: npm run build
-        run: npm run build
+            - name: npm run lint
+              run: npm run lint
 
-      - name: npm run test
-        run: npm run test
+            - name: npm run build
+              run: npm run build
 
-  build-and-push-image:
-    runs-on: ubuntu-latest
-    needs: [build-and-test-api, build-and-test-client]
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - dockerfile: ./Moda.Web/src/Moda.Web.Api/Dockerfile
-            image: awaldow/moda-api
-            contextDir: .
-          - dockerfile: ./Moda.Web/src/moda.web.reactclient/Dockerfile
-            image: awaldow/moda-client
-            contextDir: ./Moda.Web/src/moda.web.reactclient
-    permissions:
-      contents: read
-      packages: write
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-  
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          username: awaldow
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-  
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ matrix.image }}
-  
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: ${{ matrix.contextDir }}
-          file: ${{ matrix.dockerfile }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+            - name: npm run test
+              run: npm run test
+
+    build-and-push-image:
+        runs-on: ubuntu-latest
+        needs: [build-and-test-api, build-and-test-client]
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - dockerfile: ./Moda.Web/src/Moda.Web.Api/Dockerfile
+                      image: awaldow/moda-api
+                      contextDir: .
+                    - dockerfile: ./Moda.Web/src/moda.web.reactclient/Dockerfile
+                      image: awaldow/moda-client
+                      contextDir: .
+        permissions:
+            contents: read
+            packages: write
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Log in to the Container registry
+              uses: docker/login-action@v2
+              with:
+                  username: awaldow
+                  password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+            - name: Extract metadata (tags, labels) for Docker
+              id: meta
+              uses: docker/metadata-action@v4
+              with:
+                  images: ${{ matrix.image }}
+                  tags: |
+                      type=raw,value=latest,enable={{is_default_branch}}
+                      type=semver,pattern={{version}}
+                      type=semver,pattern={{major}}.{{minor}}
+                      type=semver,pattern={{major}}
+                      type=sha,format=long
+                      type=ref,event=branch
+                      type=ref,event=pr
+
+            - name: Generate .env file for client build
+              if: matrix.image == 'awaldow/moda-client'
+              run: |
+                  echo "NEXT_PUBLIC_AZURE_AD_CLIENT_ID='4d566fb3-7966-4c77-9864-113020fd646f'" >> Moda.Web/src/moda.web.reactclient/.env
+                  echo "NEXT_PUBLIC_AZURE_AD_TENANT_ID='f399216f-be6b-4062-8700-54952e44e7ef'" >> Moda.Web/src/moda.web.reactclient/.env
+                  echo "NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY='https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef'" >> Moda.Web/src/moda.web.reactclient/.env
+                  echo "NEXT_PUBLIC_API_BASE_URL='https://moda-api.ashysea-bf348877.westus3.azurecontainerapps.io'" >> Moda.Web/src/moda.web.reactclient/.env
+                  cat Moda.Web/src/moda.web.reactclient/.env
+
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v4
+              with:
+                  context: ${{ matrix.contextDir }}
+                  file: ${{ matrix.dockerfile }}
+                  push: true
+                  tags: ${{ steps.meta.outputs.tags }}
+                  labels: ${{ steps.meta.outputs.labels }}
+
+    terraform:
+        name: "Terraform"
+        runs-on: ubuntu-latest
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+        needs: [build-and-push-image]
+        defaults:
+            run:
+                working-directory: .iac/moda
+
+        steps:
+            - uses: actions/checkout@v3
+              name: Checkout
+
+            - uses: hashicorp/setup-terraform@v2
+              name: Setup Terraform
+              with:
+                  cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+            - name: Terraform Init
+              id: init
+              run: |
+                  terraform init
+                  terraform workspace select moda-dev
+                  terraform workspace show
+
+            - name: Terraform fmt
+              id: fmt
+              run: terraform fmt -check
+              continue-on-error: true
+
+            - name: Terraform Validate
+              id: validate
+              run: terraform validate -no-color
+
+            - name: Terraform Apply
+              id: apply
+              run: terraform apply -auto-approve -var="docker_tag=sha-${{ github.sha }}" -var="sql_admin_pass=${{ secrets.SQL_ADMIN_PASSWORD }}" -var="aad_api_client_secret=${{ secrets.AAD_API_CLIENT_SECRET }}" -var-file="dev.tfvars"
+
+    deploy:
+      name: "Deploy"
+      runs-on: ubuntu-latest
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      needs: [terraform]
+      steps:
+        - uses: actions/checkout@v3
+          name: Checkout
+
+        - name: Setup .NET
+          uses: actions/setup-dotnet@v3
+          with:
+            dotnet-version: 7.0.x
+
+        - name: Workload restore
+          run: dotnet workload restore
+
+        - name: Restore dependencies
+          run: dotnet restore
+
+        - name: App Setting Variable Substitution
+          uses: microsoft/variable-substitution@v1
+          with:
+            files: 'Moda.Web/src/Moda.Web.BlazorClient/wwwroot/appsettings.json'
+          env:
+            AzureAd.Authority: 'https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef'
+            AzureAd.ClientId: '4d566fb3-7966-4c77-9864-113020fd646f'
+            AzureAd.ValidateAuthority: true
+            AzureAd.ClientSecret: '${{ secrets.AAD_API_CLIENT_SECRET }}'
+            AzureAd.ApiScope: 'api://fdca5e6f-46a2-455c-b2f3-06a9a6877190/access_as_user'
+            ApiBaseUrl: 'https://${{ steps.tfoutputs.outputs.api_hostname }}/'
+
+        - name: Build
+          run: dotnet build --no-restore
+
+        - name: Test
+          run: dotnet test --no-build --verbosity normal
+
+        - name: Install dotnet ef
+          run: dotnet tool install --global dotnet-ef
+
+        - name: Run migrations
+          run: |
+            dotnet ef database update --connection "${{ steps.tfoutputs.outputs.sql_server_connection_string }}" --startup-project Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj --project Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL/Moda.Infrastructure.Migrators.MSSQL.csproj
+
+        - name: Publish Client
+          run: dotnet publish Moda.Web/src/Moda.Web.BlazorClient/Moda.Web.BlazorClient.csproj -c Release -o ./client
+
+        - uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+        - name: 'Run Azure SWA deploy action'
+          uses: azure/static-web-apps-deploy@v1
+          with:
+            azure_static_web_apps_api_token: '${{ steps.tfoutputs.outputs.swa_token }}'
+            action: 'upload'
+            app_location: './client/wwwroot'
+            api_location: ''
+            output_location: './client/wwwroot'
+          # env:
+          #   AzureAd__Authority: "https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef"
+          #   AzureAd__ClientId: "4d566fb3-7966-4c77-9864-113020fd646f"
+          #   AzureAd__ValidateAuthority: true
+          #   AzureAd__ClientSecret: "${{ secrets.AAD_API_CLIENT_SECRET }}"
+          #   AzureAd__ApiScope: "api://fdca5e6f-46a2-455c-b2f3-06a9a6877190/access_as_user"
+          #   ApiBaseUrl: "https://${{ steps.tfoutputs.outputs.api_hostname }}/"
+
+        - name: az logout
+          run: az logout
