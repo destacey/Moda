@@ -9,26 +9,14 @@ export interface AppBreadcrumbProps {
 
 const AppBreadcrumb = () => {
   const [pathItems, setPathItems] = useState<ItemType[]>([])
+  const [isHome, setIsHome] = useState<boolean>(false)
   const pathname = usePathname()
   const { breadcrumbRoute } = useBreadcrumbs()
 
   useEffect(() => {
-    // Only use the breadcrumbRoute if the pathname matches the current route
-    if (pathname === breadcrumbRoute?.pathname && breadcrumbRoute?.fullRoute) {
-        setPathItems(breadcrumbRoute.fullRoute)
-    }
-    else {
-      const title = pathname === breadcrumbRoute?.pathname ? breadcrumbRoute?.title : null
-      const pathSegments = pathname.split('/').filter((item) => item !== '')
-      const pathItems: ItemType[] = pathSegments.map((item, index) => {
-        return {
-          path: item,
-          breadcrumbName: title && index === pathSegments.length - 1 ? title : null,
-          href: '/' + pathSegments.slice(0, index + 1).join('/'),
-        }
-      })
-  
-      setPathItems(pathItems)
+    if (breadcrumbRoute?.route) {
+      setIsHome(pathname === '/')
+      setPathItems(breadcrumbRoute.route)
     }
   }, [pathname, breadcrumbRoute])
 
@@ -41,8 +29,6 @@ const AppBreadcrumb = () => {
     const last = routes.indexOf(route) === routes.length - 1
     return <BreadcrumbSegment route={route} paths={paths} last={last} />
   }
-
-  const isHome = pathname === '/'
 
   return (
     !isHome && (
