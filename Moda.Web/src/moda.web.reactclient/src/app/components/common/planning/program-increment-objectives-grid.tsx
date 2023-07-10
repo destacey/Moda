@@ -119,7 +119,9 @@ const ProgramIncrementObjectivesGrid = ({
 
   return (
     <>
+      {/* TODO:  setup dynamic height */}
       <ModaGrid
+        height={550}
         columnDefs={columnDefs}
         rowData={objectives}
         gridControlMenuItems={controlItems}
