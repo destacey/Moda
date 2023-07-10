@@ -165,6 +165,15 @@ jobs:
       if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
       needs: [terraform]
       steps:
+        - name: Terraform Output
+          id: tfoutputs
+          uses: dflook/terraform-output@v1
+          with:
+            workspace: moda-dev
+            path: .iac/moda
+          env:
+            TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
+
         - uses: actions/checkout@v3
           name: Checkout
 
