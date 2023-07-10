@@ -7,7 +7,7 @@ import {
   ProgramIncrementObjectiveListDto,
   RiskListDto,
 } from '@/src/services/moda-api'
-import { Card } from 'antd'
+import { Button, Card } from 'antd'
 import { createElement, useEffect, useState } from 'react'
 import ProgramIncrementDetails from './program-increment-details'
 import ProgramIncrementObjectivesGrid, {
@@ -22,9 +22,12 @@ import RisksGrid, {
 } from '@/src/app/components/common/planning/risks-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
+import useAuth from '@/src/app/components/contexts/auth'
+import ManageProgramIncrementTeamsForm from './manage-program-increment-teams-form'
 
 const ProgramIncrementDetailsPage = ({ params }) => {
   useDocumentTitle('PI Details')
+  const { setBreadcrumbTitle } = useBreadcrumbs()
   const [activeTab, setActiveTab] = useState('details')
   const [programIncrement, setProgramIncrement] =
     useState<ProgramIncrementDetailsDto | null>(null)
@@ -33,7 +36,28 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     ProgramIncrementObjectiveListDto[]
   >([])
   const [risks, setRisks] = useState<RiskListDto[]>([])
-  const { setBreadcrumbTitle } = useBreadcrumbs()
+  const [openManageTeamsModal, setOpenManageTeamsModal] =
+    useState<boolean>(false)
+  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
+
+  const { hasClaim } = useAuth()
+  const canUpdateProgramIncrement = hasClaim(
+    'Permission',
+    'Permissions.ProgramIncrements.Update'
+  )
+  const showActions = canUpdateProgramIncrement
+
+  const Actions = () => {
+    return (
+      <>
+        {canUpdateProgramIncrement && (
+          <Button onClick={() => setOpenManageTeamsModal(true)}>
+            Manage Teams
+          </Button>
+        )}
+      </>
+    )
+  }
 
   const tabs = [
     {
@@ -96,13 +120,22 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     }
 
     getProgramIncrement()
-  }, [params.id, setBreadcrumbTitle])
+  }, [params.id, setBreadcrumbTitle, lastRefresh])
+
+  const onManageTeamsFormClosed = (wasSaved: boolean) => {
+    setOpenManageTeamsModal(false)
+    if (wasSaved) {
+      // TODO: refresh the PI details and Teams tab only
+      setLastRefresh(Date.now())
+    }
+  }
 
   return (
     <>
       <PageTitle
         title={programIncrement?.name}
         subtitle="Program Increment Details"
+        actions={showActions && <Actions />}
       />
       <Card
         style={{ width: '100%' }}
@@ -112,6 +145,14 @@ const ProgramIncrementDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
+      {programIncrement && (
+        <ManageProgramIncrementTeamsForm
+          showForm={openManageTeamsModal}
+          id={programIncrement.id}
+          onFormSave={() => onManageTeamsFormClosed(true)}
+          onFormCancel={() => onManageTeamsFormClosed(false)}
+        />
+      )}
     </>
   )
 }
