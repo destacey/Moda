@@ -203,10 +203,10 @@ jobs:
             ApiBaseUrl: 'https://${{ steps.tfoutputs.outputs.api_hostname }}/'
 
         - name: Build
-          run: dotnet build --no-restore
+          run: dotnet build --no-restore Moda.Web/src/Moda.Web.BlazorClient/Moda.Web.BlazorClient.csproj
 
         - name: Test
-          run: dotnet test --no-build --verbosity normal
+          run: dotnet test --no-build --verbosity normal Moda.Web/src/Moda.Web.BlazorClient/Moda.Web.BlazorClient.csproj
 
         - name: Install dotnet ef
           run: dotnet tool install --global dotnet-ef
