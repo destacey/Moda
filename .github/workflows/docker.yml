@@ -162,11 +162,20 @@ jobs:
     deploy:
       name: "Deploy"
       runs-on: ubuntu-latest
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
       needs: [terraform]
       steps:
         - uses: actions/checkout@v3
           name: Checkout
+
+        - name: Terraform Output
+          id: tfoutputs
+          uses: dflook/terraform-output@v1
+          with:
+            workspace: moda-dev
+            path: .iac/moda
+          env:
+            TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
 
         - name: Setup .NET
           uses: actions/setup-dotnet@v3
@@ -194,10 +203,10 @@ jobs:
             ApiBaseUrl: 'https://${{ steps.tfoutputs.outputs.api_hostname }}/'
 
         - name: Build
-          run: dotnet build --no-restore
+          run: dotnet build --no-restore Moda.Web/src/Moda.Web.BlazorClient/Moda.Web.BlazorClient.csproj
 
         - name: Test
-          run: dotnet test --no-build --verbosity normal
+          run: dotnet test --no-build --verbosity normal Moda.Web/src/Moda.Web.BlazorClient/Moda.Web.BlazorClient.csproj
 
         - name: Install dotnet ef
           run: dotnet tool install --global dotnet-ef
