@@ -1,5 +1,6 @@
 import { RiskDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Row } from 'antd'
+import dayjs from 'dayjs'
 import Link from 'next/link'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
@@ -10,10 +11,6 @@ const RiskDetails = (risk: RiskDetailsDto) => {
     risk.team?.type === 'Team'
       ? `/organizations/teams/${risk.team?.localId}`
       : `/organizations/team-of-teams/${risk.team?.localId}`
-
-  const followUpDate = risk.followUpDate
-    ? new Date(risk.followUpDate)?.toLocaleDateString()
-    : null
   return (
     <>
       <Row>
@@ -36,7 +33,7 @@ const RiskDetails = (risk: RiskDetailsDto) => {
               <Link href={teamLink}>{risk.team?.name}</Link>
             </Item>
             <Item label="Category">{risk.category?.name}</Item>
-            <Item label="Follow-Up Date">{followUpDate}</Item>
+            <Item label="Follow-Up Date">{risk.followUpDate && dayjs(risk.followUpDate).format('M/D/YYYY')}</Item>
             <Item label="Assignee">
               <Link href={`/organizations/employees/${risk.assignee?.localId}`}>
                 {risk.assignee?.name}
@@ -55,7 +52,7 @@ const RiskDetails = (risk: RiskDetailsDto) => {
           </Link>
         </Item>
         <Item label="Reported On">
-          {new Date(risk.reportedOn).toLocaleDateString()}
+          {risk.reportedOn && dayjs(risk.reportedOn).format('M/D/YYYY')}
         </Item>
       </Descriptions>
     </>

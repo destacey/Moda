@@ -1,5 +1,6 @@
 import { ProgramIncrementObjectiveDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Progress, Row, Tooltip } from 'antd'
+import dayjs from 'dayjs'
 import Link from 'next/link'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
@@ -8,14 +9,6 @@ const { Item } = Descriptions
 const ProgramIncrementObjectiveDetails = (
   objective: ProgramIncrementObjectiveDetailsDto
 ) => {
-  const startDate = objective.startDate
-    ? new Date(objective.startDate)?.toLocaleDateString()
-    : null
-
-  const targetDate = objective.targetDate
-    ? new Date(objective.targetDate)?.toLocaleDateString()
-    : null
-
   const teamLink =
     objective.team?.type === 'Team'
       ? `/organizations/teams/${objective.team?.localId}`
@@ -45,8 +38,14 @@ const ProgramIncrementObjectiveDetails = (
             </Item>
             <Item label="Status">{objective.status?.name}</Item>
             <Item label="Is Stretch?">{objective.isStretch?.toString()}</Item>
-            <Item label="Start">{startDate}</Item>
-            <Item label="Target">{targetDate}</Item>
+            <Item label="Start">
+              {objective.startDate &&
+                dayjs(objective.startDate).format('M/D/YYYY')}
+            </Item>
+            <Item label="Target">
+              {objective.targetDate &&
+                dayjs(objective.targetDate).format('M/D/YYYY')}
+            </Item>
             <Item label="Type">{objective.type?.name}</Item>
           </Descriptions>
         </Col>

@@ -1,5 +1,6 @@
 import { ProgramIncrementListDto } from '@/src/services/moda-api'
 import { Card, Space } from 'antd'
+import dayjs from 'dayjs'
 import Link from 'next/link'
 
 export interface ProgramIncrementCardProps {
@@ -26,7 +27,7 @@ const ProgramIncrementCard = ({
       }
     >
       <p>
-        {start.toLocaleDateString()} - {end.toLocaleDateString()}
+        {dayjs(programIncrement.start).format('M/D/YYYY')} - {dayjs(programIncrement.end).format('M/D/YYYY')}
       </p>
       <p>{daysRemaining} days remaining</p>
     </Card>

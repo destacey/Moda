@@ -1,5 +1,6 @@
 import { ProgramIncrementDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Row } from 'antd'
+import dayjs from 'dayjs'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 const { Item } = Descriptions
@@ -13,10 +14,10 @@ const ProgramIncrementDetails = (
         <Col xs={24} md={12}>
           <Descriptions>
             <Item label="Start">
-              {new Date(programIncrement.start).toLocaleDateString()}
+              {dayjs(programIncrement.start).format('M/D/YYYY')}
             </Item>
             <Item label="End">
-              {new Date(programIncrement.end).toLocaleDateString()}
+              {dayjs(programIncrement.end).format('M/D/YYYY')}
             </Item>
             <Item label="State">{programIncrement.state}</Item>
           </Descriptions>
