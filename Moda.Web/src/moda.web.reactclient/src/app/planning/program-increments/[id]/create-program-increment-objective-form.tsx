@@ -9,6 +9,8 @@ import {
   ProgramIncrementDetailsDto,
 } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
+import dayjs from 'dayjs'
+import { RangePickerProps } from 'antd/es/date-picker'
 
 export interface CreateProgramIncrementObjectiveFormProps {
   showForm: boolean
@@ -214,6 +216,16 @@ const CreateProgramIncrementObjectiveForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newObjectiveLocalId])
 
+  const disabledDate: RangePickerProps['disabledDate'] = useCallback(
+    (current) => {
+      return (
+        current < dayjs(programIncrement?.start) ||
+        current > dayjs(programIncrement?.end).add(1, 'day')
+      )
+    },
+    [programIncrement?.end, programIncrement?.start]
+  )
+
   return (
     <>
       {contextHolder}
@@ -281,10 +293,10 @@ const CreateProgramIncrementObjectiveForm = ({
             <Switch checkedChildren="Yes" unCheckedChildren="No" />
           </Form.Item>
           <Form.Item label="Start" name="startDate">
-            <DatePicker />
+            <DatePicker disabledDate={disabledDate} />
           </Form.Item>
           <Form.Item label="Target" name="targetDate">
-            <DatePicker />
+            <DatePicker disabledDate={disabledDate} />
           </Form.Item>
         </Form>
       </Modal>
