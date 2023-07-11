@@ -7,12 +7,15 @@ import { Card } from 'antd'
 import { createElement, useEffect, useState } from 'react'
 import ProgramIncrementObjectiveDetails from './program-increment-objective-details'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
+import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
+import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 
 const ObjectiveDetailsPage = ({ params }) => {
   useDocumentTitle('PI Objective Details')
   const [activeTab, setActiveTab] = useState('details')
   const [objective, setObjective] =
     useState<ProgramIncrementObjectiveDetailsDto | null>(null)
+  const { setBreadcrumbRoute } = useBreadcrumbs()
 
   const tabs = [
     {
@@ -23,6 +26,16 @@ const ObjectiveDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
+    const objectiveRoute: ItemType[] = [
+      {
+        title: 'Planning',
+      },
+      {
+        href: `/planning/program-increments`,
+        title: 'Program Increments',
+      },
+    ]
+
     const getObjective = async () => {
       const programIncrementsClient = await getProgramIncrementsClient()
       const objectiveDto = await programIncrementsClient.getObjectiveByLocalId(
@@ -30,10 +43,22 @@ const ObjectiveDetailsPage = ({ params }) => {
         params.objectiveId
       )
       setObjective(objectiveDto)
+
+      objectiveRoute.push(
+        {
+          href: `/planning/program-increments/${objectiveDto.programIncrement?.localId}`,
+          title: objectiveDto.programIncrement?.name,
+        },
+        {
+          title: objectiveDto.name,
+        }
+      )
+      // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
+      setBreadcrumbRoute(objectiveRoute)
     }
 
     getObjective()
-  }, [params.id, params.objectiveId])
+  }, [params.id, params.objectiveId, setBreadcrumbRoute])
 
   return (
     <>
