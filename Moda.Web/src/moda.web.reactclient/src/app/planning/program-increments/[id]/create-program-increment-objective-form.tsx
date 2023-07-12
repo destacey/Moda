@@ -226,6 +226,16 @@ const CreateProgramIncrementObjectiveForm = ({
     [programIncrement?.end, programIncrement?.start]
   )
 
+  const isDateWithinPiRange = useCallback(
+    (date: Date) => {
+      return (
+        dayjs(programIncrement.start) <= dayjs(date) &&
+        dayjs(date) < dayjs(programIncrement.end).add(1, 'day')
+      )
+    },
+    [programIncrement]
+  )
+
   return (
     <>
       {contextHolder}
@@ -292,10 +302,36 @@ const CreateProgramIncrementObjectiveForm = ({
           >
             <Switch checkedChildren="Yes" unCheckedChildren="No" />
           </Form.Item>
-          <Form.Item label="Start" name="startDate">
+          <Form.Item
+            label="Start"
+            name="startDate"
+            rules={[
+              {
+                validator: (_, value: Date) =>
+                  !value || isDateWithinPiRange(value)
+                    ? Promise.resolve()
+                    : Promise.reject(
+                        'Start date must be within the PI start and end dates.'
+                      ),
+              },
+            ]}
+          >
             <DatePicker disabledDate={disabledDate} />
           </Form.Item>
-          <Form.Item label="Target" name="targetDate">
+          <Form.Item
+            label="Target"
+            name="targetDate"
+            rules={[
+              {
+                validator: (_, value: Date) =>
+                  !value || isDateWithinPiRange(value)
+                    ? Promise.resolve()
+                    : Promise.reject(
+                        'Target date must be within the PI start and end dates.'
+                      ),
+              },
+            ]}
+          >
             <DatePicker disabledDate={disabledDate} />
           </Form.Item>
         </Form>
