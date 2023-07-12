@@ -205,7 +205,6 @@ const CreateProgramIncrementObjectiveForm = ({
   }, [form, formValues])
 
   useEffect(() => {
-    console.log(`useEffect for closing the form.`)
     if (newObjectiveLocalId) {
       setIsOpen(false)
       form.resetFields()
@@ -311,7 +310,7 @@ const CreateProgramIncrementObjectiveForm = ({
                   !value || isDateWithinPiRange(value)
                     ? Promise.resolve()
                     : Promise.reject(
-                        'Start date must be within the PI start and end dates.'
+                        'The start date must be within the Program Increment dates.'
                       ),
               },
             ]}
@@ -327,7 +326,7 @@ const CreateProgramIncrementObjectiveForm = ({
                   !value || isDateWithinPiRange(value)
                     ? Promise.resolve()
                     : Promise.reject(
-                        'Target date must be within the PI start and end dates.'
+                        'The target date must be within the Program Increment dates.'
                       ),
               },
             ]}

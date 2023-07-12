@@ -6,8 +6,11 @@ public sealed record CreateProgramIncrementObjectiveCommand(Guid ProgramIncremen
 
 public sealed class CreateProgramIncrementObjectiveCommandValidator : CustomValidator<CreateProgramIncrementObjectiveCommand>
 {
-    public CreateProgramIncrementObjectiveCommandValidator()
+    private readonly IPlanningDbContext _planningDbContext;
+
+    public CreateProgramIncrementObjectiveCommandValidator(IPlanningDbContext planningDbContext)
     {
+        _planningDbContext = planningDbContext;
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(o => o.Name)
@@ -23,6 +26,29 @@ public sealed class CreateProgramIncrementObjectiveCommandValidator : CustomVali
                 .LessThan(o => o.TargetDate)
                 .WithMessage("The start date must be before the target date.");
         });
+
+        RuleFor(o => o.StartDate)
+            .MustAsync(BeWithinProgramIncrementDates)
+            .WithMessage("The start date must be within the Program Increment dates.");
+
+        RuleFor(o => o.TargetDate)
+            .MustAsync(BeWithinProgramIncrementDates)
+            .WithMessage("The target date must be within the Program Increment dates.");
+    }
+
+    public async Task<bool> BeWithinProgramIncrementDates(CreateProgramIncrementObjectiveCommand command, LocalDate? date, CancellationToken cancellationToken)
+    {
+        if (!date.HasValue)
+            return true;
+
+        var programIncrement = await _planningDbContext.ProgramIncrements
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == command.ProgramIncrementId, cancellationToken);
+
+        return programIncrement is null 
+            ? false 
+            : programIncrement.DateRange.Start <= date 
+                && date <= programIncrement.DateRange.End;
     }
 }
 
