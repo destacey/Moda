@@ -35,11 +35,6 @@ interface UpdateProgramIncrementObjectiveFormValues {
   targetDate?: Date | null
 }
 
-interface ProgramIncrementTeamSelectItem {
-  value: string
-  label: string
-}
-
 const UpdateProgramIncrementObjectiveForm = ({
   showForm,
   programIncrementId,
@@ -67,6 +62,9 @@ const UpdateProgramIncrementObjectiveForm = ({
 
   const mapToFormValues = useCallback(
     (objective: ProgramIncrementObjectiveDetailsDto) => {
+      if (!objective) {
+        throw new Error('Objective not found')
+      }
       form.setFieldsValue({
         objectiveId: objective.id,
         programIncrementId: objective.programIncrement.id,
@@ -184,33 +182,18 @@ const UpdateProgramIncrementObjectiveForm = ({
     form.resetFields()
   }, [form, onFormCancel])
 
-  useEffect(() => {
-    if (canManageObjectives) {
-      setIsOpen(showForm)
-      if (showForm === true) {
-        try {
-          let objectiveData: ProgramIncrementObjectiveDetailsDto = null
-          const loadData = async () => {
-            objectiveData = await getObjective(programIncrementId, objectiveId)
-            setProgramIncrement(await getProgramIncrement(programIncrementId))
-            setStatuses(await getProgramIncrementStatuses())
-          }
-          loadData()
-          mapToFormValues(objectiveData)
-        } catch (error) {
-          handleCancel()
-          messageApi.error(
-            'An unexpected error occurred while loading form data.'
-          )
-          console.error(error)
-        }
-      }
-    } else {
+  const loadData = useCallback(async () => {
+    try {
+      const objectiveData = await getObjective(programIncrementId, objectiveId)
+      setProgramIncrement(await getProgramIncrement(programIncrementId))
+      setStatuses(await getProgramIncrementStatuses())
+      mapToFormValues(objectiveData)
+    } catch (error) {
       handleCancel()
-      messageApi.error('You do not have permission to update PI objectives.')
+      messageApi.error('An unexpected error occurred while loading form data.')
+      console.error(error)
     }
   }, [
-    canManageObjectives,
     getObjective,
     getProgramIncrement,
     getProgramIncrementStatuses,
@@ -219,8 +202,19 @@ const UpdateProgramIncrementObjectiveForm = ({
     messageApi,
     objectiveId,
     programIncrementId,
-    showForm,
   ])
+
+  useEffect(() => {
+    if (canManageObjectives) {
+      setIsOpen(showForm)
+      if (showForm) {
+        loadData()
+      }
+    } else {
+      handleCancel()
+      messageApi.error('You do not have permission to update PI objectives.')
+    }
+  }, [canManageObjectives, showForm, loadData, handleCancel, messageApi])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
