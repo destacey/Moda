@@ -1,6 +1,15 @@
 'use client'
 
-import { DatePicker, Form, Input, Modal, Select, Switch, message } from 'antd'
+import {
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  Radio,
+  Select,
+  Switch,
+  message,
+} from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../../components/contexts/auth'
 import { getProgramIncrementsClient } from '@/src/services/clients'
@@ -243,6 +252,8 @@ const UpdateProgramIncrementObjectiveForm = ({
     [programIncrement]
   )
 
+  // TODO: Add PI and Team Label
+  // TODO: Add progress input
   return (
     <>
       {contextHolder}
@@ -274,9 +285,6 @@ const UpdateProgramIncrementObjectiveForm = ({
           <Form.Item name="teamId" hidden={true}>
             <Input />
           </Form.Item>
-          <Form.Item name="statusId" hidden={true}>
-            <Input />
-          </Form.Item>
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
             <Input showCount maxLength={128} />
           </Form.Item>
@@ -297,6 +305,20 @@ const UpdateProgramIncrementObjectiveForm = ({
             valuePropName="checked"
           >
             <Switch checkedChildren="Yes" unCheckedChildren="No" />
+          </Form.Item>
+          <Form.Item
+            name="statusId"
+            label="Status"
+            rules={[{ required: true }]}
+          >
+            <Radio.Group
+              options={statuses?.map((status) => ({
+                label: status.name,
+                value: status.id,
+              }))}
+              optionType="button"
+              buttonStyle="solid"
+            />
           </Form.Item>
           <Form.Item
             label="Start"
