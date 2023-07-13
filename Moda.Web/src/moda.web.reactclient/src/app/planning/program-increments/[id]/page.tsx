@@ -10,10 +10,16 @@ import {
 import { Button, Card } from 'antd'
 import { createElement, useEffect, useState } from 'react'
 import ProgramIncrementDetails from './program-increment-details'
-import ProgramIncrementObjectivesGrid from '@/src/app/components/common/planning/program-increment-objectives-grid'
+import ProgramIncrementObjectivesGrid, {
+  ProgramIncrementObjectivesGridProps,
+} from '@/src/app/components/common/planning/program-increment-objectives-grid'
 import { TeamListItem } from '@/src/app/organizations/types'
-import TeamsGrid from '@/src/app/components/common/organizations/teams-grid'
-import RisksGrid from '@/src/app/components/common/planning/risks-grid'
+import TeamsGrid, {
+  TeamsGridProps,
+} from '@/src/app/components/common/organizations/teams-grid'
+import RisksGrid, {
+  RisksGridProps,
+} from '@/src/app/components/common/planning/risks-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
@@ -62,7 +68,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     {
       key: 'teams',
       tab: 'Teams',
-      content: createElement(TeamsGrid, { teams: teams }),
+      content: createElement(TeamsGrid, { teams: teams } as TeamsGridProps),
     },
     {
       key: 'objectives',
@@ -71,12 +77,14 @@ const ProgramIncrementDetailsPage = ({ params }) => {
         objectives: objectives,
         hideProgramIncrementColumn: true,
         hideTeamColumn: false,
-      }),
+        newObjectivesAllowed: true,
+        programIncrementId: programIncrement?.id,
+      } as ProgramIncrementObjectivesGridProps),
     },
     {
       key: 'risk-management',
       tab: 'Risk Management',
-      content: createElement(RisksGrid, { risks: risks }),
+      content: createElement(RisksGrid, { risks: risks } as RisksGridProps),
     },
   ]
 

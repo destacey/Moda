@@ -1073,7 +1073,7 @@ export class ProgramIncrementsClient {
     /**
      * Create a program increment.
      */
-    create(request: CreateProgramIncrementRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    create(request: CreateProgramIncrementRequest, cancelToken?: CancelToken | undefined): Promise<string> {
         let url_ = this.baseUrl + "/api/planning/program-increments";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1085,6 +1085,7 @@ export class ProgramIncrementsClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -1100,7 +1101,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processCreate(response: AxiosResponse): Promise<void> {
+    protected processCreate(response: AxiosResponse): Promise<string> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1112,7 +1113,10 @@ export class ProgramIncrementsClient {
         }
         if (status === 201) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<string>(result201);
 
         } else if (status === 422) {
             const _responseText = response.data;
@@ -1516,7 +1520,7 @@ export class ProgramIncrementsClient {
     /**
      * Create a program increment objective.
      */
-    createObjective(id: string, request: CreateProgramIncrementObjectiveRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    createObjective(id: string, request: CreateProgramIncrementObjectiveRequest, cancelToken?: CancelToken | undefined): Promise<number> {
         let url_ = this.baseUrl + "/api/planning/program-increments/{id}/objectives";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -1531,6 +1535,7 @@ export class ProgramIncrementsClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -1546,7 +1551,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processCreateObjective(response: AxiosResponse): Promise<void> {
+    protected processCreateObjective(response: AxiosResponse): Promise<number> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1558,7 +1563,10 @@ export class ProgramIncrementsClient {
         }
         if (status === 201) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<number>(result201);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -1585,7 +1593,7 @@ export class ProgramIncrementsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<void>(null as any);
+        return Promise.resolve<number>(null as any);
     }
 
     /**
@@ -2102,7 +2110,7 @@ export class RisksClient {
     /**
      * Create a risk.
      */
-    createRisk(request: CreateRiskRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    createRisk(request: CreateRiskRequest, cancelToken?: CancelToken | undefined): Promise<string> {
         let url_ = this.baseUrl + "/api/planning/risks";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2114,6 +2122,7 @@ export class RisksClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -2129,7 +2138,7 @@ export class RisksClient {
         });
     }
 
-    protected processCreateRisk(response: AxiosResponse): Promise<void> {
+    protected processCreateRisk(response: AxiosResponse): Promise<string> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2141,7 +2150,10 @@ export class RisksClient {
         }
         if (status === 201) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<string>(result201);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -2168,7 +2180,7 @@ export class RisksClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<void>(null as any);
+        return Promise.resolve<string>(null as any);
     }
 
     /**
@@ -2905,7 +2917,7 @@ export class BacklogLevelsClient {
     /**
      * Create a backlog level.
      */
-    create(request: CreateBacklogLevelRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    create(request: CreateBacklogLevelRequest, cancelToken?: CancelToken | undefined): Promise<number> {
         let url_ = this.baseUrl + "/api/work/backlog-levels";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2917,6 +2929,7 @@ export class BacklogLevelsClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -2932,7 +2945,7 @@ export class BacklogLevelsClient {
         });
     }
 
-    protected processCreate(response: AxiosResponse): Promise<void> {
+    protected processCreate(response: AxiosResponse): Promise<number> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2944,7 +2957,10 @@ export class BacklogLevelsClient {
         }
         if (status === 201) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<number>(result201);
 
         } else if (status === 422) {
             const _responseText = response.data;
@@ -3251,7 +3267,7 @@ export class WorkStatesClient {
     /**
      * Create a work state.
      */
-    create(request: CreateWorkStateRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    create(request: CreateWorkStateRequest, cancelToken?: CancelToken | undefined): Promise<number> {
         let url_ = this.baseUrl + "/api/work/work-states";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3263,6 +3279,7 @@ export class WorkStatesClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -3278,7 +3295,7 @@ export class WorkStatesClient {
         });
     }
 
-    protected processCreate(response: AxiosResponse): Promise<void> {
+    protected processCreate(response: AxiosResponse): Promise<number> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -3290,7 +3307,10 @@ export class WorkStatesClient {
         }
         if (status === 201) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<number>(result201);
 
         } else if (status === 422) {
             const _responseText = response.data;
@@ -3525,7 +3545,7 @@ export class WorkTypesClient {
     /**
      * Create a work type.
      */
-    create(request: CreateWorkTypeRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    create(request: CreateWorkTypeRequest, cancelToken?: CancelToken | undefined): Promise<number> {
         let url_ = this.baseUrl + "/api/work/work-types";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3537,6 +3557,7 @@ export class WorkTypesClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -3552,7 +3573,7 @@ export class WorkTypesClient {
         });
     }
 
-    protected processCreate(response: AxiosResponse): Promise<void> {
+    protected processCreate(response: AxiosResponse): Promise<number> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -3564,7 +3585,10 @@ export class WorkTypesClient {
         }
         if (status === 201) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<number>(result201);
 
         } else if (status === 422) {
             const _responseText = response.data;
@@ -3799,7 +3823,7 @@ export class EmployeesClient {
     /**
      * Create an employee.
      */
-    create(request: CreateEmployeeRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    create(request: CreateEmployeeRequest, cancelToken?: CancelToken | undefined): Promise<number> {
         let url_ = this.baseUrl + "/api/organization/employees";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3811,6 +3835,7 @@ export class EmployeesClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -3826,7 +3851,7 @@ export class EmployeesClient {
         });
     }
 
-    protected processCreate(response: AxiosResponse): Promise<void> {
+    protected processCreate(response: AxiosResponse): Promise<number> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -3838,7 +3863,10 @@ export class EmployeesClient {
         }
         if (status === 201) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<number>(result201);
 
         } else if (status === 422) {
             const _responseText = response.data;
@@ -4180,7 +4208,7 @@ export class TeamsClient {
     /**
      * Create a team.
      */
-    create(request: CreateTeamRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    create(request: CreateTeamRequest, cancelToken?: CancelToken | undefined): Promise<number> {
         let url_ = this.baseUrl + "/api/organization/teams";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -4192,6 +4220,7 @@ export class TeamsClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -4207,7 +4236,7 @@ export class TeamsClient {
         });
     }
 
-    protected processCreate(response: AxiosResponse): Promise<void> {
+    protected processCreate(response: AxiosResponse): Promise<number> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -4219,7 +4248,10 @@ export class TeamsClient {
         }
         if (status === 201) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<number>(result201);
 
         } else if (status === 422) {
             const _responseText = response.data;
@@ -4706,7 +4738,7 @@ export class TeamsClient {
     /**
      * Create a risk for a team.
      */
-    createRisk(id: string, request: CreateRiskRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    createRisk(id: string, request: CreateRiskRequest, cancelToken?: CancelToken | undefined): Promise<string> {
         let url_ = this.baseUrl + "/api/organization/teams/{id}/risks";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -4721,6 +4753,7 @@ export class TeamsClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -4736,7 +4769,7 @@ export class TeamsClient {
         });
     }
 
-    protected processCreateRisk(response: AxiosResponse): Promise<void> {
+    protected processCreateRisk(response: AxiosResponse): Promise<string> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -4748,7 +4781,10 @@ export class TeamsClient {
         }
         if (status === 201) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<string>(result201);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -4775,7 +4811,7 @@ export class TeamsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<void>(null as any);
+        return Promise.resolve<string>(null as any);
     }
 
     /**
@@ -5003,7 +5039,7 @@ export class TeamsOfTeamsClient {
     /**
      * Create a team of teams.
      */
-    create(request: CreateTeamOfTeamsRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    create(request: CreateTeamOfTeamsRequest, cancelToken?: CancelToken | undefined): Promise<number> {
         let url_ = this.baseUrl + "/api/organization/teams-of-teams";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -5015,6 +5051,7 @@ export class TeamsOfTeamsClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -5030,7 +5067,7 @@ export class TeamsOfTeamsClient {
         });
     }
 
-    protected processCreate(response: AxiosResponse): Promise<void> {
+    protected processCreate(response: AxiosResponse): Promise<number> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -5042,7 +5079,10 @@ export class TeamsOfTeamsClient {
         }
         if (status === 201) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<number>(result201);
 
         } else if (status === 422) {
             const _responseText = response.data;
@@ -5529,7 +5569,7 @@ export class TeamsOfTeamsClient {
     /**
      * Create a risk for a team of teams.
      */
-    createRisk(id: string, request: CreateRiskRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    createRisk(id: string, request: CreateRiskRequest, cancelToken?: CancelToken | undefined): Promise<string> {
         let url_ = this.baseUrl + "/api/organization/teams-of-teams/{id}/risks";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -5544,6 +5584,7 @@ export class TeamsOfTeamsClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -5559,7 +5600,7 @@ export class TeamsOfTeamsClient {
         });
     }
 
-    protected processCreateRisk(response: AxiosResponse): Promise<void> {
+    protected processCreateRisk(response: AxiosResponse): Promise<string> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -5571,7 +5612,10 @@ export class TeamsOfTeamsClient {
         }
         if (status === 201) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<string>(result201);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -5598,7 +5642,7 @@ export class TeamsOfTeamsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<void>(null as any);
+        return Promise.resolve<string>(null as any);
     }
 
     /**
@@ -5823,7 +5867,7 @@ export class AzureDevOpsBoardsConnectionsClient {
     /**
      * Create an Azure DevOps Boards connection.
      */
-    create(request: CreateAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    create(request: CreateAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken | undefined): Promise<string> {
         let url_ = this.baseUrl + "/api/app-integration/azure-devops-boards-connections";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -5835,6 +5879,7 @@ export class AzureDevOpsBoardsConnectionsClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -5850,7 +5895,7 @@ export class AzureDevOpsBoardsConnectionsClient {
         });
     }
 
-    protected processCreate(response: AxiosResponse): Promise<void> {
+    protected processCreate(response: AxiosResponse): Promise<string> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -5862,7 +5907,10 @@ export class AzureDevOpsBoardsConnectionsClient {
         }
         if (status === 201) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<string>(result201);
 
         } else if (status === 422) {
             const _responseText = response.data;
@@ -6595,6 +6643,7 @@ export interface ProgramIncrementObjectiveListDto {
     team?: PlanningTeamNavigationDto;
     progress?: number;
     type?: SimpleNavigationDto;
+    startDate?: Date | undefined;
     targetDate?: Date | undefined;
     isStretch?: boolean;
 }

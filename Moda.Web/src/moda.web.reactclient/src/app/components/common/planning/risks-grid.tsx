@@ -4,6 +4,7 @@ import ModaGrid from '../moda-grid'
 import { RiskListDto } from '@/src/services/moda-api'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { Space, Switch } from 'antd'
+import dayjs from 'dayjs'
 
 export interface RisksGridProps {
   risks: RiskListDto[]
@@ -74,14 +75,14 @@ const RisksGrid = ({ risks, hideTeamColumn = false }: RisksGridProps) => {
         field: 'followUp',
         valueGetter: (params) =>
           params.data.followUpDate
-            ? new Date(params.data.followUpDate).toLocaleDateString()
+            ? dayjs(params.data.followUpDate).format('M/D/YYYY')
             : null,
       },
       { field: 'assignee.name', cellRenderer: AssigneeLinkCellRenderer },
       {
         field: 'reportedOn',
         valueGetter: (params) =>
-          new Date(params.data.reportedOn).toLocaleDateString(),
+          dayjs(params.data.reportedOn).format('M/D/YYYY'),
       },
     ],
     [hideTeam]

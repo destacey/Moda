@@ -1,6 +1,15 @@
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, Input, Space, Tooltip, Typography } from 'antd'
+import {
+  Button,
+  Col,
+  Dropdown,
+  Input,
+  Row,
+  Space,
+  Tooltip,
+  Typography,
+} from 'antd'
 import {
   ControlOutlined,
   ExportOutlined,
@@ -17,6 +26,7 @@ interface ModaGridProps extends AgGridReactProps {
   width?: number
   includeGlobalSearch?: boolean
   includeExportButton?: boolean
+  actions?: React.ReactNode | null
   gridControlMenuItems?: ItemType[]
   loadData?: () => Promise<void>
 }
@@ -33,6 +43,7 @@ const ModaGrid = ({
   width,
   includeGlobalSearch,
   includeExportButton,
+  actions,
   gridControlMenuItems,
   defaultColDef,
   rowData,
@@ -44,6 +55,7 @@ const ModaGrid = ({
   const showGlobalSearch = includeGlobalSearch ?? true
   const showExportButton = includeExportButton ?? true
   const showGridControls = gridControlMenuItems?.length > 0
+  const toolbarMdSize = actions ? 12 : 24
 
   const gridRef = useRef<AgGridReact>(null)
 
@@ -85,48 +97,61 @@ const ModaGrid = ({
   return (
     <div style={{ width: width }}>
       <Space direction="vertical" style={{ width: '100%' }}>
-        <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Typography.Text>
-            {displayedRowCount} of {rowCount}
-          </Typography.Text>
-          {showGlobalSearch && (
-            <Input
-              placeholder="Search"
-              allowClear={true}
-              onChange={onGlobalSearchChange}
-            />
+        <Row>
+          {actions && (
+            <Col xs={24} sm={24} md={toolbarMdSize}>
+              {actions}
+            </Col>
           )}
-          {showGridControls && (
-            <Tooltip title="Grid Controls">
-              <Dropdown
-                menu={{ items: gridControlMenuItems }}
-                trigger={['click']}
-              >
-                <Button type="text" shape="circle" icon={<ControlOutlined />} />
-              </Dropdown>
-            </Tooltip>
-          )}
-          {loadData && (
-            <Tooltip title="Refresh Grid">
-              <Button
-                type="text"
-                shape="circle"
-                icon={<ReloadOutlined />}
-                onClick={onRefreshData}
-              />
-            </Tooltip>
-          )}
-          {showExportButton && (
-            <Tooltip title="Export to CSV">
-              <Button
-                type="text"
-                shape="circle"
-                icon={<ExportOutlined />}
-                onClick={onBtnExport}
-              />
-            </Tooltip>
-          )}
-        </Space>
+          <Col xs={24} sm={24} md={toolbarMdSize}>
+            <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Typography.Text>
+                {displayedRowCount} of {rowCount}
+              </Typography.Text>
+              {showGlobalSearch && (
+                <Input
+                  placeholder="Search"
+                  allowClear={true}
+                  onChange={onGlobalSearchChange}
+                />
+              )}
+              {showGridControls && (
+                <Tooltip title="Grid Controls">
+                  <Dropdown
+                    menu={{ items: gridControlMenuItems }}
+                    trigger={['click']}
+                  >
+                    <Button
+                      type="text"
+                      shape="circle"
+                      icon={<ControlOutlined />}
+                    />
+                  </Dropdown>
+                </Tooltip>
+              )}
+              {loadData && (
+                <Tooltip title="Refresh Grid">
+                  <Button
+                    type="text"
+                    shape="circle"
+                    icon={<ReloadOutlined />}
+                    onClick={onRefreshData}
+                  />
+                </Tooltip>
+              )}
+              {showExportButton && (
+                <Tooltip title="Export to CSV">
+                  <Button
+                    type="text"
+                    shape="circle"
+                    icon={<ExportOutlined />}
+                    onClick={onBtnExport}
+                  />
+                </Tooltip>
+              )}
+            </Space>
+          </Col>
+        </Row>
 
         <div className={agGridTheme} style={{ height: height ?? 700 }}>
           <AgGridReact

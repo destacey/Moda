@@ -56,14 +56,14 @@ public class Objective : BaseAuditableEntity<Guid>
 
     /// <summary>Gets the progress percentage.</summary>
     /// <value>The progress percentage.</value>
-    public double Progress 
-    { 
-        get => _progress; 
-        private set => _progress = value < 0 
+    public double Progress
+    {
+        get => _progress;
+        private set => _progress = value < 0
             ? 0.0d
             : value > 100
                 ? 100.0d
-                : value; 
+                : value;
     }
 
     /// <summary>Gets or sets the owner identifier.</summary>
@@ -120,7 +120,7 @@ public class Objective : BaseAuditableEntity<Guid>
     {
         if (Status == status) return;
 
-        if (Status is ObjectiveStatus.Closed or ObjectiveStatus.Canceled 
+        if (Status is ObjectiveStatus.Closed or ObjectiveStatus.Canceled
             && status is not ObjectiveStatus.Closed or ObjectiveStatus.Canceled)
         {
             ClosedDate = null;
@@ -160,8 +160,8 @@ public class Objective : BaseAuditableEntity<Guid>
     public static Objective Import(string name, string? description, ObjectiveType type, ObjectiveStatus status, double progress, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate, Instant? closedDate)
     {
         return new Objective()
-        { 
-            Name = name, 
+        {
+            Name = name,
             Description = description,
             Type = type,
             Status = status,

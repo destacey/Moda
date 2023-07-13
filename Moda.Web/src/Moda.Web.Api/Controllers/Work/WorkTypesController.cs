@@ -47,7 +47,7 @@ public class WorkTypesController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.WorkTypes)]
     [OpenApiOperation("Create a work type.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Int))]
     public async Task<ActionResult> Create(CreateWorkTypeRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateWorkTypeCommand(), cancellationToken);

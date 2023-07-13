@@ -72,7 +72,7 @@ public class ProgramIncrementsController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.ProgramIncrements)]
     [OpenApiOperation("Create a program increment.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Guid))]
     public async Task<ActionResult> Create([FromBody] CreateProgramIncrementRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateProgramIncrementCommand(), cancellationToken);
@@ -186,7 +186,7 @@ public class ProgramIncrementsController : ControllerBase
     [HttpPost("{id}/objectives")]
     [MustHavePermission(ApplicationAction.Manage, ApplicationResource.ProgramIncrementObjectives)]
     [OpenApiOperation("Create a program increment objective.", "")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
@@ -208,7 +208,7 @@ public class ProgramIncrementsController : ControllerBase
             return BadRequest(error);
         }
 
-        return CreatedAtAction(nameof(GetObjectiveByLocalId), new { id = result.Value }, result.Value);
+        return CreatedAtAction(nameof(GetObjectiveByLocalId), new { id, objectiveId = result.Value }, result.Value);
     }
 
     [HttpPut("{id}/objectives/{objectiveId}")]

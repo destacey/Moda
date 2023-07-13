@@ -7,6 +7,7 @@ import { ProgramIncrementListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import { useDocumentTitle } from '../../hooks/use-document-title'
+import dayjs from 'dayjs'
 
 const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
   return (
@@ -28,12 +29,11 @@ const ProgramIncrementListPage = () => {
       { field: 'state', width: 125 },
       {
         field: 'start',
-        valueGetter: (params) =>
-          new Date(params.data.start).toLocaleDateString(),
+        valueGetter: (params) => dayjs(params.data.start).format('M/D/YYYY'),
       },
       {
         field: 'end',
-        valueGetter: (params) => new Date(params.data.end).toLocaleDateString(),
+        valueGetter: (params) => dayjs(params.data.end).format('M/D/YYYY'),
       },
     ],
     []

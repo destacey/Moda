@@ -82,12 +82,14 @@ const CreateTeamForm = ({
 
   const createTeam = async (values: CreateTeamFormValues) => {
     const teamsClient = await getTeamsClient()
-    await teamsClient.create(values as CreateTeamRequest)
+    const localId = await teamsClient.create(values as CreateTeamRequest)
   }
 
   const createTeamOfTeams = async (values: CreateTeamFormValues) => {
     const teamsOfTeamsClient = await getTeamsOfTeamsClient()
-    await teamsOfTeamsClient.create(values as CreateTeamOfTeamsRequest)
+    const localId = await teamsOfTeamsClient.create(
+      values as CreateTeamOfTeamsRequest
+    )
   }
 
   const handleOk = async () => {
