@@ -10,9 +10,9 @@ export const ThemeContext = createContext<ThemeContextType | null>(null)
 export const ThemeProvider = ({ children }) => {
   const [currentThemeName, setCurrentThemeName] =
     useLocalStorageState<ThemeName>('modaTheme', 'light')
-  const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(undefined)
-  const [appBarColor, setAppBarColor] = useState('')
-  const [agGridTheme, setAgGridTheme] = useState('')
+  const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(lightTheme)
+  const [appBarColor, setAppBarColor] = useState('#2196f3')
+  const [agGridTheme, setAgGridTheme] = useState('ag-theme-balham')
   const { token } = theme.useToken()
 
   useEffect(() => {
