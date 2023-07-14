@@ -2,7 +2,7 @@
 
 import '../../styles/globals.css'
 import React from 'react'
-import { Layout, Menu } from 'antd'
+import { Layout } from 'antd'
 import { AuthenticatedTemplate } from '@azure/msal-react'
 import AppHeader from './components/common/app-header'
 import AppMenu from './components/common/menu'

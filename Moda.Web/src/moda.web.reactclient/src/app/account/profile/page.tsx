@@ -7,6 +7,7 @@ import ProfileForm from './profile-form'
 import ClaimsGrid from './claims-grid'
 import useAuth from '../../components/contexts/auth'
 import { useDocumentTitle } from '../../hooks/use-document-title'
+import useBreadcrumbs from '../../components/contexts/breadcrumbs'
 
 const tabs = [
   { key: 'profile', tab: 'Profile', content: React.createElement(ProfileForm) },
@@ -15,8 +16,9 @@ const tabs = [
 
 const AccountProfilePage = () => {
   useDocumentTitle('Account Profile')
-  const { refreshUser } = useAuth()
+  const { user, isLoading, refreshUser } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
+  const {setBreadcrumbTitle} = useBreadcrumbs()
 
   useEffect(() => {
     const reloadUserPermissions = async () => {
@@ -25,6 +27,13 @@ const AccountProfilePage = () => {
     reloadUserPermissions()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if(!isLoading && user){
+      setBreadcrumbTitle(user.name)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isLoading])
 
   return (
     <>

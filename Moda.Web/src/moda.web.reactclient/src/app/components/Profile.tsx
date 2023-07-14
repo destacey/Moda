@@ -17,7 +17,7 @@ import useAuth from './contexts/auth'
 
 export default function Profile() {
   const { setCurrentThemeName, currentThemeName } = useTheme()
-  const { login, logout, user } = useAuth()
+  const { login, logout, user, isLoading } = useAuth()
   const [themeIcon, setThemeIcon] = useState(createElement(HighlightOutlined))
   const router = useRouter()
 
@@ -36,6 +36,9 @@ export default function Profile() {
   }
 
   function WelcomeUser() {
+    if (isLoading) {
+      return <p>Loading user info...</p>
+    }
     return user.name && user.name.trim() ? <p>Welcome, {user.name}</p> : null
   }
 
