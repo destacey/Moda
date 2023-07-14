@@ -10,14 +10,6 @@ export default function AppHeader() {
   const { menuCollapsed, setMenuCollapsed } = useMenuToggle()
   const { appBarColor } = useTheme()
 
-  // const MenuIcon = () => {
-  //   return menuCollapsed ? (
-  //     <MenuUnfoldOutlined style={{ fontSize: '20px' }} />
-  //   ) : (
-  //     <MenuFoldOutlined style={{ fontSize: '20px' }} />
-  //   )
-  // }
-
   return (
     <Header
       style={{
