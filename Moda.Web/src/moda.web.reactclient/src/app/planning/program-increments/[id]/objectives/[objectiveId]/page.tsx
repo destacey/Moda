@@ -95,7 +95,7 @@ const ObjectiveDetailsPage = ({ params }) => {
   return (
     <>
       <PageTitle
-        title={objective?.name}
+        title={`${objective?.localId} - ${objective?.name}`}
         subtitle="PI Objective Details"
         actions={showActions && <Actions />}
       />
