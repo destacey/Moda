@@ -84,7 +84,10 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     {
       key: 'risk-management',
       tab: 'Risk Management',
-      content: createElement(RisksGrid, { risks: risks } as RisksGridProps),
+      content: createElement(RisksGrid, {
+        risks: risks,
+        newRisksAllowed: true,
+      } as RisksGridProps),
     },
   ]
 

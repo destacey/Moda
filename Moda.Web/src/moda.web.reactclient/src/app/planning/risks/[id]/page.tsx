@@ -14,7 +14,7 @@ const RiskDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')
   const [risk, setRisk] = useState<RiskDetailsDto | null>(null)
   const { id } = params
-  const {setBreadcrumbTitle} = useBreadcrumbs()
+  const { setBreadcrumbTitle } = useBreadcrumbs()
 
   const tabs = [
     {
@@ -37,7 +37,10 @@ const RiskDetailsPage = ({ params }) => {
 
   return (
     <>
-      <PageTitle title={risk?.summary} subtitle="Risk Details" />
+      <PageTitle
+        title={`${risk?.localId} - ${risk?.summary}`}
+        subtitle="Risk Details"
+      />
       <Card
         style={{ width: '100%' }}
         tabList={tabs}
