@@ -3932,14 +3932,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(CreateRiskRequest request);
+        System.Threading.Tasks.Task<int> CreateRiskAsync(CreateRiskRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a risk.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(CreateRiskRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<int> CreateRiskAsync(CreateRiskRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get risk details by Id.
@@ -4175,7 +4175,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(CreateRiskRequest request)
+        public virtual System.Threading.Tasks.Task<int> CreateRiskAsync(CreateRiskRequest request)
         {
             return CreateRiskAsync(request, System.Threading.CancellationToken.None);
         }
@@ -4185,7 +4185,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Create a risk.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Guid> CreateRiskAsync(CreateRiskRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<int> CreateRiskAsync(CreateRiskRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -4229,7 +4229,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Guid>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<int>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);

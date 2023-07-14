@@ -1765,8 +1765,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "guid"
+                  "type": "integer",
+                  "format": "int32"
                 }
               }
             }
