@@ -6,7 +6,7 @@ import {
   Input,
   Modal,
   Radio,
-  Select,
+  Slider,
   Switch,
   message,
 } from 'antd'
@@ -253,7 +253,6 @@ const UpdateProgramIncrementObjectiveForm = ({
   )
 
   // TODO: Add PI and Team Label
-  // TODO: Add progress input
   return (
     <>
       {contextHolder}
@@ -319,6 +318,9 @@ const UpdateProgramIncrementObjectiveForm = ({
               optionType="button"
               buttonStyle="solid"
             />
+          </Form.Item>
+          <Form.Item label="Progress" name="progress">
+            <Slider />
           </Form.Item>
           <Form.Item
             label="Start"
