@@ -3,7 +3,7 @@
 namespace Moda.Planning.Application.Risks.Commands;
 public sealed record CreateRiskCommand(string Summary, string? Description, Guid TeamId, 
     RiskCategory Category, RiskGrade Impact, RiskGrade Likelihood, Guid? AssigneeId, 
-    LocalDate? FollowUpDate, string? Response) : ICommand<Guid>;
+    LocalDate? FollowUpDate, string? Response) : ICommand<int>;
 
 public sealed class CreateRiskCommandValidator : CustomValidator<CreateRiskCommand>
 {
@@ -38,7 +38,7 @@ public sealed class CreateRiskCommandValidator : CustomValidator<CreateRiskComma
     }
 }
 
-internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskCommand, Guid>
+internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskCommand, int>
 {
     private readonly IPlanningDbContext _planningDbContext;
     private readonly IDateTimeService _dateTimeService;
@@ -53,13 +53,13 @@ internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskComma
         _currentUser = currentUser;
     }
 
-    public async Task<Result<Guid>> Handle(CreateRiskCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(CreateRiskCommand request, CancellationToken cancellationToken)
     {
         try
         {
             Guid? currentUserEmployeeId = _currentUser.GetEmployeeId();
             if (currentUserEmployeeId is null)
-                return Result.Failure<Guid>("Unable to determine current user's employee Id.");
+                return Result.Failure<int>("Unable to determine current user's employee Id.");
 
             var risk = Risk.Create(
                 request.Summary,
@@ -79,7 +79,7 @@ internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskComma
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(risk.Id);
+            return Result.Success(risk.LocalId);
         }
         catch (Exception ex)
         {
@@ -87,7 +87,7 @@ internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskComma
 
             _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
 
-            return Result.Failure<Guid>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
         }
     }
 }

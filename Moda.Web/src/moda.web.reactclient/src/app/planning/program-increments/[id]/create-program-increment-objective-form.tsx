@@ -124,7 +124,6 @@ const CreateProgramIncrementObjectiveForm = ({
     ): Promise<boolean> => {
       try {
         const localId = await createObjective(values)
-        console.log(`localId from create: ${localId}`)
         setNewObjectiveLocalId(localId)
         return true
       } catch (error) {

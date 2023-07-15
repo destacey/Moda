@@ -3,11 +3,15 @@ import { useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
 import { RiskListDto } from '@/src/services/moda-api'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
-import { Space, Switch } from 'antd'
+import { Button, Space, Switch } from 'antd'
 import dayjs from 'dayjs'
+import useAuth from '../../contexts/auth'
+import CreateRiskForm from './create-risk-form'
 
 export interface RisksGridProps {
   risks: RiskListDto[]
+  teamId?: string | null
+  newRisksAllowed?: boolean
   hideTeamColumn?: boolean
 }
 
@@ -32,11 +36,34 @@ const AssigneeLinkCellRenderer = ({ value, data }) => {
   )
 }
 
-const RisksGrid = ({ risks, hideTeamColumn = false }: RisksGridProps) => {
+const RisksGrid = ({
+  risks,
+  teamId,
+  newRisksAllowed = false,
+  hideTeamColumn = false,
+}: RisksGridProps) => {
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
+  const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
+  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
+
+  const { hasClaim } = useAuth()
+  const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
+  const showActions = newRisksAllowed && canCreateRisks
 
   const onHideTeamChange = (checked: boolean) => {
     setHideTeam(checked)
+  }
+
+  const Actions = () => {
+    return (
+      <>
+        {canCreateRisks && (
+          <Button onClick={() => setOpenCreateRiskForm(true)}>
+            Create Risk
+          </Button>
+        )}
+      </>
+    )
   }
 
   const controlItems: ItemType[] = [
@@ -88,6 +115,13 @@ const RisksGrid = ({ risks, hideTeamColumn = false }: RisksGridProps) => {
     [hideTeam]
   )
 
+  const onCreateRiskFormClosed = (wasCreated: boolean) => {
+    setOpenCreateRiskForm(false)
+    if (wasCreated) {
+      setLastRefresh(Date.now())
+    }
+  }
+
   return (
     <>
       {/* TODO:  setup dynamic height */}
@@ -95,7 +129,14 @@ const RisksGrid = ({ risks, hideTeamColumn = false }: RisksGridProps) => {
         height={550}
         columnDefs={columnDefs}
         rowData={risks}
+        actions={showActions && <Actions />}
         gridControlMenuItems={controlItems}
+      />
+      <CreateRiskForm
+        createForTeamId={teamId}
+        showForm={openCreateRiskForm}
+        onFormCreate={() => onCreateRiskFormClosed(true)}
+        onFormCancel={() => onCreateRiskFormClosed(false)}
       />
     </>
   )

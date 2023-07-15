@@ -2110,7 +2110,7 @@ export class RisksClient {
     /**
      * Create a risk.
      */
-    createRisk(request: CreateRiskRequest, cancelToken?: CancelToken | undefined): Promise<string> {
+    createRisk(request: CreateRiskRequest, cancelToken?: CancelToken | undefined): Promise<number> {
         let url_ = this.baseUrl + "/api/planning/risks";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2138,7 +2138,7 @@ export class RisksClient {
         });
     }
 
-    protected processCreateRisk(response: AxiosResponse): Promise<string> {
+    protected processCreateRisk(response: AxiosResponse): Promise<number> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2153,7 +2153,7 @@ export class RisksClient {
             let result201: any = null;
             let resultData201  = _responseText;
             result201 = JSON.parse(resultData201);
-            return Promise.resolve<string>(result201);
+            return Promise.resolve<number>(result201);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -2180,7 +2180,7 @@ export class RisksClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<string>(null as any);
+        return Promise.resolve<number>(null as any);
     }
 
     /**

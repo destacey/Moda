@@ -1,6 +1,6 @@
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
 import { Button, Progress, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'

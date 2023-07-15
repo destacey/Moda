@@ -10,10 +10,12 @@ import { Button, Card } from 'antd'
 import { createElement, useEffect, useState } from 'react'
 import TeamDetails from './team-details'
 import { getTeamsClient } from '@/src/services/clients'
-import RisksGrid from '@/src/app/components/common/planning/risks-grid'
+import RisksGrid, {
+  RisksGridProps,
+} from '@/src/app/components/common/planning/risks-grid'
 import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-memberships-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import UpdateTeamForm from '../../components/update-team'
+import EditTeamForm from '../../components/edit-team'
 import useAuth from '@/src/app/components/contexts/auth'
 import useBreadcrumb from '@/src/app/components/contexts/breadcrumbs'
 
@@ -55,7 +57,12 @@ const TeamDetailsPage = ({ params }) => {
     {
       key: 'risk-management',
       tab: 'Risk Management',
-      content: createElement(RisksGrid, { risks: risks, hideTeamColumn: true }),
+      content: createElement(RisksGrid, {
+        risks: risks,
+        teamId: team?.id,
+        newRisksAllowed: true,
+        hideTeamColumn: true,
+      } as RisksGridProps),
     },
     {
       key: 'team-memberships',
@@ -111,7 +118,7 @@ const TeamDetailsPage = ({ params }) => {
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
       {team && (
-        <UpdateTeamForm
+        <EditTeamForm
           showForm={openUpdateTeamModal}
           localId={team.localId}
           type={team.type}

@@ -10,7 +10,7 @@ import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import useAuth from '@/src/app/components/contexts/auth'
-import UpdateProgramIncrementObjectiveForm from '../../update-program-increment-objective-form'
+import EditProgramIncrementObjectiveForm from '../../edit-program-increment-objective-form'
 
 const ObjectiveDetailsPage = ({ params }) => {
   useDocumentTitle('PI Objective Details')
@@ -38,7 +38,7 @@ const ObjectiveDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
-    const objectiveRoute: ItemType[] = [
+    const breadcrumbRoute: ItemType[] = [
       {
         title: 'Planning',
       },
@@ -56,7 +56,7 @@ const ObjectiveDetailsPage = ({ params }) => {
       )
       setObjective(objectiveDto)
 
-      objectiveRoute.push(
+      breadcrumbRoute.push(
         {
           href: `/planning/program-increments/${objectiveDto.programIncrement?.localId}`,
           title: objectiveDto.programIncrement?.name,
@@ -66,7 +66,7 @@ const ObjectiveDetailsPage = ({ params }) => {
         }
       )
       // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
-      setBreadcrumbRoute(objectiveRoute)
+      setBreadcrumbRoute(breadcrumbRoute)
     }
 
     getObjective()
@@ -107,7 +107,7 @@ const ObjectiveDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      <UpdateProgramIncrementObjectiveForm
+      <EditProgramIncrementObjectiveForm
         showForm={openUpdateObjectiveModal}
         objectiveId={objective?.id}
         programIncrementId={objective?.programIncrement?.id}
