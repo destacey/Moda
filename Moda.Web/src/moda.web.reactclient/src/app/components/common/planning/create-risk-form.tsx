@@ -25,9 +25,9 @@ interface CreateRiskFormValues {
   teamId: string
   summary: string
   description?: string | undefined
-  categoryId?: number
-  impactId?: number
-  likelihoodId?: number
+  categoryId: number
+  impactId: number
+  likelihoodId: number
   assigneeId?: string | undefined
   followUpDate?: Date | undefined
   response?: string | undefined

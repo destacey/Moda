@@ -2,6 +2,7 @@
 
 import {
   DatePicker,
+  Descriptions,
   Form,
   Input,
   Modal,
@@ -22,6 +23,7 @@ import {
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
+import _ from 'lodash'
 
 export interface UpdateProgramIncrementObjectiveFormProps {
   showForm: boolean
@@ -44,6 +46,11 @@ interface UpdateProgramIncrementObjectiveFormValues {
   targetDate?: Date | null
 }
 
+interface OptionModel<T = string> {
+  value: T
+  label: string
+}
+
 const UpdateProgramIncrementObjectiveForm = ({
   showForm,
   programIncrementId,
@@ -57,11 +64,12 @@ const UpdateProgramIncrementObjectiveForm = ({
   const [form] = Form.useForm<UpdateProgramIncrementObjectiveFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
+
+  const [objectiveNumber, setObjectiveNumber] = useState<number>(undefined)
+  const [teamName, setTeamName] = useState<string>('')
   const [programIncrement, setProgramIncrement] =
     useState<ProgramIncrementDetailsDto>(undefined)
-  const [statuses, setStatuses] = useState<
-    ProgramIncrementObjectiveStatusDto[]
-  >([])
+  const [statusOptions, setStatusOptions] = useState<OptionModel<number>[]>([])
 
   const { hasClaim } = useAuth()
   const canManageObjectives = hasClaim(
@@ -128,7 +136,12 @@ const UpdateProgramIncrementObjectiveForm = ({
 
   const getProgramIncrementStatuses = useCallback(async () => {
     const programIncrementsClient = await getProgramIncrementsClient()
-    return await programIncrementsClient.getObjectiveStatuses()
+    const statusDtos = await programIncrementsClient.getObjectiveStatuses()
+    const statuses: OptionModel<number>[] = statusDtos.map((r) => ({
+      value: r.id,
+      label: r.name,
+    }))
+    return _.sortBy(statuses, ['order'])
   }, [])
 
   const updateObjective = useCallback(
@@ -145,9 +158,7 @@ const UpdateProgramIncrementObjectiveForm = ({
   )
 
   const update = useCallback(
-    async (
-      values: UpdateProgramIncrementObjectiveFormValues
-    ): Promise<boolean> => {
+    async (values: UpdateProgramIncrementObjectiveFormValues) => {
       try {
         await updateObjective(values)
         return true
@@ -194,9 +205,11 @@ const UpdateProgramIncrementObjectiveForm = ({
   const loadData = useCallback(async () => {
     try {
       const objectiveData = await getObjective(programIncrementId, objectiveId)
-      setProgramIncrement(await getProgramIncrement(programIncrementId))
-      setStatuses(await getProgramIncrementStatuses())
+      setObjectiveNumber(objectiveData.localId)
+      setTeamName(objectiveData.team.name)
       mapToFormValues(objectiveData)
+      setProgramIncrement(await getProgramIncrement(programIncrementId))
+      setStatusOptions(await getProgramIncrementStatuses())
     } catch (error) {
       handleCancel()
       messageApi.error('An unexpected error occurred while loading form data.')
@@ -252,16 +265,15 @@ const UpdateProgramIncrementObjectiveForm = ({
     [programIncrement]
   )
 
-  // TODO: Add PI and Team Label
   return (
     <>
       {contextHolder}
       <Modal
-        title="Update PI Objective"
+        title="Edit PI Objective"
         open={isOpen}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
-        okText="Update"
+        okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
@@ -275,6 +287,12 @@ const UpdateProgramIncrementObjectiveForm = ({
           layout="vertical"
           name="update-objective-form"
         >
+          <Descriptions size="small" column={1}>
+            <Descriptions.Item label="Number">
+              {objectiveNumber}
+            </Descriptions.Item>
+            <Descriptions.Item label="Team">{teamName}</Descriptions.Item>
+          </Descriptions>
           <Form.Item name="objectiveId" hidden={true}>
             <Input />
           </Form.Item>
@@ -311,10 +329,7 @@ const UpdateProgramIncrementObjectiveForm = ({
             rules={[{ required: true }]}
           >
             <Radio.Group
-              options={statuses?.map((status) => ({
-                label: status.name,
-                value: status.id,
-              }))}
+              options={statusOptions}
               optionType="button"
               buttonStyle="solid"
             />
