@@ -10,7 +10,7 @@ import {
 } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 
-export interface UpdateTeamFormProps {
+export interface EditTeamFormProps {
   showForm: boolean
   localId: number
   type: string
@@ -18,24 +18,24 @@ export interface UpdateTeamFormProps {
   onFormCancel: () => void
 }
 
-interface UpdateTeamFormValues {
+interface EditTeamFormValues {
   id: string
   name: string
   code: string
   description: string
 }
 
-const UpdateTeamForm = ({
+const EditTeamForm = ({
   showForm,
   localId,
   type,
   onFormUpdate,
   onFormCancel,
-}: UpdateTeamFormProps) => {
+}: EditTeamFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<UpdateTeamFormValues>()
+  const [form] = Form.useForm<EditTeamFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
@@ -43,7 +43,7 @@ const UpdateTeamForm = ({
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
 
   const mapTeamToFormValues = useCallback(
-    (team: UpdateTeamFormValues) => {
+    (team: EditTeamFormValues) => {
       form.setFieldsValue({
         id: team.id,
         name: team.name,
@@ -56,19 +56,17 @@ const UpdateTeamForm = ({
 
   const getTeamData = useCallback(async (teamLocalId: number) => {
     const teamsClient = await getTeamsClient()
-    return (await teamsClient.getById(teamLocalId)) as UpdateTeamFormValues
+    return (await teamsClient.getById(teamLocalId)) as EditTeamFormValues
   }, [])
 
   const getTeamOfTeamsData = useCallback(async (teamLocalId: number) => {
     const teamsOfTeamsClient = await getTeamsOfTeamsClient()
-    return (await teamsOfTeamsClient.getById(
-      teamLocalId
-    )) as UpdateTeamFormValues
+    return (await teamsOfTeamsClient.getById(teamLocalId)) as EditTeamFormValues
   }, [])
 
   const loadData = useCallback(async () => {
     try {
-      let teamData: UpdateTeamFormValues = null
+      let teamData: EditTeamFormValues = null
       if (type === 'Team') {
         teamData = await getTeamData(localId)
       } else if (type === 'Team of Teams') {
@@ -112,7 +110,7 @@ const UpdateTeamForm = ({
     )
   }, [form, formValues])
 
-  const update = async (values: UpdateTeamFormValues): Promise<boolean> => {
+  const update = async (values: EditTeamFormValues): Promise<boolean> => {
     try {
       if (type === 'Team') {
         await updateTeam(values)
@@ -138,12 +136,12 @@ const UpdateTeamForm = ({
     }
   }
 
-  const updateTeam = async (values: UpdateTeamFormValues) => {
+  const updateTeam = async (values: EditTeamFormValues) => {
     const teamsClient = await getTeamsClient()
     await teamsClient.update(values.id, values as UpdateTeamRequest)
   }
 
-  const updateTeamOfTeams = async (values: UpdateTeamFormValues) => {
+  const updateTeamOfTeams = async (values: EditTeamFormValues) => {
     const teamsOfTeamsClient = await getTeamsOfTeamsClient()
     await teamsOfTeamsClient.update(
       values.id,
@@ -247,4 +245,4 @@ const UpdateTeamForm = ({
   )
 }
 
-export default UpdateTeamForm
+export default EditTeamForm

@@ -9,14 +9,15 @@ import { Button, Card } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
-import UpdateRiskForm from '@/src/app/components/common/planning/update-risk-form'
+import UpdateRiskForm from '@/src/app/components/common/planning/edit-risk-form'
+import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 
 const RiskDetailsPage = ({ params }) => {
   useDocumentTitle('Risk Details')
   const [activeTab, setActiveTab] = useState('details')
   const [risk, setRisk] = useState<RiskDetailsDto | null>(null)
   const { id } = params
-  const { setBreadcrumbTitle } = useBreadcrumbs()
+  const { setBreadcrumbRoute } = useBreadcrumbs()
   const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
 
@@ -33,15 +34,39 @@ const RiskDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
+    const breadcrumbRoute: ItemType[] = [
+      {
+        title: 'Organizations',
+      },
+      {
+        href: `/organizations/teams`,
+        title: 'Teams',
+      },
+    ]
+
     const getRisk = async () => {
       const risksClient = await getRisksClient()
       const riskDto = await risksClient.getByLocalId(id)
       setRisk(riskDto)
-      setBreadcrumbTitle(riskDto.summary)
+
+      const teamRoute =
+        riskDto.team?.type === 'Team' ? 'teams' : 'team-of-teams'
+
+      breadcrumbRoute.push(
+        {
+          href: `/organizations/${teamRoute}/${riskDto.team?.localId}`,
+          title: riskDto.team?.name,
+        },
+        {
+          title: riskDto.summary,
+        }
+      )
+      // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
+      setBreadcrumbRoute(breadcrumbRoute)
     }
 
     getRisk()
-  }, [id, setBreadcrumbTitle, lastRefresh])
+  }, [id, lastRefresh, setBreadcrumbRoute])
 
   const onUpdateRiskFormClosed = (wasSaved: boolean) => {
     setOpenUpdateRiskForm(false)

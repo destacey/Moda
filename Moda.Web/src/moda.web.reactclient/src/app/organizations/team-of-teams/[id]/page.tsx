@@ -15,7 +15,7 @@ import RisksGrid, {
 } from '@/src/app/components/common/planning/risks-grid'
 import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-memberships-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import UpdateTeamForm from '../../components/update-team/update-team-form'
+import EditTeamForm from '../../components/edit-team/edit-team-form'
 import useAuth from '@/src/app/components/contexts/auth'
 import useBreadcrumb from '@/src/app/components/contexts/breadcrumbs'
 
@@ -118,7 +118,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
       {team && (
-        <UpdateTeamForm
+        <EditTeamForm
           showForm={openUpdateTeamModal}
           localId={team.localId}
           type={team.type}

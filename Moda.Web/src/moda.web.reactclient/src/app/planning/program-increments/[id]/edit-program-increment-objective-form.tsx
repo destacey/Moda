@@ -17,7 +17,6 @@ import { getProgramIncrementsClient } from '@/src/services/clients'
 import {
   ProgramIncrementDetailsDto,
   ProgramIncrementObjectiveDetailsDto,
-  ProgramIncrementObjectiveStatusDto,
   UpdateProgramIncrementObjectiveRequest,
 } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
@@ -25,7 +24,7 @@ import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
 import _ from 'lodash'
 
-export interface UpdateProgramIncrementObjectiveFormProps {
+export interface EditProgramIncrementObjectiveFormProps {
   showForm: boolean
   programIncrementId: string
   objectiveId: string
@@ -33,7 +32,7 @@ export interface UpdateProgramIncrementObjectiveFormProps {
   onFormCancel: () => void
 }
 
-interface UpdateProgramIncrementObjectiveFormValues {
+interface EditProgramIncrementObjectiveFormValues {
   objectiveId: string
   programIncrementId: string
   teamId: string
@@ -51,17 +50,17 @@ interface OptionModel<T = string> {
   label: string
 }
 
-const UpdateProgramIncrementObjectiveForm = ({
+const EditProgramIncrementObjectiveForm = ({
   showForm,
   programIncrementId,
   objectiveId,
   onFormSave,
   onFormCancel,
-}: UpdateProgramIncrementObjectiveFormProps) => {
+}: EditProgramIncrementObjectiveFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<UpdateProgramIncrementObjectiveFormValues>()
+  const [form] = Form.useForm<EditProgramIncrementObjectiveFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
@@ -101,7 +100,7 @@ const UpdateProgramIncrementObjectiveForm = ({
   )
 
   const mapToRequestValues = useCallback(
-    (values: UpdateProgramIncrementObjectiveFormValues) => {
+    (values: EditProgramIncrementObjectiveFormValues) => {
       return {
         objectiveId: values.objectiveId,
         programIncrementId: values.programIncrementId,
@@ -145,7 +144,7 @@ const UpdateProgramIncrementObjectiveForm = ({
   }, [])
 
   const updateObjective = useCallback(
-    async (values: UpdateProgramIncrementObjectiveFormValues) => {
+    async (values: EditProgramIncrementObjectiveFormValues) => {
       const request = mapToRequestValues(values)
       const programIncrementsClient = await getProgramIncrementsClient()
       await programIncrementsClient.updateObjective(
@@ -158,7 +157,7 @@ const UpdateProgramIncrementObjectiveForm = ({
   )
 
   const update = useCallback(
-    async (values: UpdateProgramIncrementObjectiveFormValues) => {
+    async (values: EditProgramIncrementObjectiveFormValues) => {
       try {
         await updateObjective(values)
         return true
@@ -375,4 +374,4 @@ const UpdateProgramIncrementObjectiveForm = ({
   )
 }
 
-export default UpdateProgramIncrementObjectiveForm
+export default EditProgramIncrementObjectiveForm
