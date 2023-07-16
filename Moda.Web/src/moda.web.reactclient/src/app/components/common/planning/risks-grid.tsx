@@ -45,6 +45,7 @@ const RisksGrid = ({
   hideTeamColumn = false,
 }: RisksGridProps) => {
   const [risks, setRisks] = useState<RiskListDto[]>()
+  const [includeClosed, setIncludeClosed] = useState<boolean>(false)
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
 
@@ -52,15 +53,19 @@ const RisksGrid = ({
   const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
   const showActions = newRisksAllowed && canCreateRisks
 
+  const onIncludeClosedChange = (checked: boolean) => {
+    setIncludeClosed(checked)
+  }
+
   const onHideTeamChange = (checked: boolean) => {
     setHideTeam(checked)
   }
 
   // TODO: prevent from reloading if already loaded unless refresh button is clicked
   const loadRisks = useCallback(async () => {
-    const riskDtos = await getRisks(getRisksObjectId, false)
+    const riskDtos = await getRisks(getRisksObjectId, includeClosed)
     setRisks(riskDtos)
-  }, [getRisks, getRisksObjectId])
+  }, [getRisks, getRisksObjectId, includeClosed])
 
   const Actions = () => {
     return (
@@ -79,6 +84,14 @@ const RisksGrid = ({
       label: (
         <>
           <Space direction="vertical" size="small">
+            <Space>
+              <Switch
+                size="small"
+                checked={includeClosed}
+                onChange={onIncludeClosedChange}
+              />
+              Include Closed
+            </Space>
             <Space>
               <Switch
                 size="small"
@@ -104,6 +117,7 @@ const RisksGrid = ({
         cellRenderer: TeamLinkCellRenderer,
         hide: hideTeam,
       },
+      { field: 'status', width: 125, hide: includeClosed === false },
       { field: 'category', width: 125 },
       { field: 'exposure', width: 125 },
       {
@@ -120,7 +134,7 @@ const RisksGrid = ({
           dayjs(params.data.reportedOn).format('M/D/YYYY'),
       },
     ],
-    [hideTeam]
+    [hideTeam, includeClosed]
   )
 
   const onCreateRiskFormClosed = (wasCreated: boolean) => {
