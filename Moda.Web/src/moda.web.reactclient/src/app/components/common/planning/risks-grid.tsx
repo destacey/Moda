@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
 import { RiskListDto } from '@/src/services/moda-api'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
@@ -9,7 +9,8 @@ import useAuth from '../../contexts/auth'
 import CreateRiskForm from './create-risk-form'
 
 export interface RisksGridProps {
-  risks: RiskListDto[]
+  getRisks: (id: string, includeClosed: boolean) => Promise<RiskListDto[]>
+  getRisksObjectId: string
   teamId?: string | null
   newRisksAllowed?: boolean
   hideTeamColumn?: boolean
@@ -37,14 +38,15 @@ const AssigneeLinkCellRenderer = ({ value, data }) => {
 }
 
 const RisksGrid = ({
-  risks,
+  getRisks,
+  getRisksObjectId,
   teamId,
   newRisksAllowed = false,
   hideTeamColumn = false,
 }: RisksGridProps) => {
+  const [risks, setRisks] = useState<RiskListDto[]>()
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
-  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
 
   const { hasClaim } = useAuth()
   const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
@@ -53,6 +55,12 @@ const RisksGrid = ({
   const onHideTeamChange = (checked: boolean) => {
     setHideTeam(checked)
   }
+
+  // TODO: prevent from reloading if already loaded unless refresh button is clicked
+  const loadRisks = useCallback(async () => {
+    const riskDtos = await getRisks(getRisksObjectId, false)
+    setRisks(riskDtos)
+  }, [getRisks, getRisksObjectId])
 
   const Actions = () => {
     return (
@@ -118,7 +126,7 @@ const RisksGrid = ({
   const onCreateRiskFormClosed = (wasCreated: boolean) => {
     setOpenCreateRiskForm(false)
     if (wasCreated) {
-      setLastRefresh(Date.now())
+      loadRisks()
     }
   }
 
@@ -129,6 +137,7 @@ const RisksGrid = ({
         height={550}
         columnDefs={columnDefs}
         rowData={risks}
+        loadData={loadRisks}
         actions={showActions && <Actions />}
         gridControlMenuItems={controlItems}
       />
