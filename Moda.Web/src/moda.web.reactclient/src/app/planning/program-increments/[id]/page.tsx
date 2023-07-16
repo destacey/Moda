@@ -52,13 +52,9 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     setTeams(teamDtos as TeamListItem[])
   }, [])
 
-  const loadObjectives = useCallback(async (programIncrementId: string) => {
+  const getObjectives = useCallback(async (programIncrementId: string) => {
     const programIncrementsClient = await getProgramIncrementsClient()
-    const objectiveDtos = await programIncrementsClient.getObjectives(
-      programIncrementId,
-      null
-    )
-    setObjectives(objectiveDtos)
+    return await programIncrementsClient.getObjectives(programIncrementId, null)
   }, [])
 
   const getRisks = useCallback(
@@ -99,11 +95,11 @@ const ProgramIncrementDetailsPage = ({ params }) => {
       key: 'objectives',
       tab: 'Objectives',
       content: createElement(ProgramIncrementObjectivesGrid, {
-        objectives: objectives,
+        getObjectives: getObjectives,
+        programIncrementId: programIncrement?.id,
         hideProgramIncrementColumn: true,
         hideTeamColumn: false,
         newObjectivesAllowed: true,
-        programIncrementId: programIncrement?.id,
       } as ProgramIncrementObjectivesGridProps),
     },
     {
@@ -130,11 +126,10 @@ const ProgramIncrementDetailsPage = ({ params }) => {
 
       // TODO: move these to an onclick event based on when the user clicks the tab
       await loadTeams(programIncrementDto.id)
-      await loadObjectives(programIncrementDto.id)
     }
 
     getProgramIncrement()
-  }, [loadObjectives, getRisks, loadTeams, params.id, setBreadcrumbTitle])
+  }, [getObjectives, getRisks, loadTeams, params.id, setBreadcrumbTitle])
 
   const onManageTeamsFormClosed = (wasSaved: boolean) => {
     setOpenManageTeamsModal(false)
