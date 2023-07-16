@@ -19,9 +19,6 @@ const TeamDetailsPage = ({ params }) => {
   useDocumentTitle('Team Details')
   const [activeTab, setActiveTab] = useState('details')
   const [team, setTeam] = useState<TeamDetailsDto | null>(null)
-  const [teamMemberships, setTeamMemberships] = useState<TeamMembershipsDto[]>(
-    []
-  )
   const [openUpdateTeamModal, setOpenUpdateTeamModal] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
   const { id } = params
@@ -38,6 +35,11 @@ const TeamDetailsPage = ({ params }) => {
     },
     []
   )
+
+  const getTeamMemberships = useCallback(async (teamId: string) => {
+    const teamsClient = await getTeamsClient()
+    return await teamsClient.getTeamMemberships(teamId)
+  }, [])
 
   const Actions = () => {
     return (
@@ -72,7 +74,8 @@ const TeamDetailsPage = ({ params }) => {
       key: 'team-memberships',
       tab: 'Team Memberships',
       content: createElement(TeamMembershipsGrid, {
-        teamMemberships: teamMemberships,
+        getTeamMemberships: getTeamMemberships,
+        getTeamMembershipsObjectId: team?.id,
       }),
     },
   ]
@@ -82,11 +85,6 @@ const TeamDetailsPage = ({ params }) => {
       const teamsClient = await getTeamsClient()
       const teamDto = await teamsClient.getById(id)
       setTeam(teamDto)
-
-      const teamMembershipDtos = await teamsClient.getTeamMemberships(
-        teamDto.id
-      )
-      setTeamMemberships(teamMembershipDtos)
       setBreadcrumbTitle(teamDto.name)
     }
 
@@ -96,7 +94,6 @@ const TeamDetailsPage = ({ params }) => {
   const onUpdateTeamFormClosed = (wasUpdated: boolean) => {
     setOpenUpdateTeamModal(false)
     if (wasUpdated) {
-      // TODO: refresh the team details only
       setLastRefresh(Date.now())
     }
   }

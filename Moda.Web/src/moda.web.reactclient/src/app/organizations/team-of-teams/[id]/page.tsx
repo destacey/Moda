@@ -1,11 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import {
-  RiskListDto,
-  TeamMembershipsDto,
-  TeamOfTeamsDetailsDto,
-} from '@/src/services/moda-api'
+import { TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
 import { Button, Card } from 'antd'
 import { createElement, useCallback, useEffect, useState } from 'react'
 import TeamOfTeamsDetails from './team-of-teams-details'
@@ -23,9 +19,6 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   useDocumentTitle('Team of Teams Details')
   const [activeTab, setActiveTab] = useState('details')
   const [team, setTeam] = useState<TeamOfTeamsDetailsDto | null>(null)
-  const [teamMemberships, setTeamMemberships] = useState<TeamMembershipsDto[]>(
-    []
-  )
   const [openUpdateTeamModal, setOpenUpdateTeamModal] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
   const { id } = params
@@ -42,6 +35,11 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     },
     []
   )
+
+  const getTeamMemberships = useCallback(async (teamId: string) => {
+    const teamOfTeamsClient = await getTeamsOfTeamsClient()
+    return await teamOfTeamsClient.getTeamMemberships(teamId)
+  }, [])
 
   const Actions = () => {
     return (
@@ -76,7 +74,8 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       key: 'team-memberships',
       tab: 'Team Memberships',
       content: createElement(TeamMembershipsGrid, {
-        teamMemberships: teamMemberships,
+        getTeamMemberships: getTeamMemberships,
+        getTeamMembershipsObjectId: team?.id,
       }),
     },
   ]
@@ -86,11 +85,6 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       const teamsOfTeamsClient = await getTeamsOfTeamsClient()
       const teamDto = await teamsOfTeamsClient.getById(id)
       setTeam(teamDto)
-
-      const teamMembershipDtos = await teamsOfTeamsClient.getTeamMemberships(
-        teamDto.id
-      )
-      setTeamMemberships(teamMembershipDtos)
       setBreadcrumbTitle(teamDto.name)
     }
 
@@ -100,7 +94,6 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   const onUpdateTeamFormClosed = (wasUpdated: boolean) => {
     setOpenUpdateTeamModal(false)
     if (wasUpdated) {
-      // TODO: refresh the team details only
       setLastRefresh(Date.now())
     }
   }
