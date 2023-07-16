@@ -1,10 +1,11 @@
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
 import { TeamListItem } from '../../../organizations/types'
 
 export interface TeamsGridProps {
-  teams: TeamListItem[]
+  getTeams: (id: string) => Promise<TeamListItem[]>
+  getTeamsObjectId: string
 }
 
 const TeamLinkCellRenderer = ({ value, data }) => {
@@ -22,7 +23,14 @@ const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {
   )
 }
 
-const TeamsGrid = ({ teams }: TeamsGridProps) => {
+const TeamsGrid = ({ getTeams, getTeamsObjectId }: TeamsGridProps) => {
+  const [teams, setTeams] = useState<TeamListItem[]>()
+
+  const loadTeams = useCallback(async () => {
+    const teams = await getTeams(getTeamsObjectId)
+    setTeams(teams)
+  }, [getTeams, getTeamsObjectId])
+
   const columnDefs = useMemo(
     () => [
       { field: 'localId', headerName: '#', width: 90 },
@@ -42,7 +50,12 @@ const TeamsGrid = ({ teams }: TeamsGridProps) => {
   return (
     <>
       {/* TODO:  setup dynamic height */}
-      <ModaGrid height={550} columnDefs={columnDefs} rowData={teams} />
+      <ModaGrid
+        height={550}
+        columnDefs={columnDefs}
+        rowData={teams}
+        loadData={loadTeams}
+      />
     </>
   )
 }

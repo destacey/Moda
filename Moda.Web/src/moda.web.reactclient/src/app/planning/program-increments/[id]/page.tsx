@@ -2,18 +2,13 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { getProgramIncrementsClient } from '@/src/services/clients'
-import {
-  ProgramIncrementDetailsDto,
-  ProgramIncrementObjectiveListDto,
-  RiskListDto,
-} from '@/src/services/moda-api'
+import { ProgramIncrementDetailsDto } from '@/src/services/moda-api'
 import { Button, Card } from 'antd'
 import { createElement, useCallback, useEffect, useState } from 'react'
 import ProgramIncrementDetails from './program-increment-details'
 import ProgramIncrementObjectivesGrid, {
   ProgramIncrementObjectivesGridProps,
 } from '@/src/app/components/common/planning/program-increment-objectives-grid'
-import { TeamListItem } from '@/src/app/organizations/types'
 import TeamsGrid, {
   TeamsGridProps,
 } from '@/src/app/components/common/organizations/teams-grid'
@@ -31,10 +26,6 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')
   const [programIncrement, setProgramIncrement] =
     useState<ProgramIncrementDetailsDto | null>(null)
-  const [teams, setTeams] = useState<TeamListItem[]>([])
-  const [objectives, setObjectives] = useState<
-    ProgramIncrementObjectiveListDto[]
-  >([])
   const [openManageTeamsModal, setOpenManageTeamsModal] =
     useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
@@ -46,10 +37,9 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   )
   const showActions = canUpdateProgramIncrement
 
-  const loadTeams = useCallback(async (programIncrementId: string) => {
+  const getTeams = useCallback(async (programIncrementId: string) => {
     const programIncrementsClient = await getProgramIncrementsClient()
-    const teamDtos = await programIncrementsClient.getTeams(programIncrementId)
-    setTeams(teamDtos as TeamListItem[])
+    return await programIncrementsClient.getTeams(programIncrementId)
   }, [])
 
   const getObjectives = useCallback(async (programIncrementId: string) => {
@@ -89,7 +79,10 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     {
       key: 'teams',
       tab: 'Teams',
-      content: createElement(TeamsGrid, { teams: teams } as TeamsGridProps),
+      content: createElement(TeamsGrid, {
+        getTeams: getTeams,
+        getTeamsObjectId: programIncrement?.id,
+      } as TeamsGridProps),
     },
     {
       key: 'objectives',
@@ -121,20 +114,14 @@ const ProgramIncrementDetailsPage = ({ params }) => {
       )
       setProgramIncrement(programIncrementDto)
       setBreadcrumbTitle(programIncrementDto.name)
-
-      if (!programIncrementDto) return
-
-      // TODO: move these to an onclick event based on when the user clicks the tab
-      await loadTeams(programIncrementDto.id)
     }
 
     getProgramIncrement()
-  }, [getObjectives, getRisks, loadTeams, params.id, setBreadcrumbTitle])
+  }, [getObjectives, getRisks, params.id, setBreadcrumbTitle])
 
   const onManageTeamsFormClosed = (wasSaved: boolean) => {
     setOpenManageTeamsModal(false)
     if (wasSaved) {
-      // TODO: refresh the PI details and Teams tab only
       setLastRefresh(Date.now())
     }
   }
