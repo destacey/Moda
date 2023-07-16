@@ -1,6 +1,6 @@
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
 import { Button, Progress, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
@@ -8,11 +8,11 @@ import useAuth from '../../contexts/auth'
 import CreateProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[id]/create-program-increment-objective-form'
 
 export interface ProgramIncrementObjectivesGridProps {
-  objectives: ProgramIncrementObjectiveListDto[]
+  getObjectives: (id: string) => Promise<ProgramIncrementObjectiveListDto[]>
+  programIncrementId: string
   hideProgramIncrementColumn?: boolean
   hideTeamColumn?: boolean
   newObjectivesAllowed?: boolean
-  programIncrementId?: string // needed for create objective form. may not stay this way.
 }
 
 const ProgramIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
@@ -49,19 +49,20 @@ const ProgressCellRenderer = ({ value }) => {
 }
 
 const ProgramIncrementObjectivesGrid = ({
-  objectives,
+  getObjectives,
+  programIncrementId,
   hideProgramIncrementColumn = false,
   hideTeamColumn = false,
   newObjectivesAllowed = false,
-  programIncrementId,
 }: ProgramIncrementObjectivesGridProps) => {
+  const [objectives, setObjectives] =
+    useState<ProgramIncrementObjectiveListDto[]>()
   const [hideProgramIncrement, setHideProgramIncrement] = useState<boolean>(
     hideProgramIncrementColumn
   )
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
   const [openCreateObjectiveModal, setOpenCreateObjectiveModal] =
     useState<boolean>(false)
-  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
 
   const { hasClaim } = useAuth()
   const canManageObjectives = hasClaim(
@@ -71,6 +72,11 @@ const ProgramIncrementObjectivesGrid = ({
   const canCreateObjectives =
     newObjectivesAllowed && programIncrementId && canManageObjectives
   const showActions = canCreateObjectives
+
+  const loadObjectives = useCallback(async () => {
+    const objectives = await getObjectives(programIncrementId)
+    setObjectives(objectives)
+  }, [getObjectives, programIncrementId])
 
   const columnDefs = useMemo(
     () => [
@@ -150,7 +156,7 @@ const ProgramIncrementObjectivesGrid = ({
   const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
     setOpenCreateObjectiveModal(false)
     if (wasCreated) {
-      setLastRefresh(Date.now())
+      loadObjectives()
     }
   }
 
@@ -161,6 +167,7 @@ const ProgramIncrementObjectivesGrid = ({
         height={550}
         columnDefs={columnDefs}
         rowData={objectives}
+        loadData={loadObjectives}
         actions={showActions && <Actions />}
         gridControlMenuItems={controlItems}
       />

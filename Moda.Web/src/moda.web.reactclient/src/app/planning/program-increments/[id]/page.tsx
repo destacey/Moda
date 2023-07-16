@@ -2,18 +2,13 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { getProgramIncrementsClient } from '@/src/services/clients'
-import {
-  ProgramIncrementDetailsDto,
-  ProgramIncrementObjectiveListDto,
-  RiskListDto,
-} from '@/src/services/moda-api'
+import { ProgramIncrementDetailsDto } from '@/src/services/moda-api'
 import { Button, Card } from 'antd'
-import { createElement, useEffect, useState } from 'react'
+import { createElement, useCallback, useEffect, useState } from 'react'
 import ProgramIncrementDetails from './program-increment-details'
 import ProgramIncrementObjectivesGrid, {
   ProgramIncrementObjectivesGridProps,
 } from '@/src/app/components/common/planning/program-increment-objectives-grid'
-import { TeamListItem } from '@/src/app/organizations/types'
 import TeamsGrid, {
   TeamsGridProps,
 } from '@/src/app/components/common/organizations/teams-grid'
@@ -31,11 +26,6 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')
   const [programIncrement, setProgramIncrement] =
     useState<ProgramIncrementDetailsDto | null>(null)
-  const [teams, setTeams] = useState<TeamListItem[]>([])
-  const [objectives, setObjectives] = useState<
-    ProgramIncrementObjectiveListDto[]
-  >([])
-  const [risks, setRisks] = useState<RiskListDto[]>([])
   const [openManageTeamsModal, setOpenManageTeamsModal] =
     useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
@@ -46,6 +36,27 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     'Permissions.ProgramIncrements.Update'
   )
   const showActions = canUpdateProgramIncrement
+
+  const getTeams = useCallback(async (programIncrementId: string) => {
+    const programIncrementsClient = await getProgramIncrementsClient()
+    return await programIncrementsClient.getTeams(programIncrementId)
+  }, [])
+
+  const getObjectives = useCallback(async (programIncrementId: string) => {
+    const programIncrementsClient = await getProgramIncrementsClient()
+    return await programIncrementsClient.getObjectives(programIncrementId, null)
+  }, [])
+
+  const getRisks = useCallback(
+    async (programIncrementId: string, includeClosed = false) => {
+      const programIncrementsClient = await getProgramIncrementsClient()
+      return await programIncrementsClient.getRisks(
+        programIncrementId,
+        includeClosed
+      )
+    },
+    []
+  )
 
   const Actions = () => {
     return (
@@ -68,24 +79,28 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     {
       key: 'teams',
       tab: 'Teams',
-      content: createElement(TeamsGrid, { teams: teams } as TeamsGridProps),
+      content: createElement(TeamsGrid, {
+        getTeams: getTeams,
+        getTeamsObjectId: programIncrement?.id,
+      } as TeamsGridProps),
     },
     {
       key: 'objectives',
       tab: 'Objectives',
       content: createElement(ProgramIncrementObjectivesGrid, {
-        objectives: objectives,
+        getObjectives: getObjectives,
+        programIncrementId: programIncrement?.id,
         hideProgramIncrementColumn: true,
         hideTeamColumn: false,
         newObjectivesAllowed: true,
-        programIncrementId: programIncrement?.id,
       } as ProgramIncrementObjectivesGridProps),
     },
     {
       key: 'risk-management',
       tab: 'Risk Management',
       content: createElement(RisksGrid, {
-        risks: risks,
+        getRisks: getRisks,
+        getRisksObjectId: programIncrement?.id,
         newRisksAllowed: true,
       } as RisksGridProps),
     },
@@ -99,36 +114,14 @@ const ProgramIncrementDetailsPage = ({ params }) => {
       )
       setProgramIncrement(programIncrementDto)
       setBreadcrumbTitle(programIncrementDto.name)
-
-      if (!programIncrementDto) return
-
-      // TODO: move these to an onclick event based on when the user clicks the tab
-      const teamDtos = await programIncrementsClient.getTeams(
-        programIncrementDto.id
-      )
-      setTeams(teamDtos as TeamListItem[])
-
-      const objectiveDtos = await programIncrementsClient.getObjectives(
-        programIncrementDto.id,
-        null
-      )
-      setObjectives(objectiveDtos)
-
-      // TODO: setup the ability to change whether or not to show risks that are closed
-      const riskDtos = await programIncrementsClient.getRisks(
-        programIncrementDto.id,
-        true
-      )
-      setRisks(riskDtos)
     }
 
     getProgramIncrement()
-  }, [params.id, setBreadcrumbTitle, lastRefresh])
+  }, [getObjectives, getRisks, params.id, setBreadcrumbTitle])
 
   const onManageTeamsFormClosed = (wasSaved: boolean) => {
     setOpenManageTeamsModal(false)
     if (wasSaved) {
-      // TODO: refresh the PI details and Teams tab only
       setLastRefresh(Date.now())
     }
   }
