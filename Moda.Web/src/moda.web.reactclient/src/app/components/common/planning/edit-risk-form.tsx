@@ -79,7 +79,7 @@ const UpdateRiskForm = ({
         categoryId: risk.category.id,
         impactId: risk.impact.id,
         likelihoodId: risk.likelihood.id,
-        assigneeId: risk.assignee.id,
+        assigneeId: risk.assignee?.id,
         followUpDate: risk.followUpDate ? dayjs(risk.followUpDate) : undefined,
         response: risk.response,
       })
@@ -233,6 +233,7 @@ const UpdateRiskForm = ({
     getRisk,
     getRiskCategoryOptions,
     getRiskGradeOptions,
+    getRiskStatusOptions,
     handleCancel,
     mapToFormValues,
     messageApi,
