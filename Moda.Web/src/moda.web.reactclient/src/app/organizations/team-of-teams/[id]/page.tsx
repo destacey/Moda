@@ -7,7 +7,7 @@ import {
   TeamOfTeamsDetailsDto,
 } from '@/src/services/moda-api'
 import { Button, Card } from 'antd'
-import { createElement, useEffect, useState } from 'react'
+import { createElement, useCallback, useEffect, useState } from 'react'
 import TeamOfTeamsDetails from './team-of-teams-details'
 import { getTeamsOfTeamsClient } from '@/src/services/clients'
 import RisksGrid, {
@@ -23,7 +23,6 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   useDocumentTitle('Team of Teams Details')
   const [activeTab, setActiveTab] = useState('details')
   const [team, setTeam] = useState<TeamOfTeamsDetailsDto | null>(null)
-  const [risks, setRisks] = useState<RiskListDto[]>([])
   const [teamMemberships, setTeamMemberships] = useState<TeamMembershipsDto[]>(
     []
   )
@@ -35,6 +34,14 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
   const showActions = canUpdateTeam
+
+  const getRisks = useCallback(
+    async (teamId: string, includeClosed = false) => {
+      const teamOfTeamsClient = await getTeamsOfTeamsClient()
+      return await teamOfTeamsClient.getRisks(teamId, includeClosed)
+    },
+    []
+  )
 
   const Actions = () => {
     return (
@@ -58,9 +65,10 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       key: 'risk-management',
       tab: 'Risk Management',
       content: createElement(RisksGrid, {
-        risks: risks,
-        teamId: team?.id,
+        getRisks: getRisks,
+        getRisksObjectId: team?.id,
         newRisksAllowed: true,
+        teamId: team?.id,
         hideTeamColumn: true,
       } as RisksGridProps),
     },
@@ -78,11 +86,6 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       const teamsOfTeamsClient = await getTeamsOfTeamsClient()
       const teamDto = await teamsOfTeamsClient.getById(id)
       setTeam(teamDto)
-
-      // TODO: move these to an onclick event based on when the user clicks the tab
-      // TODO: setup the ability to change whether or not to show risks that are closed
-      const riskDtos = await teamsOfTeamsClient.getRisks(teamDto.id, true)
-      setRisks(riskDtos)
 
       const teamMembershipDtos = await teamsOfTeamsClient.getTeamMemberships(
         teamDto.id
