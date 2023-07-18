@@ -6,7 +6,7 @@ using Moda.Organization.Application.TeamsOfTeams.Dtos;
 
 namespace Moda.Web.Api.Models.Planning.ProgramIncrements;
 
-public class ProgramIncrementTeamReponse : IMapFrom<TeamListDto>, IMapFrom<TeamOfTeamsListDto>
+public class ProgramIncrementTeamResponse : IMapFrom<TeamListDto>, IMapFrom<TeamOfTeamsListDto>
 {
     /// <summary>Gets or sets the identifier.</summary>
     /// <value>The identifier.</value>
@@ -38,7 +38,7 @@ public class ProgramIncrementTeamReponse : IMapFrom<TeamListDto>, IMapFrom<TeamO
 
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<TeamListDto, ProgramIncrementTeamReponse>();
-        config.NewConfig<TeamOfTeamsListDto, ProgramIncrementTeamReponse>();
+        config.NewConfig<TeamListDto, ProgramIncrementTeamResponse>();
+        config.NewConfig<TeamOfTeamsListDto, ProgramIncrementTeamResponse>();
     }
 }

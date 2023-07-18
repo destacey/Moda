@@ -1062,7 +1062,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ProgramIncrementTeamReponse"
+                    "$ref": "#/components/schemas/ProgramIncrementTeamResponse"
                   }
                 }
               }
@@ -5830,7 +5830,7 @@
           }
         }
       },
-      "ProgramIncrementTeamReponse": {
+      "ProgramIncrementTeamResponse": {
         "type": "object",
         "additionalProperties": false,
         "properties": {

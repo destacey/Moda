@@ -2123,14 +2123,14 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get a list of program increment teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ProgramIncrementTeamReponse>> GetTeamsAsync(System.Guid id);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ProgramIncrementTeamResponse>> GetTeamsAsync(System.Guid id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a list of program increment teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ProgramIncrementTeamReponse>> GetTeamsAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ProgramIncrementTeamResponse>> GetTeamsAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Manager program increment teams.
@@ -2764,7 +2764,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get a list of program increment teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ProgramIncrementTeamReponse>> GetTeamsAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ProgramIncrementTeamResponse>> GetTeamsAsync(System.Guid id)
         {
             return GetTeamsAsync(id, System.Threading.CancellationToken.None);
         }
@@ -2774,7 +2774,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         /// Get a list of program increment teams.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ProgramIncrementTeamReponse>> GetTeamsAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ProgramIncrementTeamResponse>> GetTeamsAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -2815,7 +2815,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<ProgramIncrementTeamReponse>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<ProgramIncrementTeamResponse>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13310,7 +13310,7 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ProgramIncrementTeamReponse
+    public partial class ProgramIncrementTeamResponse
     {
         /// <summary>
         /// Gets or sets the identifier.

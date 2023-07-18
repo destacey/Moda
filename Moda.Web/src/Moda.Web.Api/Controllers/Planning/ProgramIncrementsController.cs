@@ -105,9 +105,9 @@ public class ProgramIncrementsController : ControllerBase
     [OpenApiOperation("Get a list of program increment teams.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<ProgramIncrementTeamReponse>>> GetTeams(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ProgramIncrementTeamResponse>>> GetTeams(Guid id, CancellationToken cancellationToken)
     {
-        List<ProgramIncrementTeamReponse> piTeams = new();
+        List<ProgramIncrementTeamResponse> piTeams = new();
         var teamIds = await _sender.Send(new GetProgramIncrementTeamsQuery(id), cancellationToken);
         
         if (teamIds.Any())
@@ -115,8 +115,8 @@ public class ProgramIncrementsController : ControllerBase
             var teams = await _sender.Send(new GetTeamsQuery(true, teamIds), cancellationToken);
             var teamOfTeams = await _sender.Send(new GetTeamOfTeamsListQuery(true, teamIds), cancellationToken);
 
-            piTeams.AddRange(teams.Adapt<List<ProgramIncrementTeamReponse>>());
-            piTeams.AddRange(teamOfTeams.Adapt<List<ProgramIncrementTeamReponse>>());
+            piTeams.AddRange(teams.Adapt<List<ProgramIncrementTeamResponse>>());
+            piTeams.AddRange(teamOfTeams.Adapt<List<ProgramIncrementTeamResponse>>());
         }
 
         return Ok(piTeams);
