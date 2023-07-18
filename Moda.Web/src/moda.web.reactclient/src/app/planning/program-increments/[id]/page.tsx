@@ -19,6 +19,7 @@ import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
 import ManageProgramIncrementTeamsForm from './manage-program-increment-teams-form'
+import ProgramIncrementViewSelector from './program-increment-view-selector'
 
 const ProgramIncrementDetailsPage = ({ params }) => {
   useDocumentTitle('PI Details')
@@ -132,6 +133,10 @@ const ProgramIncrementDetailsPage = ({ params }) => {
         title={programIncrement?.name}
         subtitle="Program Increment Details"
         actions={showActions && <Actions />}
+      />
+      <ProgramIncrementViewSelector
+        startingView="details"
+        programIncrementLocalId={programIncrement?.localId}
       />
       <Card
         style={{ width: '100%' }}
