@@ -72,7 +72,9 @@ public class RolesController : ControllerBase
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
     public async Task<ActionResult<string>> Create(CreateOrUpdateRoleRequest request)
     {
-        return await _roleService.CreateOrUpdateAsync(request.ToCreateOrUpdateRoleCommand());
+        var id =  await _roleService.CreateOrUpdateAsync(request.ToCreateOrUpdateRoleCommand());
+
+        return CreatedAtAction(nameof(Create), new { id }, id);
     }
 
     [HttpDelete("{id}")]

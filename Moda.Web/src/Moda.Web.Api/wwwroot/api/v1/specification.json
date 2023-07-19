@@ -10,6 +10,45 @@
     "version": "v1"
   },
   "paths": {
+    "/api/user-management/permissions": {
+      "get": {
+        "tags": [
+          "Permissions"
+        ],
+        "summary": "Get a list of all permissions.",
+        "operationId": "Permissions_GetList",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationPermission"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/user-management/profiles": {
       "get": {
         "tags": [
@@ -5335,6 +5374,63 @@
   },
   "components": {
     "schemas": {
+      "ApplicationPermission": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "isBasic": {
+            "type": "boolean"
+          },
+          "isRoot": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ErrorResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "messages": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string",
+            "nullable": true
+          },
+          "exception": {
+            "type": "string",
+            "nullable": true
+          },
+          "errorId": {
+            "type": "string",
+            "nullable": true
+          },
+          "supportMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "UserDetailsDto": {
         "type": "object",
         "additionalProperties": false,
@@ -5389,39 +5485,6 @@
           },
           "name": {
             "type": "string"
-          }
-        }
-      },
-      "ErrorResult": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "messages": {
-            "type": "array",
-            "nullable": true,
-            "items": {
-              "type": "string"
-            }
-          },
-          "source": {
-            "type": "string",
-            "nullable": true
-          },
-          "exception": {
-            "type": "string",
-            "nullable": true
-          },
-          "errorId": {
-            "type": "string",
-            "nullable": true
-          },
-          "supportMessage": {
-            "type": "string",
-            "nullable": true
-          },
-          "statusCode": {
-            "type": "integer",
-            "format": "int32"
           }
         }
       },
