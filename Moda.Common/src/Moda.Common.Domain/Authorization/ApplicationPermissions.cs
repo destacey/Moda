@@ -26,6 +26,7 @@ public static class ApplicationResource
     public const string UserRoles = nameof(UserRoles);
     public const string Roles = nameof(Roles);
     public const string RoleClaims = nameof(RoleClaims);
+    public const string Permissions = nameof(Permissions);
 
     public const string Connections = nameof(Connections);
     public const string Connectors = nameof(Connectors);
@@ -76,7 +77,9 @@ public static class ApplicationPermissions
         new("Delete Roles", ApplicationAction.Delete, ApplicationResource.Roles),
 
         new("View RoleClaims", ApplicationAction.View, ApplicationResource.RoleClaims),
-        new("Update RoleClaims", ApplicationAction.Update, ApplicationResource.RoleClaims)
+        new("Update RoleClaims", ApplicationAction.Update, ApplicationResource.RoleClaims),
+
+        new("View Permissions", ApplicationAction.View, ApplicationResource.Permissions)
     };
 
     private static readonly ApplicationPermission[] _appIntegration = new ApplicationPermission[]
