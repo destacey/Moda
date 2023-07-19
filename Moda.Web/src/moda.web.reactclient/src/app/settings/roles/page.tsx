@@ -6,26 +6,66 @@ import ModaGrid from '../../components/common/moda-grid'
 import { RoleListDto } from '@/src/services/moda-api'
 import { getRolesClient } from '@/src/services/clients'
 import { authorizePage } from '../../components/hoc'
+import { useGetRoles } from '@/src/services/query'
+import Link from 'next/link'
+import { Button } from 'antd'
+import useAuth from '../../components/contexts/auth'
+import CreateRoleForm from './create-role-form'
+import { useRouter } from 'next/navigation'
 
+const LinkCellRenderer = ({ value, data }) => {
+  return (
+    <Link href={`roles/${data.id}`}>{value}</Link>
+  )
+}
 const Page = () => {
-  const [roles, setRoles] = useState<RoleListDto[]>([])
-
   const columnDefs = useMemo(
-    () => [{ field: 'name' }, { field: 'description' }],
+    () => [
+      { field: 'name', cellRenderer: LinkCellRenderer }, 
+      { field: 'description' }],
     []
   )
 
   const getRoles = useCallback(async () => {
-    const rolesClient = await getRolesClient()
-    const roleDtos = await rolesClient.getList()
-    setRoles(roleDtos)
+    roleData.refetch();
   }, [])
+
+  const router = useRouter();
+  const roleData = useGetRoles();
+  const [showCreateRoleModal, setShowCreateRoleModal] = useState(false)
+
+  const { hasClaim } = useAuth();
+  const canCreateRole = hasClaim('Permission', 'Permissions.Roles.Create');
+  
+  const Actions = () => {
+    return (
+      <>
+        { canCreateRole && (
+          <Button onClick={() => setShowCreateRoleModal(true)}>
+            Create Role
+          </Button>
+        )}
+      </>
+    )
+  }
 
   return (
     <>
-      <PageTitle title="Roles" />
+      <PageTitle 
+        title="Roles" 
+        actions={<Actions />}/>
 
-      <ModaGrid columnDefs={columnDefs} rowData={roles} loadData={getRoles} />
+      <ModaGrid columnDefs={columnDefs} rowData={roleData.data} loadData={getRoles} />
+
+      <CreateRoleForm
+        showForm={showCreateRoleModal}
+        roles={roleData.data}
+        onFormCreate={(id: string) => {
+          setShowCreateRoleModal(false);
+          router.push(`/settings/roles/${id}`);
+        }}
+        onFormCancel={() => setShowCreateRoleModal(false)}
+      />
     </>
   )
 }
