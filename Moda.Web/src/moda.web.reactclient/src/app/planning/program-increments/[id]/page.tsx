@@ -3,7 +3,7 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import { getProgramIncrementsClient } from '@/src/services/clients'
 import { ProgramIncrementDetailsDto } from '@/src/services/moda-api'
-import { Button, Card } from 'antd'
+import { Button, Card, Space } from 'antd'
 import { createElement, useCallback, useEffect, useState } from 'react'
 import ProgramIncrementDetails from './program-increment-details'
 import ProgramIncrementObjectivesGrid, {
@@ -19,7 +19,7 @@ import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
 import ManageProgramIncrementTeamsForm from './manage-program-increment-teams-form'
-import ProgramIncrementViewSelector from './program-increment-view-selector'
+import Link from 'next/link'
 
 const ProgramIncrementDetailsPage = ({ params }) => {
   useDocumentTitle('PI Details')
@@ -36,7 +36,6 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     'Permission',
     'Permissions.ProgramIncrements.Update'
   )
-  const showActions = canUpdateProgramIncrement
 
   const getTeams = useCallback(async (programIncrementId: string) => {
     const programIncrementsClient = await getProgramIncrementsClient()
@@ -62,11 +61,18 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   const Actions = () => {
     return (
       <>
-        {canUpdateProgramIncrement && (
-          <Button onClick={() => setOpenManageTeamsModal(true)}>
-            Manage Teams
-          </Button>
-        )}
+        <Space>
+          <Link
+            href={`/planning/program-increments/${programIncrement?.localId}/plan-review`}
+          >
+            Plan Review
+          </Link>
+          {canUpdateProgramIncrement && (
+            <Button onClick={() => setOpenManageTeamsModal(true)}>
+              Manage Teams
+            </Button>
+          )}
+        </Space>
       </>
     )
   }
@@ -120,23 +126,19 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     getProgramIncrement()
   }, [getObjectives, getRisks, params.id, setBreadcrumbTitle])
 
-  const onManageTeamsFormClosed = (wasSaved: boolean) => {
+  const onManageTeamsFormClosed = useCallback((wasSaved: boolean) => {
     setOpenManageTeamsModal(false)
     if (wasSaved) {
       setLastRefresh(Date.now())
     }
-  }
+  }, [])
 
   return (
     <>
       <PageTitle
         title={programIncrement?.name}
         subtitle="Program Increment Details"
-        actions={showActions && <Actions />}
-      />
-      <ProgramIncrementViewSelector
-        startingView="details"
-        programIncrementLocalId={programIncrement?.localId}
+        actions={<Actions />}
       />
       <Card
         style={{ width: '100%' }}

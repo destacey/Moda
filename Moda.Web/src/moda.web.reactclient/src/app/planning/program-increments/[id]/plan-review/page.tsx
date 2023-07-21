@@ -10,9 +10,8 @@ import {
 } from '@/src/services/moda-api'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { useEffect, useState } from 'react'
-import ProgramIncrementViewSelector from '../program-increment-view-selector'
-import { Card, Col, Row } from 'antd'
-import { CardTabListType } from 'antd/es/card'
+import { Card } from 'antd'
+import Link from 'next/link'
 
 const ProgramIncrementPlanReviewPage = ({ params }) => {
   useDocumentTitle('PI Plan Review')
@@ -77,12 +76,24 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
     }
   })
 
+  const Actions = () => {
+    return (
+      <>
+        <Link
+          href={`/planning/program-increments/${programIncrement?.localId}`}
+        >
+          PI Details
+        </Link>
+      </>
+    )
+  }
+
   return (
     <>
-      <PageTitle title={programIncrement?.name} subtitle="PI Plan Review" />
-      <ProgramIncrementViewSelector
-        startingView="plan-review"
-        programIncrementLocalId={programIncrement?.localId}
+      <PageTitle
+        title={programIncrement?.name}
+        subtitle="PI Plan Review"
+        actions={<Actions />}
       />
       <Card
         style={{ width: '100%' }}
