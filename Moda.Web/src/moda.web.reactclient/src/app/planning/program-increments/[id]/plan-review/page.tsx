@@ -9,9 +9,10 @@ import {
   ProgramIncrementTeamResponse,
 } from '@/src/services/moda-api'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Card } from 'antd'
 import Link from 'next/link'
+import ProgramIncrementTeamPlanReview from './program-increment-team-plan-review'
 
 const ProgramIncrementPlanReviewPage = ({ params }) => {
   useDocumentTitle('PI Plan Review')
@@ -51,13 +52,14 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
       // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
       setBreadcrumbRoute(breadcrumbRoute)
 
-      var teams = await programIncrementsClient.getTeams(programIncrementDto.id)
+      const teamData = await programIncrementsClient.getTeams(
+        programIncrementDto.id
+      )
       setTeams(
-        teams
+        teamData
           .sort((a, b) => a.code.localeCompare(b.code))
           .filter((t) => t.type === 'Team')
       )
-      setActiveTab(teams[0].localId.toString())
     }
 
     getProgramIncrement()
@@ -68,6 +70,12 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
     setBreadcrumbRoute,
   ])
 
+  useEffect(() => {
+    if (teams.length > 0) {
+      setActiveTab(teams[0].localId.toString())
+    }
+  }, [teams])
+
   const tabs = teams.map((team) => {
     return {
       key: team.localId.toString(),
@@ -75,6 +83,10 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
       content: <div>{team.code}</div>,
     }
   })
+
+  const activeTeam = useCallback(() => {
+    return teams.find((t) => t.localId.toString() === activeTab)
+  }, [activeTab, teams])
 
   const Actions = () => {
     return (
@@ -101,16 +113,11 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
         activeTabKey={activeTab}
         onTabChange={(key) => setActiveTab(key)}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
+        <ProgramIncrementTeamPlanReview
+          programIncrement={programIncrement}
+          team={activeTeam()}
+        />
       </Card>
-      {/* <Row>
-        <Col xs={24} sm={24} md={12}>
-          Objectives
-        </Col>
-        <Col xs={24} sm={24} md={12}>
-          Risks
-        </Col>
-      </Row> */}
     </>
   )
 }

@@ -52,6 +52,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
       const programIncrementsClient = await getProgramIncrementsClient()
       return await programIncrementsClient.getRisks(
         programIncrementId,
+        null,
         includeClosed
       )
     },
@@ -124,7 +125,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     }
 
     getProgramIncrement()
-  }, [getObjectives, getRisks, params.id, setBreadcrumbTitle])
+  }, [params.id, setBreadcrumbTitle])
 
   const onManageTeamsFormClosed = useCallback((wasSaved: boolean) => {
     setOpenManageTeamsModal(false)
