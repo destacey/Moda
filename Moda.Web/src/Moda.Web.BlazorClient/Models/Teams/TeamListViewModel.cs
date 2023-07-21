@@ -51,7 +51,7 @@ public record TeamListViewModel
         };
     }
 
-    public static TeamListViewModel FromProgramIncrementTeamResponse(ProgramIncrementTeamReponse dto)
+    public static TeamListViewModel FromProgramIncrementTeamResponse(ProgramIncrementTeamResponse dto)
     {
         return new TeamListViewModel()
         {

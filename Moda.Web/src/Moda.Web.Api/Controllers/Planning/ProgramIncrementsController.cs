@@ -329,9 +329,9 @@ public class ProgramIncrementsController : ControllerBase
     [OpenApiOperation("Get program increment risks.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken, bool includeClosed = false)
+    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken, Guid? teamId = null, bool includeClosed = false)
     {
-        var risks = await _sender.Send(new GetRisksByProgramIncrementQuery(id, includeClosed), cancellationToken);
+        var risks = await _sender.Send(new GetRisksByProgramIncrementQuery(id, includeClosed, teamId), cancellationToken);
 
         return Ok(risks);
     }

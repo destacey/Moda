@@ -1963,13 +1963,16 @@ export class ProgramIncrementsClient {
 
     /**
      * Get program increment risks.
+     * @param teamId (optional) 
      * @param includeClosed (optional) 
      */
-    getRisks(id: string, includeClosed: boolean | undefined, cancelToken?: CancelToken | undefined): Promise<RiskListDto[]> {
+    getRisks(id: string, teamId: string | null | undefined, includeClosed: boolean | undefined, cancelToken?: CancelToken | undefined): Promise<RiskListDto[]> {
         let url_ = this.baseUrl + "/api/planning/program-increments/{id}/risks?";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (teamId !== undefined && teamId !== null)
+            url_ += "teamId=" + encodeURIComponent("" + teamId) + "&";
         if (includeClosed === null)
             throw new Error("The parameter 'includeClosed' cannot be null.");
         else if (includeClosed !== undefined)

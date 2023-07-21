@@ -1641,13 +1641,23 @@
             "x-position": 1
           },
           {
+            "name": "teamId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
             "name": "includeClosed",
             "in": "query",
             "schema": {
               "type": "boolean",
               "default": false
             },
-            "x-position": 2
+            "x-position": 3
           }
         ],
         "responses": {
