@@ -26,7 +26,7 @@ export default function RootLayout({
           <ThemeProvider>
             <AuthenticatedTemplate>
               <MenuToggleProvider>
-                <Layout className="layout" style={{ minHeight: '100vh' }}>
+                <Layout>
                   <AppHeader />
                   <Layout>
                     <AppMenu />
