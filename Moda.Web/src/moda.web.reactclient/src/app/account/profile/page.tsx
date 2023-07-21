@@ -8,19 +8,32 @@ import ClaimsGrid from './claims-grid'
 import useAuth from '../../components/contexts/auth'
 import { useDocumentTitle } from '../../hooks/use-document-title'
 import useBreadcrumbs from '../../components/contexts/breadcrumbs'
-
-const tabs = [
-  { key: 'profile', tab: 'Profile', content: React.createElement(ProfileForm) },
-  { key: 'claims', tab: 'Claims', content: React.createElement(ClaimsGrid) },
-]
+import { getProfileClient } from '@/src/services/clients'
+import { UserDetailsDto } from '@/src/services/moda-api'
 
 const AccountProfilePage = () => {
   useDocumentTitle('Account Profile')
   const { user, isLoading, refreshUser } = useAuth()
+  const [profile, setProfile] = useState<UserDetailsDto>()
   const [activeTab, setActiveTab] = useState('profile')
-  const {setBreadcrumbTitle} = useBreadcrumbs()
+  const { setBreadcrumbTitle } = useBreadcrumbs()
+
+  const tabs = [
+    {
+      key: 'profile',
+      tab: 'Profile',
+      content: React.createElement(ProfileForm, profile),
+    },
+    { key: 'claims', tab: 'Claims', content: React.createElement(ClaimsGrid) },
+  ]
 
   useEffect(() => {
+    const loadProfile = async () => {
+      const profileClient = await getProfileClient()
+      setProfile(await profileClient.get())
+    }
+    loadProfile()
+
     const reloadUserPermissions = async () => {
       await refreshUser()
     }
@@ -29,11 +42,10 @@ const AccountProfilePage = () => {
   }, [])
 
   useEffect(() => {
-    if(!isLoading && user){
+    if (!isLoading && user) {
       setBreadcrumbTitle(user.name)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, isLoading])
+  }, [user, isLoading, setBreadcrumbTitle])
 
   return (
     <>
