@@ -79,7 +79,8 @@ internal sealed class GetProgramIncrementObjectivesQueryHandler : IQueryHandler<
             return new List<ProgramIncrementObjectiveListDto>();
 
         // call the objective query handler
-        var objectives = await _sender.Send(new GetObjectivesForProgramIncrementsQuery(new Guid[] { programIncrement.Id }, null), cancellationToken);
+        var teamIds = request.TeamId.HasValue ? new Guid[] { request.TeamId.Value } : null;
+        var objectives = await _sender.Send(new GetObjectivesForProgramIncrementsQuery(new Guid[] { programIncrement.Id }, teamIds), cancellationToken);
         if (!objectives.Any() || programIncrement.Objectives.Count != objectives.Count)
             ThrowAndLogException(request, $"Error mapping objectives for program increment {programIncrement.Id}.");
 
