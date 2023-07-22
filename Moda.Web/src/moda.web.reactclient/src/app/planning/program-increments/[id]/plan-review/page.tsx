@@ -12,7 +12,7 @@ import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { useCallback, useEffect, useState } from 'react'
 import { Card } from 'antd'
 import Link from 'next/link'
-import ProgramIncrementTeamPlanReview from './program-increment-team-plan-review'
+import TeamPlanReview from './team-plan-review'
 
 const ProgramIncrementPlanReviewPage = ({ params }) => {
   useDocumentTitle('PI Plan Review')
@@ -113,7 +113,7 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
         activeTabKey={activeTab}
         onTabChange={(key) => setActiveTab(key)}
       >
-        <ProgramIncrementTeamPlanReview
+        <TeamPlanReview
           programIncrement={programIncrement}
           team={activeTeam()}
         />
