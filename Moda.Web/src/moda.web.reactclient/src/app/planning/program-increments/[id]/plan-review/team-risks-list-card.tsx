@@ -80,7 +80,7 @@ const TeamRisksListCard = ({
   const onCreateRiskFormClosed = (wasCreated: boolean) => {
     setOpenCreateRiskForm(false)
     if (wasCreated) {
-      loadRisks()
+      loadRisks(programIncrementId, teamId)
     }
   }
 

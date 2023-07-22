@@ -90,7 +90,7 @@ const TeamObjectivesListCard = ({
   const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
     setOpenCreateObjectiveModal(false)
     if (wasCreated) {
-      loadObjectives()
+      loadObjectives(programIncrementId, teamId)
     }
   }
 
