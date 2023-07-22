@@ -31,7 +31,7 @@ const TeamObjectivesListCard = ({
       } else if (!a.isStretch && b.isStretch) {
         return -1
       } else {
-        return a.name.localeCompare(b.name)
+        return a.localId.toString().localeCompare(b.localId.toString())
       }
     })
 

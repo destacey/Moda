@@ -1,5 +1,5 @@
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
-import { List, Typography } from 'antd'
+import { List, Progress, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 
@@ -22,7 +22,7 @@ const ObjectiveListItem = ({
     )
   }
   const description = () => {
-    const content = `Stretch?: ${objective.isStretch}`
+    const content = `Status: ${objective.status?.name} | Stretch?: ${objective.isStretch}`
     const startDate = objective.startDate
       ? ` | Start: ${
           objective.startDate
@@ -37,6 +37,9 @@ const ObjectiveListItem = ({
             : ''
         }`
       : null
+    const showProgress: boolean =
+      objective.status?.name === 'In Progress' ||
+      objective.status?.name === 'Closed'
     return (
       <>
         <Typography.Text>
@@ -44,6 +47,7 @@ const ObjectiveListItem = ({
           {startDate}
           {targetDate}
         </Typography.Text>
+        {showProgress && <Progress percent={objective.progress} size="small" />}
       </>
     )
   }
