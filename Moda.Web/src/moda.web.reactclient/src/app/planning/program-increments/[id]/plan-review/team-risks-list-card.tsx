@@ -3,6 +3,9 @@ import { PlusOutlined } from '@ant-design/icons'
 import { Button, Card, Empty, List } from 'antd'
 import RiskListItem from './risk-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
+import { useState } from 'react'
+import useAuth from '@/src/app/components/contexts/auth'
+import CreateRiskForm from '@/src/app/components/common/planning/create-risk-form'
 
 export interface TeamRisksListCardProps {
   risks: RiskListDto[]
@@ -15,6 +18,11 @@ const TeamRisksListCard = ({
   programIncrementId,
   teamId,
 }: TeamRisksListCardProps) => {
+  const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
+
+  const { hasClaim } = useAuth()
+  const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
+
   const cardTitle = () => {
     let title = `Risks`
     if (risks?.length > 0) {
@@ -50,14 +58,36 @@ const TeamRisksListCard = ({
       />
     )
   }
+
+  const onCreateRiskFormClosed = (wasCreated: boolean) => {
+    setOpenCreateRiskForm(false)
+    if (wasCreated) {
+      //loadRisks()
+    }
+  }
+
   return (
-    <Card
-      size="small"
-      title={cardTitle()}
-      extra={<Button type="text" icon={<PlusOutlined />} />}
-    >
-      <RisksList />
-    </Card>
+    <>
+      <Card
+        size="small"
+        title={cardTitle()}
+        extra={
+          <Button
+            type="text"
+            icon={<PlusOutlined />}
+            onClick={() => setOpenCreateRiskForm(true)}
+          />
+        }
+      >
+        <RisksList />
+      </Card>
+      <CreateRiskForm
+        createForTeamId={teamId}
+        showForm={openCreateRiskForm}
+        onFormCreate={() => onCreateRiskFormClosed(true)}
+        onFormCancel={() => onCreateRiskFormClosed(false)}
+      />
+    </>
   )
 }
 

@@ -285,7 +285,11 @@ const UpdateRiskForm = ({
             name="summary"
             rules={[{ required: true }]}
           >
-            <Input showCount maxLength={256} />
+            <Input.TextArea
+              autoSize={{ minRows: 2, maxRows: 4 }}
+              showCount
+              maxLength={256}
+            />
           </Form.Item>
           <Form.Item
             name="description"
