@@ -5,8 +5,7 @@ import {
   ProgramIncrementTeamResponse,
   RiskListDto,
 } from '@/src/services/moda-api'
-import { PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Row, Space } from 'antd'
+import { Col, Row } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import TeamObjectivesListCard from './team-objectives-list-card'
 import TeamRisksListCard from './team-risks-list-card'
@@ -63,7 +62,12 @@ const TeamPlanReview = ({ programIncrement, team }: TeamPlanReviewProps) => {
     <>
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={24} md={24} lg={12}>
-          <TeamObjectivesListCard objectives={objectives} teamId={team?.id} />
+          <TeamObjectivesListCard
+            objectives={objectives}
+            teamId={team?.id}
+            programIncrementId={programIncrement?.id}
+            newObjectivesAllowed={true}
+          />
         </Col>
         <Col xs={24} sm={24} md={24} lg={12}>
           <TeamRisksListCard

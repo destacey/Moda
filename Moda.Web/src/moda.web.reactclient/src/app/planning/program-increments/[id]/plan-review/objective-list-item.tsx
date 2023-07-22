@@ -37,9 +37,9 @@ const ObjectiveListItem = ({
             : ''
         }`
       : null
-    const showProgress: boolean =
-      objective.status?.name === 'In Progress' ||
-      objective.status?.name === 'Closed'
+    const showProgress = objective.status?.name !== 'Not Started'
+    const progressStatus =
+      objective.status?.name === 'Canceled' ? 'exception' : undefined
     return (
       <>
         <Typography.Text>
@@ -47,7 +47,13 @@ const ObjectiveListItem = ({
           {startDate}
           {targetDate}
         </Typography.Text>
-        {showProgress && <Progress percent={objective.progress} size="small" />}
+        {showProgress && (
+          <Progress
+            percent={objective.progress}
+            status={progressStatus}
+            size="small"
+          />
+        )}
       </>
     )
   }

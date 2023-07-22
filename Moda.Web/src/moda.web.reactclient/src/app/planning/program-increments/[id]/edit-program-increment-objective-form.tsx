@@ -302,7 +302,11 @@ const EditProgramIncrementObjectiveForm = ({
             <Input />
           </Form.Item>
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-            <Input showCount maxLength={128} />
+            <Input.TextArea
+              autoSize={{ minRows: 1, maxRows: 2 }}
+              showCount
+              maxLength={128}
+            />
           </Form.Item>
           <Form.Item
             name="description"

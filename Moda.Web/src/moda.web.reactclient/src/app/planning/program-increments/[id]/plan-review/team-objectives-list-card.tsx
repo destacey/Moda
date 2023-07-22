@@ -3,16 +3,34 @@ import { PlusOutlined } from '@ant-design/icons'
 import { Button, Card, Empty, List, Space } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
+import { useState } from 'react'
+import useAuth from '@/src/app/components/contexts/auth'
+import CreateProgramIncrementObjectiveForm from '../create-program-increment-objective-form'
 
 export interface TeamObjectivesListCardProps {
   objectives: ProgramIncrementObjectiveListDto[]
   teamId: string
+  programIncrementId?: string
+  newObjectivesAllowed?: boolean
 }
 
 const TeamObjectivesListCard = ({
   objectives,
   teamId,
+  programIncrementId,
+  newObjectivesAllowed = false,
 }: TeamObjectivesListCardProps) => {
+  const [openCreateObjectiveModal, setOpenCreateObjectiveModal] =
+    useState<boolean>(false)
+
+  const { hasClaim } = useAuth()
+  const canManageObjectives = hasClaim(
+    'Permission',
+    'Permissions.ProgramIncrementObjectives.Manage'
+  )
+  const canCreateObjectives =
+    newObjectivesAllowed && programIncrementId && canManageObjectives
+
   const cardTitle = () => {
     let title = `Objectives`
     if (objectives?.length > 0) {
@@ -49,14 +67,38 @@ const TeamObjectivesListCard = ({
     )
   }
 
+  const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
+    setOpenCreateObjectiveModal(false)
+    if (wasCreated) {
+      //loadObjectives()
+    }
+  }
+
   return (
-    <Card
-      size="small"
-      title={cardTitle()}
-      extra={<Button type="text" icon={<PlusOutlined />} />}
-    >
-      <ObjectivesList />
-    </Card>
+    <>
+      <Card
+        size="small"
+        title={cardTitle()}
+        extra={
+          canCreateObjectives && (
+            <Button
+              type="text"
+              icon={<PlusOutlined />}
+              onClick={() => setOpenCreateObjectiveModal(true)}
+            />
+          )
+        }
+      >
+        <ObjectivesList />
+      </Card>
+      <CreateProgramIncrementObjectiveForm
+        programIncrementId={programIncrementId}
+        teamId={teamId}
+        showForm={openCreateObjectiveModal}
+        onFormCreate={() => onCreateObjectiveFormClosed(true)}
+        onFormCancel={() => onCreateObjectiveFormClosed(false)}
+      />
+    </>
   )
 }
 
