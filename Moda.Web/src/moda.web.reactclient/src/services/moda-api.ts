@@ -1334,7 +1334,7 @@ export class ProgramIncrementsClient {
     /**
      * Get a list of program increment teams.
      */
-    getTeams(id: string, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementTeamReponse[]> {
+    getTeams(id: string, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementTeamResponse[]> {
         let url_ = this.baseUrl + "/api/planning/program-increments/{id}/teams";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -1361,7 +1361,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processGetTeams(response: AxiosResponse): Promise<ProgramIncrementTeamReponse[]> {
+    protected processGetTeams(response: AxiosResponse): Promise<ProgramIncrementTeamResponse[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1376,7 +1376,7 @@ export class ProgramIncrementsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProgramIncrementTeamReponse[]>(result200);
+            return Promise.resolve<ProgramIncrementTeamResponse[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -1389,7 +1389,7 @@ export class ProgramIncrementsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ProgramIncrementTeamReponse[]>(null as any);
+        return Promise.resolve<ProgramIncrementTeamResponse[]>(null as any);
     }
 
     /**
@@ -1963,13 +1963,16 @@ export class ProgramIncrementsClient {
 
     /**
      * Get program increment risks.
+     * @param teamId (optional) 
      * @param includeClosed (optional) 
      */
-    getRisks(id: string, includeClosed: boolean | undefined, cancelToken?: CancelToken | undefined): Promise<RiskListDto[]> {
+    getRisks(id: string, teamId: string | null | undefined, includeClosed: boolean | undefined, cancelToken?: CancelToken | undefined): Promise<RiskListDto[]> {
         let url_ = this.baseUrl + "/api/planning/program-increments/{id}/risks?";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (teamId !== undefined && teamId !== null)
+            url_ += "teamId=" + encodeURIComponent("" + teamId) + "&";
         if (includeClosed === null)
             throw new Error("The parameter 'includeClosed' cannot be null.");
         else if (includeClosed !== undefined)
@@ -6609,7 +6612,7 @@ export interface UpdateProgramIncrementRequest {
     end: Date;
 }
 
-export interface ProgramIncrementTeamReponse {
+export interface ProgramIncrementTeamResponse {
     /** Gets or sets the identifier. */
     id?: string;
     /** Gets the local identifier. */

@@ -31,7 +31,15 @@ const ActiveProgramIncrements = () => {
           </Row>
           <Row>
             {activeProgramIncrements.map((pi) => (
-              <Col key={pi.localId} xs={24} sm={12} md={6} lg={4}>
+              <Col
+                key={pi.localId}
+                xs={24}
+                sm={12}
+                md={8}
+                lg={6}
+                xl={6}
+                xxl={4}
+              >
                 <ProgramIncrementCard programIncrement={pi} />
               </Col>
             ))}

@@ -13,7 +13,7 @@ import { useCallback, useEffect, useState } from 'react'
 import difference from 'lodash/difference'
 import {
   ManageProgramIncrementTeamsRequest,
-  ProgramIncrementTeamReponse,
+  ProgramIncrementTeamResponse,
 } from '@/src/services/moda-api'
 
 export interface ManageProgramIncrementTeamsFormProps {
@@ -150,7 +150,7 @@ const ManageProgramIncrementTeamsForm = ({
     const piClient = await getProgramIncrementsClient()
     const piTeamsDtos = await piClient.getTeams(id)
 
-    return piTeamsDtos.map((team: ProgramIncrementTeamReponse) => ({
+    return piTeamsDtos.map((team: ProgramIncrementTeamResponse) => ({
       key: team.id,
       name: team.name,
       code: team.code,

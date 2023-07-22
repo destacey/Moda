@@ -158,7 +158,7 @@ else
 
     private async Task GetTeams()
     {
-        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetTeamsAsync(_programIncrement.Id), Snackbar) is List<ProgramIncrementTeamReponse> result)
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetTeamsAsync(_programIncrement.Id), Snackbar) is List<ProgramIncrementTeamResponse> result)
         {
             _piTeams = result.Select(t => TeamListViewModel.FromProgramIncrementTeamResponse(t)).OrderBy(t => t.Name).ToList();
         }
@@ -302,7 +302,7 @@ else
     private async Task GetRisks(bool includeClosed)
     {
         _includeClosedRisks = includeClosed;
-        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetRisksAsync(_programIncrement.Id, _includeClosedRisks), Snackbar) is List<RiskListDto> result)
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetRisksAsync(_programIncrement.Id, null, _includeClosedRisks), Snackbar) is List<RiskListDto> result)
         {
             _risks = result.OrderByDescending(r => r.ReportedOn).ToList();
         }

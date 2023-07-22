@@ -6,7 +6,7 @@ using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.Risks.Queries;
 
-public sealed record GetRisksByProgramIncrementQuery(Guid ProgramIncrementId, bool IncludeClosed) : IQuery<IReadOnlyList<RiskListDto>>;
+public sealed record GetRisksByProgramIncrementQuery(Guid ProgramIncrementId, bool IncludeClosed, Guid? TeamId) : IQuery<IReadOnlyList<RiskListDto>>;
 
 internal sealed class GetRisksByProgramIncrementQueryHandler : IQueryHandler<GetRisksByProgramIncrementQuery, IReadOnlyList<RiskListDto>>
 {
@@ -25,6 +25,9 @@ internal sealed class GetRisksByProgramIncrementQueryHandler : IQueryHandler<Get
         if (!teamIds.Any())
             return new List<RiskListDto>();
 
+        if (request.TeamId.HasValue && !teamIds.Contains(request.TeamId.Value))
+            return new List<RiskListDto>();
+
         var piDates = await _planningDbContext.ProgramIncrements
             .Where(p => p.Id == request.ProgramIncrementId)
             .Select(p => new 
@@ -38,10 +41,18 @@ internal sealed class GetRisksByProgramIncrementQueryHandler : IQueryHandler<Get
 
         var query = _planningDbContext.Risks
             .Include(r => r.Team)
-            .Include(r => r.Assignee)
-            .Where(r => r.TeamId.HasValue && teamIds.ToList().Contains(r.TeamId.Value))
+            .Include(r => r.Assignee)            
             .Where(r => r.ReportedOn <= piDates.end && (!r.ClosedDate.HasValue || piDates.start <= r.ClosedDate.Value))
             .AsQueryable();
+
+        if (request.TeamId.HasValue)
+        {
+            query = query.Where(r => r.TeamId == request.TeamId.Value);
+        }
+        else
+        {
+            query = query.Where(r => r.TeamId.HasValue && teamIds.ToList().Contains(r.TeamId.Value));
+        }
 
         if (!request.IncludeClosed)
         {

@@ -36,7 +36,7 @@ public class BaseTeamViewModel
         Type = dto.Type;
     }
 
-    public BaseTeamViewModel(ProgramIncrementTeamReponse dto)
+    public BaseTeamViewModel(ProgramIncrementTeamResponse dto)
     {
         Id = dto.Id;
         Name = dto.Name;
