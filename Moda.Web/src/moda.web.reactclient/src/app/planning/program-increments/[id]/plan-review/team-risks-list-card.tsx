@@ -1,27 +1,45 @@
+'use client'
+
 import { RiskListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
 import { Button, Card, Empty, List } from 'antd'
 import RiskListItem from './risk-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import useAuth from '@/src/app/components/contexts/auth'
 import CreateRiskForm from '@/src/app/components/common/planning/create-risk-form'
 
 export interface TeamRisksListCardProps {
-  risks: RiskListDto[]
+  getRisks: (
+    programIncrementId: string,
+    teamId: string
+  ) => Promise<RiskListDto[]>
   programIncrementId: string
   teamId: string
 }
 
 const TeamRisksListCard = ({
-  risks,
+  getRisks,
   programIncrementId,
   teamId,
 }: TeamRisksListCardProps) => {
+  const [risks, setRisks] = useState<RiskListDto[]>()
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
 
   const { hasClaim } = useAuth()
   const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
+
+  const loadRisks = useCallback(
+    async (programIncrementId: string, teamId: string) => {
+      const riskDtos = await getRisks(programIncrementId, teamId)
+      setRisks(riskDtos)
+    },
+    [getRisks]
+  )
+
+  useEffect(() => {
+    loadRisks(programIncrementId, teamId)
+  }, [loadRisks, programIncrementId, teamId])
 
   const cardTitle = () => {
     let title = `Risks`
@@ -62,7 +80,7 @@ const TeamRisksListCard = ({
   const onCreateRiskFormClosed = (wasCreated: boolean) => {
     setOpenCreateRiskForm(false)
     if (wasCreated) {
-      //loadRisks()
+      loadRisks()
     }
   }
 
@@ -72,11 +90,13 @@ const TeamRisksListCard = ({
         size="small"
         title={cardTitle()}
         extra={
-          <Button
-            type="text"
-            icon={<PlusOutlined />}
-            onClick={() => setOpenCreateRiskForm(true)}
-          />
+          canCreateRisks && (
+            <Button
+              type="text"
+              icon={<PlusOutlined />}
+              onClick={() => setOpenCreateRiskForm(true)}
+            />
+          )
         }
       >
         <RisksList />

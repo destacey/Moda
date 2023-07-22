@@ -1,9 +1,7 @@
 import { getProgramIncrementsClient } from '@/src/services/clients'
 import {
   ProgramIncrementDetailsDto,
-  ProgramIncrementObjectiveListDto,
   ProgramIncrementTeamResponse,
-  RiskListDto,
 } from '@/src/services/moda-api'
 import { Col, Row } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
@@ -16,54 +14,39 @@ export interface TeamPlanReviewProps {
 }
 
 const TeamPlanReview = ({ programIncrement, team }: TeamPlanReviewProps) => {
-  const [objectives, setObjectives] = useState<
-    ProgramIncrementObjectiveListDto[]
-  >([])
-  const [risks, setRisks] = useState<RiskListDto[]>([])
-
   const getObjectives = useCallback(
     async (programIncrementId: string, teamId: string) => {
-      const programIncrementsClient = await getProgramIncrementsClient()
-      return await programIncrementsClient.getObjectives(
-        programIncrementId,
-        teamId
-      )
+      if (programIncrementId && teamId) {
+        const programIncrementsClient = await getProgramIncrementsClient()
+        return await programIncrementsClient.getObjectives(
+          programIncrementId,
+          teamId
+        )
+      }
     },
     []
   )
 
   const getRisks = useCallback(
-    async (
-      programIncrementId: string,
-      teamId: string,
-      includeClosed = false
-    ) => {
-      const programIncrementsClient = await getProgramIncrementsClient()
-      return await programIncrementsClient.getRisks(
-        programIncrementId,
-        teamId,
-        includeClosed
-      )
+    async (programIncrementId: string, teamId: string) => {
+      if (programIncrementId && teamId) {
+        const programIncrementsClient = await getProgramIncrementsClient()
+        return await programIncrementsClient.getRisks(
+          programIncrementId,
+          teamId,
+          false
+        )
+      }
     },
     []
   )
-
-  useEffect(() => {
-    const loadData = async () => {
-      if (programIncrement && team) {
-        setObjectives(await getObjectives(programIncrement.id, team.id))
-        setRisks(await getRisks(programIncrement.id, team.id))
-      }
-    }
-    loadData()
-  }, [getObjectives, getRisks, programIncrement, team])
 
   return (
     <>
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={24} md={24} lg={12}>
           <TeamObjectivesListCard
-            objectives={objectives}
+            getObjectives={getObjectives}
             teamId={team?.id}
             programIncrementId={programIncrement?.id}
             newObjectivesAllowed={true}
@@ -71,7 +54,7 @@ const TeamPlanReview = ({ programIncrement, team }: TeamPlanReviewProps) => {
         </Col>
         <Col xs={24} sm={24} md={24} lg={12}>
           <TeamRisksListCard
-            risks={risks}
+            getRisks={getRisks}
             programIncrementId={programIncrement?.id}
             teamId={team?.id}
           />
