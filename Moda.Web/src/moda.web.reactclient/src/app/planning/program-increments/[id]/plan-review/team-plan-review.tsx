@@ -62,10 +62,10 @@ const TeamPlanReview = ({ programIncrement, team }: TeamPlanReviewProps) => {
   return (
     <>
       <Row gutter={[16, 16]}>
-        <Col xs={24} sm={24} md={12}>
+        <Col xs={24} sm={24} md={24} lg={12}>
           <TeamObjectivesListCard objectives={objectives} teamId={team?.id} />
         </Col>
-        <Col xs={24} sm={24} md={12}>
+        <Col xs={24} sm={24} md={24} lg={12}>
           <TeamRisksListCard
             risks={risks}
             programIncrementId={programIncrement?.id}

@@ -2,6 +2,7 @@ import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
 import { Button, Card, Empty, List, Space } from 'antd'
 import ObjectiveListItem from './objective-list-item'
+import ModaEmpty from '@/src/app/components/common/moda-empty'
 
 export interface TeamObjectivesListCardProps {
   objectives: ProgramIncrementObjectiveListDto[]
@@ -12,16 +13,18 @@ const TeamObjectivesListCard = ({
   objectives,
   teamId,
 }: TeamObjectivesListCardProps) => {
+  const cardTitle = () => {
+    let title = `Objectives`
+    if (objectives?.length > 0) {
+      title += ` (${objectives.length})`
+    }
+    return title
+  }
+
   const ObjectivesList = () => {
     if (!objectives || objectives.length === 0) {
-      return (
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No objectives"
-        />
-      )
+      return <ModaEmpty message="No objectives" />
     }
-
     const sortedObjectives = objectives.sort((a, b) => {
       if (a.isStretch && !b.isStretch) {
         return 1
@@ -49,7 +52,7 @@ const TeamObjectivesListCard = ({
   return (
     <Card
       size="small"
-      title="Objectives"
+      title={cardTitle()}
       extra={<Button type="text" icon={<PlusOutlined />} />}
     >
       <ObjectivesList />
