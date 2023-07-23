@@ -32,6 +32,13 @@ variable "app_reg_api_scope" {
   sensitive   = true
 }
 
+variable "aad_tenant_id" {
+  type        = string
+  description = "The tenant ID for the AAD App Registration."
+  default     = ""
+  sensitive   = true
+}
+
 variable "docker_tag" {
   type        = string
   description = "The tag for the Docker image."
