@@ -148,7 +148,7 @@ jobs:
 
             - name: Terraform Apply
               id: apply
-              run: terraform apply -auto-approve -var="docker_tag=sha-${{ github.sha }}" -var="sql_admin_pass=${{ secrets.SQL_ADMIN_PASSWORD }}" -var="aad_api_client_secret=${{ secrets.AAD_API_CLIENT_SECRET }}" -var-file="dev.tfvars"
+              run: terraform apply -auto-approve -var="docker_tag=sha-${{ github.sha }}" -var="sql_admin_pass=${{ secrets.SQL_ADMIN_PASSWORD }}" -var="aad_api_client_secret=${{ secrets.AAD_API_CLIENT_SECRET }}"
 
     deploy:
       name: "Deploy"

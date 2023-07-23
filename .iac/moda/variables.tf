@@ -44,3 +44,9 @@ variable "docker_tag" {
   description = "The tag for the Docker image."
   default     = "latest"
 }
+
+variable "api_url" {
+  type        = string
+  description = "The URL for the API."
+  default     = ""
+}
