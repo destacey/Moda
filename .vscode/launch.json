@@ -74,7 +74,7 @@
         {
             "name": "Compound: Launch Moda with Compose",
             "configurations": [
-                "Debug Moda API on Host",
+                "Docker: Attach to API in Docker",
                 "Browser: Launch Moda React Client in Chrome"
             ],
             "preLaunchTask": "Compose and Wait",
