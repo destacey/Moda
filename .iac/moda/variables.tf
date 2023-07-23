@@ -45,8 +45,8 @@ variable "docker_tag" {
   default     = "latest"
 }
 
-variable "api_url" {
+variable "client_url" {
   type        = string
-  description = "The URL for the API."
+  description = "The client url for CORS for the API."
   default     = ""
 }

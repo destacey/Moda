@@ -235,7 +235,7 @@ resource "azurerm_container_app" "moda_backend" {
 
       env {
         name  = "CorsSettings__WebClient"
-        value = "https://${azurerm_static_site.moda_swa.default_host_name};${var.api_url}"
+        value = "https://${azurerm_static_site.moda_swa.default_host_name};${var.client_url}"
       }
     }
   }
