@@ -44,6 +44,7 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/entrypoint.sh ./
+RUN chmod +x /app/entrypoint.sh
 RUN chown nextjs:nodejs /app/entrypoint.sh
 
 # Automatically leverage output traces to reduce image size
