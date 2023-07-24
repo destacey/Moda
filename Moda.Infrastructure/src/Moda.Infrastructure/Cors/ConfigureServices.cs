@@ -21,7 +21,8 @@ internal static class ConfigureServices
                 policy.AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials()
-                    .WithOrigins(origins.ToArray()))
+                    .WithOrigins(origins.ToArray())
+                    .SetIsOriginAllowedToAllowWildcardSubdomains())
         );
             
     }
