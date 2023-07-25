@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react'
 import PageTitle from '../page-title'
 import { getProgramIncrementsClient } from '@/src/services/clients'
-import { Col, Divider, Row } from 'antd'
+import { Col, Divider, Row, Space } from 'antd'
 import ProgramIncrementCard from './program-increment-card'
+import dayjs from 'dayjs'
+
+const isWithinTwoWeeks = (date: Date) => {
+  const twoWeeksFromNow = dayjs().add(14, 'day')
+  return dayjs(date) <= twoWeeksFromNow
+}
 
 const ActiveProgramIncrements = () => {
   const [activeProgramIncrements, setActiveProgramIncrements] = useState([])
@@ -12,7 +18,9 @@ const ActiveProgramIncrements = () => {
       const programIncrementClient = await getProgramIncrementsClient()
       const programIncrementDtos = await programIncrementClient.getList()
       const activeProgramIncrements = programIncrementDtos.filter(
-        (pi) => pi.state === 'Active'
+        (pi) =>
+          pi.state === 'Active' ||
+          (pi.state === 'Future' && isWithinTwoWeeks(pi.start))
       )
       setActiveProgramIncrements(activeProgramIncrements)
     }
@@ -27,22 +35,16 @@ const ActiveProgramIncrements = () => {
       return (
         <>
           <Row>
-            <PageTitle title="Active Program Increments" />
+            <PageTitle title="Program Increments" />
           </Row>
           <Row>
-            {activeProgramIncrements.map((pi) => (
-              <Col
-                key={pi.localId}
-                xs={24}
-                sm={12}
-                md={8}
-                lg={6}
-                xl={6}
-                xxl={4}
-              >
-                <ProgramIncrementCard programIncrement={pi} />
-              </Col>
-            ))}
+            <Space>
+              {activeProgramIncrements.map((pi) => (
+                <Col key={pi.localId}>
+                  <ProgramIncrementCard programIncrement={pi} />
+                </Col>
+              ))}
+            </Space>
           </Row>
           <Divider />
         </>
