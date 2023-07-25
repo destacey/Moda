@@ -22,7 +22,11 @@ const ActiveProgramIncrements = () => {
           pi.state === 'Active' ||
           (pi.state === 'Future' && isWithinTwoWeeks(pi.start))
       )
-      setActiveProgramIncrements(activeProgramIncrements)
+      setActiveProgramIncrements(
+        activeProgramIncrements?.sort((a, b) => {
+          return new Date(a.start).getTime() - new Date(b.start).getTime()
+        })
+      )
     }
 
     loadActiveProgramIncrements()
