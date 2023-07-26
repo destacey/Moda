@@ -9,7 +9,6 @@ import useAuth from '../../contexts/auth'
 import CreateRiskForm from './create-risk-form'
 import { EditOutlined } from '@ant-design/icons'
 import UpdateRiskForm from './edit-risk-form'
-import { set } from 'lodash'
 
 export interface RisksGridProps {
   getRisks: (id: string, includeClosed: boolean) => Promise<RiskListDto[]>

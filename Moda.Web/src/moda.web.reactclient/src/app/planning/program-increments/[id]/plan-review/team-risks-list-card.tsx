@@ -5,7 +5,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import { Button, Card, Empty, List } from 'antd'
 import RiskListItem from './risk-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
-import { useCallback, useEffect, useState } from 'react'
+import { use, useCallback, useEffect, useState } from 'react'
 import useAuth from '@/src/app/components/contexts/auth'
 import CreateRiskForm from '@/src/app/components/common/planning/create-risk-form'
 
@@ -28,6 +28,7 @@ const TeamRisksListCard = ({
 
   const { hasClaim } = useAuth()
   const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
+  const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
 
   const loadRisks = useCallback(
     async (programIncrementId: string, teamId: string) => {
@@ -36,6 +37,10 @@ const TeamRisksListCard = ({
     },
     [getRisks]
   )
+
+  const refreshRisks = useCallback(() => {
+    loadRisks(programIncrementId, teamId)
+  }, [loadRisks, programIncrementId, teamId])
 
   useEffect(() => {
     loadRisks(programIncrementId, teamId)
@@ -72,7 +77,13 @@ const TeamRisksListCard = ({
       <List
         size="small"
         dataSource={sortedRisks}
-        renderItem={(risk) => <RiskListItem risk={risk} />}
+        renderItem={(risk) => (
+          <RiskListItem
+            risk={risk}
+            canUpdateRisks={canUpdateRisks}
+            refreshRisks={refreshRisks}
+          />
+        )}
       />
     )
   }
