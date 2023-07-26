@@ -1,12 +1,23 @@
+import UpdateRiskForm from '@/src/app/components/common/planning/edit-risk-form'
 import { RiskListDto } from '@/src/services/moda-api'
-import { List, Typography } from 'antd'
+import { EditOutlined } from '@ant-design/icons'
+import { Button, List, Space, Typography } from 'antd'
 import Link from 'next/link'
+import { useState } from 'react'
 
 export interface RiskListItemProps {
   risk: RiskListDto
+  canUpdateRisks: boolean
+  refreshRisks: () => void
 }
 
-const RiskListItem = ({ risk }: RiskListItemProps) => {
+const RiskListItem = ({
+  risk,
+  canUpdateRisks,
+  refreshRisks,
+}: RiskListItemProps) => {
+  const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
+
   const title = () => {
     return (
       <Link href={`/planning/risks/${risk.localId}`}>
@@ -33,10 +44,33 @@ const RiskListItem = ({ risk }: RiskListItemProps) => {
     )
   }
 
+  const onEditRiskFormClosed = (wasSaved: boolean) => {
+    setOpenUpdateRiskForm(false)
+    if (wasSaved) {
+      refreshRisks()
+    }
+  }
+
   return (
-    <List.Item key={risk.localId}>
-      <List.Item.Meta title={title()} description={description()} />
-    </List.Item>
+    <>
+      <List.Item key={risk.localId}>
+        <List.Item.Meta title={title()} description={description()} />
+        {canUpdateRisks && (
+          <Button
+            type="text"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => setOpenUpdateRiskForm(true)}
+          />
+        )}
+      </List.Item>
+      <UpdateRiskForm
+        showForm={openUpdateRiskForm}
+        riskId={risk.id}
+        onFormSave={() => onEditRiskFormClosed(true)}
+        onFormCancel={() => onEditRiskFormClosed(false)}
+      />
+    </>
   )
 }
 

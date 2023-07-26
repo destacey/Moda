@@ -13,9 +13,23 @@ const ProgramIncrementCard = ({
   const start = new Date(programIncrement.start)
   const end = new Date(programIncrement.end)
   const now = new Date()
+
   const daysRemaining = Math.ceil(
     (end.getTime() - now.getTime()) / (1000 * 3600 * 24)
   )
+  const daysUntilStart = Math.ceil(
+    (start.getTime() - now.getTime()) / (1000 * 3600 * 24)
+  )
+
+  const daysRemainingText = () => {
+    if (programIncrement.state === 'Active') {
+      return `${daysRemaining} days remaining`
+    }
+
+    if (programIncrement.state === 'Future') {
+      return `${daysUntilStart} days until start`
+    }
+  }
   return (
     <Card size="small" title={programIncrement.name}>
       <Space direction="vertical">
@@ -23,7 +37,7 @@ const ProgramIncrementCard = ({
           {dayjs(programIncrement.start).format('M/D/YYYY')}
           <Typography.Text type="secondary"> - </Typography.Text>
           {dayjs(programIncrement.end).format('M/D/YYYY')}
-          <Typography.Text> ({daysRemaining} days remaining)</Typography.Text>
+          <Typography.Text> ({daysRemainingText()})</Typography.Text>
         </Space>
         <Space>
           <Link

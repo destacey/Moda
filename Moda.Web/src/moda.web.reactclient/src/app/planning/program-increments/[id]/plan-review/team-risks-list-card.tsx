@@ -28,6 +28,7 @@ const TeamRisksListCard = ({
 
   const { hasClaim } = useAuth()
   const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
+  const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
 
   const loadRisks = useCallback(
     async (programIncrementId: string, teamId: string) => {
@@ -36,6 +37,10 @@ const TeamRisksListCard = ({
     },
     [getRisks]
   )
+
+  const refreshRisks = useCallback(() => {
+    loadRisks(programIncrementId, teamId)
+  }, [loadRisks, programIncrementId, teamId])
 
   useEffect(() => {
     loadRisks(programIncrementId, teamId)
@@ -72,7 +77,13 @@ const TeamRisksListCard = ({
       <List
         size="small"
         dataSource={sortedRisks}
-        renderItem={(risk) => <RiskListItem risk={risk} />}
+        renderItem={(risk) => (
+          <RiskListItem
+            risk={risk}
+            canUpdateRisks={canUpdateRisks}
+            refreshRisks={refreshRisks}
+          />
+        )}
       />
     )
   }

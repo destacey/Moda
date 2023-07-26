@@ -47,6 +47,10 @@ const TeamObjectivesListCard = ({
     [getObjectives]
   )
 
+  const refreshObjectives = useCallback(() => {
+    loadObjectives(programIncrementId, teamId)
+  }, [loadObjectives, programIncrementId, teamId])
+
   useEffect(() => {
     loadObjectives(programIncrementId, teamId)
   }, [loadObjectives, programIncrementId, teamId])
@@ -81,6 +85,8 @@ const TeamObjectivesListCard = ({
           <ObjectiveListItem
             objective={objective}
             piLocalId={objective.programIncrement.localId}
+            canUpdateObjectives={canManageObjectives}
+            refreshObjectives={refreshObjectives}
           />
         )}
       />
