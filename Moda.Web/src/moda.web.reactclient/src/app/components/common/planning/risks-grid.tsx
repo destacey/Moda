@@ -7,6 +7,7 @@ import { Button, Space, Switch } from 'antd'
 import dayjs from 'dayjs'
 import useAuth from '../../contexts/auth'
 import CreateRiskForm from './create-risk-form'
+import { EditFilled, EditOutlined, EditTwoTone } from '@ant-design/icons'
 
 export interface RisksGridProps {
   getRisks: (id: string, includeClosed: boolean) => Promise<RiskListDto[]>
@@ -14,6 +15,21 @@ export interface RisksGridProps {
   teamId?: string | null
   newRisksAllowed?: boolean
   hideTeamColumn?: boolean
+}
+
+const EditBtnCellRenderer = (props) => {
+  const btnClickedHandler = () => {
+    props.clicked(props.value)
+  }
+
+  return (
+    <Button
+      type="text"
+      size="small"
+      icon={<EditOutlined />}
+      onClick={() => btnClickedHandler()} // setOpenEditRiskModal
+    />
+  )
 }
 
 const RiskLinkCellRenderer = ({ value, data }) => {
@@ -48,9 +64,11 @@ const RisksGrid = ({
   const [includeClosed, setIncludeClosed] = useState<boolean>(false)
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
+  const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
 
   const { hasClaim } = useAuth()
   const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
+  const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
   const showActions = newRisksAllowed && canCreateRisks
 
   const onIncludeClosedChange = (checked: boolean) => {
@@ -66,6 +84,14 @@ const RisksGrid = ({
     const riskDtos = await getRisks(getRisksObjectId, includeClosed)
     setRisks(riskDtos)
   }, [getRisks, getRisksObjectId, includeClosed])
+
+  const editRiskButtonClicked = useCallback(
+    (id: string) => {
+      console.log('editRiskButtonClicked', id)
+      setOpenUpdateRiskForm(true)
+    },
+    [setOpenUpdateRiskForm]
+  )
 
   const Actions = () => {
     return (
@@ -110,6 +136,27 @@ const RisksGrid = ({
   // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
   const columnDefs = useMemo(
     () => [
+      {
+        field: 'actions',
+        headerName: '',
+        width: 50,
+        filter: false,
+        sortable: false,
+        hide: !canUpdateRisks,
+        cellRenderer: (params) => {
+          return (
+            canUpdateRisks && (
+              <Button
+                type="text"
+                size="small"
+                icon={<EditTwoTone />}
+                onClick={() => editRiskButtonClicked(params.id)}
+              />
+            )
+          )
+        },
+      },
+      { field: 'id', hide: true },
       { field: 'localId', headerName: '#', width: 90 },
       { field: 'summary', width: 300, cellRenderer: RiskLinkCellRenderer },
       {
@@ -134,7 +181,7 @@ const RisksGrid = ({
           dayjs(params.data.reportedOn).format('M/D/YYYY'),
       },
     ],
-    [hideTeam, includeClosed]
+    [editRiskButtonClicked, hideTeam, includeClosed]
   )
 
   const onCreateRiskFormClosed = (wasCreated: boolean) => {
