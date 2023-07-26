@@ -7,7 +7,9 @@ import { Button, Space, Switch } from 'antd'
 import dayjs from 'dayjs'
 import useAuth from '../../contexts/auth'
 import CreateRiskForm from './create-risk-form'
-import { EditFilled, EditOutlined, EditTwoTone } from '@ant-design/icons'
+import { EditOutlined } from '@ant-design/icons'
+import UpdateRiskForm from './edit-risk-form'
+import { set } from 'lodash'
 
 export interface RisksGridProps {
   getRisks: (id: string, includeClosed: boolean) => Promise<RiskListDto[]>
@@ -15,21 +17,6 @@ export interface RisksGridProps {
   teamId?: string | null
   newRisksAllowed?: boolean
   hideTeamColumn?: boolean
-}
-
-const EditBtnCellRenderer = (props) => {
-  const btnClickedHandler = () => {
-    props.clicked(props.value)
-  }
-
-  return (
-    <Button
-      type="text"
-      size="small"
-      icon={<EditOutlined />}
-      onClick={() => btnClickedHandler()} // setOpenEditRiskModal
-    />
-  )
 }
 
 const RiskLinkCellRenderer = ({ value, data }) => {
@@ -65,6 +52,7 @@ const RisksGrid = ({
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
   const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
+  const [editRiskId, setEditRiskId] = useState<string | null>(null)
 
   const { hasClaim } = useAuth()
   const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
@@ -87,11 +75,19 @@ const RisksGrid = ({
 
   const editRiskButtonClicked = useCallback(
     (id: string) => {
-      console.log('editRiskButtonClicked', id)
+      setEditRiskId(id)
       setOpenUpdateRiskForm(true)
     },
     [setOpenUpdateRiskForm]
   )
+
+  const onEditRiskFormClosed = (wasSaved: boolean) => {
+    setOpenUpdateRiskForm(false)
+    setEditRiskId(null)
+    if (wasSaved) {
+      loadRisks()
+    }
+  }
 
   const Actions = () => {
     return (
@@ -149,8 +145,8 @@ const RisksGrid = ({
               <Button
                 type="text"
                 size="small"
-                icon={<EditTwoTone />}
-                onClick={() => editRiskButtonClicked(params.id)}
+                icon={<EditOutlined />}
+                onClick={() => editRiskButtonClicked(params.data.id)}
               />
             )
           )
@@ -181,7 +177,7 @@ const RisksGrid = ({
           dayjs(params.data.reportedOn).format('M/D/YYYY'),
       },
     ],
-    [editRiskButtonClicked, hideTeam, includeClosed]
+    [canUpdateRisks, editRiskButtonClicked, hideTeam, includeClosed]
   )
 
   const onCreateRiskFormClosed = (wasCreated: boolean) => {
@@ -207,6 +203,12 @@ const RisksGrid = ({
         showForm={openCreateRiskForm}
         onFormCreate={() => onCreateRiskFormClosed(true)}
         onFormCancel={() => onCreateRiskFormClosed(false)}
+      />
+      <UpdateRiskForm
+        showForm={openUpdateRiskForm}
+        riskId={editRiskId}
+        onFormSave={() => onEditRiskFormClosed(true)}
+        onFormCancel={() => onEditRiskFormClosed(false)}
       />
     </>
   )
