@@ -1,17 +1,26 @@
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
-import { List, Progress, Typography } from 'antd'
+import { Button, List, Progress, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import { useState } from 'react'
+import EditProgramIncrementObjectiveForm from '../edit-program-increment-objective-form'
+import { EditOutlined } from '@ant-design/icons'
 
 export interface ObjectiveListItemProps {
   objective: ProgramIncrementObjectiveListDto
   piLocalId: number
+  canUpdateObjectives: boolean
+  refreshObjectives: () => void
 }
 
 const ObjectiveListItem = ({
   objective,
   piLocalId,
+  canUpdateObjectives,
+  refreshObjectives,
 }: ObjectiveListItemProps) => {
+  const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
+    useState<boolean>(false)
   const title = () => {
     return (
       <Link
@@ -58,10 +67,34 @@ const ObjectiveListItem = ({
     )
   }
 
+  const onEditObjectiveFormClosed = (wasSaved: boolean) => {
+    setOpenUpdateObjectiveForm(false)
+    if (wasSaved) {
+      refreshObjectives()
+    }
+  }
+
   return (
-    <List.Item key={objective.localId}>
-      <List.Item.Meta title={title()} description={description()} />
-    </List.Item>
+    <>
+      <List.Item key={objective.localId}>
+        <List.Item.Meta title={title()} description={description()} />
+        {canUpdateObjectives && (
+          <Button
+            type="text"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => setOpenUpdateObjectiveForm(true)}
+          />
+        )}
+      </List.Item>
+      <EditProgramIncrementObjectiveForm
+        showForm={openUpdateObjectiveForm}
+        objectiveId={objective?.id}
+        programIncrementId={objective?.programIncrement?.id}
+        onFormSave={() => onEditObjectiveFormClosed(true)}
+        onFormCancel={() => onEditObjectiveFormClosed(false)}
+      />
+    </>
   )
 }
 
