@@ -197,18 +197,22 @@ const RisksGrid = ({
         actions={showActions && <Actions />}
         gridControlMenuItems={controlItems}
       />
-      <CreateRiskForm
-        createForTeamId={teamId}
-        showForm={openCreateRiskForm}
-        onFormCreate={() => onCreateRiskFormClosed(true)}
-        onFormCancel={() => onCreateRiskFormClosed(false)}
-      />
-      <UpdateRiskForm
-        showForm={openUpdateRiskForm}
-        riskId={editRiskId}
-        onFormSave={() => onEditRiskFormClosed(true)}
-        onFormCancel={() => onEditRiskFormClosed(false)}
-      />
+      {canCreateRisks && (
+        <CreateRiskForm
+          createForTeamId={teamId}
+          showForm={openCreateRiskForm}
+          onFormCreate={() => onCreateRiskFormClosed(true)}
+          onFormCancel={() => onCreateRiskFormClosed(false)}
+        />
+      )}
+      {canUpdateRisks && (
+        <UpdateRiskForm
+          showForm={openUpdateRiskForm}
+          riskId={editRiskId}
+          onFormSave={() => onEditRiskFormClosed(true)}
+          onFormCancel={() => onEditRiskFormClosed(false)}
+        />
+      )}
     </>
   )
 }

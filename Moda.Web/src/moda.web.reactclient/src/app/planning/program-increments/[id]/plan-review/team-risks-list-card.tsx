@@ -112,12 +112,14 @@ const TeamRisksListCard = ({
       >
         <RisksList />
       </Card>
-      <CreateRiskForm
-        createForTeamId={teamId}
-        showForm={openCreateRiskForm}
-        onFormCreate={() => onCreateRiskFormClosed(true)}
-        onFormCancel={() => onCreateRiskFormClosed(false)}
-      />
+      {canCreateRisks && (
+        <CreateRiskForm
+          createForTeamId={teamId}
+          showForm={openCreateRiskForm}
+          onFormCreate={() => onCreateRiskFormClosed(true)}
+          onFormCancel={() => onCreateRiskFormClosed(false)}
+        />
+      )}
     </>
   )
 }

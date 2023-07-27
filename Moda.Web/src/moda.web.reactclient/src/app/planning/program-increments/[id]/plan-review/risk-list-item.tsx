@@ -64,12 +64,14 @@ const RiskListItem = ({
           />
         )}
       </List.Item>
-      <UpdateRiskForm
-        showForm={openUpdateRiskForm}
-        riskId={risk.id}
-        onFormSave={() => onEditRiskFormClosed(true)}
-        onFormCancel={() => onEditRiskFormClosed(false)}
-      />
+      {canUpdateRisks && (
+        <UpdateRiskForm
+          showForm={openUpdateRiskForm}
+          riskId={risk.id}
+          onFormSave={() => onEditRiskFormClosed(true)}
+          onFormCancel={() => onEditRiskFormClosed(false)}
+        />
+      )}
     </>
   )
 }

@@ -113,7 +113,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {team && (
+      {team && canUpdateTeam && (
         <EditTeamForm
           showForm={openUpdateTeamModal}
           localId={team.localId}
