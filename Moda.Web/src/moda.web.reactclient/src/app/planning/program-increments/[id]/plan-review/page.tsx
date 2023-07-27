@@ -84,9 +84,9 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
     }
   })
 
-  const activeTeam = useCallback(() => {
+  const activeTeam = () => {
     return teams.find((t) => t.localId.toString() === activeTab)
-  }, [activeTab, teams])
+  }
 
   const Actions = () => {
     return (
