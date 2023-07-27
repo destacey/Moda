@@ -149,7 +149,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {programIncrement && (
+      {programIncrement && canUpdateProgramIncrement && (
         <ManageProgramIncrementTeamsForm
           showForm={openManageTeamsModal}
           id={programIncrement.id}

@@ -116,11 +116,13 @@ const TeamListPage = () => {
         rowData={teams}
         loadData={getTeams}
       />
-      <CreateTeamForm
-        showForm={openCreateTeamModal}
-        onFormCreate={() => onCreateTeamFormClosed(true)}
-        onFormCancel={() => onCreateTeamFormClosed(false)}
-      />
+      {canCreateTeam && (
+        <CreateTeamForm
+          showForm={openCreateTeamModal}
+          onFormCreate={() => onCreateTeamFormClosed(true)}
+          onFormCancel={() => onCreateTeamFormClosed(false)}
+        />
+      )}
     </>
   )
 }

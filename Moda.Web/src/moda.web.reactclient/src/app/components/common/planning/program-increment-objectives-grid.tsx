@@ -217,19 +217,23 @@ const ProgramIncrementObjectivesGrid = ({
         actions={showActions && <Actions />}
         gridControlMenuItems={controlItems}
       />
-      <CreateProgramIncrementObjectiveForm
-        programIncrementId={programIncrementId}
-        showForm={openCreateObjectiveModal}
-        onFormCreate={() => onCreateObjectiveFormClosed(true)}
-        onFormCancel={() => onCreateObjectiveFormClosed(false)}
-      />
-      <EditProgramIncrementObjectiveForm
-        showForm={openUpdateObjectiveForm}
-        objectiveId={editObjectiveId}
-        programIncrementId={programIncrementId}
-        onFormSave={() => onEditObjectiveFormClosed(true)}
-        onFormCancel={() => onEditObjectiveFormClosed(false)}
-      />
+      {canManageObjectives && (
+        <CreateProgramIncrementObjectiveForm
+          programIncrementId={programIncrementId}
+          showForm={openCreateObjectiveModal}
+          onFormCreate={() => onCreateObjectiveFormClosed(true)}
+          onFormCancel={() => onCreateObjectiveFormClosed(false)}
+        />
+      )}
+      {canManageObjectives && (
+        <EditProgramIncrementObjectiveForm
+          showForm={openUpdateObjectiveForm}
+          objectiveId={editObjectiveId}
+          programIncrementId={programIncrementId}
+          onFormSave={() => onEditObjectiveFormClosed(true)}
+          onFormCancel={() => onEditObjectiveFormClosed(false)}
+        />
+      )}
     </>
   )
 }

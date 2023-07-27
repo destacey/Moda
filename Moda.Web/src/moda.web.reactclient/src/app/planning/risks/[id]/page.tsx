@@ -100,12 +100,14 @@ const RiskDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      <UpdateRiskForm
-        showForm={openUpdateRiskForm}
-        riskId={risk?.id}
-        onFormSave={() => onUpdateRiskFormClosed(true)}
-        onFormCancel={() => onUpdateRiskFormClosed(false)}
-      />
+      {canUpdateRisks && (
+        <UpdateRiskForm
+          showForm={openUpdateRiskForm}
+          riskId={risk?.id}
+          onFormSave={() => onUpdateRiskFormClosed(true)}
+          onFormCancel={() => onUpdateRiskFormClosed(false)}
+        />
+      )}
     </>
   )
 }

@@ -117,13 +117,15 @@ const TeamObjectivesListCard = ({
       >
         <ObjectivesList />
       </Card>
-      <CreateProgramIncrementObjectiveForm
-        programIncrementId={programIncrementId}
-        teamId={teamId}
-        showForm={openCreateObjectiveModal}
-        onFormCreate={() => onCreateObjectiveFormClosed(true)}
-        onFormCancel={() => onCreateObjectiveFormClosed(false)}
-      />
+      {canManageObjectives && (
+        <CreateProgramIncrementObjectiveForm
+          programIncrementId={programIncrementId}
+          teamId={teamId}
+          showForm={openCreateObjectiveModal}
+          onFormCreate={() => onCreateObjectiveFormClosed(true)}
+          onFormCancel={() => onCreateObjectiveFormClosed(false)}
+        />
+      )}
     </>
   )
 }

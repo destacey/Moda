@@ -185,7 +185,9 @@ const ManageProgramIncrementTeamsForm = ({
       }
     } else {
       onFormCancel()
-      messageApi.error('You do not have permission to update teams.')
+      messageApi.error(
+        'You do not have permission to update the Program Increment.'
+      )
     }
   }, [canUpdatePI, id, loadData, messageApi, onFormCancel, showForm])
 

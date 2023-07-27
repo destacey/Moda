@@ -107,13 +107,15 @@ const ObjectiveDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      <EditProgramIncrementObjectiveForm
-        showForm={openUpdateObjectiveModal}
-        objectiveId={objective?.id}
-        programIncrementId={objective?.programIncrement?.id}
-        onFormSave={() => onUpdateObjectiveFormClosed(true)}
-        onFormCancel={() => onUpdateObjectiveFormClosed(false)}
-      />
+      {canManageObjectives && (
+        <EditProgramIncrementObjectiveForm
+          showForm={openUpdateObjectiveModal}
+          objectiveId={objective?.id}
+          programIncrementId={objective?.programIncrement?.id}
+          onFormSave={() => onUpdateObjectiveFormClosed(true)}
+          onFormCancel={() => onUpdateObjectiveFormClosed(false)}
+        />
+      )}
     </>
   )
 }

@@ -87,13 +87,15 @@ const ObjectiveListItem = ({
           />
         )}
       </List.Item>
-      <EditProgramIncrementObjectiveForm
-        showForm={openUpdateObjectiveForm}
-        objectiveId={objective?.id}
-        programIncrementId={objective?.programIncrement?.id}
-        onFormSave={() => onEditObjectiveFormClosed(true)}
-        onFormCancel={() => onEditObjectiveFormClosed(false)}
-      />
+      {canUpdateObjectives && (
+        <EditProgramIncrementObjectiveForm
+          showForm={openUpdateObjectiveForm}
+          objectiveId={objective?.id}
+          programIncrementId={objective?.programIncrement?.id}
+          onFormSave={() => onEditObjectiveFormClosed(true)}
+          onFormCancel={() => onEditObjectiveFormClosed(false)}
+        />
+      )}
     </>
   )
 }
