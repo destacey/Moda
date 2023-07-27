@@ -153,7 +153,10 @@ const ModaGrid = ({
           </Col>
         </Row>
 
-        <div className={agGridTheme} style={{ height: height ?? 700 }}>
+        <div
+          className={agGridTheme ?? 'ag-theme-balham'}
+          style={{ height: height ?? 700 }}
+        >
           <AgGridReact
             ref={gridRef}
             defaultColDef={defaultColDef ?? modaDefaultColDef}
