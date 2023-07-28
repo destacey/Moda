@@ -1,3 +1,5 @@
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-balham.css'
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
@@ -16,9 +18,6 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
-
-import 'ag-grid-community/styles/ag-grid.css'
-import 'ag-grid-community/styles/ag-theme-balham.css'
 import useTheme from '../contexts/theme'
 
 interface ModaGridProps extends AgGridReactProps {
@@ -86,13 +85,14 @@ const ModaGrid = ({
   }, [])
 
   useEffect(() => {
+    console.log('ModaGrid agGridTheme:', agGridTheme)
     // When the grid is first rendered or if the onRefreshData function changes, load the data if the grid is ready
     if (!gridRef.current?.api) return
     const loadGridData = async () => {
       await onRefreshData()
     }
     loadGridData()
-  }, [onRefreshData])
+  }, [agGridTheme, onRefreshData])
 
   return (
     <div style={{ width: width }}>
@@ -153,10 +153,7 @@ const ModaGrid = ({
           </Col>
         </Row>
 
-        <div
-          className={agGridTheme ?? 'ag-theme-balham'}
-          style={{ height: height ?? 700 }}
-        >
+        <div className={agGridTheme} style={{ height: height ?? 700 }}>
           <AgGridReact
             ref={gridRef}
             defaultColDef={defaultColDef ?? modaDefaultColDef}
