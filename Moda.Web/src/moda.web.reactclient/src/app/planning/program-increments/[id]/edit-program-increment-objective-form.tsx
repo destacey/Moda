@@ -203,11 +203,12 @@ const EditProgramIncrementObjectiveForm = ({
 
   const loadData = useCallback(async () => {
     try {
+      // the PI is needed before the form values are set
+      setProgramIncrement(await getProgramIncrement(programIncrementId))
       const objectiveData = await getObjective(programIncrementId, objectiveId)
       setObjectiveNumber(objectiveData.localId)
       setTeamName(objectiveData.team.name)
       mapToFormValues(objectiveData)
-      setProgramIncrement(await getProgramIncrement(programIncrementId))
       setStatusOptions(await getProgramIncrementStatuses())
     } catch (error) {
       handleCancel()
@@ -256,12 +257,13 @@ const EditProgramIncrementObjectiveForm = ({
 
   const isDateWithinPiRange = useCallback(
     (date: Date) => {
+      console.log('isDateWithinPiRange', date)
       return (
-        dayjs(programIncrement.start) <= dayjs(date) &&
-        dayjs(date) < dayjs(programIncrement.end).add(1, 'day')
+        dayjs(programIncrement?.start) <= dayjs(date) &&
+        dayjs(date) < dayjs(programIncrement?.end).add(1, 'day')
       )
     },
-    [programIncrement]
+    [programIncrement?.end, programIncrement?.start]
   )
 
   return (
