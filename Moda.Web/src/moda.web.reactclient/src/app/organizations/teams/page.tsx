@@ -31,7 +31,7 @@ const TeamListPage = () => {
   useDocumentTitle('Teams')
   const [teams, setTeams] = useState<TeamListItem[]>([])
   const [includeDisabled, setIncludeDisabled] = useState<boolean>(false)
-  const [openCreateTeamModal, setOpenCreateTeamModal] = useState<boolean>(false)
+  const [openCreateTeamForm, setOpenCreateTeamForm] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
 
   const { hasClaim } = useAuth()
@@ -58,7 +58,7 @@ const TeamListPage = () => {
     return (
       <>
         {canCreateTeam && (
-          <Button onClick={() => setOpenCreateTeamModal(true)}>
+          <Button onClick={() => setOpenCreateTeamForm(true)}>
             Create Team
           </Button>
         )}
@@ -101,7 +101,7 @@ const TeamListPage = () => {
   }, [includeDisabled, lastRefresh])
 
   const onCreateTeamFormClosed = (wasCreated: boolean) => {
-    setOpenCreateTeamModal(false)
+    setOpenCreateTeamForm(false)
     if (wasCreated) {
       setLastRefresh(Date.now())
     }
@@ -118,7 +118,7 @@ const TeamListPage = () => {
       />
       {canCreateTeam && (
         <CreateTeamForm
-          showForm={openCreateTeamModal}
+          showForm={openCreateTeamForm}
           onFormCreate={() => onCreateTeamFormClosed(true)}
           onFormCancel={() => onCreateTeamFormClosed(false)}
         />
