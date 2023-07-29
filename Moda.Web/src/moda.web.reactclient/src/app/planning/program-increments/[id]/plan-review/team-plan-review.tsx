@@ -53,7 +53,7 @@ const TeamPlanReview = ({ programIncrement, team }: TeamPlanReviewProps) => {
             getObjectives={getObjectives}
             teamId={team?.id}
             programIncrementId={programIncrement?.id}
-            newObjectivesAllowed={true}
+            newObjectivesAllowed={!programIncrement?.objectivesLocked ?? false}
           />
         </Col>
         <Col xs={24} sm={24} md={24} lg={12}>

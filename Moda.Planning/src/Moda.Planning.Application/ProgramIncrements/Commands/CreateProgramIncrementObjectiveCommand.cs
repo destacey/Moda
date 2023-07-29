@@ -72,16 +72,25 @@ internal sealed class CreateProgramIncrementObjectiveCommandHandler : ICommandHa
             var programIncrement = await _planningDbContext.ProgramIncrements
                 .FirstOrDefaultAsync(p => p.Id == request.ProgramIncrementId, cancellationToken);
             if (programIncrement is null)
-                return Result.Failure<int>($"Program Increment {request.ProgramIncrementId} not found.");
+            {
+                _logger.LogError("Program Increment {ProgramIncrementId} not found.", request.ProgramIncrementId);
+                return Result.Failure<int>("Program Increment not found.");
+            }
 
             if (programIncrement.ObjectivesLocked)
-                return Result.Failure<int>($"Objectives are locked for Program Increment {request.ProgramIncrementId}");
+            {
+                _logger.LogError("Objectives are locked for the Program Increment {ProgramIncrementId}", request.ProgramIncrementId);
+                return Result.Failure<int>("Objectives are locked for the Program Increment");
+            }
 
             var team = await _planningDbContext.PlanningTeams
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == request.TeamId, cancellationToken);
             if (team is null)
-                return Result.Failure<int>($"Team {request.TeamId} not found.");
+            {
+                _logger.LogError("Team {TeamId} not found.", request.TeamId);
+                return Result.Failure<int>("Team not found.");
+            }
 
             var objectiveResult = await _sender.Send(new CreateObjectiveCommand(
                 request.Name, 
@@ -92,7 +101,10 @@ internal sealed class CreateProgramIncrementObjectiveCommandHandler : ICommandHa
                 request.StartDate, 
                 request.TargetDate), cancellationToken);
             if (objectiveResult.IsFailure)
+            {
+                _logger.LogError("Unable to create objective.  Error: {Error}", objectiveResult.Error);
                 return Result.Failure<int>($"Unable to create objective.  Error: {objectiveResult.Error}");
+            }
 
             var result = programIncrement.CreateObjective(team, objectiveResult.Value, request.IsStretch);
             if (result.IsFailure)

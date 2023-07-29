@@ -136,7 +136,8 @@ const CreateProgramIncrementObjectiveForm = ({
           messageApi.error('Correct the validation error(s) to continue.')
         } else {
           messageApi.error(
-            'An unexpected error occurred while creating the PI objective.'
+            error.supportMessage ??
+              'An unexpected error occurred while creating the program increment.'
           )
           console.error(error)
         }
