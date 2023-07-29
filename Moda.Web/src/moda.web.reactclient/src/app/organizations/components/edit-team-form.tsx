@@ -2,7 +2,7 @@
 
 import { Form, Input, Modal, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
-import useAuth from '../../../components/contexts/auth'
+import useAuth from '../../components/contexts/auth'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
 import {
   UpdateTeamOfTeamsRequest,

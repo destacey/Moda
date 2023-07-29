@@ -85,7 +85,6 @@ const ModaGrid = ({
   }, [])
 
   useEffect(() => {
-    console.log('ModaGrid agGridTheme:', agGridTheme)
     // When the grid is first rendered or if the onRefreshData function changes, load the data if the grid is ready
     if (!gridRef.current?.api) return
     const loadGridData = async () => {

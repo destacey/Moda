@@ -11,7 +11,7 @@ import RisksGrid, {
 } from '@/src/app/components/common/planning/risks-grid'
 import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-memberships-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import EditTeamForm from '../../components/edit-team/edit-team-form'
+import { EditTeamForm } from '../../components'
 import useAuth from '@/src/app/components/contexts/auth'
 import useBreadcrumb from '@/src/app/components/contexts/breadcrumbs'
 
