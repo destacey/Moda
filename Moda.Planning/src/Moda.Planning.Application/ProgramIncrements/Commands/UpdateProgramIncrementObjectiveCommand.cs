@@ -105,7 +105,7 @@ internal sealed class UpdateProgramIncrementObjectiveCommandHandler : ICommandHa
             
             var objectiveResult = await _sender.Send(new UpdateObjectiveCommand(
                 updatePiObjectiveResult.Value.ObjectiveId,
-                request.Name, 
+                objectiveName, 
                 request.Description,
                 request.Status,
                 request.Progress,
