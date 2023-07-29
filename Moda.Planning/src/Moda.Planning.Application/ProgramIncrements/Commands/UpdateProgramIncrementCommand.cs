@@ -1,5 +1,5 @@
 ﻿namespace Moda.Planning.Application.ProgramIncrements.Commands;
-public sealed record UpdateProgramIncrementCommand(Guid Id, string Name, string? Description, LocalDateRange DateRange) : ICommand<int>;
+public sealed record UpdateProgramIncrementCommand(Guid Id, string Name, string? Description, LocalDateRange DateRange, bool objectivesLocked) : ICommand<int>;
 
 public sealed class UpdateProgramIncrementCommandValidator : CustomValidator<UpdateProgramIncrementCommand>
 {
@@ -55,7 +55,8 @@ internal sealed class UpdateProgramIncrementCommandHandler : ICommandHandler<Upd
             var updateResult = programIncrement.Update(
                 request.Name,
                 request.Description,
-                request.DateRange
+                request.DateRange,
+                request.objectivesLocked
                 );
 
             if (updateResult.IsFailure)

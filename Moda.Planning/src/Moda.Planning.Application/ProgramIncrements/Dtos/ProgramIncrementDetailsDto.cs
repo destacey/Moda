@@ -33,6 +33,10 @@ public sealed record ProgramIncrementDetailsDto
     /// <value>The state.</value>
     public required string State { get; set; }
 
+    /// <summary>Gets or sets a value indicating whether [objectives locked].</summary>
+    /// <value><c>true</c> if [objectives locked]; otherwise, <c>false</c>.</value>
+    public bool ObjectivesLocked { get; set; }
+
     // TODO: do this with Mapster
     public static ProgramIncrementDetailsDto Create(ProgramIncrement programIncrement, IDateTimeService dateTimeService)
     {
@@ -44,7 +48,8 @@ public sealed record ProgramIncrementDetailsDto
             Description = programIncrement.Description,
             Start = programIncrement.DateRange.Start,
             End = programIncrement.DateRange.End,
-            State = programIncrement.StateOn(dateTimeService.Now.InUtc().Date).GetDisplayName()
+            State = programIncrement.StateOn(dateTimeService.Now.InUtc().Date).GetDisplayName(),
+            ObjectivesLocked = programIncrement.ObjectivesLocked
         };
     }
 }

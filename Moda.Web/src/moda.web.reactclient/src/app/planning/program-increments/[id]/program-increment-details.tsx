@@ -1,5 +1,5 @@
 import { ProgramIncrementDetailsDto } from '@/src/services/moda-api'
-import { Col, Descriptions, Row } from 'antd'
+import { Col, Descriptions, Row, Space, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
@@ -20,12 +20,17 @@ const ProgramIncrementDetails = (
               {dayjs(programIncrement.end).format('M/D/YYYY')}
             </Item>
             <Item label="State">{programIncrement.state}</Item>
+            <Item label="Objectives Locked?">
+              {programIncrement.objectivesLocked ? 'Yes' : 'No'}
+            </Item>
           </Descriptions>
         </Col>
         <Col xs={24} md={12}>
           <Descriptions layout="vertical">
             <Item label="Description">
-              <ReactMarkdown>{programIncrement.description}</ReactMarkdown>
+              <Space direction="vertical">
+                <ReactMarkdown>{programIncrement.description}</ReactMarkdown>
+              </Space>
             </Item>
           </Descriptions>
         </Col>

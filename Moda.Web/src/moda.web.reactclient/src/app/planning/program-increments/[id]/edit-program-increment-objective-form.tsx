@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  Alert,
   DatePicker,
   Descriptions,
   Form,
@@ -288,6 +289,9 @@ const EditProgramIncrementObjectiveForm = ({
           layout="vertical"
           name="update-objective-form"
         >
+          {programIncrement?.objectivesLocked && (
+            <Alert message="PI Objectives are locked." type="info" showIcon />
+          )}
           <Descriptions size="small" column={1}>
             <Descriptions.Item label="Number">
               {objectiveNumber}
@@ -308,6 +312,7 @@ const EditProgramIncrementObjectiveForm = ({
               autoSize={{ minRows: 1, maxRows: 2 }}
               showCount
               maxLength={128}
+              disabled={programIncrement?.objectivesLocked}
             />
           </Form.Item>
           <Form.Item
@@ -326,7 +331,11 @@ const EditProgramIncrementObjectiveForm = ({
             name="isStretch"
             valuePropName="checked"
           >
-            <Switch checkedChildren="Yes" unCheckedChildren="No" />
+            <Switch
+              checkedChildren="Yes"
+              unCheckedChildren="No"
+              disabled={programIncrement?.objectivesLocked}
+            />
           </Form.Item>
           <Form.Item
             name="statusId"

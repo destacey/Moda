@@ -13233,6 +13233,9 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("state", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string State { get; set; } = default!;
 
+        [Newtonsoft.Json.JsonProperty("objectivesLocked", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool ObjectivesLocked { get; set; } = default!;
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -13310,6 +13313,12 @@ namespace Moda.Web.BlazorClient.Infrastructure.ApiClient
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         [Newtonsoft.Json.JsonConverter(typeof(DateFormatConverter))]
         public System.DateTime End { get; set; } = default!;
+
+        /// <summary>
+        /// Gets or sets the objectives locked.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("objectivesLocked", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool ObjectivesLocked { get; set; } = default!;
 
     }
 

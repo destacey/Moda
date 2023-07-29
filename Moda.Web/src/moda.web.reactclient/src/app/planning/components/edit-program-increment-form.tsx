@@ -1,6 +1,6 @@
 'use client'
 
-import { DatePicker, Form, Input, Modal, message } from 'antd'
+import { DatePicker, Form, Input, Modal, Switch, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../components/contexts/auth'
 import {
@@ -24,6 +24,7 @@ interface EditProgramIncrementFormValues {
   description?: string
   start: Date
   end: Date
+  objectivesLocked: boolean
 }
 
 const EditProgramIncrementForm = ({
@@ -52,6 +53,7 @@ const EditProgramIncrementForm = ({
         description: programIncrement.description,
         start: dayjs(programIncrement.start),
         end: dayjs(programIncrement.end),
+        objectivesLocked: programIncrement.objectivesLocked,
       })
     },
     [form]
@@ -64,6 +66,7 @@ const EditProgramIncrementForm = ({
       description: values.description,
       start: (values.start as any)?.format('YYYY-MM-DD'),
       end: (values.end as any)?.format('YYYY-MM-DD'),
+      objectivesLocked: values.objectivesLocked,
     } as UpdateProgramIncrementRequest
   }
 
@@ -203,6 +206,13 @@ const EditProgramIncrementForm = ({
           </Form.Item>
           <Form.Item label="End" name="end" rules={[{ required: true }]}>
             <DatePicker />
+          </Form.Item>
+          <Form.Item
+            label="Objectives Locked?"
+            name="objectivesLocked"
+            valuePropName="checked"
+          >
+            <Switch checkedChildren="Yes" unCheckedChildren="No" />
           </Form.Item>
         </Form>
       </Modal>

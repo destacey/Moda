@@ -5758,6 +5758,9 @@
           },
           "state": {
             "type": "string"
+          },
+          "objectivesLocked": {
+            "type": "boolean"
           }
         }
       },
@@ -5837,6 +5840,10 @@
             "description": "Gets or sets the end.",
             "format": "date",
             "nullable": false
+          },
+          "objectivesLocked": {
+            "type": "boolean",
+            "description": "Gets or sets the objectives locked."
           }
         }
       },

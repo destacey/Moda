@@ -6586,6 +6586,7 @@ export interface ProgramIncrementDetailsDto {
     start?: Date;
     end?: Date;
     state?: string;
+    objectivesLocked?: boolean;
 }
 
 export interface CreateProgramIncrementRequest {
@@ -6610,6 +6611,8 @@ export interface UpdateProgramIncrementRequest {
     start: Date;
     /** Gets or sets the end. */
     end: Date;
+    /** Gets or sets the objectives locked. */
+    objectivesLocked?: boolean;
 }
 
 export interface ProgramIncrementTeamResponse {

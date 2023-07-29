@@ -1,5 +1,5 @@
 import { ProgramIncrementObjectiveDetailsDto } from '@/src/services/moda-api'
-import { Col, Descriptions, Progress, Row, Tooltip } from 'antd'
+import { Col, Descriptions, Progress, Row, Space, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
@@ -52,7 +52,9 @@ const ProgramIncrementObjectiveDetails = (
         <Col xs={24} md={12}>
           <Descriptions layout="vertical">
             <Item label="Description">
-              <ReactMarkdown>{objective.description}</ReactMarkdown>
+              <Space direction="vertical">
+                <ReactMarkdown>{objective.description}</ReactMarkdown>
+              </Space>
             </Item>
           </Descriptions>
         </Col>

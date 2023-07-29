@@ -128,7 +128,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
         programIncrementId: programIncrement?.id,
         hideProgramIncrementColumn: true,
         hideTeamColumn: false,
-        newObjectivesAllowed: true,
+        newObjectivesAllowed: !programIncrement?.objectivesLocked ?? false,
       } as ProgramIncrementObjectivesGridProps),
     },
     {
