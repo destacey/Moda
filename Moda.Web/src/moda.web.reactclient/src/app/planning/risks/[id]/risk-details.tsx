@@ -1,5 +1,5 @@
 import { RiskDetailsDto } from '@/src/services/moda-api'
-import { Col, Descriptions, Row } from 'antd'
+import { Col, Descriptions, Row, Space } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
@@ -17,12 +17,16 @@ const RiskDetails = (risk: RiskDetailsDto) => {
         <Col xs={24} md={10}>
           <Descriptions layout="vertical">
             <Item label="Description">
-              <ReactMarkdown>{risk.description}</ReactMarkdown>
+              <Space direction="vertical">
+                <ReactMarkdown>{risk.description}</ReactMarkdown>
+              </Space>
             </Item>
           </Descriptions>
           <Descriptions layout="vertical">
             <Item label="Response">
-              <ReactMarkdown>{risk.response}</ReactMarkdown>
+              <Space direction="vertical">
+                <ReactMarkdown>{risk.response}</ReactMarkdown>
+              </Space>
             </Item>
           </Descriptions>
         </Col>
