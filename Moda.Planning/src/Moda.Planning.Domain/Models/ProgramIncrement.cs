@@ -69,13 +69,16 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
     /// <param name="dateRange">The date range.</param>
-    public Result Update(string name, string? description, LocalDateRange dateRange)
+    /// <param name="objectivesLocked">if set to <c>true</c> [objectives locked].</param>
+    /// <returns></returns>
+    public Result Update(string name, string? description, LocalDateRange dateRange, bool objectivesLocked)
     {
         try
         {
             Name = name;
             Description = description;
             DateRange = dateRange;
+            ObjectivesLocked = objectivesLocked;
 
             return Result.Success();
         }
@@ -91,7 +94,7 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
     public IterationState StateOn(LocalDate date)
     {
         if (DateRange.IsPastOn(date)) { return IterationState.Completed; }
-        if (DateRange.IsActiveOn(date)) { return IterationState.Active; };
+        if (DateRange.IsActiveOn(date)) { return IterationState.Active; }
         return IterationState.Future;
     }
 

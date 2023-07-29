@@ -24,9 +24,13 @@ public sealed record UpdateProgramIncrementRequest
     /// <value>The end.</value>
     public LocalDate End { get; set; }
 
+    /// <summary>Gets or sets the objectives locked.</summary>
+    /// <value><c>true</c> if [objectives locked]; otherwise, <c>false</c>.</value>
+    public bool ObjectivesLocked { get; set; }
+
     public UpdateProgramIncrementCommand ToUpdateProgramIncrementCommand()
     {
-        return new UpdateProgramIncrementCommand(Id, Name, Description, new LocalDateRange(Start, End));
+        return new UpdateProgramIncrementCommand(Id, Name, Description, new LocalDateRange(Start, End), ObjectivesLocked);
     }
 }
 
