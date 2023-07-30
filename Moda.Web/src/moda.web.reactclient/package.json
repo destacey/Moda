@@ -33,6 +33,7 @@
     "ag-grid-community": "^30.0.6",
     "ag-grid-react": "^30.0.6",
     "antd": "^5.7.3",
+    "apexcharts": "^3.41.0",
     "axios": "^1.4.0",
     "dayjs": "^1.11.9",
     "jwt-decode": "^3.1.2",
@@ -40,6 +41,7 @@
     "lodash.sortby": "^4.7.0",
     "next": "13.4.7",
     "react": "18.2.0",
+    "react-apexcharts": "^1.4.1",
     "react-dom": "18.2.0",
     "react-markdown": "^8.0.7"
   }
