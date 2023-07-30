@@ -37,8 +37,7 @@ const Permissions = (props: PermissionsProps) => {
   useEffect(() => setPermissions(props.permissions), [props.permissions])
 
   useEffect(() => {
-    const groups = availablePermissions.data?.reduce(
-      (acc: PermissionGroup[], permission) => {
+    const groups = availablePermissions.data?.reduce((acc: PermissionGroup[], permission) => {
         const item = {
           name: permission.name,
           description: permission.description,
@@ -57,7 +56,7 @@ const Permissions = (props: PermissionsProps) => {
       []
     )
 
-    setPermissionGroups(groups)
+    setPermissionGroups(groups.sort((a, b) => a.name.localeCompare(b.name)));
     setActivePermissionGroup(groups?.[0])
   }, [availablePermissions.data])
 
