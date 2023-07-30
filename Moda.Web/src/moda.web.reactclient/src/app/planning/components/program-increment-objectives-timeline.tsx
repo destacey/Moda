@@ -1,11 +1,11 @@
+import vis from 'vis-timeline/dist/vis-timeline-graph2d.esm'
+import 'vis-timeline/styles/vis-timeline-graph2d.css'
 import {
   ProgramIncrementDetailsDto,
   ProgramIncrementObjectiveListDto,
 } from '@/src/services/moda-api'
-import { ApexOptions } from 'apexcharts'
 import dayjs from 'dayjs'
-import { use, useCallback, useEffect, useState } from 'react'
-import ReactApexChart from 'react-apexcharts'
+import { useCallback, useEffect, useState } from 'react'
 import { ModaEmpty } from '../../components/common'
 
 interface ProgramIncrementObjectivesTimelineProps {
@@ -17,70 +17,64 @@ interface ProgramIncrementObjectivesTimelineProps {
   teamId: string
 }
 
+interface TimelineItem {
+  id: number
+  programIncrementLocalId: number
+  content: string
+  start: Date
+  end: Date
+  group?: string | undefined
+  type?: string | undefined
+}
+
+// TODO: add a link within the content to the objective details page
+const ItemTemplate = (item) => {
+  return <>{item.content}</>
+}
+
 const ProgramIncrementObjectivesTimeline = ({
   getObjectives,
   programIncrement,
   teamId,
 }: ProgramIncrementObjectivesTimelineProps) => {
-  const [objectives, setObjectives] = useState<
-    ProgramIncrementObjectiveListDto[]
-  >([])
-  const [chartSeries, setChartSeries] = useState<ApexAxisChartSeries>([])
-  const [chartHeight, setChartHeight] = useState<number>(500)
+  const [objectives, setObjectives] = useState<TimelineItem[]>([])
 
-  const chartOptions: ApexOptions = {
-    chart: {
-      toolbar: {
-        autoSelected: 'pan',
-      },
-    },
-    plotOptions: {
-      bar: {
-        horizontal: true,
-        distributed: true,
-        dataLabels: {
-          hideOverflowingLabels: false,
-        },
-      },
-    },
-    dataLabels: {
-      enabled: true,
-      formatter: function (val, opts) {
-        var label = opts.w.globals.labels[opts.dataPointIndex]
-        return label
-      },
-      style: {
-        colors: ['#f5f5f5', '#fff'],
-      },
-    },
-    xaxis: {
-      type: 'datetime',
-      min: programIncrement
-        ? dayjs(programIncrement.start).valueOf()
-        : undefined,
-      max: programIncrement ? dayjs(programIncrement.end).valueOf() : undefined,
-    },
-    yaxis: {
-      show: false,
-    },
-    grid: {
-      row: {
-        colors: ['#f5f5f5', '#fff'],
-        opacity: 1,
-      },
-    },
-  }
+  // TODO: add the ability to export/save as svg or png
+  // TODO: update the styles to match the rest of the app.  Especially for dark mode.
+  const options = useCallback((start: Date, end: Date, template) => {
+    return {
+      orientation: 'top',
+      showCurrentTime: true,
+      minHeight: 200,
+      maxHeight: 700,
+      verticalScroll: true,
+      zoomKey: 'ctrlKey',
+      start: dayjs(start).subtract(1, 'week').toDate(),
+      end: dayjs(end).add(1, 'week').toDate(),
+      editable: false,
+      teamplate: template,
+    }
+  }, [])
 
   const loadObjectives = useCallback(
     async (programIncrementId: string, teamId: string) => {
       const objectiveDtos = await getObjectives(programIncrementId, teamId)
-      const rowHeight = objectiveDtos.length <= 10 ? 75 : 50
-      setChartHeight(objectiveDtos.length * rowHeight + 100)
       setObjectives(
-        objectiveDtos.filter((obj) => obj.status?.name !== 'Canceled')
+        objectiveDtos
+          .filter((obj) => obj.status?.name !== 'Canceled')
+          .map((obj, index) => {
+            return {
+              id: obj.localId,
+              programIncrementLocalId: obj.programIncrement.localId,
+              content: obj.name,
+              start: dayjs(obj.startDate ?? programIncrement.start).toDate(),
+              end: dayjs(obj.targetDate ?? programIncrement.end).toDate(),
+              group: obj.team?.name,
+            }
+          })
       )
     },
-    [getObjectives]
+    [getObjectives, programIncrement.end, programIncrement.start]
   )
 
   useEffect(() => {
@@ -89,36 +83,45 @@ const ProgramIncrementObjectivesTimeline = ({
 
   useEffect(() => {
     if (!objectives || objectives.length === 0) {
-      setChartSeries([])
       return
     }
+    // TODO: add the ability for content to overflow if the text is too long
+    const items = [
+      {
+        id: -1,
+        content: '',
+        start: dayjs(programIncrement.start).toDate(),
+        end: dayjs(programIncrement.start).add(1, 'day').toDate(),
+        type: 'background',
+      },
+      {
+        id: -2,
+        content: '',
+        start: dayjs(programIncrement.end).toDate(),
+        end: dayjs(programIncrement.end).add(1, 'day').toDate(),
+        type: 'background',
+      },
+      ...objectives,
+    ]
 
-    const seriesData = objectives.map((objective) => {
-      return {
-        x: objective.name,
-        y: [
-          dayjs(objective.startDate ?? programIncrement.start).valueOf(),
-          dayjs(objective.targetDate ?? programIncrement.end).valueOf(),
-        ],
-      }
-    })
-    setChartSeries([{ data: seriesData }])
-  }, [objectives, programIncrement.end, programIncrement.start])
+    var container = document.getElementById('timeline-vis')
+    const timeline = new vis.Timeline(
+      container,
+      items,
+      options(programIncrement.start, programIncrement.end, ItemTemplate)
+    )
+  }, [objectives, options, programIncrement.end, programIncrement.start])
 
   const TimelineChart = () => {
     if (!objectives || objectives.length === 0) {
       return <ModaEmpty message="No objectives" />
     }
 
+    // TODO: add a loading indicator
     return (
-      <div id="chart">
-        <ReactApexChart
-          options={chartOptions}
-          series={chartSeries}
-          type="rangeBar"
-          height={chartHeight}
-        />
-      </div>
+      <>
+        <div id="timeline-vis"></div>
+      </>
     )
   }
 
