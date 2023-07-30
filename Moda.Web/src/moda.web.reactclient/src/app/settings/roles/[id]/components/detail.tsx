@@ -1,7 +1,10 @@
 import useAuth from '@/src/app/components/contexts/auth'
 import { getRolesClient } from '@/src/services/clients'
 import { RoleDto } from '@/src/services/moda-api'
-import { useDeleteRoleMutation, useCreateRoleMutation } from '@/src/services/query'
+import {
+  useDeleteRoleMutation,
+  useCreateRoleMutation,
+} from '@/src/services/query'
 import { Button, Checkbox, Form, Input, Popconfirm, message } from 'antd'
 import { get } from 'lodash'
 import { useRouter } from 'next/navigation'
@@ -17,9 +20,9 @@ const Detail = (props: RolesDetailProps) => {
   const router = useRouter()
   const { hasClaim } = useAuth()
 
-  const queryClient = useQueryClient();
-  const useDeleteRole = useDeleteRoleMutation(queryClient);
-  const useCreateRole = useCreateRoleMutation(queryClient);
+  const queryClient = useQueryClient()
+  const useDeleteRole = useDeleteRoleMutation(queryClient)
+  const useCreateRole = useCreateRoleMutation(queryClient)
   const canDelete = hasClaim('Permission', 'Permissions.Roles.Delete')
   const [messageApi, contextHolder] = message.useMessage()
 
@@ -27,15 +30,15 @@ const Detail = (props: RolesDetailProps) => {
 
   const confirmDelete = async (e: React.MouseEvent<HTMLElement>) => {
     try {
-      await useDeleteRole.mutateAsync(role.id);
-      messageApi.success('Role deleted successfully');
+      await useDeleteRole.mutateAsync(role.id)
+      messageApi.success('Role deleted successfully')
 
       // Allow delay for message to show
       setTimeout(() => {
-        router.push('/settings/roles');
-      }, 1500);
-    } catch(error) {
-      messageApi.error(error?.messages?.join() ?? 'Failed to delete role');
+        router.push('/settings/roles')
+      }, 1500)
+    } catch (error) {
+      messageApi.error(error?.messages?.join() ?? 'Failed to delete role')
     }
   }
 
@@ -49,7 +52,8 @@ const Detail = (props: RolesDetailProps) => {
 
       messageApi.success('Role saved successfully')
     } catch (error) {
-      messageApi.error('Finished catch', error.messages.join())
+      console.log(error);
+      messageApi.error(error.exception ?? 'Role update failed');
     }
   }
 
@@ -73,9 +77,15 @@ const Detail = (props: RolesDetailProps) => {
             label="Name"
             name="name"
             initialValue={role?.name}
-            rules={[{ required: true, message: 'Please input a name' }]}
+            rules={[
+              { required: true, message: 'Please input a name' },
+              {
+                max: 250,
+                message: 'The name cannot exceed 256 characters.',
+              },
+            ]}
           >
-            <Input />
+            <Input showCount maxLength={256} />
           </Form.Item>
 
           <Form.Item
@@ -100,7 +110,9 @@ const Detail = (props: RolesDetailProps) => {
                   okText="Yes"
                   cancelText="No"
                 >
-                  <Button type='text' danger>Delete</Button>
+                  <Button type="text" danger>
+                    Delete
+                  </Button>
                 </Popconfirm>
               )}
             </div>

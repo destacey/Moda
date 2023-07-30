@@ -56,7 +56,7 @@ const Permissions = (props: PermissionsProps) => {
       []
     )
 
-    setPermissionGroups(groups.sort((a, b) => a.name.localeCompare(b.name)));
+    setPermissionGroups(groups?.sort((a, b) => a.name.localeCompare(b.name)) ?? groups);
     setActivePermissionGroup(groups?.[0])
   }, [availablePermissions.data])
 

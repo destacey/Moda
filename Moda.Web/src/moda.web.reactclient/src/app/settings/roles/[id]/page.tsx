@@ -56,13 +56,11 @@ const Page = ({ params }) => {
         subtitle="Role Details"
       />
       <Card
-        style={{ width: '100%', height: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
         onTabChange={(key) => setActiveTab(key)}
       >
         {tabs.find((t) => t.key === activeTab)?.content}
-        
       </Card>
     </>
   )
