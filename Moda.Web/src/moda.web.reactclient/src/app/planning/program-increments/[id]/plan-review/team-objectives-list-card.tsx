@@ -2,7 +2,7 @@
 
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Empty, List, Space } from 'antd'
+import { Button, Card, List, Space } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
 import { useCallback, useEffect, useState } from 'react'

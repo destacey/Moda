@@ -11,7 +11,6 @@ import dayjs from 'dayjs'
 import { CreateProgramIncrementForm } from '../components'
 import useAuth from '../../components/contexts/auth'
 import { Button } from 'antd'
-import { last } from 'lodash'
 
 const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
   return (
