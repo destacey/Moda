@@ -1,11 +1,11 @@
-import vis from 'vis-timeline/dist/vis-timeline-graph2d.esm'
+import * as vis from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import 'vis-timeline/styles/vis-timeline-graph2d.css'
 import {
   ProgramIncrementDetailsDto,
   ProgramIncrementObjectiveListDto,
 } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ModaEmpty } from '../../components/common'
 
 interface ProgramIncrementObjectivesTimelineProps {
@@ -17,9 +17,10 @@ interface ProgramIncrementObjectivesTimelineProps {
   teamId: string
 }
 
-interface TimelineItem {
+interface TimelineItem extends vis.DataItem {
   id: number
   programIncrementLocalId: number
+  title?: string | undefined
   content: string
   start: Date
   end: Date
@@ -27,10 +28,43 @@ interface TimelineItem {
   type?: string | undefined
 }
 
-// TODO: add a link within the content to the objective details page
-const ItemTemplate = (item) => {
-  return <>{item.content}</>
-}
+// TODO: get this working with the template function
+// const TimelineContentTemplate = (objective: ProgramIncrementObjectiveListDto) => {
+//   const content = `Status: ${objective.status?.name} | Stretch?: ${objective.isStretch}`
+//   const startDate = objective.startDate
+//     ? ` | Start: ${
+//         objective.startDate
+//           ? dayjs(objective.startDate)?.format('M/D/YYYY')
+//           : ''
+//       }`
+//     : null
+//   const targetDate = objective.targetDate
+//     ? ` | Target: ${
+//         objective.targetDate
+//           ? dayjs(objective.targetDate)?.format('M/D/YYYY')
+//           : ''
+//       }`
+//     : null
+//   const showProgress = objective.status?.name !== 'Not Started'
+//   const progressStatus =
+//     objective.status?.name === 'Canceled' ? 'exception' : undefined
+//   return (
+//     <>
+//       <Typography.Text>
+//         {content}
+//         {startDate}
+//         {targetDate}
+//       </Typography.Text>
+//       {showProgress && (
+//         <Progress
+//           percent={objective.progress}
+//           status={progressStatus}
+//           size="small"
+//         />
+//       )}
+//     </>
+//   )
+// }
 
 const ProgramIncrementObjectivesTimeline = ({
   getObjectives,
@@ -41,24 +75,24 @@ const ProgramIncrementObjectivesTimeline = ({
 
   // TODO: add the ability to export/save as svg or png
   // TODO: update the styles to match the rest of the app.  Especially for dark mode.
-  const options = useCallback((start: Date, end: Date, template) => {
+  const options: vis.TimelineOptions = useMemo(() => {
     return {
+      editable: false,
       orientation: 'top',
-      showCurrentTime: true,
-      minHeight: 200,
       maxHeight: 700,
+      minHeight: 200,
+      moveable: true,
+      showCurrentTime: true,
       verticalScroll: true,
       zoomKey: 'ctrlKey',
-      start: dayjs(start).subtract(1, 'week').toDate(),
-      end: dayjs(end).add(1, 'week').toDate(),
-      editable: false,
-      teamplate: template,
+      start: dayjs(programIncrement.start).subtract(1, 'week').toDate(),
+      end: dayjs(programIncrement.end).add(1, 'week').toDate(),
     }
-  }, [])
+  }, [programIncrement])
 
   const loadObjectives = useCallback(
-    async (programIncrementId: string, teamId: string) => {
-      const objectiveDtos = await getObjectives(programIncrementId, teamId)
+    async (programIncrement: ProgramIncrementDetailsDto, teamId: string) => {
+      const objectiveDtos = await getObjectives(programIncrement.id, teamId)
       setObjectives(
         objectiveDtos
           .filter((obj) => obj.status?.name !== 'Canceled')
@@ -66,7 +100,8 @@ const ProgramIncrementObjectivesTimeline = ({
             return {
               id: obj.localId,
               programIncrementLocalId: obj.programIncrement.localId,
-              content: obj.name,
+              title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
+              content: `${obj.name} (${obj.status?.name})`,
               start: dayjs(obj.startDate ?? programIncrement.start).toDate(),
               end: dayjs(obj.targetDate ?? programIncrement.end).toDate(),
               group: obj.team?.name,
@@ -74,11 +109,11 @@ const ProgramIncrementObjectivesTimeline = ({
           })
       )
     },
-    [getObjectives, programIncrement.end, programIncrement.start]
+    [getObjectives]
   )
 
   useEffect(() => {
-    loadObjectives(programIncrement?.id, teamId)
+    loadObjectives(programIncrement, teamId)
   }, [loadObjectives, programIncrement, teamId])
 
   useEffect(() => {
@@ -86,9 +121,11 @@ const ProgramIncrementObjectivesTimeline = ({
       return
     }
     // TODO: add the ability for content to overflow if the text is too long
-    const items = [
+    const items: TimelineItem[] = [
       {
         id: -1,
+        programIncrementLocalId: -1,
+        title: 'PI Start',
         content: '',
         start: dayjs(programIncrement.start).toDate(),
         end: dayjs(programIncrement.start).add(1, 'day').toDate(),
@@ -96,6 +133,8 @@ const ProgramIncrementObjectivesTimeline = ({
       },
       {
         id: -2,
+        programIncrementLocalId: -2,
+        title: 'PI End',
         content: '',
         start: dayjs(programIncrement.end).toDate(),
         end: dayjs(programIncrement.end).add(1, 'day').toDate(),
@@ -105,11 +144,7 @@ const ProgramIncrementObjectivesTimeline = ({
     ]
 
     var container = document.getElementById('timeline-vis')
-    const timeline = new vis.Timeline(
-      container,
-      items,
-      options(programIncrement.start, programIncrement.end, ItemTemplate)
-    )
+    const timeline = new vis.Timeline(container, items, options)
   }, [objectives, options, programIncrement.end, programIncrement.start])
 
   const TimelineChart = () => {
@@ -117,7 +152,6 @@ const ProgramIncrementObjectivesTimeline = ({
       return <ModaEmpty message="No objectives" />
     }
 
-    // TODO: add a loading indicator
     return (
       <>
         <div id="timeline-vis"></div>
@@ -125,6 +159,7 @@ const ProgramIncrementObjectivesTimeline = ({
     )
   }
 
+  // TODO: add a loading indicator
   return <TimelineChart />
 }
 
