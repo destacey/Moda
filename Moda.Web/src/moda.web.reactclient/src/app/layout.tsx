@@ -13,6 +13,7 @@ import { ThemeProvider } from './components/contexts/theme'
 import { AuthProvider } from './components/contexts/auth'
 import { BreadcrumbsProvider } from './components/contexts/breadcrumbs'
 import { MenuToggleProvider } from './components/contexts/menu-toggle'
+import LoadingAccount from './components/common/loading-account'
 
 const { Content } = Layout
 
@@ -30,22 +31,24 @@ export default function RootLayout({
               <MenuToggleProvider>
                 <Layout>
                   <AppHeader />
-                  <Layout>
-                    <AppMenu />
-                    <Layout style={{ padding: '0 24px 24px' }}>
-                      <BreadcrumbsProvider>
-                        <AppBreadcrumb />
-                        <Content
-                          style={{
-                            margin: 0,
-                            minHeight: 280,
-                          }}
-                        >
-                          {children}
-                        </Content>
-                      </BreadcrumbsProvider>
+                  <LoadingAccount>
+                    <Layout>
+                      <AppMenu />
+                      <Layout style={{ padding: '0 24px 24px' }}>
+                        <BreadcrumbsProvider>
+                          <AppBreadcrumb />
+                          <Content
+                            style={{
+                              margin: 0,
+                              minHeight: 280,
+                            }}
+                          >
+                            {children}
+                          </Content>
+                        </BreadcrumbsProvider>
+                      </Layout>
                     </Layout>
-                  </Layout>
+                  </LoadingAccount>
                 </Layout>
               </MenuToggleProvider>
             </AuthenticatedTemplate>
