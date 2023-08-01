@@ -109,7 +109,7 @@ public class ProgramIncrementsController : ControllerBase
     {
         List<ProgramIncrementTeamResponse> piTeams = new();
         var teamIds = await _sender.Send(new GetProgramIncrementTeamsQuery(id), cancellationToken);
-        
+
         if (teamIds.Any())
         {
             var teams = await _sender.Send(new GetTeamsQuery(true, teamIds), cancellationToken);
@@ -307,6 +307,29 @@ public class ProgramIncrementsController : ControllerBase
             };
             return BadRequest(error);
         }
+    }
+
+    [HttpDelete("{id}/objectives/{objectiveId}")]
+    [MustHavePermission(ApplicationAction.Manage, ApplicationResource.ProgramIncrementObjectives)]
+    [OpenApiOperation("Delete a program increment objective.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> DeleteObjective(Guid id, Guid objectiveId, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeleteProgramIncrementObjectiveCommand(id, objectiveId), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "ProgramIncrementsController.DeleteObjective"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
     }
 
     [HttpGet("objective-statuses")]
