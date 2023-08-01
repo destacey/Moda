@@ -73,7 +73,10 @@ const TeamObjectivesListCard = ({
       } else if (!a.isStretch && b.isStretch) {
         return -1
       } else {
-        return a.localId.toString().localeCompare(b.localId.toString())
+        const statusOrder = ['Not Started', 'In Progress', 'Closed', 'Canceled']
+        const aStatusIndex = statusOrder.indexOf(a.status.name)
+        const bStatusIndex = statusOrder.indexOf(b.status.name)
+        return aStatusIndex - bStatusIndex
       }
     })
 

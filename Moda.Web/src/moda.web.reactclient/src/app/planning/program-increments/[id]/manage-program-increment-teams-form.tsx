@@ -1,3 +1,5 @@
+'use client'
+
 import useAuth from '@/src/app/components/contexts/auth'
 import { TeamListItem } from '@/src/app/organizations/types'
 import {

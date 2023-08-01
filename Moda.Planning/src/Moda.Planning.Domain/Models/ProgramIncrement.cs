@@ -186,6 +186,28 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         }
     }
 
+    public Result DeleteObjective(Guid piObjectiveId)
+    {
+        try
+        {
+            if (ObjectivesLocked)
+                return Result.Failure("Objectives are locked for this Program Increment.");
+
+            var existingObjective = _objectives.FirstOrDefault(x => x.Id == piObjectiveId);
+            if (existingObjective == null)
+                return Result.Failure($"Program Increment Objective {piObjectiveId} not found.");
+
+            // TODO: deleting it here is not soft deleting it
+            //_objectives.Remove(existingObjective);
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
     /// <summary>Creates the specified name.</summary>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>

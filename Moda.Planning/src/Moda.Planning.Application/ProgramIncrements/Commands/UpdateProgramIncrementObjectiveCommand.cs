@@ -101,16 +101,16 @@ internal sealed class UpdateProgramIncrementObjectiveCommandHandler : ICommandHa
                     return Result.Failure<int>($"Objective {request.ProgramIncrementObjectiveId} not found.");
 
                 objectiveName = currentObjective.Name;
-            }            
-            
+            }
+
             var objectiveResult = await _sender.Send(new UpdateObjectiveCommand(
                 updatePiObjectiveResult.Value.ObjectiveId,
-                objectiveName, 
+                objectiveName,
                 request.Description,
                 request.Status,
                 request.Progress,
                 updatePiObjectiveResult.Value.TeamId,
-                request.StartDate, 
+                request.StartDate,
                 request.TargetDate), cancellationToken);
             if (objectiveResult.IsFailure)
                 return Result.Failure<int>($"Unable to update the underlying objective.  Error: {objectiveResult.Error}");

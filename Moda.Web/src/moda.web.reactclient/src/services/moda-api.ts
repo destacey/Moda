@@ -1746,6 +1746,66 @@ export class ProgramIncrementsClient {
     }
 
     /**
+     * Delete a program increment objective.
+     */
+    deleteObjective(id: string, objectiveId: string, cancelToken?: CancelToken | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/objectives/{objectiveId}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (objectiveId === undefined || objectiveId === null)
+            throw new Error("The parameter 'objectiveId' must be defined.");
+        url_ = url_.replace("{objectiveId}", encodeURIComponent("" + objectiveId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDeleteObjective(_response);
+        });
+    }
+
+    protected processDeleteObjective(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Get a program increment objective using the PI and Objective local Ids.
      */
     getObjectiveByLocalId(id: number, objectiveId: number, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementObjectiveDetailsDto> {

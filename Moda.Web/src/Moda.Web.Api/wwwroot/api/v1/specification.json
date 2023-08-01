@@ -1424,6 +1424,55 @@
             "Bearer": []
           }
         ]
+      },
+      "delete": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Delete a program increment objective.",
+        "operationId": "ProgramIncrements_DeleteObjective",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "objectiveId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/planning/program-increments/local-id/{id}/objectives/{objectiveId}": {
