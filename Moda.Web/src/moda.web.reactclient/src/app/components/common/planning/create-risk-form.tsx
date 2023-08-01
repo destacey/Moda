@@ -327,6 +327,7 @@ const CreateRiskForm = ({
           </Form.Item>
           <Form.Item name="assigneeId" label="Assignee">
             <Select
+              allowClear
               showSearch
               placeholder="Select an assignee"
               optionFilterProp="children"
