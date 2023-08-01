@@ -36,11 +36,14 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
             if (users is null || !users.Any())
                 return Result.Failure<IEnumerable<IExternalEmployee>>("No employees found in Active Directory via Microsoft Graph");
 
+            _logger.LogInformation("Found {UserCount} users in Active Directory via Microsoft Graph", users.Count);
+
             List<AzureAdEmployee> employees = new(users.Count);
             foreach (var user in users.Where(u => !string.IsNullOrWhiteSpace(u.Id)))
             {
                 // TODO move this to a single operation for the entire list of users
                 var manager = await GetUserManager(user.Id!, cancellationToken);
+                _logger.LogInformation("Found manager {ManagerId} for user {UserId}", manager?.Id, user.Id);
                 user.Manager = manager;
                 employees.Add(new AzureAdEmployee(user));
             }
