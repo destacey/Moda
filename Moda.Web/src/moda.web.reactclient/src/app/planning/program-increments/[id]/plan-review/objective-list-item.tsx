@@ -1,5 +1,5 @@
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
-import { Button, List, Progress, Typography } from 'antd'
+import { Button, List, Progress, Space, Tag, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -30,17 +30,30 @@ const ObjectiveListItem = ({
       </Link>
     )
   }
+
+  const getColorForStatus = (status: string) => {
+    switch (status) {
+      case 'In Progress':
+        return 'blue'
+      case 'Completed':
+        return 'green'
+      case 'Canceled':
+        return 'red'
+      default:
+        return 'default'
+    }
+  }
+
   const description = () => {
-    const content = `Status: ${objective.status?.name} | Stretch?: ${objective.isStretch}`
     const startDate = objective.startDate
-      ? ` | Start: ${
+      ? `Start: ${
           objective.startDate
             ? dayjs(objective.startDate)?.format('M/D/YYYY')
             : ''
         }`
       : null
     const targetDate = objective.targetDate
-      ? ` | Target: ${
+      ? `Target: ${
           objective.targetDate
             ? dayjs(objective.targetDate)?.format('M/D/YYYY')
             : ''
@@ -51,11 +64,17 @@ const ObjectiveListItem = ({
       objective.status?.name === 'Canceled' ? 'exception' : undefined
     return (
       <>
-        <Typography.Text>
-          {content}
-          {startDate}
-          {targetDate}
-        </Typography.Text>
+        <Space>
+          <Tag color={getColorForStatus(objective.status.name)}>
+            {objective.status.name}
+          </Tag>
+          {objective.isStretch && <Tag>Stretch</Tag>}
+          <Typography.Text>
+            {startDate}
+            {startDate && targetDate && ' - '}
+            {targetDate}
+          </Typography.Text>
+        </Space>
         {showProgress && (
           <Progress
             percent={objective.progress}
