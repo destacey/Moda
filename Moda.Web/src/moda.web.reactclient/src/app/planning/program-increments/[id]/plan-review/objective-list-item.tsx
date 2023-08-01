@@ -35,7 +35,7 @@ const ObjectiveListItem = ({
     switch (status) {
       case 'In Progress':
         return 'blue'
-      case 'Completed':
+      case 'Closed':
         return 'green'
       case 'Canceled':
         return 'red'
