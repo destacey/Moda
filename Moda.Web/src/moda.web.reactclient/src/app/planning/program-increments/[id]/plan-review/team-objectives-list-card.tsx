@@ -8,6 +8,7 @@ import ModaEmpty from '@/src/app/components/common/moda-empty'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '@/src/app/components/contexts/auth'
 import CreateProgramIncrementObjectiveForm from '../create-program-increment-objective-form'
+import dayjs from 'dayjs'
 
 export interface TeamObjectivesListCardProps {
   getObjectives: (
@@ -76,7 +77,19 @@ const TeamObjectivesListCard = ({
         const statusOrder = ['Not Started', 'In Progress', 'Closed', 'Canceled']
         const aStatusIndex = statusOrder.indexOf(a.status.name)
         const bStatusIndex = statusOrder.indexOf(b.status.name)
-        return aStatusIndex - bStatusIndex
+        if (aStatusIndex === bStatusIndex) {
+          if (a.targetDate && b.targetDate) {
+            return dayjs(a.targetDate).isAfter(dayjs(b.targetDate)) ? 1 : -1
+          } else if (a.targetDate) {
+            return -1
+          } else if (b.targetDate) {
+            return 1
+          } else {
+            return 0
+          }
+        } else {
+          return aStatusIndex - bStatusIndex
+        }
       }
     })
 
