@@ -9,6 +9,9 @@ const { Item } = Descriptions
 const ProgramIncrementObjectiveDetails = (
   objective: ProgramIncrementObjectiveDetailsDto
 ) => {
+  const progressStatus =
+    objective.status?.name === 'Canceled' ? 'exception' : undefined
+
   const teamLink =
     objective.team?.type === 'Team'
       ? `/organizations/teams/${objective.team?.localId}`
@@ -19,7 +22,7 @@ const ProgramIncrementObjectiveDetails = (
       <Row>
         <Col span={12} offset={6}>
           <Tooltip title="Progress">
-            <Progress percent={objective.progress} />
+            <Progress percent={objective.progress} status={progressStatus} />
           </Tooltip>
         </Col>
       </Row>
