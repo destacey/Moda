@@ -39,26 +39,26 @@ export default function RootLayout({
             <AuthenticatedTemplate>
               <QueryClientProvider client={queryClient}>
                 <MenuToggleProvider>
-                  <Layout className="layout" style={{ minHeight: '100vh' }}>
-                                      <AppHeader />
+                  <Layout>
+                    <AppHeader />
                     <LoadingAccount>
-                    <Layout>
-                      <AppMenu />
-                      <Layout style={{ padding: '0 24px 24px' }}>
-                        <BreadcrumbsProvider>
-                          <AppBreadcrumb />
-                          <Content
-                            style={{
-                              margin: 0,
-                              minHeight: 280,
-                            }}
-                          >
-                            {children}
-                          </Content>
-                        </BreadcrumbsProvider>
+                      <Layout>
+                        <AppMenu />
+                        <Layout style={{ padding: '0 24px 24px' }}>
+                          <BreadcrumbsProvider>
+                            <AppBreadcrumb />
+                            <Content
+                              style={{
+                                margin: 0,
+                                height: '100%',
+                              }}
+                            >
+                              {children}
+                            </Content>
+                          </BreadcrumbsProvider>
+                        </Layout>
                       </Layout>
-                                          </Layout>
-                                      </LoadingAccount>
+                    </LoadingAccount>
                   </Layout>
                 </MenuToggleProvider>
               </QueryClientProvider>
