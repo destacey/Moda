@@ -10,7 +10,6 @@ WORKDIR /app
 COPY Moda.Web/src/moda.web.reactclient/package.json Moda.Web/src/moda.web.reactclient/package-lock.json* ./
 RUN npm ci
 
-
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
@@ -25,7 +24,12 @@ ENV NEXT_TELEMETRY_DISABLED 1
 #RUN yarn build
 
 # If using npm comment out above and use below instead
-RUN npm run build
+RUN NEXT_PUBLIC_API_BASE_URL=APP_NEXT_PUBLIC_API_BASE_URL \
+    NEXT_PUBLIC_API_SCOPE=APP_NEXT_PUBLIC_API_SCOPE \
+    NEXT_PUBLIC_AZURE_AD_CLIENT_ID=APP_NEXT_PUBLIC_AZURE_AD_CLIENT_ID \
+    NEXT_PUBLIC_AZURE_AD_TENANT_ID=APP_NEXT_PUBLIC_AZURE_AD_TENANT_ID \
+    NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY=APP_NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY \
+    npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -39,16 +43,22 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/entrypoint.sh ./
+RUN chmod +x /app/entrypoint.sh
+RUN chown nextjs:nodejs /app/entrypoint.sh
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+RUN chown -R nextjs:nodejs /app/.next
 
 USER nextjs
 
 EXPOSE 3000
 
 ENV PORT 3000
+
+ENTRYPOINT [ "/app/entrypoint.sh" ]
 
 CMD ["node", "server.js"]

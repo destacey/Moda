@@ -23,12 +23,12 @@ export const msalConfig: Configuration = {
           case LogLevel.Error:
             console.error(message)
             return
-          case LogLevel.Info:
-            console.info(message)
-            return
-          case LogLevel.Verbose:
-            console.debug(message)
-            return
+          // case LogLevel.Info:
+          //   console.info(message)
+          //   return
+          // case LogLevel.Verbose:
+          //   console.debug(message)
+          //   return
           case LogLevel.Warning:
             console.warn(message)
             return
@@ -39,7 +39,7 @@ export const msalConfig: Configuration = {
 }
 
 export const tokenRequest = {
-  scopes: ['api://fdca5e6f-46a2-455c-b2f3-06a9a6877190/access_as_user'],
+  scopes: [process.env.NEXT_PUBLIC_API_SCOPE],
   forceRefresh: false,
 }
 

@@ -15,6 +15,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
+      - CorsSettings__WebClient=http://localhost:5002
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -27,3 +28,9 @@ services:
       dockerfile: Moda.Web/src/moda.web.reactclient/Dockerfile
     ports:
       - 5002:3000
+    environment:
+      - NEXT_PUBLIC_AZURE_AD_CLIENT_ID=${AAD_CLIENT_ID}
+      - NEXT_PUBLIC_AZURE_AD_TENANT_ID=${AAD_TENANT_ID}
+      - NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY=${AAD_LOGON_AUTHORITY}
+      - NEXT_PUBLIC_API_SCOPE=${API_SCOPE}
+      - NEXT_PUBLIC_API_BASE_URL=${API_BASE_URL}

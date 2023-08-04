@@ -1101,7 +1101,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ProgramIncrementTeamReponse"
+                    "$ref": "#/components/schemas/ProgramIncrementTeamResponse"
                   }
                 }
               }
@@ -1463,6 +1463,55 @@
             "Bearer": []
           }
         ]
+      },
+      "delete": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Delete a program increment objective.",
+        "operationId": "ProgramIncrements_DeleteObjective",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "objectiveId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/planning/program-increments/local-id/{id}/objectives/{objectiveId}": {
@@ -1680,13 +1729,23 @@
             "x-position": 1
           },
           {
+            "name": "teamId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
             "name": "includeClosed",
             "in": "query",
             "schema": {
               "type": "boolean",
               "default": false
             },
-            "x-position": 2
+            "x-position": 3
           }
         ],
         "responses": {
@@ -1804,8 +1863,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "guid"
+                  "type": "integer",
+                  "format": "int32"
                 }
               }
             }
@@ -5811,6 +5870,9 @@
           },
           "state": {
             "type": "string"
+          },
+          "objectivesLocked": {
+            "type": "boolean"
           }
         }
       },
@@ -5890,10 +5952,14 @@
             "description": "Gets or sets the end.",
             "format": "date",
             "nullable": false
+          },
+          "objectivesLocked": {
+            "type": "boolean",
+            "description": "Gets or sets the objectives locked."
           }
         }
       },
-      "ProgramIncrementTeamReponse": {
+      "ProgramIncrementTeamResponse": {
         "type": "object",
         "additionalProperties": false,
         "properties": {

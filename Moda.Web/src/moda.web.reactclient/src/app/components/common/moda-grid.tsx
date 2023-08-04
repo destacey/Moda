@@ -1,3 +1,5 @@
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-balham.css'
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
@@ -16,9 +18,6 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
-
-import 'ag-grid-community/styles/ag-grid.css'
-import 'ag-grid-community/styles/ag-theme-balham.css'
 import useTheme from '../contexts/theme'
 
 interface ModaGridProps extends AgGridReactProps {
@@ -92,7 +91,7 @@ const ModaGrid = ({
       await onRefreshData()
     }
     loadGridData()
-  }, [onRefreshData])
+  }, [agGridTheme, onRefreshData])
 
   return (
     <div style={{ width: width }}>

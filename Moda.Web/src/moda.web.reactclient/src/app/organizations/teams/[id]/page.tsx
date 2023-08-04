@@ -1,19 +1,17 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import {
-  RiskListDto,
-  TeamDetailsDto,
-  TeamMembershipsDto,
-} from '@/src/services/moda-api'
+import { TeamDetailsDto, TeamMembershipsDto } from '@/src/services/moda-api'
 import { Button, Card } from 'antd'
-import { createElement, useEffect, useState } from 'react'
+import { createElement, useCallback, useEffect, useState } from 'react'
 import TeamDetails from './team-details'
 import { getTeamsClient } from '@/src/services/clients'
-import RisksGrid from '@/src/app/components/common/planning/risks-grid'
+import RisksGrid, {
+  RisksGridProps,
+} from '@/src/app/components/common/planning/risks-grid'
 import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-memberships-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import UpdateTeamForm from '../../components/update-team'
+import { EditTeamForm } from '../../components'
 import useAuth from '@/src/app/components/contexts/auth'
 import useBreadcrumb from '@/src/app/components/contexts/breadcrumbs'
 
@@ -21,10 +19,6 @@ const TeamDetailsPage = ({ params }) => {
   useDocumentTitle('Team Details')
   const [activeTab, setActiveTab] = useState('details')
   const [team, setTeam] = useState<TeamDetailsDto | null>(null)
-  const [risks, setRisks] = useState<RiskListDto[]>([])
-  const [teamMemberships, setTeamMemberships] = useState<TeamMembershipsDto[]>(
-    []
-  )
   const [openUpdateTeamModal, setOpenUpdateTeamModal] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
   const { id } = params
@@ -33,6 +27,19 @@ const TeamDetailsPage = ({ params }) => {
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
   const showActions = canUpdateTeam
+
+  const getRisks = useCallback(
+    async (teamId: string, includeClosed = false) => {
+      const teamsClient = await getTeamsClient()
+      return await teamsClient.getRisks(teamId, includeClosed)
+    },
+    []
+  )
+
+  const getTeamMemberships = useCallback(async (teamId: string) => {
+    const teamsClient = await getTeamsClient()
+    return await teamsClient.getTeamMemberships(teamId)
+  }, [])
 
   const Actions = () => {
     return (
@@ -55,13 +62,20 @@ const TeamDetailsPage = ({ params }) => {
     {
       key: 'risk-management',
       tab: 'Risk Management',
-      content: createElement(RisksGrid, { risks: risks, hideTeamColumn: true }),
+      content: createElement(RisksGrid, {
+        getRisks: getRisks,
+        getRisksObjectId: team?.id,
+        newRisksAllowed: true,
+        teamId: team?.id,
+        hideTeamColumn: true,
+      } as RisksGridProps),
     },
     {
       key: 'team-memberships',
       tab: 'Team Memberships',
       content: createElement(TeamMembershipsGrid, {
-        teamMemberships: teamMemberships,
+        getTeamMemberships: getTeamMemberships,
+        getTeamMembershipsObjectId: team?.id,
       }),
     },
   ]
@@ -71,16 +85,6 @@ const TeamDetailsPage = ({ params }) => {
       const teamsClient = await getTeamsClient()
       const teamDto = await teamsClient.getById(id)
       setTeam(teamDto)
-
-      // TODO: move these to an onclick event based on when the user clicks the tab
-      // TODO: setup the ability to change whether or not to show risks that are closed
-      const riskDtos = await teamsClient.getRisks(teamDto.id, true)
-      setRisks(riskDtos)
-
-      const teamMembershipDtos = await teamsClient.getTeamMemberships(
-        teamDto.id
-      )
-      setTeamMemberships(teamMembershipDtos)
       setBreadcrumbTitle(teamDto.name)
     }
 
@@ -90,7 +94,6 @@ const TeamDetailsPage = ({ params }) => {
   const onUpdateTeamFormClosed = (wasUpdated: boolean) => {
     setOpenUpdateTeamModal(false)
     if (wasUpdated) {
-      // TODO: refresh the team details only
       setLastRefresh(Date.now())
     }
   }
@@ -110,8 +113,8 @@ const TeamDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {team && (
-        <UpdateTeamForm
+      {team && canUpdateTeam && (
+        <EditTeamForm
           showForm={openUpdateTeamModal}
           localId={team.localId}
           type={team.type}

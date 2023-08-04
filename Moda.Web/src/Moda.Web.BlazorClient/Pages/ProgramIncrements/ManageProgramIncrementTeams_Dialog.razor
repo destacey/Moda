@@ -62,7 +62,7 @@ else
 
     private async Task SetProgramIncrementTeams()
     {
-        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetTeamsAsync(Id), Snackbar) is List<ProgramIncrementTeamReponse> result)
+        if (await ApiHelper.ExecuteCallGuardedAsync(() => ProgramIncrementsClient.GetTeamsAsync(Id), Snackbar) is List<ProgramIncrementTeamResponse> result)
         {
             if (result.Any())
                 _selectViewModel.SelectedValues = result.Select(t => t.Id).ToHashSet();

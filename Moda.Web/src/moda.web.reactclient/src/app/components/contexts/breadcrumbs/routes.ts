@@ -39,6 +39,10 @@ const routes = {
   'users': {
     title: 'Users'
   },
+  'account': {
+    title: 'Account',
+    href: null
+  }
 }
 
 export default routes

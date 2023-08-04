@@ -1,5 +1,5 @@
 import { TeamDetailsDto } from '@/src/services/moda-api'
-import { Col, Descriptions, Row } from 'antd'
+import { Col, Descriptions, Row, Space } from 'antd'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 
@@ -26,7 +26,9 @@ const TeamDetails = (team: TeamDetailsDto) => {
         <Col xs={24} md={12}>
           <Descriptions layout="vertical">
             <Item label="Description">
-              <ReactMarkdown>{team.description}</ReactMarkdown>
+              <Space direction="vertical">
+                <ReactMarkdown>{team.description}</ReactMarkdown>
+              </Space>
             </Item>
           </Descriptions>
         </Col>

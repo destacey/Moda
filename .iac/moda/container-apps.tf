@@ -72,6 +72,31 @@ resource "azurerm_container_app" "moda_frontend" {
         failure_count_threshold = 5
         interval_seconds        = 10
       }
+
+      env {
+        name  = "NEXT_PUBLIC_API_BASE_URL"
+        value = "https://${azurerm_container_app.moda_backend.ingress.0.fqdn}"
+      }
+
+      env {
+        name  = "NEXT_PUBLIC_AZURE_AD_CLIENT_ID"
+        value = var.app_reg_client_id
+      }
+
+      env {
+        name  = "NEXT_PUBLIC_AZURE_AD_TENANT_ID"
+        value = var.aad_tenant_id
+      }
+
+      env {
+        name  = "NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY"
+        value = "https://login.microsoftonline.com/${var.aad_tenant_id}"
+      }
+
+      env {
+        name  = "NEXT_PUBLIC_API_SCOPE"
+        value = var.app_reg_api_scope
+      }
     }
   }
 }
@@ -210,7 +235,7 @@ resource "azurerm_container_app" "moda_backend" {
 
       env {
         name  = "CorsSettings__WebClient"
-        value = "https://${azurerm_static_site.moda_swa.default_host_name};https://${azurerm_container_app.moda_frontend.ingress.0.fqdn}"
+        value = "https://${azurerm_static_site.moda_swa.default_host_name};${var.client_url}"
       }
     }
   }

@@ -1,3 +1,5 @@
+'use client'
+
 import useAuth from '@/src/app/components/contexts/auth'
 import { TeamListItem } from '@/src/app/organizations/types'
 import {
@@ -13,7 +15,7 @@ import { useCallback, useEffect, useState } from 'react'
 import difference from 'lodash/difference'
 import {
   ManageProgramIncrementTeamsRequest,
-  ProgramIncrementTeamReponse,
+  ProgramIncrementTeamResponse,
 } from '@/src/services/moda-api'
 
 export interface ManageProgramIncrementTeamsFormProps {
@@ -150,7 +152,7 @@ const ManageProgramIncrementTeamsForm = ({
     const piClient = await getProgramIncrementsClient()
     const piTeamsDtos = await piClient.getTeams(id)
 
-    return piTeamsDtos.map((team: ProgramIncrementTeamReponse) => ({
+    return piTeamsDtos.map((team: ProgramIncrementTeamResponse) => ({
       key: team.id,
       name: team.name,
       code: team.code,
@@ -185,7 +187,9 @@ const ManageProgramIncrementTeamsForm = ({
       }
     } else {
       onFormCancel()
-      messageApi.error('You do not have permission to update teams.')
+      messageApi.error(
+        'You do not have permission to update the Program Increment.'
+      )
     }
   }, [canUpdatePI, id, loadData, messageApi, onFormCancel, showForm])
 
@@ -246,7 +250,6 @@ const ManageProgramIncrementTeamsForm = ({
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
-        closable={false}
         keyboard={false} // disable esc key to close modal
         destroyOnClose={true}
       >

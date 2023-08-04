@@ -15,6 +15,7 @@ import { RangePickerProps } from 'antd/es/date-picker'
 export interface CreateProgramIncrementObjectiveFormProps {
   showForm: boolean
   programIncrementId: string
+  teamId?: string
   onFormCreate: () => void
   onFormCancel: () => void
 }
@@ -38,6 +39,7 @@ interface ProgramIncrementTeamSelectItem {
 const CreateProgramIncrementObjectiveForm = ({
   showForm,
   programIncrementId,
+  teamId,
   onFormCreate,
   onFormCancel,
 }: CreateProgramIncrementObjectiveFormProps) => {
@@ -60,9 +62,10 @@ const CreateProgramIncrementObjectiveForm = ({
   )
 
   const mapToFormValues = useCallback(
-    (programIncrementId: string, statusId: number) => {
+    (programIncrementId: string, statusId: number, teamId?: string) => {
       form.setFieldsValue({
         programIncrementId: programIncrementId,
+        teamId: teamId,
         statusId: statusId,
         isStretch: false,
       })
@@ -124,7 +127,6 @@ const CreateProgramIncrementObjectiveForm = ({
     ): Promise<boolean> => {
       try {
         const localId = await createObjective(values)
-        console.log(`localId from create: ${localId}`)
         setNewObjectiveLocalId(localId)
         return true
       } catch (error) {
@@ -134,7 +136,8 @@ const CreateProgramIncrementObjectiveForm = ({
           messageApi.error('Correct the validation error(s) to continue.')
         } else {
           messageApi.error(
-            'An unexpected error occurred while creating the PI objective.'
+            error.supportMessage ??
+              'An unexpected error occurred while creating the program increment.'
           )
           console.error(error)
         }
@@ -174,7 +177,7 @@ const CreateProgramIncrementObjectiveForm = ({
             setDefaultStatusId(statuses.find((s) => s.order === 1)?.id)
           }
           loadData()
-          mapToFormValues(programIncrementId, defaultStatusId)
+          mapToFormValues(programIncrementId, defaultStatusId, teamId)
         } catch (error) {
           handleCancel()
           messageApi.error(
@@ -195,6 +198,7 @@ const CreateProgramIncrementObjectiveForm = ({
     mapToFormValues,
     programIncrementId,
     defaultStatusId,
+    teamId,
   ])
 
   useEffect(() => {
@@ -247,7 +251,6 @@ const CreateProgramIncrementObjectiveForm = ({
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
-        closable={false}
         keyboard={false} // disable esc key to close modal
         destroyOnClose={true}
       >
@@ -266,6 +269,7 @@ const CreateProgramIncrementObjectiveForm = ({
           <Form.Item name="teamId" label="Team" rules={[{ required: true }]}>
             <Select
               showSearch
+              disabled={teamId !== undefined}
               placeholder="Select a team"
               optionFilterProp="children"
               filterOption={(input, option) =>
@@ -282,7 +286,11 @@ const CreateProgramIncrementObjectiveForm = ({
             />
           </Form.Item>
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-            <Input showCount maxLength={128} />
+            <Input.TextArea
+              autoSize={{ minRows: 1, maxRows: 2 }}
+              showCount
+              maxLength={128}
+            />
           </Form.Item>
           <Form.Item
             name="description"

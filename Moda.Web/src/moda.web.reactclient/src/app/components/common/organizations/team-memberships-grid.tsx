@@ -1,10 +1,12 @@
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
 import { TeamMembershipsDto } from '@/src/services/moda-api'
+import dayjs from 'dayjs'
 
 export interface TeamMembershipsGridProps {
-  teamMemberships: TeamMembershipsDto[]
+  getTeamMemberships: (id: string) => Promise<TeamMembershipsDto[]>
+  getTeamMembershipsObjectId: string
 }
 
 const ChildLinkCellRenderer = ({ value, data }) => {
@@ -25,21 +27,30 @@ const ParentLinkCellRenderer = ({ value, data }) => {
   )
 }
 
-const TeamMembershipsGrid = ({ teamMemberships }: TeamMembershipsGridProps) => {
+const TeamMembershipsGrid = ({
+  getTeamMemberships,
+  getTeamMembershipsObjectId,
+}: TeamMembershipsGridProps) => {
+  const [teamMemberships, setTeamMemberships] = useState<TeamMembershipsDto[]>()
+
+  const loadTeamMemberships = useCallback(async () => {
+    const teamMemberships = await getTeamMemberships(getTeamMembershipsObjectId)
+    setTeamMemberships(teamMemberships)
+  }, [getTeamMemberships, getTeamMembershipsObjectId])
+
   const columnDefs = useMemo(
     () => [
       { field: 'child.name', cellRenderer: ChildLinkCellRenderer },
       { field: 'parent.name', cellRenderer: ParentLinkCellRenderer },
       { field: 'state' },
-      // TODO: fix these dates
       {
         field: 'start',
-        valueGetter: (params) => new Date(params.data.start).toUTCString(),
+        valueGetter: (params) => dayjs(params.data.start).format('M/D/YYYY'),
       },
       {
         field: 'end',
         valueGetter: (params) =>
-          params.data.end ? new Date(params.data.end).toUTCString() : null,
+          params.data.end ? dayjs(params.data.end).format('M/D/YYYY') : null,
       },
     ],
     []
@@ -47,7 +58,11 @@ const TeamMembershipsGrid = ({ teamMemberships }: TeamMembershipsGridProps) => {
 
   return (
     <>
-      <ModaGrid columnDefs={columnDefs} rowData={teamMemberships} />
+      <ModaGrid
+        columnDefs={columnDefs}
+        rowData={teamMemberships}
+        loadData={loadTeamMemberships}
+      />
     </>
   )
 }

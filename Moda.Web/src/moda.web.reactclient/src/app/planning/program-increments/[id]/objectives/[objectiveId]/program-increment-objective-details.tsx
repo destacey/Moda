@@ -1,5 +1,5 @@
 import { ProgramIncrementObjectiveDetailsDto } from '@/src/services/moda-api'
-import { Col, Descriptions, Progress, Row, Tooltip } from 'antd'
+import { Col, Descriptions, Progress, Row, Space, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
@@ -9,6 +9,9 @@ const { Item } = Descriptions
 const ProgramIncrementObjectiveDetails = (
   objective: ProgramIncrementObjectiveDetailsDto
 ) => {
+  const progressStatus =
+    objective.status?.name === 'Canceled' ? 'exception' : undefined
+
   const teamLink =
     objective.team?.type === 'Team'
       ? `/organizations/teams/${objective.team?.localId}`
@@ -19,7 +22,7 @@ const ProgramIncrementObjectiveDetails = (
       <Row>
         <Col span={12} offset={6}>
           <Tooltip title="Progress">
-            <Progress percent={objective.progress} />
+            <Progress percent={objective.progress} status={progressStatus} />
           </Tooltip>
         </Col>
       </Row>
@@ -52,7 +55,9 @@ const ProgramIncrementObjectiveDetails = (
         <Col xs={24} md={12}>
           <Descriptions layout="vertical">
             <Item label="Description">
-              <ReactMarkdown>{objective.description}</ReactMarkdown>
+              <Space direction="vertical">
+                <ReactMarkdown>{objective.description}</ReactMarkdown>
+              </Space>
             </Item>
           </Descriptions>
         </Col>

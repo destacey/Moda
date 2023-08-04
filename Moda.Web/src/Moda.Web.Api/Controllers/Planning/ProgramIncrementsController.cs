@@ -105,18 +105,18 @@ public class ProgramIncrementsController : ControllerBase
     [OpenApiOperation("Get a list of program increment teams.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<ProgramIncrementTeamReponse>>> GetTeams(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ProgramIncrementTeamResponse>>> GetTeams(Guid id, CancellationToken cancellationToken)
     {
-        List<ProgramIncrementTeamReponse> piTeams = new();
+        List<ProgramIncrementTeamResponse> piTeams = new();
         var teamIds = await _sender.Send(new GetProgramIncrementTeamsQuery(id), cancellationToken);
-        
+
         if (teamIds.Any())
         {
             var teams = await _sender.Send(new GetTeamsQuery(true, teamIds), cancellationToken);
             var teamOfTeams = await _sender.Send(new GetTeamOfTeamsListQuery(true, teamIds), cancellationToken);
 
-            piTeams.AddRange(teams.Adapt<List<ProgramIncrementTeamReponse>>());
-            piTeams.AddRange(teamOfTeams.Adapt<List<ProgramIncrementTeamReponse>>());
+            piTeams.AddRange(teams.Adapt<List<ProgramIncrementTeamResponse>>());
+            piTeams.AddRange(teamOfTeams.Adapt<List<ProgramIncrementTeamResponse>>());
         }
 
         return Ok(piTeams);
@@ -309,6 +309,29 @@ public class ProgramIncrementsController : ControllerBase
         }
     }
 
+    [HttpDelete("{id}/objectives/{objectiveId}")]
+    [MustHavePermission(ApplicationAction.Manage, ApplicationResource.ProgramIncrementObjectives)]
+    [OpenApiOperation("Delete a program increment objective.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> DeleteObjective(Guid id, Guid objectiveId, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeleteProgramIncrementObjectiveCommand(id, objectiveId), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "ProgramIncrementsController.DeleteObjective"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
     [HttpGet("objective-statuses")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrementObjectives)]
     [OpenApiOperation("Get a list of all PI objective statuses.", "")]
@@ -329,9 +352,9 @@ public class ProgramIncrementsController : ControllerBase
     [OpenApiOperation("Get program increment risks.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken, bool includeClosed = false)
+    public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetRisks(Guid id, CancellationToken cancellationToken, Guid? teamId = null, bool includeClosed = false)
     {
-        var risks = await _sender.Send(new GetRisksByProgramIncrementQuery(id, includeClosed), cancellationToken);
+        var risks = await _sender.Send(new GetRisksByProgramIncrementQuery(id, includeClosed, teamId), cancellationToken);
 
         return Ok(risks);
     }

@@ -1,13 +1,20 @@
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
 import { RiskListDto } from '@/src/services/moda-api'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
-import { Space, Switch } from 'antd'
+import { Button, Space, Switch } from 'antd'
 import dayjs from 'dayjs'
+import useAuth from '../../contexts/auth'
+import CreateRiskForm from './create-risk-form'
+import { EditOutlined } from '@ant-design/icons'
+import UpdateRiskForm from './edit-risk-form'
 
 export interface RisksGridProps {
-  risks: RiskListDto[]
+  getRisks: (id: string, includeClosed: boolean) => Promise<RiskListDto[]>
+  getRisksObjectId: string
+  teamId?: string | null
+  newRisksAllowed?: boolean
   hideTeamColumn?: boolean
 }
 
@@ -32,11 +39,65 @@ const AssigneeLinkCellRenderer = ({ value, data }) => {
   )
 }
 
-const RisksGrid = ({ risks, hideTeamColumn = false }: RisksGridProps) => {
+const RisksGrid = ({
+  getRisks,
+  getRisksObjectId,
+  teamId,
+  newRisksAllowed = false,
+  hideTeamColumn = false,
+}: RisksGridProps) => {
+  const [risks, setRisks] = useState<RiskListDto[]>()
+  const [includeClosed, setIncludeClosed] = useState<boolean>(false)
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
+  const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
+  const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
+  const [editRiskId, setEditRiskId] = useState<string | null>(null)
+
+  const { hasClaim } = useAuth()
+  const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
+  const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
+  const showActions = newRisksAllowed && canCreateRisks
+
+  const onIncludeClosedChange = (checked: boolean) => {
+    setIncludeClosed(checked)
+  }
 
   const onHideTeamChange = (checked: boolean) => {
     setHideTeam(checked)
+  }
+
+  // TODO: prevent from reloading if already loaded unless refresh button is clicked
+  const loadRisks = useCallback(async () => {
+    const riskDtos = await getRisks(getRisksObjectId, includeClosed)
+    setRisks(riskDtos)
+  }, [getRisks, getRisksObjectId, includeClosed])
+
+  const editRiskButtonClicked = useCallback(
+    (id: string) => {
+      setEditRiskId(id)
+      setOpenUpdateRiskForm(true)
+    },
+    [setOpenUpdateRiskForm]
+  )
+
+  const onEditRiskFormClosed = (wasSaved: boolean) => {
+    setOpenUpdateRiskForm(false)
+    setEditRiskId(null)
+    if (wasSaved) {
+      loadRisks()
+    }
+  }
+
+  const Actions = () => {
+    return (
+      <>
+        {canCreateRisks && (
+          <Button onClick={() => setOpenCreateRiskForm(true)}>
+            Create Risk
+          </Button>
+        )}
+      </>
+    )
   }
 
   const controlItems: ItemType[] = [
@@ -44,6 +105,14 @@ const RisksGrid = ({ risks, hideTeamColumn = false }: RisksGridProps) => {
       label: (
         <>
           <Space direction="vertical" size="small">
+            <Space>
+              <Switch
+                size="small"
+                checked={includeClosed}
+                onChange={onIncludeClosedChange}
+              />
+              Include Closed
+            </Space>
             <Space>
               <Switch
                 size="small"
@@ -62,6 +131,27 @@ const RisksGrid = ({ risks, hideTeamColumn = false }: RisksGridProps) => {
   // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
   const columnDefs = useMemo(
     () => [
+      {
+        field: 'actions',
+        headerName: '',
+        width: 50,
+        filter: false,
+        sortable: false,
+        hide: !canUpdateRisks,
+        cellRenderer: (params) => {
+          return (
+            canUpdateRisks && (
+              <Button
+                type="text"
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => editRiskButtonClicked(params.data.id)}
+              />
+            )
+          )
+        },
+      },
+      { field: 'id', hide: true },
       { field: 'localId', headerName: '#', width: 90 },
       { field: 'summary', width: 300, cellRenderer: RiskLinkCellRenderer },
       {
@@ -69,6 +159,7 @@ const RisksGrid = ({ risks, hideTeamColumn = false }: RisksGridProps) => {
         cellRenderer: TeamLinkCellRenderer,
         hide: hideTeam,
       },
+      { field: 'status', width: 125, hide: includeClosed === false },
       { field: 'category', width: 125 },
       { field: 'exposure', width: 125 },
       {
@@ -85,8 +176,15 @@ const RisksGrid = ({ risks, hideTeamColumn = false }: RisksGridProps) => {
           dayjs(params.data.reportedOn).format('M/D/YYYY'),
       },
     ],
-    [hideTeam]
+    [canUpdateRisks, editRiskButtonClicked, hideTeam, includeClosed]
   )
+
+  const onCreateRiskFormClosed = (wasCreated: boolean) => {
+    setOpenCreateRiskForm(false)
+    if (wasCreated) {
+      loadRisks()
+    }
+  }
 
   return (
     <>
@@ -95,8 +193,26 @@ const RisksGrid = ({ risks, hideTeamColumn = false }: RisksGridProps) => {
         height={550}
         columnDefs={columnDefs}
         rowData={risks}
+        loadData={loadRisks}
+        actions={showActions && <Actions />}
         gridControlMenuItems={controlItems}
       />
+      {canCreateRisks && (
+        <CreateRiskForm
+          createForTeamId={teamId}
+          showForm={openCreateRiskForm}
+          onFormCreate={() => onCreateRiskFormClosed(true)}
+          onFormCancel={() => onCreateRiskFormClosed(false)}
+        />
+      )}
+      {canUpdateRisks && (
+        <UpdateRiskForm
+          showForm={openUpdateRiskForm}
+          riskId={editRiskId}
+          onFormSave={() => onEditRiskFormClosed(true)}
+          onFormCancel={() => onEditRiskFormClosed(false)}
+        />
+      )}
     </>
   )
 }

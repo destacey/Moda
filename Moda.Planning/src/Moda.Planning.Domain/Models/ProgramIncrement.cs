@@ -69,13 +69,16 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
     /// <param name="dateRange">The date range.</param>
-    public Result Update(string name, string? description, LocalDateRange dateRange)
+    /// <param name="objectivesLocked">if set to <c>true</c> [objectives locked].</param>
+    /// <returns></returns>
+    public Result Update(string name, string? description, LocalDateRange dateRange, bool objectivesLocked)
     {
         try
         {
             Name = name;
             Description = description;
             DateRange = dateRange;
+            ObjectivesLocked = objectivesLocked;
 
             return Result.Success();
         }
@@ -91,7 +94,7 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
     public IterationState StateOn(LocalDate date)
     {
         if (DateRange.IsPastOn(date)) { return IterationState.Completed; }
-        if (DateRange.IsActiveOn(date)) { return IterationState.Active; };
+        if (DateRange.IsActiveOn(date)) { return IterationState.Active; }
         return IterationState.Future;
     }
 
@@ -180,6 +183,28 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         catch (Exception ex)
         {
             return Result.Failure<ProgramIncrementObjective>(ex.ToString());
+        }
+    }
+
+    public Result DeleteObjective(Guid piObjectiveId)
+    {
+        try
+        {
+            if (ObjectivesLocked)
+                return Result.Failure("Objectives are locked for this Program Increment.");
+
+            var existingObjective = _objectives.FirstOrDefault(x => x.Id == piObjectiveId);
+            if (existingObjective == null)
+                return Result.Failure($"Program Increment Objective {piObjectiveId} not found.");
+
+            // TODO: deleting it here is not soft deleting it
+            //_objectives.Remove(existingObjective);
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
         }
     }
 

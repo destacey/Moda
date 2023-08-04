@@ -8,6 +8,9 @@ import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import { useDocumentTitle } from '../../hooks/use-document-title'
 import dayjs from 'dayjs'
+import { CreateProgramIncrementForm } from '../components'
+import useAuth from '../../components/contexts/auth'
+import { Button } from 'antd'
 
 const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
   return (
@@ -20,6 +23,16 @@ const ProgramIncrementListPage = () => {
   const [programIncrements, setProgramIncrements] = useState<
     ProgramIncrementListDto[]
   >([])
+  const [openCreateProgramIncrementForm, setOpenCreateProgramIncrementForm] =
+    useState<boolean>(false)
+  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
+
+  const { hasClaim } = useAuth()
+  const canCreateProgramIncrement = hasClaim(
+    'Permission',
+    'Permissions.ProgramIncrements.Create'
+  )
+  const showActions = canCreateProgramIncrement
 
   // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
   const columnDefs = useMemo(
@@ -42,17 +55,59 @@ const ProgramIncrementListPage = () => {
   const getProgramIncrements = useCallback(async () => {
     const programIncrementClient = await getProgramIncrementsClient()
     const programIncrementDtos = await programIncrementClient.getList()
-    setProgramIncrements(programIncrementDtos) // TODO: add sorting: by state: active, future, completed, then by start date
-  }, [])
+
+    setProgramIncrements(
+      programIncrementDtos.sort((a, b) => {
+        const stateOrder = ['Active', 'Future', 'Completed']
+        const aStateIndex = stateOrder.indexOf(a.state)
+        const bStateIndex = stateOrder.indexOf(b.state)
+        if (aStateIndex !== bStateIndex) {
+          return aStateIndex - bStateIndex
+        } else {
+          return new Date(a.start).getTime() - new Date(b.start).getTime()
+        }
+      })
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastRefresh])
+
+  const onCreateProgramIncrementFormClosed = (wasCreated: boolean) => {
+    setOpenCreateProgramIncrementForm(false)
+    if (wasCreated) {
+      setLastRefresh(Date.now())
+    }
+  }
+
+  const Actions = () => {
+    return (
+      <>
+        {canCreateProgramIncrement && (
+          <Button onClick={() => setOpenCreateProgramIncrementForm(true)}>
+            Create Program Increment
+          </Button>
+        )}
+      </>
+    )
+  }
 
   return (
     <>
-      <PageTitle title="Program Increments" />
+      <PageTitle
+        title="Program Increments"
+        actions={showActions && <Actions />}
+      />
       <ModaGrid
         columnDefs={columnDefs}
         rowData={programIncrements}
         loadData={getProgramIncrements}
       />
+      {canCreateProgramIncrement && (
+        <CreateProgramIncrementForm
+          showForm={openCreateProgramIncrementForm}
+          onFormCreate={() => onCreateProgramIncrementFormClosed(true)}
+          onFormCancel={() => onCreateProgramIncrementFormClosed(false)}
+        />
+      )}
     </>
   )
 }

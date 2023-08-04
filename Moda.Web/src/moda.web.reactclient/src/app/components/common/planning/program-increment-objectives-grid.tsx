@@ -1,18 +1,20 @@
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
 import { Button, Progress, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import useAuth from '../../contexts/auth'
 import CreateProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[id]/create-program-increment-objective-form'
+import EditProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[id]/edit-program-increment-objective-form'
+import { EditOutlined } from '@ant-design/icons'
 
 export interface ProgramIncrementObjectivesGridProps {
-  objectives: ProgramIncrementObjectiveListDto[]
+  getObjectives: (id: string) => Promise<ProgramIncrementObjectiveListDto[]>
+  programIncrementId: string
   hideProgramIncrementColumn?: boolean
   hideTeamColumn?: boolean
   newObjectivesAllowed?: boolean
-  programIncrementId?: string // needed for create objective form. may not stay this way.
 }
 
 const ProgramIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
@@ -43,25 +45,37 @@ const TeamLinkCellRenderer = ({ value, data }) => {
   return <Link href={teamLink}>{value}</Link>
 }
 
-const ProgressCellRenderer = ({ value }) => {
-  // TODO: why is ag-grid showing a period on right side of the column?
-  return <Progress percent={value} size="small" />
+const ProgressCellRenderer = ({ value, data }) => {
+  const progressStatus =
+    data.status?.name === 'Canceled' ? 'exception' : undefined
+  return (
+    <Progress
+      percent={value}
+      size="small"
+      status={progressStatus}
+      style={{ marginLeft: '5px', marginRight: '5px' }}
+    />
+  )
 }
 
 const ProgramIncrementObjectivesGrid = ({
-  objectives,
+  getObjectives,
+  programIncrementId,
   hideProgramIncrementColumn = false,
   hideTeamColumn = false,
   newObjectivesAllowed = false,
-  programIncrementId,
 }: ProgramIncrementObjectivesGridProps) => {
+  const [objectives, setObjectives] =
+    useState<ProgramIncrementObjectiveListDto[]>()
   const [hideProgramIncrement, setHideProgramIncrement] = useState<boolean>(
     hideProgramIncrementColumn
   )
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
   const [openCreateObjectiveModal, setOpenCreateObjectiveModal] =
     useState<boolean>(false)
-  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
+  const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
+    useState<boolean>(false)
+  const [editObjectiveId, setEditObjectiveId] = useState<string | null>(null)
 
   const { hasClaim } = useAuth()
   const canManageObjectives = hasClaim(
@@ -72,8 +86,42 @@ const ProgramIncrementObjectivesGrid = ({
     newObjectivesAllowed && programIncrementId && canManageObjectives
   const showActions = canCreateObjectives
 
+  const loadObjectives = useCallback(async () => {
+    const objectives = await getObjectives(programIncrementId)
+    setObjectives(objectives)
+  }, [getObjectives, programIncrementId])
+
+  const editObjectiveButtonClicked = useCallback(
+    (id: string) => {
+      setEditObjectiveId(id)
+      setOpenUpdateObjectiveForm(true)
+    },
+    [setOpenUpdateObjectiveForm]
+  )
+
   const columnDefs = useMemo(
     () => [
+      {
+        field: 'actions',
+        headerName: '',
+        width: 50,
+        filter: false,
+        sortable: false,
+        hide: !canManageObjectives,
+        cellRenderer: (params) => {
+          return (
+            canManageObjectives && (
+              <Button
+                type="text"
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => editObjectiveButtonClicked(params.data.id)}
+              />
+            )
+          )
+        },
+      },
+      { field: 'id', hide: true },
       { field: 'localId', headerName: '#', width: 90 },
       {
         field: 'name',
@@ -96,7 +144,12 @@ const ProgramIncrementObjectivesGrid = ({
       { field: 'targetDate' },
       { field: 'isStretch' },
     ],
-    [hideProgramIncrement, hideTeam]
+    [
+      canManageObjectives,
+      editObjectiveButtonClicked,
+      hideProgramIncrement,
+      hideTeam,
+    ]
   )
 
   const onHideProgramIncrementChange = (checked: boolean) => {
@@ -150,7 +203,14 @@ const ProgramIncrementObjectivesGrid = ({
   const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
     setOpenCreateObjectiveModal(false)
     if (wasCreated) {
-      setLastRefresh(Date.now())
+      loadObjectives()
+    }
+  }
+
+  const onEditObjectiveFormClosed = (wasSaved: boolean) => {
+    setOpenUpdateObjectiveForm(false)
+    if (wasSaved) {
+      loadObjectives()
     }
   }
 
@@ -161,15 +221,27 @@ const ProgramIncrementObjectivesGrid = ({
         height={550}
         columnDefs={columnDefs}
         rowData={objectives}
+        loadData={loadObjectives}
         actions={showActions && <Actions />}
         gridControlMenuItems={controlItems}
       />
-      <CreateProgramIncrementObjectiveForm
-        programIncrementId={programIncrementId}
-        showForm={openCreateObjectiveModal}
-        onFormCreate={() => onCreateObjectiveFormClosed(true)}
-        onFormCancel={() => onCreateObjectiveFormClosed(false)}
-      />
+      {canManageObjectives && (
+        <CreateProgramIncrementObjectiveForm
+          programIncrementId={programIncrementId}
+          showForm={openCreateObjectiveModal}
+          onFormCreate={() => onCreateObjectiveFormClosed(true)}
+          onFormCancel={() => onCreateObjectiveFormClosed(false)}
+        />
+      )}
+      {canManageObjectives && (
+        <EditProgramIncrementObjectiveForm
+          showForm={openUpdateObjectiveForm}
+          objectiveId={editObjectiveId}
+          programIncrementId={programIncrementId}
+          onFormSave={() => onEditObjectiveFormClosed(true)}
+          onFormCancel={() => onEditObjectiveFormClosed(false)}
+        />
+      )}
     </>
   )
 }

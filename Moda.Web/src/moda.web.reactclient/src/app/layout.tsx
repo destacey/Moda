@@ -1,8 +1,10 @@
 'use client'
 
 import '../../styles/globals.css'
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-balham.css'
 import React from 'react'
-import { Layout, Menu } from 'antd'
+import { Layout } from 'antd'
 import { AuthenticatedTemplate } from '@azure/msal-react'
 import AppHeader from './components/common/app-header'
 import AppMenu from './components/common/menu'
@@ -12,6 +14,7 @@ import { AuthProvider } from './components/contexts/auth'
 import { BreadcrumbsProvider } from './components/contexts/breadcrumbs'
 import { MenuToggleProvider } from './components/contexts/menu-toggle'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import LoadingAccount from './components/common/loading-account'
 
 const { Content } = Layout
 
@@ -37,7 +40,8 @@ export default function RootLayout({
               <QueryClientProvider client={queryClient}>
                 <MenuToggleProvider>
                   <Layout className="layout" style={{ minHeight: '100vh' }}>
-                    <AppHeader />
+                                      <AppHeader />
+                    <LoadingAccount>
                     <Layout>
                       <AppMenu />
                       <Layout style={{ padding: '0 24px 24px' }}>
@@ -53,7 +57,8 @@ export default function RootLayout({
                           </Content>
                         </BreadcrumbsProvider>
                       </Layout>
-                    </Layout>
+                                          </Layout>
+                                      </LoadingAccount>
                   </Layout>
                 </MenuToggleProvider>
               </QueryClientProvider>

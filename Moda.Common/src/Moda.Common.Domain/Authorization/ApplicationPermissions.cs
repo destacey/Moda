@@ -113,7 +113,7 @@ public static class ApplicationPermissions
         new("Delete Program Increments", ApplicationAction.Delete, ApplicationResource.ProgramIncrements),
 
         new("View Program Increment Objectives", ApplicationAction.View, ApplicationResource.ProgramIncrementObjectives, IsBasic: true),
-        new("Create and update Program Increment Objectives", ApplicationAction.Manage, ApplicationResource.ProgramIncrementObjectives, IsBasic: true),
+        new("Create, update, and delete Program Increment Objectives", ApplicationAction.Manage, ApplicationResource.ProgramIncrementObjectives, IsBasic: true),
         new("Import Program Increment Objectives", ApplicationAction.Import, ApplicationResource.ProgramIncrementObjectives),
 
         new("View Risks", ApplicationAction.View, ApplicationResource.Risks, IsBasic: true),

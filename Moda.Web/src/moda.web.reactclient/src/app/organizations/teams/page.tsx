@@ -9,7 +9,7 @@ import { Button, Modal, Space, Switch } from 'antd'
 import Link from 'next/link'
 import { TeamListItem } from '../types'
 import { useDocumentTitle } from '../../hooks/use-document-title'
-import CreateTeamForm from '../components/create-team'
+import { CreateTeamForm } from '../components'
 import useAuth from '../../components/contexts/auth'
 
 const TeamLinkCellRenderer = ({ value, data }) => {
@@ -31,7 +31,7 @@ const TeamListPage = () => {
   useDocumentTitle('Teams')
   const [teams, setTeams] = useState<TeamListItem[]>([])
   const [includeDisabled, setIncludeDisabled] = useState<boolean>(false)
-  const [openCreateTeamModal, setOpenCreateTeamModal] = useState<boolean>(false)
+  const [openCreateTeamForm, setOpenCreateTeamForm] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
 
   const { hasClaim } = useAuth()
@@ -58,7 +58,7 @@ const TeamListPage = () => {
     return (
       <>
         {canCreateTeam && (
-          <Button onClick={() => setOpenCreateTeamModal(true)}>
+          <Button onClick={() => setOpenCreateTeamForm(true)}>
             Create Team
           </Button>
         )}
@@ -101,7 +101,7 @@ const TeamListPage = () => {
   }, [includeDisabled, lastRefresh])
 
   const onCreateTeamFormClosed = (wasCreated: boolean) => {
-    setOpenCreateTeamModal(false)
+    setOpenCreateTeamForm(false)
     if (wasCreated) {
       setLastRefresh(Date.now())
     }
@@ -116,11 +116,13 @@ const TeamListPage = () => {
         rowData={teams}
         loadData={getTeams}
       />
-      <CreateTeamForm
-        showForm={openCreateTeamModal}
-        onFormCreate={() => onCreateTeamFormClosed(true)}
-        onFormCancel={() => onCreateTeamFormClosed(false)}
-      />
+      {canCreateTeam && (
+        <CreateTeamForm
+          showForm={openCreateTeamForm}
+          onFormCreate={() => onCreateTeamFormClosed(true)}
+          onFormCancel={() => onCreateTeamFormClosed(false)}
+        />
+      )}
     </>
   )
 }

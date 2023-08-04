@@ -1,109 +1,51 @@
 'use client'
 
-import { Form, Input, Modal, message } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
-import useAuth from '../../../components/contexts/auth'
+import { Form, Input, Modal, Radio, message } from 'antd'
+import { useEffect, useState } from 'react'
+import useAuth from '../../components/contexts/auth'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
 import {
-  UpdateTeamOfTeamsRequest,
-  UpdateTeamRequest,
+  CreateTeamOfTeamsRequest,
+  CreateTeamRequest,
 } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 
-export interface UpdateTeamFormProps {
+export interface CreateTeamFormProps {
   showForm: boolean
-  localId: number
-  type: string
-  onFormUpdate: () => void
+  onFormCreate: () => void
   onFormCancel: () => void
 }
 
-interface UpdateTeamFormValues {
-  id: string
+interface CreateTeamFormValues {
+  type: 'Team' | 'Team of Teams'
   name: string
   code: string
   description: string
 }
 
-const UpdateTeamForm = ({
+const CreateTeamForm = ({
   showForm,
-  localId,
-  type,
-  onFormUpdate,
+  onFormCreate,
   onFormCancel,
-}: UpdateTeamFormProps) => {
+}: CreateTeamFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<UpdateTeamFormValues>()
+  const [form] = Form.useForm<CreateTeamFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
   const { hasClaim } = useAuth()
-  const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
-
-  const mapTeamToFormValues = useCallback(
-    (team: UpdateTeamFormValues) => {
-      form.setFieldsValue({
-        id: team.id,
-        name: team.name,
-        code: team.code,
-        description: team.description,
-      })
-    },
-    [form]
-  )
-
-  const getTeamData = useCallback(async (teamLocalId: number) => {
-    const teamsClient = await getTeamsClient()
-    return (await teamsClient.getById(teamLocalId)) as UpdateTeamFormValues
-  }, [])
-
-  const getTeamOfTeamsData = useCallback(async (teamLocalId: number) => {
-    const teamsOfTeamsClient = await getTeamsOfTeamsClient()
-    return (await teamsOfTeamsClient.getById(
-      teamLocalId
-    )) as UpdateTeamFormValues
-  }, [])
-
-  const loadData = useCallback(async () => {
-    try {
-      let teamData: UpdateTeamFormValues = null
-      if (type === 'Team') {
-        teamData = await getTeamData(localId)
-      } else if (type === 'Team of Teams') {
-        teamData = await getTeamOfTeamsData(localId)
-      } else {
-        throw new Error(`Invalid team type: ${type}`)
-      }
-      mapTeamToFormValues(teamData)
-    } catch (error) {
-      messageApi.error(
-        `An unexpected error occurred while retrieving the ${type}.`
-      )
-      console.error(error)
-    }
-  }, [
-    localId,
-    mapTeamToFormValues,
-    messageApi,
-    getTeamData,
-    getTeamOfTeamsData,
-    type,
-  ])
+  const canCreateTeam = hasClaim('Permission', 'Permissions.Teams.Create')
 
   useEffect(() => {
-    if (canUpdateTeam) {
+    if (canCreateTeam) {
       setIsOpen(showForm)
     } else {
       onFormCancel()
-      messageApi.error('You do not have permission to update teams.')
+      messageApi.error('You do not have permission to create teams.')
     }
-
-    if (showForm) {
-      loadData()
-    }
-  }, [canUpdateTeam, loadData, messageApi, onFormCancel, showForm])
+  }, [canCreateTeam, onFormCancel, showForm, messageApi])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -112,14 +54,14 @@ const UpdateTeamForm = ({
     )
   }, [form, formValues])
 
-  const update = async (values: UpdateTeamFormValues): Promise<boolean> => {
+  const create = async (values: CreateTeamFormValues): Promise<boolean> => {
     try {
-      if (type === 'Team') {
-        await updateTeam(values)
-      } else if (type === 'Team of Teams') {
-        await updateTeamOfTeams(values)
+      if (values.type === 'Team') {
+        await createTeam(values)
+      } else if (values.type === 'Team of Teams') {
+        await createTeamOfTeams(values)
       } else {
-        throw new Error(`Invalid team type: ${type}`)
+        throw new Error(`Invalid team type: ${values.type}`)
       }
       return true
     } catch (error) {
@@ -129,7 +71,7 @@ const UpdateTeamForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          `An unexpected error occurred while creating the ${type}.`
+          `An unexpected error occurred while creating the ${values.type}.`
         )
         console.error(error)
       }
@@ -138,16 +80,15 @@ const UpdateTeamForm = ({
     }
   }
 
-  const updateTeam = async (values: UpdateTeamFormValues) => {
+  const createTeam = async (values: CreateTeamFormValues) => {
     const teamsClient = await getTeamsClient()
-    await teamsClient.update(values.id, values as UpdateTeamRequest)
+    const localId = await teamsClient.create(values as CreateTeamRequest)
   }
 
-  const updateTeamOfTeams = async (values: UpdateTeamFormValues) => {
+  const createTeamOfTeams = async (values: CreateTeamFormValues) => {
     const teamsOfTeamsClient = await getTeamsOfTeamsClient()
-    await teamsOfTeamsClient.update(
-      values.id,
-      values as UpdateTeamOfTeamsRequest
+    const localId = await teamsOfTeamsClient.create(
+      values as CreateTeamOfTeamsRequest
     )
   }
 
@@ -155,12 +96,12 @@ const UpdateTeamForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await update(values)) {
+      if (await create(values)) {
         setIsOpen(false)
         setIsSaving(false)
         form.resetFields()
-        onFormUpdate()
-        messageApi.success(`Successfully updated ${type}.`)
+        onFormCreate()
+        messageApi.success(`Successfully created ${values.type}.`)
       } else {
         setIsSaving(false)
       }
@@ -179,15 +120,14 @@ const UpdateTeamForm = ({
     <>
       {contextHolder}
       <Modal
-        title="Edit Team"
+        title="Create Team"
         open={isOpen}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
-        okText="Save"
+        okText="Create"
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
-        closable={false}
         keyboard={false} // disable esc key to close modal
         destroyOnClose={true}
       >
@@ -195,10 +135,13 @@ const UpdateTeamForm = ({
           form={form}
           size="small"
           layout="vertical"
-          name="update-team-form"
+          name="create-team-form"
         >
-          <Form.Item name="id" hidden={true}>
-            <Input />
+          <Form.Item label="Team Type" name="type" rules={[{ required: true }]}>
+            <Radio.Group>
+              <Radio value="Team">Team</Radio>
+              <Radio value="Team of Teams">Team of Teams</Radio>
+            </Radio.Group>
           </Form.Item>
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
             <Input showCount maxLength={128} />
@@ -247,4 +190,4 @@ const UpdateTeamForm = ({
   )
 }
 
-export default UpdateTeamForm
+export default CreateTeamForm

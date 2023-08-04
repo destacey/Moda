@@ -1,5 +1,5 @@
 import { RiskDetailsDto } from '@/src/services/moda-api'
-import { Col, Descriptions, Row } from 'antd'
+import { Col, Descriptions, Row, Space } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
@@ -17,12 +17,16 @@ const RiskDetails = (risk: RiskDetailsDto) => {
         <Col xs={24} md={10}>
           <Descriptions layout="vertical">
             <Item label="Description">
-              <ReactMarkdown>{risk.description}</ReactMarkdown>
+              <Space direction="vertical">
+                <ReactMarkdown>{risk.description}</ReactMarkdown>
+              </Space>
             </Item>
           </Descriptions>
           <Descriptions layout="vertical">
             <Item label="Response">
-              <ReactMarkdown>{risk.response}</ReactMarkdown>
+              <Space direction="vertical">
+                <ReactMarkdown>{risk.response}</ReactMarkdown>
+              </Space>
             </Item>
           </Descriptions>
         </Col>
@@ -33,13 +37,15 @@ const RiskDetails = (risk: RiskDetailsDto) => {
               <Link href={teamLink}>{risk.team?.name}</Link>
             </Item>
             <Item label="Category">{risk.category?.name}</Item>
-            <Item label="Follow-Up Date">{risk.followUpDate && dayjs(risk.followUpDate).format('M/D/YYYY')}</Item>
+            <Item label="Follow-Up Date">
+              {risk.followUpDate && dayjs(risk.followUpDate).format('M/D/YYYY')}
+            </Item>
             <Item label="Assignee">
               <Link href={`/organizations/employees/${risk.assignee?.localId}`}>
                 {risk.assignee?.name}
               </Link>
             </Item>
-            <Item label="exposure">{risk.exposure?.name}</Item>
+            <Item label="Exposure">{risk.exposure?.name}</Item>
             <Item label="Impact">{risk.impact?.name}</Item>
             <Item label="Likelihood">{risk.likelihood?.name}</Item>
           </Descriptions>

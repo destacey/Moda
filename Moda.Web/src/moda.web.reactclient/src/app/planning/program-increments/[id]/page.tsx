@@ -2,18 +2,13 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { getProgramIncrementsClient } from '@/src/services/clients'
-import {
-  ProgramIncrementDetailsDto,
-  ProgramIncrementObjectiveListDto,
-  RiskListDto,
-} from '@/src/services/moda-api'
-import { Button, Card } from 'antd'
-import { createElement, useEffect, useState } from 'react'
+import { ProgramIncrementDetailsDto } from '@/src/services/moda-api'
+import { Button, Card, Dropdown, MenuProps, Space } from 'antd'
+import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
 import ProgramIncrementDetails from './program-increment-details'
 import ProgramIncrementObjectivesGrid, {
   ProgramIncrementObjectivesGridProps,
 } from '@/src/app/components/common/planning/program-increment-objectives-grid'
-import { TeamListItem } from '@/src/app/organizations/types'
 import TeamsGrid, {
   TeamsGridProps,
 } from '@/src/app/components/common/organizations/teams-grid'
@@ -24,6 +19,10 @@ import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
 import ManageProgramIncrementTeamsForm from './manage-program-increment-teams-form'
+import Link from 'next/link'
+import { DownOutlined } from '@ant-design/icons'
+import { ItemType } from 'antd/es/menu/hooks/useItems'
+import { EditProgramIncrementForm } from '../../components'
 
 const ProgramIncrementDetailsPage = ({ params }) => {
   useDocumentTitle('PI Details')
@@ -31,13 +30,9 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')
   const [programIncrement, setProgramIncrement] =
     useState<ProgramIncrementDetailsDto | null>(null)
-  const [teams, setTeams] = useState<TeamListItem[]>([])
-  const [objectives, setObjectives] = useState<
-    ProgramIncrementObjectiveListDto[]
-  >([])
-  const [risks, setRisks] = useState<RiskListDto[]>([])
-  const [openManageTeamsModal, setOpenManageTeamsModal] =
+  const [openEditProgramIncrementForm, setOpenEditProgramIncrementForm] =
     useState<boolean>(false)
+  const [openManageTeamsForm, setOpenManageTeamsForm] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
 
   const { hasClaim } = useAuth()
@@ -45,16 +40,68 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     'Permission',
     'Permissions.ProgramIncrements.Update'
   )
-  const showActions = canUpdateProgramIncrement
+
+  const getTeams = useCallback(async (programIncrementId: string) => {
+    const programIncrementsClient = await getProgramIncrementsClient()
+    return await programIncrementsClient.getTeams(programIncrementId)
+  }, [])
+
+  const getObjectives = useCallback(async (programIncrementId: string) => {
+    const programIncrementsClient = await getProgramIncrementsClient()
+    return await programIncrementsClient.getObjectives(programIncrementId, null)
+  }, [])
+
+  const getRisks = useCallback(
+    async (programIncrementId: string, includeClosed = false) => {
+      const programIncrementsClient = await getProgramIncrementsClient()
+      return await programIncrementsClient.getRisks(
+        programIncrementId,
+        null,
+        includeClosed
+      )
+    },
+    []
+  )
+
+  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+    const items: ItemType[] = []
+    if (canUpdateProgramIncrement) {
+      items.push(
+        {
+          key: 'edit',
+          label: 'Edit',
+          onClick: () => setOpenEditProgramIncrementForm(true),
+        },
+        {
+          key: 'manage-teams',
+          label: 'Manage Teams',
+          onClick: () => setOpenManageTeamsForm(true),
+        }
+      )
+    }
+    return items
+  }, [canUpdateProgramIncrement])
 
   const Actions = () => {
     return (
       <>
-        {canUpdateProgramIncrement && (
-          <Button onClick={() => setOpenManageTeamsModal(true)}>
-            Manage Teams
-          </Button>
-        )}
+        <Space>
+          <Link
+            href={`/planning/program-increments/${programIncrement?.localId}/plan-review`}
+          >
+            Plan Review
+          </Link>
+          {canUpdateProgramIncrement && (
+            <Dropdown menu={{ items: actionsMenuItems }}>
+              <Button>
+                <Space>
+                  Actions
+                  <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+          )}
+        </Space>
       </>
     )
   }
@@ -68,23 +115,30 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     {
       key: 'teams',
       tab: 'Teams',
-      content: createElement(TeamsGrid, { teams: teams } as TeamsGridProps),
+      content: createElement(TeamsGrid, {
+        getTeams: getTeams,
+        getTeamsObjectId: programIncrement?.id,
+      } as TeamsGridProps),
     },
     {
       key: 'objectives',
       tab: 'Objectives',
       content: createElement(ProgramIncrementObjectivesGrid, {
-        objectives: objectives,
+        getObjectives: getObjectives,
+        programIncrementId: programIncrement?.id,
         hideProgramIncrementColumn: true,
         hideTeamColumn: false,
-        newObjectivesAllowed: true,
-        programIncrementId: programIncrement?.id,
+        newObjectivesAllowed: !programIncrement?.objectivesLocked ?? false,
       } as ProgramIncrementObjectivesGridProps),
     },
     {
       key: 'risk-management',
       tab: 'Risk Management',
-      content: createElement(RisksGrid, { risks: risks } as RisksGridProps),
+      content: createElement(RisksGrid, {
+        getRisks: getRisks,
+        getRisksObjectId: programIncrement?.id,
+        newRisksAllowed: true,
+      } as RisksGridProps),
     },
   ]
 
@@ -96,46 +150,31 @@ const ProgramIncrementDetailsPage = ({ params }) => {
       )
       setProgramIncrement(programIncrementDto)
       setBreadcrumbTitle(programIncrementDto.name)
-
-      if (!programIncrementDto) return
-
-      // TODO: move these to an onclick event based on when the user clicks the tab
-      const teamDtos = await programIncrementsClient.getTeams(
-        programIncrementDto.id
-      )
-      setTeams(teamDtos as TeamListItem[])
-
-      const objectiveDtos = await programIncrementsClient.getObjectives(
-        programIncrementDto.id,
-        null
-      )
-      setObjectives(objectiveDtos)
-
-      // TODO: setup the ability to change whether or not to show risks that are closed
-      const riskDtos = await programIncrementsClient.getRisks(
-        programIncrementDto.id,
-        true
-      )
-      setRisks(riskDtos)
     }
 
     getProgramIncrement()
   }, [params.id, setBreadcrumbTitle, lastRefresh])
 
-  const onManageTeamsFormClosed = (wasSaved: boolean) => {
-    setOpenManageTeamsModal(false)
+  const onEditFormClosed = useCallback((wasSaved: boolean) => {
+    setOpenEditProgramIncrementForm(false)
     if (wasSaved) {
-      // TODO: refresh the PI details and Teams tab only
       setLastRefresh(Date.now())
     }
-  }
+  }, [])
+
+  const onManageTeamsFormClosed = useCallback((wasSaved: boolean) => {
+    setOpenManageTeamsForm(false)
+    if (wasSaved) {
+      setLastRefresh(Date.now())
+    }
+  }, [])
 
   return (
     <>
       <PageTitle
         title={programIncrement?.name}
         subtitle="Program Increment Details"
-        actions={showActions && <Actions />}
+        actions={<Actions />}
       />
       <Card
         style={{ width: '100%' }}
@@ -145,13 +184,21 @@ const ProgramIncrementDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {programIncrement && (
-        <ManageProgramIncrementTeamsForm
-          showForm={openManageTeamsModal}
-          id={programIncrement.id}
-          onFormSave={() => onManageTeamsFormClosed(true)}
-          onFormCancel={() => onManageTeamsFormClosed(false)}
-        />
+      {programIncrement && canUpdateProgramIncrement && (
+        <>
+          <EditProgramIncrementForm
+            showForm={openEditProgramIncrementForm}
+            id={programIncrement?.id}
+            onFormUpdate={() => onEditFormClosed(true)}
+            onFormCancel={() => onEditFormClosed(false)}
+          />
+          <ManageProgramIncrementTeamsForm
+            showForm={openManageTeamsForm}
+            id={programIncrement?.id}
+            onFormSave={() => onManageTeamsFormClosed(true)}
+            onFormCancel={() => onManageTeamsFormClosed(false)}
+          />
+        </>
       )}
     </>
   )

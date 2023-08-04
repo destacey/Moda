@@ -4,18 +4,15 @@ import { useEffect, useState } from 'react'
 import useBreadcrumbs, { BreadcrumbSegment } from '../contexts/breadcrumbs'
 import { usePathname } from 'next/navigation'
 
-export interface AppBreadcrumbProps {
-}
+export interface AppBreadcrumbProps {}
 
 const AppBreadcrumb = () => {
   const [pathItems, setPathItems] = useState<ItemType[]>([])
-  const [isHome, setIsHome] = useState<boolean>(false)
   const pathname = usePathname()
   const { breadcrumbRoute } = useBreadcrumbs()
 
   useEffect(() => {
     if (breadcrumbRoute?.route) {
-      setIsHome(pathname === '/')
       setPathItems(breadcrumbRoute.route)
     }
   }, [pathname, breadcrumbRoute])
@@ -31,14 +28,12 @@ const AppBreadcrumb = () => {
   }
 
   return (
-    !isHome && (
-      <Breadcrumb
-        separator=">"
-        style={{ margin: '16px 0' }}
-        itemRender={itemRender}
-        items={pathItems}
-      />
-    )
+    <Breadcrumb
+      separator=">"
+      style={{ margin: '16px 0' }}
+      itemRender={itemRender}
+      items={pathItems}
+    />
   )
 }
 

@@ -79,7 +79,7 @@ public class RisksController : ControllerBase
     [HttpPost()]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Risks)]
     [OpenApiOperation("Create a risk.", "")]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
@@ -98,7 +98,7 @@ public class RisksController : ControllerBase
             return BadRequest(error);
         }
 
-        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+        return CreatedAtAction(nameof(GetByLocalId), new { id = result.Value }, result.Value);
     }
 
     [HttpPut("{id}")]
