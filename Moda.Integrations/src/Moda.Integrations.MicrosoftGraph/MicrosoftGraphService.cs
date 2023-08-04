@@ -38,8 +38,9 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
 
             _logger.LogInformation("Found {UserCount} users in Active Directory via Microsoft Graph", users.Count);
 
+            users = users.Where(u => !string.IsNullOrWhiteSpace(u.Id)).ToList();
             List<AzureAdEmployee> employees = new(users.Count);
-            foreach (var user in users.Where(u => !string.IsNullOrWhiteSpace(u.Id)))
+            foreach (var user in users)
             {
                 // TODO move this to a single operation for the entire list of users
                 var manager = await GetUserManager(user.Id!, cancellationToken);
@@ -63,7 +64,7 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
     /// </summary>
     /// <param name="groupId">Azure Ad Group Object Id</param>
     /// <returns></returns>
-    private async Task<IReadOnlyList<User>> GetGroupMembers(string groupId, CancellationToken cancellationToken)
+    private async Task<List<User>> GetGroupMembers(string groupId, CancellationToken cancellationToken)
     {
         // TODO handle paging
         var members = await _graphServiceClient.Groups[groupId]
@@ -79,7 +80,7 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
         return members?.OdataCount > 0 ? members.Value!.Select(m => (User)m).ToList() : new List<User>();
     }
 
-    private async Task<IReadOnlyList<User>> GetActiveDirectoryUsers(bool includeDisabled, CancellationToken cancellationToken)
+    private async Task<List<User>> GetActiveDirectoryUsers(bool includeDisabled, CancellationToken cancellationToken)
     {
         var filter = includeDisabled
             ? "usertype eq 'Member' and givenName ne null and surname ne null"
