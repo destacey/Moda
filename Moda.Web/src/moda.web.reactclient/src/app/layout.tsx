@@ -40,7 +40,7 @@ export default function RootLayout({
                           <Content
                             style={{
                               margin: 0,
-                              minHeight: 280,
+                              height: '100vh',
                             }}
                           >
                             {children}
