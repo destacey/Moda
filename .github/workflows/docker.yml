@@ -151,76 +151,34 @@ jobs:
               run: terraform apply -auto-approve -var="docker_tag=sha-${{ github.sha }}" -var="sql_admin_pass=${{ secrets.SQL_ADMIN_PASSWORD }}" -var="aad_api_client_secret=${{ secrets.AAD_API_CLIENT_SECRET }}"
 
     deploy:
-      name: "Deploy"
-      runs-on: ubuntu-latest
-      if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
-      needs: [terraform]
-      steps:
-        - uses: actions/checkout@v3
-          name: Checkout
+        name: "Deploy"
+        runs-on: ubuntu-latest
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+        needs: [terraform]
+        steps:
+            - uses: actions/checkout@v3
+              name: Checkout
 
-        - name: Terraform Output
-          id: tfoutputs
-          uses: dflook/terraform-output@v1
-          with:
-            workspace: moda-dev
-            path: .iac/moda
-          env:
-            TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
+            - name: Terraform Output
+              id: tfoutputs
+              uses: dflook/terraform-output@v1
+              with:
+                  workspace: moda-dev
+                  path: .iac/moda
+              env:
+                  TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
 
-        - name: Setup .NET
-          uses: actions/setup-dotnet@v3
-          with:
-            dotnet-version: 7.0.x
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v3
+              with:
+                  dotnet-version: 7.0.x
 
-        - name: Workload restore
-          run: |
-            cd Moda.Web/src/Moda.Web.BlazorClient
-            dotnet workload restore
+            - name: Restore dependencies
+              run: dotnet restore
 
-        - name: Restore dependencies
-          run: dotnet restore
+            - name: Install dotnet ef
+              run: dotnet tool install --global dotnet-ef
 
-        - name: App Setting Variable Substitution
-          uses: microsoft/variable-substitution@v1
-          with:
-            files: 'Moda.Web/src/Moda.Web.BlazorClient/wwwroot/appsettings.json'
-          env:
-            AzureAd.Authority: 'https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef'
-            AzureAd.ClientId: '4d566fb3-7966-4c77-9864-113020fd646f'
-            AzureAd.ValidateAuthority: true
-            AzureAd.ClientSecret: '${{ secrets.AAD_API_CLIENT_SECRET }}'
-            AzureAd.ApiScope: 'api://fdca5e6f-46a2-455c-b2f3-06a9a6877190/access_as_user'
-            ApiBaseUrl: 'https://${{ steps.tfoutputs.outputs.api_hostname }}/'
-
-        - name: Build
-          run: dotnet build --no-restore Moda.Web/src/Moda.Web.BlazorClient/Moda.Web.BlazorClient.csproj
-
-        - name: Test
-          run: dotnet test --no-build --verbosity normal Moda.Web/src/Moda.Web.BlazorClient/Moda.Web.BlazorClient.csproj
-
-        - name: Install dotnet ef
-          run: dotnet tool install --global dotnet-ef
-
-        - name: Run migrations
-          run: |
-            dotnet ef database update --connection "${{ steps.tfoutputs.outputs.sql_server_connection_string }}" --startup-project Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj --project Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL/Moda.Infrastructure.Migrators.MSSQL.csproj
-
-        - name: Publish Client
-          run: dotnet publish Moda.Web/src/Moda.Web.BlazorClient/Moda.Web.BlazorClient.csproj -c Release -o ./client
-
-        - uses: azure/login@v1
-          with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-        - name: 'Run Azure SWA deploy action'
-          uses: azure/static-web-apps-deploy@v1
-          with:
-            azure_static_web_apps_api_token: '${{ steps.tfoutputs.outputs.swa_token }}'
-            action: 'upload'
-            app_location: './client/wwwroot'
-            api_location: ''
-            output_location: './client/wwwroot'
-
-        - name: az logout
-          run: az logout
+            - name: Run migrations
+              run: |
+                  dotnet ef database update --connection "${{ steps.tfoutputs.outputs.sql_server_connection_string }}" --startup-project Moda.Web/src/Moda.Web.Api/Moda.Web.Api.csproj --project Moda.Infrastructure/src/Moda.Infrastructure.Migrators.MSSQL/Moda.Infrastructure.Migrators.MSSQL.csproj
