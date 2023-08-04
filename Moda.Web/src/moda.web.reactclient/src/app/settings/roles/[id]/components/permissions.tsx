@@ -1,13 +1,23 @@
 import useTheme from '@/src/app/components/contexts/theme'
-import { getPermissionsClient, getRolesClient } from '@/src/services/clients'
-import { ApplicationPermission, PermissionsClient, RoleDto } from '@/src/services/moda-api'
-import { useGetPermissions, useUpdatePermissionsMutation } from '@/src/services/query'
-import { Row, Col, List, Switch, Anchor, Badge, Button, message } from 'antd'
+import {
+  useGetPermissions,
+  useUpdatePermissionsMutation,
+} from '@/src/services/query'
+import {
+  Row,
+  Col,
+  List,
+  Switch,
+  Badge,
+  Button,
+  message,
+  Typography,
+} from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useQueryClient } from 'react-query'
 
 interface PermissionsProps {
-  roleId: string,
+  roleId: string
   permissions: string[]
 }
 
@@ -31,13 +41,14 @@ const Permissions = (props: PermissionsProps) => {
   const [activePermissionGroup, setActivePermissionGroup] =
     useState<PermissionGroup>(null)
 
-  const queryClient = useQueryClient();
-  const updatePermissions = useUpdatePermissionsMutation(queryClient);
+  const queryClient = useQueryClient()
+  const updatePermissions = useUpdatePermissionsMutation(queryClient)
 
   useEffect(() => setPermissions(props.permissions), [props.permissions])
 
   useEffect(() => {
-    const groups = availablePermissions.data?.reduce((acc: PermissionGroup[], permission) => {
+    const groups = availablePermissions.data?.reduce(
+      (acc: PermissionGroup[], permission) => {
         const item = {
           name: permission.name,
           description: permission.description,
@@ -56,7 +67,9 @@ const Permissions = (props: PermissionsProps) => {
       []
     )
 
-    setPermissionGroups(groups?.sort((a, b) => a.name.localeCompare(b.name)) ?? groups);
+    setPermissionGroups(
+      groups?.sort((a, b) => a.name.localeCompare(b.name)) ?? groups
+    )
     setActivePermissionGroup(groups?.[0])
   }, [availablePermissions.data])
 
@@ -69,7 +82,7 @@ const Permissions = (props: PermissionsProps) => {
       updatedPermissions = permissions.filter((p) => p !== item.name)
     }
 
-    setPermissions(updatedPermissions);
+    setPermissions(updatedPermissions)
   }
 
   const hasPermission = (permission: string) => permissions.includes(permission)
@@ -87,10 +100,9 @@ const Permissions = (props: PermissionsProps) => {
   const handleSave = async () => {
     try {
       await updatePermissions.mutateAsync({
-          roleId: props.roleId,
-          permissions: permissions
-        }
-      );
+        roleId: props.roleId,
+        permissions: permissions,
+      })
 
       messageApi.success('Permissions saved successfully')
     } catch (error) {
@@ -98,8 +110,7 @@ const Permissions = (props: PermissionsProps) => {
     }
   }
 
-  if (availablePermissions.isLoading) 
-    return <div>Loading...</div>
+  if (availablePermissions.isLoading) return <div>Loading...</div>
 
   function handleSelectAll(select: boolean): void {
     if (activePermissionGroup) {
@@ -125,13 +136,13 @@ const Permissions = (props: PermissionsProps) => {
     <div>
       {contextHolder}
       <Row>
-        <Col span={4}>
-          <p>Permission Groups</p>
+        <Col span={7}>
+          <Typography.Title level={5}>Permission Groups</Typography.Title>
           <List
             size="small"
             dataSource={permissionGroups}
             style={{
-              height: 'calc(100vh - 320px)',
+              height: 'calc(100vh - 400px)',
               overflowY: 'scroll',
             }}
             renderItem={(item) => (
@@ -161,14 +172,17 @@ const Permissions = (props: PermissionsProps) => {
           />
         </Col>
         <Col
-          span={19}
+          span={16}
           push={1}
           style={{ display: 'flex', flexDirection: 'column' }}
         >
-          <div style={{height: '100%'}}>
-            <div>
+          <div style={{ height: '100%' }}>
+            {/* <div>
               <p>{activePermissionGroup?.name} Available Permissions</p>
-            </div>
+            </div> */}
+            <Typography.Title level={5}>
+              {activePermissionGroup?.name} Available Permissions
+            </Typography.Title>
             {activePermissionGroup?.permissions?.map((permission, i) => (
               <div key={i} style={{ paddingBottom: '15px' }}>
                 <Switch
@@ -182,13 +196,23 @@ const Permissions = (props: PermissionsProps) => {
               </div>
             ))}
 
-            <div style={{marginTop: '15px'}}>
-              <a href="#" onClick={() => handleSelectAll(true)}>Select All </a> | <a href="#" onClick={() => handleSelectAll(false)}>Unselect All </a>
+            <div style={{ marginTop: '15px' }}>
+              <a href="#" onClick={() => handleSelectAll(true)}>
+                Select All{' '}
+              </a>{' '}
+              |{' '}
+              <a href="#" onClick={() => handleSelectAll(false)}>
+                Unselect All{' '}
+              </a>
             </div>
           </div>
 
           <div>
-            <Button type="primary" htmlType="button" onClick={() => handleSave()}>
+            <Button
+              type="primary"
+              htmlType="button"
+              onClick={() => handleSave()}
+            >
               Save Permissions
             </Button>
           </div>

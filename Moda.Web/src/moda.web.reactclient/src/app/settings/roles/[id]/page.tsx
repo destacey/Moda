@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { useGetRoleById } from '@/src/services/query'
-import { Button, Card, Space, message, Layout } from 'antd'
+import { Card } from 'antd'
 import { createElement, useEffect, useState } from 'react'
 import Detail from './components/detail'
 import Permissions from './components/permissions'
@@ -28,7 +28,7 @@ const Page = ({ params }) => {
 
   useEffect(
     () => setBreadcrumbTitle(roleData.data?.name ?? 'New Role'),
-    [roleData.data]
+    [roleData.data, setBreadcrumbTitle]
   )
 
   const tabs = [
@@ -36,7 +36,7 @@ const Page = ({ params }) => {
       key: 'details',
       tab: 'Details',
       content: createElement(Detail, {
-        role: roleData.data
+        role: roleData.data,
       }),
     },
     canViewPermissions && {
@@ -44,17 +44,14 @@ const Page = ({ params }) => {
       tab: 'Permissions',
       content: createElement(Permissions, {
         roleId: roleData.data?.id,
-        permissions: roleData.data?.permissions
+        permissions: roleData.data?.permissions,
       }),
     },
   ]
 
   return (
     <>
-      <PageTitle
-        title={roleData.data?.name}
-        subtitle="Role Details"
-      />
+      <PageTitle title={roleData.data?.name} subtitle="Role Details" />
       <Card
         tabList={tabs}
         activeTabKey={activeTab}
