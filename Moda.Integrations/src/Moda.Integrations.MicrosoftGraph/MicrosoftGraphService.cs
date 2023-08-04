@@ -84,6 +84,8 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
             ? "usertype eq 'Member'"
             : "accountEnabled eq true and usertype eq 'Member'";
 
+        var users = new List<User>();
+
         // TODO handle paging
         //https://docs.microsoft.com/en-us/graph/aad-advanced-queries?tabs=csharp
         var adUsers = await _graphServiceClient.Users//.GetAsync();
@@ -96,7 +98,19 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
                 requestConfiguration.QueryParameters.Filter = filter;
             }, cancellationToken);
 
-        return adUsers?.Value.Count > 0 ? adUsers.Value!.ToList() : new List<User>();
+        users.AddRange(adUsers?.Value!);
+        var nextLink = adUsers?.OdataNextLink;
+        
+        while (nextLink != null)
+        {
+            var req = _graphServiceClient.Users.ToGetRequestInformation();
+            req.QueryParameters.Add("%24skiptoken", adUsers.OdataNextLink);
+            var result = await _graphServiceClient.RequestAdapter.SendAsync(req, UserCollectionResponse.CreateFromDiscriminatorValue, cancellationToken: cancellationToken);
+            users.AddRange(adUsers.Value!);
+            nextLink = result.OdataNextLink;
+        }
+
+        return users;
     }
 
     private async Task<DirectoryObject?> GetUserManager(string userId, CancellationToken cancellationToken)
