@@ -11,7 +11,7 @@ namespace Moda.Integrations.MicrosoftGraph;
 
 public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
 {
-    private readonly string[] _selectOptions = new string[] { "id", "userPrincipalName", "accountEnabled", "givenName", "surname", "jobTitle", "department", "officeLocation", "mail", "manager", "employeeHireDate" };
+    private readonly string[] _selectOptions = new string[] { "id", "userPrincipalName", "userType", "accountEnabled", "givenName", "surname", "jobTitle", "department", "officeLocation", "mail", "manager", "employeeHireDate" };
 
     private readonly GraphServiceClient _graphServiceClient;
     private readonly IConfiguration _configuration;
@@ -38,17 +38,14 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
 
             _logger.LogInformation("Found {UserCount} users in Active Directory via Microsoft Graph", users.Count);
 
-            users = users.Where(u => !string.IsNullOrWhiteSpace(u.Id)).ToList();
+            users = users.Where(u => !string.IsNullOrWhiteSpace(u.Id) && !string.IsNullOrEmpty(u.GivenName) && !string.IsNullOrEmpty(u.Surname)).ToList();
             List<AzureAdEmployee> employees = new(users.Count);
             foreach (var user in users)
             {
-                // TODO move this to a single operation for the entire list of users
-                var manager = await GetUserManager(user.Id!, cancellationToken);
-                _logger.LogInformation("Found manager {ManagerId} for user {UserId}", manager?.Id, user.Id);
-                user.Manager = manager;
                 employees.Add(new AzureAdEmployee(user));
             }
 
+            _logger.LogInformation("Returning {EmployeeCount} employees from Active Directory via Microsoft Graph", employees.Count);
             return Result.Success((IEnumerable<IExternalEmployee>)employees);
         }
         catch (Exception ex)
@@ -73,8 +70,9 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
             {
                 requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
                 requestConfiguration.QueryParameters.Count = true;
+                requestConfiguration.QueryParameters.Expand = new string[] { "manager($select=id)" };
                 requestConfiguration.QueryParameters.Select = _selectOptions;
-                requestConfiguration.QueryParameters.Filter = "accountEnabled eq true and usertype eq 'Member' and givenName ne null and surname ne null";
+                requestConfiguration.QueryParameters.Filter = "accountEnabled eq true and usertype eq 'Member'";
             }, cancellationToken);
 
         return members?.OdataCount > 0 ? members.Value!.Select(m => (User)m).ToList() : new List<User>();
@@ -83,8 +81,8 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
     private async Task<List<User>> GetActiveDirectoryUsers(bool includeDisabled, CancellationToken cancellationToken)
     {
         var filter = includeDisabled
-            ? "usertype eq 'Member' and givenName ne null and surname ne null"
-            : "accountEnabled eq true and usertype eq 'Member' and givenName ne null and surname ne null";
+            ? "usertype eq 'Member'"
+            : "accountEnabled eq true and usertype eq 'Member'";
 
         // TODO handle paging
         //https://docs.microsoft.com/en-us/graph/aad-advanced-queries?tabs=csharp
@@ -93,11 +91,12 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
             {
                 requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
                 requestConfiguration.QueryParameters.Count = true;
+                requestConfiguration.QueryParameters.Expand = new string[] { "manager($select=id)" };
                 requestConfiguration.QueryParameters.Select = _selectOptions;
                 requestConfiguration.QueryParameters.Filter = filter;
             }, cancellationToken);
 
-        return adUsers?.OdataCount > 0 ? adUsers.Value!.ToList() : new List<User>();
+        return adUsers?.Value.Count > 0 ? adUsers.Value!.ToList() : new List<User>();
     }
 
     private async Task<DirectoryObject?> GetUserManager(string userId, CancellationToken cancellationToken)
