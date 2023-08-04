@@ -11,6 +11,78 @@
 import axios, { AxiosError } from 'axios';
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
 
+export class PermissionsClient {
+    private instance: AxiosInstance;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance ? instance : axios.create();
+
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+
+    }
+
+    /**
+     * Get a list of all permissions.
+     */
+    getList( cancelToken?: CancelToken | undefined): Promise<ApplicationPermission[]> {
+        let url_ = this.baseUrl + "/api/user-management/permissions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetList(_response);
+        });
+    }
+
+    protected processGetList(response: AxiosResponse): Promise<ApplicationPermission[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ApplicationPermission[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ApplicationPermission[]>(null as any);
+    }
+}
+
 export class ProfileClient {
     private instance: AxiosInstance;
     private baseUrl: string;
@@ -6526,6 +6598,24 @@ export class BackgroundJobsClient {
     }
 }
 
+export interface ApplicationPermission {
+    description?: string;
+    action?: string;
+    resource?: string;
+    isBasic?: boolean;
+    isRoot?: boolean;
+    name?: string;
+}
+
+export interface ErrorResult {
+    messages?: string[] | undefined;
+    source?: string | undefined;
+    exception?: string | undefined;
+    errorId?: string | undefined;
+    supportMessage?: string | undefined;
+    statusCode?: number;
+}
+
 export interface UserDetailsDto {
     id?: string;
     userName?: string | undefined;
@@ -6541,15 +6631,6 @@ export interface NavigationDto {
     id?: string;
     localId?: number;
     name?: string;
-}
-
-export interface ErrorResult {
-    messages?: string[] | undefined;
-    source?: string | undefined;
-    exception?: string | undefined;
-    errorId?: string | undefined;
-    supportMessage?: string | undefined;
-    statusCode?: number;
 }
 
 export interface ProblemDetails {

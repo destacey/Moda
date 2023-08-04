@@ -2,6 +2,7 @@ import axios from 'axios'
 import {
   BackgroundJobsClient,
   EmployeesClient,
+  PermissionsClient,
   ProfileClient,
   ProgramIncrementsClient,
   RisksClient,
@@ -28,6 +29,8 @@ export const getBackgroundJobsClient = async (accessToken?: string) =>
   new BackgroundJobsClient('', await createDefaultAxiosInstance(accessToken))
 export const getEmployeesClient = async (accessToken?: string) =>
   new EmployeesClient('', await createDefaultAxiosInstance(accessToken))
+  export const getPermissionsClient = async (accessToken?: string) =>
+    new PermissionsClient('', await createDefaultAxiosInstance(accessToken))
 export const getProfileClient = async (accessToken?: string) =>
   new ProfileClient('', await createDefaultAxiosInstance(accessToken))
 export const getProgramIncrementsClient = async (accessToken?: string) =>

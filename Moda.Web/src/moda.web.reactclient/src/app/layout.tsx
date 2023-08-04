@@ -13,9 +13,18 @@ import { ThemeProvider } from './components/contexts/theme'
 import { AuthProvider } from './components/contexts/auth'
 import { BreadcrumbsProvider } from './components/contexts/breadcrumbs'
 import { MenuToggleProvider } from './components/contexts/menu-toggle'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import LoadingAccount from './components/common/loading-account'
 
 const { Content } = Layout
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+    },
+  },
+})
 
 export default function RootLayout({
   children,
@@ -28,29 +37,31 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider>
             <AuthenticatedTemplate>
-              <MenuToggleProvider>
-                <Layout>
-                  <AppHeader />
-                  <LoadingAccount>
-                    <Layout>
-                      <AppMenu />
-                      <Layout style={{ padding: '0 24px 24px' }}>
-                        <BreadcrumbsProvider>
-                          <AppBreadcrumb />
-                          <Content
-                            style={{
-                              margin: 0,
-                              height: '100vh',
-                            }}
-                          >
-                            {children}
-                          </Content>
-                        </BreadcrumbsProvider>
+              <QueryClientProvider client={queryClient}>
+                <MenuToggleProvider>
+                  <Layout>
+                    <AppHeader />
+                    <LoadingAccount>
+                      <Layout>
+                        <AppMenu />
+                        <Layout style={{ padding: '0 24px 24px' }}>
+                          <BreadcrumbsProvider>
+                            <AppBreadcrumb />
+                            <Content
+                              style={{
+                                margin: 0,
+                                height: '100%',
+                              }}
+                            >
+                              {children}
+                            </Content>
+                          </BreadcrumbsProvider>
+                        </Layout>
                       </Layout>
-                    </Layout>
-                  </LoadingAccount>
-                </Layout>
-              </MenuToggleProvider>
+                    </LoadingAccount>
+                  </Layout>
+                </MenuToggleProvider>
+              </QueryClientProvider>
             </AuthenticatedTemplate>
           </ThemeProvider>
         </AuthProvider>

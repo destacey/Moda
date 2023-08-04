@@ -96,12 +96,13 @@ export default function AppMenu() {
       width={235}
       collapsedWidth={50}
       collapsed={menuCollapsed}
+      style={{ minHeight: '100vh' }}
     >
       <Menu
         mode="inline"
         defaultSelectedKeys={['1']}
         defaultOpenKeys={['sub1']}
-        style={{ height: '100%' }}
+        style={{ minHeight: '100%' }}
         items={menuItems}
       />
     </Sider>

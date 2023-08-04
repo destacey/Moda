@@ -72,7 +72,7 @@ internal class RoleService : IRoleService
 
             await _events.PublishAsync(new ApplicationRoleCreatedEvent(role.Id, role.Name!, _dateTimeService.Now));
 
-            return string.Format("Role {0} Created.", request.Name);
+            return role.Id;
         }
         else
         {
@@ -98,7 +98,7 @@ internal class RoleService : IRoleService
 
             await _events.PublishAsync(new ApplicationRoleUpdatedEvent(role.Id, role.Name, _dateTimeService.Now));
 
-            return string.Format("Role {0} Updated.", role.Name);
+            return role.Id;
         }
     }
 
