@@ -2,7 +2,7 @@
 
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Card, List, Space } from 'antd'
+import { Badge, Button, Card, List, Space } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
 import { useCallback, useEffect, useState } from 'react'
@@ -56,12 +56,15 @@ const TeamObjectivesListCard = ({
     loadObjectives(programIncrementId, teamId)
   }, [loadObjectives, programIncrementId, teamId])
 
-  const cardTitle = () => {
-    let title = `Objectives`
-    if (objectives?.length > 0) {
-      title += ` (${objectives.length})`
-    }
-    return title
+  const CardTitle = () => {
+    const count = objectives?.length ?? 0
+    const showBadge = count > 0
+    return (
+      <Space>
+        {'Objectives'}
+        {showBadge && <Badge color="white" size="small" count={count} />}
+      </Space>
+    )
   }
 
   const ObjectivesList = () => {
@@ -120,7 +123,7 @@ const TeamObjectivesListCard = ({
     <>
       <Card
         size="small"
-        title={cardTitle()}
+        title={<CardTitle />}
         extra={
           canCreateObjectives && (
             <Button
