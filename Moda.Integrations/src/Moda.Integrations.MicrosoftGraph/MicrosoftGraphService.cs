@@ -43,9 +43,9 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
             foreach (var user in users)
             {
                 // TODO move this to a single operation for the entire list of users
-                var manager = await GetUserManager(user.Id!, cancellationToken);
-                _logger.LogInformation("Found manager {ManagerId} for user {UserId}", manager?.Id, user.Id);
-                user.Manager = manager;
+                // var manager = await GetUserManager(user.Id!, cancellationToken);
+                // _logger.LogInformation("Found manager {ManagerId} for user {UserId}", manager?.Id, user.Id);
+                //user.Manager = manager;
                 employees.Add(new AzureAdEmployee(user));
             }
 
@@ -73,6 +73,7 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
             {
                 requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
                 requestConfiguration.QueryParameters.Count = true;
+                requestConfiguration.QueryParameters.Expand = new string[] { "manager($select=id)" };
                 requestConfiguration.QueryParameters.Select = _selectOptions;
                 requestConfiguration.QueryParameters.Filter = "accountEnabled eq true and usertype eq 'Member' and givenName ne null and surname ne null";
             }, cancellationToken);
@@ -93,6 +94,7 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
             {
                 requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
                 requestConfiguration.QueryParameters.Count = true;
+                requestConfiguration.QueryParameters.Expand = new string[] { "manager($select=id)" };
                 requestConfiguration.QueryParameters.Select = _selectOptions;
                 requestConfiguration.QueryParameters.Filter = filter;
             }, cancellationToken);
