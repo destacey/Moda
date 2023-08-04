@@ -45,9 +45,17 @@ const TeamLinkCellRenderer = ({ value, data }) => {
   return <Link href={teamLink}>{value}</Link>
 }
 
-const ProgressCellRenderer = ({ value }) => {
-  // TODO: why is ag-grid showing a period on right side of the column?
-  return <Progress percent={value} size="small" />
+const ProgressCellRenderer = ({ value, data }) => {
+  const progressStatus =
+    data.status?.name === 'Canceled' ? 'exception' : undefined
+  return (
+    <Progress
+      percent={value}
+      size="small"
+      status={progressStatus}
+      style={{ marginLeft: '5px', marginRight: '5px' }}
+    />
+  )
 }
 
 const ProgramIncrementObjectivesGrid = ({

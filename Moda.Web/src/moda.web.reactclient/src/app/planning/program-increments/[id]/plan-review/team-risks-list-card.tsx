@@ -2,7 +2,7 @@
 
 import { RiskListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Empty, List } from 'antd'
+import { Badge, Button, Card, Empty, List, Space } from 'antd'
 import RiskListItem from './risk-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
 import { useCallback, useEffect, useState } from 'react'
@@ -46,12 +46,15 @@ const TeamRisksListCard = ({
     loadRisks(programIncrementId, teamId)
   }, [loadRisks, programIncrementId, teamId])
 
-  const cardTitle = () => {
-    let title = `Risks`
-    if (risks?.length > 0) {
-      title += ` (${risks.length})`
-    }
-    return title
+  const CardTitle = () => {
+    const count = risks?.length ?? 0
+    const showBadge = count > 0
+    return (
+      <Space>
+        {'Risks'}
+        {showBadge && <Badge color="white" size="small" count={count} />}
+      </Space>
+    )
   }
 
   const RisksList = () => {
@@ -99,7 +102,7 @@ const TeamRisksListCard = ({
     <>
       <Card
         size="small"
-        title={cardTitle()}
+        title={<CardTitle />}
         extra={
           canCreateRisks && (
             <Button

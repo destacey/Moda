@@ -2,12 +2,13 @@
 
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Card, List, Space } from 'antd'
+import { Badge, Button, Card, List, Space } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '@/src/app/components/contexts/auth'
 import CreateProgramIncrementObjectiveForm from '../create-program-increment-objective-form'
+import dayjs from 'dayjs'
 
 export interface TeamObjectivesListCardProps {
   getObjectives: (
@@ -55,12 +56,15 @@ const TeamObjectivesListCard = ({
     loadObjectives(programIncrementId, teamId)
   }, [loadObjectives, programIncrementId, teamId])
 
-  const cardTitle = () => {
-    let title = `Objectives`
-    if (objectives?.length > 0) {
-      title += ` (${objectives.length})`
-    }
-    return title
+  const CardTitle = () => {
+    const count = objectives?.length ?? 0
+    const showBadge = count > 0
+    return (
+      <Space>
+        {'Objectives'}
+        {showBadge && <Badge color="white" size="small" count={count} />}
+      </Space>
+    )
   }
 
   const ObjectivesList = () => {
@@ -76,7 +80,19 @@ const TeamObjectivesListCard = ({
         const statusOrder = ['Not Started', 'In Progress', 'Closed', 'Canceled']
         const aStatusIndex = statusOrder.indexOf(a.status.name)
         const bStatusIndex = statusOrder.indexOf(b.status.name)
-        return aStatusIndex - bStatusIndex
+        if (aStatusIndex === bStatusIndex) {
+          if (a.targetDate && b.targetDate) {
+            return dayjs(a.targetDate).isAfter(dayjs(b.targetDate)) ? 1 : -1
+          } else if (a.targetDate) {
+            return -1
+          } else if (b.targetDate) {
+            return 1
+          } else {
+            return 0
+          }
+        } else {
+          return aStatusIndex - bStatusIndex
+        }
       }
     })
 
@@ -107,7 +123,7 @@ const TeamObjectivesListCard = ({
     <>
       <Card
         size="small"
-        title={cardTitle()}
+        title={<CardTitle />}
         extra={
           canCreateObjectives && (
             <Button

@@ -1,7 +1,7 @@
 import UpdateRiskForm from '@/src/app/components/common/planning/edit-risk-form'
 import { RiskListDto } from '@/src/services/moda-api'
 import { EditOutlined } from '@ant-design/icons'
-import { Button, List, Space, Typography } from 'antd'
+import { Button, List, Space, Tag, Typography } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -26,7 +26,7 @@ const RiskListItem = ({
     )
   }
   const description = () => {
-    const content = `Category: ${risk.category} | Exposure: ${risk.exposure}`
+    const content = `Exposure: ${risk.exposure}`
     const assigneeInfo = risk.assignee ? (
       <>
         {' | Assignee: '}
@@ -37,10 +37,13 @@ const RiskListItem = ({
     ) : null
 
     return (
-      <Typography.Text>
-        {content}
-        {assigneeInfo}
-      </Typography.Text>
+      <Space>
+        <Tag>{risk.category}</Tag>
+        <Typography.Text>
+          {content}
+          {assigneeInfo}
+        </Typography.Text>
+      </Space>
     )
   }
 
