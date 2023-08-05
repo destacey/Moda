@@ -68,7 +68,6 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
             .TransitiveMembers
             .GetAsync(requestConfiguration =>
             {
-                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
                 requestConfiguration.QueryParameters.Expand = new string[] { "manager($select=id)" };
                 requestConfiguration.QueryParameters.Select = _selectOptions;
                 requestConfiguration.QueryParameters.Filter = "accountEnabled eq true and usertype eq 'Member'";
@@ -107,7 +106,6 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
         var adUsers = await _graphServiceClient.Users
             .GetAsync(requestConfiguration =>
             {
-                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
                 requestConfiguration.QueryParameters.Expand = new string[] { "manager($select=id)" };
                 requestConfiguration.QueryParameters.Select = _selectOptions;
                 requestConfiguration.QueryParameters.Filter = filter;
