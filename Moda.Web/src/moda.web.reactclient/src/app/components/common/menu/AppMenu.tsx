@@ -8,7 +8,11 @@ import { Menu } from 'antd'
 import Sider from 'antd/es/layout/Sider'
 import { useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
-import { ItemType, MenuItemType } from 'antd/es/menu/hooks/useItems'
+import {
+  ItemType,
+  MenuItemGroupType,
+  MenuItemType,
+} from 'antd/es/menu/hooks/useItems'
 import {
   Item,
   MenuItem,
@@ -49,7 +53,7 @@ const menu: (Item | MenuItem)[] = [
   //     menuItem('Programs', 'ppm.programs'),
   //     menuItem('Projects', 'ppm.projects'),
   // ]),
-  { type: 'divider' },
+  { key: 'settings-divider', type: 'divider' },
   menuItem('Settings', 'settings', null, <SettingOutlined />, [
     restrictedMenuItem(
       'Permissions.Users.View',
@@ -87,7 +91,18 @@ export default function AppMenu() {
       (acc, item) => filterAndTransformMenuItem(acc, item, hasClaim),
       [] as ItemType<MenuItemType>[]
     )
-    setMenuItems(filteredMenu)
+
+    const settingsMenuItem = filteredMenu.find(
+      (item) => item.key === 'settings'
+    ) as MenuItemGroupType
+
+    setMenuItems(
+      settingsMenuItem.children?.length > 0
+        ? filteredMenu
+        : filteredMenu.filter(
+            (item) => item.key !== 'settings' && item.key !== 'settings-divider'
+          )
+    )
   }, [hasClaim])
 
   return (

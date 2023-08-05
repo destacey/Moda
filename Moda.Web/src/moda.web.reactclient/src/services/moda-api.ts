@@ -410,7 +410,7 @@ export class RolesClient {
     /**
      * Create or update a role.
      */
-    create(request: CreateOrUpdateRoleRequest, cancelToken?: CancelToken | undefined): Promise<string> {
+    createOrUpdate(request: CreateOrUpdateRoleRequest, cancelToken?: CancelToken | undefined): Promise<string> {
         let url_ = this.baseUrl + "/api/user-management/roles";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -434,11 +434,11 @@ export class RolesClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processCreate(_response);
+            return this.processCreateOrUpdate(_response);
         });
     }
 
-    protected processCreate(response: AxiosResponse): Promise<string> {
+    protected processCreateOrUpdate(response: AxiosResponse): Promise<string> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -589,6 +589,13 @@ export class RolesClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 409) {
+            const _responseText = response.data;
+            let result409: any = null;
+            let resultData409  = _responseText;
+            result409 = JSON.parse(resultData409);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result409);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;

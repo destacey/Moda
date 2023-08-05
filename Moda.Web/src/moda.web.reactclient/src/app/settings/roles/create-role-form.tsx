@@ -3,10 +3,13 @@
 import { Form, Input, Modal, Select, message } from 'antd'
 import { useEffect, useState } from 'react'
 import useAuth from '../../components/contexts/auth'
-import { getRolesClient } from '@/src/services/clients'
 import { toFormErrors } from '@/src/utils'
 import { RoleDto } from '@/src/services/moda-api'
-import { useCreateRoleMutation, useGetRoleById, useUpdatePermissionsMutation } from '@/src/services/query'
+import {
+  useCreateRoleMutation,
+  useGetRoleById,
+  useUpdatePermissionsMutation,
+} from '@/src/services/query'
 import { useQueryClient } from 'react-query'
 
 export interface CreateRoleFormProps {
@@ -30,18 +33,19 @@ const CreateRoleForm = ({
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [roleIdToCopyPermissions, setRoleIdToCopyPermissions] = useState<string>('');
+  const [roleIdToCopyPermissions, setRoleIdToCopyPermissions] =
+    useState<string>('')
   const [form] = Form.useForm<CreateRoleFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
   const { hasClaim } = useAuth()
-  const roleData = useGetRoleById(roleIdToCopyPermissions );
+  const roleData = useGetRoleById(roleIdToCopyPermissions)
   const canCreate = hasClaim('Permission', 'Permissions.Roles.Create')
 
-  const queryClient = useQueryClient();
-  const createRole = useCreateRoleMutation(queryClient);
-  const updatePermissions = useUpdatePermissionsMutation(queryClient);
+  const queryClient = useQueryClient()
+  const createRole = useCreateRoleMutation(queryClient)
+  const updatePermissions = useUpdatePermissionsMutation(queryClient)
 
   useEffect(() => {
     if (canCreate) {
@@ -64,13 +68,13 @@ const CreateRoleForm = ({
       var id = await createRole.mutateAsync({
         name: values.name,
         description: values.description,
-      });
+      })
 
       if (roleIdToCopyPermissions && roleData.data.permissions) {
         await updatePermissions.mutateAsync({
           roleId: id,
-          permissions: roleData.data.permissions
-        });
+          permissions: roleData.data.permissions,
+        })
       }
 
       return id
@@ -93,7 +97,7 @@ const CreateRoleForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      const id = await create(values);
+      const id = await create(values)
 
       if (id) {
         setIsOpen(false)
@@ -127,7 +131,6 @@ const CreateRoleForm = ({
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
-        closable={false}
         keyboard={false} // disable esc key to close modal
         destroyOnClose={true}
       >
@@ -138,13 +141,14 @@ const CreateRoleForm = ({
           name="create-role-form"
         >
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-            <Input showCount maxLength={256} />
+            <Input.TextArea
+              autoSize={{ minRows: 1, maxRows: 4 }}
+              showCount
+              maxLength={256}
+            />
           </Form.Item>
 
-          <Form.Item
-            name="description"
-            label="Description"
-          >
+          <Form.Item name="description" label="Description">
             <Input.TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
@@ -153,28 +157,26 @@ const CreateRoleForm = ({
           </Form.Item>
 
           <Form.Item name="isDefault" label="Copy Permissions From">
-            {roles && <Select
-              showSearch
-              placeholder="Select a Role"
-              optionFilterProp="children"
-              onChange={setRoleIdToCopyPermissions}
-              // onSearch={onSearch}
-              filterOption={(input, option) =>
-                (option?.label ?? '')
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-              options={[
-                {
-                  value: '',
-                  label: '--None',
-                },
-                ...roles?.map((role) => ({
-                  value: role.id,
-                  label: role.name,
-                }))
-              ]}
-            />}
+            {roles && (
+              <Select
+                allowClear
+                showSearch
+                placeholder="Select a Role"
+                optionFilterProp="children"
+                onChange={setRoleIdToCopyPermissions}
+                filterOption={(input, option) =>
+                  (option?.label ?? '')
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                options={
+                  roles?.map((role) => ({
+                    value: role.id,
+                    label: role.name,
+                  })) ?? []
+                }
+              />
+            )}
           </Form.Item>
         </Form>
       </Modal>

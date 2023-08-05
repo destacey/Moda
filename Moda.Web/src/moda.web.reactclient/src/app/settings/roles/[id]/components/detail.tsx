@@ -1,12 +1,11 @@
 import useAuth from '@/src/app/components/contexts/auth'
-import { getRolesClient } from '@/src/services/clients'
-import { RoleDto } from '@/src/services/moda-api'
+import { CreateOrUpdateRoleRequest, RoleDto } from '@/src/services/moda-api'
 import {
   useDeleteRoleMutation,
   useCreateRoleMutation,
 } from '@/src/services/query'
-import { Button, Checkbox, Form, Input, Popconfirm, message } from 'antd'
-import { get } from 'lodash'
+import { toFormErrors } from '@/src/utils'
+import { Button, Form, Input, Popconfirm, Space, message } from 'antd'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { useQueryClient } from 'react-query'
@@ -17,6 +16,8 @@ interface RolesDetailProps {
 
 const Detail = (props: RolesDetailProps) => {
   const [role, setRole] = useState<RoleDto>(props.role)
+  const [form] = Form.useForm<CreateOrUpdateRoleRequest>()
+  //const formValues = Form.useWatch([], form)
   const router = useRouter()
   const { hasClaim } = useAuth()
 
@@ -38,7 +39,11 @@ const Detail = (props: RolesDetailProps) => {
         router.push('/settings/roles')
       }, 1500)
     } catch (error) {
-      messageApi.error(error?.messages?.join() ?? 'Failed to delete role')
+      if (error.statusCode === 409 && error.supportMessage) {
+        messageApi.error(error.supportMessage)
+      } else {
+        messageApi.error(error?.messages?.join() ?? 'Failed to delete role')
+      }
     }
   }
 
@@ -52,8 +57,18 @@ const Detail = (props: RolesDetailProps) => {
 
       messageApi.success('Role saved successfully')
     } catch (error) {
-      console.log(error);
-      messageApi.error(error.exception ?? 'Role update failed');
+      if (error.status === 422 && error.errors) {
+        const formErrors = toFormErrors(error.errors)
+        form.setFields(formErrors)
+        messageApi.error('Correct the validation error(s) to continue.')
+      } else if (error.statusCode === 409 && error.exception) {
+        messageApi.error(error.exception)
+      } else {
+        messageApi.error(
+          'An unexpected error occurred while updating the Risk.'
+        )
+      }
+      //console.error(error)
     }
   }
 
@@ -66,6 +81,7 @@ const Detail = (props: RolesDetailProps) => {
       {contextHolder}
       {role && (
         <Form
+          form={form}
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 16 }}
           style={{ maxWidth: 600 }}
@@ -77,27 +93,28 @@ const Detail = (props: RolesDetailProps) => {
             label="Name"
             name="name"
             initialValue={role?.name}
-            rules={[
-              { required: true, message: 'Please input a name' },
-              {
-                max: 250,
-                message: 'The name cannot exceed 256 characters.',
-              },
-            ]}
+            rules={[{ required: true }]}
           >
-            <Input showCount maxLength={256} />
+            <Input.TextArea
+              autoSize={{ minRows: 1, maxRows: 4 }}
+              showCount
+              maxLength={256}
+            />
           </Form.Item>
 
           <Form.Item
             label="Description"
             name="description"
             initialValue={role?.description}
-            rules={[{ required: false }]}
           >
-            <Input.TextArea />
+            <Input.TextArea
+              autoSize={{ minRows: 6, maxRows: 10 }}
+              showCount
+              maxLength={1024}
+            />
           </Form.Item>
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
               <Button type="primary" htmlType="submit">
                 Save
               </Button>
@@ -115,7 +132,7 @@ const Detail = (props: RolesDetailProps) => {
                   </Button>
                 </Popconfirm>
               )}
-            </div>
+            </Space>
           </Form.Item>
         </Form>
       )}

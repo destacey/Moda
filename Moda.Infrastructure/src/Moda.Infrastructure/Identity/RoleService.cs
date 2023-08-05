@@ -1,3 +1,4 @@
+using FluentValidation.Results;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -67,6 +68,8 @@ internal class RoleService : IRoleService
 
             if (!result.Succeeded)
             {
+                HandleValidationErrors(result);
+
                 throw new InternalServerException("Register role failed");
             }
 
@@ -86,17 +89,17 @@ internal class RoleService : IRoleService
                 throw new ConflictException(string.Format("Not allowed to modify {0} Role.", role.Name));
             }
 
-            role.Name = request.Name;
-            role.NormalizedName = request.Name.ToUpperInvariant();
-            role.Description = request.Description;
+            role.Update(request.Name, request.Description);
             var result = await _roleManager.UpdateAsync(role);
 
             if (!result.Succeeded)
             {
+                HandleValidationErrors(result);
+
                 throw new InternalServerException("Update role failed");
             }
 
-            await _events.PublishAsync(new ApplicationRoleUpdatedEvent(role.Id, role.Name, _dateTimeService.Now));
+            await _events.PublishAsync(new ApplicationRoleUpdatedEvent(role.Id, role.Name!, _dateTimeService.Now));
 
             return role.Id;
         }
@@ -158,12 +161,12 @@ internal class RoleService : IRoleService
 
         if (ApplicationRoles.IsDefault(role.Name!))
         {
-            throw new ConflictException(string.Format("Not allowed to delete {0} Role.", role.Name));
+            throw new ConflictException(string.Format("Not allowed to delete the {0} Role.", role.Name));
         }
 
         if ((await _userManager.GetUsersInRoleAsync(role.Name!)).Count > 0)
         {
-            throw new ConflictException(string.Format("Not allowed to delete {0} Role as it is being used.", role.Name));
+            throw new ConflictException(string.Format("Not allowed to delete the {0} Role as it is being used.", role.Name));
         }
 
         await _roleManager.DeleteAsync(role);
@@ -171,5 +174,22 @@ internal class RoleService : IRoleService
         await _events.PublishAsync(new ApplicationRoleDeletedEvent(role.Id, role.Name!, _dateTimeService.Now));
 
         return string.Format("Role {0} Deleted.", role.Name);
+    }
+
+    /// <summary>Handles specific validation errors if they exist.</summary>
+    /// <param name="result">The result.</param>
+    /// <exception cref="Moda.Common.Application.Exceptions.ValidationException"></exception>
+    private void HandleValidationErrors(IdentityResult result)
+    {
+        if (result.Errors.Any(e => e.Code == "DuplicateRoleName"))
+        {
+            var duplicateRoleName = result.Errors.First(e => e.Code == "DuplicateRoleName");
+            var failures = new List<ValidationFailure>()
+            {
+                new ValidationFailure("Name", duplicateRoleName.Description)
+            };
+
+            throw new ValidationException(failures);
+        }
     }
 }

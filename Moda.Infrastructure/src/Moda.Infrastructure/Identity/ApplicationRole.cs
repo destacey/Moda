@@ -12,4 +12,11 @@ public class ApplicationRole : IdentityRole
         Description = description?.Trim();
         NormalizedName = name.Trim().ToUpperInvariant();
     }
+
+    public void Update(string name, string? description = null)
+    {
+        Name = name.Trim();
+        NormalizedName = name.Trim().ToUpperInvariant();
+        Description = description?.Trim();
+    }
 }

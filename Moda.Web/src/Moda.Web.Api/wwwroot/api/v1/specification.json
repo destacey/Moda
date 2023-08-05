@@ -255,7 +255,7 @@
           "Roles"
         ],
         "summary": "Create or update a role.",
-        "operationId": "Roles_Create",
+        "operationId": "Roles_CreateOrUpdate",
         "requestBody": {
           "x-name": "request",
           "content": {
@@ -385,6 +385,16 @@
             "description": ""
           },
           "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "409": {
             "description": "",
             "content": {
               "application/json": {
