@@ -97,17 +97,20 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
                 requestConfiguration.QueryParameters.Select = _selectOptions;
                 requestConfiguration.QueryParameters.Filter = filter;
             }, cancellationToken);
-
+        _logger.LogInformation("Initial Graph request complete, found {UserCount} users", adUsers?.OdataCount ?? 0);
+        _logger.LogInformation("NextLink value is {NextLink}", adUsers?.OdataNextLink ?? "null");
         users.AddRange(adUsers?.Value!);
         var nextLink = adUsers?.OdataNextLink;
-        
+
         while (nextLink != null)
         {
             var req = _graphServiceClient.Users.ToGetRequestInformation();
             req.QueryParameters.Add("%24skiptoken", adUsers.OdataNextLink);
             var result = await _graphServiceClient.RequestAdapter.SendAsync(req, UserCollectionResponse.CreateFromDiscriminatorValue, cancellationToken: cancellationToken);
+            _logger.LogInformation("NextLink request complete, found {UserCount} users", result.OdataCount);
             users.AddRange(adUsers.Value!);
             nextLink = result.OdataNextLink;
+            _logger.LogInformation("New NextLink value is {NextLink}", nextLink);
         }
 
         return users;
