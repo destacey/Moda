@@ -131,6 +131,17 @@ public static class ModaApiConventions
     {
     }
 
+    [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+    public static void CreateReturn201String(
+        [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
+        [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+        object request)
+    {
+    }
+
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]

@@ -1,3 +1,5 @@
+using Moda.Common.Application.Exceptions;
+
 namespace Moda.Web.Api.Controllers.UserManagement;
 
 [Route("api/user-management/roles")]
@@ -6,10 +8,12 @@ namespace Moda.Web.Api.Controllers.UserManagement;
 public class RolesController : ControllerBase
 {
     private readonly IRoleService _roleService;
+    private readonly ILogger<RolesController> _logger;
 
-    public RolesController(IRoleService roleService)
+    public RolesController(IRoleService roleService, ILogger<RolesController> logger)
     {
         _roleService = roleService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -69,12 +73,12 @@ public class RolesController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roles)]
     [OpenApiOperation("Create or update a role.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Create))]
-    public async Task<ActionResult<string>> Create(CreateOrUpdateRoleRequest request)
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201String))]
+    public async Task<ActionResult<string>> CreateOrUpdate(CreateOrUpdateRoleRequest request)
     {
         var id =  await _roleService.CreateOrUpdateAsync(request.ToCreateOrUpdateRoleCommand());
 
-        return CreatedAtAction(nameof(Create), new { id }, id);
+        return CreatedAtAction(nameof(GetById), new { id }, id);
     }
 
     [HttpDelete("{id}")]
@@ -82,9 +86,24 @@ public class RolesController : ControllerBase
     [OpenApiOperation("Delete a role.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status409Conflict)]
     public async Task<ActionResult> Delete(string id)
     {
-        await _roleService.DeleteAsync(id);
+        try
+        {
+            await _roleService.DeleteAsync(id);
+        }
+        catch (ConflictException ex)
+        {
+            _logger.LogError(ex, "Error deleting role with id {id}", id);
+            var error = new ErrorResult
+            {
+                StatusCode = 409,
+                SupportMessage = ex.Message,
+                Source = "RolesController.Delete"
+            };
+            return BadRequest(error);
+        }
 
         return NoContent();
     }
