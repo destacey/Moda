@@ -134,7 +134,7 @@ const RisksGrid = ({
       {
         field: 'actions',
         headerName: '',
-        width: 50,
+        width: 80,
         filter: false,
         sortable: false,
         hide: !canUpdateRisks,

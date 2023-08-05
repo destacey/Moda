@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Ardalis.GuardClauses" Version="4.0.1" />
+        <PackageReference Include="Ardalis.GuardClauses" Version="4.1.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -16,7 +16,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <InternalsVisibleTo Include="Moda.Organization.Domain.Tests"/>
+        <InternalsVisibleTo Include="Moda.Organization.Domain.Tests" />
     </ItemGroup>
 
 </Project>

@@ -12,6 +12,7 @@ namespace Moda.Integrations.MicrosoftGraph;
 public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
 {
     private readonly string[] _selectOptions = new string[] { "id", "userPrincipalName", "userType", "accountEnabled", "givenName", "surname", "jobTitle", "department", "officeLocation", "mail", "manager", "employeeHireDate" };
+    private readonly int _maxPageSize = 100; // graph api max page size is 999
 
     private readonly GraphServiceClient _graphServiceClient;
     private readonly IConfiguration _configuration;
@@ -63,19 +64,36 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
     /// <returns></returns>
     private async Task<List<User>> GetGroupMembers(string groupId, CancellationToken cancellationToken)
     {
-        // TODO handle paging
         var members = await _graphServiceClient.Groups[groupId]
             .TransitiveMembers
             .GetAsync(requestConfiguration =>
             {
-                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
-                requestConfiguration.QueryParameters.Count = true;
                 requestConfiguration.QueryParameters.Expand = new string[] { "manager($select=id)" };
                 requestConfiguration.QueryParameters.Select = _selectOptions;
                 requestConfiguration.QueryParameters.Filter = "accountEnabled eq true and usertype eq 'Member'";
+                requestConfiguration.QueryParameters.Top = _maxPageSize;
             }, cancellationToken);
 
-        return members?.OdataCount > 0 ? members.Value!.Select(m => (User)m).ToList() : new List<User>();
+        List<User> users = new();
+        if (members is null || members.Value is null)
+        {
+            _logger.LogWarning("GetGroupMembers:  No members found for group {GroupId} in Active Directory via Microsoft Graph", groupId);
+            return users;
+        }
+
+        var pageIterator = PageIterator<DirectoryObject, DirectoryObjectCollectionResponse>
+            .CreatePageIterator(
+                _graphServiceClient,
+                members,
+                (d) =>
+                {
+                    users.Add((User)d);
+                    return true;
+                });
+
+        await pageIterator.IterateAsync(cancellationToken);
+
+        return users;
     }
 
     private async Task<List<User>> GetActiveDirectoryUsers(bool includeDisabled, CancellationToken cancellationToken)
@@ -84,19 +102,36 @@ public sealed class MicrosoftGraphService : IExternalEmployeeDirectoryService
             ? "usertype eq 'Member'"
             : "accountEnabled eq true and usertype eq 'Member'";
 
-        // TODO handle paging
         //https://docs.microsoft.com/en-us/graph/aad-advanced-queries?tabs=csharp
-        var adUsers = await _graphServiceClient.Users//.GetAsync();
+        var adUsers = await _graphServiceClient.Users
             .GetAsync(requestConfiguration =>
             {
-                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
-                requestConfiguration.QueryParameters.Count = true;
                 requestConfiguration.QueryParameters.Expand = new string[] { "manager($select=id)" };
                 requestConfiguration.QueryParameters.Select = _selectOptions;
                 requestConfiguration.QueryParameters.Filter = filter;
+                requestConfiguration.QueryParameters.Top = _maxPageSize;
             }, cancellationToken);
 
-        return adUsers?.Value.Count > 0 ? adUsers.Value!.ToList() : new List<User>();
+        List<User> users = new();
+        if (adUsers is null || adUsers.Value is null)
+        {
+            _logger.LogWarning("GetActiveDirectoryUsers:  No users found in Active Directory via Microsoft Graph");
+            return users;
+        }
+
+        var pageIterator = PageIterator<User, UserCollectionResponse>
+            .CreatePageIterator(
+                _graphServiceClient,
+                adUsers,
+                (u) =>
+                {
+                    users.Add(u);
+                    return true;
+                });
+
+        await pageIterator.IterateAsync(cancellationToken);
+
+        return users;
     }
 
     private async Task<DirectoryObject?> GetUserManager(string userId, CancellationToken cancellationToken)
