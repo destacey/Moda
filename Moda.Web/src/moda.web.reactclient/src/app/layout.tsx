@@ -18,13 +18,7 @@ import LoadingAccount from './components/common/loading-account'
 
 const { Content } = Layout
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-    },
-  },
-})
+const queryClient = new QueryClient({})
 
 export default function RootLayout({
   children,
