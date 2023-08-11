@@ -1,10 +1,12 @@
 import { QueryClient, useMutation, useQuery } from 'react-query'
-import { QK } from './query-keys'
-import { getPermissionsClient, getRolesClient } from './clients'
+import { getPermissionsClient, getRolesClient } from '../clients'
 import {
   CreateOrUpdateRoleRequest,
   UpdateRolePermissionsRequest,
-} from './moda-api'
+} from '../moda-api'
+import { QK } from './query-keys'
+
+// ROLES
 
 export const useGetRoles = () => {
   return useQuery({
@@ -18,13 +20,6 @@ export const useGetRoleById = (id: string) => {
     queryKey: [QK.ROLES, id],
     queryFn: async () => (await getRolesClient()).getByIdWithPermissions(id),
     enabled: !!id,
-  })
-}
-
-export const useGetPermissions = () => {
-  return useQuery({
-    queryKey: [QK.PERMISSIONS],
-    queryFn: async () => (await getPermissionsClient()).getList(),
   })
 }
 
@@ -57,5 +52,14 @@ export const useDeleteRoleMutation = (queryClient: QueryClient) => {
     onSuccess: (data) => {
       queryClient.invalidateQueries(QK.ROLES)
     },
+  })
+}
+
+// PERMISSIONS
+
+export const useGetPermissions = () => {
+  return useQuery({
+    queryKey: [QK.PERMISSIONS],
+    queryFn: async () => (await getPermissionsClient()).getList(),
   })
 }

@@ -2,7 +2,7 @@ import useTheme from '@/src/app/components/contexts/theme'
 import {
   useGetPermissions,
   useUpdatePermissionsMutation,
-} from '@/src/services/query'
+} from '@/src/services/queries/user-management-queries'
 import {
   Row,
   Col,

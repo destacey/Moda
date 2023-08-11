@@ -9,7 +9,7 @@ import {
   useCreateRoleMutation,
   useGetRoleById,
   useUpdatePermissionsMutation,
-} from '@/src/services/query'
+} from '@/src/services/queries/user-management-queries'
 import { useQueryClient } from 'react-query'
 
 export interface CreateRoleFormProps {
@@ -59,7 +59,7 @@ const CreateRoleForm = ({
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
       () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false)
+      () => setIsValid(false),
     )
   }, [form, formValues])
 
@@ -85,7 +85,7 @@ const CreateRoleForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          `An unexpected error occurred while creating the role.`
+          `An unexpected error occurred while creating the role.`,
         )
       }
 

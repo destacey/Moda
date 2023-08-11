@@ -1,16 +1,16 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { useGetRoleById } from '@/src/services/query'
 import { Card } from 'antd'
 import { createElement, useEffect, useState } from 'react'
-import Detail from './components/detail'
+import RoleDetails from './components/role-details'
 import Permissions from './components/permissions'
 import useAuth from '@/src/app/components/contexts/auth'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
+import { useGetRoleById } from '@/src/services/queries/user-management-queries'
 
 const RoleDetailsPage = ({ params }) => {
-  const roleData = useGetRoleById(params.id)
+  const { data: roleData } = useGetRoleById(params.id)
 
   const [activeTab, setActiveTab] = useState('details')
   const { hasClaim } = useAuth()
@@ -24,30 +24,30 @@ const RoleDetailsPage = ({ params }) => {
   const { setBreadcrumbTitle } = useBreadcrumbs()
 
   useEffect(() => {
-    setBreadcrumbTitle(roleData.data?.name ?? 'New Role')
-  }, [roleData.data, setBreadcrumbTitle])
+    setBreadcrumbTitle(roleData?.name ?? 'New Role')
+  }, [roleData, setBreadcrumbTitle])
 
   const tabs = [
     {
       key: 'details',
       tab: 'Details',
-      content: createElement(Detail, {
-        role: roleData.data,
+      content: createElement(RoleDetails, {
+        role: roleData,
       }),
     },
     canViewPermissions && {
       key: 'permissions',
       tab: 'Permissions',
       content: createElement(Permissions, {
-        roleId: roleData.data?.id,
-        permissions: roleData.data?.permissions,
+        roleId: roleData?.id,
+        permissions: roleData?.permissions,
       }),
     },
   ]
 
   return (
     <>
-      <PageTitle title={roleData.data?.name} subtitle="Role Details" />
+      <PageTitle title={roleData?.name} subtitle="Role Details" />
       <Card
         tabList={tabs}
         activeTabKey={activeTab}
