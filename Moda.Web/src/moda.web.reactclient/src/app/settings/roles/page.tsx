@@ -10,9 +10,16 @@ import useAuth from '../../components/contexts/auth'
 import CreateRoleForm from './create-role-form'
 import { useRouter } from 'next/navigation'
 import { useGetRoles } from '@/src/services/queries/user-management-queries'
+import { RoleListDto } from '@/src/services/moda-api'
 
 const LinkCellRenderer = ({ value, data }) => {
   return <Link href={`roles/${data.id}`}>{value}</Link>
+}
+
+const sortRoles = (data: RoleListDto[]) => {
+  return data?.sort((a, b) => {
+    return a.name.localeCompare(b.name)
+  })
 }
 
 const RoleListPage = () => {
@@ -31,7 +38,7 @@ const RoleListPage = () => {
     [],
   )
 
-  const getRoles = useCallback(async () => {
+  const refresh = useCallback(async () => {
     refetch
   }, [refetch])
 
@@ -51,7 +58,11 @@ const RoleListPage = () => {
     <>
       <PageTitle title="Roles" actions={<Actions />} />
 
-      <ModaGrid columnDefs={columnDefs} rowData={data} loadData={getRoles} />
+      <ModaGrid
+        columnDefs={columnDefs}
+        rowData={sortRoles(data)}
+        loadData={refresh}
+      />
 
       <CreateRoleForm
         showForm={showCreateRoleModal}

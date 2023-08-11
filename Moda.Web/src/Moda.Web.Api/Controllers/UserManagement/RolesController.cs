@@ -25,7 +25,7 @@ public class RolesController : ControllerBase
     {
         var roles = await _roleService.GetListAsync(cancellationToken);
 
-        return Ok(roles.OrderBy(r => r.Name));
+        return Ok(roles);
     }
 
     [HttpGet("{id}")]
@@ -76,7 +76,7 @@ public class RolesController : ControllerBase
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201String))]
     public async Task<ActionResult<string>> CreateOrUpdate(CreateOrUpdateRoleRequest request)
     {
-        var id =  await _roleService.CreateOrUpdateAsync(request.ToCreateOrUpdateRoleCommand());
+        var id = await _roleService.CreateOrUpdateAsync(request.ToCreateOrUpdateRoleCommand());
 
         return CreatedAtAction(nameof(GetById), new { id }, id);
     }
