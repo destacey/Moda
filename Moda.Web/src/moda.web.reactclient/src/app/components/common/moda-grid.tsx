@@ -160,6 +160,7 @@ const ModaGrid = ({
             animateRows={true}
             rowData={rowData}
             onModelUpdated={onModelUpdated}
+            multiSortKey="ctrl"
             {...props}
           ></AgGridReact>
         </div>
