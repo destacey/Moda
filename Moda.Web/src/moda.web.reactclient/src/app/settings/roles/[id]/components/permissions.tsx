@@ -178,9 +178,6 @@ const Permissions = (props: PermissionsProps) => {
           style={{ display: 'flex', flexDirection: 'column' }}
         >
           <Space direction="vertical" style={{ height: '100%' }}>
-            {/* <div>
-              <p>{activePermissionGroup?.name} Available Permissions</p>
-            </div> */}
             <Typography.Title level={5}>
               {activePermissionGroup?.name} Available Permissions
             </Typography.Title>
