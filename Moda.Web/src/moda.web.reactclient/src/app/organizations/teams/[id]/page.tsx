@@ -13,7 +13,7 @@ import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import { EditTeamForm } from '../../components'
 import useAuth from '@/src/app/components/contexts/auth'
-import useBreadcrumb from '@/src/app/components/contexts/breadcrumbs'
+import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 
 const TeamDetailsPage = ({ params }) => {
   useDocumentTitle('Team Details')
@@ -22,7 +22,7 @@ const TeamDetailsPage = ({ params }) => {
   const [openUpdateTeamModal, setOpenUpdateTeamModal] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
   const { id } = params
-  const { setBreadcrumbTitle } = useBreadcrumb()
+  const { setBreadcrumbTitle } = useBreadcrumbs()
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
@@ -33,7 +33,7 @@ const TeamDetailsPage = ({ params }) => {
       const teamsClient = await getTeamsClient()
       return await teamsClient.getRisks(teamId, includeClosed)
     },
-    []
+    [],
   )
 
   const getTeamMemberships = useCallback(async (teamId: string) => {
