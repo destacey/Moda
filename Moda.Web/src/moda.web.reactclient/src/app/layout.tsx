@@ -18,7 +18,13 @@ import LoadingAccount from './components/common/loading-account'
 
 const { Content } = Layout
 
-const queryClient = new QueryClient({})
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+})
 
 export default function RootLayout({
   children,
