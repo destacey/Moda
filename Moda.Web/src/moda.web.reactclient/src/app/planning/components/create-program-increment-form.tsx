@@ -4,8 +4,8 @@ import { DatePicker, Form, Input, Modal, message } from 'antd'
 import { useEffect, useState } from 'react'
 import useAuth from '../../components/contexts/auth'
 import { CreateProgramIncrementRequest } from '@/src/services/moda-api'
-import { getProgramIncrementsClient } from '@/src/services/clients'
 import { toFormErrors } from '@/src/utils'
+import { useCreateProgramIncrementMutation } from '@/src/services/queries/planning-queries'
 
 export interface CreateProgramIncrementFormProps {
   showForm: boolean
@@ -20,6 +20,15 @@ interface CreateProgramIncrementFormValues {
   end: Date
 }
 
+const mapToRequestValues = (values: CreateProgramIncrementFormValues) => {
+  return {
+    name: values.name,
+    description: values.description,
+    start: (values.start as any)?.format('YYYY-MM-DD'),
+    end: (values.end as any)?.format('YYYY-MM-DD'),
+  } as CreateProgramIncrementRequest
+}
+
 const CreateProgramIncrementForm = ({
   showForm,
   onFormCreate,
@@ -32,34 +41,20 @@ const CreateProgramIncrementForm = ({
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
+  const createProgramIncrement = useCreateProgramIncrementMutation()
+
   const { hasClaim } = useAuth()
   const canCreateProgramIncrement = hasClaim(
     'Permission',
-    'Permissions.ProgramIncrements.Create'
+    'Permissions.ProgramIncrements.Create',
   )
 
-  const mapToRequestValues = (values: CreateProgramIncrementFormValues) => {
-    return {
-      name: values.name,
-      description: values.description,
-      start: (values.start as any)?.format('YYYY-MM-DD'),
-      end: (values.end as any)?.format('YYYY-MM-DD'),
-    } as CreateProgramIncrementRequest
-  }
-
-  const createProgramIncrement = async (
-    values: CreateProgramIncrementFormValues
-  ) => {
-    const request = mapToRequestValues(values)
-    const programIncrementsClient = await getProgramIncrementsClient()
-    return await programIncrementsClient.create(request)
-  }
-
   const create = async (
-    values: CreateProgramIncrementFormValues
+    values: CreateProgramIncrementFormValues,
   ): Promise<boolean> => {
     try {
-      await createProgramIncrement(values)
+      const request = mapToRequestValues(values)
+      await createProgramIncrement.mutateAsync(request)
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -68,7 +63,7 @@ const CreateProgramIncrementForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          'An unexpected error occurred while creating the program increment.'
+          'An unexpected error occurred while creating the program increment.',
         )
         console.error(error)
       }
@@ -105,7 +100,7 @@ const CreateProgramIncrementForm = ({
     } else {
       onFormCancel()
       messageApi.error(
-        'You do not have permission to create program increments.'
+        'You do not have permission to create program increments.',
       )
     }
   }, [canCreateProgramIncrement, onFormCancel, showForm, messageApi])
@@ -113,7 +108,7 @@ const CreateProgramIncrementForm = ({
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
       () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false)
+      () => setIsValid(false),
     )
   }, [form, formValues])
 

@@ -7,9 +7,12 @@ import {
   ProgramIncrementDetailsDto,
   UpdateProgramIncrementRequest,
 } from '@/src/services/moda-api'
-import { getProgramIncrementsClient } from '@/src/services/clients'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
+import {
+  useGetProgramIncrementById,
+  useUpdateProgramIncrementMutation,
+} from '@/src/services/queries/planning-queries'
 
 export interface EditProgramIncrementFormProps {
   showForm: boolean
@@ -27,6 +30,17 @@ interface EditProgramIncrementFormValues {
   objectivesLocked: boolean
 }
 
+const mapToRequestValues = (values: EditProgramIncrementFormValues) => {
+  return {
+    id: values.id,
+    name: values.name,
+    description: values.description,
+    start: (values.start as any)?.format('YYYY-MM-DD'),
+    end: (values.end as any)?.format('YYYY-MM-DD'),
+    objectivesLocked: values.objectivesLocked,
+  } as UpdateProgramIncrementRequest
+}
+
 const EditProgramIncrementForm = ({
   showForm,
   id,
@@ -40,10 +54,13 @@ const EditProgramIncrementForm = ({
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
+  const { data: programIncrementData } = useGetProgramIncrementById(id)
+  const updateProgramIncrement = useUpdateProgramIncrementMutation()
+
   const { hasClaim } = useAuth()
   const canUpdateProgramIncrement = hasClaim(
     'Permission',
-    'Permissions.ProgramIncrements.Update'
+    'Permissions.ProgramIncrements.Update',
   )
   const mapTeamToFormValues = useCallback(
     (programIncrement: ProgramIncrementDetailsDto) => {
@@ -56,38 +73,15 @@ const EditProgramIncrementForm = ({
         objectivesLocked: programIncrement.objectivesLocked,
       })
     },
-    [form]
+    [form],
   )
 
-  const mapToRequestValues = (values: EditProgramIncrementFormValues) => {
-    return {
-      id: values.id,
-      name: values.name,
-      description: values.description,
-      start: (values.start as any)?.format('YYYY-MM-DD'),
-      end: (values.end as any)?.format('YYYY-MM-DD'),
-      objectivesLocked: values.objectivesLocked,
-    } as UpdateProgramIncrementRequest
-  }
-
-  const getProgramIncrement = async (id: string) => {
-    const programIncrementsClient = await getProgramIncrementsClient()
-    return await programIncrementsClient.getById(id)
-  }
-
-  const updateProgramIncrement = async (
-    values: EditProgramIncrementFormValues
-  ) => {
-    const request = mapToRequestValues(values)
-    const programIncrementsClient = await getProgramIncrementsClient()
-    return await programIncrementsClient.update(request.id, request)
-  }
-
   const update = async (
-    values: EditProgramIncrementFormValues
+    values: EditProgramIncrementFormValues,
   ): Promise<boolean> => {
     try {
-      await updateProgramIncrement(values)
+      const request = mapToRequestValues(values)
+      await updateProgramIncrement.mutateAsync(request)
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -96,7 +90,7 @@ const EditProgramIncrementForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          'An unexpected error occurred while editing the program increment.'
+          'An unexpected error occurred while editing the program increment.',
         )
         console.error(error)
       }
@@ -115,7 +109,7 @@ const EditProgramIncrementForm = ({
         messageApi.success('Successfully updated program increment.')
       }
     } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
+      console.error('handleOk error', errorInfo)
     } finally {
       setIsSaving(false)
     }
@@ -129,17 +123,17 @@ const EditProgramIncrementForm = ({
 
   const loadData = useCallback(async () => {
     try {
-      const programIncrement = await getProgramIncrement(id)
-      mapTeamToFormValues(programIncrement)
+      mapTeamToFormValues(programIncrementData)
       setIsValid(true)
     } catch (error) {
       handleCancel()
       messageApi.error('An unexpected error occurred while loading form data.')
       console.error(error)
     }
-  }, [handleCancel, id, mapTeamToFormValues, messageApi])
+  }, [handleCancel, mapTeamToFormValues, messageApi, programIncrementData])
 
   useEffect(() => {
+    if (!programIncrementData) return
     if (canUpdateProgramIncrement) {
       setIsOpen(showForm)
       if (showForm) {
@@ -149,12 +143,19 @@ const EditProgramIncrementForm = ({
       onFormCancel()
       messageApi.error('You do not have permission to edit program increments.')
     }
-  }, [canUpdateProgramIncrement, onFormCancel, showForm, messageApi, loadData])
+  }, [
+    canUpdateProgramIncrement,
+    loadData,
+    messageApi,
+    onFormCancel,
+    programIncrementData,
+    showForm,
+  ])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
       () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false)
+      () => setIsValid(false),
     )
   }, [form, formValues])
 
