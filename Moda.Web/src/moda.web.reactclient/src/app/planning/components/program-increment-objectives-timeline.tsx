@@ -5,16 +5,13 @@ import {
   ProgramIncrementObjectiveListDto,
 } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ModaEmpty } from '../../components/common'
+import { UseQueryResult } from 'react-query'
 
 interface ProgramIncrementObjectivesTimelineProps {
-  getObjectives: (
-    programIncrementId: string,
-    teamId?: string
-  ) => Promise<ProgramIncrementObjectiveListDto[]>
+  objectivesQuery: UseQueryResult<ProgramIncrementObjectiveListDto[], unknown>
   programIncrement: ProgramIncrementDetailsDto
-  teamId: string
 }
 
 interface TimelineItem extends vis.DataItem {
@@ -67,9 +64,8 @@ interface TimelineItem extends vis.DataItem {
 // }
 
 const ProgramIncrementObjectivesTimeline = ({
-  getObjectives,
+  objectivesQuery,
   programIncrement,
-  teamId,
 }: ProgramIncrementObjectivesTimelineProps) => {
   const [objectives, setObjectives] = useState<TimelineItem[]>([])
 
@@ -90,31 +86,23 @@ const ProgramIncrementObjectivesTimeline = ({
     }
   }, [programIncrement])
 
-  const loadObjectives = useCallback(
-    async (programIncrement: ProgramIncrementDetailsDto, teamId: string) => {
-      const objectiveDtos = await getObjectives(programIncrement.id, teamId)
-      setObjectives(
-        objectiveDtos
-          .filter((obj) => obj.status?.name !== 'Canceled')
-          .map((obj, index) => {
-            return {
-              id: obj.localId,
-              programIncrementLocalId: obj.programIncrement.localId,
-              title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
-              content: `${obj.name} (${obj.status?.name})`,
-              start: dayjs(obj.startDate ?? programIncrement.start).toDate(),
-              end: dayjs(obj.targetDate ?? programIncrement.end).toDate(),
-              group: obj.team?.name,
-            }
-          })
-      )
-    },
-    [getObjectives]
-  )
-
   useEffect(() => {
-    loadObjectives(programIncrement, teamId)
-  }, [loadObjectives, programIncrement, teamId])
+    setObjectives(
+      objectivesQuery?.data
+        ?.filter((obj) => obj.status?.name !== 'Canceled')
+        .map((obj, index) => {
+          return {
+            id: obj.localId,
+            programIncrementLocalId: obj.programIncrement.localId,
+            title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
+            content: `${obj.name} (${obj.status?.name})`,
+            start: dayjs(obj.startDate ?? programIncrement.start).toDate(),
+            end: dayjs(obj.targetDate ?? programIncrement.end).toDate(),
+            group: obj.team?.name,
+          }
+        }),
+    )
+  }, [objectivesQuery?.data, programIncrement.end, programIncrement.start])
 
   useEffect(() => {
     if (!objectives || objectives.length === 0) {

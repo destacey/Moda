@@ -1,16 +1,19 @@
-import { getProgramIncrementsClient } from '@/src/services/clients'
 import {
   ProgramIncrementDetailsDto,
   ProgramIncrementTeamResponse,
 } from '@/src/services/moda-api'
 import { Col, Row, Segmented, Space, Typography } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import TeamObjectivesListCard from './team-objectives-list-card'
 import TeamRisksListCard from './team-risks-list-card'
 import Link from 'next/link'
 import { BarsOutlined, BuildOutlined } from '@ant-design/icons'
 import { SegmentedLabeledOption } from 'antd/es/segmented'
 import { ProgramIncrementObjectivesTimeline } from '../../../components'
+import {
+  useGetProgramIncrementObjectivesByTeamId,
+  useGetProgramIncrementRisksByTeamId,
+} from '@/src/services/queries/planning-queries'
 
 export interface TeamPlanReviewProps {
   programIncrement: ProgramIncrementDetailsDto
@@ -20,31 +23,14 @@ export interface TeamPlanReviewProps {
 const TeamPlanReview = ({ programIncrement, team }: TeamPlanReviewProps) => {
   const [currentView, setCurrentView] = useState<string | number>('List')
 
-  const getObjectives = useCallback(
-    async (programIncrementId: string, teamId: string) => {
-      if (programIncrementId && teamId) {
-        const programIncrementsClient = await getProgramIncrementsClient()
-        return await programIncrementsClient.getObjectives(
-          programIncrementId,
-          teamId
-        )
-      }
-    },
-    []
+  const objectivesQuery = useGetProgramIncrementObjectivesByTeamId(
+    programIncrement?.id,
+    team?.id,
   )
 
-  const getRisks = useCallback(
-    async (programIncrementId: string, teamId: string) => {
-      if (programIncrementId && teamId) {
-        const programIncrementsClient = await getProgramIncrementsClient()
-        return await programIncrementsClient.getRisks(
-          programIncrementId,
-          teamId,
-          false
-        )
-      }
-    },
-    []
+  const risksQuery = useGetProgramIncrementRisksByTeamId(
+    programIncrement?.id,
+    team?.id,
   )
 
   const viewSelectorOptions: SegmentedLabeledOption[] = [
@@ -63,18 +49,14 @@ const TeamPlanReview = ({ programIncrement, team }: TeamPlanReviewProps) => {
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={24} md={24} lg={12}>
           <TeamObjectivesListCard
-            getObjectives={getObjectives}
+            objectivesQuery={objectivesQuery}
             teamId={team?.id}
             programIncrementId={programIncrement?.id}
             newObjectivesAllowed={!programIncrement?.objectivesLocked ?? false}
           />
         </Col>
         <Col xs={24} sm={24} md={24} lg={12}>
-          <TeamRisksListCard
-            getRisks={getRisks}
-            programIncrementId={programIncrement?.id}
-            teamId={team?.id}
-          />
+          <TeamRisksListCard riskQuery={risksQuery} teamId={team?.id} />
         </Col>
       </Row>
     )
@@ -83,9 +65,8 @@ const TeamPlanReview = ({ programIncrement, team }: TeamPlanReviewProps) => {
   const TimelineView = () => {
     return (
       <ProgramIncrementObjectivesTimeline
-        getObjectives={getObjectives}
+        objectivesQuery={objectivesQuery}
         programIncrement={programIncrement}
-        teamId={team?.id}
       />
     )
   }

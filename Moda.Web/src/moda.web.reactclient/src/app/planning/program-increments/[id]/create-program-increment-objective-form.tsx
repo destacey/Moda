@@ -3,14 +3,16 @@
 import { DatePicker, Form, Input, Modal, Select, Switch, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../../components/contexts/auth'
-import { getProgramIncrementsClient } from '@/src/services/clients'
-import {
-  CreateProgramIncrementObjectiveRequest,
-  ProgramIncrementDetailsDto,
-} from '@/src/services/moda-api'
+import { CreateProgramIncrementObjectiveRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
+import {
+  useCreateProgramIncrementObjectiveMutation,
+  useGetProgramIncrementById,
+  useGetProgramIncrementObjectiveStatuses,
+  useGetProgramIncrementTeams,
+} from '@/src/services/queries/planning-queries'
 
 export interface CreateProgramIncrementObjectiveFormProps {
   showForm: boolean
@@ -36,6 +38,21 @@ interface ProgramIncrementTeamSelectItem {
   label: string
 }
 
+const mapToRequestValues = (
+  values: CreateProgramIncrementObjectiveFormValues,
+) => {
+  return {
+    programIncrementId: values.programIncrementId,
+    teamId: values.teamId,
+    name: values.name,
+    statusId: values.statusId,
+    description: values.description,
+    isStretch: values.isStretch,
+    startDate: (values.startDate as any)?.format('YYYY-MM-DD'),
+    targetDate: (values.targetDate as any)?.format('YYYY-MM-DD'),
+  } as CreateProgramIncrementObjectiveRequest
+}
+
 const CreateProgramIncrementObjectiveForm = ({
   showForm,
   programIncrementId,
@@ -49,16 +66,21 @@ const CreateProgramIncrementObjectiveForm = ({
   const [form] = Form.useForm<CreateProgramIncrementObjectiveFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
-  const [programIncrement, setProgramIncrement] =
-    useState<ProgramIncrementDetailsDto | null>(null)
   const [teams, setTeams] = useState<ProgramIncrementTeamSelectItem[]>([])
   const [defaultStatusId, setDefaultStatusId] = useState<number>(null)
   const [newObjectiveLocalId, setNewObjectiveLocalId] = useState<number>(null)
 
+  const { data: programIncrementData } =
+    useGetProgramIncrementById(programIncrementId)
+  const { data: teamData } = useGetProgramIncrementTeams(programIncrementId)
+  const { data: statusData } = useGetProgramIncrementObjectiveStatuses()
+
+  const createObjective = useCreateProgramIncrementObjectiveMutation()
+
   const { hasClaim } = useAuth()
   const canManageObjectives = hasClaim(
     'Permission',
-    'Permissions.ProgramIncrementObjectives.Manage'
+    'Permissions.ProgramIncrementObjectives.Manage',
   )
 
   const mapToFormValues = useCallback(
@@ -70,84 +92,34 @@ const CreateProgramIncrementObjectiveForm = ({
         isStretch: false,
       })
     },
-    [form]
+    [form],
   )
 
-  const mapToRequestValues = useCallback(
-    (values: CreateProgramIncrementObjectiveFormValues) => {
-      return {
-        programIncrementId: values.programIncrementId,
-        teamId: values.teamId,
-        name: values.name,
-        statusId: values.statusId,
-        description: values.description,
-        isStretch: values.isStretch,
-        startDate: (values.startDate as any)?.format('YYYY-MM-DD'),
-        targetDate: (values.targetDate as any)?.format('YYYY-MM-DD'),
-      } as CreateProgramIncrementObjectiveRequest
-    },
-    []
-  )
-
-  const getProgramIncrement = async (id: string) => {
-    const programIncrementsClient = await getProgramIncrementsClient()
-    return await programIncrementsClient.getById(id)
-  }
-
-  // currently only allowing PI objectives for Teams.
-  const getProgramIncrementTeams = async (id: string) => {
-    const programIncrementsClient = await getProgramIncrementsClient()
-    var teams = await programIncrementsClient.getTeams(id)
-    return teams
-      .filter((t) => t.type === 'Team')
-      .map((t) => ({ value: t.id, label: t.name }))
-  }
-
-  const getProgramIncrementStatuses = async () => {
-    const programIncrementsClient = await getProgramIncrementsClient()
-    return await programIncrementsClient.getObjectiveStatuses()
-  }
-
-  const createObjective = useCallback(
-    async (values: CreateProgramIncrementObjectiveFormValues) => {
+  const create = async (
+    values: CreateProgramIncrementObjectiveFormValues,
+  ): Promise<boolean> => {
+    try {
       const request = mapToRequestValues(values)
-      const programIncrementsClient = await getProgramIncrementsClient()
-      const localId = await programIncrementsClient.createObjective(
-        values.programIncrementId,
-        request
-      )
-      return localId
-    },
-    [mapToRequestValues]
-  )
-
-  const create = useCallback(
-    async (
-      values: CreateProgramIncrementObjectiveFormValues
-    ): Promise<boolean> => {
-      try {
-        const localId = await createObjective(values)
-        setNewObjectiveLocalId(localId)
-        return true
-      } catch (error) {
-        if (error.status === 422 && error.errors) {
-          const formErrors = toFormErrors(error.errors)
-          form.setFields(formErrors)
-          messageApi.error('Correct the validation error(s) to continue.')
-        } else {
-          messageApi.error(
-            error.supportMessage ??
-              'An unexpected error occurred while creating the program increment.'
-          )
-          console.error(error)
-        }
-        return false
+      const localId = await createObjective.mutateAsync(request)
+      setNewObjectiveLocalId(localId)
+      return true
+    } catch (error) {
+      if (error.status === 422 && error.errors) {
+        const formErrors = toFormErrors(error.errors)
+        form.setFields(formErrors)
+        messageApi.error('Correct the validation error(s) to continue.')
+      } else {
+        messageApi.error(
+          error.supportMessage ??
+            'An unexpected error occurred while creating the program increment.',
+        )
+        console.error(error)
       }
-    },
-    [createObjective, form, messageApi]
-  )
+      return false
+    }
+  }
 
-  const handleOk = useCallback(async () => {
+  const handleOk = async () => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
@@ -157,7 +129,7 @@ const CreateProgramIncrementObjectiveForm = ({
     } finally {
       setIsSaving(false)
     }
-  }, [form, create])
+  }
 
   const handleCancel = useCallback(() => {
     setIsOpen(false)
@@ -166,22 +138,23 @@ const CreateProgramIncrementObjectiveForm = ({
   }, [form, onFormCancel])
 
   useEffect(() => {
+    if (!teamData || !statusData) return
+
     if (canManageObjectives) {
       setIsOpen(showForm)
       if (showForm === true) {
         try {
-          const loadData = async () => {
-            setProgramIncrement(await getProgramIncrement(programIncrementId))
-            setTeams(await getProgramIncrementTeams(programIncrementId))
-            const statuses = await getProgramIncrementStatuses()
-            setDefaultStatusId(statuses.find((s) => s.order === 1)?.id)
-          }
-          loadData()
+          setDefaultStatusId(statusData.find((s) => s.order === 1)?.id)
+          setTeams(
+            teamData
+              .filter((t) => t.type === 'Team')
+              .map((t) => ({ value: t.id, label: t.name })),
+          )
           mapToFormValues(programIncrementId, defaultStatusId, teamId)
         } catch (error) {
           handleCancel()
           messageApi.error(
-            'An unexpected error occurred while loading form data.'
+            'An unexpected error occurred while loading form data.',
           )
           console.error(error)
         }
@@ -199,12 +172,14 @@ const CreateProgramIncrementObjectiveForm = ({
     programIncrementId,
     defaultStatusId,
     teamId,
+    statusData,
+    teamData,
   ])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
       () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false)
+      () => setIsValid(false),
     )
   }, [form, formValues])
 
@@ -222,21 +197,21 @@ const CreateProgramIncrementObjectiveForm = ({
   const disabledDate: RangePickerProps['disabledDate'] = useCallback(
     (current) => {
       return (
-        current < dayjs(programIncrement?.start) ||
-        current > dayjs(programIncrement?.end).add(1, 'day')
+        current < dayjs(programIncrementData?.start) ||
+        current > dayjs(programIncrementData?.end).add(1, 'day')
       )
     },
-    [programIncrement?.end, programIncrement?.start]
+    [programIncrementData?.start, programIncrementData?.end],
   )
 
   const isDateWithinPiRange = useCallback(
     (date: Date) => {
       return (
-        dayjs(programIncrement.start) <= dayjs(date) &&
-        dayjs(date) < dayjs(programIncrement.end).add(1, 'day')
+        dayjs(programIncrementData.start) <= dayjs(date) &&
+        dayjs(date) < dayjs(programIncrementData.end).add(1, 'day')
       )
     },
-    [programIncrement]
+    [programIncrementData?.start, programIncrementData?.end],
   )
 
   return (
@@ -274,7 +249,7 @@ const CreateProgramIncrementObjectiveForm = ({
               optionFilterProp="children"
               filterOption={(input, option) =>
                 (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase()
+                  input.toLowerCase(),
                 )
               }
               filterSort={(optionA, optionB) =>
@@ -319,7 +294,7 @@ const CreateProgramIncrementObjectiveForm = ({
                   !value || isDateWithinPiRange(value)
                     ? Promise.resolve()
                     : Promise.reject(
-                        'The start date must be within the Program Increment dates.'
+                        'The start date must be within the Program Increment dates.',
                       ),
               },
             ]}
@@ -335,7 +310,7 @@ const CreateProgramIncrementObjectiveForm = ({
                   !value || isDateWithinPiRange(value)
                     ? Promise.resolve()
                     : Promise.reject(
-                        'The target date must be within the Program Increment dates.'
+                        'The target date must be within the Program Increment dates.',
                       ),
               },
             ]}
