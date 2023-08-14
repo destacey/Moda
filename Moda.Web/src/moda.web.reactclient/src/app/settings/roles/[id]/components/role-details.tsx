@@ -8,7 +8,6 @@ import { toFormErrors } from '@/src/utils'
 import { Button, Form, Input, Popconfirm, Space, message } from 'antd'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import { useQueryClient } from 'react-query'
 
 interface RolesDetailProps {
   role: RoleDto
@@ -20,9 +19,8 @@ const RoleDetails = (props: RolesDetailProps) => {
   const router = useRouter()
   const { hasClaim } = useAuth()
 
-  const queryClient = useQueryClient()
-  const useDeleteRole = useDeleteRoleMutation(queryClient)
-  const useCreateRole = useCreateRoleMutation(queryClient)
+  const useDeleteRole = useDeleteRoleMutation()
+  const useCreateRole = useCreateRoleMutation()
   const canDelete = hasClaim('Permission', 'Permissions.Roles.Delete')
   const [messageApi, contextHolder] = message.useMessage()
 

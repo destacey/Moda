@@ -10,7 +10,6 @@ import {
   useGetRoleById,
   useUpdatePermissionsMutation,
 } from '@/src/services/queries/user-management-queries'
-import { useQueryClient } from 'react-query'
 
 export interface CreateRoleFormProps {
   showForm: boolean
@@ -43,9 +42,8 @@ const CreateRoleForm = ({
   const roleData = useGetRoleById(roleIdToCopyPermissions)
   const canCreate = hasClaim('Permission', 'Permissions.Roles.Create')
 
-  const queryClient = useQueryClient()
-  const createRole = useCreateRoleMutation(queryClient)
-  const updatePermissions = useUpdatePermissionsMutation(queryClient)
+  const createRole = useCreateRoleMutation()
+  const updatePermissions = useUpdatePermissionsMutation()
 
   useEffect(() => {
     if (canCreate) {
@@ -65,7 +63,7 @@ const CreateRoleForm = ({
 
   const create = async (values: CreateRoleFormValues): Promise<string> => {
     try {
-      var id = await createRole.mutateAsync({
+      const id = await createRole.mutateAsync({
         name: values.name,
         description: values.description,
       })

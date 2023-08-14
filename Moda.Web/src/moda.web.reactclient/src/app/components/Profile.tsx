@@ -1,7 +1,6 @@
 import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
-  useMsal,
 } from '@azure/msal-react'
 import { Avatar, Button, Dropdown, Space } from 'antd'
 import {
@@ -49,8 +48,8 @@ export default function Profile() {
   useEffect(() => {
     setThemeIcon(
       createElement(
-        currentThemeName === 'light' ? HighlightOutlined : HighlightFilled
-      )
+        currentThemeName === 'light' ? HighlightOutlined : HighlightFilled,
+      ),
     )
   }, [currentThemeName])
 

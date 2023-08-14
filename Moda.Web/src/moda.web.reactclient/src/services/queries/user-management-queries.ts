@@ -1,4 +1,4 @@
-import { QueryClient, useMutation, useQuery } from 'react-query'
+import { QueryClient, useMutation, useQuery, useQueryClient } from 'react-query'
 import { getPermissionsClient, getRolesClient } from '../clients'
 import {
   CreateOrUpdateRoleRequest,
@@ -23,7 +23,8 @@ export const useGetRoleById = (id: string) => {
   })
 }
 
-export const useCreateRoleMutation = (queryClient: QueryClient) => {
+export const useCreateRoleMutation = () => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (params: CreateOrUpdateRoleRequest) =>
       (await getRolesClient()).createOrUpdate(params),
@@ -33,7 +34,8 @@ export const useCreateRoleMutation = (queryClient: QueryClient) => {
   })
 }
 
-export const useUpdatePermissionsMutation = (queryClient: QueryClient) => {
+export const useUpdatePermissionsMutation = () => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (params: UpdateRolePermissionsRequest) =>
       (await getRolesClient()).updatePermissions(params.roleId, {
@@ -46,7 +48,8 @@ export const useUpdatePermissionsMutation = (queryClient: QueryClient) => {
   })
 }
 
-export const useDeleteRoleMutation = (queryClient: QueryClient) => {
+export const useDeleteRoleMutation = () => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => (await getRolesClient()).delete(id),
     onSuccess: (data) => {

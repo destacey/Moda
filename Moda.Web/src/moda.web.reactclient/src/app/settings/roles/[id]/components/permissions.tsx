@@ -15,7 +15,6 @@ import {
   Space,
 } from 'antd'
 import React, { useEffect, useState } from 'react'
-import { useQueryClient } from 'react-query'
 
 interface PermissionsProps {
   roleId: string
@@ -42,8 +41,7 @@ const Permissions = (props: PermissionsProps) => {
   const [activePermissionGroup, setActivePermissionGroup] =
     useState<PermissionGroup>(null)
 
-  const queryClient = useQueryClient()
-  const updatePermissions = useUpdatePermissionsMutation(queryClient)
+  const updatePermissions = useUpdatePermissionsMutation()
 
   useEffect(() => setPermissions(props.permissions), [props.permissions])
 
