@@ -1,11 +1,11 @@
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import ModaGrid from '../moda-grid'
-import { TeamListItem } from '../../../organizations/types'
+import { UseQueryResult } from 'react-query'
+import { ProgramIncrementTeamResponse } from '@/src/services/moda-api'
 
 export interface TeamsGridProps {
-  getTeams: (id: string) => Promise<TeamListItem[]>
-  getTeamsObjectId: string
+  teamsQuery: UseQueryResult<ProgramIncrementTeamResponse[], unknown>
 }
 
 const TeamLinkCellRenderer = ({ value, data }) => {
@@ -23,13 +23,11 @@ const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {
   )
 }
 
-const TeamsGrid = ({ getTeams, getTeamsObjectId }: TeamsGridProps) => {
-  const [teams, setTeams] = useState<TeamListItem[]>()
-
-  const loadTeams = useCallback(async () => {
-    const teams = await getTeams(getTeamsObjectId)
-    setTeams(teams)
-  }, [getTeams, getTeamsObjectId])
+const TeamsGrid = ({ teamsQuery }: TeamsGridProps) => {
+  const refresh = useCallback(async () => {
+    teamsQuery.refetch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const columnDefs = useMemo(
     () => [
@@ -44,7 +42,7 @@ const TeamsGrid = ({ getTeams, getTeamsObjectId }: TeamsGridProps) => {
       },
       { field: 'isActive' }, // TODO: convert to yes/no
     ],
-    []
+    [],
   )
 
   return (
@@ -53,8 +51,8 @@ const TeamsGrid = ({ getTeams, getTeamsObjectId }: TeamsGridProps) => {
       <ModaGrid
         height={550}
         columnDefs={columnDefs}
-        rowData={teams}
-        loadData={loadTeams}
+        rowData={teamsQuery.data}
+        loadData={refresh}
       />
     </>
   )

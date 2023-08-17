@@ -70,7 +70,6 @@ const ModaGrid = ({
 
   const onGridReady = useCallback(async () => {
     await onRefreshData()
-    gridRef.current?.api.sizeColumnsToFit()
   }, [onRefreshData])
 
   const onModelUpdated = useCallback(() => {
@@ -88,10 +87,8 @@ const ModaGrid = ({
   useEffect(() => {
     // When the grid is first rendered or if the onRefreshData function changes, load the data if the grid is ready
     if (!gridRef.current?.api) return
-    const loadGridData = async () => {
-      await onRefreshData()
-    }
-    loadGridData()
+
+    onRefreshData()
   }, [agGridTheme, onRefreshData])
 
   return (

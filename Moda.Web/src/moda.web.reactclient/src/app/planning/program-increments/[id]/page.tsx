@@ -1,8 +1,6 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { getProgramIncrementsClient } from '@/src/services/clients'
-import { ProgramIncrementDetailsDto } from '@/src/services/moda-api'
 import { Button, Card, Dropdown, MenuProps, Space } from 'antd'
 import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
 import ProgramIncrementDetails from './program-increment-details'
@@ -23,45 +21,61 @@ import Link from 'next/link'
 import { DownOutlined } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { EditProgramIncrementForm } from '../../components'
+import {
+  useGetProgramIncrementByLocalId,
+  useGetProgramIncrementObjectives,
+  useGetProgramIncrementRisks,
+  useGetProgramIncrementTeams,
+} from '@/src/services/queries/planning-queries'
+
+enum ProgramIncrementTabs {
+  Details = 'details',
+  Teams = 'teams',
+  Objectives = 'objectives',
+  RiskManagement = 'risk-management',
+}
 
 const ProgramIncrementDetailsPage = ({ params }) => {
   useDocumentTitle('PI Details')
   const { setBreadcrumbTitle } = useBreadcrumbs()
-  const [activeTab, setActiveTab] = useState('details')
-  const [programIncrement, setProgramIncrement] =
-    useState<ProgramIncrementDetailsDto | null>(null)
+  const [activeTab, setActiveTab] = useState(ProgramIncrementTabs.Details)
+  const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
   const [openEditProgramIncrementForm, setOpenEditProgramIncrementForm] =
     useState<boolean>(false)
+  const [teamsQueryEnabled, setTeamsQueryEnabled] = useState<boolean>(false)
+  const [objectivesQueryEnabled, setObjectivesQueryEnabled] =
+    useState<boolean>(false)
+  const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [openManageTeamsForm, setOpenManageTeamsForm] = useState<boolean>(false)
-  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
 
   const { hasClaim } = useAuth()
   const canUpdateProgramIncrement = hasClaim(
     'Permission',
-    'Permissions.ProgramIncrements.Update'
+    'Permissions.ProgramIncrements.Update',
   )
 
-  const getTeams = useCallback(async (programIncrementId: string) => {
-    const programIncrementsClient = await getProgramIncrementsClient()
-    return await programIncrementsClient.getTeams(programIncrementId)
-  }, [])
+  const { data: programIncrementData, refetch: refetchProgramIncrement } =
+    useGetProgramIncrementByLocalId(params.id)
 
-  const getObjectives = useCallback(async (programIncrementId: string) => {
-    const programIncrementsClient = await getProgramIncrementsClient()
-    return await programIncrementsClient.getObjectives(programIncrementId, null)
-  }, [])
-
-  const getRisks = useCallback(
-    async (programIncrementId: string, includeClosed = false) => {
-      const programIncrementsClient = await getProgramIncrementsClient()
-      return await programIncrementsClient.getRisks(
-        programIncrementId,
-        null,
-        includeClosed
-      )
-    },
-    []
+  const teamsQuery = useGetProgramIncrementTeams(
+    programIncrementData?.id,
+    teamsQueryEnabled,
   )
+
+  const objectivesQuery = useGetProgramIncrementObjectives(
+    programIncrementData?.id,
+    objectivesQueryEnabled,
+  )
+
+  const risksQuery = useGetProgramIncrementRisks(
+    programIncrementData?.id,
+    includeClosedRisks,
+    risksQueryEnabled,
+  )
+
+  const onIncludeClosedRisksChanged = useCallback((includeClosed: boolean) => {
+    setIncludeClosedRisks(includeClosed)
+  }, [])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
@@ -76,7 +90,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
           key: 'manage-teams',
           label: 'Manage Teams',
           onClick: () => setOpenManageTeamsForm(true),
-        }
+        },
       )
     }
     return items
@@ -86,9 +100,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     return (
       <>
         <Space>
-          <Link
-            href={`/planning/program-increments/${programIncrement?.localId}/plan-review`}
-          >
+          <Link href={`/planning/program-increments/${params.id}/plan-review`}>
             Plan Review
           </Link>
           {canUpdateProgramIncrement && (
@@ -108,71 +120,87 @@ const ProgramIncrementDetailsPage = ({ params }) => {
 
   const tabs = [
     {
-      key: 'details',
+      key: ProgramIncrementTabs.Details,
       tab: 'Details',
-      content: createElement(ProgramIncrementDetails, programIncrement),
+      content: createElement(ProgramIncrementDetails, programIncrementData),
     },
     {
-      key: 'teams',
+      key: ProgramIncrementTabs.Teams,
       tab: 'Teams',
       content: createElement(TeamsGrid, {
-        getTeams: getTeams,
-        getTeamsObjectId: programIncrement?.id,
+        teamsQuery: teamsQuery,
       } as TeamsGridProps),
     },
     {
-      key: 'objectives',
+      key: ProgramIncrementTabs.Objectives,
       tab: 'Objectives',
       content: createElement(ProgramIncrementObjectivesGrid, {
-        getObjectives: getObjectives,
-        programIncrementId: programIncrement?.id,
+        objectivesQuery: objectivesQuery,
+        programIncrementId: programIncrementData?.id,
         hideProgramIncrementColumn: true,
         hideTeamColumn: false,
-        newObjectivesAllowed: !programIncrement?.objectivesLocked ?? false,
+        newObjectivesAllowed: !programIncrementData?.objectivesLocked ?? false,
       } as ProgramIncrementObjectivesGridProps),
     },
     {
-      key: 'risk-management',
+      key: ProgramIncrementTabs.RiskManagement,
       tab: 'Risk Management',
       content: createElement(RisksGrid, {
-        getRisks: getRisks,
-        getRisksObjectId: programIncrement?.id,
+        risksQuery: risksQuery,
+        updateIncludeClosed: onIncludeClosedRisksChanged,
+        getRisksObjectId: programIncrementData?.id,
         newRisksAllowed: true,
       } as RisksGridProps),
     },
   ]
 
   useEffect(() => {
-    const getProgramIncrement = async () => {
-      const programIncrementsClient = await getProgramIncrementsClient()
-      const programIncrementDto = await programIncrementsClient.getByLocalId(
-        params.id
-      )
-      setProgramIncrement(programIncrementDto)
-      setBreadcrumbTitle(programIncrementDto.name)
-    }
-
-    getProgramIncrement()
-  }, [params.id, setBreadcrumbTitle, lastRefresh])
+    setBreadcrumbTitle(programIncrementData?.name)
+  }, [setBreadcrumbTitle, programIncrementData?.name])
 
   const onEditFormClosed = useCallback((wasSaved: boolean) => {
     setOpenEditProgramIncrementForm(false)
     if (wasSaved) {
-      setLastRefresh(Date.now())
+      refetchProgramIncrement()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const onManageTeamsFormClosed = useCallback((wasSaved: boolean) => {
     setOpenManageTeamsForm(false)
     if (wasSaved) {
-      setLastRefresh(Date.now())
+      refetchProgramIncrement()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // doesn't trigger on first render
+  const onTabChange = useCallback(
+    (key) => {
+      setActiveTab(key)
+
+      // enables the query for the tab on first render if it hasn't been enabled yet
+      if (key == ProgramIncrementTabs.Teams && !teamsQueryEnabled) {
+        setTeamsQueryEnabled(true)
+      } else if (
+        key == ProgramIncrementTabs.Objectives &&
+        !objectivesQueryEnabled
+      ) {
+        setObjectivesQueryEnabled(true)
+      } else if (
+        key == ProgramIncrementTabs.RiskManagement &&
+        !risksQueryEnabled
+      ) {
+        setRisksQueryEnabled(true)
+      }
+    },
+    [objectivesQueryEnabled, risksQueryEnabled, teamsQueryEnabled],
+  )
 
   return (
     <>
       <PageTitle
-        title={programIncrement?.name}
+        title={programIncrementData?.name}
         subtitle="Program Increment Details"
         actions={<Actions />}
       />
@@ -180,21 +208,21 @@ const ProgramIncrementDetailsPage = ({ params }) => {
         style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
+        onTabChange={onTabChange}
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {programIncrement && canUpdateProgramIncrement && (
+      {programIncrementData && canUpdateProgramIncrement && (
         <>
           <EditProgramIncrementForm
             showForm={openEditProgramIncrementForm}
-            id={programIncrement?.id}
+            id={programIncrementData?.id}
             onFormUpdate={() => onEditFormClosed(true)}
             onFormCancel={() => onEditFormClosed(false)}
           />
           <ManageProgramIncrementTeamsForm
             showForm={openManageTeamsForm}
-            id={programIncrement?.id}
+            id={programIncrementData?.id}
             onFormSave={() => onManageTeamsFormClosed(true)}
             onFormCancel={() => onManageTeamsFormClosed(false)}
           />
