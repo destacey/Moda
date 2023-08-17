@@ -4,6 +4,7 @@ import { QK } from './query-keys'
 import {
   CreateProgramIncrementObjectiveRequest,
   CreateProgramIncrementRequest,
+  CreateRiskRequest,
   UpdateProgramIncrementObjectiveRequest,
   UpdateProgramIncrementRequest,
 } from '../moda-api'
@@ -155,11 +156,12 @@ export const useGetProgramIncrementObjectiveStatusOptions = () => {
     queryFn: async () =>
       (await getProgramIncrementsClient()).getObjectiveStatuses(),
     select: (data) => {
-      const statuses: OptionModel<number>[] = data.map((s) => ({
+      const statuses = _.sortBy(data, ['order'])
+      const options: OptionModel<number>[] = statuses.map((s) => ({
         value: s.id,
         label: s.name,
       }))
-      return _.sortBy(statuses, ['order'])
+      return options
     },
     staleTime: 300000,
   })
@@ -239,5 +241,52 @@ export const useGetMyRisks = () => {
     queryKey: [QK.MY_RISKS],
     queryFn: async () => (await getRisksClient()).getMyRisks(),
     staleTime: 10000,
+  })
+}
+
+export const useGetRiskCategoryOptions = () => {
+  return useQuery({
+    queryKey: [QK.RISK_CATEGORY_OPTIONS],
+    queryFn: async () => (await getRisksClient()).getCategories(),
+    select: (data) => {
+      const categories = _.sortBy(data, ['order'])
+      const options: OptionModel<number>[] = categories.map((c) => ({
+        value: c.id,
+        label: c.name,
+      }))
+      return options
+    },
+    staleTime: 300000,
+  })
+}
+
+export const useGetRiskGradeOptions = () => {
+  return useQuery({
+    queryKey: [QK.RISK_GRADE_OPTIONS],
+    queryFn: async () => (await getRisksClient()).getGrades(),
+    select: (data) => {
+      const grades = _.sortBy(data, ['order'])
+      const options: OptionModel<number>[] = grades.map((c) => ({
+        value: c.id,
+        label: c.name,
+      }))
+      return options
+    },
+    staleTime: 300000,
+  })
+}
+
+export const useCreateRiskMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (risk: CreateRiskRequest) =>
+      (await getRisksClient()).createRisk(risk),
+    onSuccess: (data) => {
+      // TODO: invalidate only the relevant queries based on the user and team type
+      queryClient.invalidateQueries([QK.PROGRAM_INCREMENT_RISKS])
+      queryClient.invalidateQueries([QK.TEAM_RISKS])
+      queryClient.invalidateQueries([QK.TEAM_OF_TEAMS_RISKS])
+      queryClient.invalidateQueries([QK.MY_RISKS])
+    },
   })
 }
