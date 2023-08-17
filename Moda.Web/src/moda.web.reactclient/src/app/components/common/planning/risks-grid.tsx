@@ -69,7 +69,7 @@ const RisksGrid = ({
   }
 
   const refresh = useCallback(async () => {
-    await risksQuery.refetch()
+    risksQuery.refetch()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

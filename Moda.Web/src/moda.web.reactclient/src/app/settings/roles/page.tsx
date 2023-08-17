@@ -39,7 +39,7 @@ const RoleListPage = () => {
   )
 
   const refresh = useCallback(async () => {
-    refetch
+    refetch()
   }, [refetch])
 
   const Actions = () => {
