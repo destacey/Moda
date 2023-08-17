@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import { getProgramIncrementsClient } from '../clients'
+import { getProgramIncrementsClient, getRisksClient } from '../clients'
 import { QK } from './query-keys'
 import {
   CreateProgramIncrementObjectiveRequest,
@@ -230,5 +230,14 @@ export const useGetProgramIncrementRisksByTeamId = (
       (await getProgramIncrementsClient()).getRisks(id, teamId, includeClosed),
     staleTime: 10000,
     enabled: !!id && !!teamId && enabled,
+  })
+}
+
+// RISKS
+export const useGetMyRisks = () => {
+  return useQuery({
+    queryKey: [QK.MY_RISKS],
+    queryFn: async () => (await getRisksClient()).getMyRisks(),
+    staleTime: 10000,
   })
 }
