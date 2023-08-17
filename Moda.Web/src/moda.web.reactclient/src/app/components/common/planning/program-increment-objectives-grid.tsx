@@ -9,6 +9,7 @@ import CreateProgramIncrementObjectiveForm from '@/src/app/planning/program-incr
 import EditProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[id]/edit-program-increment-objective-form'
 import { EditOutlined } from '@ant-design/icons'
 import { UseQueryResult } from 'react-query'
+import dayjs from 'dayjs'
 
 export interface ProgramIncrementObjectivesGridProps {
   objectivesQuery: UseQueryResult<ProgramIncrementObjectiveListDto[], unknown>
@@ -140,8 +141,20 @@ const ProgramIncrementObjectivesGrid = ({
         hide: hideTeam,
       },
       { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
-      { field: 'startDate' },
-      { field: 'targetDate' },
+      {
+        field: 'startDate',
+        valueGetter: (params) =>
+          params.data.startDate
+            ? dayjs(params.data.startDate).format('M/D/YYYY')
+            : null,
+      },
+      {
+        field: 'targetDate',
+        valueGetter: (params) =>
+          params.data.targetDate
+            ? dayjs(params.data.targetDate).format('M/D/YYYY')
+            : null,
+      },
       { field: 'isStretch' },
     ],
     [
