@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
 import {
   getEmployeesClient,
-  getRisksClient,
   getTeamsClient,
   getTeamsOfTeamsClient,
 } from '@/src/services/clients'

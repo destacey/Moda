@@ -7,6 +7,7 @@ import {
   CreateRiskRequest,
   UpdateProgramIncrementObjectiveRequest,
   UpdateProgramIncrementRequest,
+  UpdateRiskRequest,
 } from '../moda-api'
 import _ from 'lodash'
 import { OptionModel } from '@/src/app/components/types'
@@ -59,8 +60,9 @@ export const useUpdateProgramIncrementMutation = () => {
         programIncrement.id,
         programIncrement,
       ),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries(QK.PROGRAM_INCREMENTS)
+    onSuccess: (data, context) => {
+      queryClient.invalidateQueries([QK.PROGRAM_INCREMENTS])
+      queryClient.invalidateQueries([QK.PROGRAM_INCREMENTS, context.id])
     },
   })
 }
@@ -190,8 +192,17 @@ export const useUpdateProgramIncrementObjectiveMutation = () => {
         objective.objectiveId,
         objective,
       ),
-    onSuccess: () => {
+    onSuccess: (data, context) => {
       queryClient.invalidateQueries([QK.PROGRAM_INCREMENT_OBJECTIVES])
+      queryClient.invalidateQueries([
+        QK.PROGRAM_INCREMENT_OBJECTIVES,
+        context.programIncrementId,
+      ])
+      queryClient.invalidateQueries([
+        QK.PROGRAM_INCREMENT_OBJECTIVES,
+        context.programIncrementId,
+        context.objectiveId,
+      ])
     },
   })
 }
@@ -236,11 +247,36 @@ export const useGetProgramIncrementRisksByTeamId = (
 }
 
 // RISKS
+export const useGetRiskById = (id: string) => {
+  return useQuery({
+    queryKey: [QK.RISKS, id],
+    queryFn: async () => (await getRisksClient()).getById(id),
+    staleTime: 10000,
+    enabled: !!id,
+  })
+}
+
 export const useGetMyRisks = () => {
   return useQuery({
     queryKey: [QK.MY_RISKS],
     queryFn: async () => (await getRisksClient()).getMyRisks(),
     staleTime: 10000,
+  })
+}
+
+export const useGetRiskStatusOptions = () => {
+  return useQuery({
+    queryKey: [QK.RISK_STATUS_OPTIONS],
+    queryFn: async () => (await getRisksClient()).getStatuses(),
+    select: (data) => {
+      const statuses = _.sortBy(data, ['order'])
+      const options: OptionModel<number>[] = statuses.map((c) => ({
+        value: c.id,
+        label: c.name,
+      }))
+      return options
+    },
+    staleTime: 300000,
   })
 }
 
@@ -281,11 +317,29 @@ export const useCreateRiskMutation = () => {
   return useMutation({
     mutationFn: async (risk: CreateRiskRequest) =>
       (await getRisksClient()).createRisk(risk),
-    onSuccess: (data) => {
-      // TODO: invalidate only the relevant queries based on the user and team type
+    onSuccess: (data, context) => {
       queryClient.invalidateQueries([QK.PROGRAM_INCREMENT_RISKS])
       queryClient.invalidateQueries([QK.TEAM_RISKS])
+      queryClient.invalidateQueries([QK.TEAM_RISKS, context.teamId])
       queryClient.invalidateQueries([QK.TEAM_OF_TEAMS_RISKS])
+      queryClient.invalidateQueries([QK.TEAM_OF_TEAMS_RISKS, context.teamId])
+      queryClient.invalidateQueries([QK.MY_RISKS])
+    },
+  })
+}
+
+export const useUpdateRiskMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (risk: UpdateRiskRequest) =>
+      (await getRisksClient()).update(risk.riskId, risk),
+    onSuccess: (data, context) => {
+      queryClient.invalidateQueries([QK.RISKS, context.riskId])
+      queryClient.invalidateQueries([QK.PROGRAM_INCREMENT_RISKS])
+      queryClient.invalidateQueries([QK.TEAM_RISKS])
+      queryClient.invalidateQueries([QK.TEAM_RISKS, context.teamId])
+      queryClient.invalidateQueries([QK.TEAM_OF_TEAMS_RISKS])
+      queryClient.invalidateQueries([QK.TEAM_OF_TEAMS_RISKS, context.teamId])
       queryClient.invalidateQueries([QK.MY_RISKS])
     },
   })
