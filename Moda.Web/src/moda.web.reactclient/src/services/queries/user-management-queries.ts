@@ -1,10 +1,12 @@
-import { QueryClient, useMutation, useQuery } from 'react-query'
-import { QK } from './query-keys'
-import { getPermissionsClient, getRolesClient } from './clients'
+import { QueryClient, useMutation, useQuery, useQueryClient } from 'react-query'
+import { getPermissionsClient, getRolesClient } from '../clients'
 import {
   CreateOrUpdateRoleRequest,
   UpdateRolePermissionsRequest,
-} from './moda-api'
+} from '../moda-api'
+import { QK } from './query-keys'
+
+// ROLES
 
 export const useGetRoles = () => {
   return useQuery({
@@ -21,14 +23,8 @@ export const useGetRoleById = (id: string) => {
   })
 }
 
-export const useGetPermissions = () => {
-  return useQuery({
-    queryKey: [QK.PERMISSIONS],
-    queryFn: async () => (await getPermissionsClient()).getList(),
-  })
-}
-
-export const useCreateRoleMutation = (queryClient: QueryClient) => {
+export const useCreateRoleMutation = () => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (params: CreateOrUpdateRoleRequest) =>
       (await getRolesClient()).createOrUpdate(params),
@@ -38,7 +34,8 @@ export const useCreateRoleMutation = (queryClient: QueryClient) => {
   })
 }
 
-export const useUpdatePermissionsMutation = (queryClient: QueryClient) => {
+export const useUpdatePermissionsMutation = () => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (params: UpdateRolePermissionsRequest) =>
       (await getRolesClient()).updatePermissions(params.roleId, {
@@ -51,11 +48,21 @@ export const useUpdatePermissionsMutation = (queryClient: QueryClient) => {
   })
 }
 
-export const useDeleteRoleMutation = (queryClient: QueryClient) => {
+export const useDeleteRoleMutation = () => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => (await getRolesClient()).delete(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries(QK.ROLES)
     },
+  })
+}
+
+// PERMISSIONS
+
+export const useGetPermissions = () => {
+  return useQuery({
+    queryKey: [QK.PERMISSIONS],
+    queryFn: async () => (await getPermissionsClient()).getList(),
   })
 }

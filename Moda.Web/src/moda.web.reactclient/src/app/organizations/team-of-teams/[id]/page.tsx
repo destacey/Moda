@@ -13,28 +13,39 @@ import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import { EditTeamForm } from '../../components'
 import useAuth from '@/src/app/components/contexts/auth'
-import useBreadcrumb from '@/src/app/components/contexts/breadcrumbs'
+import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
+import { useGetTeamOfTeamsRisks } from '@/src/services/queries/organization-queries'
+
+enum TeamOfTeamsTabs {
+  Details = 'details',
+  RiskManagement = 'risk-management',
+  TeamMemberships = 'team-memberships',
+}
 
 const TeamOfTeamsDetailsPage = ({ params }) => {
   useDocumentTitle('Team of Teams Details')
-  const [activeTab, setActiveTab] = useState('details')
+  const [activeTab, setActiveTab] = useState(TeamOfTeamsTabs.Details)
   const [team, setTeam] = useState<TeamOfTeamsDetailsDto | null>(null)
-  const [openUpdateTeamModal, setOpenUpdateTeamModal] = useState<boolean>(false)
+  const [openUpdateTeamForm, setOpenUpdateTeamForm] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
   const { id } = params
-  const { setBreadcrumbTitle } = useBreadcrumb()
+  const { setBreadcrumbTitle } = useBreadcrumbs()
+  const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
+  const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
   const showActions = canUpdateTeam
 
-  const getRisks = useCallback(
-    async (teamId: string, includeClosed = false) => {
-      const teamOfTeamsClient = await getTeamsOfTeamsClient()
-      return await teamOfTeamsClient.getRisks(teamId, includeClosed)
-    },
-    []
+  const risksQuery = useGetTeamOfTeamsRisks(
+    team?.id,
+    includeClosedRisks,
+    risksQueryEnabled,
   )
+
+  const onIncludeClosedRisksChanged = useCallback((includeClosed: boolean) => {
+    setIncludeClosedRisks(includeClosed)
+  }, [])
 
   const getTeamMemberships = useCallback(async (teamId: string) => {
     const teamOfTeamsClient = await getTeamsOfTeamsClient()
@@ -45,9 +56,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     return (
       <>
         {canUpdateTeam && (
-          <Button onClick={() => setOpenUpdateTeamModal(true)}>
-            Edit Team
-          </Button>
+          <Button onClick={() => setOpenUpdateTeamForm(true)}>Edit Team</Button>
         )}
       </>
     )
@@ -55,23 +64,23 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
 
   const tabs = [
     {
-      key: 'details',
+      key: TeamOfTeamsTabs.Details,
       tab: 'Details',
       content: createElement(TeamOfTeamsDetails, team),
     },
     {
-      key: 'risk-management',
+      key: TeamOfTeamsTabs.RiskManagement,
       tab: 'Risk Management',
       content: createElement(RisksGrid, {
-        getRisks: getRisks,
-        getRisksObjectId: team?.id,
+        risksQuery: risksQuery,
+        updateIncludeClosed: onIncludeClosedRisksChanged,
         newRisksAllowed: true,
         teamId: team?.id,
         hideTeamColumn: true,
       } as RisksGridProps),
     },
     {
-      key: 'team-memberships',
+      key: TeamOfTeamsTabs.TeamMemberships,
       tab: 'Team Memberships',
       content: createElement(TeamMembershipsGrid, {
         getTeamMemberships: getTeamMemberships,
@@ -92,11 +101,24 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   }, [id, setBreadcrumbTitle, lastRefresh])
 
   const onUpdateTeamFormClosed = (wasUpdated: boolean) => {
-    setOpenUpdateTeamModal(false)
+    setOpenUpdateTeamForm(false)
     if (wasUpdated) {
       setLastRefresh(Date.now())
     }
   }
+
+  // doesn't trigger on first render
+  const onTabChange = useCallback(
+    (key) => {
+      setActiveTab(key)
+
+      // enables the query for the tab on first render if it hasn't been enabled yet
+      if (key == TeamOfTeamsTabs.RiskManagement && !risksQueryEnabled) {
+        setRisksQueryEnabled(true)
+      }
+    },
+    [risksQueryEnabled],
+  )
 
   return (
     <>
@@ -109,13 +131,13 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
         style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
+        onTabChange={onTabChange}
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {team && canUpdateTeam && (
+      {openUpdateTeamForm && team && canUpdateTeam && (
         <EditTeamForm
-          showForm={openUpdateTeamModal}
+          showForm={openUpdateTeamForm}
           localId={team.localId}
           type={team.type}
           onFormUpdate={() => onUpdateTeamFormClosed(true)}

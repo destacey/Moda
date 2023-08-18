@@ -9,10 +9,11 @@ import useAuth from '../../contexts/auth'
 import CreateRiskForm from './create-risk-form'
 import { EditOutlined } from '@ant-design/icons'
 import UpdateRiskForm from './edit-risk-form'
+import { UseQueryResult } from 'react-query'
 
 export interface RisksGridProps {
-  getRisks: (id: string, includeClosed: boolean) => Promise<RiskListDto[]>
-  getRisksObjectId: string
+  risksQuery: UseQueryResult<RiskListDto[], unknown>
+  updateIncludeClosed: (includeClosed: boolean) => void
   teamId?: string | null
   newRisksAllowed?: boolean
   hideTeamColumn?: boolean
@@ -40,13 +41,12 @@ const AssigneeLinkCellRenderer = ({ value, data }) => {
 }
 
 const RisksGrid = ({
-  getRisks,
-  getRisksObjectId,
+  risksQuery,
+  updateIncludeClosed,
   teamId,
   newRisksAllowed = false,
   hideTeamColumn = false,
 }: RisksGridProps) => {
-  const [risks, setRisks] = useState<RiskListDto[]>()
   const [includeClosed, setIncludeClosed] = useState<boolean>(false)
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
@@ -59,32 +59,40 @@ const RisksGrid = ({
   const showActions = newRisksAllowed && canCreateRisks
 
   const onIncludeClosedChange = (checked: boolean) => {
+    console.log('onIncludeClosedChange', checked)
     setIncludeClosed(checked)
+    updateIncludeClosed(checked)
   }
 
   const onHideTeamChange = (checked: boolean) => {
     setHideTeam(checked)
   }
 
-  // TODO: prevent from reloading if already loaded unless refresh button is clicked
-  const loadRisks = useCallback(async () => {
-    const riskDtos = await getRisks(getRisksObjectId, includeClosed)
-    setRisks(riskDtos)
-  }, [getRisks, getRisksObjectId, includeClosed])
+  const refresh = useCallback(async () => {
+    risksQuery.refetch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const editRiskButtonClicked = useCallback(
     (id: string) => {
       setEditRiskId(id)
       setOpenUpdateRiskForm(true)
     },
-    [setOpenUpdateRiskForm]
+    [setOpenUpdateRiskForm],
   )
 
   const onEditRiskFormClosed = (wasSaved: boolean) => {
     setOpenUpdateRiskForm(false)
     setEditRiskId(null)
     if (wasSaved) {
-      loadRisks()
+      refresh()
+    }
+  }
+
+  const onCreateRiskFormClosed = (wasCreated: boolean) => {
+    setOpenCreateRiskForm(false)
+    if (wasCreated) {
+      refresh()
     }
   }
 
@@ -134,7 +142,7 @@ const RisksGrid = ({
       {
         field: 'actions',
         headerName: '',
-        width: 80,
+        width: 50,
         filter: false,
         sortable: false,
         hide: !canUpdateRisks,
@@ -176,15 +184,8 @@ const RisksGrid = ({
           dayjs(params.data.reportedOn).format('M/D/YYYY'),
       },
     ],
-    [canUpdateRisks, editRiskButtonClicked, hideTeam, includeClosed]
+    [canUpdateRisks, editRiskButtonClicked, hideTeam, includeClosed],
   )
-
-  const onCreateRiskFormClosed = (wasCreated: boolean) => {
-    setOpenCreateRiskForm(false)
-    if (wasCreated) {
-      loadRisks()
-    }
-  }
 
   return (
     <>
@@ -192,12 +193,12 @@ const RisksGrid = ({
       <ModaGrid
         height={550}
         columnDefs={columnDefs}
-        rowData={risks}
-        loadData={loadRisks}
+        rowData={risksQuery.data}
+        loadData={refresh}
         actions={showActions && <Actions />}
         gridControlMenuItems={controlItems}
       />
-      {canCreateRisks && (
+      {openCreateRiskForm && canCreateRisks && (
         <CreateRiskForm
           createForTeamId={teamId}
           showForm={openCreateRiskForm}
@@ -205,7 +206,7 @@ const RisksGrid = ({
           onFormCancel={() => onCreateRiskFormClosed(false)}
         />
       )}
-      {canUpdateRisks && (
+      {openUpdateRiskForm && canUpdateRisks && (
         <UpdateRiskForm
           showForm={openUpdateRiskForm}
           riskId={editRiskId}

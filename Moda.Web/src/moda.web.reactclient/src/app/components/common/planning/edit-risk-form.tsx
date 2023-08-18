@@ -12,11 +12,19 @@ import {
 } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
-import { getEmployeesClient, getRisksClient } from '@/src/services/clients'
+import { getEmployeesClient } from '@/src/services/clients'
 import { RiskDetailsDto, UpdateRiskRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import _ from 'lodash'
 import dayjs from 'dayjs'
+import { OptionModel } from '../../types'
+import {
+  useGetRiskById,
+  useGetRiskCategoryOptions,
+  useGetRiskGradeOptions,
+  useGetRiskStatusOptions,
+  useUpdateRiskMutation,
+} from '@/src/services/queries/planning-queries'
 
 export interface UpdateRiskFormProps {
   showForm: boolean
@@ -39,9 +47,20 @@ interface UpdateRiskFormValues {
   response?: string | undefined
 }
 
-interface OptionModel<T = string> {
-  value: T
-  label: string
+const mapToRequestValues = (values: UpdateRiskFormValues) => {
+  return {
+    riskId: values.riskId,
+    teamId: values.teamId,
+    summary: values.summary,
+    description: values.description,
+    statusId: values.statusId,
+    categoryId: values.categoryId,
+    impactId: values.impactId,
+    likelihoodId: values.likelihoodId,
+    assigneeId: values.assigneeId,
+    followUpDate: (values.followUpDate as any)?.format('YYYY-MM-DD'),
+    response: values.response,
+  } as UpdateRiskRequest
 }
 
 const UpdateRiskForm = ({
@@ -57,13 +76,14 @@ const UpdateRiskForm = ({
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
+  const { data: riskData } = useGetRiskById(riskId)
   const [riskNumber, setRiskNumber] = useState<number>(undefined)
   const [teamName, setTeamName] = useState<string>('')
   const [employeeOptions, setEmployeeOptions] = useState<OptionModel[]>()
-  const [statusOptions, setStatusOptions] = useState<OptionModel<number>[]>()
-  const [categoryOptions, setCategoryOptions] =
-    useState<OptionModel<number>[]>()
-  const [gradeOptions, setGradeOptions] = useState<OptionModel<number>[]>()
+  const updateRisk = useUpdateRiskMutation()
+  const { data: riskStatusOptions } = useGetRiskStatusOptions()
+  const { data: riskCategoryOptions } = useGetRiskCategoryOptions()
+  const { data: riskGradeOptions } = useGetRiskGradeOptions()
 
   const { hasClaim } = useAuth()
   const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
@@ -84,29 +104,8 @@ const UpdateRiskForm = ({
         response: risk.response,
       })
     },
-    [form]
+    [form],
   )
-
-  const mapToRequestValues = useCallback((values: UpdateRiskFormValues) => {
-    return {
-      riskId: values.riskId,
-      teamId: values.teamId,
-      summary: values.summary,
-      description: values.description,
-      statusId: values.statusId,
-      categoryId: values.categoryId,
-      impactId: values.impactId,
-      likelihoodId: values.likelihoodId,
-      assigneeId: values.assigneeId,
-      followUpDate: (values.followUpDate as any)?.format('YYYY-MM-DD'),
-      response: values.response,
-    } as UpdateRiskRequest
-  }, [])
-
-  const getRisk = useCallback(async (riskId: string) => {
-    const risksClient = await getRisksClient()
-    return await risksClient.getById(riskId)
-  }, [])
 
   const getEmployeeOptions = useCallback(async () => {
     const employeesClient = await getEmployeesClient()
@@ -118,65 +117,28 @@ const UpdateRiskForm = ({
     return _.sortBy(employees, ['label'])
   }, [])
 
-  const getRiskStatusOptions = useCallback(async () => {
-    const risksClient = await getRisksClient()
-    const statusDtos = await risksClient.getStatuses()
-    const statuses: OptionModel<number>[] = statusDtos.map((r) => ({
-      value: r.id,
-      label: r.name,
-    }))
+  const update = async (values: UpdateRiskFormValues) => {
+    try {
+      const request = mapToRequestValues(values)
+      await updateRisk.mutateAsync(request)
 
-    return _.sortBy(statuses, ['order'])
-  }, [])
-
-  const getRiskCategoryOptions = useCallback(async () => {
-    const risksClient = await getRisksClient()
-    const categoryDtos = await risksClient.getCategories()
-    const categories: OptionModel<number>[] = categoryDtos.map((r) => ({
-      value: r.id,
-      label: r.name,
-    }))
-
-    return _.sortBy(categories, ['order'])
-  }, [])
-
-  const getRiskGradeOptions = useCallback(async () => {
-    const risksClient = await getRisksClient()
-    const gradeDtos = await risksClient.getGrades()
-    const grades: OptionModel<number>[] = gradeDtos.map((r) => ({
-      value: r.id,
-      label: r.name,
-    }))
-
-    return _.sortBy(grades, ['order'])
-  }, [])
-
-  const update = useCallback(
-    async (values: UpdateRiskFormValues) => {
-      try {
-        const request = mapToRequestValues(values)
-        const risksClient = await getRisksClient()
-        await risksClient.update(request.riskId, request)
-
-        return true
-      } catch (error) {
-        if (error.status === 422 && error.errors) {
-          const formErrors = toFormErrors(error.errors)
-          form.setFields(formErrors)
-          messageApi.error('Correct the validation error(s) to continue.')
-        } else {
-          messageApi.error(
-            'An unexpected error occurred while updating the Risk.'
-          )
-          console.error(error)
-        }
-        return false
+      return true
+    } catch (error) {
+      if (error.status === 422 && error.errors) {
+        const formErrors = toFormErrors(error.errors)
+        form.setFields(formErrors)
+        messageApi.error('Correct the validation error(s) to continue.')
+      } else {
+        messageApi.error(
+          'An unexpected error occurred while updating the Risk.',
+        )
+        console.error(error)
       }
-    },
-    [form, mapToRequestValues, messageApi]
-  )
+      return false
+    }
+  }
 
-  const handleOk = useCallback(async () => {
+  const handleOk = async () => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
@@ -191,7 +153,7 @@ const UpdateRiskForm = ({
     } finally {
       setIsSaving(false)
     }
-  }, [form, messageApi, onFormSave, update])
+  }
 
   const handleCancel = useCallback(() => {
     setIsOpen(false)
@@ -200,25 +162,22 @@ const UpdateRiskForm = ({
   }, [form, onFormCancel])
 
   useEffect(() => {
+    if (!riskData) return
     if (canUpdateRisks) {
       setIsOpen(showForm)
       if (showForm === true) {
         try {
           const loadData = async () => {
-            const riskData = await getRisk(riskId)
-            setRiskNumber(riskData.localId)
-            setTeamName(riskData.team.name)
+            setRiskNumber(riskData?.localId)
+            setTeamName(riskData?.team.name)
             mapToFormValues(riskData)
             setEmployeeOptions(await getEmployeeOptions())
-            setStatusOptions(await getRiskStatusOptions())
-            setCategoryOptions(await getRiskCategoryOptions())
-            setGradeOptions(await getRiskGradeOptions())
           }
           loadData()
         } catch (error) {
           handleCancel()
           messageApi.error(
-            'An unexpected error occurred while loading form data.'
+            'An unexpected error occurred while loading form data.',
           )
           console.error(error)
         }
@@ -230,21 +189,17 @@ const UpdateRiskForm = ({
   }, [
     canUpdateRisks,
     getEmployeeOptions,
-    getRisk,
-    getRiskCategoryOptions,
-    getRiskGradeOptions,
-    getRiskStatusOptions,
     handleCancel,
     mapToFormValues,
     messageApi,
-    riskId,
+    riskData,
     showForm,
   ])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
       () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false)
+      () => setIsValid(false),
     )
   }, [form, formValues])
 
@@ -307,7 +262,7 @@ const UpdateRiskForm = ({
             rules={[{ required: true }]}
           >
             <Radio.Group
-              options={statusOptions}
+              options={riskStatusOptions}
               optionType="button"
               buttonStyle="solid"
             />
@@ -318,7 +273,7 @@ const UpdateRiskForm = ({
             rules={[{ required: true }]}
           >
             <Radio.Group
-              options={categoryOptions}
+              options={riskCategoryOptions}
               optionType="button"
               buttonStyle="solid"
             />
@@ -329,7 +284,7 @@ const UpdateRiskForm = ({
             rules={[{ required: true }]}
           >
             <Radio.Group
-              options={gradeOptions}
+              options={riskGradeOptions}
               optionType="button"
               buttonStyle="solid"
             />
@@ -340,7 +295,7 @@ const UpdateRiskForm = ({
             rules={[{ required: true }]}
           >
             <Radio.Group
-              options={gradeOptions}
+              options={riskGradeOptions}
               optionType="button"
               buttonStyle="solid"
             />
@@ -353,7 +308,7 @@ const UpdateRiskForm = ({
               optionFilterProp="children"
               filterOption={(input, option) =>
                 (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase()
+                  input.toLowerCase(),
                 )
               }
               filterSort={(optionA, optionB) =>

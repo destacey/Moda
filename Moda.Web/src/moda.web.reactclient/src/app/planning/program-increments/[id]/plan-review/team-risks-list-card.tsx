@@ -8,46 +8,27 @@ import ModaEmpty from '@/src/app/components/common/moda-empty'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '@/src/app/components/contexts/auth'
 import CreateRiskForm from '@/src/app/components/common/planning/create-risk-form'
+import { UseQueryResult } from 'react-query'
 
 export interface TeamRisksListCardProps {
-  getRisks: (
-    programIncrementId: string,
-    teamId: string
-  ) => Promise<RiskListDto[]>
-  programIncrementId: string
+  riskQuery: UseQueryResult<RiskListDto[], unknown>
   teamId: string
 }
 
-const TeamRisksListCard = ({
-  getRisks,
-  programIncrementId,
-  teamId,
-}: TeamRisksListCardProps) => {
-  const [risks, setRisks] = useState<RiskListDto[]>()
+const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
 
   const { hasClaim } = useAuth()
   const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
   const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
 
-  const loadRisks = useCallback(
-    async (programIncrementId: string, teamId: string) => {
-      const riskDtos = await getRisks(programIncrementId, teamId)
-      setRisks(riskDtos)
-    },
-    [getRisks]
-  )
-
   const refreshRisks = useCallback(() => {
-    loadRisks(programIncrementId, teamId)
-  }, [loadRisks, programIncrementId, teamId])
-
-  useEffect(() => {
-    loadRisks(programIncrementId, teamId)
-  }, [loadRisks, programIncrementId, teamId])
+    riskQuery.refetch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const CardTitle = () => {
-    const count = risks?.length ?? 0
+    const count = riskQuery?.data?.length ?? 0
     const showBadge = count > 0
     return (
       <Space>
@@ -58,11 +39,11 @@ const TeamRisksListCard = ({
   }
 
   const RisksList = () => {
-    if (!risks || risks.length === 0) {
+    if (!riskQuery?.data || riskQuery?.data.length === 0) {
       return <ModaEmpty message="No risks" />
     }
 
-    const sortedRisks = risks.sort((a, b) => {
+    const sortedRisks = riskQuery?.data.sort((a, b) => {
       const categoryOrder = ['Owned', 'Accepted', 'Mitigated', 'Resolved']
       const aIndex = categoryOrder.indexOf(a.category)
       const bIndex = categoryOrder.indexOf(b.category)
@@ -94,7 +75,7 @@ const TeamRisksListCard = ({
   const onCreateRiskFormClosed = (wasCreated: boolean) => {
     setOpenCreateRiskForm(false)
     if (wasCreated) {
-      loadRisks(programIncrementId, teamId)
+      refreshRisks()
     }
   }
 
@@ -115,7 +96,7 @@ const TeamRisksListCard = ({
       >
         <RisksList />
       </Card>
-      {canCreateRisks && (
+      {openCreateRiskForm && canCreateRisks && (
         <CreateRiskForm
           createForTeamId={teamId}
           showForm={openCreateRiskForm}

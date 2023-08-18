@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { AuthContext, AuthContextType } from '../contexts/auth'
 import withAuthorization, { WithAuthorizationProps } from './withAuthorization'
-import { AuthContext } from '../contexts/auth'
 
 describe('withAuthorization', () => {
   const MockComponent = () => <div>Authorized</div>
@@ -24,8 +24,9 @@ describe('withAuthorization', () => {
   }
 
   const renderComponent = (component) => {
-    const authContext = {
+    const authContext: AuthContextType = {
       user: null,
+      isLoading: false,
       acquireToken: () => Promise.resolve('token'),
       refreshUser: () => Promise.resolve(),
       login: () => Promise.resolve(),
@@ -36,7 +37,7 @@ describe('withAuthorization', () => {
     return render(
       <AuthContext.Provider value={authContext}>
         {component}
-      </AuthContext.Provider>
+      </AuthContext.Provider>,
     )
   }
 
@@ -44,13 +45,12 @@ describe('withAuthorization', () => {
     mockHasClaim.mockReturnValue(true)
 
     const WrappedComponent = withAuthorization(MockComponent)
-
     const { getByText } = renderComponent(<WrappedComponent {...mockProps} />)
 
     expect(getByText('Authorized')).toBeInTheDocument()
     expect(mockHasClaim).toHaveBeenCalledWith(
       'Permission',
-      mockProps.claimValue
+      mockProps.claimValue,
     )
   })
 
@@ -62,11 +62,11 @@ describe('withAuthorization', () => {
 
     expect(getByText('403')).toBeInTheDocument()
     expect(
-      getByText('Sorry, you are not authorized to access this page.')
+      getByText('Sorry, you are not authorized to access this page.'),
     ).toBeInTheDocument()
     expect(mockHasClaim).toHaveBeenCalledWith(
       'Permission',
-      mockProps.claimValue
+      mockProps.claimValue,
     )
   })
 
@@ -79,7 +79,7 @@ describe('withAuthorization', () => {
         claimType="TestType"
         claimValue="TestValue"
         notAuthorizedBehavior="DoNotRender"
-      />
+      />,
     )
 
     expect(queryByText('Authorized', { exact: false })).toBeNull()
@@ -92,10 +92,10 @@ describe('withAuthorization', () => {
     const WrappedComponent = withAuthorization(
       MockComponent,
       'TestType',
-      'TestValue'
+      'TestValue',
     )
     const { queryByText } = renderComponent(
-      <WrappedComponent notAuthorizedBehavior="DoNotRender" />
+      <WrappedComponent notAuthorizedBehavior="DoNotRender" />,
     )
 
     expect(queryByText('Authorized', { exact: false })).toBeNull()

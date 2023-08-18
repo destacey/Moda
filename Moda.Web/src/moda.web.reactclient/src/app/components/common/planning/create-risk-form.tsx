@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
 import {
   getEmployeesClient,
-  getRisksClient,
   getTeamsClient,
   getTeamsOfTeamsClient,
 } from '@/src/services/clients'
@@ -13,6 +12,12 @@ import { CreateRiskRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { TeamListItem } from '@/src/app/organizations/types'
 import _ from 'lodash'
+import { OptionModel } from '../../types'
+import {
+  useCreateRiskMutation,
+  useGetRiskCategoryOptions,
+  useGetRiskGradeOptions,
+} from '@/src/services/queries/planning-queries'
 
 export interface CreateRiskFormProps {
   showForm: boolean
@@ -33,9 +38,18 @@ interface CreateRiskFormValues {
   response?: string | undefined
 }
 
-interface OptionModel {
-  value: string
-  label: string
+const mapToRequestValues = (values: CreateRiskFormValues) => {
+  return {
+    teamId: values.teamId,
+    summary: values.summary,
+    description: values.description,
+    categoryId: values.categoryId,
+    impactId: values.impactId,
+    likelihoodId: values.likelihoodId,
+    assigneeId: values.assigneeId,
+    followUpDate: (values.followUpDate as any)?.format('YYYY-MM-DD'),
+    response: values.response,
+  } as CreateRiskRequest
 }
 
 const CreateRiskForm = ({
@@ -53,13 +67,15 @@ const CreateRiskForm = ({
 
   const [teamOptions, setTeamOptions] = useState<OptionModel[]>()
   const [employeeOptions, setEmployeeOptions] = useState<OptionModel[]>()
-  const [categoryOptions, setCategoryOptions] = useState<OptionModel[]>()
-  const [gradeOptions, setGradeOptions] = useState<OptionModel[]>()
 
   const [newRiskLocalId, setNewRiskLocalId] = useState<number>(null)
 
   const { hasClaim } = useAuth()
   const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
+
+  const createRisk = useCreateRiskMutation()
+  const { data: riskCategoryOptions } = useGetRiskCategoryOptions()
+  const { data: riskGradeOptions } = useGetRiskGradeOptions()
 
   const mapToFormValues = useCallback(
     (teamId: string | undefined) => {
@@ -67,22 +83,8 @@ const CreateRiskForm = ({
         teamId: teamId,
       })
     },
-    [form]
+    [form],
   )
-
-  const mapToRequestValues = useCallback((values: CreateRiskFormValues) => {
-    return {
-      teamId: values.teamId,
-      summary: values.summary,
-      description: values.description,
-      categoryId: values.categoryId,
-      impactId: values.impactId,
-      likelihoodId: values.likelihoodId,
-      assigneeId: values.assigneeId,
-      followUpDate: (values.followUpDate as any)?.format('YYYY-MM-DD'),
-      response: values.response,
-    } as CreateRiskRequest
-  }, [])
 
   const getTeamOptions = useCallback(async () => {
     const teamsClient = await getTeamsClient()
@@ -107,55 +109,28 @@ const CreateRiskForm = ({
     return _.sortBy(employees, ['label'])
   }, [])
 
-  const getRiskCategorOptions = useCallback(async () => {
-    const risksClient = await getRisksClient()
-    const categoryDtos = await risksClient.getCategories()
-    const categories: OptionModel[] = categoryDtos.map((r) => ({
-      value: r.id.toString(),
-      label: r.name,
-    }))
-
-    return _.sortBy(categories, ['order'])
-  }, [])
-
-  const getRiskGradeOptions = useCallback(async () => {
-    const risksClient = await getRisksClient()
-    const gradeDtos = await risksClient.getGrades()
-    const grades: OptionModel[] = gradeDtos.map((r) => ({
-      value: r.id.toString(),
-      label: r.name,
-    }))
-
-    return _.sortBy(grades, ['order'])
-  }, [])
-
-  const create = useCallback(
-    async (values: CreateRiskFormValues) => {
-      try {
-        const request = mapToRequestValues(values)
-        const risksClient = await getRisksClient()
-        const localId = await risksClient.createRisk(request)
-        setNewRiskLocalId(localId)
-
-        return true
-      } catch (error) {
-        if (error.status === 422 && error.errors) {
-          const formErrors = toFormErrors(error.errors)
-          form.setFields(formErrors)
-          messageApi.error('Correct the validation error(s) to continue.')
-        } else {
-          messageApi.error(
-            'An unexpected error occurred while creating the Risk.'
-          )
-          console.error(error)
-        }
-        return false
+  const create = async (values: CreateRiskFormValues) => {
+    try {
+      const request = mapToRequestValues(values)
+      const localId = await createRisk.mutateAsync(request)
+      setNewRiskLocalId(localId)
+      return true
+    } catch (error) {
+      if (error.status === 422 && error.errors) {
+        const formErrors = toFormErrors(error.errors)
+        form.setFields(formErrors)
+        messageApi.error('Correct the validation error(s) to continue.')
+      } else {
+        messageApi.error(
+          'An unexpected error occurred while creating the Risk.',
+        )
+        console.error(error)
       }
-    },
-    [form, mapToRequestValues, messageApi]
-  )
+      return false
+    }
+  }
 
-  const handleOk = useCallback(async () => {
+  const handleOk = async () => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
@@ -165,7 +140,7 @@ const CreateRiskForm = ({
     } finally {
       setIsSaving(false)
     }
-  }, [form, create])
+  }
 
   const handleCancel = useCallback(() => {
     setIsOpen(false)
@@ -181,15 +156,13 @@ const CreateRiskForm = ({
           const loadData = async () => {
             setTeamOptions(await getTeamOptions())
             setEmployeeOptions(await getEmployeeOptions())
-            setCategoryOptions(await getRiskCategorOptions())
-            setGradeOptions(await getRiskGradeOptions())
           }
           loadData()
           mapToFormValues(createForTeamId)
         } catch (error) {
           handleCancel()
           messageApi.error(
-            'An unexpected error occurred while loading form data.'
+            'An unexpected error occurred while loading form data.',
           )
           console.error(error)
         }
@@ -202,8 +175,6 @@ const CreateRiskForm = ({
     canCreateRisks,
     createForTeamId,
     getEmployeeOptions,
-    getRiskCategorOptions,
-    getRiskGradeOptions,
     getTeamOptions,
     handleCancel,
     mapToFormValues,
@@ -214,7 +185,7 @@ const CreateRiskForm = ({
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
       () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false)
+      () => setIsValid(false),
     )
   }, [form, formValues])
 
@@ -258,7 +229,7 @@ const CreateRiskForm = ({
               optionFilterProp="children"
               filterOption={(input, option) =>
                 (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase()
+                  input.toLowerCase(),
                 )
               }
               filterSort={(optionA, optionB) =>
@@ -297,7 +268,7 @@ const CreateRiskForm = ({
             rules={[{ required: true }]}
           >
             <Radio.Group
-              options={categoryOptions}
+              options={riskCategoryOptions}
               optionType="button"
               buttonStyle="solid"
             />
@@ -308,7 +279,7 @@ const CreateRiskForm = ({
             rules={[{ required: true }]}
           >
             <Radio.Group
-              options={gradeOptions}
+              options={riskGradeOptions}
               optionType="button"
               buttonStyle="solid"
             />
@@ -319,7 +290,7 @@ const CreateRiskForm = ({
             rules={[{ required: true }]}
           >
             <Radio.Group
-              options={gradeOptions}
+              options={riskGradeOptions}
               optionType="button"
               buttonStyle="solid"
             />
@@ -332,7 +303,7 @@ const CreateRiskForm = ({
               optionFilterProp="children"
               filterOption={(input, option) =>
                 (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase()
+                  input.toLowerCase(),
                 )
               }
               filterSort={(optionA, optionB) =>

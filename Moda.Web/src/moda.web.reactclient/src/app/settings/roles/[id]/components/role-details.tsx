@@ -3,27 +3,24 @@ import { CreateOrUpdateRoleRequest, RoleDto } from '@/src/services/moda-api'
 import {
   useDeleteRoleMutation,
   useCreateRoleMutation,
-} from '@/src/services/query'
+} from '@/src/services/queries/user-management-queries'
 import { toFormErrors } from '@/src/utils'
 import { Button, Form, Input, Popconfirm, Space, message } from 'antd'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import { useQueryClient } from 'react-query'
 
 interface RolesDetailProps {
   role: RoleDto
 }
 
-const Detail = (props: RolesDetailProps) => {
+const RoleDetails = (props: RolesDetailProps) => {
   const [role, setRole] = useState<RoleDto>(props.role)
   const [form] = Form.useForm<CreateOrUpdateRoleRequest>()
-  //const formValues = Form.useWatch([], form)
   const router = useRouter()
   const { hasClaim } = useAuth()
 
-  const queryClient = useQueryClient()
-  const useDeleteRole = useDeleteRoleMutation(queryClient)
-  const useCreateRole = useCreateRoleMutation(queryClient)
+  const useDeleteRole = useDeleteRoleMutation()
+  const useCreateRole = useCreateRoleMutation()
   const canDelete = hasClaim('Permission', 'Permissions.Roles.Delete')
   const [messageApi, contextHolder] = message.useMessage()
 
@@ -65,10 +62,9 @@ const Detail = (props: RolesDetailProps) => {
         messageApi.error(error.exception)
       } else {
         messageApi.error(
-          'An unexpected error occurred while updating the Risk.'
+          'An unexpected error occurred while updating the Risk.',
         )
       }
-      //console.error(error)
     }
   }
 
@@ -140,4 +136,4 @@ const Detail = (props: RolesDetailProps) => {
   )
 }
 
-export default Detail
+export default RoleDetails

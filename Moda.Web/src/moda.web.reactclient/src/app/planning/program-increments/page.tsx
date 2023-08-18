@@ -2,7 +2,6 @@
 
 import ModaGrid from '@/src/app/components/common/moda-grid'
 import PageTitle from '@/src/app/components/common/page-title'
-import { getProgramIncrementsClient } from '@/src/services/clients'
 import { ProgramIncrementListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
@@ -11,6 +10,7 @@ import dayjs from 'dayjs'
 import { CreateProgramIncrementForm } from '../components'
 import useAuth from '../../components/contexts/auth'
 import { Button } from 'antd'
+import { useGetProgramIncrements } from '@/src/services/queries/planning-queries'
 
 const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
   return (
@@ -18,19 +18,30 @@ const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
   )
 }
 
+const stateOrder = ['Active', 'Future', 'Completed']
+const sortProgramIncrements = (data: ProgramIncrementListDto[]) => {
+  return data?.sort((a, b) => {
+    const aStateIndex = stateOrder.indexOf(a.state)
+    const bStateIndex = stateOrder.indexOf(b.state)
+    if (aStateIndex !== bStateIndex) {
+      return aStateIndex - bStateIndex
+    } else {
+      return dayjs(b.start).unix() - dayjs(a.start).unix()
+    }
+  })
+}
+
 const ProgramIncrementListPage = () => {
   useDocumentTitle('Program Increments')
-  const [programIncrements, setProgramIncrements] = useState<
-    ProgramIncrementListDto[]
-  >([])
   const [openCreateProgramIncrementForm, setOpenCreateProgramIncrementForm] =
     useState<boolean>(false)
-  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
+
+  const { data, refetch } = useGetProgramIncrements()
 
   const { hasClaim } = useAuth()
   const canCreateProgramIncrement = hasClaim(
     'Permission',
-    'Permissions.ProgramIncrements.Create'
+    'Permissions.ProgramIncrements.Create',
   )
   const showActions = canCreateProgramIncrement
 
@@ -39,7 +50,10 @@ const ProgramIncrementListPage = () => {
     () => [
       { field: 'localId', headerName: '#', width: 90 },
       { field: 'name', cellRenderer: ProgramIncrementLinkCellRenderer },
-      { field: 'state', width: 125 },
+      {
+        field: 'state',
+        width: 125,
+      },
       {
         field: 'start',
         valueGetter: (params) => dayjs(params.data.start).format('M/D/YYYY'),
@@ -49,32 +63,17 @@ const ProgramIncrementListPage = () => {
         valueGetter: (params) => dayjs(params.data.end).format('M/D/YYYY'),
       },
     ],
-    []
+    [],
   )
 
-  const getProgramIncrements = useCallback(async () => {
-    const programIncrementClient = await getProgramIncrementsClient()
-    const programIncrementDtos = await programIncrementClient.getList()
-
-    setProgramIncrements(
-      programIncrementDtos.sort((a, b) => {
-        const stateOrder = ['Active', 'Future', 'Completed']
-        const aStateIndex = stateOrder.indexOf(a.state)
-        const bStateIndex = stateOrder.indexOf(b.state)
-        if (aStateIndex !== bStateIndex) {
-          return aStateIndex - bStateIndex
-        } else {
-          return new Date(a.start).getTime() - new Date(b.start).getTime()
-        }
-      })
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastRefresh])
+  const refresh = useCallback(async () => {
+    refetch
+  }, [refetch])
 
   const onCreateProgramIncrementFormClosed = (wasCreated: boolean) => {
     setOpenCreateProgramIncrementForm(false)
     if (wasCreated) {
-      setLastRefresh(Date.now())
+      refetch()
     }
   }
 
@@ -98,10 +97,10 @@ const ProgramIncrementListPage = () => {
       />
       <ModaGrid
         columnDefs={columnDefs}
-        rowData={programIncrements}
-        loadData={getProgramIncrements}
+        rowData={sortProgramIncrements(data)}
+        loadData={refresh}
       />
-      {canCreateProgramIncrement && (
+      {openCreateProgramIncrementForm && canCreateProgramIncrement && (
         <CreateProgramIncrementForm
           showForm={openCreateProgramIncrementForm}
           onFormCreate={() => onCreateProgramIncrementFormClosed(true)}

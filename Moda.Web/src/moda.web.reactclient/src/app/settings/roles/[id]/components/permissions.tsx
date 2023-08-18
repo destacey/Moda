@@ -2,7 +2,7 @@ import useTheme from '@/src/app/components/contexts/theme'
 import {
   useGetPermissions,
   useUpdatePermissionsMutation,
-} from '@/src/services/query'
+} from '@/src/services/queries/user-management-queries'
 import {
   Row,
   Col,
@@ -12,9 +12,9 @@ import {
   Button,
   message,
   Typography,
+  Space,
 } from 'antd'
 import React, { useEffect, useState } from 'react'
-import { useQueryClient } from 'react-query'
 
 interface PermissionsProps {
   roleId: string
@@ -41,8 +41,7 @@ const Permissions = (props: PermissionsProps) => {
   const [activePermissionGroup, setActivePermissionGroup] =
     useState<PermissionGroup>(null)
 
-  const queryClient = useQueryClient()
-  const updatePermissions = useUpdatePermissionsMutation(queryClient)
+  const updatePermissions = useUpdatePermissionsMutation()
 
   useEffect(() => setPermissions(props.permissions), [props.permissions])
 
@@ -64,11 +63,11 @@ const Permissions = (props: PermissionsProps) => {
         }
         return acc
       },
-      []
+      [],
     )
 
     setPermissionGroups(
-      groups?.sort((a, b) => a.name.localeCompare(b.name)) ?? groups
+      groups?.sort((a, b) => a.name.localeCompare(b.name)) ?? groups,
     )
     setActivePermissionGroup(groups?.[0])
   }, [availablePermissions.data])
@@ -89,7 +88,7 @@ const Permissions = (props: PermissionsProps) => {
 
   const badgeLabel = (permissions: PermissionItem[]) => {
     const unselectedPermissions = permissions.filter(
-      (p) => !hasPermission(p.name)
+      (p) => !hasPermission(p.name),
     )
 
     if (unselectedPermissions.length === 0) return 'All'
@@ -176,15 +175,12 @@ const Permissions = (props: PermissionsProps) => {
           push={1}
           style={{ display: 'flex', flexDirection: 'column' }}
         >
-          <div style={{ height: '100%' }}>
-            {/* <div>
-              <p>{activePermissionGroup?.name} Available Permissions</p>
-            </div> */}
+          <Space direction="vertical" style={{ height: '100%' }}>
             <Typography.Title level={5}>
               {activePermissionGroup?.name} Available Permissions
             </Typography.Title>
             {activePermissionGroup?.permissions?.map((permission, i) => (
-              <div key={i} style={{ paddingBottom: '15px' }}>
+              <Space key={i} style={{ paddingBottom: '15px' }}>
                 <Switch
                   checked={hasPermission(permission.name)}
                   onChange={() => {
@@ -193,10 +189,10 @@ const Permissions = (props: PermissionsProps) => {
                   style={{ marginRight: '10px' }}
                 />{' '}
                 {permission.description}
-              </div>
+              </Space>
             ))}
 
-            <div style={{ marginTop: '15px' }}>
+            <Space style={{ marginTop: '15px' }}>
               <a href="#" onClick={() => handleSelectAll(true)}>
                 Select All{' '}
               </a>{' '}
@@ -204,10 +200,10 @@ const Permissions = (props: PermissionsProps) => {
               <a href="#" onClick={() => handleSelectAll(false)}>
                 Unselect All{' '}
               </a>
-            </div>
-          </div>
+            </Space>
+          </Space>
 
-          <div>
+          <Space>
             <Button
               type="primary"
               htmlType="button"
@@ -215,7 +211,7 @@ const Permissions = (props: PermissionsProps) => {
             >
               Save Permissions
             </Button>
-          </div>
+          </Space>
         </Col>
       </Row>
     </div>

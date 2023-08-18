@@ -21,7 +21,7 @@ const { Content } = Layout
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5,
+      retry: false,
     },
   },
 })
@@ -42,7 +42,7 @@ export default function RootLayout({
                   <Layout>
                     <AppHeader />
                     <LoadingAccount>
-                      <Layout>
+                      <Layout hasSider>
                         <AppMenu />
                         <Layout style={{ padding: '0 24px 24px' }}>
                           <BreadcrumbsProvider>

@@ -9,8 +9,7 @@ import {
   useCreateRoleMutation,
   useGetRoleById,
   useUpdatePermissionsMutation,
-} from '@/src/services/query'
-import { useQueryClient } from 'react-query'
+} from '@/src/services/queries/user-management-queries'
 
 export interface CreateRoleFormProps {
   showForm: boolean
@@ -43,9 +42,8 @@ const CreateRoleForm = ({
   const roleData = useGetRoleById(roleIdToCopyPermissions)
   const canCreate = hasClaim('Permission', 'Permissions.Roles.Create')
 
-  const queryClient = useQueryClient()
-  const createRole = useCreateRoleMutation(queryClient)
-  const updatePermissions = useUpdatePermissionsMutation(queryClient)
+  const createRole = useCreateRoleMutation()
+  const updatePermissions = useUpdatePermissionsMutation()
 
   useEffect(() => {
     if (canCreate) {
@@ -59,13 +57,13 @@ const CreateRoleForm = ({
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
       () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false)
+      () => setIsValid(false),
     )
   }, [form, formValues])
 
   const create = async (values: CreateRoleFormValues): Promise<string> => {
     try {
-      var id = await createRole.mutateAsync({
+      const id = await createRole.mutateAsync({
         name: values.name,
         description: values.description,
       })
@@ -85,7 +83,7 @@ const CreateRoleForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          `An unexpected error occurred while creating the role.`
+          `An unexpected error occurred while creating the role.`,
         )
       }
 
