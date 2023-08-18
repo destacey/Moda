@@ -215,16 +215,10 @@ const ProgramIncrementObjectivesGrid = ({
 
   const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
     setOpenCreateObjectiveForm(false)
-    if (wasCreated) {
-      refresh()
-    }
   }
 
   const onEditObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
-    if (wasSaved) {
-      refresh()
-    }
   }
 
   return (
