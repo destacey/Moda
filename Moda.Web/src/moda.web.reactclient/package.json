@@ -28,8 +28,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.5",
-    "@azure/msal-browser": "^3.0.0",
-    "@azure/msal-react": "^2.0.0",
+    "@azure/msal-browser": "^2.38.1",
+    "@azure/msal-react": "^1.5.9",
     "ag-grid-community": "^30.0.6",
     "ag-grid-react": "^30.0.6",
     "antd": "5.8.3",
