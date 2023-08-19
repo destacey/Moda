@@ -5,7 +5,7 @@ import {
   ScheduleOutlined,
 } from '@ant-design/icons'
 import { Layout, Menu } from 'antd'
-import { useLayoutEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
 import {
   ItemType,
@@ -86,7 +86,7 @@ export default function AppMenu() {
   const { currentThemeName } = useTheme()
   const { hasClaim } = useAuth()
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     // Reduce the menu items based on the user's claims and transformed into antd menu items using the getItem function
     const filteredMenu = menu.reduce(
       (acc, item) => filterAndTransformMenuItem(acc, item, hasClaim),
