@@ -19,7 +19,7 @@ export const menuItem = (
   key: string,
   route?: string,
   icon?: React.ReactNode,
-  children?: Item[]
+  children?: Item[],
 ) => {
   return {
     display,
@@ -37,7 +37,7 @@ export const restrictedMenuItem = (
   key: string,
   route?: string,
   icon?: React.ReactNode,
-  children?: Item[]
+  children?: Item[],
 ) => {
   return {
     ...menuItem(display, key, route, icon, children),
@@ -52,7 +52,7 @@ function getItem(
   route?: string,
   icon?: React.ReactNode,
   children?: MenuItem[],
-  type?: 'group'
+  type?: 'group',
 ): MenuItem {
   return {
     key,
@@ -66,7 +66,7 @@ function getItem(
 export const filterAndTransformMenuItem = (
   acc: ItemType<MenuItemType>[],
   item: Item | MenuItem,
-  claimCheck: (claimType: string, claimValue: string) => boolean
+  claimCheck: (claimType: string, claimValue: string) => boolean,
 ) => {
   if ('type' in item) {
     acc.push(item)
@@ -75,7 +75,7 @@ export const filterAndTransformMenuItem = (
       const children = item.children
         ? item.children.reduce(
             (acc, item) => filterAndTransformMenuItem(acc, item, claimCheck),
-            []
+            [],
           )
         : undefined
       acc.push(getItem(item.display, item.key, item.route, item.icon, children))
@@ -84,7 +84,7 @@ export const filterAndTransformMenuItem = (
     const children = item.children
       ? item.children.reduce(
           (acc, item) => filterAndTransformMenuItem(acc, item, claimCheck),
-          []
+          [],
         )
       : undefined
     acc.push(getItem(item.display, item.key, item.route, item.icon, children))
