@@ -1,14 +1,13 @@
-import { Header } from 'antd/es/layout/layout'
 import Profile from '../Profile'
-import useTheme from '../contexts/theme'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
 import React from 'react'
-import { Button, Space, Typography } from 'antd'
+import { Layout, Button, Space, Typography } from 'antd'
 import useMenuToggle from '../contexts/menu-toggle'
+
+const { Header } = Layout
 
 export default function AppHeader() {
   const { menuCollapsed, setMenuCollapsed } = useMenuToggle()
-  const { appBarColor } = useTheme()
 
   return (
     <>
@@ -18,7 +17,6 @@ export default function AppHeader() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: appBarColor,
         }}
       >
         <Space>
