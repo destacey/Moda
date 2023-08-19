@@ -2,7 +2,7 @@ import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
 } from '@azure/msal-react'
-import { Avatar, Button, Dropdown, Space } from 'antd'
+import { Avatar, Button, Dropdown, Space, Typography } from 'antd'
 import {
   HighlightFilled,
   HighlightOutlined,
@@ -36,9 +36,11 @@ export default function Profile() {
 
   function WelcomeUser() {
     if (isLoading) {
-      return <p>Loading user info...</p>
+      return <Typography.Text>Loading user info...</Typography.Text>
     }
-    return user.name && user.name.trim() ? <p>Welcome, {user.name}</p> : null
+    return user.name && user.name.trim() ? (
+      <Typography.Text>Welcome, {user.name}</Typography.Text>
+    ) : null
   }
 
   const toggleTheme = () => {

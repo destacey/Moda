@@ -11,15 +11,13 @@ export const ThemeProvider = ({ children }) => {
   const [currentThemeName, setCurrentThemeName] =
     useLocalStorageState<ThemeName>('modaTheme', 'light')
   const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(lightTheme)
-  const [appBarColor, setAppBarColor] = useState('#2196f3')
   const [agGridTheme, setAgGridTheme] = useState('ag-theme-balham')
   const { token } = theme.useToken()
 
   useEffect(() => {
     setCurrentTheme(currentThemeName === 'light' ? lightTheme : darkTheme)
-    setAppBarColor(currentThemeName === 'light' ? '#2196f3' : '#262a2c')
     setAgGridTheme(
-      currentThemeName === 'light' ? 'ag-theme-balham' : 'ag-theme-balham-dark'
+      currentThemeName === 'light' ? 'ag-theme-balham' : 'ag-theme-balham-dark',
     )
   }, [currentThemeName])
 
@@ -28,7 +26,6 @@ export const ThemeProvider = ({ children }) => {
       value={{
         currentThemeName,
         setCurrentThemeName,
-        appBarColor,
         agGridTheme,
         token,
       }}

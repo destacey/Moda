@@ -7,16 +7,16 @@ import {
   getTeamsClient,
   getTeamsOfTeamsClient,
 } from '@/src/services/clients'
-import { Modal, Spin, TransferProps, message } from 'antd'
+import { Modal, Spin, Transfer, TransferProps, message } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import { TableRowSelection } from 'antd/es/table/interface'
-import Transfer, { TransferItem } from 'antd/es/transfer'
 import { useCallback, useEffect, useState } from 'react'
 import difference from 'lodash/difference'
 import {
   ManageProgramIncrementTeamsRequest,
   ProgramIncrementTeamResponse,
 } from '@/src/services/moda-api'
+import { TransferItem } from 'antd/es/transfer'
 
 export interface ManageProgramIncrementTeamsFormProps {
   showForm: boolean
@@ -87,7 +87,7 @@ const TableTransfer = ({
               if (itemDisabled || listDisabled) return
               onItemSelect(
                 key as string,
-                !listSelectedKeys.includes(key as string)
+                !listSelectedKeys.includes(key as string),
               )
             },
           })}
@@ -128,7 +128,7 @@ const ManageProgramIncrementTeamsForm = ({
   const { hasClaim } = useAuth()
   const canUpdatePI = hasClaim(
     'Permission',
-    'Permissions.ProgramIncrements.Update'
+    'Permissions.ProgramIncrements.Update',
   )
 
   // TODO: should this be in a custom hook? The teams index page has a similar call.
@@ -170,13 +170,13 @@ const ManageProgramIncrementTeamsForm = ({
         setTargetKeys(piTeamsData.map((team) => team.key))
       } catch (error) {
         messageApi.error(
-          `An unexpected error occurred while retrieving PI teams.`
+          `An unexpected error occurred while retrieving PI teams.`,
         )
         console.error(error)
       }
       setIsLoading(false)
     },
-    [getProgramIncrementTeams, getTeams, messageApi]
+    [getProgramIncrementTeams, getTeams, messageApi],
   )
 
   useEffect(() => {
@@ -188,7 +188,7 @@ const ManageProgramIncrementTeamsForm = ({
     } else {
       onFormCancel()
       messageApi.error(
-        'You do not have permission to update the Program Increment.'
+        'You do not have permission to update the Program Increment.',
       )
     }
   }, [canUpdatePI, id, loadData, messageApi, onFormCancel, showForm])

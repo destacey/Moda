@@ -4,9 +4,8 @@ import {
   SettingOutlined,
   ScheduleOutlined,
 } from '@ant-design/icons'
-import { Menu } from 'antd'
-import Sider from 'antd/es/layout/Sider'
-import { useEffect, useState } from 'react'
+import { Layout, Menu } from 'antd'
+import { useLayoutEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
 import {
   ItemType,
@@ -23,6 +22,8 @@ import {
 import useMenuToggle from '../../contexts/menu-toggle'
 import useTheme from '../../contexts/theme'
 
+const { Sider } = Layout
+
 const menu: (Item | MenuItem)[] = [
   menuItem('Home', 'home', '/', <HomeOutlined />),
   menuItem('Organizations', 'org', null, <TeamOutlined />, [
@@ -33,7 +34,7 @@ const menu: (Item | MenuItem)[] = [
     menuItem(
       'Program Increments',
       'plan.program-increments',
-      '/planning/program-increments'
+      '/planning/program-increments',
     ),
     // menuItem('Iterations', 'plan.iterations'),
     // menuItem('Sprints', 'plan.sprints'),
@@ -60,21 +61,21 @@ const menu: (Item | MenuItem)[] = [
       'Permission',
       'Users',
       'settings.users',
-      '/settings/users'
+      '/settings/users',
     ),
     restrictedMenuItem(
       'Permissions.Roles.View',
       'Permission',
       'Roles',
       'settings.roles',
-      '/settings/roles'
+      '/settings/roles',
     ),
     restrictedMenuItem(
       'Permissions.BackgroundJobs.View',
       'Permission',
       'Background Jobs',
       'settings.background-jobs',
-      '/settings/background-jobs'
+      '/settings/background-jobs',
     ),
   ]),
 ]
@@ -85,23 +86,24 @@ export default function AppMenu() {
   const { currentThemeName } = useTheme()
   const { hasClaim } = useAuth()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // Reduce the menu items based on the user's claims and transformed into antd menu items using the getItem function
     const filteredMenu = menu.reduce(
       (acc, item) => filterAndTransformMenuItem(acc, item, hasClaim),
-      [] as ItemType<MenuItemType>[]
+      [] as ItemType<MenuItemType>[],
     )
 
     const settingsMenuItem = filteredMenu.find(
-      (item) => item.key === 'settings'
+      (item) => item.key === 'settings',
     ) as MenuItemGroupType
 
     setMenuItems(
       settingsMenuItem.children?.length > 0
         ? filteredMenu
         : filteredMenu.filter(
-            (item) => item.key !== 'settings' && item.key !== 'settings-divider'
-          )
+            (item) =>
+              item.key !== 'settings' && item.key !== 'settings-divider',
+          ),
     )
   }, [hasClaim])
 
@@ -111,15 +113,8 @@ export default function AppMenu() {
       width={235}
       collapsedWidth={50}
       collapsed={menuCollapsed}
-      style={{ minHeight: '100vh' }}
     >
-      <Menu
-        mode="inline"
-        defaultSelectedKeys={['1']}
-        defaultOpenKeys={['sub1']}
-        style={{ minHeight: '100%' }}
-        items={menuItems}
-      />
+      <Menu mode="inline" style={{ minHeight: '100%' }} items={menuItems} />
     </Sider>
   )
 }

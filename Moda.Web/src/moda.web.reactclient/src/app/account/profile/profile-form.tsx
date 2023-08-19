@@ -1,6 +1,7 @@
 import { UserDetailsDto } from '@/src/services/moda-api'
 import { Descriptions } from 'antd'
-import Item from 'antd/es/descriptions/Item'
+
+const { Item } = Descriptions
 
 const ProfileForm = (profile: UserDetailsDto) => {
   return (
