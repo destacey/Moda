@@ -150,10 +150,10 @@ const Permissions = (props: PermissionsProps) => {
                 style={{
                   cursor: 'pointer',
                   display: 'flex',
-                  borderLeft: `2px solid ${
+                  borderLeft: `${
                     activePermissionGroup.name == item.name
-                      ? theme.token.colorPrimary
-                      : theme.appBarColor
+                      ? '2px solid' + theme.token.colorPrimary
+                      : ''
                   }`,
                 }}
               >
