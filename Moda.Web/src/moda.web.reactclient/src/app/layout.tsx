@@ -38,39 +38,39 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <StyledComponentsRegistry>
-          <AuthProvider>
-            <ThemeProvider>
-              <AuthenticatedTemplate>
-                <QueryClientProvider client={queryClient}>
-                  <MenuToggleProvider>
-                    <Layout>
-                      <AppHeader />
-                      <LoadingAccount>
-                        <Layout hasSider style={{ minHeight: '100vh' }}>
-                          <AppMenu />
-                          <Layout style={{ padding: '0 24px 24px' }}>
-                            <BreadcrumbsProvider>
-                              <AppBreadcrumb />
-                              <Content
-                                style={{
-                                  margin: 0,
-                                  height: '100%',
-                                }}
-                              >
-                                {children}
-                              </Content>
-                            </BreadcrumbsProvider>
-                          </Layout>
+        {/* <StyledComponentsRegistry> */}
+        <AuthProvider>
+          <ThemeProvider>
+            <AuthenticatedTemplate>
+              <QueryClientProvider client={queryClient}>
+                <MenuToggleProvider>
+                  <Layout>
+                    <AppHeader />
+                    <LoadingAccount>
+                      <Layout hasSider style={{ minHeight: '100vh' }}>
+                        <AppMenu />
+                        <Layout style={{ padding: '0 24px 24px' }}>
+                          <BreadcrumbsProvider>
+                            <AppBreadcrumb />
+                            <Content
+                              style={{
+                                margin: 0,
+                                height: '100%',
+                              }}
+                            >
+                              {children}
+                            </Content>
+                          </BreadcrumbsProvider>
                         </Layout>
-                      </LoadingAccount>
-                    </Layout>
-                  </MenuToggleProvider>
-                </QueryClientProvider>
-              </AuthenticatedTemplate>
-            </ThemeProvider>
-          </AuthProvider>
-        </StyledComponentsRegistry>
+                      </Layout>
+                    </LoadingAccount>
+                  </Layout>
+                </MenuToggleProvider>
+              </QueryClientProvider>
+            </AuthenticatedTemplate>
+          </ThemeProvider>
+        </AuthProvider>
+        {/* </StyledComponentsRegistry> */}
       </body>
     </html>
   )
