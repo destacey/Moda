@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useEffect, useState } from 'react'
+import { createContext } from 'react'
 import { MenuToggleContextType } from './types'
 import { useLocalStorageState } from '@/src/app/hooks'
 

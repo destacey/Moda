@@ -25,7 +25,7 @@ const sortRoles = (data: RoleListDto[]) => {
 
 const RoleListPage = () => {
   useDocumentTitle('Roles')
-  const [showCreateRoleModal, setShowCreateRoleModal] = useState(false)
+  const [openCreateRoleForm, setOpenCreateRoleForm] = useState(false)
   const router = useRouter()
   const { data, refetch } = useGetRoles()
 
@@ -48,7 +48,7 @@ const RoleListPage = () => {
     return (
       <>
         {canCreateRole && (
-          <Button onClick={() => setShowCreateRoleModal(true)}>
+          <Button onClick={() => setOpenCreateRoleForm(true)}>
             Create Role
           </Button>
         )}
@@ -66,15 +66,17 @@ const RoleListPage = () => {
         loadData={refresh}
       />
 
-      <CreateRoleForm
-        showForm={showCreateRoleModal}
-        roles={data}
-        onFormCreate={(id: string) => {
-          setShowCreateRoleModal(false)
-          router.push(`/settings/roles/${id}`)
-        }}
-        onFormCancel={() => setShowCreateRoleModal(false)}
-      />
+      {openCreateRoleForm && (
+        <CreateRoleForm
+          showForm={openCreateRoleForm}
+          roles={data}
+          onFormCreate={(id: string) => {
+            setOpenCreateRoleForm(false)
+            router.push(`/settings/roles/${id}`)
+          }}
+          onFormCancel={() => setOpenCreateRoleForm(false)}
+        />
+      )}
     </>
   )
 }
