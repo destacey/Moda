@@ -9,7 +9,7 @@ export const useGetTeamRisks = (
   enabled: boolean = true,
 ) => {
   return useQuery({
-    queryKey: [QK.TEAM_RISKS, id, { includeClosed: includeClosed }],
+    queryKey: [QK.TEAM_RISKS, id, includeClosed],
     queryFn: async () => (await getTeamsClient()).getRisks(id, includeClosed),
     staleTime: 10000,
     enabled: !!id && enabled,
@@ -23,7 +23,7 @@ export const useGetTeamOfTeamsRisks = (
   enabled: boolean = true,
 ) => {
   return useQuery({
-    queryKey: [QK.TEAM_OF_TEAMS_RISKS, id, { includeClosed: includeClosed }],
+    queryKey: [QK.TEAM_OF_TEAMS_RISKS, id, includeClosed],
     queryFn: async () =>
       (await getTeamsOfTeamsClient()).getRisks(id, includeClosed),
     staleTime: 10000,
