@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {
+  AzureDevOpsBoardsConnectionsClient,
   BackgroundJobsClient,
   EmployeesClient,
   PermissionsClient,
@@ -25,12 +26,19 @@ const createDefaultAxiosInstance = async (accessToken?: string) =>
     transformResponse: (data) => data,
   })
 
+export const getAzureDevOpsBoardsConnectionsClient = async (
+  accessToken?: string,
+) =>
+  new AzureDevOpsBoardsConnectionsClient(
+    '',
+    await createDefaultAxiosInstance(accessToken),
+  )
 export const getBackgroundJobsClient = async (accessToken?: string) =>
   new BackgroundJobsClient('', await createDefaultAxiosInstance(accessToken))
 export const getEmployeesClient = async (accessToken?: string) =>
   new EmployeesClient('', await createDefaultAxiosInstance(accessToken))
-  export const getPermissionsClient = async (accessToken?: string) =>
-    new PermissionsClient('', await createDefaultAxiosInstance(accessToken))
+export const getPermissionsClient = async (accessToken?: string) =>
+  new PermissionsClient('', await createDefaultAxiosInstance(accessToken))
 export const getProfileClient = async (accessToken?: string) =>
   new ProfileClient('', await createDefaultAxiosInstance(accessToken))
 export const getProgramIncrementsClient = async (accessToken?: string) =>
