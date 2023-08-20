@@ -1,3 +1,5 @@
+'use client'
+
 import { Breadcrumb } from 'antd'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { useEffect, useState } from 'react'
@@ -21,7 +23,7 @@ const AppBreadcrumb = () => {
     route: ItemType,
     params: any,
     routes: ItemType[],
-    paths: string[]
+    paths: string[],
   ) => {
     const last = routes.indexOf(route) === routes.length - 1
     return <BreadcrumbSegment route={route} paths={paths} last={last} />

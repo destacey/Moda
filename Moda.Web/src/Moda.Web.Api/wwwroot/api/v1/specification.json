@@ -4935,7 +4935,7 @@
         ]
       }
     },
-    "/api/app-integration/azure-devops-boards-connections": {
+    "/api/app-integrations/azure-devops-boards-connections": {
       "get": {
         "tags": [
           "AzureDevOpsBoardsConnections"
@@ -5042,7 +5042,7 @@
         ]
       }
     },
-    "/api/app-integration/azure-devops-boards-connections/{id}": {
+    "/api/app-integrations/azure-devops-boards-connections/{id}": {
       "get": {
         "tags": [
           "AzureDevOpsBoardsConnections"
@@ -5164,7 +5164,7 @@
         ]
       }
     },
-    "/api/app-integration/azure-devops-boards-connections/{id}/config": {
+    "/api/app-integrations/azure-devops-boards-connections/{id}/config": {
       "get": {
         "tags": [
           "AzureDevOpsBoardsConnections"
@@ -5283,7 +5283,7 @@
         ]
       }
     },
-    "/api/app-integration/connectors": {
+    "/api/app-integrations/connectors": {
       "get": {
         "tags": [
           "Connectors"

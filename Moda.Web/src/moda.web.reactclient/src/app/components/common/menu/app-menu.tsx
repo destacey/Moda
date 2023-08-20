@@ -71,6 +71,13 @@ const menu: (Item | MenuItem)[] = [
       '/settings/roles',
     ),
     restrictedMenuItem(
+      'Permissions.Connections.View',
+      'Permission',
+      'Connections',
+      'settings.connections',
+      '/settings/connections',
+    ),
+    restrictedMenuItem(
       'Permissions.BackgroundJobs.View',
       'Permission',
       'Background Jobs',

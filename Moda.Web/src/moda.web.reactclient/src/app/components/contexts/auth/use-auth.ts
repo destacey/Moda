@@ -1,3 +1,5 @@
+'use client'
+
 import { useContext } from 'react'
 import { AuthContext } from './auth-context'
 import { AuthContextType } from './types'

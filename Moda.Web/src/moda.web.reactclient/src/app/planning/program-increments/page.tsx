@@ -100,7 +100,7 @@ const ProgramIncrementListPage = () => {
         rowData={sortProgramIncrements(data)}
         loadData={refresh}
       />
-      {openCreateProgramIncrementForm && canCreateProgramIncrement && (
+      {openCreateProgramIncrementForm && (
         <CreateProgramIncrementForm
           showForm={openCreateProgramIncrementForm}
           onFormCreate={() => onCreateProgramIncrementFormClosed(true)}

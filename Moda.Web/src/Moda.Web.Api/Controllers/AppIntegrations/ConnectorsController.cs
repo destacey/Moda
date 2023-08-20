@@ -1,6 +1,6 @@
 ﻿namespace Moda.Web.Api.Controllers.AppIntegrations;
 
-[Route("api/app-integration/connectors")]
+[Route("api/app-integrations/connectors")]
 [ApiVersionNeutral]
 [ApiController]
 public class ConnectorsController : ControllerBase

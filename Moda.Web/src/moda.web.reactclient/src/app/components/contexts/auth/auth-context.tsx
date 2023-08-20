@@ -1,3 +1,5 @@
+'use client'
+
 import { MsalProvider } from '@azure/msal-react'
 import { createContext, useCallback, useEffect, useState } from 'react'
 import jwt_decode from 'jwt-decode'
@@ -63,13 +65,16 @@ const AuthProvider = ({ children }) => {
     }
   }
 
-  const hasClaim = useCallback((claimType: string, claimValue: string): boolean => {
-    return (
-      user.claims.some(
-        (claim) => claim.type === claimType && claim.value === claimValue
-      ) ?? false
-    )
-  }, [user])
+  const hasClaim = useCallback(
+    (claimType: string, claimValue: string): boolean => {
+      return (
+        user.claims.some(
+          (claim) => claim.type === claimType && claim.value === claimValue,
+        ) ?? false
+      )
+    },
+    [user],
+  )
 
   useEffect(() => {
     msalInstance.handleRedirectPromise().then((response) => {

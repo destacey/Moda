@@ -11,15 +11,17 @@ import { Button, Dropdown, MenuProps, Space } from 'antd'
 import { DownOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
+import { useDocumentTitle } from '../../hooks'
 
-const Page = () => {
+const BackgroundJobsListPage = () => {
+  useDocumentTitle('Background Jobs')
   const [jobTypes, setJobTypes] = useState<BackgroundJobTypeDto[]>([])
   const [backgroundJobs, setBackgroundJobs] = useState<BackgroundJobDto[]>([])
   const { hasClaim } = useAuth()
   const canViewHangfire = hasClaim('Permission', 'Permissions.Hangfire.View')
   const canRunBackgroundJobs = hasClaim(
     'Permission',
-    'Permissions.BackgroundJobs.Create'
+    'Permissions.BackgroundJobs.Create',
   )
   const showActions = canViewHangfire || canRunBackgroundJobs
 
@@ -32,7 +34,7 @@ const Page = () => {
       { field: 'namespace' },
       { field: 'startedAt', headerName: 'Start (UTC)' },
     ],
-    []
+    [],
   )
 
   const getJobTypes = useCallback(async () => {
@@ -53,7 +55,7 @@ const Page = () => {
       await backgroundJobsClient.run(jobTypeId)
       getRunningJobs()
     },
-    [getRunningJobs]
+    [getRunningJobs],
   )
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const hangfireUrl = process.env.NEXT_PUBLIC_API_BASE_URL + '/jobs'
@@ -118,9 +120,9 @@ const Page = () => {
 }
 
 const PageWithAuthorization = authorizePage(
-  Page,
+  BackgroundJobsListPage,
   'Permission',
-  'Permissions.BackgroundJobs.View'
+  'Permissions.BackgroundJobs.View',
 )
 
 export default PageWithAuthorization
