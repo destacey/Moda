@@ -2,7 +2,7 @@
 
 namespace Moda.Web.Api.Controllers.AppIntegrations;
 
-[Route("api/app-integration/azure-devops-boards-connections")]
+[Route("api/app-integrations/azure-devops-boards-connections")]
 [ApiVersionNeutral]
 [ApiController]
 public class AzureDevOpsBoardsConnectionsController : ControllerBase
@@ -25,7 +25,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     public async Task<ActionResult<IReadOnlyList<ConnectionListDto>>> GetList(CancellationToken cancellationToken, bool includeDisabled = false)
     {
         var connections = await _sender.Send(new GetConnectionsQuery(includeDisabled, _connector), cancellationToken);
-        return Ok(connections.OrderBy(c => c.Name));
+        return Ok(connections);
     }
 
     [HttpGet("{id}")]

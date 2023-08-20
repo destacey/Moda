@@ -5948,7 +5948,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * @param includeDisabled (optional) 
      */
     getList(includeDisabled: boolean | undefined, cancelToken?: CancelToken | undefined): Promise<ConnectionListDto[]> {
-        let url_ = this.baseUrl + "/api/app-integration/azure-devops-boards-connections?";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections?";
         if (includeDisabled === null)
             throw new Error("The parameter 'includeDisabled' cannot be null.");
         else if (includeDisabled !== undefined)
@@ -6010,7 +6010,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Create an Azure DevOps Boards connection.
      */
     create(request: CreateAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken | undefined): Promise<string> {
-        let url_ = this.baseUrl + "/api/app-integration/azure-devops-boards-connections";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -6075,7 +6075,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Get Azure DevOps Boards connection based on id.
      */
     getById(id: string, cancelToken?: CancelToken | undefined): Promise<ConnectionListDto[]> {
-        let url_ = this.baseUrl + "/api/app-integration/azure-devops-boards-connections/{id}";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -6143,7 +6143,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Update an Azure DevOps Boards connection.
      */
     update(id: string, request: UpdateAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken | undefined): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integration/azure-devops-boards-connections/{id}";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -6211,7 +6211,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Get Azure DevOps Boards connection based on id.
      */
     getConfig(id: string, cancelToken?: CancelToken | undefined): Promise<AzureDevOpsBoardsConnectionConfigurationDto> {
-        let url_ = this.baseUrl + "/api/app-integration/azure-devops-boards-connections/{id}/config";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/config";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -6279,7 +6279,7 @@ export class AzureDevOpsBoardsConnectionsClient {
      * Update an Azure DevOps Boards connection.
      */
     updateConfig(id: string, request: UpdateAzureDevOpsBoardConnectionConfigurationRequest, cancelToken?: CancelToken | undefined): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integration/azure-devops-boards-connections/{id}/config";
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/config";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -6361,7 +6361,7 @@ export class ConnectorsClient {
      * Get a list of all connectors.
      */
     getList( cancelToken?: CancelToken | undefined): Promise<ConnectorListDto[]> {
-        let url_ = this.baseUrl + "/api/app-integration/connectors";
+        let url_ = this.baseUrl + "/api/app-integrations/connectors";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
