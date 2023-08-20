@@ -1,3 +1,5 @@
+'use client'
+
 import { ComponentType, FC } from 'react'
 import NotAuthorized from '../common/not-authorized'
 import useAuth from '../contexts/auth'
@@ -13,7 +15,7 @@ import useAuth from '../contexts/auth'
 const authorizePage = <P extends object>(
   WrappedPage: ComponentType<P>,
   requiredClaimType?: string,
-  requiredClaimValue?: string
+  requiredClaimValue?: string,
 ): FC<P> => {
   const AuthorizePage: ComponentType<P> = ({ ...props }) => {
     const { hasClaim } = useAuth()
