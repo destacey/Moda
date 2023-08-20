@@ -7,10 +7,13 @@ import { useDocumentTitle } from '../../hooks'
 import useAuth from '../../components/contexts/auth'
 import { useGetConnections } from '@/src/services/queries/app-integration-queries'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
-import { Space, Switch } from 'antd'
+import { Button, Space, Switch } from 'antd'
+import CreateConnectionForm from './components/create-connection-form'
 
 const ConnectionsPage = () => {
   useDocumentTitle('Connections')
+  const [openCreateConnectionForm, setOpenCreateConnectionForm] =
+    useState(false)
   const [includeDisabled, setIncludeDisabled] = useState(false)
   const { data: connectionsData, refetch } = useGetConnections(includeDisabled)
 
@@ -19,6 +22,7 @@ const ConnectionsPage = () => {
     'Permission',
     'Permissions.Connections.Create',
   )
+  const showActions = canCreateConnection
 
   const columnDefs = useMemo(
     () => [
@@ -30,6 +34,19 @@ const ConnectionsPage = () => {
     ],
     [],
   )
+
+  const Actions = () => {
+    if (!showActions) return null
+    return (
+      <>
+        {canCreateConnection && (
+          <Button onClick={() => setOpenCreateConnectionForm(true)}>
+            Create Connection
+          </Button>
+        )}
+      </>
+    )
+  }
 
   const refresh = useCallback(async () => {
     refetch()
@@ -57,7 +74,7 @@ const ConnectionsPage = () => {
 
   return (
     <>
-      <PageTitle title="Connections" />
+      <PageTitle title="Connections" actions={<Actions />} />
 
       <ModaGrid
         columnDefs={columnDefs}
@@ -65,6 +82,14 @@ const ConnectionsPage = () => {
         rowData={connectionsData}
         loadData={refresh}
       />
+
+      {openCreateConnectionForm && (
+        <CreateConnectionForm
+          showForm={openCreateConnectionForm}
+          onFormCreate={() => setOpenCreateConnectionForm(false)}
+          onFormCancel={() => setOpenCreateConnectionForm(false)}
+        />
+      )}
     </>
   )
 }

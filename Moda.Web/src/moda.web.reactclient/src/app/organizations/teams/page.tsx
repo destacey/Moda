@@ -55,6 +55,7 @@ const TeamListPage = () => {
   )
 
   const Actions = () => {
+    if (!showActions) return null
     return (
       <>
         {canCreateTeam && (
@@ -109,7 +110,7 @@ const TeamListPage = () => {
 
   return (
     <>
-      <PageTitle title="Teams" actions={showActions && <Actions />} />
+      <PageTitle title="Teams" actions={<Actions />} />
       <ModaGrid
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
