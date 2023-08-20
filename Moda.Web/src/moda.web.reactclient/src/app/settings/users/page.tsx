@@ -7,6 +7,7 @@ import { UserDetailsDto } from '@/src/services/moda-api'
 import { getUsersClient } from '@/src/services/clients'
 import { authorizePage } from '../../components/hoc'
 import Link from 'next/link'
+import { useDocumentTitle } from '../../hooks'
 
 const EmployeeLinkCellRenderer = ({ value, data }) => {
   return (
@@ -16,7 +17,8 @@ const EmployeeLinkCellRenderer = ({ value, data }) => {
   )
 }
 
-const Page = () => {
+const UsersListPage = () => {
+  useDocumentTitle('Users')
   const [users, setUsers] = useState<UserDetailsDto[]>([])
 
   const columnDefs = useMemo(
@@ -32,7 +34,7 @@ const Page = () => {
       },
       { field: 'isActive' }, // TODO: convert to yes/no
     ],
-    []
+    [],
   )
 
   const getUsers = useCallback(async () => {
@@ -51,9 +53,9 @@ const Page = () => {
 }
 
 const PageWithAuthorization = authorizePage(
-  Page,
+  UsersListPage,
   'Permission',
-  'Permissions.Users.View'
+  'Permissions.Users.View',
 )
 
 export default PageWithAuthorization

@@ -11,6 +11,7 @@ import CreateRoleForm from './create-role-form'
 import { useRouter } from 'next/navigation'
 import { useGetRoles } from '@/src/services/queries/user-management-queries'
 import { RoleListDto } from '@/src/services/moda-api'
+import { useDocumentTitle } from '../../hooks'
 
 const LinkCellRenderer = ({ value, data }) => {
   return <Link href={`roles/${data.id}`}>{value}</Link>
@@ -23,6 +24,7 @@ const sortRoles = (data: RoleListDto[]) => {
 }
 
 const RoleListPage = () => {
+  useDocumentTitle('Roles')
   const [showCreateRoleModal, setShowCreateRoleModal] = useState(false)
   const router = useRouter()
   const { data, refetch } = useGetRoles()
