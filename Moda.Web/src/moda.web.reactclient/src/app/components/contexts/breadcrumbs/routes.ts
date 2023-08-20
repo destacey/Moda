@@ -1,48 +1,50 @@
-
 const routes = {
-  'organizations': {
+  organizations: {
     title: 'Organizations',
-    href: null
+    href: null,
   },
   'team-of-teams': {
     title: 'Teams',
-    href: '/organizations/teams'
+    href: '/organizations/teams',
   },
-  'employees': {
-    title: 'Employees'
+  employees: {
+    title: 'Employees',
   },
-  'teams': {
-    title: 'Teams'
-   },
-  'planning': {
+  teams: {
+    title: 'Teams',
+  },
+  planning: {
     title: 'Planning',
-    href: null
+    href: null,
   },
   'program-increments': {
-    title: 'Program Increments'
+    title: 'Program Increments',
   },
-  'risks': {
+  risks: {
     title: 'Teams',
-    href: null
+    href: null,
   },
-  'settings': {
+  settings: {
     title: 'Settings',
-    href: null
+    href: null,
   },
   'background-jobs': {
     title: 'Background Jobs',
-    href: null
+    href: null,
   },
-  'roles': {
-    title: 'Roles'
+  connections: {
+    title: 'Connections',
   },
-  'users': {
-    title: 'Users'
+  roles: {
+    title: 'Roles',
   },
-  'account': {
+  users: {
+    title: 'Users',
+  },
+  account: {
     title: 'Account',
-    href: null
-  }
+    href: null,
+  },
 }
 
 export default routes
