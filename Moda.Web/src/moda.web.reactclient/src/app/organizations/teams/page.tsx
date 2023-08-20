@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../../components/common/moda-grid'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
-import { Button, Modal, Space, Switch } from 'antd'
+import { Button, Space, Switch } from 'antd'
 import Link from 'next/link'
 import { TeamListItem } from '../types'
 import { useDocumentTitle } from '../../hooks/use-document-title'
@@ -51,7 +51,7 @@ const TeamListPage = () => {
       },
       { field: 'isActive' }, // TODO: convert to yes/no
     ],
-    []
+    [],
   )
 
   const Actions = () => {
