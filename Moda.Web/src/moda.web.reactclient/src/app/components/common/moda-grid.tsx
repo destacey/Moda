@@ -29,7 +29,8 @@ interface ModaGridProps extends AgGridReactProps {
   includeExportButton?: boolean
   actions?: React.ReactNode | null
   gridControlMenuItems?: ItemType[]
-  loadData?: () => Promise<void>
+  loadData?: () => Promise<void> | void
+  isDataLoading?: boolean
 }
 
 const modaDefaultColDef = {
@@ -50,6 +51,7 @@ const ModaGrid = ({
   defaultColDef,
   rowData,
   loadData,
+  isDataLoading,
   ...props
 }: ModaGridProps) => {
   const { agGridTheme } = useTheme()
@@ -62,17 +64,6 @@ const ModaGrid = ({
   const gridRef = useRef<AgGridReact>(null)
 
   const rowCount = rowData?.length ?? 0
-
-  const onRefreshData = useCallback(async () => {
-    if (!loadData) return
-    gridRef.current?.api?.showLoadingOverlay()
-    await loadData()
-    gridRef.current?.api?.hideOverlay()
-  }, [loadData])
-
-  const onGridReady = useCallback(async () => {
-    await onRefreshData()
-  }, [onRefreshData])
 
   const onModelUpdated = useCallback(() => {
     setDisplayedRowCount(gridRef.current?.api.getDisplayedRowCount() ?? 0)
@@ -87,11 +78,15 @@ const ModaGrid = ({
   }, [])
 
   useEffect(() => {
-    // When the grid is first rendered or if the onRefreshData function changes, load the data if the grid is ready
-    if (!gridRef.current?.api) return
+    if(!gridRef.current?.api) return
 
-    onRefreshData()
-  }, [agGridTheme, onRefreshData])
+    if(isDataLoading) {
+      gridRef.current?.api.showLoadingOverlay()
+    } else {
+      gridRef.current?.api.hideOverlay()
+    }
+
+  }, [isDataLoading])
 
   return (
     <div style={{ width: width }}>
@@ -134,7 +129,7 @@ const ModaGrid = ({
                     type="text"
                     shape="circle"
                     icon={<ReloadOutlined />}
-                    onClick={onRefreshData}
+                    onClick={() => loadData?.()}
                   />
                 </Tooltip>
               )}
@@ -156,7 +151,7 @@ const ModaGrid = ({
           <AgGridReact
             ref={gridRef}
             defaultColDef={defaultColDef ?? modaDefaultColDef}
-            onGridReady={onGridReady}
+            onGridReady={()=> loadData?.()}
             animateRows={true}
             rowData={rowData}
             onModelUpdated={onModelUpdated}

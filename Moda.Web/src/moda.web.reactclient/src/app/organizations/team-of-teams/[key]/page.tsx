@@ -1,7 +1,6 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
 import { Button, Card } from 'antd'
 import { createElement, useCallback, useEffect, useState } from 'react'
 import TeamOfTeamsDetails from './team-of-teams-details'
@@ -17,6 +16,8 @@ import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { useGetTeamOfTeamsRisks } from '@/src/services/queries/organization-queries'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound } from 'next/navigation'
+import { resetActiveTeam, retrieveTeam, setEditTeamOpen, useTeamDetail } from '../../teamsSlice'
+import { useAppDispatch } from '@/src/app/hooks'
 
 enum TeamOfTeamsTabs {
   Details = 'details',
@@ -27,9 +28,6 @@ enum TeamOfTeamsTabs {
 const TeamOfTeamsDetailsPage = ({ params }) => {
   useDocumentTitle('Team of Teams Details')
   const [activeTab, setActiveTab] = useState(TeamOfTeamsTabs.Details)
-  const [team, setTeam] = useState<TeamOfTeamsDetailsDto | null>(null)
-  const [openUpdateTeamForm, setOpenUpdateTeamForm] = useState<boolean>(false)
-  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
   const { key } = params
   const { setBreadcrumbTitle } = useBreadcrumbs()
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
@@ -39,6 +37,9 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
   const showActions = canUpdateTeam
+
+  const {team, error, isEditOpen} = useTeamDetail()
+  const dispatch = useAppDispatch()
 
   const risksQuery = useGetTeamOfTeamsRisks(
     team?.id,
@@ -59,7 +60,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     return (
       <>
         {canUpdateTeam && (
-          <Button onClick={() => setOpenUpdateTeamForm(true)}>Edit</Button>
+          <Button onClick={() => dispatch(setEditTeamOpen(true))}>Edit Team</Button>
         )}
       </>
     )
@@ -93,27 +94,13 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
-    const getTeam = async () => {
-      const teamsOfTeamsClient = await getTeamsOfTeamsClient()
-      const teamDto = await teamsOfTeamsClient.getById(key)
-      setTeam(teamDto)
-      setBreadcrumbTitle(teamDto.name)
-    }
+    dispatch(resetActiveTeam)
+    dispatch(retrieveTeam({key, type: 'Team of Teams'}))
+  }, [key, dispatch])
 
-    getTeam().catch((error) => {
-      if (error.status === 404) {
-        setTeamNotFound(true)
-      }
-      console.error('getTeam error', error)
-    })
-  }, [key, setBreadcrumbTitle, lastRefresh])
-
-  const onUpdateTeamFormClosed = (wasUpdated: boolean) => {
-    setOpenUpdateTeamForm(false)
-    if (wasUpdated) {
-      setLastRefresh(Date.now())
-    }
-  }
+  useEffect(() => {
+    team && setBreadcrumbTitle(team.name)
+  }, [team, setBreadcrumbTitle])
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
@@ -147,14 +134,8 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {openUpdateTeamForm && (
-        <EditTeamForm
-          showForm={openUpdateTeamForm}
-          teamKey={team.key}
-          type={team.type}
-          onFormUpdate={() => onUpdateTeamFormClosed(true)}
-          onFormCancel={() => onUpdateTeamFormClosed(false)}
-        />
+      {isEditOpen && team && canUpdateTeam && (
+        <EditTeamForm team={team} />
       )}
     </>
   )
