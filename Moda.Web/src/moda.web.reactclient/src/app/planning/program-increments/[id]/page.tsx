@@ -22,7 +22,7 @@ import { DownOutlined } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { EditProgramIncrementForm } from '../../components'
 import {
-  useGetProgramIncrementByLocalId,
+  useGetProgramIncrementByKey,
   useGetProgramIncrementObjectives,
   useGetProgramIncrementRisks,
   useGetProgramIncrementTeams,
@@ -55,7 +55,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   )
 
   const { data: programIncrementData, refetch: refetchProgramIncrement } =
-    useGetProgramIncrementByLocalId(params.id)
+    useGetProgramIncrementByKey(params.id)
 
   const teamsQuery = useGetProgramIncrementTeams(
     programIncrementData?.id,

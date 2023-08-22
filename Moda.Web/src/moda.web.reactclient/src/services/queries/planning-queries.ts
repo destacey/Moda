@@ -31,13 +31,12 @@ export const useGetProgramIncrementById = (id: string) => {
   })
 }
 
-export const useGetProgramIncrementByLocalId = (localId: number) => {
+export const useGetProgramIncrementByKey = (key: number) => {
   return useQuery({
-    queryKey: [QK.PROGRAM_INCREMENTS, localId],
-    queryFn: async () =>
-      (await getProgramIncrementsClient()).getByLocalId(localId),
+    queryKey: [QK.PROGRAM_INCREMENTS, key],
+    queryFn: async () => (await getProgramIncrementsClient()).getByLocalId(key),
     staleTime: 60000,
-    enabled: !!localId,
+    enabled: !!key,
   })
 }
 
@@ -124,7 +123,7 @@ export const useGetProgramIncrementObjectiveById = (
   })
 }
 
-export const useGetProgramIncrementObjectiveByLocalId = (
+export const useGetProgramIncrementObjectiveByKey = (
   id: number,
   objectiveId: number,
 ) => {
