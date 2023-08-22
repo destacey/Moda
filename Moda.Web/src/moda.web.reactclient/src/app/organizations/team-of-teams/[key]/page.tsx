@@ -28,7 +28,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   const [team, setTeam] = useState<TeamOfTeamsDetailsDto | null>(null)
   const [openUpdateTeamForm, setOpenUpdateTeamForm] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
-  const { id } = params
+  const { key } = params
   const { setBreadcrumbTitle } = useBreadcrumbs()
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
@@ -92,13 +92,13 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   useEffect(() => {
     const getTeam = async () => {
       const teamsOfTeamsClient = await getTeamsOfTeamsClient()
-      const teamDto = await teamsOfTeamsClient.getById(id)
+      const teamDto = await teamsOfTeamsClient.getById(key)
       setTeam(teamDto)
       setBreadcrumbTitle(teamDto.name)
     }
 
     getTeam()
-  }, [id, setBreadcrumbTitle, lastRefresh])
+  }, [key, setBreadcrumbTitle, lastRefresh])
 
   const onUpdateTeamFormClosed = (wasUpdated: boolean) => {
     setOpenUpdateTeamForm(false)
