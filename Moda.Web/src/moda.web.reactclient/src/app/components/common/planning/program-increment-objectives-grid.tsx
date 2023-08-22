@@ -123,7 +123,7 @@ const ProgramIncrementObjectivesGrid = ({
         },
       },
       { field: 'id', hide: true },
-      { field: 'localId', headerName: '#', width: 90 },
+      { field: 'localId', headerName: 'Key', width: 90 },
       {
         field: 'name',
         width: 400,

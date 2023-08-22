@@ -48,7 +48,7 @@ const ProgramIncrementListPage = () => {
   // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
   const columnDefs = useMemo(
     () => [
-      { field: 'localId', headerName: '#', width: 90 },
+      { field: 'localId', headerName: 'Key', width: 90 },
       { field: 'name', cellRenderer: ProgramIncrementLinkCellRenderer },
       {
         field: 'state',

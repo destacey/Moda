@@ -29,7 +29,7 @@ const EmployeeListPage = () => {
 
   const columnDefs = useMemo(
     () => [
-      { field: 'localId', headerName: '#', width: 90 },
+      { field: 'localId', headerName: 'Key', width: 90 },
       {
         field: 'displayName',
         headerName: 'Name',
@@ -46,7 +46,7 @@ const EmployeeListPage = () => {
       { field: 'email' },
       { field: 'isActive' }, // TODO: convert to yes/no
     ],
-    []
+    [],
   )
 
   const onIncludeInactiveChange = (checked: boolean) => {

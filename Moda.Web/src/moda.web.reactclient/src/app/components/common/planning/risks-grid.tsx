@@ -160,7 +160,7 @@ const RisksGrid = ({
         },
       },
       { field: 'id', hide: true },
-      { field: 'localId', headerName: '#', width: 90 },
+      { field: 'localId', headerName: 'Key', width: 90 },
       { field: 'summary', width: 300, cellRenderer: RiskLinkCellRenderer },
       {
         field: 'team.name',

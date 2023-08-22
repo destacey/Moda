@@ -40,7 +40,7 @@ const TeamListPage = () => {
 
   const columnDefs = useMemo(
     () => [
-      { field: 'localId', headerName: '#', width: 90 },
+      { field: 'localId', headerName: 'Key', width: 90 },
       { field: 'name', cellRenderer: TeamLinkCellRenderer },
       { field: 'code', width: 125 },
       { field: 'type' },
