@@ -54,13 +54,13 @@ public class ProgramIncrementsController : ControllerBase
             : NotFound();
     }
 
-    [HttpGet("local-id/{id}")]
+    [HttpGet("key/{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
-    [OpenApiOperation("Get program increment details using the localId.", "")]
+    [OpenApiOperation("Get program increment details using the key.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult<ProgramIncrementDetailsDto>> GetByLocalId(int id)
+    public async Task<ActionResult<ProgramIncrementDetailsDto>> GetByKey(int id)
     {
         var programIncrement = await _sender.Send(new GetProgramIncrementQuery(id));
 
@@ -168,13 +168,13 @@ public class ProgramIncrementsController : ControllerBase
             : NotFound();
     }
 
-    [HttpGet("local-id/{id}/objectives/{objectiveId}")]
+    [HttpGet("key/{id}/objectives/{objectiveId}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrementObjectives)]
-    [OpenApiOperation("Get a program increment objective using the PI and Objective local Ids.", "")]
+    [OpenApiOperation("Get a program increment objective using the PI and Objective keys.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ProgramIncrementObjectiveDetailsDto>> GetObjectiveByLocalId(int id, int objectiveId, CancellationToken cancellationToken)
+    public async Task<ActionResult<ProgramIncrementObjectiveDetailsDto>> GetObjectiveByKey(int id, int objectiveId, CancellationToken cancellationToken)
     {
         var objective = await _sender.Send(new GetProgramIncrementObjectiveQuery(id, objectiveId), cancellationToken);
 
@@ -208,7 +208,7 @@ public class ProgramIncrementsController : ControllerBase
             return BadRequest(error);
         }
 
-        return CreatedAtAction(nameof(GetObjectiveByLocalId), new { id, objectiveId = result.Value }, result.Value);
+        return CreatedAtAction(nameof(GetObjectiveByKey), new { id, objectiveId = result.Value }, result.Value);
     }
 
     [HttpPut("{id}/objectives/{objectiveId}")]

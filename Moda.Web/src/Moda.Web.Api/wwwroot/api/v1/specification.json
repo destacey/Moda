@@ -1026,13 +1026,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/local-id/{id}": {
+    "/api/planning/program-increments/key/{id}": {
       "get": {
         "tags": [
           "ProgramIncrements"
         ],
-        "summary": "Get program increment details using the localId.",
-        "operationId": "ProgramIncrements_GetByLocalId",
+        "summary": "Get program increment details using the key.",
+        "operationId": "ProgramIncrements_GetByKey",
         "parameters": [
           {
             "name": "id",
@@ -1524,13 +1524,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/local-id/{id}/objectives/{objectiveId}": {
+    "/api/planning/program-increments/key/{id}/objectives/{objectiveId}": {
       "get": {
         "tags": [
           "ProgramIncrements"
         ],
-        "summary": "Get a program increment objective using the PI and Objective local Ids.",
-        "operationId": "ProgramIncrements_GetObjectiveByLocalId",
+        "summary": "Get a program increment objective using the PI and Objective keys.",
+        "operationId": "ProgramIncrements_GetObjectiveByKey",
         "parameters": [
           {
             "name": "id",
@@ -2036,13 +2036,13 @@
         ]
       }
     },
-    "/api/planning/risks/local-id/{id}": {
+    "/api/planning/risks/key/{id}": {
       "get": {
         "tags": [
           "Risks"
         ],
-        "summary": "Get risk details using the localId.",
-        "operationId": "Risks_GetByLocalId",
+        "summary": "Get risk details using the key.",
+        "operationId": "Risks_GetByKey",
         "parameters": [
           {
             "name": "id",
@@ -3233,7 +3233,7 @@
         "tags": [
           "Employees"
         ],
-        "summary": "Get employee details using the localId.",
+        "summary": "Get employee details using the key.",
         "operationId": "Employees_GetById",
         "parameters": [
           {
@@ -3541,7 +3541,7 @@
         "tags": [
           "Teams"
         ],
-        "summary": "Get team details using the localId.",
+        "summary": "Get team details using the key.",
         "operationId": "Teams_GetById",
         "parameters": [
           {
@@ -4299,7 +4299,7 @@
         "tags": [
           "TeamsOfTeams"
         ],
-        "summary": "Get team of teams details using the localId.",
+        "summary": "Get team of teams details using the key.",
         "operationId": "TeamsOfTeams_GetById",
         "parameters": [
           {
@@ -5978,9 +5978,9 @@
             "description": "Gets or sets the identifier.",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
-            "description": "Gets the local identifier.",
+            "description": "Gets the key.",
             "format": "int32"
           },
           "name": {

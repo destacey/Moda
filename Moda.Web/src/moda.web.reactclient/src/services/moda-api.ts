@@ -1347,10 +1347,10 @@ export class ProgramIncrementsClient {
     }
 
     /**
-     * Get program increment details using the localId.
+     * Get program increment details using the key.
      */
-    getByLocalId(id: number, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementDetailsDto> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/local-id/{id}";
+    getByKey(id: number, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/program-increments/key/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1372,11 +1372,11 @@ export class ProgramIncrementsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetByLocalId(_response);
+            return this.processGetByKey(_response);
         });
     }
 
-    protected processGetByLocalId(response: AxiosResponse): Promise<ProgramIncrementDetailsDto> {
+    protected processGetByKey(response: AxiosResponse): Promise<ProgramIncrementDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1885,10 +1885,10 @@ export class ProgramIncrementsClient {
     }
 
     /**
-     * Get a program increment objective using the PI and Objective local Ids.
+     * Get a program increment objective using the PI and Objective keys.
      */
-    getObjectiveByLocalId(id: number, objectiveId: number, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementObjectiveDetailsDto> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/local-id/{id}/objectives/{objectiveId}";
+    getObjectiveByKey(id: number, objectiveId: number, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementObjectiveDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/program-increments/key/{id}/objectives/{objectiveId}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1913,11 +1913,11 @@ export class ProgramIncrementsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetObjectiveByLocalId(_response);
+            return this.processGetObjectiveByKey(_response);
         });
     }
 
-    protected processGetObjectiveByLocalId(response: AxiosResponse): Promise<ProgramIncrementObjectiveDetailsDto> {
+    protected processGetObjectiveByKey(response: AxiosResponse): Promise<ProgramIncrementObjectiveDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2458,10 +2458,10 @@ export class RisksClient {
     }
 
     /**
-     * Get risk details using the localId.
+     * Get risk details using the key.
      */
-    getByLocalId(id: number, cancelToken?: CancelToken | undefined): Promise<RiskDetailsDto> {
-        let url_ = this.baseUrl + "/api/planning/risks/local-id/{id}";
+    getByKey(id: number, cancelToken?: CancelToken | undefined): Promise<RiskDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/risks/key/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -2483,11 +2483,11 @@ export class RisksClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetByLocalId(_response);
+            return this.processGetByKey(_response);
         });
     }
 
-    protected processGetByLocalId(response: AxiosResponse): Promise<RiskDetailsDto> {
+    protected processGetByKey(response: AxiosResponse): Promise<RiskDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -4028,7 +4028,7 @@ export class EmployeesClient {
     }
 
     /**
-     * Get employee details using the localId.
+     * Get employee details using the key.
      */
     getById(id: number, cancelToken?: CancelToken | undefined): Promise<EmployeeDetailsDto> {
         let url_ = this.baseUrl + "/api/organization/employees/{id}";
@@ -4413,7 +4413,7 @@ export class TeamsClient {
     }
 
     /**
-     * Get team details using the localId.
+     * Get team details using the key.
      */
     getById(id: number, cancelToken?: CancelToken | undefined): Promise<TeamDetailsDto> {
         let url_ = this.baseUrl + "/api/organization/teams/{id}";
@@ -5244,7 +5244,7 @@ export class TeamsOfTeamsClient {
     }
 
     /**
-     * Get team of teams details using the localId.
+     * Get team of teams details using the key.
      */
     getById(id: number, cancelToken?: CancelToken | undefined): Promise<TeamOfTeamsDetailsDto> {
         let url_ = this.baseUrl + "/api/organization/teams-of-teams/{id}";
@@ -6766,8 +6766,8 @@ export interface UpdateProgramIncrementRequest {
 export interface ProgramIncrementTeamResponse {
     /** Gets or sets the identifier. */
     id?: string;
-    /** Gets the local identifier. */
-    localId?: number;
+    /** Gets the key. */
+    key?: number;
     /** The name of the workspace. */
     name?: string;
     /** Gets the code. */
