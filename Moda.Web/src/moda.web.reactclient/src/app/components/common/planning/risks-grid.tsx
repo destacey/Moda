@@ -26,17 +26,13 @@ const RiskLinkCellRenderer = ({ value, data }) => {
 const TeamLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.team?.type === 'Team' ? 'teams' : 'team-of-teams'
   return (
-    <Link href={`/organizations/${teamRoute}/${data.team?.key}`}>
-      {value}
-    </Link>
+    <Link href={`/organizations/${teamRoute}/${data.team?.key}`}>{value}</Link>
   )
 }
 
 const AssigneeLinkCellRenderer = ({ value, data }) => {
   return (
-    <Link href={`/organizations/employees/${data.assignee?.key}`}>
-      {value}
-    </Link>
+    <Link href={`/organizations/employees/${data.assignee?.key}`}>{value}</Link>
   )
 }
 
@@ -59,7 +55,6 @@ const RisksGrid = ({
   const showActions = newRisksAllowed && canCreateRisks
 
   const onIncludeClosedChange = (checked: boolean) => {
-    console.log('onIncludeClosedChange', checked)
     setIncludeClosed(checked)
     updateIncludeClosed(checked)
   }

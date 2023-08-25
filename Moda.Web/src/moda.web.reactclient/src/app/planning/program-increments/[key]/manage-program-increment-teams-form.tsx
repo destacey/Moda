@@ -7,16 +7,15 @@ import {
   getTeamsClient,
   getTeamsOfTeamsClient,
 } from '@/src/services/clients'
-import { Modal, Spin, Transfer, TransferProps, message } from 'antd'
-import Table, { ColumnsType } from 'antd/es/table'
-import { TableRowSelection } from 'antd/es/table/interface'
+import { Modal, Spin, Table, Transfer, TransferProps, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import difference from 'lodash/difference'
 import {
   ManageProgramIncrementTeamsRequest,
   ProgramIncrementTeamResponse,
 } from '@/src/services/moda-api'
-import { TransferItem } from 'antd/es/transfer'
+import type { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
+import type { TransferItem } from 'antd/es/transfer'
 
 export interface ManageProgramIncrementTeamsFormProps {
   showForm: boolean
@@ -200,7 +199,6 @@ const ManageProgramIncrementTeamsForm = ({
         id: id,
         teamIds: targetKeys,
       }
-      console.log('team count', request.teamIds.length)
       await piClient.manageTeams(id, request)
 
       return true
@@ -234,7 +232,6 @@ const ManageProgramIncrementTeamsForm = ({
   }
 
   const onChange = (nextTargetKeys: string[]) => {
-    console.log('onChange', nextTargetKeys)
     setTargetKeys(nextTargetKeys)
   }
 

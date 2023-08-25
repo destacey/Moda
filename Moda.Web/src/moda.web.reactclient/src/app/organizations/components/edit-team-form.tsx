@@ -12,7 +12,7 @@ import { toFormErrors } from '@/src/utils'
 
 export interface EditTeamFormProps {
   showForm: boolean
-  key: number
+  teamKey: number
   type: string
   onFormUpdate: () => void
   onFormCancel: () => void
@@ -27,7 +27,7 @@ interface EditTeamFormValues {
 
 const EditTeamForm = ({
   showForm,
-  key,
+  teamKey,
   type,
   onFormUpdate,
   onFormCancel,
@@ -51,7 +51,7 @@ const EditTeamForm = ({
         description: team.description,
       })
     },
-    [form]
+    [form],
   )
 
   const getTeamData = useCallback(async (key: number) => {
@@ -68,21 +68,21 @@ const EditTeamForm = ({
     try {
       let teamData: EditTeamFormValues = null
       if (type === 'Team') {
-        teamData = await getTeamData(key)
+        teamData = await getTeamData(teamKey)
       } else if (type === 'Team of Teams') {
-        teamData = await getTeamOfTeamsData(key)
+        teamData = await getTeamOfTeamsData(teamKey)
       } else {
         throw new Error(`Invalid team type: ${type}`)
       }
       mapTeamToFormValues(teamData)
     } catch (error) {
       messageApi.error(
-        `An unexpected error occurred while retrieving the ${type}.`
+        `An unexpected error occurred while retrieving the ${type}.`,
       )
       console.error(error)
     }
   }, [
-    key,
+    teamKey,
     mapTeamToFormValues,
     messageApi,
     getTeamData,
@@ -106,7 +106,7 @@ const EditTeamForm = ({
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
       () => setIsValid(true && form.isFieldsTouched()),
-      () => setIsValid(false)
+      () => setIsValid(false),
     )
   }, [form, formValues])
 
@@ -127,7 +127,7 @@ const EditTeamForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          `An unexpected error occurred while creating the ${type}.`
+          `An unexpected error occurred while creating the ${type}.`,
         )
         console.error(error)
       }
@@ -145,7 +145,7 @@ const EditTeamForm = ({
     const teamsOfTeamsClient = await getTeamsOfTeamsClient()
     await teamsOfTeamsClient.update(
       values.id,
-      values as UpdateTeamOfTeamsRequest
+      values as UpdateTeamOfTeamsRequest,
     )
   }
 

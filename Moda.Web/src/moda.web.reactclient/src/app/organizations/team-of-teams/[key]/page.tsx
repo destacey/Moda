@@ -56,7 +56,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     return (
       <>
         {canUpdateTeam && (
-          <Button onClick={() => setOpenUpdateTeamForm(true)}>Edit Team</Button>
+          <Button onClick={() => setOpenUpdateTeamForm(true)}>Edit</Button>
         )}
       </>
     )
@@ -135,10 +135,10 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {openUpdateTeamForm && team && canUpdateTeam && (
+      {openUpdateTeamForm && (
         <EditTeamForm
           showForm={openUpdateTeamForm}
-          key={team.key}
+          teamKey={team.key}
           type={team.type}
           onFormUpdate={() => onUpdateTeamFormClosed(true)}
           onFormCancel={() => onUpdateTeamFormClosed(false)}

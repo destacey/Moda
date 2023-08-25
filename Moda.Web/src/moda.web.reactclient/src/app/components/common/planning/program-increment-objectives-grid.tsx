@@ -5,8 +5,8 @@ import ModaGrid from '../moda-grid'
 import { Button, Progress, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import useAuth from '../../contexts/auth'
-import CreateProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[id]/create-program-increment-objective-form'
-import EditProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[id]/edit-program-increment-objective-form'
+import CreateProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[key]/create-program-increment-objective-form'
+import EditProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[key]/edit-program-increment-objective-form'
 import { EditOutlined } from '@ant-design/icons'
 import { UseQueryResult } from 'react-query'
 import dayjs from 'dayjs'
@@ -31,9 +31,7 @@ const ProgramIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
 
 const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
   return (
-    <Link
-      href={`/planning/program-increments/${data.programIncrement?.key}`}
-    >
+    <Link href={`/planning/program-increments/${data.programIncrement?.key}`}>
       {value}
     </Link>
   )
@@ -232,7 +230,7 @@ const ProgramIncrementObjectivesGrid = ({
         actions={showActions && <Actions />}
         gridControlMenuItems={controlItems}
       />
-      {openCreateObjectiveForm && canManageObjectives && (
+      {openCreateObjectiveForm && (
         <CreateProgramIncrementObjectiveForm
           showForm={openCreateObjectiveForm}
           programIncrementId={programIncrementId}
@@ -240,7 +238,7 @@ const ProgramIncrementObjectivesGrid = ({
           onFormCancel={() => onCreateObjectiveFormClosed(false)}
         />
       )}
-      {openUpdateObjectiveForm && canManageObjectives && (
+      {openUpdateObjectiveForm && (
         <EditProgramIncrementObjectiveForm
           showForm={openUpdateObjectiveForm}
           objectiveId={editObjectiveId}

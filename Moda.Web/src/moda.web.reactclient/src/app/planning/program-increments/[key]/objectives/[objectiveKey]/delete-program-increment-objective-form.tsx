@@ -21,19 +21,18 @@ const DeleteProgramIncrementObjectiveForm = ({
   const [messageApi, contextHolder] = message.useMessage()
 
   const deleteObjective = async (
-    objective: ProgramIncrementObjectiveDetailsDto
+    objective: ProgramIncrementObjectiveDetailsDto,
   ) => {
     try {
-      console.log('deleteObjective')
       const programIncrementsClient = await getProgramIncrementsClient()
       await programIncrementsClient.deleteObjective(
         objective.programIncrement.id,
-        objective.id
+        objective.id,
       )
       return true
     } catch (error) {
       messageApi.error(
-        'An unexpected error occurred while deleting the PI objective.'
+        'An unexpected error occurred while deleting the PI objective.',
       )
       console.log(error)
       return false
