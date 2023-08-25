@@ -68,7 +68,7 @@ const CreateProgramIncrementObjectiveForm = ({
   const [messageApi, contextHolder] = message.useMessage()
   const [teams, setTeams] = useState<ProgramIncrementTeamSelectItem[]>([])
   const [defaultStatusId, setDefaultStatusId] = useState<number>(null)
-  const [newObjectiveLocalId, setNewObjectiveLocalId] = useState<number>(null)
+  const [newObjectiveKey, setNewObjectiveKey] = useState<number>(null)
 
   const { data: programIncrementData } =
     useGetProgramIncrementById(programIncrementId)
@@ -100,8 +100,8 @@ const CreateProgramIncrementObjectiveForm = ({
   ): Promise<boolean> => {
     try {
       const request = mapToRequestValues(values)
-      const localId = await createObjective.mutateAsync(request)
-      setNewObjectiveLocalId(localId)
+      const key = await createObjective.mutateAsync(request)
+      setNewObjectiveKey(key)
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -184,7 +184,7 @@ const CreateProgramIncrementObjectiveForm = ({
   }, [form, formValues])
 
   useEffect(() => {
-    if (newObjectiveLocalId) {
+    if (newObjectiveKey) {
       setIsOpen(false)
       form.resetFields()
       onFormCreate()
@@ -192,7 +192,7 @@ const CreateProgramIncrementObjectiveForm = ({
     }
     // we don't want a trigger on the other dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newObjectiveLocalId])
+  }, [newObjectiveKey])
 
   const disabledDate: RangePickerProps['disabledDate'] = useCallback(
     (current) => {

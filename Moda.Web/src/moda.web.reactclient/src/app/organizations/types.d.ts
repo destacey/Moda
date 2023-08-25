@@ -2,7 +2,7 @@ import { TeamNavigationDto } from '@/src/services/moda-api'
 
 export interface TeamListItem {
   id: string
-  localId: number
+  key: number
   name: string
   code: string
   type: string

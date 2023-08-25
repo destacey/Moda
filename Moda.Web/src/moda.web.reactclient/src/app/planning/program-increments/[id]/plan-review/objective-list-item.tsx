@@ -8,14 +8,14 @@ import { EditOutlined } from '@ant-design/icons'
 
 export interface ObjectiveListItemProps {
   objective: ProgramIncrementObjectiveListDto
-  piLocalId: number
+  piKey: number
   canUpdateObjectives: boolean
   refreshObjectives: () => void
 }
 
 const ObjectiveListItem = ({
   objective,
-  piLocalId,
+  piKey,
   canUpdateObjectives,
   refreshObjectives,
 }: ObjectiveListItemProps) => {
@@ -24,7 +24,7 @@ const ObjectiveListItem = ({
   const title = () => {
     return (
       <Link
-        href={`/planning/program-increments/${piLocalId}/objectives/${objective.localId}`}
+        href={`/planning/program-increments/${piKey}/objectives/${objective.localId}`}
       >
         {objective.localId} - {objective.name}
       </Link>

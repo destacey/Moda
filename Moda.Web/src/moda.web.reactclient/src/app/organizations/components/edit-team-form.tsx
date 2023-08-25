@@ -12,7 +12,7 @@ import { toFormErrors } from '@/src/utils'
 
 export interface EditTeamFormProps {
   showForm: boolean
-  localId: number
+  key: number
   type: string
   onFormUpdate: () => void
   onFormCancel: () => void
@@ -27,7 +27,7 @@ interface EditTeamFormValues {
 
 const EditTeamForm = ({
   showForm,
-  localId,
+  key,
   type,
   onFormUpdate,
   onFormCancel,
@@ -68,9 +68,9 @@ const EditTeamForm = ({
     try {
       let teamData: EditTeamFormValues = null
       if (type === 'Team') {
-        teamData = await getTeamData(localId)
+        teamData = await getTeamData(key)
       } else if (type === 'Team of Teams') {
-        teamData = await getTeamOfTeamsData(localId)
+        teamData = await getTeamOfTeamsData(key)
       } else {
         throw new Error(`Invalid team type: ${type}`)
       }
@@ -82,7 +82,7 @@ const EditTeamForm = ({
       console.error(error)
     }
   }, [
-    localId,
+    key,
     mapTeamToFormValues,
     messageApi,
     getTeamData,

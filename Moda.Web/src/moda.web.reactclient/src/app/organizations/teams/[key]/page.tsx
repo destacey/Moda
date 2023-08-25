@@ -139,7 +139,7 @@ const TeamDetailsPage = ({ params }) => {
       {openUpdateTeamForm && team && canUpdateTeam && (
         <EditTeamForm
           showForm={openUpdateTeamForm}
-          localId={team.localId}
+          key={team.localId}
           type={team.type}
           onFormUpdate={() => onUpdateTeamFormClosed(true)}
           onFormCancel={() => onUpdateTeamFormClosed(false)}
