@@ -72,7 +72,7 @@ internal sealed class CreateTeamOfTeamsCommandHandler : ICommandHandler<CreateTe
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(team.LocalId);
+            return Result.Success(team.Key);
         }
         catch (Exception ex)
         {

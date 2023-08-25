@@ -87,7 +87,7 @@ const TeamObjectivesListCard = ({
         renderItem={(objective) => (
           <ObjectiveListItem
             objective={objective}
-            piKey={objective.programIncrement.localId}
+            piKey={objective.programIncrement.key}
             canUpdateObjectives={canManageObjectives}
             refreshObjectives={refreshObjectives}
           />

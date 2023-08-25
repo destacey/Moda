@@ -235,7 +235,7 @@ const EditProgramIncrementObjectiveForm = ({
           )}
           <Descriptions size="small" column={1}>
             <Descriptions.Item label="Number">
-              {objectiveData?.localId}
+              {objectiveData?.key}
             </Descriptions.Item>
             <Descriptions.Item label="Team">
               {objectiveData?.team.name}

@@ -20,13 +20,13 @@ export interface RisksGridProps {
 }
 
 const RiskLinkCellRenderer = ({ value, data }) => {
-  return <Link href={`/planning/risks/${data.localId}`}>{value}</Link>
+  return <Link href={`/planning/risks/${data.key}`}>{value}</Link>
 }
 
 const TeamLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.team?.type === 'Team' ? 'teams' : 'team-of-teams'
   return (
-    <Link href={`/organizations/${teamRoute}/${data.team?.localId}`}>
+    <Link href={`/organizations/${teamRoute}/${data.team?.key}`}>
       {value}
     </Link>
   )
@@ -34,7 +34,7 @@ const TeamLinkCellRenderer = ({ value, data }) => {
 
 const AssigneeLinkCellRenderer = ({ value, data }) => {
   return (
-    <Link href={`/organizations/employees/${data.assignee?.localId}`}>
+    <Link href={`/organizations/employees/${data.assignee?.key}`}>
       {value}
     </Link>
   )
@@ -160,7 +160,7 @@ const RisksGrid = ({
         },
       },
       { field: 'id', hide: true },
-      { field: 'localId', headerName: 'Key', width: 90 },
+      { field: 'key', width: 90 },
       { field: 'summary', width: 300, cellRenderer: RiskLinkCellRenderer },
       {
         field: 'team.name',

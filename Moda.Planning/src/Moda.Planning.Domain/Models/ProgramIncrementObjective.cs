@@ -15,9 +15,9 @@ public class ProgramIncrementObjective : BaseAuditableEntity<Guid>
         IsStretch = isStretch;
     }
 
-    /// <summary>Gets the local identifier.</summary>
-    /// <value>The local identifier.</value>
-    public int LocalId { get; init; }
+    /// <summary>Gets the key.</summary>
+    /// <value>The key.</value>
+    public int Key { get; init; }
 
     /// <summary>Gets the program increment identifier.</summary>
     /// <value>The program increment identifier.</value>

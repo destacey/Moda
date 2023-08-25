@@ -5,7 +5,7 @@ namespace Moda.Planning.Application.Risks.Dtos;
 public class RiskDetailsDto : IMapFrom<Risk>
 {
     public Guid Id { get; set; }
-    public int LocalId { get; set; }
+    public int Key { get; set; }
     public required string Summary { get; set; }
     public string? Description { get; set; }
     public PlanningTeamNavigationDto? Team { get; set; }
@@ -24,12 +24,12 @@ public class RiskDetailsDto : IMapFrom<Risk>
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<Risk, RiskDetailsDto>()
-            .Map(dest => dest.ReportedBy, src => NavigationDto.Create(src.ReportedBy.Id, src.ReportedBy.LocalId, src.ReportedBy.Name.FullName))
+            .Map(dest => dest.ReportedBy, src => NavigationDto.Create(src.ReportedBy.Id, src.ReportedBy.Key, src.ReportedBy.Name.FullName))
             .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))
             .Map(dest => dest.Category, src => SimpleNavigationDto.FromEnum(src.Category))
             .Map(dest => dest.Impact, src => SimpleNavigationDto.FromEnum(src.Impact))
             .Map(dest => dest.Likelihood, src => SimpleNavigationDto.FromEnum(src.Likelihood))
             .Map(dest => dest.Exposure, src => SimpleNavigationDto.FromEnum(src.Exposure))
-            .Map(dest => dest.Assignee, src => src.Assignee == null ? null : NavigationDto.Create(src.Assignee.Id, src.Assignee.LocalId, src.Assignee.Name.FullName));
+            .Map(dest => dest.Assignee, src => src.Assignee == null ? null : NavigationDto.Create(src.Assignee.Id, src.Assignee.Key, src.Assignee.Name.FullName));
     }
 }

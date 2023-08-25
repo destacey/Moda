@@ -9,7 +9,7 @@ import {
   ProgramIncrementTeamResponse,
 } from '@/src/services/moda-api'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card } from 'antd'
 import Link from 'next/link'
 import TeamPlanReview from './team-plan-review'
@@ -35,65 +35,63 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
 
     const getProgramIncrement = async () => {
       const programIncrementsClient = await getProgramIncrementsClient()
-      const programIncrementDto = await programIncrementsClient.getByLocalId(
-        params.id
+      const programIncrementDto = await programIncrementsClient.getByKey(
+        params.key,
       )
       setProgramIncrement(programIncrementDto)
 
       breadcrumbRoute.push(
         {
-          href: `/planning/program-increments/${programIncrement?.localId}`,
+          href: `/planning/program-increments/${programIncrement?.key}`,
           title: programIncrement?.name,
         },
         {
           title: 'Plan Review',
-        }
+        },
       )
       // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
       setBreadcrumbRoute(breadcrumbRoute)
 
       const teamData = await programIncrementsClient.getTeams(
-        programIncrementDto.id
+        programIncrementDto.id,
       )
       setTeams(
         teamData
           .sort((a, b) => a.code.localeCompare(b.code))
-          .filter((t) => t.type === 'Team')
+          .filter((t) => t.type === 'Team'),
       )
     }
 
     getProgramIncrement()
   }, [
-    params.id,
-    programIncrement?.localId,
+    params.key,
+    programIncrement?.key,
     programIncrement?.name,
     setBreadcrumbRoute,
   ])
 
   useEffect(() => {
     if (teams.length > 0) {
-      setActiveTab(teams[0].localId.toString())
+      setActiveTab(teams[0].key.toString())
     }
   }, [teams])
 
   const tabs = teams.map((team) => {
     return {
-      key: team.localId.toString(),
+      key: team.key.toString(),
       tab: team.code,
       content: <div>{team.code}</div>,
     }
   })
 
   const activeTeam = () => {
-    return teams.find((t) => t.localId.toString() === activeTab)
+    return teams.find((t) => t.key.toString() === activeTab)
   }
 
   const Actions = () => {
     return (
       <>
-        <Link
-          href={`/planning/program-increments/${programIncrement?.localId}`}
-        >
+        <Link href={`/planning/program-increments/${programIncrement?.key}`}>
           PI Details
         </Link>
       </>

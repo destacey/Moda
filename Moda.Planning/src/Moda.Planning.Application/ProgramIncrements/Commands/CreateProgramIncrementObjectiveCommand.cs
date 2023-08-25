@@ -119,11 +119,11 @@ internal sealed class CreateProgramIncrementObjectiveCommandHandler : ICommandHa
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
 
-            var localId = programIncrement.Objectives
+            var key = programIncrement.Objectives
                 .First(o => o.ObjectiveId == objectiveResult.Value)
-                .LocalId;
+                .Key;
 
-            return Result.Success(localId);
+            return Result.Success(key);
         }
         catch (Exception ex)
         {

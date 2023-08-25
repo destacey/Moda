@@ -55,7 +55,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   )
 
   const { data: programIncrementData, refetch: refetchProgramIncrement } =
-    useGetProgramIncrementByKey(params.id)
+    useGetProgramIncrementByKey(params.key)
 
   const teamsQuery = useGetProgramIncrementTeams(
     programIncrementData?.id,
@@ -100,7 +100,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     return (
       <>
         <Space>
-          <Link href={`/planning/program-increments/${params.id}/plan-review`}>
+          <Link href={`/planning/program-increments/${params.key}/plan-review`}>
             Plan Review
           </Link>
           {canUpdateProgramIncrement && (

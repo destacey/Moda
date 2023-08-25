@@ -116,7 +116,7 @@ internal sealed class UpdateProgramIncrementObjectiveCommandHandler : ICommandHa
                 return Result.Failure<int>($"Unable to update the underlying objective.  Error: {objectiveResult.Error}");
             // TODO: isStretch is still updated in this scenario.
 
-            return Result.Success(updatePiObjectiveResult.Value.LocalId);
+            return Result.Success(updatePiObjectiveResult.Value.Key);
         }
         catch (Exception ex)
         {

@@ -7,13 +7,13 @@ public sealed record GetRiskQuery : IQuery<RiskDetailsDto?>
     {
         RiskId = riskId;
     }
-    public GetRiskQuery(int riskLocalId)
+    public GetRiskQuery(int riskKey)
     {
-        RiskLocalId = riskLocalId;
+        RiskKey = riskKey;
     }
 
     public Guid? RiskId { get; }
-    public int? RiskLocalId { get; }
+    public int? RiskKey { get; }
 }
 
 internal sealed class GetRiskQueryHandler : IQueryHandler<GetRiskQuery, RiskDetailsDto?>
@@ -39,9 +39,9 @@ internal sealed class GetRiskQueryHandler : IQueryHandler<GetRiskQuery, RiskDeta
         {
             query = query.Where(e => e.Id == request.RiskId.Value);
         }
-        else if (request.RiskLocalId.HasValue)
+        else if (request.RiskKey.HasValue)
         {
-            query = query.Where(e => e.LocalId == request.RiskLocalId.Value);
+            query = query.Where(e => e.Key == request.RiskKey.Value);
         }
         else
         {

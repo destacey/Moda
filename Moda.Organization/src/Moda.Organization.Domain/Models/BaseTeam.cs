@@ -13,9 +13,9 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
 
     protected readonly List<TeamMembership> _parentMemberships = new();
 
-    /// <summary>Gets the local identifier.</summary>
-    /// <value>The local identifier.</value>
-    public int LocalId { get; protected set; }
+    /// <summary>Gets the key.</summary>
+    /// <value>The key.</value>
+    public int Key { get; protected set; }
 
     /// <summary>
     /// The name of the team.

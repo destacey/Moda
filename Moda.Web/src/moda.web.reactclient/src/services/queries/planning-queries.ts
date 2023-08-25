@@ -34,7 +34,7 @@ export const useGetProgramIncrementById = (id: string) => {
 export const useGetProgramIncrementByKey = (key: number) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENTS, key],
-    queryFn: async () => (await getProgramIncrementsClient()).getByLocalId(key),
+    queryFn: async () => (await getProgramIncrementsClient()).getByKey(key),
     staleTime: 60000,
     enabled: !!key,
   })
@@ -130,7 +130,7 @@ export const useGetProgramIncrementObjectiveByKey = (
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVES, id, objectiveId],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getObjectiveByLocalId(
+      (await getProgramIncrementsClient()).getObjectiveByKey(
         id,
         objectiveId,
       ),

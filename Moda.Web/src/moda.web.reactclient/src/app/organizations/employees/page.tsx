@@ -11,12 +11,12 @@ import Link from 'next/link'
 import { useDocumentTitle } from '../../hooks/use-document-title'
 
 const EmployeeLinkCellRenderer = ({ value, data }) => {
-  return <Link href={`/organizations/employees/${data.localId}`}>{value}</Link>
+  return <Link href={`/organizations/employees/${data.key}`}>{value}</Link>
 }
 
 const ManagerLinkCellRenderer = ({ value, data }) => {
   return (
-    <Link href={`/organizations/employees/${data.managerLocalId}`}>
+    <Link href={`/organizations/employees/${data.managerKey}`}>
       {value}
     </Link>
   )
@@ -29,7 +29,7 @@ const EmployeeListPage = () => {
 
   const columnDefs = useMemo(
     () => [
-      { field: 'localId', headerName: 'Key', width: 90 },
+      { field: 'key', width: 90 },
       {
         field: 'displayName',
         headerName: 'Name',

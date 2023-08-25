@@ -5548,7 +5548,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },
@@ -5831,7 +5831,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },
@@ -5859,7 +5859,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },
@@ -6050,7 +6050,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },
@@ -6125,7 +6125,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },
@@ -6670,7 +6670,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },
@@ -6721,7 +6721,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },
@@ -7260,7 +7260,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },
@@ -7308,7 +7308,7 @@
             "format": "guid",
             "nullable": true
           },
-          "managerLocalId": {
+          "managerKey": {
             "type": "integer",
             "format": "int32",
             "nullable": true
@@ -7330,7 +7330,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },
@@ -7386,7 +7386,7 @@
             "format": "guid",
             "nullable": true
           },
-          "managerLocalId": {
+          "managerKey": {
             "type": "integer",
             "format": "int32",
             "nullable": true
@@ -7601,7 +7601,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },
@@ -7635,7 +7635,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },
@@ -7833,7 +7833,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },
@@ -7867,7 +7867,7 @@
             "type": "string",
             "format": "guid"
           },
-          "localId": {
+          "key": {
             "type": "integer",
             "format": "int32"
           },

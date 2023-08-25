@@ -13,14 +13,14 @@ public sealed record GetProgramIncrementObjectivesQuery : IQuery<IReadOnlyList<P
         TeamId = teamId;
     }
 
-    public GetProgramIncrementObjectivesQuery(int localId, Guid? teamId)
+    public GetProgramIncrementObjectivesQuery(int key, Guid? teamId)
     {
-        LocalId = localId;
+        Key = key;
         TeamId = teamId;
     }
 
     public Guid? Id { get; set; }
-    public int? LocalId { get; set; }
+    public int? Key { get; set; }
     public Guid? TeamId { get; set; }
 }
 
@@ -63,9 +63,9 @@ internal sealed class GetProgramIncrementObjectivesQueryHandler : IQueryHandler<
         {
             query = query.Where(p => p.Id == request.Id.Value);
         }
-        else if (request.LocalId.HasValue)
+        else if (request.Key.HasValue)
         {
-            query = query.Where(p => p.LocalId == request.LocalId.Value);
+            query = query.Where(p => p.Key == request.Key.Value);
         }
         else
         {
@@ -85,7 +85,7 @@ internal sealed class GetProgramIncrementObjectivesQueryHandler : IQueryHandler<
             ThrowAndLogException(request, $"Error mapping objectives for program increment {programIncrement.Id}.");
 
         // map the list of objectives
-        var piNavigation = NavigationDto.Create(programIncrement.Id, programIncrement.LocalId, programIncrement.Name);
+        var piNavigation = NavigationDto.Create(programIncrement.Id, programIncrement.Key, programIncrement.Name);
         List<ProgramIncrementObjectiveListDto> piObjectives = new(objectives.Count);
         foreach (var piObjective in programIncrement.Objectives)
         {

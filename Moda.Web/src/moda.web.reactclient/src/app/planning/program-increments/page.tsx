@@ -14,7 +14,7 @@ import { useGetProgramIncrements } from '@/src/services/queries/planning-queries
 
 const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
   return (
-    <Link href={`/planning/program-increments/${data.localId}`}>{value}</Link>
+    <Link href={`/planning/program-increments/${data.key}`}>{value}</Link>
   )
 }
 
@@ -48,7 +48,7 @@ const ProgramIncrementListPage = () => {
   // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
   const columnDefs = useMemo(
     () => [
-      { field: 'localId', headerName: 'Key', width: 90 },
+      { field: 'key', width: 90 },
       { field: 'name', cellRenderer: ProgramIncrementLinkCellRenderer },
       {
         field: 'state',

@@ -6,7 +6,7 @@ namespace Moda.Planning.Application.Risks.Dtos;
 public class RiskListDto : IMapFrom<Risk>
 {
     public Guid Id { get; set; }
-    public int LocalId { get; set; }
+    public int Key { get; set; }
     public required string Summary { get; set; }
     public PlanningTeamNavigationDto? Team { get; set; }
     public Instant ReportedOn { get; set; }
@@ -22,6 +22,6 @@ public class RiskListDto : IMapFrom<Risk>
             .Map(dest => dest.Status, src => src.Status.GetDisplayName())
             .Map(dest => dest.Category, src => src.Category.GetDisplayName())
             .Map(dest => dest.Exposure, src => src.Exposure.GetDisplayName())
-            .Map(dest => dest.Assignee, src => src.Assignee == null ? null : NavigationDto.Create(src.Assignee.Id, src.Assignee.LocalId, src.Assignee.Name.FullName));
+            .Map(dest => dest.Assignee, src => src.Assignee == null ? null : NavigationDto.Create(src.Assignee.Id, src.Assignee.Key, src.Assignee.Name.FullName));
     }
 }

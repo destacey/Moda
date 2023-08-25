@@ -14,8 +14,8 @@ const ProgramIncrementObjectiveDetails = (
 
   const teamLink =
     objective.team?.type === 'Team'
-      ? `/organizations/teams/${objective.team?.localId}`
-      : `/organizations/team-of-teams/${objective.team?.localId}`
+      ? `/organizations/teams/${objective.team?.key}`
+      : `/organizations/team-of-teams/${objective.team?.key}`
 
   return (
     <>
@@ -31,7 +31,7 @@ const ProgramIncrementObjectiveDetails = (
           <Descriptions>
             <Item label="PI">
               <Link
-                href={`/planning/program-increments/${objective.programIncrement?.localId}`}
+                href={`/planning/program-increments/${objective.programIncrement?.key}`}
               >
                 {objective.programIncrement?.name}
               </Link>

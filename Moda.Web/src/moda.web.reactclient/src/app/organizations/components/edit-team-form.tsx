@@ -54,14 +54,14 @@ const EditTeamForm = ({
     [form]
   )
 
-  const getTeamData = useCallback(async (teamLocalId: number) => {
+  const getTeamData = useCallback(async (key: number) => {
     const teamsClient = await getTeamsClient()
-    return (await teamsClient.getById(teamLocalId)) as EditTeamFormValues
+    return (await teamsClient.getById(key)) as EditTeamFormValues
   }, [])
 
-  const getTeamOfTeamsData = useCallback(async (teamLocalId: number) => {
+  const getTeamOfTeamsData = useCallback(async (teamKey: number) => {
     const teamsOfTeamsClient = await getTeamsOfTeamsClient()
-    return (await teamsOfTeamsClient.getById(teamLocalId)) as EditTeamFormValues
+    return (await teamsOfTeamsClient.getById(teamKey)) as EditTeamFormValues
   }, [])
 
   const loadData = useCallback(async () => {

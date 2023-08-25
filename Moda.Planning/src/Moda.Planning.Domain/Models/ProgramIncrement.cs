@@ -25,9 +25,9 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         ObjectivesLocked = false;
     }
 
-    /// <summary>Gets the local identifier.</summary>
-    /// <value>The local identifier.</value>
-    public int LocalId { get; private set; }
+    /// <summary>Gets the key.</summary>
+    /// <value>The key.</value>
+    public int Key { get; private set; }
 
     /// <summary>
     /// The name of the Program Increment.

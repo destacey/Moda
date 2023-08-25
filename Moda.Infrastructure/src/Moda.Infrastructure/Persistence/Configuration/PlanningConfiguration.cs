@@ -13,22 +13,22 @@ public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
         builder.ToTable("PlanningTeams", SchemaNames.Planning);
 
         builder.HasKey(t => t.Id);
-        builder.HasAlternateKey(t => t.LocalId);
+        builder.HasAlternateKey(t => t.Key);
 
         builder.HasIndex(t => new { t.Id, t.IsDeleted })
-            .IncludeProperties(t => new { t.LocalId, t.Name, t.Code, t.Type, t.IsActive });
-        builder.HasIndex(t =>  new { t.LocalId, t.IsDeleted })
+            .IncludeProperties(t => new { t.Key, t.Name, t.Code, t.Type, t.IsActive });
+        builder.HasIndex(t =>  new { t.Key, t.IsDeleted })
             .IncludeProperties(t => new { t.Id, t.Name, t.Code, t.Type, t.IsActive });
         builder.HasIndex(t => t.Code)
             .IsUnique()
-            .IncludeProperties(t => new { t.Id, t.LocalId, t.Name, t.Type, t.IsActive });
+            .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Type, t.IsActive });
         builder.HasIndex(t => new { t.IsActive, t.IsDeleted })
-            .IncludeProperties(t => new { t.Id, t.LocalId, t.Name, t.Code, t.Type });
+            .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Code, t.Type });
         builder.HasIndex(t => t.IsDeleted)
-            .IncludeProperties(t => new { t.Id, t.LocalId, t.Name, t.Code, t.Type, t.IsActive });
+            .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Code, t.Type, t.IsActive });
 
         builder.Property(t => t.Id).ValueGeneratedNever();
-        builder.Property(t => t.LocalId).ValueGeneratedNever();
+        builder.Property(t => t.Key).ValueGeneratedNever();
 
         builder.Property(t => t.Name).IsRequired().HasMaxLength(128);
         builder.Property(t => t.Code).IsRequired()
@@ -63,7 +63,7 @@ public class ProgramIncrementConfig : IEntityTypeConfiguration<ProgramIncrement>
         builder.ToTable("ProgramIncrements", SchemaNames.Planning);
 
         builder.HasKey(p => p.Id);
-        builder.HasAlternateKey(p => p.LocalId);
+        builder.HasAlternateKey(p => p.Key);
 
         builder.HasIndex(p => p.Id)
             .IncludeProperties(p => new { p.Name, p.Description });
@@ -71,7 +71,7 @@ public class ProgramIncrementConfig : IEntityTypeConfiguration<ProgramIncrement>
             .IsUnique();
         builder.HasIndex(p => p.IsDeleted);
 
-        builder.Property(p => p.LocalId).ValueGeneratedOnAdd();
+        builder.Property(p => p.Key).ValueGeneratedOnAdd();
 
         builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
         builder.Property(p => p.Description).HasMaxLength(1024);
@@ -103,20 +103,20 @@ public class ProgramIncrementObjectiveConfig : IEntityTypeConfiguration<ProgramI
         builder.ToTable("ProgramIncrementObjectives", SchemaNames.Planning);
 
         builder.HasKey(o => o.Id);
-        builder.HasAlternateKey(o => o.LocalId);
+        builder.HasAlternateKey(o => o.Key);
 
         builder.HasIndex(o => new { o.Id, o.IsDeleted })
-            .IncludeProperties(o => new { o.LocalId, o.ProgramIncrementId, o.ObjectiveId, o.Type, o.IsStretch });
-        builder.HasIndex(o => new { o.LocalId, o.IsDeleted })
+            .IncludeProperties(o => new { o.Key, o.ProgramIncrementId, o.ObjectiveId, o.Type, o.IsStretch });
+        builder.HasIndex(o => new { o.Key, o.IsDeleted })
             .IncludeProperties(o => new { o.Id, o.ProgramIncrementId, o.ObjectiveId, o.Type, o.IsStretch });
         builder.HasIndex(o => new { o.ProgramIncrementId, o.IsDeleted })
-            .IncludeProperties(o => new { o.Id, o.LocalId, o.ObjectiveId, o.Type, o.IsStretch });
+            .IncludeProperties(o => new { o.Id, o.Key, o.ObjectiveId, o.Type, o.IsStretch });
         builder.HasIndex(o => new { o.ObjectiveId, o.IsDeleted })
-            .IncludeProperties(o => new { o.Id, o.LocalId, o.ProgramIncrementId, o.Type, o.IsStretch });
+            .IncludeProperties(o => new { o.Id, o.Key, o.ProgramIncrementId, o.Type, o.IsStretch });
         builder.HasIndex(o => o.IsDeleted)
-            .IncludeProperties(o => new { o.Id, o.LocalId, o.ProgramIncrementId, o.ObjectiveId, o.Type, o.IsStretch });
+            .IncludeProperties(o => new { o.Id, o.Key, o.ProgramIncrementId, o.ObjectiveId, o.Type, o.IsStretch });
 
-        builder.Property(o => o.LocalId).ValueGeneratedOnAdd();
+        builder.Property(o => o.Key).ValueGeneratedOnAdd();
 
         builder.Property(o => o.ObjectiveId).IsRequired();
         builder.Property(o => o.Type).IsRequired()
@@ -181,12 +181,12 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
         builder.ToTable("Risks", SchemaNames.Planning);
 
         builder.HasKey(r => r.Id);
-        builder.HasAlternateKey(r => r.LocalId);
+        builder.HasAlternateKey(r => r.Key);
 
         builder.HasIndex(r => r.Id);
         builder.HasIndex(r => r.IsDeleted);
 
-        builder.Property(r => r.LocalId).ValueGeneratedOnAdd();
+        builder.Property(r => r.Key).ValueGeneratedOnAdd();
 
         builder.Property(r => r.Summary).HasMaxLength(256).IsRequired();
         builder.Property(r => r.Description).HasMaxLength(1024);

@@ -30,7 +30,7 @@ const ObjectiveDetailsPage = ({ params }) => {
   const { hasClaim } = useAuth()
   const canManageObjectives = hasClaim(
     'Permission',
-    'Permissions.ProgramIncrementObjectives.Manage'
+    'Permissions.ProgramIncrementObjectives.Manage',
   )
   const showActions = canManageObjectives
 
@@ -55,27 +55,27 @@ const ObjectiveDetailsPage = ({ params }) => {
 
     const getObjective = async () => {
       const programIncrementsClient = await getProgramIncrementsClient()
-      const objectiveDto = await programIncrementsClient.getObjectiveByLocalId(
-        params.id,
-        params.objectiveId
+      const objectiveDto = await programIncrementsClient.getObjectiveByKey(
+        params.key,
+        params.objectiveKey,
       )
       setObjective(objectiveDto)
 
       breadcrumbRoute.push(
         {
-          href: `/planning/program-increments/${objectiveDto.programIncrement?.localId}`,
+          href: `/planning/program-increments/${objectiveDto.programIncrement?.key}`,
           title: objectiveDto.programIncrement?.name,
         },
         {
           title: objectiveDto.name,
-        }
+        },
       )
       // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
       setBreadcrumbRoute(breadcrumbRoute)
     }
 
     getObjective()
-  }, [params.id, params.objectiveId, setBreadcrumbRoute, lastRefresh])
+  }, [params.key, params.objectiveKey, setBreadcrumbRoute, lastRefresh])
 
   const onUpdateObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
@@ -89,7 +89,7 @@ const ObjectiveDetailsPage = ({ params }) => {
     setOpenDeleteObjectiveForm(false)
     if (wasSaved) {
       // redirect to the PI details page
-      window.location.href = `/planning/program-increments/${params.id}`
+      window.location.href = `/planning/program-increments/${params.key}`
     }
   }
 
@@ -106,7 +106,7 @@ const ObjectiveDetailsPage = ({ params }) => {
           key: 'delete',
           label: 'Delete',
           onClick: () => setOpenDeleteObjectiveForm(true),
-        }
+        },
       )
     }
     return items
@@ -132,7 +132,7 @@ const ObjectiveDetailsPage = ({ params }) => {
   return (
     <>
       <PageTitle
-        title={`${objective?.localId} - ${objective?.name}`}
+        title={`${objective?.key} - ${objective?.name}`}
         subtitle="PI Objective Details"
         actions={showActions && <Actions />}
       />
@@ -144,7 +144,7 @@ const ObjectiveDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {canManageObjectives && (
+      {openUpdateObjectiveForm && canManageObjectives && (
         <EditProgramIncrementObjectiveForm
           showForm={openUpdateObjectiveForm}
           objectiveId={objective?.id}
@@ -153,7 +153,7 @@ const ObjectiveDetailsPage = ({ params }) => {
           onFormCancel={() => onUpdateObjectiveFormClosed(false)}
         />
       )}
-      {canManageObjectives && (
+      {openDeleteObjectiveForm && canManageObjectives && (
         <DeleteProgramIncrementObjectiveForm
           showForm={openDeleteObjectiveForm}
           objective={objective}

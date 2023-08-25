@@ -9,9 +9,9 @@ public sealed record EmployeeDetailsDto : IMapFrom<Employee>
     /// <value>The identifier.</value>
     public Guid Id { get; set; }
 
-    /// <summary>Gets the local identifier.</summary>
-    /// <value>The local identifier.</value>
-    public int LocalId { get; set; }
+    /// <summary>Gets the key.</summary>
+    /// <value>The key.</value>
+    public int Key { get; set; }
 
     /// <summary>Gets the display name.</summary>
     /// <value>The display name.</value>
@@ -69,9 +69,9 @@ public sealed record EmployeeDetailsDto : IMapFrom<Employee>
     /// <value>The manager identifier.</value>
     public Guid? ManagerId { get; set; }
 
-    /// <summary>Gets the local identifier.</summary>
-    /// <value>The local identifier.</value>
-    public int? ManagerLocalId { get; set; }
+    /// <summary>Gets the key.</summary>
+    /// <value>The key.</value>
+    public int? ManagerKey { get; set; }
 
     /// <summary>Gets the manager.</summary>
     /// <value>The manager.</value>
@@ -93,7 +93,7 @@ public sealed record EmployeeDetailsDto : IMapFrom<Employee>
             .Map(dest => dest.Suffix, src => src.Name.Suffix)
             .Map(dest => dest.Title, src => src.Name.Title)
             .Map(dest => dest.Email, src => src.Email.Value)
-            .Map(dest => dest.ManagerLocalId, src => src.Manager!.LocalId)
+            .Map(dest => dest.ManagerKey, src => src.Manager!.Key)
             .Map(dest => dest.ManagerName, src => $"{src.Manager!.Name.FirstName} {src.Manager!.Name.LastName}", srcCond => srcCond.ManagerId.HasValue && srcCond.Manager!.IsActive);
     }
 }

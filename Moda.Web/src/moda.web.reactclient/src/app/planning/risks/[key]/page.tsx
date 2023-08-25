@@ -16,7 +16,7 @@ const RiskDetailsPage = ({ params }) => {
   useDocumentTitle('Risk Details')
   const [activeTab, setActiveTab] = useState('details')
   const [risk, setRisk] = useState<RiskDetailsDto | null>(null)
-  const { id } = params
+  const { key } = params
   const { setBreadcrumbRoute } = useBreadcrumbs()
   const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
@@ -46,7 +46,7 @@ const RiskDetailsPage = ({ params }) => {
 
     const getRisk = async () => {
       const risksClient = await getRisksClient()
-      const riskDto = await risksClient.getByLocalId(id)
+      const riskDto = await risksClient.getByKey(key)
       setRisk(riskDto)
 
       const teamRoute =
@@ -54,7 +54,7 @@ const RiskDetailsPage = ({ params }) => {
 
       breadcrumbRoute.push(
         {
-          href: `/organizations/${teamRoute}/${riskDto.team?.localId}`,
+          href: `/organizations/${teamRoute}/${riskDto.team?.key}`,
           title: riskDto.team?.name,
         },
         {
@@ -66,7 +66,7 @@ const RiskDetailsPage = ({ params }) => {
     }
 
     getRisk()
-  }, [id, lastRefresh, setBreadcrumbRoute])
+  }, [key, lastRefresh, setBreadcrumbRoute])
 
   const onUpdateRiskFormClosed = (wasSaved: boolean) => {
     setOpenUpdateRiskForm(false)
@@ -88,7 +88,7 @@ const RiskDetailsPage = ({ params }) => {
   return (
     <>
       <PageTitle
-        title={`${risk?.localId} - ${risk?.summary}`}
+        title={`${risk?.key} - ${risk?.summary}`}
         subtitle="Risk Details"
         actions={showActions && <Actions />}
       />

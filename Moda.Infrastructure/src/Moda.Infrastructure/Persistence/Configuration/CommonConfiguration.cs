@@ -12,7 +12,7 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
         builder.ToTable("Employees", SchemaNames.Organization);
 
         builder.HasKey(e => e.Id);
-        builder.HasAlternateKey(e => e.LocalId);
+        builder.HasAlternateKey(e => e.Key);
 
         builder.HasIndex(e => e.Id);
         builder.HasIndex(e => e.EmployeeNumber)
@@ -21,7 +21,7 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
         builder.HasIndex(e => e.IsActive);
         builder.HasIndex(e => e.IsDeleted);
 
-        builder.Property(e => e.LocalId).ValueGeneratedOnAdd();
+        builder.Property(e => e.Key).ValueGeneratedOnAdd();
 
         builder.Property(e => e.EmployeeNumber).HasMaxLength(256).IsRequired();
         builder.Property(e => e.HireDate);

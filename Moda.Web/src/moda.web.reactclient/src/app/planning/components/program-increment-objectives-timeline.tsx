@@ -92,8 +92,8 @@ const ProgramIncrementObjectivesTimeline = ({
         ?.filter((obj) => obj.status?.name !== 'Canceled')
         .map((obj, index) => {
           return {
-            id: obj.localId,
-            programIncrementKey: obj.programIncrement.localId,
+            id: obj.key,
+            programIncrementKey: obj.programIncrement.key,
             title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
             content: `${obj.name} (${obj.status?.name})`,
             start: dayjs(obj.startDate ?? programIncrement.start).toDate(),

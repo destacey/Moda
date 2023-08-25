@@ -68,7 +68,7 @@ internal sealed class RemoveInvalidEmployeeCommandHandler : ICommandHandler<Remo
             _logger.LogInformation("The invalid employee {EmployeeId} with employee number {EmployeeNumber} has been deleted", request.Id, objectId);
             _logger.LogInformation("Object Id {EmployeeNumber} has been added to the ExternalEmployeeBlacklistItems list.", objectId);
 
-            return Result.Success(employee.LocalId);
+            return Result.Success(employee.Key);
         }
         catch (Exception ex)
         {

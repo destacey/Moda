@@ -55,7 +55,7 @@ internal sealed class CreateProgramIncrementCommandHandler : ICommandHandler<Cre
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(programIncrement.LocalId);
+            return Result.Success(programIncrement.Key);
         }
         catch (Exception ex)
         {

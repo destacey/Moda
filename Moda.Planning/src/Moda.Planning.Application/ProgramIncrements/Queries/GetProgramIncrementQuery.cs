@@ -7,13 +7,13 @@ public sealed record GetProgramIncrementQuery : IQuery<ProgramIncrementDetailsDt
     {
         ProgramIncrementId = programIncrementId;
     }
-    public GetProgramIncrementQuery(int programIncrementLocalId)
+    public GetProgramIncrementQuery(int programIncrementKey)
     {
-        ProgramIncrementLocalId = programIncrementLocalId;
+        ProgramIncrementKey = programIncrementKey;
     }
 
     public Guid? ProgramIncrementId { get; }
-    public int? ProgramIncrementLocalId { get; }
+    public int? ProgramIncrementKey { get; }
 }
 
 internal sealed class GetProgramIncrementQueryHandler : IQueryHandler<GetProgramIncrementQuery, ProgramIncrementDetailsDto?>
@@ -37,9 +37,9 @@ internal sealed class GetProgramIncrementQueryHandler : IQueryHandler<GetProgram
         {
             query = query.Where(e => e.Id == request.ProgramIncrementId.Value);
         }
-        else if (request.ProgramIncrementLocalId.HasValue)
+        else if (request.ProgramIncrementKey.HasValue)
         {
-            query = query.Where(e => e.LocalId == request.ProgramIncrementLocalId.Value);
+            query = query.Where(e => e.Key == request.ProgramIncrementKey.Value);
         }
         else
         {

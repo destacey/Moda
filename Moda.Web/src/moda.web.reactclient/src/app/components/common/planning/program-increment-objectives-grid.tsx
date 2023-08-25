@@ -22,7 +22,7 @@ export interface ProgramIncrementObjectivesGridProps {
 const ProgramIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
   return (
     <Link
-      href={`/planning/program-increments/${data.programIncrement?.localId}/objectives/${data.localId}`}
+      href={`/planning/program-increments/${data.programIncrement?.key}/objectives/${data.key}`}
     >
       {value}
     </Link>
@@ -32,7 +32,7 @@ const ProgramIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
 const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
   return (
     <Link
-      href={`/planning/program-increments/${data.programIncrement?.localId}`}
+      href={`/planning/program-increments/${data.programIncrement?.key}`}
     >
       {value}
     </Link>
@@ -42,8 +42,8 @@ const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
 const TeamLinkCellRenderer = ({ value, data }) => {
   const teamLink =
     data.team?.type === 'Team'
-      ? `/organizations/teams/${data.team?.localId}`
-      : `/organizations/team-of-teams/${data.team?.localId}`
+      ? `/organizations/teams/${data.team?.key}`
+      : `/organizations/team-of-teams/${data.team?.key}`
   return <Link href={teamLink}>{value}</Link>
 }
 
@@ -123,7 +123,7 @@ const ProgramIncrementObjectivesGrid = ({
         },
       },
       { field: 'id', hide: true },
-      { field: 'localId', headerName: 'Key', width: 90 },
+      { field: 'key', width: 90 },
       {
         field: 'name',
         width: 400,

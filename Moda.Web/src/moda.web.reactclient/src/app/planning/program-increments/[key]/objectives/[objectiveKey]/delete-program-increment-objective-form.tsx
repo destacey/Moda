@@ -79,7 +79,7 @@ const DeleteProgramIncrementObjectiveForm = ({
         keyboard={false} // disable esc key to close modal
         destroyOnClose={true}
       >
-        {objective?.localId} - {objective?.name}
+        {objective?.key} - {objective?.name}
       </Modal>
     </>
   )

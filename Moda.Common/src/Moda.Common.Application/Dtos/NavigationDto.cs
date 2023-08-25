@@ -3,14 +3,14 @@
 public record NavigationDto
 {
     public Guid Id { get; set; }
-    public int LocalId { get; set; }
+    public int Key { get; set; }
     public required string Name { get; set; }
 
-    public static NavigationDto Create(Guid id, int localId, string name)
+    public static NavigationDto Create(Guid id, int key, string name)
         => new()
         {
             Id = id,
-            LocalId = localId,
+            Key = key,
             Name = name
         };
 }

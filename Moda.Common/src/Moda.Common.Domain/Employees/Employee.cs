@@ -31,9 +31,9 @@ public sealed class Employee : BaseAuditableEntity<Guid>, IActivatable
         ManagerId = managerId;
     }
 
-    /// <summary>Gets the local identifier.</summary>
-    /// <value>The local identifier.</value>
-    public int LocalId { get; private set; }
+    /// <summary>Gets the key.</summary>
+    /// <value>The key.</value>
+    public int Key { get; private set; }
 
     /// <summary>Gets the employee name.</summary>
     /// <value>The employee name.</value>

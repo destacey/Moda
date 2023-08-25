@@ -15,22 +15,22 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
             .HasValue<TeamOfTeams>(TeamType.TeamOfTeams);
 
         builder.HasKey(o => o.Id);
-        builder.HasAlternateKey(o => o.LocalId);
+        builder.HasAlternateKey(o => o.Key);
 
         builder.HasIndex(o => o.Id)
-            .IncludeProperties(o => new { o.LocalId, o.Name, o.Code, o.IsActive, o.IsDeleted });
-        builder.HasIndex(o => o.LocalId)
+            .IncludeProperties(o => new { o.Key, o.Name, o.Code, o.IsActive, o.IsDeleted });
+        builder.HasIndex(o => o.Key)
             .IncludeProperties(o => new { o.Id, o.Name, o.Code, o.IsActive, o.IsDeleted });
         builder.HasIndex(o => o.Name)
             .IsUnique();
         builder.HasIndex(o => o.Code)
             .IsUnique()
-            .IncludeProperties(o => new { o.Id, o.LocalId, o.Name, o.IsActive, o.IsDeleted });
+            .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.IsActive, o.IsDeleted });
         builder.HasIndex(o => o.IsActive);
         builder.HasIndex(o => o.IsDeleted)
-            .IncludeProperties(o => new { o.Id, o.LocalId, o.Name, o.Code, o.Type, o.IsActive });
+            .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.Code, o.Type, o.IsActive });
 
-        builder.Property(o => o.LocalId).ValueGeneratedOnAdd();
+        builder.Property(o => o.Key).ValueGeneratedOnAdd();
 
         builder.Property(o => o.Name).IsRequired().HasMaxLength(128);
         builder.Property(o => o.Code).IsRequired()

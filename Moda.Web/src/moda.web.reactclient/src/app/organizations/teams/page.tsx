@@ -15,13 +15,13 @@ import useAuth from '../../components/contexts/auth'
 const TeamLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.type === 'Team' ? 'teams' : 'team-of-teams'
   return (
-    <Link href={`/organizations/${teamRoute}/${data.localId}`}>{value}</Link>
+    <Link href={`/organizations/${teamRoute}/${data.key}`}>{value}</Link>
   )
 }
 
 const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {
   return (
-    <Link href={`/organizations/team-of-teams/${data.teamOfTeams?.localId}`}>
+    <Link href={`/organizations/team-of-teams/${data.teamOfTeams?.key}`}>
       {value}
     </Link>
   )
@@ -40,7 +40,7 @@ const TeamListPage = () => {
 
   const columnDefs = useMemo(
     () => [
-      { field: 'localId', headerName: 'Key', width: 90 },
+      { field: 'key', width: 90 },
       { field: 'name', cellRenderer: TeamLinkCellRenderer },
       { field: 'code', width: 125 },
       { field: 'type' },

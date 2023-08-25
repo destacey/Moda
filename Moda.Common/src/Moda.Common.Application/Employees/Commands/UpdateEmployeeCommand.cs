@@ -154,7 +154,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
 
             await _modaDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(employee.LocalId);
+            return Result.Success(employee.Key);
         }
         catch (Exception ex)
         {

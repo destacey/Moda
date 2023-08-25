@@ -168,7 +168,7 @@ const UpdateRiskForm = ({
       if (showForm === true) {
         try {
           const loadData = async () => {
-            setRiskNumber(riskData?.localId)
+            setRiskNumber(riskData?.key)
             setTeamName(riskData?.team.name)
             mapToFormValues(riskData)
             setEmployeeOptions(await getEmployeeOptions())

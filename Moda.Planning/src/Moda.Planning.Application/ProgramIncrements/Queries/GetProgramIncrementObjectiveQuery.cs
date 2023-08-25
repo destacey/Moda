@@ -13,16 +13,16 @@ public sealed record GetProgramIncrementObjectiveQuery : IQuery<ProgramIncrement
         ObjectiveId = objectiveId;
     }
 
-    public GetProgramIncrementObjectiveQuery(int localId, int objectiveLocalId)
+    public GetProgramIncrementObjectiveQuery(int key, int objectiveKey)
     {
-        LocalId = localId;
-        ObjectiveLocalId = objectiveLocalId;
+        Key = key;
+        ObjectiveKey = objectiveKey;
     }
 
     public Guid? Id { get; set; }
     public Guid? ObjectiveId { get; }
-    public int? LocalId { get; set; }
-    public int? ObjectiveLocalId { get; }
+    public int? Key { get; set; }
+    public int? ObjectiveKey { get; }
 }
 
 internal sealed class GetProgramIncrementObjectiveQueryHandler : IQueryHandler<GetProgramIncrementObjectiveQuery, ProgramIncrementObjectiveDetailsDto?>
@@ -48,11 +48,11 @@ internal sealed class GetProgramIncrementObjectiveQueryHandler : IQueryHandler<G
                 .ThenInclude(o => o.Team)
                 .Where(p => p.Id == request.Id.Value);
         }
-        else if (request.LocalId.HasValue && request.ObjectiveLocalId.HasValue)
+        else if (request.Key.HasValue && request.ObjectiveKey.HasValue)
         {
-            query = query.Include(p => p.Objectives.Where(o => o.LocalId == request.ObjectiveLocalId.Value))
+            query = query.Include(p => p.Objectives.Where(o => o.Key == request.ObjectiveKey.Value))
                 .ThenInclude(o => o.Team)
-                .Where(p => p.LocalId == request.LocalId.Value);
+                .Where(p => p.Key == request.Key.Value);
         }
         else
         {
@@ -64,7 +64,7 @@ internal sealed class GetProgramIncrementObjectiveQueryHandler : IQueryHandler<G
             .FirstOrDefaultAsync(cancellationToken);
         if (programIncrement is null || programIncrement.Objectives.Count != 1
             || (request.ObjectiveId.HasValue && programIncrement.Objectives.First().Id != request.ObjectiveId) 
-            || (request.ObjectiveLocalId.HasValue && programIncrement.Objectives.First().LocalId != request.ObjectiveLocalId))
+            || (request.ObjectiveKey.HasValue && programIncrement.Objectives.First().Key != request.ObjectiveKey))
             return null;
 
         // call the objective query handler
@@ -72,7 +72,7 @@ internal sealed class GetProgramIncrementObjectiveQueryHandler : IQueryHandler<G
         if (objective is null)
             return null;
 
-        var piNavigation = NavigationDto.Create(programIncrement.Id, programIncrement.LocalId, programIncrement.Name);
+        var piNavigation = NavigationDto.Create(programIncrement.Id, programIncrement.Key, programIncrement.Name);
 
         return ProgramIncrementObjectiveDetailsDto.Create(programIncrement.Objectives.First(), objective, piNavigation);
     }

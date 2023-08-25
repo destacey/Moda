@@ -11,7 +11,7 @@ import { useDocumentTitle } from '../../hooks'
 
 const EmployeeLinkCellRenderer = ({ value, data }) => {
   return (
-    <Link href={`/organizations/employees/${data.employee?.localId}`}>
+    <Link href={`/organizations/employees/${data.employee?.key}`}>
       {value}
     </Link>
   )

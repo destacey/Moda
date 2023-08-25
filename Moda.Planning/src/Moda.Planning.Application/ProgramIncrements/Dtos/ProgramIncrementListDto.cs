@@ -8,9 +8,9 @@ public sealed record ProgramIncrementListDto
     /// <value>The identifier.</value>
     public Guid Id { get; set; }
 
-    /// <summary>Gets the local identifier.</summary>
-    /// <value>The local identifier.</value>
-    public int LocalId { get; set; }
+    /// <summary>Gets the key.</summary>
+    /// <value>The key.</value>
+    public int Key { get; set; }
 
     /// <summary>
     /// The name of the program increment.
@@ -35,7 +35,7 @@ public sealed record ProgramIncrementListDto
         return new ProgramIncrementListDto()
         {
             Id = programIncrement.Id,
-            LocalId = programIncrement.LocalId,
+            Key = programIncrement.Key,
             Name = programIncrement.Name,
             Start = programIncrement.DateRange.Start,
             End = programIncrement.DateRange.End,
