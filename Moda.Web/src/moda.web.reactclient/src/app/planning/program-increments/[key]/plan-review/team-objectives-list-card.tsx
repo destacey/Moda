@@ -72,7 +72,7 @@ const TeamObjectivesListCard = ({
           } else if (b.targetDate) {
             return 1
           } else {
-            return 0
+            return a.key - b.key
           }
         } else {
           return aStatusIndex - bStatusIndex
