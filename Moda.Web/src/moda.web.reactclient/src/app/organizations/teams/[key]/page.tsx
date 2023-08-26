@@ -16,7 +16,7 @@ import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { useGetTeamRisks } from '@/src/services/queries/organization-queries'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound } from 'next/navigation'
-import { resetActiveTeam, retrieveTeam, setEditTeamOpen, useTeamDetail } from '../../teamsSlice'
+import { resetActiveTeam, retrieveTeam, setEditTeamOpen, useTeamDetail } from '../../teams-slice'
 import { useAppDispatch } from '@/src/app/hooks'
 
 enum TeamTabs {

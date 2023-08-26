@@ -8,7 +8,7 @@ import {
 } from '@/src/services/moda-api'
 import { EditTeamFormValues } from '../types'
 import withModalForm, { FormProps } from '../../components/hoc/withModalForm'
-import { refreshActiveTeam, retrieveTeams, setEditTeamOpen, updateTeam, useEditTeam } from '../teamsSlice'
+import { refreshActiveTeam, retrieveTeams, setEditTeamOpen, updateTeam, useEditTeam } from '../teams-slice'
 import { AppDispatch } from '@/src/store'
 
 interface EditTeamFormProps extends FormProps<EditTeamFormValues> {

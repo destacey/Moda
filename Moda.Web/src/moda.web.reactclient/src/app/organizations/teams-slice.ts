@@ -260,7 +260,7 @@ export const useEditTeam = () => useAppSelector((state) => {
 export const useTeamDetail = () => useAppSelector((state) => {
     return {
         team: state.teams.activeTeam,
-        isLoading: state.teams.isLoading,
+        isLoading: state.teams.editTeam.isLoading,
         isEditOpen: state.teams.editTeam.isOpen,
         error: state.teams.activeTeamLoadingError,
         teamNotFound: state.teams.activeTeamNotFound

@@ -7,10 +7,9 @@ import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { Button, Space, Switch } from 'antd'
 import Link from 'next/link'
 import { useDocumentTitle } from '../../hooks/use-document-title'
-import { CreateTeamForm } from '../components'
 import useAuth from '../../components/contexts/auth'
 import { useAppSelector, useAppDispatch } from '../../hooks'
-import { retrieveTeams, setIncludeDisabled, setCreateTeamOpen } from '../teamsSlice'
+import { retrieveTeams, setIncludeDisabled, setCreateTeamOpen } from '../teams-slice'
 import { ModalCreateTeamForm } from '../components/create-team-form'
 
 const TeamLinkCellRenderer = ({ value, data }) => {
