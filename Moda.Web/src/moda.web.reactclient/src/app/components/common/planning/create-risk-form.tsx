@@ -68,7 +68,7 @@ const CreateRiskForm = ({
   const [teamOptions, setTeamOptions] = useState<OptionModel[]>()
   const [employeeOptions, setEmployeeOptions] = useState<OptionModel[]>()
 
-  const [newRiskLocalId, setNewRiskLocalId] = useState<number>(null)
+  const [newRiskKey, setNewRiskKey] = useState<number>(null)
 
   const { hasClaim } = useAuth()
   const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
@@ -112,8 +112,8 @@ const CreateRiskForm = ({
   const create = async (values: CreateRiskFormValues) => {
     try {
       const request = mapToRequestValues(values)
-      const localId = await createRisk.mutateAsync(request)
-      setNewRiskLocalId(localId)
+      const key = await createRisk.mutateAsync(request)
+      setNewRiskKey(key)
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -190,7 +190,7 @@ const CreateRiskForm = ({
   }, [form, formValues])
 
   useEffect(() => {
-    if (newRiskLocalId) {
+    if (newRiskKey) {
       setIsOpen(false)
       form.resetFields()
       onFormCreate()
@@ -198,7 +198,7 @@ const CreateRiskForm = ({
     }
     // we don't want a trigger on the other dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newRiskLocalId])
+  }, [newRiskKey])
 
   return (
     <>

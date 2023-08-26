@@ -1,5 +1,4 @@
-﻿using Moda.Common.Domain.Data;
-using Moda.Common.Domain.Interfaces;
+﻿using Moda.Common.Domain.Interfaces;
 using Moda.Organization.Domain.Enums;
 using Moda.Organization.Domain.Models;
 using NodaTime;
@@ -20,7 +19,7 @@ public class PlanningTeam : BaseEntity<Guid>, ISoftDelete
     public PlanningTeam(BaseTeam team)
     {
         Id = team.Id;
-        LocalId = team.LocalId;
+        Key = team.Key;
         Name = team.Name;
         Code = team.Code;
         Type = team.Type;
@@ -30,7 +29,7 @@ public class PlanningTeam : BaseEntity<Guid>, ISoftDelete
         IsDeleted = team.IsDeleted;
     }
 
-    public int LocalId { get; private set; }
+    public int Key { get; private set; }
     public string Name { get; private set; } = default!;
     public TeamCode Code { get; private set; } = default!;
     public TeamType Type { get; private set; } = default!;
@@ -46,7 +45,7 @@ public class PlanningTeam : BaseEntity<Guid>, ISoftDelete
     public void Update(BaseTeam team)
     {
         Id = team.Id;
-        LocalId = team.LocalId;
+        Key = team.Key;
         Name = team.Name;
         Code = team.Code;
         Type = team.Type;

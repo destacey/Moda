@@ -41,13 +41,13 @@ const ProgramIncrementCard = ({
         </Space>
         <Space>
           <Link
-            href={`/planning/program-increments/${programIncrement.localId}`}
+            href={`/planning/program-increments/${programIncrement.key}`}
           >
             Details
           </Link>
           <Typography.Text type="secondary"> | </Typography.Text>
           <Link
-            href={`/planning/program-increments/${programIncrement.localId}/plan-review`}
+            href={`/planning/program-increments/${programIncrement.key}/plan-review`}
           >
             Plan Review
           </Link>

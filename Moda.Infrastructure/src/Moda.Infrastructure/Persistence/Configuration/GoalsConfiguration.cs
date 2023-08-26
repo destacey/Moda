@@ -11,20 +11,20 @@ public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
         builder.ToTable(name: "Objectives", SchemaNames.Goals);
 
         builder.HasKey(o => o.Id);
-        builder.HasAlternateKey(o => o.LocalId);
+        builder.HasAlternateKey(o => o.Key);
 
         builder.HasIndex(o => new { o.Id, o.IsDeleted })
-            .IncludeProperties(o => new { o.LocalId, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId});
-        builder.HasIndex(o => new { o.LocalId, o.IsDeleted })
+            .IncludeProperties(o => new { o.Key, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId});
+        builder.HasIndex(o => new { o.Key, o.IsDeleted })
             .IncludeProperties(o => new { o.Id, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId });
         builder.HasIndex(o => new { o.OwnerId, o.IsDeleted })
-            .IncludeProperties(o => new { o.Id, o.LocalId, o.Name, o.Type, o.Status, o.PlanId });
+            .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.Type, o.Status, o.PlanId });
         builder.HasIndex(o => new { o.PlanId, o.IsDeleted })
-            .IncludeProperties(o => new { o.Id, o.LocalId, o.Name, o.Type, o.Status, o.OwnerId });
+            .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.Type, o.Status, o.OwnerId });
         builder.HasIndex(o => o.IsDeleted)
-            .IncludeProperties(o => new { o.Id, o.LocalId, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId });
+            .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId });
 
-        builder.Property(o => o.LocalId).ValueGeneratedOnAdd();
+        builder.Property(o => o.Key).ValueGeneratedOnAdd();
 
         builder.Property(o => o.Name).IsRequired().HasMaxLength(256);
         builder.Property(o => o.Description).HasMaxLength(1024);

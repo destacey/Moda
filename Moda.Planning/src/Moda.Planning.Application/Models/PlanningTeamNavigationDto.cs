@@ -17,7 +17,7 @@ public record PlanningTeamNavigationDto : NavigationDto, IMapFrom<PlanningTeam>
         return new PlanningTeamNavigationDto()
         {
             Id = team.Id,
-            LocalId = team.LocalId,
+            Key = team.Key,
             Name = team.Name,
             Type = team.Type.GetDisplayName()
         };

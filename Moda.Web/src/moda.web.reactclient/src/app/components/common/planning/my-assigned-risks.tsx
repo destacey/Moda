@@ -22,8 +22,8 @@ const MyAssignedRisks = () => {
       <Card size="small" title="My Assigned Risks">
         <List size="small">
           {risks.map((r) => (
-            <List.Item key={r.localId}>
-              <Link href={`/planning/risks/${r.localId}`}>
+            <List.Item key={r.key}>
+              <Link href={`/planning/risks/${r.key}`}>
                 {riskMessage(r)}
               </Link>
             </List.Item>

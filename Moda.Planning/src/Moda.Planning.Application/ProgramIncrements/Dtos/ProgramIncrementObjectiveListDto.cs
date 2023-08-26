@@ -10,9 +10,9 @@ public sealed record ProgramIncrementObjectiveListDto
     /// <value>The identifier.</value>
     public Guid Id { get; set; }
 
-    /// <summary>Gets the local identifier.</summary>
-    /// <value>The local identifier.</value>
-    public int LocalId { get; set; }
+    /// <summary>Gets the key.</summary>
+    /// <value>The key.</value>
+    public int Key { get; set; }
 
     /// <summary>
     /// The name of the objective.
@@ -50,7 +50,7 @@ public sealed record ProgramIncrementObjectiveListDto
         return new ProgramIncrementObjectiveListDto()
         {
             Id = piObjective.Id,
-            LocalId = piObjective.LocalId,
+            Key = piObjective.Key,
             Name = objective.Name,
             ProgramIncrement = piNavigationDto,
             Status = objective.Status,

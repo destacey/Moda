@@ -32,7 +32,7 @@ public class EmployeesController : ControllerBase
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
-    [OpenApiOperation("Get employee details using the localId.", "")]
+    [OpenApiOperation("Get employee details using the key.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<EmployeeDetailsDto>> GetById(int id)

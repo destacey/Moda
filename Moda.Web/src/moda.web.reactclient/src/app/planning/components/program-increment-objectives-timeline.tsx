@@ -16,7 +16,7 @@ interface ProgramIncrementObjectivesTimelineProps {
 
 interface TimelineItem extends vis.DataItem {
   id: number
-  programIncrementLocalId: number
+  programIncrementKey: number
   title?: string | undefined
   content: string
   start: Date
@@ -92,8 +92,8 @@ const ProgramIncrementObjectivesTimeline = ({
         ?.filter((obj) => obj.status?.name !== 'Canceled')
         .map((obj, index) => {
           return {
-            id: obj.localId,
-            programIncrementLocalId: obj.programIncrement.localId,
+            id: obj.key,
+            programIncrementKey: obj.programIncrement.key,
             title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
             content: `${obj.name} (${obj.status?.name})`,
             start: dayjs(obj.startDate ?? programIncrement.start).toDate(),
@@ -112,7 +112,7 @@ const ProgramIncrementObjectivesTimeline = ({
     const items: TimelineItem[] = [
       {
         id: -1,
-        programIncrementLocalId: -1,
+        programIncrementKey: -1,
         title: 'PI Start',
         content: '',
         start: dayjs(programIncrement.start).toDate(),
@@ -121,7 +121,7 @@ const ProgramIncrementObjectivesTimeline = ({
       },
       {
         id: -2,
-        programIncrementLocalId: -2,
+        programIncrementKey: -2,
         title: 'PI End',
         content: '',
         start: dayjs(programIncrement.end).toDate(),

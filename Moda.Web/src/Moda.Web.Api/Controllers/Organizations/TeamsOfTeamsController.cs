@@ -39,7 +39,7 @@ public class TeamsOfTeamsController : ControllerBase
 
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
-    [OpenApiOperation("Get team of teams details using the localId.", "")]
+    [OpenApiOperation("Get team of teams details using the key.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]

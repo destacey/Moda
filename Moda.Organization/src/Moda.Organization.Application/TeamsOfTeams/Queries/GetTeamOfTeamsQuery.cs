@@ -5,16 +5,16 @@ public sealed record GetTeamOfTeamsQuery : IQuery<TeamOfTeamsDetailsDto?>
 {
     public GetTeamOfTeamsQuery(Guid teamId)
     {
-        TeamOfTeamId = teamId;
+        TeamOfTeamsId = teamId;
     }
 
-    public GetTeamOfTeamsQuery(int teamLocalId)
+    public GetTeamOfTeamsQuery(int teamKey)
     {
-        TeamOfTeamsLocalId = teamLocalId;
+        TeamOfTeamsKey = teamKey;
     }
 
-    public Guid? TeamOfTeamId { get; }
-    public int? TeamOfTeamsLocalId { get; }
+    public Guid? TeamOfTeamsId { get; }
+    public int? TeamOfTeamsKey { get; }
 }
 
 internal sealed class GetTeamOfTeamsQueryHandler : IQueryHandler<GetTeamOfTeamsQuery, TeamOfTeamsDetailsDto?>
@@ -37,13 +37,13 @@ internal sealed class GetTeamOfTeamsQueryHandler : IQueryHandler<GetTeamOfTeamsQ
             .Include(t => t.ParentMemberships.Where(m => m.DateRange.Start <= today && (!m.DateRange.End.HasValue || today <= m.DateRange.End)))
             .AsQueryable();
 
-        if (request.TeamOfTeamId.HasValue)
+        if (request.TeamOfTeamsId.HasValue)
         {
-            query = query.Where(e => e.Id == request.TeamOfTeamId.Value);
+            query = query.Where(e => e.Id == request.TeamOfTeamsId.Value);
         }
-        else if (request.TeamOfTeamsLocalId.HasValue)
+        else if (request.TeamOfTeamsKey.HasValue)
         {
-            query = query.Where(e => e.LocalId == request.TeamOfTeamsLocalId.Value);
+            query = query.Where(e => e.Key == request.TeamOfTeamsKey.Value);
         }
         else
         {

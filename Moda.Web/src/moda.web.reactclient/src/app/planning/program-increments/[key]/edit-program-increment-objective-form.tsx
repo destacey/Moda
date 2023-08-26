@@ -1,81 +1,94 @@
 'use client'
 
-import { DatePicker, Form, Input, Modal, Select, Switch, message } from 'antd'
+import {
+  Alert,
+  DatePicker,
+  Descriptions,
+  Form,
+  Input,
+  Modal,
+  Radio,
+  Slider,
+  Switch,
+  message,
+} from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../../components/contexts/auth'
-import { CreateProgramIncrementObjectiveRequest } from '@/src/services/moda-api'
+import {
+  ProgramIncrementObjectiveDetailsDto,
+  UpdateProgramIncrementObjectiveRequest,
+} from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
+import _ from 'lodash'
 import {
-  useCreateProgramIncrementObjectiveMutation,
   useGetProgramIncrementById,
-  useGetProgramIncrementObjectiveStatuses,
-  useGetProgramIncrementTeams,
+  useGetProgramIncrementObjectiveById,
+  useGetProgramIncrementObjectiveStatusOptions,
+  useUpdateProgramIncrementObjectiveMutation,
 } from '@/src/services/queries/planning-queries'
 
-export interface CreateProgramIncrementObjectiveFormProps {
+export interface EditProgramIncrementObjectiveFormProps {
   showForm: boolean
   programIncrementId: string
-  teamId?: string
-  onFormCreate: () => void
+  objectiveId: string
+  onFormSave: () => void
   onFormCancel: () => void
 }
 
-interface CreateProgramIncrementObjectiveFormValues {
+interface EditProgramIncrementObjectiveFormValues {
+  objectiveId: string
   programIncrementId: string
   teamId: string
   name: string
   statusId: number
   description?: string | null
   isStretch: boolean
+  progress: number
   startDate?: Date | null
   targetDate?: Date | null
 }
 
-interface ProgramIncrementTeamSelectItem {
-  value: string
-  label: string
-}
-
 const mapToRequestValues = (
-  values: CreateProgramIncrementObjectiveFormValues,
+  values: EditProgramIncrementObjectiveFormValues,
 ) => {
   return {
+    objectiveId: values.objectiveId,
     programIncrementId: values.programIncrementId,
     teamId: values.teamId,
     name: values.name,
     statusId: values.statusId,
     description: values.description,
     isStretch: values.isStretch,
+    progress: values.progress,
     startDate: (values.startDate as any)?.format('YYYY-MM-DD'),
     targetDate: (values.targetDate as any)?.format('YYYY-MM-DD'),
-  } as CreateProgramIncrementObjectiveRequest
+  } as UpdateProgramIncrementObjectiveRequest
 }
 
-const CreateProgramIncrementObjectiveForm = ({
+const EditProgramIncrementObjectiveForm = ({
   showForm,
   programIncrementId,
-  teamId,
-  onFormCreate,
+  objectiveId,
+  onFormSave,
   onFormCancel,
-}: CreateProgramIncrementObjectiveFormProps) => {
+}: EditProgramIncrementObjectiveFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateProgramIncrementObjectiveFormValues>()
+  const [form] = Form.useForm<EditProgramIncrementObjectiveFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
-  const [teams, setTeams] = useState<ProgramIncrementTeamSelectItem[]>([])
-  const [defaultStatusId, setDefaultStatusId] = useState<number>(null)
-  const [newObjectiveLocalId, setNewObjectiveLocalId] = useState<number>(null)
 
   const { data: programIncrementData } =
     useGetProgramIncrementById(programIncrementId)
-  const { data: teamData } = useGetProgramIncrementTeams(programIncrementId)
-  const { data: statusData } = useGetProgramIncrementObjectiveStatuses()
-
-  const createObjective = useCreateProgramIncrementObjectiveMutation()
+  const { data: objectiveData } = useGetProgramIncrementObjectiveById(
+    programIncrementId,
+    objectiveId,
+  )
+  const { data: statusOptions } = useGetProgramIncrementObjectiveStatusOptions()
+  const updateObjective = useUpdateProgramIncrementObjectiveMutation()
 
   const { hasClaim } = useAuth()
   const canManageObjectives = hasClaim(
@@ -84,24 +97,32 @@ const CreateProgramIncrementObjectiveForm = ({
   )
 
   const mapToFormValues = useCallback(
-    (programIncrementId: string, statusId: number, teamId?: string) => {
+    (objective: ProgramIncrementObjectiveDetailsDto) => {
+      if (!objective) {
+        throw new Error('Objective not found')
+      }
       form.setFieldsValue({
-        programIncrementId: programIncrementId,
-        teamId: teamId,
-        statusId: statusId,
-        isStretch: false,
+        objectiveId: objective.id,
+        programIncrementId: objective.programIncrement.id,
+        teamId: objective.team.id,
+        statusId: objective.status.id,
+        name: objective.name,
+        description: objective.description,
+        startDate: objective.startDate ? dayjs(objective.startDate) : undefined,
+        targetDate: objective.targetDate
+          ? dayjs(objective.targetDate)
+          : undefined,
+        progress: objective.progress,
+        isStretch: objective.isStretch,
       })
     },
     [form],
   )
 
-  const create = async (
-    values: CreateProgramIncrementObjectiveFormValues,
-  ): Promise<boolean> => {
+  const update = async (values: EditProgramIncrementObjectiveFormValues) => {
     try {
       const request = mapToRequestValues(values)
-      const localId = await createObjective.mutateAsync(request)
-      setNewObjectiveLocalId(localId)
+      await updateObjective.mutateAsync(request)
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -110,8 +131,7 @@ const CreateProgramIncrementObjectiveForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          error.supportMessage ??
-            'An unexpected error occurred while creating the program increment.',
+          'An unexpected error occurred while updating the PI objective.',
         )
         console.error(error)
       }
@@ -123,7 +143,12 @@ const CreateProgramIncrementObjectiveForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      await create(values)
+      if (await update(values)) {
+        setIsOpen(false)
+        onFormSave()
+        form.resetFields()
+        messageApi.success('Successfully updated PI objective.')
+      }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
     } finally {
@@ -138,42 +163,23 @@ const CreateProgramIncrementObjectiveForm = ({
   }, [form, onFormCancel])
 
   useEffect(() => {
-    if (!teamData || !statusData) return
-
+    if (!objectiveData) return
     if (canManageObjectives) {
       setIsOpen(showForm)
-      if (showForm === true) {
-        try {
-          setDefaultStatusId(statusData.find((s) => s.order === 1)?.id)
-          setTeams(
-            teamData
-              .filter((t) => t.type === 'Team')
-              .map((t) => ({ value: t.id, label: t.name })),
-          )
-          mapToFormValues(programIncrementId, defaultStatusId, teamId)
-        } catch (error) {
-          handleCancel()
-          messageApi.error(
-            'An unexpected error occurred while loading form data.',
-          )
-          console.error(error)
-        }
+      if (showForm) {
+        mapToFormValues(objectiveData)
       }
     } else {
       handleCancel()
-      messageApi.error('You do not have permission to create PI objectives.')
+      messageApi.error('You do not have permission to update PI objectives.')
     }
   }, [
     canManageObjectives,
     handleCancel,
-    showForm,
-    messageApi,
     mapToFormValues,
-    programIncrementId,
-    defaultStatusId,
-    teamId,
-    statusData,
-    teamData,
+    messageApi,
+    objectiveData,
+    showForm,
   ])
 
   useEffect(() => {
@@ -182,17 +188,6 @@ const CreateProgramIncrementObjectiveForm = ({
       () => setIsValid(false),
     )
   }, [form, formValues])
-
-  useEffect(() => {
-    if (newObjectiveLocalId) {
-      setIsOpen(false)
-      form.resetFields()
-      onFormCreate()
-      messageApi.success('Successfully created PI objective.')
-    }
-    // we don't want a trigger on the other dependencies
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newObjectiveLocalId])
 
   const disabledDate: RangePickerProps['disabledDate'] = useCallback(
     (current) => {
@@ -207,8 +202,8 @@ const CreateProgramIncrementObjectiveForm = ({
   const isDateWithinPiRange = useCallback(
     (date: Date) => {
       return (
-        dayjs(programIncrementData.start) <= dayjs(date) &&
-        dayjs(date) < dayjs(programIncrementData.end).add(1, 'day')
+        dayjs(programIncrementData?.start) <= dayjs(date) &&
+        dayjs(date) < dayjs(programIncrementData?.end).add(1, 'day')
       )
     },
     [programIncrementData?.start, programIncrementData?.end],
@@ -218,11 +213,11 @@ const CreateProgramIncrementObjectiveForm = ({
     <>
       {contextHolder}
       <Modal
-        title="Create PI Objective"
+        title="Edit PI Objective"
         open={isOpen}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
-        okText="Create"
+        okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
@@ -233,38 +228,34 @@ const CreateProgramIncrementObjectiveForm = ({
           form={form}
           size="small"
           layout="vertical"
-          name="create-objective-form"
+          name="update-objective-form"
         >
+          {programIncrementData?.objectivesLocked && (
+            <Alert message="PI Objectives are locked." type="info" showIcon />
+          )}
+          <Descriptions size="small" column={1}>
+            <Descriptions.Item label="Number">
+              {objectiveData?.key}
+            </Descriptions.Item>
+            <Descriptions.Item label="Team">
+              {objectiveData?.team.name}
+            </Descriptions.Item>
+          </Descriptions>
+          <Form.Item name="objectiveId" hidden={true}>
+            <Input />
+          </Form.Item>
           <Form.Item name="programIncrementId" hidden={true}>
             <Input />
           </Form.Item>
-          <Form.Item name="statusId" hidden={true}>
+          <Form.Item name="teamId" hidden={true}>
             <Input />
-          </Form.Item>
-          <Form.Item name="teamId" label="Team" rules={[{ required: true }]}>
-            <Select
-              showSearch
-              disabled={teamId !== undefined}
-              placeholder="Select a team"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
-              filterSort={(optionA, optionB) =>
-                (optionA?.label ?? '')
-                  .toLowerCase()
-                  .localeCompare((optionB?.label ?? '').toLowerCase())
-              }
-              options={teams}
-            />
           </Form.Item>
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
             <Input.TextArea
               autoSize={{ minRows: 1, maxRows: 2 }}
               showCount
               maxLength={128}
+              disabled={programIncrementData?.objectivesLocked}
             />
           </Form.Item>
           <Form.Item
@@ -283,7 +274,25 @@ const CreateProgramIncrementObjectiveForm = ({
             name="isStretch"
             valuePropName="checked"
           >
-            <Switch checkedChildren="Yes" unCheckedChildren="No" />
+            <Switch
+              checkedChildren="Yes"
+              unCheckedChildren="No"
+              disabled={programIncrementData?.objectivesLocked}
+            />
+          </Form.Item>
+          <Form.Item
+            name="statusId"
+            label="Status"
+            rules={[{ required: true }]}
+          >
+            <Radio.Group
+              options={statusOptions}
+              optionType="button"
+              buttonStyle="solid"
+            />
+          </Form.Item>
+          <Form.Item label="Progress" name="progress">
+            <Slider />
           </Form.Item>
           <Form.Item
             label="Start"
@@ -323,4 +332,4 @@ const CreateProgramIncrementObjectiveForm = ({
   )
 }
 
-export default CreateProgramIncrementObjectiveForm
+export default EditProgramIncrementObjectiveForm

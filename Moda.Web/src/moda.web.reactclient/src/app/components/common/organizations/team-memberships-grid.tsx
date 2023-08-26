@@ -12,7 +12,7 @@ export interface TeamMembershipsGridProps {
 const ChildLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.child.type === 'Team' ? 'teams' : 'team-of-teams'
   return (
-    <Link href={`/organizations/${teamRoute}/${data.child.localId}`}>
+    <Link href={`/organizations/${teamRoute}/${data.child.key}`}>
       {value}
     </Link>
   )
@@ -21,7 +21,7 @@ const ChildLinkCellRenderer = ({ value, data }) => {
 const ParentLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.parent.type === 'Team' ? 'teams' : 'team-of-teams'
   return (
-    <Link href={`/organizations/${teamRoute}/${data.parent.localId}`}>
+    <Link href={`/organizations/${teamRoute}/${data.parent.key}`}>
       {value}
     </Link>
   )

@@ -82,7 +82,7 @@ const TeamPlanReview = ({ programIncrement, team }: TeamPlanReviewProps) => {
         }}
       >
         <Typography.Title level={3} style={{ margin: '0' }}>
-          <Link href={`/organizations/teams/${team?.localId}`}>
+          <Link href={`/organizations/teams/${team?.key}`}>
             {team?.name}
           </Link>
         </Typography.Title>

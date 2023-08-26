@@ -32,9 +32,9 @@ public class Risk : BaseAuditableEntity<Guid>
         Status = RiskStatus.Open;
     }
 
-    /// <summary>Gets the local identifier.</summary>
-    /// <value>The local identifier.</value>
-    public int LocalId { get; private set; }
+    /// <summary>Gets the key.</summary>
+    /// <value>The key.</value>
+    public int Key { get; private set; }
 
     /// <summary>
     /// The summary of the Risk.

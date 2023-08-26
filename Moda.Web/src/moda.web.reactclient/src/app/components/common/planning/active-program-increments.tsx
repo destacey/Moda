@@ -37,7 +37,7 @@ const ActiveProgramIncrements = () => {
       <Row>
         <Space>
           {activeProgramIncrements?.map((pi) => (
-            <Col key={pi.localId}>
+            <Col key={pi.key}>
               <ProgramIncrementCard programIncrement={pi} />
             </Col>
           ))}

@@ -9,13 +9,13 @@ public sealed record GetTeamOfTeamsNavigationQuery : IQuery<TeamNavigationDto?>
         TeamId = teamId;
     }
 
-    public GetTeamOfTeamsNavigationQuery(int teamLocalId)
+    public GetTeamOfTeamsNavigationQuery(int teamKey)
     {
-        TeamLocalId = teamLocalId;
+        TeamKey = teamKey;
     }
 
     public Guid? TeamId { get; }
-    public int? TeamLocalId { get; }
+    public int? TeamKey { get; }
 }
 
 internal sealed class GetTeamOfTeamsNavigationQueryHandler : IQueryHandler<GetTeamOfTeamsNavigationQuery, TeamNavigationDto?>
@@ -37,9 +37,9 @@ internal sealed class GetTeamOfTeamsNavigationQueryHandler : IQueryHandler<GetTe
         {
             query = query.Where(e => e.Id == request.TeamId.Value);
         }
-        else if (request.TeamLocalId.HasValue)
+        else if (request.TeamKey.HasValue)
         {
-            query = query.Where(e => e.LocalId == request.TeamLocalId.Value);
+            query = query.Where(e => e.Key == request.TeamKey.Value);
         }
         else
         {

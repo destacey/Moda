@@ -13,7 +13,7 @@ const EmployeeDetailsPage = ({ params }) => {
   useDocumentTitle('Employee Details')
   const [activeTab, setActiveTab] = useState('details')
   const [employee, setEmployee] = useState<EmployeeDetailsDto | null>(null)
-  const { id } = params
+  const { key } = params
   const { setBreadcrumbTitle } = useBreadcrumbs()
 
   const tabs = [
@@ -27,13 +27,13 @@ const EmployeeDetailsPage = ({ params }) => {
   useEffect(() => {
     const getEmployee = async () => {
       const employeesClient = await getEmployeesClient()
-      const employeeDto = await employeesClient.getById(id)
+      const employeeDto = await employeesClient.getById(key)
       setEmployee(employeeDto)
       setBreadcrumbTitle(employeeDto.displayName)
     }
 
     getEmployee()
-  }, [id, setBreadcrumbTitle])
+  }, [key, setBreadcrumbTitle])
 
   return (
     <>

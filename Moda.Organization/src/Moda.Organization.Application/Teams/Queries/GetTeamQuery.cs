@@ -8,13 +8,13 @@ public sealed record GetTeamQuery : IQuery<TeamDetailsDto?>
         TeamId = teamId;
     }
 
-    public GetTeamQuery(int teamLocalId)
+    public GetTeamQuery(int teamKey)
     {
-        TeamLocalId = teamLocalId;
+        TeamKey = teamKey;
     }
 
     public Guid? TeamId { get; }
-    public int? TeamLocalId { get; }
+    public int? TeamKey { get; }
 }
 
 internal sealed class GetTeamQueryHandler : IQueryHandler<GetTeamQuery, TeamDetailsDto?>
@@ -41,9 +41,9 @@ internal sealed class GetTeamQueryHandler : IQueryHandler<GetTeamQuery, TeamDeta
         {
             query = query.Where(e => e.Id == request.TeamId.Value);
         }
-        else if (request.TeamLocalId.HasValue)
+        else if (request.TeamKey.HasValue)
         {
-            query = query.Where(e => e.LocalId == request.TeamLocalId.Value);
+            query = query.Where(e => e.Key == request.TeamKey.Value);
         }
         else
         {

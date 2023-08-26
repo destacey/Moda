@@ -22,7 +22,7 @@ import { DownOutlined } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { EditProgramIncrementForm } from '../../components'
 import {
-  useGetProgramIncrementByLocalId,
+  useGetProgramIncrementByKey,
   useGetProgramIncrementObjectives,
   useGetProgramIncrementRisks,
   useGetProgramIncrementTeams,
@@ -55,7 +55,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   )
 
   const { data: programIncrementData, refetch: refetchProgramIncrement } =
-    useGetProgramIncrementByLocalId(params.id)
+    useGetProgramIncrementByKey(params.key)
 
   const teamsQuery = useGetProgramIncrementTeams(
     programIncrementData?.id,
@@ -100,7 +100,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     return (
       <>
         <Space>
-          <Link href={`/planning/program-increments/${params.id}/plan-review`}>
+          <Link href={`/planning/program-increments/${params.key}/plan-review`}>
             Plan Review
           </Link>
           {canUpdateProgramIncrement && (
@@ -176,19 +176,19 @@ const ProgramIncrementDetailsPage = ({ params }) => {
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
-    (key) => {
-      setActiveTab(key)
+    (tabKey) => {
+      setActiveTab(tabKey)
 
       // enables the query for the tab on first render if it hasn't been enabled yet
-      if (key == ProgramIncrementTabs.Teams && !teamsQueryEnabled) {
+      if (tabKey == ProgramIncrementTabs.Teams && !teamsQueryEnabled) {
         setTeamsQueryEnabled(true)
       } else if (
-        key == ProgramIncrementTabs.Objectives &&
+        tabKey == ProgramIncrementTabs.Objectives &&
         !objectivesQueryEnabled
       ) {
         setObjectivesQueryEnabled(true)
       } else if (
-        key == ProgramIncrementTabs.RiskManagement &&
+        tabKey == ProgramIncrementTabs.RiskManagement &&
         !risksQueryEnabled
       ) {
         setRisksQueryEnabled(true)
@@ -212,7 +212,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {programIncrementData && canUpdateProgramIncrement && (
+      {programIncrementData && (
         <>
           <EditProgramIncrementForm
             showForm={openEditProgramIncrementForm}

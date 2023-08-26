@@ -9,8 +9,8 @@ const { Item } = Descriptions
 const RiskDetails = (risk: RiskDetailsDto) => {
   const teamLink =
     risk.team?.type === 'Team'
-      ? `/organizations/teams/${risk.team?.localId}`
-      : `/organizations/team-of-teams/${risk.team?.localId}`
+      ? `/organizations/teams/${risk.team?.key}`
+      : `/organizations/team-of-teams/${risk.team?.key}`
   return (
     <>
       <Row>
@@ -41,7 +41,7 @@ const RiskDetails = (risk: RiskDetailsDto) => {
               {risk.followUpDate && dayjs(risk.followUpDate).format('M/D/YYYY')}
             </Item>
             <Item label="Assignee">
-              <Link href={`/organizations/employees/${risk.assignee?.localId}`}>
+              <Link href={`/organizations/employees/${risk.assignee?.key}`}>
                 {risk.assignee?.name}
               </Link>
             </Item>
@@ -53,7 +53,7 @@ const RiskDetails = (risk: RiskDetailsDto) => {
       </Row>
       <Descriptions>
         <Item label="Reported By">
-          <Link href={`/organizations/employees/${risk.reportedBy?.localId}`}>
+          <Link href={`/organizations/employees/${risk.reportedBy?.key}`}>
             {risk.reportedBy?.name}
           </Link>
         </Item>

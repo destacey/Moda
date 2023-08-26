@@ -15,7 +15,7 @@ const TeamOfTeamsDetails = (team: TeamOfTeamsDetailsDto) => {
             <Item label="Type">{team.type}</Item>
             <Item label="Team of Teams">
               <Link
-                href={`/organizations/team-of-teams/${team.teamOfTeams?.localId}`}
+                href={`/organizations/team-of-teams/${team.teamOfTeams?.key}`}
               >
                 {team.teamOfTeams?.name}
               </Link>

@@ -12,7 +12,7 @@ const EmployeeDetails = (employee: EmployeeDetailsDto) => {
         <Item label="Job Title">{employee.jobTitle}</Item>
         <Item label="Department">{employee.department}</Item>
         <Item label="Manager">
-          <Link href={`/organizations/employees/${employee.managerLocalId}`}>
+          <Link href={`/organizations/employees/${employee.managerKey}`}>
             {employee.managerName}
           </Link>
         </Item>

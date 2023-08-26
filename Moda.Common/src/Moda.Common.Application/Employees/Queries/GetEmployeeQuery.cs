@@ -10,13 +10,13 @@ public sealed record GetEmployeeQuery : IQuery<EmployeeDetailsDto?>
     {
         EmployeeId = employeeId;
     }
-    public GetEmployeeQuery(int employeeLocalId)
+    public GetEmployeeQuery(int employeeKey)
     {
-        EmployeeLocalId = employeeLocalId;
+        EmployeeKey = employeeKey;
     }
 
     public Guid? EmployeeId { get; }
-    public int? EmployeeLocalId { get; }
+    public int? EmployeeKey { get; }
 }
 
 internal sealed class GetEmployeeQueryHandler : IQueryHandler<GetEmployeeQuery, EmployeeDetailsDto?>
@@ -38,9 +38,9 @@ internal sealed class GetEmployeeQueryHandler : IQueryHandler<GetEmployeeQuery, 
         {
             query = query.Where(e => e.Id == request.EmployeeId.Value);
         }
-        else if (request.EmployeeLocalId.HasValue)
+        else if (request.EmployeeKey.HasValue)
         {
-            query = query.Where(e => e.LocalId == request.EmployeeLocalId.Value);
+            query = query.Where(e => e.Key == request.EmployeeKey.Value);
         }
         else
         {

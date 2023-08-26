@@ -28,7 +28,6 @@ const TeamDetailsPage = ({ params }) => {
   const [team, setTeam] = useState<TeamDetailsDto | null>(null)
   const [openUpdateTeamForm, setOpenUpdateTeamForm] = useState<boolean>(false)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
-  const { id } = params
   const { setBreadcrumbTitle } = useBreadcrumbs()
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
@@ -56,7 +55,7 @@ const TeamDetailsPage = ({ params }) => {
     return (
       <>
         {canUpdateTeam && (
-          <Button onClick={() => setOpenUpdateTeamForm(true)}>Edit Team</Button>
+          <Button onClick={() => setOpenUpdateTeamForm(true)}>Edit</Button>
         )}
       </>
     )
@@ -93,13 +92,13 @@ const TeamDetailsPage = ({ params }) => {
   useEffect(() => {
     const getTeam = async () => {
       const teamsClient = await getTeamsClient()
-      const teamDto = await teamsClient.getById(id)
+      const teamDto = await teamsClient.getById(params.key)
       setTeam(teamDto)
       setBreadcrumbTitle(teamDto.name)
     }
 
     getTeam()
-  }, [id, setBreadcrumbTitle, lastRefresh])
+  }, [params.key, setBreadcrumbTitle, lastRefresh])
 
   const onUpdateTeamFormClosed = (wasUpdated: boolean) => {
     setOpenUpdateTeamForm(false)
@@ -110,11 +109,11 @@ const TeamDetailsPage = ({ params }) => {
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
-    (key) => {
-      setActiveTab(key)
+    (tabKey) => {
+      setActiveTab(tabKey)
 
       // enables the query for the tab on first render if it hasn't been enabled yet
-      if (key == TeamTabs.RiskManagement && !risksQueryEnabled) {
+      if (tabKey == TeamTabs.RiskManagement && !risksQueryEnabled) {
         setRisksQueryEnabled(true)
       }
     },
@@ -136,10 +135,10 @@ const TeamDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {openUpdateTeamForm && team && canUpdateTeam && (
+      {openUpdateTeamForm && (
         <EditTeamForm
           showForm={openUpdateTeamForm}
-          localId={team.localId}
+          teamKey={team.key}
           type={team.type}
           onFormUpdate={() => onUpdateTeamFormClosed(true)}
           onFormCancel={() => onUpdateTeamFormClosed(false)}

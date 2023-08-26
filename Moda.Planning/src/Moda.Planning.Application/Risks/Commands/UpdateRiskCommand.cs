@@ -90,7 +90,7 @@ internal sealed class UpdateRiskCommandHandler : ICommandHandler<UpdateRiskComma
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(risk.LocalId);
+            return Result.Success(risk.Key);
         }
         catch (Exception ex)
         {

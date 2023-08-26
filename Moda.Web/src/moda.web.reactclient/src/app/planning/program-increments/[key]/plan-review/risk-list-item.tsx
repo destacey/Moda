@@ -20,8 +20,8 @@ const RiskListItem = ({
 
   const title = () => {
     return (
-      <Link href={`/planning/risks/${risk.localId}`}>
-        {risk.localId} - {risk.summary}
+      <Link href={`/planning/risks/${risk.key}`}>
+        {risk.key} - {risk.summary}
       </Link>
     )
   }
@@ -30,7 +30,7 @@ const RiskListItem = ({
     const assigneeInfo = risk.assignee ? (
       <>
         {' | Assignee: '}
-        <Link href={`/organizations/employees/${risk.assignee.localId}`}>
+        <Link href={`/organizations/employees/${risk.assignee.key}`}>
           {risk.assignee.name}
         </Link>
       </>
@@ -56,7 +56,7 @@ const RiskListItem = ({
 
   return (
     <>
-      <List.Item key={risk.localId}>
+      <List.Item key={risk.key}>
         <List.Item.Meta title={title()} description={description()} />
         {canUpdateRisks && (
           <Button

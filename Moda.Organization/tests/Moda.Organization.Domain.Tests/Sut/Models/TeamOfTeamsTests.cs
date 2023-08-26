@@ -14,11 +14,11 @@ public class TeamOfTeamsTests
 
     private TeamOfTeams GenerateTeamOfTeams(bool isActive)
     {
-        int localId = RandomNumberGenerator.GetInt32(1, 100000);
+        int key = RandomNumberGenerator.GetInt32(1, 100000);
 
         var team = TeamOfTeams.Create("Test Team of Teams", _genericTeamCode, null, _now);
         team.SetPrivate(t => t.Id, Guid.NewGuid());
-        team.SetPrivate(t => t.LocalId, localId);
+        team.SetPrivate(t => t.Key, key);
 
         if (!isActive)
         {

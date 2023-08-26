@@ -14,11 +14,11 @@ public class TeamTests
 
     private Team GenerateTeam(bool isActive)
     {
-        int localId = RandomNumberGenerator.GetInt32(1, 100000);
+        int key = RandomNumberGenerator.GetInt32(1, 100000);
 
         var team = Team.Create("Test Team", _genericTeamCode, "This is a description.", _now);
         team.SetPrivate(t => t.Id, Guid.NewGuid());
-        team.SetPrivate(t => t.LocalId, localId);
+        team.SetPrivate(t => t.Key, key);
 
         if (!isActive)
         {
@@ -32,11 +32,11 @@ public class TeamTests
 
     private TeamOfTeams GenerateTeamOfTeams(bool isActive)
     {
-        int localId = RandomNumberGenerator.GetInt32(1, 100000);
+        int key = RandomNumberGenerator.GetInt32(1, 100000);
 
         var team = TeamOfTeams.Create("Test Team of Teams", new TeamCode("TOT"), null, _now);
         team.SetPrivate(t => t.Id, Guid.NewGuid());
-        team.SetPrivate(t => t.LocalId, localId);
+        team.SetPrivate(t => t.Key, key);
 
         if (!isActive)
         {

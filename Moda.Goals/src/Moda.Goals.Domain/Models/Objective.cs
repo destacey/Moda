@@ -24,9 +24,9 @@ public class Objective : BaseAuditableEntity<Guid>
         TargetDate = targetDate;
     }
 
-    /// <summary>Gets the local identifier.</summary>
-    /// <value>The local identifier.</value>
-    public int LocalId { get; init; }
+    /// <summary>Gets the key.</summary>
+    /// <value>The key.</value>
+    public int Key { get; init; }
 
     /// <summary>
     /// The name of the Objective.

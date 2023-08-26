@@ -1347,10 +1347,10 @@ export class ProgramIncrementsClient {
     }
 
     /**
-     * Get program increment details using the localId.
+     * Get program increment details using the key.
      */
-    getByLocalId(id: number, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementDetailsDto> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/local-id/{id}";
+    getByKey(id: number, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/program-increments/key/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1372,11 +1372,11 @@ export class ProgramIncrementsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetByLocalId(_response);
+            return this.processGetByKey(_response);
         });
     }
 
-    protected processGetByLocalId(response: AxiosResponse): Promise<ProgramIncrementDetailsDto> {
+    protected processGetByKey(response: AxiosResponse): Promise<ProgramIncrementDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1885,10 +1885,10 @@ export class ProgramIncrementsClient {
     }
 
     /**
-     * Get a program increment objective using the PI and Objective local Ids.
+     * Get a program increment objective using the PI and Objective keys.
      */
-    getObjectiveByLocalId(id: number, objectiveId: number, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementObjectiveDetailsDto> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/local-id/{id}/objectives/{objectiveId}";
+    getObjectiveByKey(id: number, objectiveId: number, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementObjectiveDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/program-increments/key/{id}/objectives/{objectiveId}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1913,11 +1913,11 @@ export class ProgramIncrementsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetObjectiveByLocalId(_response);
+            return this.processGetObjectiveByKey(_response);
         });
     }
 
-    protected processGetObjectiveByLocalId(response: AxiosResponse): Promise<ProgramIncrementObjectiveDetailsDto> {
+    protected processGetObjectiveByKey(response: AxiosResponse): Promise<ProgramIncrementObjectiveDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2458,10 +2458,10 @@ export class RisksClient {
     }
 
     /**
-     * Get risk details using the localId.
+     * Get risk details using the key.
      */
-    getByLocalId(id: number, cancelToken?: CancelToken | undefined): Promise<RiskDetailsDto> {
-        let url_ = this.baseUrl + "/api/planning/risks/local-id/{id}";
+    getByKey(id: number, cancelToken?: CancelToken | undefined): Promise<RiskDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/risks/key/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -2483,11 +2483,11 @@ export class RisksClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetByLocalId(_response);
+            return this.processGetByKey(_response);
         });
     }
 
-    protected processGetByLocalId(response: AxiosResponse): Promise<RiskDetailsDto> {
+    protected processGetByKey(response: AxiosResponse): Promise<RiskDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -4028,7 +4028,7 @@ export class EmployeesClient {
     }
 
     /**
-     * Get employee details using the localId.
+     * Get employee details using the key.
      */
     getById(id: number, cancelToken?: CancelToken | undefined): Promise<EmployeeDetailsDto> {
         let url_ = this.baseUrl + "/api/organization/employees/{id}";
@@ -4413,7 +4413,7 @@ export class TeamsClient {
     }
 
     /**
-     * Get team details using the localId.
+     * Get team details using the key.
      */
     getById(id: number, cancelToken?: CancelToken | undefined): Promise<TeamDetailsDto> {
         let url_ = this.baseUrl + "/api/organization/teams/{id}";
@@ -5244,7 +5244,7 @@ export class TeamsOfTeamsClient {
     }
 
     /**
-     * Get team of teams details using the localId.
+     * Get team of teams details using the key.
      */
     getById(id: number, cancelToken?: CancelToken | undefined): Promise<TeamOfTeamsDetailsDto> {
         let url_ = this.baseUrl + "/api/organization/teams-of-teams/{id}";
@@ -6636,7 +6636,7 @@ export interface UserDetailsDto {
 
 export interface NavigationDto {
     id?: string;
-    localId?: number;
+    key?: number;
     name?: string;
 }
 
@@ -6719,7 +6719,7 @@ export interface ToggleUserStatusRequest {
 
 export interface ProgramIncrementListDto {
     id?: string;
-    localId?: number;
+    key?: number;
     name?: string;
     start?: Date;
     end?: Date;
@@ -6728,7 +6728,7 @@ export interface ProgramIncrementListDto {
 
 export interface ProgramIncrementDetailsDto {
     id?: string;
-    localId?: number;
+    key?: number;
     name?: string;
     description?: string | undefined;
     start?: Date;
@@ -6766,8 +6766,8 @@ export interface UpdateProgramIncrementRequest {
 export interface ProgramIncrementTeamResponse {
     /** Gets or sets the identifier. */
     id?: string;
-    /** Gets the local identifier. */
-    localId?: number;
+    /** Gets the key. */
+    key?: number;
     /** The name of the workspace. */
     name?: string;
     /** Gets the code. */
@@ -6790,7 +6790,7 @@ export interface ManageProgramIncrementTeamsRequest {
 
 export interface ProgramIncrementObjectiveListDto {
     id?: string;
-    localId?: number;
+    key?: number;
     name?: string;
     status?: SimpleNavigationDto;
     programIncrement?: NavigationDto;
@@ -6813,7 +6813,7 @@ export interface PlanningTeamNavigationDto extends NavigationDto {
 
 export interface ProgramIncrementObjectiveDetailsDto {
     id?: string;
-    localId?: number;
+    key?: number;
     name?: string;
     description?: string | undefined;
     status?: SimpleNavigationDto;
@@ -6952,7 +6952,7 @@ export interface ProgramIncrementObjectiveStatusDto {
 
 export interface RiskListDto {
     id?: string;
-    localId?: number;
+    key?: number;
     summary?: string;
     team?: PlanningTeamNavigationDto | undefined;
     reportedOn?: Date;
@@ -6965,7 +6965,7 @@ export interface RiskListDto {
 
 export interface RiskDetailsDto {
     id?: string;
-    localId?: number;
+    key?: number;
     summary?: string;
     description?: string | undefined;
     team?: PlanningTeamNavigationDto | undefined;
@@ -7126,7 +7126,7 @@ export interface UpdateWorkTypeRequest {
 
 export interface EmployeeListDto {
     id?: string;
-    localId?: number;
+    key?: number;
     displayName?: string;
     firstName?: string;
     middleName?: string | undefined;
@@ -7139,14 +7139,14 @@ export interface EmployeeListDto {
     department?: string | undefined;
     officeLocation?: string | undefined;
     managerId?: string | undefined;
-    managerLocalId?: number | undefined;
+    managerKey?: number | undefined;
     managerName?: string | undefined;
     isActive?: boolean;
 }
 
 export interface EmployeeDetailsDto {
     id?: string;
-    localId?: number;
+    key?: number;
     displayName?: string;
     fullName?: string;
     firstName?: string;
@@ -7161,7 +7161,7 @@ export interface EmployeeDetailsDto {
     department?: string | undefined;
     officeLocation?: string | undefined;
     managerId?: string | undefined;
-    managerLocalId?: number | undefined;
+    managerKey?: number | undefined;
     managerName?: string | undefined;
     isActive?: boolean;
 }
@@ -7224,7 +7224,7 @@ export interface UpdateEmployeeRequest {
 
 export interface TeamListDto {
     id?: string;
-    localId?: number;
+    key?: number;
     name?: string;
     code?: string;
     type?: string;
@@ -7234,7 +7234,7 @@ export interface TeamListDto {
 
 export interface TeamDetailsDto {
     id?: string;
-    localId?: number;
+    key?: number;
     name?: string;
     code?: string;
     description?: string | undefined;
@@ -7287,7 +7287,7 @@ export interface UpdateTeamMembershipRequest {
 
 export interface TeamOfTeamsListDto {
     id?: string;
-    localId?: number;
+    key?: number;
     name?: string;
     code?: string;
     type?: string;
@@ -7297,7 +7297,7 @@ export interface TeamOfTeamsListDto {
 
 export interface TeamOfTeamsDetailsDto {
     id?: string;
-    localId?: number;
+    key?: number;
     name?: string;
     code?: string;
     description?: string | undefined;

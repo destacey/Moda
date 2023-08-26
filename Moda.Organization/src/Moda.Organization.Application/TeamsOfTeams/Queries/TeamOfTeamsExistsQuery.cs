@@ -6,13 +6,13 @@ public sealed record TeamOfTeamsExistsQuery : IQuery<bool>
         TeamId = teamId;
     }
 
-    public TeamOfTeamsExistsQuery(int teamLocalId)
+    public TeamOfTeamsExistsQuery(int teamKey)
     {
-        TeamLocalId = teamLocalId;
+        TeamKey = teamKey;
     }
 
     public Guid? TeamId { get; }
-    public int? TeamLocalId { get; }
+    public int? TeamKey { get; }
 }
 
 internal sealed class TeamOfTeamsExistsQueryHandler : IQueryHandler<TeamOfTeamsExistsQuery, bool>
@@ -34,9 +34,9 @@ internal sealed class TeamOfTeamsExistsQueryHandler : IQueryHandler<TeamOfTeamsE
         {
             return await query.AnyAsync(e => e.Id == request.TeamId.Value, cancellationToken);
         }
-        else if (request.TeamLocalId.HasValue)
+        else if (request.TeamKey.HasValue)
         {
-            return await query.AnyAsync(e => e.LocalId == request.TeamLocalId.Value, cancellationToken);
+            return await query.AnyAsync(e => e.Key == request.TeamKey.Value, cancellationToken);
         }
         else
         {
