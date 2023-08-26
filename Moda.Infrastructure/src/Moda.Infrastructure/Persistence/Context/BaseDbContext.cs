@@ -59,7 +59,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         // optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
 
         optionsBuilder.UseDatabase(_dbSettings.DBProvider!, _dbSettings.ConnectionString!);
-    }    
+    }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
@@ -142,23 +142,24 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
                         break;
 
                     case EntityState.Modified:
-                        if (property.IsModified && entry.Entity is ISoftDelete && property.OriginalValue == null && property.CurrentValue != null)
-                        {
-                            trailEntry.ChangedColumns.Add(propertyName);
-                            trailEntry.TrailType = TrailType.Delete;
-                            trailEntry.OldValues[propertyName] = property.OriginalValue;
-                            trailEntry.NewValues[propertyName] = property.CurrentValue;
-                        }
-                        else if (property.IsModified && property.OriginalValue?.Equals(property.CurrentValue) == false)
+                        // TODO: IsModified appears to always be true
+                        if (property.IsModified && ((property.OriginalValue is null && property.CurrentValue is not null) || property.OriginalValue?.Equals(property.CurrentValue) == false))
                         {
                             trailEntry.ChangedColumns.Add(propertyName);
                             trailEntry.TrailType = TrailType.Update;
                             trailEntry.OldValues[propertyName] = property.OriginalValue;
                             trailEntry.NewValues[propertyName] = property.CurrentValue;
                         }
-
                         break;
                 }
+
+            }
+
+            // set trailtype to SoftDelete if the entity is soft deleted
+            if (entry.State == EntityState.Modified && entry.Entity is ISoftDelete softDeleteEntity && softDeleteEntity.IsDeleted
+                    && trailEntry.OldValues.TryGetValue("IsDeleted", out var oldIsDeletedValue) && oldIsDeletedValue is not null && (bool)oldIsDeletedValue == false)
+            {
+                trailEntry.TrailType = TrailType.SoftDelete;
             }
         }
 
