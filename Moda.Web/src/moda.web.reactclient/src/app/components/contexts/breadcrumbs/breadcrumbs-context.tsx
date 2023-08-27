@@ -54,6 +54,7 @@ export const BreadcrumbsProvider = ({ children }) => {
   )
 
   useEffect(() => {
+    setIsVisible(true)
     // Only set the default route if it hasn't been set already
     if (breadcrumbRoute?.pathname !== pathname) {
       setBreadcrumbRoute({ pathname, route: generateRoute(pathname) })

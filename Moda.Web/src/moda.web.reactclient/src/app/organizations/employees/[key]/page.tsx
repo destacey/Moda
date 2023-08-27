@@ -9,6 +9,7 @@ import { Card } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { authorizePage } from '@/src/app/components/hoc'
+import { notFound } from 'next/navigation'
 
 const EmployeeDetailsPage = ({ params }) => {
   useDocumentTitle('Employee Details')
@@ -16,6 +17,7 @@ const EmployeeDetailsPage = ({ params }) => {
   const [employee, setEmployee] = useState<EmployeeDetailsDto | null>(null)
   const { key } = params
   const { setBreadcrumbTitle } = useBreadcrumbs()
+  const [notEmployeeFound, setEmployeeNotFound] = useState<boolean>(false)
 
   const tabs = [
     {
@@ -33,8 +35,17 @@ const EmployeeDetailsPage = ({ params }) => {
       setBreadcrumbTitle(employeeDto.displayName)
     }
 
-    getEmployee()
+    getEmployee().catch((error) => {
+      if (error.status === 404) {
+        setEmployeeNotFound(true)
+      }
+      console.error('getEmployee error', error)
+    })
   }, [key, setBreadcrumbTitle])
+
+  if (notEmployeeFound) {
+    return notFound()
+  }
 
   return (
     <>

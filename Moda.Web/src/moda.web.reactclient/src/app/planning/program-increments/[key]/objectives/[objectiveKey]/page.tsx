@@ -1,8 +1,6 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { getProgramIncrementsClient } from '@/src/services/clients'
-import { ProgramIncrementObjectiveDetailsDto } from '@/src/services/moda-api'
 import { Button, Card, Dropdown, MenuProps, Space } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import ProgramIncrementObjectiveDetails from './program-increment-objective-details'
@@ -15,19 +13,27 @@ import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { BreadcrumbItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import DeleteProgramIncrementObjectiveForm from './delete-program-increment-objective-form'
 import { authorizePage } from '@/src/app/components/hoc'
+import { useGetProgramIncrementObjectiveByKey } from '@/src/services/queries/planning-queries'
+import { notFound, useRouter } from 'next/navigation'
 
 const ObjectiveDetailsPage = ({ params }) => {
   useDocumentTitle('PI Objective Details')
+
+  const {
+    data: objectiveData,
+    isLoading,
+    isFetching,
+    refetch: refetchObjective,
+  } = useGetProgramIncrementObjectiveByKey(params.key, params.objectiveKey)
+
   const [activeTab, setActiveTab] = useState('details')
-  const [objective, setObjective] =
-    useState<ProgramIncrementObjectiveDetailsDto | null>(null)
   const { setBreadcrumbRoute } = useBreadcrumbs()
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
   const [openDeleteObjectiveForm, setOpenDeleteObjectiveForm] =
     useState<boolean>(false)
-  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
 
+  const router = useRouter()
   const { hasClaim } = useAuth()
   const canManageObjectives = hasClaim(
     'Permission',
@@ -39,11 +45,13 @@ const ObjectiveDetailsPage = ({ params }) => {
     {
       key: 'details',
       tab: 'Details',
-      content: <ProgramIncrementObjectiveDetails objective={objective} />,
+      content: <ProgramIncrementObjectiveDetails objective={objectiveData} />,
     },
   ]
 
   useEffect(() => {
+    if (!objectiveData) return
+
     const breadcrumbRoute: BreadcrumbItemType[] = [
       {
         title: 'Planning',
@@ -54,35 +62,23 @@ const ObjectiveDetailsPage = ({ params }) => {
       },
     ]
 
-    const getObjective = async () => {
-      const programIncrementsClient = await getProgramIncrementsClient()
-      const objectiveDto = await programIncrementsClient.getObjectiveByKey(
-        params.key,
-        params.objectiveKey,
-      )
-      setObjective(objectiveDto)
-
-      breadcrumbRoute.push(
-        {
-          href: `/planning/program-increments/${objectiveDto.programIncrement?.key}`,
-          title: objectiveDto.programIncrement?.name,
-        },
-        {
-          title: objectiveDto.name,
-        },
-      )
-      // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
-      setBreadcrumbRoute(breadcrumbRoute)
-    }
-
-    getObjective()
-  }, [params.key, params.objectiveKey, setBreadcrumbRoute, lastRefresh])
+    breadcrumbRoute.push(
+      {
+        href: `/planning/program-increments/${objectiveData.programIncrement?.key}`,
+        title: objectiveData.programIncrement?.name,
+      },
+      {
+        title: objectiveData.name,
+      },
+    )
+    // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
+    setBreadcrumbRoute(breadcrumbRoute)
+  }, [objectiveData, setBreadcrumbRoute])
 
   const onUpdateObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
     if (wasSaved) {
-      // TODO: refresh the PI details and Teams tab only
-      setLastRefresh(Date.now())
+      refetchObjective()
     }
   }
 
@@ -90,7 +86,7 @@ const ObjectiveDetailsPage = ({ params }) => {
     setOpenDeleteObjectiveForm(false)
     if (wasSaved) {
       // redirect to the PI details page
-      window.location.href = `/planning/program-increments/${params.key}`
+      router.push(`/planning/program-increments/${params.key}`)
     }
   }
 
@@ -130,10 +126,14 @@ const ObjectiveDetailsPage = ({ params }) => {
     )
   }
 
+  if (!isLoading && !isFetching && !objectiveData) {
+    notFound()
+  }
+
   return (
     <>
       <PageTitle
-        title={`${objective?.key} - ${objective?.name}`}
+        title={`${objectiveData?.key} - ${objectiveData?.name}`}
         subtitle="PI Objective Details"
         actions={showActions && <Actions />}
       />
@@ -145,19 +145,19 @@ const ObjectiveDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {openUpdateObjectiveForm && canManageObjectives && (
+      {openUpdateObjectiveForm && (
         <EditProgramIncrementObjectiveForm
           showForm={openUpdateObjectiveForm}
-          objectiveId={objective?.id}
-          programIncrementId={objective?.programIncrement?.id}
+          objectiveId={objectiveData?.id}
+          programIncrementId={objectiveData?.programIncrement?.id}
           onFormSave={() => onUpdateObjectiveFormClosed(true)}
           onFormCancel={() => onUpdateObjectiveFormClosed(false)}
         />
       )}
-      {openDeleteObjectiveForm && canManageObjectives && (
+      {openDeleteObjectiveForm && (
         <DeleteProgramIncrementObjectiveForm
           showForm={openDeleteObjectiveForm}
-          objective={objective}
+          objective={objectiveData}
           onFormSave={() => onDeleteObjectiveFormClosed(true)}
           onFormCancel={() => onDeleteObjectiveFormClosed(false)}
         />

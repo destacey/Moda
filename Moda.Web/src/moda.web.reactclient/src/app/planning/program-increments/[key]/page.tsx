@@ -28,6 +28,7 @@ import {
   useGetProgramIncrementTeams,
 } from '@/src/services/queries/planning-queries'
 import { authorizePage } from '@/src/app/components/hoc'
+import { notFound } from 'next/navigation'
 
 enum ProgramIncrementTabs {
   Details = 'details',
@@ -55,8 +56,12 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     'Permissions.ProgramIncrements.Update',
   )
 
-  const { data: programIncrementData, refetch: refetchProgramIncrement } =
-    useGetProgramIncrementByKey(params.key)
+  const {
+    data: programIncrementData,
+    isLoading,
+    isFetching,
+    refetch: refetchProgramIncrement,
+  } = useGetProgramIncrementByKey(params.key)
 
   const teamsQuery = useGetProgramIncrementTeams(
     programIncrementData?.id,
@@ -199,6 +204,10 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     },
     [objectivesQueryEnabled, risksQueryEnabled, teamsQueryEnabled],
   )
+
+  if (!isLoading && !isFetching && !programIncrementData) {
+    notFound()
+  }
 
   return (
     <>

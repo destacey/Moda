@@ -10,15 +10,20 @@ import useAuth from '@/src/app/components/contexts/auth'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useGetConnectionById } from '@/src/services/queries/app-integration-queries'
+import { notFound } from 'next/navigation'
 
 const ConnectionDetailsPage = ({ params }) => {
   useDocumentTitle('Connection Details')
-  const { data: connectionData, refetch } = useGetConnectionById(params.id)
+  const {
+    data: connectionData,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useGetConnectionById(params.id)
   const { setBreadcrumbRoute } = useBreadcrumbs()
   const [activeTab, setActiveTab] = useState('details')
   const [openUpdateConnectionForm, setOpenUpdateConnectionForm] =
     useState<boolean>(false)
-  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
 
   const { hasClaim } = useAuth()
   const canUpdateConnections = hasClaim(
@@ -52,7 +57,7 @@ const ConnectionDetailsPage = ({ params }) => {
     ]
     // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
     setBreadcrumbRoute(breadcrumbRoute)
-  }, [connectionData, lastRefresh, setBreadcrumbRoute])
+  }, [connectionData, setBreadcrumbRoute])
 
   // const onUpdateConnectionFormClosed = (wasSaved: boolean) => {
   //   setOpenUpdateConnectionForm(false)
@@ -72,6 +77,10 @@ const ConnectionDetailsPage = ({ params }) => {
   //     </>
   //   )
   // }
+
+  if (!isLoading && !isFetching && !connectionData) {
+    notFound()
+  }
 
   return (
     <>

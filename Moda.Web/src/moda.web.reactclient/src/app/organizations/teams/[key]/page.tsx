@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { TeamDetailsDto, TeamMembershipsDto } from '@/src/services/moda-api'
+import { TeamDetailsDto } from '@/src/services/moda-api'
 import { Button, Card } from 'antd'
 import { createElement, useCallback, useEffect, useState } from 'react'
 import TeamDetails from './team-details'
@@ -16,6 +16,7 @@ import useAuth from '@/src/app/components/contexts/auth'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { useGetTeamRisks } from '@/src/services/queries/organization-queries'
 import { authorizePage } from '@/src/app/components/hoc'
+import { notFound } from 'next/navigation'
 
 enum TeamTabs {
   Details = 'details',
@@ -32,6 +33,7 @@ const TeamDetailsPage = ({ params }) => {
   const { setBreadcrumbTitle } = useBreadcrumbs()
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
+  const [notTeamFound, setTeamNotFound] = useState<boolean>(false)
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
@@ -98,7 +100,12 @@ const TeamDetailsPage = ({ params }) => {
       setBreadcrumbTitle(teamDto.name)
     }
 
-    getTeam()
+    getTeam().catch((error) => {
+      if (error.status === 404) {
+        setTeamNotFound(true)
+      }
+      console.error('getTeam error', error)
+    })
   }, [params.key, setBreadcrumbTitle, lastRefresh])
 
   const onUpdateTeamFormClosed = (wasUpdated: boolean) => {
@@ -120,6 +127,10 @@ const TeamDetailsPage = ({ params }) => {
     },
     [risksQueryEnabled],
   )
+
+  if (notTeamFound) {
+    return notFound()
+  }
 
   return (
     <>
