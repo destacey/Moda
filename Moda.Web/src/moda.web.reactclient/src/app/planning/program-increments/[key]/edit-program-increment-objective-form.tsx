@@ -150,7 +150,7 @@ const EditProgramIncrementObjectiveForm = ({
         messageApi.success('Successfully updated PI objective.')
       }
     } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
+      console.error('handleOk error', errorInfo)
     } finally {
       setIsSaving(false)
     }

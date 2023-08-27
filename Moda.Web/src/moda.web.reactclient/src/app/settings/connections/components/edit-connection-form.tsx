@@ -1,54 +1,74 @@
 import useAuth from '@/src/app/components/contexts/auth'
-import { CreateAzureDevOpsBoardConnectionRequest } from '@/src/services/moda-api'
-import { useCreateConnectionMutation } from '@/src/services/queries/app-integration-queries'
+import {
+  ConnectionDetailsDto,
+  UpdateAzureDevOpsBoardConnectionRequest,
+} from '@/src/services/moda-api'
+import {
+  useGetConnectionById,
+  useUpdateConnectionMutation,
+} from '@/src/services/queries/app-integration-queries'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, message } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-export interface CreateConnectionFormProps {
+export interface EditConnectionFormProps {
   showForm: boolean
-  onFormCreate: () => void
+  id: string
+  onFormUpdate: () => void
   onFormCancel: () => void
 }
 
-interface CreateConnectionFormValues {
+interface EditConnectionFormValues {
+  id: string
   name: string
-  description?: string
+  description?: string | null
 }
 
-const mapToRequestValues = (values: CreateConnectionFormValues) => {
+const mapToRequestValues = (values: EditConnectionFormValues) => {
   return {
+    id: values.id,
     name: values.name,
     description: values.description,
-  } as CreateAzureDevOpsBoardConnectionRequest
+  } as UpdateAzureDevOpsBoardConnectionRequest
 }
 
-const CreateConnectionForm = ({
+const EditConnectionForm = ({
   showForm,
-  onFormCreate,
+  id,
+  onFormUpdate,
   onFormCancel,
-}: CreateConnectionFormProps) => {
+}: EditConnectionFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateConnectionFormValues>()
+  const [form] = Form.useForm<EditConnectionFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const createConnection = useCreateConnectionMutation()
+  const { data: connectionData } = useGetConnectionById(id)
+  const updateConnection = useUpdateConnectionMutation()
 
   const { hasClaim } = useAuth()
-  const canCreateConnection = hasClaim(
+  const canUpdateConnection = hasClaim(
     'Permission',
-    'Permissions.Connections.Create',
+    'Permissions.Connections.Update',
   )
 
-  const create = async (
-    values: CreateConnectionFormValues,
-  ): Promise<boolean> => {
+  const mapToFormValues = useCallback(
+    (connection: ConnectionDetailsDto) => {
+      form.setFieldsValue({
+        id: connection.id,
+        name: connection.name,
+        description: connection.description,
+      })
+    },
+    [form],
+  )
+
+  const update = async (values: EditConnectionFormValues): Promise<boolean> => {
     try {
       const request = mapToRequestValues(values)
-      await createConnection.mutateAsync(request)
+      await updateConnection.mutateAsync(request)
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -56,7 +76,8 @@ const CreateConnectionForm = ({
         form.setFields(formErrors)
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        messageApi.error('An error occurred while creating the connection.')
+        messageApi.error('An error occurred while editing the connection.')
+        console.error(error)
       }
       return false
     }
@@ -66,33 +87,44 @@ const CreateConnectionForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values)) {
+      if (await update(values)) {
         setIsOpen(false)
+        onFormUpdate()
         form.resetFields()
-        onFormCreate()
-        messageApi.success('Successfully created connection.')
+        messageApi.success('Successfully updated connection.')
       }
     } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
+      console.error('handleOk error', errorInfo)
     } finally {
       setIsSaving(false)
     }
   }
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setIsOpen(false)
     onFormCancel()
     form.resetFields()
-  }
+  }, [onFormCancel, form])
 
   useEffect(() => {
-    if (canCreateConnection) {
+    if (!connectionData) return
+    if (canUpdateConnection) {
       setIsOpen(showForm)
+      if (showForm) {
+        mapToFormValues(connectionData)
+      }
     } else {
       onFormCancel()
-      messageApi.error('You do not have permission to create connections.')
+      messageApi.error('You do not have permission to edit connections.')
     }
-  }, [canCreateConnection, onFormCancel, showForm, messageApi])
+  }, [
+    canUpdateConnection,
+    connectionData,
+    mapToFormValues,
+    messageApi,
+    onFormCancel,
+    showForm,
+  ])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -105,11 +137,11 @@ const CreateConnectionForm = ({
     <>
       {contextHolder}
       <Modal
-        title="Create Connection"
+        title="Edit Connection"
         open={isOpen}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
-        okText="Create"
+        okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
@@ -120,8 +152,11 @@ const CreateConnectionForm = ({
           form={form}
           size="small"
           layout="vertical"
-          name="create-connection-form"
+          name="edit-connection-form"
         >
+          <Form.Item name="id" hidden={true}>
+            <Input />
+          </Form.Item>
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
             <Input.TextArea
               autoSize={{ minRows: 1, maxRows: 4 }}
@@ -146,4 +181,4 @@ const CreateConnectionForm = ({
   )
 }
 
-export default CreateConnectionForm
+export default EditConnectionForm

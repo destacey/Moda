@@ -62,7 +62,7 @@ const EditProgramIncrementForm = ({
     'Permission',
     'Permissions.ProgramIncrements.Update',
   )
-  const mapTeamToFormValues = useCallback(
+  const mapToFormValues = useCallback(
     (programIncrement: ProgramIncrementDetailsDto) => {
       form.setFieldsValue({
         id: programIncrement.id,
@@ -90,7 +90,7 @@ const EditProgramIncrementForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          'An unexpected error occurred while editing the program increment.',
+          'An error occurred while editing the program increment.',
         )
         console.error(error)
       }
@@ -123,14 +123,14 @@ const EditProgramIncrementForm = ({
 
   const loadData = useCallback(async () => {
     try {
-      mapTeamToFormValues(programIncrementData)
+      mapToFormValues(programIncrementData)
       setIsValid(true)
     } catch (error) {
       handleCancel()
       messageApi.error('An unexpected error occurred while loading form data.')
       console.error(error)
     }
-  }, [handleCancel, mapTeamToFormValues, messageApi, programIncrementData])
+  }, [handleCancel, mapToFormValues, messageApi, programIncrementData])
 
   useEffect(() => {
     if (!programIncrementData) return

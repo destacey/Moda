@@ -11,6 +11,7 @@ import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useGetConnectionById } from '@/src/services/queries/app-integration-queries'
 import { notFound } from 'next/navigation'
+import EditConnectionForm from '../components/edit-connection-form'
 
 const ConnectionDetailsPage = ({ params }) => {
   useDocumentTitle('Connection Details')
@@ -22,7 +23,7 @@ const ConnectionDetailsPage = ({ params }) => {
   } = useGetConnectionById(params.id)
   const { setBreadcrumbRoute } = useBreadcrumbs()
   const [activeTab, setActiveTab] = useState('details')
-  const [openUpdateConnectionForm, setOpenUpdateConnectionForm] =
+  const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
 
   const { hasClaim } = useAuth()
@@ -59,24 +60,22 @@ const ConnectionDetailsPage = ({ params }) => {
     setBreadcrumbRoute(breadcrumbRoute)
   }, [connectionData, setBreadcrumbRoute])
 
-  // const onUpdateConnectionFormClosed = (wasSaved: boolean) => {
-  //   setOpenUpdateConnectionForm(false)
-  //   if (wasSaved) {
-  //     setLastRefresh(Date.now())
-  //   }
-  // }
+  const onEditConnectionFormClosed = (wasSaved: boolean) => {
+    setOpenEditConnectionForm(false)
+    if (wasSaved) {
+      refetch()
+    }
+  }
 
-  // const Actions = () => {
-  //   return (
-  //     <>
-  //       {canUpdateConnections && (
-  //         <Button onClick={() => setOpenUpdateConnectionForm(true)}>
-  //           Edit
-  //         </Button>
-  //       )}
-  //     </>
-  //   )
-  // }
+  const Actions = () => {
+    return (
+      <>
+        {canUpdateConnections && (
+          <Button onClick={() => setOpenEditConnectionForm(true)}>Edit</Button>
+        )}
+      </>
+    )
+  }
 
   if (!isLoading && !isFetching && !connectionData) {
     notFound()
@@ -87,7 +86,7 @@ const ConnectionDetailsPage = ({ params }) => {
       <PageTitle
         title={connectionData?.name}
         subtitle="Connection Details"
-        //actions={showActions && <Actions />}
+        actions={showActions && <Actions />}
       />
       <Card
         style={{ width: '100%' }}
@@ -97,6 +96,14 @@ const ConnectionDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
+      {openEditConnectionForm && (
+        <EditConnectionForm
+          showForm={openEditConnectionForm}
+          id={connectionData?.id}
+          onFormUpdate={() => onEditConnectionFormClosed(true)}
+          onFormCancel={() => onEditConnectionFormClosed(false)}
+        />
+      )}
     </>
   )
 }
