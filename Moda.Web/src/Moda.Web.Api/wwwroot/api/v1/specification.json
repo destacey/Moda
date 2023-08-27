@@ -5067,10 +5067,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ConnectionListDto"
-                  }
+                  "$ref": "#/components/schemas/ConnectionDetailsDto"
                 }
               }
             }
@@ -5169,7 +5166,7 @@
         "tags": [
           "AzureDevOpsBoardsConnections"
         ],
-        "summary": "Get Azure DevOps Boards connection based on id.",
+        "summary": "Get Azure DevOps Boards connection configuration based on id.",
         "operationId": "AzureDevOpsBoardsConnections_GetConfig",
         "parameters": [
           {
@@ -5225,7 +5222,7 @@
         "tags": [
           "AzureDevOpsBoardsConnections"
         ],
-        "summary": "Update an Azure DevOps Boards connection.",
+        "summary": "Update an Azure DevOps Boards connection configuration.",
         "operationId": "AzureDevOpsBoardsConnections_UpdateConfig",
         "parameters": [
           {
@@ -7971,6 +7968,32 @@
           },
           "name": {
             "type": "string"
+          },
+          "connector": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isValidConfiguration": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ConnectionDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           },
           "connector": {
             "type": "string"
