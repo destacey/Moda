@@ -5,10 +5,17 @@ export interface BreadcrumbContextType {
     pathname: string
     route?: ItemType[]
   }
+  isVisible: boolean
+  /**
+   * Sets the value to make the breadcrumb visible or not
+   * @param isVisible
+   * @returns
+   */
+  setBreadcrumbIsVisible: (isVisible: boolean) => void
   /**
    * Sets the title displayed for the last item in the page breadcrumb
-   * @param title 
-   * @returns 
+   * @param title
+   * @returns
    */
   setBreadcrumbTitle: (title: string) => void
   /**
@@ -16,6 +23,6 @@ export interface BreadcrumbContextType {
    * @param route
    * @returns
    * @example setBreadcrumbRoute([{ title: 'Org' }, { title: 'Teams', href: '/orgs/teams' }, { title: ${team.name} }])
-  */
+   */
   setBreadcrumbRoute: (route: ItemType[]) => void
 }

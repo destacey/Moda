@@ -11,7 +11,7 @@ export interface AppBreadcrumbProps {}
 const AppBreadcrumb = () => {
   const [pathItems, setPathItems] = useState<ItemType[]>([])
   const pathname = usePathname()
-  const { breadcrumbRoute } = useBreadcrumbs()
+  const { breadcrumbRoute, isVisible } = useBreadcrumbs()
 
   useEffect(() => {
     if (breadcrumbRoute?.route) {
@@ -28,6 +28,8 @@ const AppBreadcrumb = () => {
     const last = routes.indexOf(route) === routes.length - 1
     return <BreadcrumbSegment route={route} paths={paths} last={last} />
   }
+
+  if (!isVisible) return null
 
   return (
     <Breadcrumb
