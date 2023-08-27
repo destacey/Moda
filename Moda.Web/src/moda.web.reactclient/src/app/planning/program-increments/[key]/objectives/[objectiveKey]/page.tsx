@@ -4,7 +4,7 @@ import PageTitle from '@/src/app/components/common/page-title'
 import { getProgramIncrementsClient } from '@/src/services/clients'
 import { ProgramIncrementObjectiveDetailsDto } from '@/src/services/moda-api'
 import { Button, Card, Dropdown, MenuProps, Space } from 'antd'
-import { createElement, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ProgramIncrementObjectiveDetails from './program-increment-objective-details'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
@@ -14,6 +14,7 @@ import { DownOutlined } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { BreadcrumbItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import DeleteProgramIncrementObjectiveForm from './delete-program-increment-objective-form'
+import { authorizePage } from '@/src/app/components/hoc'
 
 const ObjectiveDetailsPage = ({ params }) => {
   useDocumentTitle('PI Objective Details')
@@ -38,7 +39,7 @@ const ObjectiveDetailsPage = ({ params }) => {
     {
       key: 'details',
       tab: 'Details',
-      content: createElement(ProgramIncrementObjectiveDetails, objective),
+      content: <ProgramIncrementObjectiveDetails objective={objective} />,
     },
   ]
 
@@ -165,4 +166,10 @@ const ObjectiveDetailsPage = ({ params }) => {
   )
 }
 
-export default ObjectiveDetailsPage
+const ObjectiveDetailsPageWithAuthorization = authorizePage(
+  ObjectiveDetailsPage,
+  'Permission',
+  'Permissions.ProgramIncrements.View',
+)
+
+export default ObjectiveDetailsPageWithAuthorization

@@ -6,9 +6,15 @@ import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 const { Item } = Descriptions
 
-const ProgramIncrementObjectiveDetails = (
+interface ProgramIncrementObjectiveDetailsProps {
   objective: ProgramIncrementObjectiveDetailsDto
-) => {
+}
+
+const ProgramIncrementObjectiveDetails = ({
+  objective,
+}: ProgramIncrementObjectiveDetailsProps) => {
+  if (!objective) return null
+
   const progressStatus =
     objective.status?.name === 'Canceled' ? 'exception' : undefined
 

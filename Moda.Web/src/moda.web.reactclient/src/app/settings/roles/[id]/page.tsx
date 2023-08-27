@@ -8,6 +8,7 @@ import Permissions from './components/permissions'
 import useAuth from '@/src/app/components/contexts/auth'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { useGetRoleById } from '@/src/services/queries/user-management-queries'
+import { authorizePage } from '@/src/app/components/hoc'
 
 const RoleDetailsPage = ({ params }) => {
   const { data: roleData } = useGetRoleById(params.id)
@@ -31,17 +32,17 @@ const RoleDetailsPage = ({ params }) => {
     {
       key: 'details',
       tab: 'Details',
-      content: createElement(RoleDetails, {
-        role: roleData,
-      }),
+      content: <RoleDetails role={roleData} />,
     },
     canViewPermissions && {
       key: 'permissions',
       tab: 'Permissions',
-      content: createElement(Permissions, {
-        roleId: roleData?.id,
-        permissions: roleData?.permissions,
-      }),
+      content: (
+        <Permissions
+          roleId={roleData?.id}
+          permissions={roleData?.permissions}
+        />
+      ),
     },
   ]
 
@@ -59,4 +60,10 @@ const RoleDetailsPage = ({ params }) => {
   )
 }
 
-export default RoleDetailsPage
+const RoleDetailsPageWithAuthorization = authorizePage(
+  RoleDetailsPage,
+  'Permission',
+  'Permissions.Roles.View',
+)
+
+export default RoleDetailsPageWithAuthorization

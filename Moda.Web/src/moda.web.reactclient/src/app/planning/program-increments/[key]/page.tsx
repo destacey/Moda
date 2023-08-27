@@ -27,6 +27,7 @@ import {
   useGetProgramIncrementRisks,
   useGetProgramIncrementTeams,
 } from '@/src/services/queries/planning-queries'
+import { authorizePage } from '@/src/app/components/hoc'
 
 enum ProgramIncrementTabs {
   Details = 'details',
@@ -122,7 +123,9 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     {
       key: ProgramIncrementTabs.Details,
       tab: 'Details',
-      content: createElement(ProgramIncrementDetails, programIncrementData),
+      content: (
+        <ProgramIncrementDetails programIncrement={programIncrementData} />
+      ),
     },
     {
       key: ProgramIncrementTabs.Teams,
@@ -232,4 +235,10 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   )
 }
 
-export default ProgramIncrementDetailsPage
+const ProgramIncrementDetailsPageWithAuthorization = authorizePage(
+  ProgramIncrementDetailsPage,
+  'Permission',
+  'Permissions.ProgramIncrements.View',
+)
+
+export default ProgramIncrementDetailsPageWithAuthorization

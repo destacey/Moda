@@ -5,7 +5,12 @@ import ReactMarkdown from 'react-markdown'
 
 const { Item } = Descriptions
 
-const TeamDetails = (team: TeamDetailsDto) => {
+interface TeamDetailsProps {
+  team: TeamDetailsDto
+}
+
+const TeamDetails = ({ team }: TeamDetailsProps) => {
+  if (!team) return null
   return (
     <>
       <Row>

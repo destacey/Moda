@@ -3,7 +3,7 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import { getRisksClient } from '@/src/services/clients'
 import { RiskDetailsDto } from '@/src/services/moda-api'
-import { createElement, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import RiskDetails from './risk-details'
 import { Button, Card } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
@@ -11,6 +11,7 @@ import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
 import UpdateRiskForm from '@/src/app/components/common/planning/edit-risk-form'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
+import { authorizePage } from '@/src/app/components/hoc'
 
 const RiskDetailsPage = ({ params }) => {
   useDocumentTitle('Risk Details')
@@ -29,7 +30,7 @@ const RiskDetailsPage = ({ params }) => {
     {
       key: 'details',
       tab: 'Details',
-      content: createElement(RiskDetails, risk),
+      content: <RiskDetails risk={risk} />,
     },
   ]
 
@@ -59,7 +60,7 @@ const RiskDetailsPage = ({ params }) => {
         },
         {
           title: riskDto.summary,
-        }
+        },
       )
       // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
       setBreadcrumbRoute(breadcrumbRoute)
@@ -112,4 +113,10 @@ const RiskDetailsPage = ({ params }) => {
   )
 }
 
-export default RiskDetailsPage
+const RiskDetailsPageWithAuthorization = authorizePage(
+  RiskDetailsPage,
+  'Permission',
+  'Permissions.Risks.View',
+)
+
+export default RiskDetailsPageWithAuthorization

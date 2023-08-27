@@ -5,9 +5,15 @@ import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 const { Item } = Descriptions
 
-const ProgramIncrementDetails = (
+interface ProgramIncrementDetailsProps {
   programIncrement: ProgramIncrementDetailsDto
-) => {
+}
+
+const ProgramIncrementDetails = ({
+  programIncrement,
+}: ProgramIncrementDetailsProps) => {
+  if (!programIncrement) return null
+
   return (
     <>
       <Row>

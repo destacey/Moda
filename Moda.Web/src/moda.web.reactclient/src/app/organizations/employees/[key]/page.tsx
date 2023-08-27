@@ -2,12 +2,13 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { EmployeeDetailsDto } from '@/src/services/moda-api'
-import { createElement, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import EmployeeDetails from './employee-details'
 import { getEmployeesClient } from '@/src/services/clients'
 import { Card } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
+import { authorizePage } from '@/src/app/components/hoc'
 
 const EmployeeDetailsPage = ({ params }) => {
   useDocumentTitle('Employee Details')
@@ -20,7 +21,7 @@ const EmployeeDetailsPage = ({ params }) => {
     {
       key: 'details',
       tab: 'Details',
-      content: createElement(EmployeeDetails, employee),
+      content: <EmployeeDetails employee={employee} />,
     },
   ]
 
@@ -50,4 +51,10 @@ const EmployeeDetailsPage = ({ params }) => {
   )
 }
 
-export default EmployeeDetailsPage
+const EmployeeDetailsPageWithAuthorization = authorizePage(
+  EmployeeDetailsPage,
+  'Permission',
+  'Permissions.Employees.View',
+)
+
+export default EmployeeDetailsPageWithAuthorization

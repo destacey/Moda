@@ -6,7 +6,13 @@ import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 const { Item } = Descriptions
 
-const RiskDetails = (risk: RiskDetailsDto) => {
+interface RiskDetailsProps {
+  risk: RiskDetailsDto
+}
+
+const RiskDetails = ({ risk }: RiskDetailsProps) => {
+  if (!risk) return null
+
   const teamLink =
     risk.team?.type === 'Team'
       ? `/organizations/teams/${risk.team?.key}`
@@ -31,7 +37,7 @@ const RiskDetails = (risk: RiskDetailsDto) => {
           </Descriptions>
         </Col>
         <Col xs={24} md={14}>
-          <Descriptions>
+          <Descriptions column={2}>
             <Item label="Status">{risk.status?.name}</Item>
             <Item label="Team">
               <Link href={teamLink}>{risk.team?.name}</Link>

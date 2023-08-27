@@ -15,6 +15,7 @@ import { EditTeamForm } from '../../components'
 import useAuth from '@/src/app/components/contexts/auth'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { useGetTeamRisks } from '@/src/services/queries/organization-queries'
+import { authorizePage } from '@/src/app/components/hoc'
 
 enum TeamTabs {
   Details = 'details',
@@ -65,7 +66,7 @@ const TeamDetailsPage = ({ params }) => {
     {
       key: TeamTabs.Details,
       tab: 'Details',
-      content: createElement(TeamDetails, team),
+      content: <TeamDetails team={team} />,
     },
     {
       key: TeamTabs.RiskManagement,
@@ -148,4 +149,10 @@ const TeamDetailsPage = ({ params }) => {
   )
 }
 
-export default TeamDetailsPage
+const TeamDetailsPageWithAuthorization = authorizePage(
+  TeamDetailsPage,
+  'Permission',
+  'Permissions.Teams.View',
+)
+
+export default TeamDetailsPageWithAuthorization
