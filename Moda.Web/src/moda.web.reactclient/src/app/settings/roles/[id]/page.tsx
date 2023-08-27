@@ -1,16 +1,18 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { Card } from 'antd'
-import { createElement, useEffect, useState } from 'react'
+import { Card, Result } from 'antd'
+import { useEffect, useState } from 'react'
 import RoleDetails from './components/role-details'
 import Permissions from './components/permissions'
 import useAuth from '@/src/app/components/contexts/auth'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { useGetRoleById } from '@/src/services/queries/user-management-queries'
+import { authorizePage } from '@/src/app/components/hoc'
+import { notFound } from 'next/navigation'
 
 const RoleDetailsPage = ({ params }) => {
-  const { data: roleData } = useGetRoleById(params.id)
+  const { data: roleData, isLoading, isFetching } = useGetRoleById(params.id)
 
   const [activeTab, setActiveTab] = useState('details')
   const { hasClaim } = useAuth()
@@ -24,26 +26,30 @@ const RoleDetailsPage = ({ params }) => {
   const { setBreadcrumbTitle } = useBreadcrumbs()
 
   useEffect(() => {
-    setBreadcrumbTitle(roleData?.name ?? 'New Role')
-  }, [roleData, setBreadcrumbTitle])
+    setBreadcrumbTitle(roleData?.name)
+  }, [roleData?.name, setBreadcrumbTitle])
 
   const tabs = [
     {
       key: 'details',
       tab: 'Details',
-      content: createElement(RoleDetails, {
-        role: roleData,
-      }),
+      content: <RoleDetails role={roleData} />,
     },
     canViewPermissions && {
       key: 'permissions',
       tab: 'Permissions',
-      content: createElement(Permissions, {
-        roleId: roleData?.id,
-        permissions: roleData?.permissions,
-      }),
+      content: (
+        <Permissions
+          roleId={roleData?.id}
+          permissions={roleData?.permissions}
+        />
+      ),
     },
   ]
+
+  if (!isLoading && !isFetching && !roleData) {
+    notFound()
+  }
 
   return (
     <>
@@ -59,4 +65,10 @@ const RoleDetailsPage = ({ params }) => {
   )
 }
 
-export default RoleDetailsPage
+const RoleDetailsPageWithAuthorization = authorizePage(
+  RoleDetailsPage,
+  'Permission',
+  'Permissions.Roles.View',
+)
+
+export default RoleDetailsPageWithAuthorization

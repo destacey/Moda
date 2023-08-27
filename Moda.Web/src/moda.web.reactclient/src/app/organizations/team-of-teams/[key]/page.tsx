@@ -15,6 +15,8 @@ import { EditTeamForm } from '../../components'
 import useAuth from '@/src/app/components/contexts/auth'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { useGetTeamOfTeamsRisks } from '@/src/services/queries/organization-queries'
+import { authorizePage } from '@/src/app/components/hoc'
+import { notFound } from 'next/navigation'
 
 enum TeamOfTeamsTabs {
   Details = 'details',
@@ -32,6 +34,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   const { setBreadcrumbTitle } = useBreadcrumbs()
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
+  const [notTeamFound, setTeamNotFound] = useState<boolean>(false)
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
@@ -66,7 +69,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     {
       key: TeamOfTeamsTabs.Details,
       tab: 'Details',
-      content: createElement(TeamOfTeamsDetails, team),
+      content: <TeamOfTeamsDetails team={team} />,
     },
     {
       key: TeamOfTeamsTabs.RiskManagement,
@@ -97,7 +100,12 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       setBreadcrumbTitle(teamDto.name)
     }
 
-    getTeam()
+    getTeam().catch((error) => {
+      if (error.status === 404) {
+        setTeamNotFound(true)
+      }
+      console.error('getTeam error', error)
+    })
   }, [key, setBreadcrumbTitle, lastRefresh])
 
   const onUpdateTeamFormClosed = (wasUpdated: boolean) => {
@@ -119,6 +127,10 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     },
     [risksQueryEnabled],
   )
+
+  if (notTeamFound) {
+    return notFound()
+  }
 
   return (
     <>
@@ -148,4 +160,10 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   )
 }
 
-export default TeamOfTeamsDetailsPage
+const TeamOfTeamsDetailsPageWithAuthorization = authorizePage(
+  TeamOfTeamsDetailsPage,
+  'Permission',
+  'Permissions.Teams.View',
+)
+
+export default TeamOfTeamsDetailsPageWithAuthorization

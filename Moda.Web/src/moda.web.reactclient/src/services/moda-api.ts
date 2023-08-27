@@ -6074,7 +6074,7 @@ export class AzureDevOpsBoardsConnectionsClient {
     /**
      * Get Azure DevOps Boards connection based on id.
      */
-    getById(id: string, cancelToken?: CancelToken | undefined): Promise<ConnectionListDto[]> {
+    getById(id: string, cancelToken?: CancelToken | undefined): Promise<ConnectionDetailsDto> {
         let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -6101,7 +6101,7 @@ export class AzureDevOpsBoardsConnectionsClient {
         });
     }
 
-    protected processGetById(response: AxiosResponse): Promise<ConnectionListDto[]> {
+    protected processGetById(response: AxiosResponse): Promise<ConnectionDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -6116,7 +6116,7 @@ export class AzureDevOpsBoardsConnectionsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ConnectionListDto[]>(result200);
+            return Promise.resolve<ConnectionDetailsDto>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -6136,7 +6136,7 @@ export class AzureDevOpsBoardsConnectionsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ConnectionListDto[]>(null as any);
+        return Promise.resolve<ConnectionDetailsDto>(null as any);
     }
 
     /**
@@ -6208,7 +6208,7 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Get Azure DevOps Boards connection based on id.
+     * Get Azure DevOps Boards connection configuration based on id.
      */
     getConfig(id: string, cancelToken?: CancelToken | undefined): Promise<AzureDevOpsBoardsConnectionConfigurationDto> {
         let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/config";
@@ -6276,7 +6276,7 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Update an Azure DevOps Boards connection.
+     * Update an Azure DevOps Boards connection configuration.
      */
     updateConfig(id: string, request: UpdateAzureDevOpsBoardConnectionConfigurationRequest, cancelToken?: CancelToken | undefined): Promise<void> {
         let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/config";
@@ -7328,6 +7328,15 @@ export interface UpdateTeamOfTeamsRequest {
 export interface ConnectionListDto {
     id?: string;
     name?: string;
+    connector?: string;
+    isActive?: boolean;
+    isValidConfiguration?: boolean;
+}
+
+export interface ConnectionDetailsDto {
+    id?: string;
+    name?: string;
+    description?: string | undefined;
     connector?: string;
     isActive?: boolean;
     isValidConfiguration?: boolean;

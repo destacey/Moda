@@ -5,7 +5,13 @@ import Link from 'next/link'
 
 const { Item } = Descriptions
 
-const EmployeeDetails = (employee: EmployeeDetailsDto) => {
+interface EmployeeDetailsProps {
+  employee: EmployeeDetailsDto
+}
+
+const EmployeeDetails = ({ employee }: EmployeeDetailsProps) => {
+  if (!employee) return null
+
   return (
     <>
       <Descriptions>
@@ -17,7 +23,9 @@ const EmployeeDetails = (employee: EmployeeDetailsDto) => {
           </Link>
         </Item>
         <Item label="Office Location">{employee.officeLocation}</Item>
-        <Item label="Hire Date">{employee.hireDate && dayjs(employee.hireDate).format('M/D/YYYY')}</Item>
+        <Item label="Hire Date">
+          {employee.hireDate && dayjs(employee.hireDate).format('M/D/YYYY')}
+        </Item>
         <Item label="Is Active?">{employee.isActive?.toString()}</Item>
       </Descriptions>
     </>

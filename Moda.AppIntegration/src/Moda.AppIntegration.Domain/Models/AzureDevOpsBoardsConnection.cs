@@ -7,6 +7,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         Name = name;
         Description = description;
         Connector = Connector.AzureDevOpsBoards;
+        Configuration = new AzureDevOpsBoardsConnectionConfiguration(null, null);
     }
 
     public Result Update(string name, string? description, Instant timestamp)

@@ -6,9 +6,13 @@ import { authorizePage } from '../../components/hoc'
 import { useDocumentTitle } from '../../hooks'
 import useAuth from '../../components/contexts/auth'
 import { useGetConnections } from '@/src/services/queries/app-integration-queries'
-import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { Button, Space, Switch } from 'antd'
 import CreateConnectionForm from './components/create-connection-form'
+import Link from 'next/link'
+
+const ConnectionLinkCellRenderer = ({ value, data }) => {
+  return <Link href={`/settings/connections/${data.id}`}>{value}</Link>
+}
 
 const ConnectionsPage = () => {
   useDocumentTitle('Connections')
@@ -27,7 +31,7 @@ const ConnectionsPage = () => {
   const columnDefs = useMemo(
     () => [
       { field: 'id', hide: true },
-      { field: 'name' },
+      { field: 'name', cellRenderer: ConnectionLinkCellRenderer },
       { field: 'connector' },
       { field: 'isActive' },
       { field: 'isValidConfiguration' },
@@ -56,7 +60,7 @@ const ConnectionsPage = () => {
     setIncludeDisabled(checked)
   }
 
-  const controlItems: ItemType[] = [
+  const controlItems = [
     {
       label: (
         <Space>

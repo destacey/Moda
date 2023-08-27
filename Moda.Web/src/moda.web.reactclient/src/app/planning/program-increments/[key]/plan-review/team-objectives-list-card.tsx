@@ -18,6 +18,8 @@ export interface TeamObjectivesListCardProps {
   newObjectivesAllowed?: boolean
 }
 
+const statusOrder = ['Not Started', 'In Progress', 'Closed', 'Canceled']
+
 const TeamObjectivesListCard = ({
   objectivesQuery,
   programIncrementId,
@@ -55,25 +57,27 @@ const TeamObjectivesListCard = ({
     if (!objectivesQuery?.data || objectivesQuery?.data.length === 0) {
       return <ModaEmpty message="No objectives" />
     }
+
     const sortedObjectives = objectivesQuery?.data.sort((a, b) => {
       if (a.isStretch && !b.isStretch) {
         return 1
       } else if (!a.isStretch && b.isStretch) {
         return -1
       } else {
-        const statusOrder = ['Not Started', 'In Progress', 'Closed', 'Canceled']
         const aStatusIndex = statusOrder.indexOf(a.status.name)
         const bStatusIndex = statusOrder.indexOf(b.status.name)
         if (aStatusIndex === bStatusIndex) {
           if (a.targetDate && b.targetDate) {
-            return dayjs(a.targetDate).isAfter(dayjs(b.targetDate)) ? 1 : -1
+            const targetDateDiff = dayjs(a.targetDate).diff(dayjs(b.targetDate))
+            if (targetDateDiff !== 0) {
+              return targetDateDiff
+            }
           } else if (a.targetDate) {
             return -1
           } else if (b.targetDate) {
             return 1
-          } else {
-            return a.key - b.key
           }
+          return a.key - b.key
         } else {
           return aStatusIndex - bStatusIndex
         }

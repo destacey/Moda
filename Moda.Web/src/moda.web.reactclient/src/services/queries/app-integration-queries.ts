@@ -13,6 +13,15 @@ export const useGetConnections = (includeDisabled: boolean = false) => {
   })
 }
 
+export const useGetConnectionById = (id: string) => {
+  return useQuery({
+    queryKey: [QK.CONNECTIONS, id],
+    queryFn: async () =>
+      (await getAzureDevOpsBoardsConnectionsClient()).getById(id),
+    staleTime: 60000,
+  })
+}
+
 export const useCreateConnectionMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({

@@ -124,18 +124,15 @@ export const useGetProgramIncrementObjectiveById = (
 }
 
 export const useGetProgramIncrementObjectiveByKey = (
-  id: number,
-  objectiveId: number,
+  key: number,
+  objectiveKey: number,
 ) => {
   return useQuery({
-    queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVES, id, objectiveId],
+    queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVES, key, objectiveKey],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getObjectiveByKey(
-        id,
-        objectiveId,
-      ),
+      (await getProgramIncrementsClient()).getObjectiveByKey(key, objectiveKey),
     staleTime: 10000,
-    enabled: !!id && !!objectiveId,
+    enabled: !!key && !!objectiveKey,
   })
 }
 
@@ -252,6 +249,15 @@ export const useGetRiskById = (id: string) => {
     queryFn: async () => (await getRisksClient()).getById(id),
     staleTime: 10000,
     enabled: !!id,
+  })
+}
+
+export const useGetRiskByKey = (key: number) => {
+  return useQuery({
+    queryKey: [QK.RISKS, key],
+    queryFn: async () => (await getRisksClient()).getByKey(key),
+    staleTime: 10000,
+    enabled: !!key,
   })
 }
 
