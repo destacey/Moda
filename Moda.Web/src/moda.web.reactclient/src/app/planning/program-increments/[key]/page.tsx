@@ -163,8 +163,8 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
-    setBreadcrumbTitle(programIncrementData?.name)
-  }, [setBreadcrumbTitle, programIncrementData?.name])
+    programIncrementData && setBreadcrumbTitle(programIncrementData.name)
+  }, [setBreadcrumbTitle, programIncrementData])
 
   const onEditFormClosed = useCallback((wasSaved: boolean) => {
     setOpenEditProgramIncrementForm(false)
