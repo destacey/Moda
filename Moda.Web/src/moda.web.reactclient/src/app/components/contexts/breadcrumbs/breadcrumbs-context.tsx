@@ -11,10 +11,11 @@ export const BreadcrumbsContext = createContext<BreadcrumbContextType | null>(
 export const BreadcrumbsProvider = ({ children }) => {
   const [breadcrumbRoute, setBreadcrumbRoute] = useState<{
     pathname: string
-    title?: string
     route?: ItemType[]
+    defaultRoute?: ItemType[]
   }>(null)
   const [isVisible, setIsVisible] = useState(true)
+  const [overrideForPath, setOverrideForPath] = useState<string>('')
   const pathname = usePathname()
 
   const setRoute = useCallback(
@@ -49,6 +50,7 @@ export const BreadcrumbsProvider = ({ children }) => {
     (title: string) => {
       const route = generateRoute(pathname, title)
       setBreadcrumbRoute({ pathname, route })
+      setOverrideForPath(pathname)
     },
     [pathname, generateRoute],
   )
@@ -56,10 +58,12 @@ export const BreadcrumbsProvider = ({ children }) => {
   useEffect(() => {
     setIsVisible(true)
     // Only set the default route if it hasn't been set already
-    if (breadcrumbRoute?.pathname !== pathname) {
-      setBreadcrumbRoute({ pathname, route: generateRoute(pathname) })
+
+    if (breadcrumbRoute?.pathname !== pathname && overrideForPath !== pathname) {
+      const defaultRoute = generateRoute(pathname)
+      setBreadcrumbRoute({ pathname, route: defaultRoute })
     }
-  }, [pathname, generateRoute, breadcrumbRoute])
+  }, [pathname, generateRoute, breadcrumbRoute, overrideForPath])
 
   return (
     <BreadcrumbsContext.Provider
