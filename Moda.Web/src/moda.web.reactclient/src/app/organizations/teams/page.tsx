@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { useDocumentTitle } from '../../hooks/use-document-title'
 import useAuth from '../../components/contexts/auth'
 import { useAppSelector, useAppDispatch } from '../../hooks'
-import { retrieveTeams, setIncludeDisabled, setCreateTeamOpen } from '../teams-slice'
+import { retrieveTeams, setIncludeDisabled, setCreateTeamOpen, selectAllTeams } from '../teams-slice'
 import { ModalCreateTeamForm } from '../components/create-team-form'
 
 const TeamLinkCellRenderer = ({ value, data }) => {
@@ -29,7 +29,7 @@ const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {
 
 const TeamListPage = () => {
   useDocumentTitle('Teams')
-  const teams = useAppSelector((state) => state.teams.teams)
+  const teams = useAppSelector(selectAllTeams)
   const teamsLoadingstatus = useAppSelector((state) => state.teams.isLoading)
   const includeDisabled = useAppSelector((state) => state.teams.includeInactiveTeams)
   const createTeamOpen = useAppSelector((state) => state.teams.createTeam.isOpen)

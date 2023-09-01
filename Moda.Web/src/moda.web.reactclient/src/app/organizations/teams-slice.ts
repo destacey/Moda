@@ -1,4 +1,4 @@
-import {createSlice, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit'
+import {createSlice, PayloadAction, createAsyncThunk, createEntityAdapter} from '@reduxjs/toolkit'
 import { FieldData } from 'rc-field-form/lib/interface'
 import type {CreateTeamFormValues, EditTeamFormValues, TeamListItem, TeamType} from './types'
 import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
@@ -7,9 +7,14 @@ import { RootState } from '@/src/store'
 import { toFormErrors } from '@/src/utils'
 import { useAppSelector } from '../hooks'
 
+const teamsAdapter = createEntityAdapter<TeamListItem>({
+    selectId: (team) => team.key,
+    // Compare teams by key
+    sortComparer: (a, b) => a.key - b.key
+})
+
 // Define a type for the slice state
-interface TeamsState {
-    teams: TeamListItem[]
+interface TeamsState extends ReturnType<typeof teamsAdapter.getInitialState> {
     activeTeam: TeamDetailsDto | TeamOfTeamsDetailsDto | null
     includeInactiveTeams: boolean
     isLoading: boolean
@@ -31,9 +36,10 @@ interface TeamsState {
     }
 }
 
+
+
 // Define the initial state using that type
-const initialState: TeamsState = {
-    teams: [],
+const initialState: TeamsState = teamsAdapter.getInitialState({
     activeTeam: null,
     includeInactiveTeams: false,
     isLoading: false,
@@ -53,7 +59,7 @@ const initialState: TeamsState = {
         validationErrors: [],
         saveError: null
     }
-}
+})
 
 export const retrieveTeams = createAsyncThunk('teams/getTeams', async (arg, {getState, rejectWithValue}) => {
     try {
@@ -159,7 +165,7 @@ export const teamsSlice = createSlice({
             })
             .addCase(retrieveTeams.fulfilled, (state, action) => {
                 state.isLoading = false
-                state.teams = action.payload
+                teamsAdapter.setAll(state, action.payload)
             })
             .addCase(retrieveTeams.rejected, (state, action: PayloadAction<{error?: any}>) => {
                 state.isLoading = false
@@ -236,7 +242,17 @@ export const teamsSlice = createSlice({
     },
 })
 
-export const { setIncludeDisabled, errorAcknowledged, setCreateTeamOpen, setEditTeamOpen, resetActiveTeam } = teamsSlice.actions
+export const { 
+    setIncludeDisabled, 
+    errorAcknowledged, 
+    setCreateTeamOpen, 
+    setEditTeamOpen, 
+    resetActiveTeam 
+} = teamsSlice.actions
+
+export const {
+    selectAll: selectAllTeams,
+} = teamsAdapter.getSelectors((state: RootState) => state.teams)
 
 export const useCreateTeam = () => useAppSelector((state) => {
     return { 
