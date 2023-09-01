@@ -16,8 +16,8 @@ import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { useGetTeamOfTeamsRisks } from '@/src/services/queries/organization-queries'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound } from 'next/navigation'
-import { resetActiveTeam, retrieveTeam, setEditTeamOpen, useTeamDetail } from '../../teams-slice'
-import { useAppDispatch } from '@/src/app/hooks'
+import { resetActiveTeam, retrieveTeam, setEditTeamOpen, selectTeamDetail } from '../../teams-slice'
+import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 
 enum TeamOfTeamsTabs {
   Details = 'details',
@@ -38,7 +38,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
   const showActions = canUpdateTeam
 
-  const {team, error, isEditOpen} = useTeamDetail()
+  const {team, error, isEditOpen} = useAppSelector(selectTeamDetail)
   const dispatch = useAppDispatch()
 
   const risksQuery = useGetTeamOfTeamsRisks(

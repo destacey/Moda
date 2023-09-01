@@ -1,4 +1,4 @@
-import {createSlice, PayloadAction, createAsyncThunk, createEntityAdapter} from '@reduxjs/toolkit'
+import {createSlice, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector} from '@reduxjs/toolkit'
 import { FieldData } from 'rc-field-form/lib/interface'
 import type {CreateTeamFormValues, EditTeamFormValues, TeamListItem, TeamType} from './types'
 import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
@@ -254,33 +254,40 @@ export const {
     selectAll: selectAllTeams,
 } = teamsAdapter.getSelectors((state: RootState) => state.teams)
 
-export const useCreateTeam = () => useAppSelector((state) => {
-    return { 
-        isOpen: state.teams.createTeam.isOpen, 
-        isSaving: state.teams.createTeam.isSaving, 
-        saveError: state.teams.createTeam.saveError, 
-        validationErrors: state.teams.createTeam.validationErrors 
-    }
-})
+export const selectCreateTeamIsOpen = (state: RootState) => state.teams.createTeam.isOpen
+export const selectCreateTeamIsSaving = (state: RootState) => state.teams.createTeam.isSaving
+export const selectCreateTeamValidationErrors = (state: RootState) => state.teams.createTeam.validationErrors
+export const selectCreateTeamSaveError = (state: RootState) => state.teams.createTeam.saveError
 
-export const useEditTeam = () => useAppSelector((state) => {
-    return {
-        isOpen: state.teams.editTeam.isOpen,
-        isSaving: state.teams.editTeam.isSaving,
-        saveError: state.teams.editTeam.saveError,
-        validationErrors: state.teams.editTeam.validationErrors,
-        team: state.teams.activeTeam
+export const selectCreateTeam = createSelector(
+    [selectCreateTeamIsOpen, selectCreateTeamIsSaving, selectCreateTeamValidationErrors, selectCreateTeamSaveError], 
+    (isOpen, isSaving, validationErrors, saveError) => {
+        return {isOpen, isSaving, validationErrors, saveError}
     }
-})
+)
 
-export const useTeamDetail = () => useAppSelector((state) => {
-    return {
-        team: state.teams.activeTeam,
-        isLoading: state.teams.editTeam.isLoading,
-        isEditOpen: state.teams.editTeam.isOpen,
-        error: state.teams.activeTeamLoadingError,
-        teamNotFound: state.teams.activeTeamNotFound
+export const selectEditTeamIsOpen = (state: RootState) => state.teams.editTeam.isOpen
+export const selectEditTeamIsSaving = (state: RootState) => state.teams.editTeam.isSaving
+export const selectEditTeamValidationErrors = (state: RootState) => state.teams.editTeam.validationErrors
+export const selectEditTeamSaveError = (state: RootState) => state.teams.editTeam.saveError
+export const selectActiveTeam = (state: RootState) => state.teams.activeTeam
+
+export const selectEditTeam = createSelector(
+    [selectEditTeamIsOpen, selectEditTeamIsSaving, selectEditTeamValidationErrors, selectEditTeamSaveError, selectActiveTeam],
+    (isOpen, isSaving, validationErrors, saveError, team) => {
+        return {isOpen, isSaving, validationErrors, saveError, team}
     }
-})
+)
+
+export const selectActiveTeamIsLoading = (state: RootState) => state.teams.editTeam.isLoading
+export const selectActiveTeamLoadingError = (state: RootState) => state.teams.activeTeamLoadingError
+export const selectActiveTeamNotFound = (state: RootState) => state.teams.activeTeamNotFound
+
+export const selectTeamDetail = createSelector(
+    [selectActiveTeam, selectEditTeamIsOpen, selectActiveTeamIsLoading, selectActiveTeamLoadingError, selectActiveTeamNotFound],
+    (team, isEditOpen, isLoading, error, teamNotFound) => {
+        return {team, isEditOpen, isLoading, error, teamNotFound}
+    }
+)
 
 export default teamsSlice.reducer
