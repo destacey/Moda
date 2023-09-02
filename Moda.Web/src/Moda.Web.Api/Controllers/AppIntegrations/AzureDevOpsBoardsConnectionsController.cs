@@ -53,6 +53,8 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     {
         var config = await _sender.Send(new GetAzureDevOpsBoardsConnectionConfigurationQuery(id), cancellationToken);
 
+        config?.MaskPersonalAccessToken();
+
         return config is not null
             ? Ok(config)
             : NotFound();

@@ -1,6 +1,7 @@
 ﻿namespace Moda.AppIntegration.Domain.Models;
 public sealed record AzureDevOpsBoardsConnectionConfiguration
 {
+    // TODO: Move _baseUrl to a configuration file.
     private readonly string _baseUrl = "https://dev.azure.com";
     private AzureDevOpsBoardsConnectionConfiguration() { }
     public AzureDevOpsBoardsConnectionConfiguration(string? organization, string? personalAccessToken)

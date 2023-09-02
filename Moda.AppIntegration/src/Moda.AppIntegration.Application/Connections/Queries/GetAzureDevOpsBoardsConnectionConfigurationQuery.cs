@@ -2,15 +2,7 @@
 using Microsoft.Extensions.Logging;
 
 namespace Moda.AppIntegration.Application.Connections.Queries;
-public sealed record GetAzureDevOpsBoardsConnectionConfigurationQuery : IQuery<AzureDevOpsBoardsConnectionConfigurationDto?>
-{
-    public GetAzureDevOpsBoardsConnectionConfigurationQuery(Guid connectionId)
-    {
-        ConnectionId = connectionId;
-    }
-
-    public Guid ConnectionId { get; }
-}
+public sealed record GetAzureDevOpsBoardsConnectionConfigurationQuery(Guid ConnectionId) : IQuery<AzureDevOpsBoardsConnectionConfigurationDto?>;
 
 internal sealed class GetAzureDevOpsBoardsConnectionConfigurationQueryHandler : IQueryHandler<GetAzureDevOpsBoardsConnectionConfigurationQuery, AzureDevOpsBoardsConnectionConfigurationDto?>
 {
