@@ -51,3 +51,12 @@ export const useUpdateConnectionMutation = () => {
     },
   })
 }
+
+export const useGetConfiguration = (id: string) => {
+  return useQuery({
+    queryKey: [QK.CONNECTION_CONFIGURATIONS, id],
+    queryFn: async () =>
+      (await getAzureDevOpsBoardsConnectionsClient()).getConfig(id),
+    staleTime: 60000,
+  })
+}
