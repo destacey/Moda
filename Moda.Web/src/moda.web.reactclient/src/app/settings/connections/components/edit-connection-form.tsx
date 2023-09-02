@@ -4,8 +4,8 @@ import {
   UpdateAzureDevOpsBoardConnectionRequest,
 } from '@/src/services/moda-api'
 import {
-  useGetConnectionById,
-  useUpdateConnectionMutation,
+  useGetAzDOBoardsConnectionById,
+  useUpdateAzDOBoardsConnectionMutation,
 } from '@/src/services/queries/app-integration-queries'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, message } from 'antd'
@@ -45,8 +45,8 @@ const EditConnectionForm = ({
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const { data: connectionData } = useGetConnectionById(id)
-  const updateConnection = useUpdateConnectionMutation()
+  const { data: connectionData } = useGetAzDOBoardsConnectionById(id)
+  const updateConnection = useUpdateAzDOBoardsConnectionMutation()
 
   const { hasClaim } = useAuth()
   const canUpdateConnection = hasClaim(

@@ -5,7 +5,7 @@ import { ModaGrid, PageTitle } from '../../components/common'
 import { authorizePage } from '../../components/hoc'
 import { useDocumentTitle } from '../../hooks'
 import useAuth from '../../components/contexts/auth'
-import { useGetConnections } from '@/src/services/queries/app-integration-queries'
+import { useGetAzDOBoardsConnections } from '@/src/services/queries/app-integration-queries'
 import { Button, Space, Switch } from 'antd'
 import CreateConnectionForm from './components/create-connection-form'
 import Link from 'next/link'
@@ -19,7 +19,8 @@ const ConnectionsPage = () => {
   const [openCreateConnectionForm, setOpenCreateConnectionForm] =
     useState(false)
   const [includeDisabled, setIncludeDisabled] = useState(false)
-  const { data: connectionsData, refetch } = useGetConnections(includeDisabled)
+  const { data: connectionsData, refetch } =
+    useGetAzDOBoardsConnections(includeDisabled)
 
   const { hasClaim } = useAuth()
   const canCreateConnection = hasClaim(

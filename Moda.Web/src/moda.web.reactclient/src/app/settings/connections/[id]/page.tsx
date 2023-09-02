@@ -10,8 +10,8 @@ import useAuth from '@/src/app/components/contexts/auth'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { authorizePage } from '@/src/app/components/hoc'
 import {
-  useGetConfiguration,
-  useGetConnectionById,
+  useGetAzDOBoardsConfiguration,
+  useGetAzDOBoardsConnectionById,
 } from '@/src/services/queries/app-integration-queries'
 import { notFound } from 'next/navigation'
 import EditConnectionForm from '../components/edit-connection-form'
@@ -39,14 +39,14 @@ const ConnectionDetailsPage = ({ params }) => {
     isLoading,
     isFetching,
     refetch,
-  } = useGetConnectionById(params.id)
+  } = useGetAzDOBoardsConnectionById(params.id)
 
   const {
     data: configurationData,
     isLoading: configurationIsLoading,
     isFetching: configurationIsFetching,
     refetch: configurationRefetch,
-  } = useGetConfiguration(params.id)
+  } = useGetAzDOBoardsConfiguration(params.id)
 
   const tabs = [
     {
