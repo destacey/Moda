@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: moda-ui
+  name: moda-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: moda-ui
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.service: moda-ui
+    spec:
+      containers:
+        - env:
+          - name: NEXT_PUBLIC_API_BASE_URL
+            value: http://moda-api:5000
+          - name: NEXT_PUBLIC_AZURE_AD_CLIENT_ID
+            value: {{.Values.ui.clientId}}
+          - name: NEXT_PUBLIC_AZURE_AD_TENANT_ID
+            value: {{.Values.ui.tenantId}}
+          - name: NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY
+            value: {{.Values.ui.logonAuthority}}
+          - name: NEXT_PUBLIC_API_SCOPE
+            value: {{.Values.ui.apiScope}}
+          image: awaldow/moda-client:{{.Values.ui.tag | default "latest"}}
+          name: moda.api
+          ports:
+            - containerPort: 3000
+          {{- if (.Values.moda.resources) }}
+          resources:
+            {{- toYaml .Values.moda.resources | nindent 12 }}
+          {{- end }}
+      restartPolicy: Always
+status: {}

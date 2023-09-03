@@ -1,0 +1,17 @@
+{{- if .Values.mssql.create -}}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: mssql
+  name: mssql
+spec:
+  type: NodePort
+  ports:
+    - name: "1433"
+      port: 1433
+      nodePort: 31433
+  selector:
+    io.kompose.service: mssql
+{{- end -}}
+# Need to make this host accessible for local development

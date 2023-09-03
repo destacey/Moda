@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: moda-api
+  name: moda-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: moda-api
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.service: moda-api
+    spec:
+      containers:
+        - env:
+          - name: ASPNETCORE_ENVIRONMENT
+            {{- if .Values.moda.development }}
+            value: Development
+            {{- else }}
+            value: Production
+            {{- end }}
+          - name: ASPNETCORE_URLS
+            value: http://+:5150
+          - name: DatabaseSettings__ConnectionString # TODO: These need to come from values.yaml at some point
+            value: Server=mssql;Database=moda;User Id=sa;Password=ffadisodija1345@#;TrustServerCertificate=true
+          - name: HangfireSettings__Storage__ConnectionString
+            value: Server=mssql;Database=moda;User Id=sa;Password=ffadisodija1345@#;TrustServerCertificate=true
+          image: awaldow/moda-api:{{.Values.api.tag | default "latest"}}
+          name: moda.api
+          ports:
+            # - containerPort: 7021 # https port
+            # - containerPort: 5000 # http port
+            - containerPort: 5150 # http port
+          {{- if (.Values.moda.resources) }}
+          resources:
+            {{- toYaml .Values.moda.resources | nindent 12 }}
+          {{- end }}
+      restartPolicy: Always
+status: {}

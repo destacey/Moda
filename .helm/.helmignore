@@ -21,3 +21,6 @@
 .idea/
 *.tmproj
 .vscode/
+
+generate-helm-yaml.ps1
+install-helm-local.ps1

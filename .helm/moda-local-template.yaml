@@ -1,0 +1,229 @@
+---
+# Source: moda/templates/moda-web-api-claim0-persistentvolumeclaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: moda-web-api-claim0
+  name: moda-web-api-claim0
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+---
+# Source: moda/templates/moda-web-api-claim1-persistentvolumeclaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: moda-web-api-claim1
+  name: moda-web-api-claim1
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+---
+# Source: moda/templates/mssql-claim0-persistentvolumeclaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: mssql-claim0
+  name: mssql-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+---
+# Source: moda/templates/moda.web.api-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: moda-web-api
+  name: moda.web.api
+spec:
+  ports:
+    - name: "7021"
+      port: 7021
+      targetPort: 7021
+    - name: "5150"
+      port: 5150
+      targetPort: 5150
+    - name: "5000"
+      port: 5000
+      targetPort: 5000
+  selector:
+    io.kompose.service: moda-web-api
+status:
+  loadBalancer: {}
+---
+# Source: moda/templates/mssql-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: mssql
+  name: mssql
+spec:
+  type: NodePort
+  ports:
+    - name: "1433"
+      port: 1433
+      nodePort: 31433
+  selector:
+    io.kompose.service: mssql# Need to make this host accessible for local development
+---
+# Source: moda/templates/moda-web-api-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: moda-web-api
+  name: moda-web-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: moda-web-api
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.service: moda-web-api
+    spec:
+      containers:
+        - env:
+          - name: ASPNETCORE_ENVIRONMENT
+            value: Development
+          - name: ASPNETCORE_URLS
+            value: http://+:5150
+          - name: DatabaseSettings__ConnectionString
+            value: Server=mssql;Database=moda;User Id=sa;Password=ffadisodija1345@#;TrustServerCertificate=true
+          - name: HangfireSettings__Storage__ConnectionString
+            value: Server=mssql;Database=moda;User Id=sa;Password=ffadisodija1345@#;TrustServerCertificate=true
+          - name: Prometheus__Enabled
+            value: "false"
+          - name: Tracing__Enabled
+            value: "false"
+          - name: Tracing__OtlpEndpoint
+            value: http://tempo:4007
+          - name: Tracing__ServiceName
+            value: Moda.Web.API
+          - name: Tracing__ShowSQLText
+            value: "true"
+          image: modawebapi
+          name: moda.web.api
+          ports:
+            - containerPort: 7021 # https port
+            - containerPort: 5150 # prometheus endpoint
+            - containerPort: 5000 # http port
+          resources:
+            limits:
+              cpu: 100m
+              memory: 256Mi
+            requests:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /root/.microsoft/usersecrets
+              name: moda-web-api-claim0
+              readOnly: true
+            - mountPath: /root/.aspnet/https
+              name: moda-web-api-claim1
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: moda-web-api-claim0
+          hostPath:
+            path: ${APPDATA}/Microsoft/UserSecrets
+            type: Directory
+        - name: moda-web-api-claim1
+          hostPath:
+            path: ${APPDATA}/ASP.NET/Https
+            type: Directory
+status: {}
+---
+# Source: moda/templates/mssql-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: mssql
+  name: mssql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mssql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.service: mssql
+    spec:
+      containers:
+        - env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: MSSQL_PID
+              value: Express
+            - name: SA_PASSWORD
+              value: ffadisodija1345@#
+          image: mcr.microsoft.com/mssql/server:2022-latest
+          name: mssql
+          ports:
+            - containerPort: 1433
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/opt/mssql/data
+              name: mssql-claim0
+      restartPolicy: Always
+      volumes:
+        - name: mssql-claim0
+          persistentVolumeClaim:
+            claimName: mssql-claim0
+status: {}
+---
+# Source: moda/templates/default-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+  name: nginx
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+spec:
+  controller: k8s.io/ingress-nginx
+---
+# Source: moda/templates/moda.web.api-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: moda.web.api-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: moda.web.api
+                port:
+                  number: 5150 # http

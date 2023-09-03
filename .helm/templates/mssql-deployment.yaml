@@ -1,0 +1,42 @@
+{{- if .Values.mssql.create -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: mssql
+  name: mssql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mssql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.service: mssql
+    spec:
+      containers:
+        - env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: MSSQL_PID
+              value: Express
+            - name: SA_PASSWORD
+              value: ffadisodija1345@#
+          image: mcr.microsoft.com/mssql/server:2022-latest
+          name: mssql
+          ports:
+            - containerPort: 1433
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/opt/mssql/data
+              name: mssql-claim0
+      restartPolicy: Always
+      volumes:
+        - name: mssql-claim0
+          persistentVolumeClaim:
+            claimName: mssql-claim0
+status: {}
+{{- end -}}

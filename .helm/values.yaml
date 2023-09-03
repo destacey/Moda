@@ -1,0 +1,32 @@
+api:
+  tag: 0.5.1
+  development: true
+  # If you want to dictate Moda API resource usage, use the commented block and values that make sense. Those below are just placeholders to show structure.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+ui:
+  tag: 0.5.1
+  development: true
+  # set the following in your own values file
+  # # clientId: 
+  # # tenantId:
+  # # logonAuthority:
+  # # apiScope: 
+  # If you want to dictate Moda UI resource usage, use the commented block and values that make sense. Those below are just placeholders to show structure.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+mssql:
+  create: true # If true, deploys a mssql container and sets the connection string in the moda web api deployment
+  

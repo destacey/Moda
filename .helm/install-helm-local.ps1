@@ -1,0 +1,1 @@
+helm install -f values.yaml moda-local .

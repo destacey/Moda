@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: moda-api
+  name: moda.web.api
+spec:
+  ports:
+    - name: "7021"
+      port: 7021
+      targetPort: 7021
+    - name: "5150"
+      port: 5150
+      targetPort: 5150
+    - name: "5000"
+      port: 5000
+      targetPort: 5000
+  selector:
+    io.kompose.service: moda-api
+status:
+  loadBalancer: {}
