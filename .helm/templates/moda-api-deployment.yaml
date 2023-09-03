@@ -28,13 +28,13 @@ spec:
             value: http://+:5150
           - name: DatabaseSettings__ConnectionString # TODO: These need to come from values.yaml at some point
             {{- if .Values.mssql.create }}
-            value: Server=mssql;Database=moda;User Id=sa;Password=ffadisodija1345@#;TrustServerCertificate=true
+            value: Server=mssql.moda.svc.cluster.local;Database=moda;User Id=sa;Password={{.Values.mssql.admin_password}};TrustServerCertificate=true
             {{- else }}
             value: {{ .Values.mssql.connectionString }}
             {{- end }}
           - name: HangfireSettings__Storage__ConnectionString
             {{- if .Values.mssql.create }}
-            value: Server=mssql;Database=moda;User Id=sa;Password=ffadisodija1345@#;TrustServerCertificate=true
+            value: Server=mssql.moda.svc.cluster.local;Database=moda;User Id=sa;Password={{.Values.mssql.admin_password}};TrustServerCertificate=true
             {{- else }}
             value: {{ .Values.mssql.connectionString }}
             {{- end }}
