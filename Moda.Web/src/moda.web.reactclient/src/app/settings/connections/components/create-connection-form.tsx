@@ -2,7 +2,7 @@ import useAuth from '@/src/app/components/contexts/auth'
 import { CreateAzureDevOpsBoardConnectionRequest } from '@/src/services/moda-api'
 import { useCreateAzdoBoardsConnectionMutation } from '@/src/services/queries/app-integration-queries'
 import { toFormErrors } from '@/src/utils'
-import { Form, Input, Modal, message } from 'antd'
+import { Divider, Form, Input, Modal, message } from 'antd'
 import { useEffect, useState } from 'react'
 
 export interface CreateConnectionFormProps {
@@ -14,12 +14,16 @@ export interface CreateConnectionFormProps {
 interface CreateConnectionFormValues {
   name: string
   description?: string
+  organization?: string | null
+  personalAccessToken?: string | null
 }
 
 const mapToRequestValues = (values: CreateConnectionFormValues) => {
   return {
     name: values.name,
     description: values.description,
+    organization: values.organization,
+    personalAccessToken: values.personalAccessToken,
   } as CreateAzureDevOpsBoardConnectionRequest
 }
 
@@ -139,6 +143,18 @@ const CreateConnectionForm = ({
               showCount
               maxLength={1024}
             />
+          </Form.Item>
+
+          {/* TODO: make the configuration section dynamic based on the connector  */}
+
+          <Divider orientation="left" style={{ marginTop: '50px' }}>
+            Azure DevOps Configuration
+          </Divider>
+          <Form.Item label="Organization" name="organization">
+            <Input showCount maxLength={128} />
+          </Form.Item>
+          <Form.Item label="Personal Access Token" name="personalAccessToken">
+            <Input showCount maxLength={128} />
           </Form.Item>
         </Form>
       </Modal>

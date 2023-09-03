@@ -8,7 +8,7 @@ import {
   useUpdateAzdoBoardsConnectionMutation,
 } from '@/src/services/queries/app-integration-queries'
 import { toFormErrors } from '@/src/utils'
-import { Form, Input, Modal, message } from 'antd'
+import { Divider, Form, Input, Modal, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 export interface EditConnectionFormProps {
@@ -184,6 +184,9 @@ const EditConnectionForm = ({
 
           {/* TODO: make the configuration section dynamic based on the connector  */}
 
+          <Divider orientation="left" style={{ marginTop: '50px' }}>
+            Azure DevOps Configuration
+          </Divider>
           <Form.Item label="Organization" name="organization">
             <Input showCount maxLength={128} />
           </Form.Item>

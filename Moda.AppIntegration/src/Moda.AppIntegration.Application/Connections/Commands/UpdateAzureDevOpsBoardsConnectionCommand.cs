@@ -39,8 +39,12 @@ public sealed record UpdateAzureDevOpsBoardsConnectionCommand : ICommand<Guid>
 
 public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomValidator<UpdateAzureDevOpsBoardsConnectionCommand>
 {
-    public UpdateAzureDevOpsBoardsConnectionCommandValidator()
+    private readonly IAppIntegrationDbContext _appIntegrationDbContext;
+
+    public UpdateAzureDevOpsBoardsConnectionCommandValidator(IAppIntegrationDbContext appIntegrationDbContext)
     {
+        _appIntegrationDbContext = appIntegrationDbContext;
+
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(c => c.Name)
@@ -49,6 +53,27 @@ public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);
+
+        RuleFor(c => c.Organization)
+            .MaximumLength(128)
+            .MustAsync(async (cmd, organization, cancellationToken) => await BeUniqueOrganization(cmd.Id, organization, cancellationToken)).WithMessage("The organization for this connection already exists.");
+
+        RuleFor(c => c.PersonalAccessToken)
+            .MaximumLength(128);
+    }
+
+    public async Task<bool> BeUniqueOrganization(Guid id, string? organization, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(organization))
+            return true;
+
+        var connections = await _appIntegrationDbContext.AzureDevOpsBoardsConnections
+            .Where(c => c.Id != id && !string.IsNullOrWhiteSpace(c.ConfigurationString))
+            .ToListAsync(cancellationToken);
+
+        return connections
+            .Where(c => c.Configuration is not null && !string.IsNullOrWhiteSpace(c.Configuration.Organization))
+            .All(c => c.Configuration!.Organization != organization);
     }
 }
 

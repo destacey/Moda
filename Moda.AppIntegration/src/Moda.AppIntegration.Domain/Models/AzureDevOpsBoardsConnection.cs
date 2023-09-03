@@ -2,12 +2,13 @@
 public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsConnectionConfiguration>
 {
     private AzureDevOpsBoardsConnection() : base() { }
-    private AzureDevOpsBoardsConnection(string name, string? description)
+    private AzureDevOpsBoardsConnection(string name, string? description, AzureDevOpsBoardsConnectionConfiguration? configuration)
     {
         Name = name;
         Description = description;
         Connector = Connector.AzureDevOpsBoards;
-        Configuration = new AzureDevOpsBoardsConnectionConfiguration(null, null);
+        Configuration = configuration ?? new AzureDevOpsBoardsConnectionConfiguration(null, null);
+        ValidateConfiguration();
     }
 
     public Result Update(string name, string? description, AzureDevOpsBoardsConnectionConfiguration? configuration, Instant timestamp)
@@ -53,9 +54,9 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         IsValidConfiguration = Configuration?.IsValid() ?? false;
     }
 
-    public static AzureDevOpsBoardsConnection Create(string name, string? description, Instant timestamp)
+    public static AzureDevOpsBoardsConnection Create(string name, string? description, AzureDevOpsBoardsConnectionConfiguration? configuration, Instant timestamp)
     {
-        var connector = new AzureDevOpsBoardsConnection(name, description);
+        var connector = new AzureDevOpsBoardsConnection(name, description, configuration);
         connector.AddDomainEvent(EntityCreatedEvent.WithEntity(connector, timestamp));
         return connector;
     }

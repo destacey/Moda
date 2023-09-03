@@ -16,11 +16,11 @@ public sealed record UpdateAzureDevOpsBoardConnectionRequest
 
     /// <summary>Gets the organization.</summary>
     /// <value>The Azure DevOps Organization name.</value>
-    public string? Organization { get; }
+    public string? Organization { get; set; }
 
     /// <summary>Gets the personal access token.</summary>
     /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
-    public string? PersonalAccessToken { get; }
+    public string? PersonalAccessToken { get; set; }
 
     public UpdateAzureDevOpsBoardsConnectionCommand ToUpadateAzureDevOpsBoardsConnectionCommand()
         => new(Id, Name, Description, Organization, PersonalAccessToken);

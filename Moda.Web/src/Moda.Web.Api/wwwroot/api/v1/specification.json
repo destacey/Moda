@@ -8056,6 +8056,20 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
+          },
+          "organization": {
+            "type": "string",
+            "description": "Gets the organization.",
+            "maxLength": 128,
+            "minLength": 0,
+            "nullable": true
+          },
+          "personalAccessToken": {
+            "type": "string",
+            "description": "Gets the personal access token.",
+            "maxLength": 128,
+            "minLength": 0,
+            "nullable": true
           }
         }
       },

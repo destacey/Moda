@@ -37,11 +37,11 @@ public sealed class UpdateAzureDevOpsBoardsConnectionConfigurationCommandValidat
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(c => c.Organization)
-            .MaximumLength(256)
+            .MaximumLength(128)
             .MustAsync(async (cmd, organization, cancellationToken) => await BeUniqueOrganization(cmd.Id, organization, cancellationToken)).WithMessage("The organization for this connection already exists.");
 
         RuleFor(c => c.PersonalAccessToken)
-            .MaximumLength(256);
+            .MaximumLength(128);
     }
 
     public async Task<bool> BeUniqueOrganization(Guid id, string? organization, CancellationToken cancellationToken)

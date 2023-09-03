@@ -68,7 +68,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Guid))]
     public async Task<ActionResult> Create(CreateAzureDevOpsBoardConnectionRequest request, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(request.ToCreateConnectionCommand(), cancellationToken);
+        var result = await _sender.Send(request.ToCreateAzureDevOpsBoardsConnectionCommand(), cancellationToken);
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)

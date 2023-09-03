@@ -10,8 +10,16 @@ public sealed record CreateAzureDevOpsBoardConnectionRequest
     /// <value>The connection description.</value>
     public string? Description { get; set; }
 
-    public CreateConnectionCommand ToCreateConnectionCommand()
-        => new(Name, Description, Connector.AzureDevOpsBoards);
+    /// <summary>Gets the organization.</summary>
+    /// <value>The Azure DevOps Organization name.</value>
+    public string? Organization { get; set; }
+
+    /// <summary>Gets the personal access token.</summary>
+    /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
+    public string? PersonalAccessToken { get; set; }
+
+    public CreateAzureDevOpsBoardsConnectionCommand ToCreateAzureDevOpsBoardsConnectionCommand()
+        => new(Name, Description, Organization, PersonalAccessToken);
 }
 
 public sealed class CreateAzureDevOpsBoardConnectionRequestValidator : CustomValidator<CreateAzureDevOpsBoardConnectionRequest>
@@ -26,5 +34,11 @@ public sealed class CreateAzureDevOpsBoardConnectionRequestValidator : CustomVal
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);
+
+        RuleFor(c => c.Organization)
+            .MaximumLength(128);
+
+        RuleFor(c => c.PersonalAccessToken)
+            .MaximumLength(128);
     }
 }

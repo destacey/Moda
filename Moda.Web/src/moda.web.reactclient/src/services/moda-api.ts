@@ -7355,6 +7355,10 @@ export interface CreateAzureDevOpsBoardConnectionRequest {
     name: string;
     /** Gets or sets the description. */
     description?: string | undefined;
+    /** Gets the organization. */
+    organization?: string | undefined;
+    /** Gets the personal access token. */
+    personalAccessToken?: string | undefined;
 }
 
 export interface UpdateAzureDevOpsBoardConnectionRequest {
