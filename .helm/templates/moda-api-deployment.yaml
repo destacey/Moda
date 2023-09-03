@@ -19,7 +19,7 @@ spec:
       containers:
         - env:
           - name: ASPNETCORE_ENVIRONMENT
-            {{- if .Values.moda.development }}
+            {{- if .Values.api.development }}
             value: Development
             {{- else }}
             value: Production
@@ -27,9 +27,30 @@ spec:
           - name: ASPNETCORE_URLS
             value: http://+:5150
           - name: DatabaseSettings__ConnectionString # TODO: These need to come from values.yaml at some point
+            {{- if .Values.mssql.create }}
             value: Server=mssql;Database=moda;User Id=sa;Password=ffadisodija1345@#;TrustServerCertificate=true
+            {{- else }}
+            value: {{ .Values.mssql.connectionString }}
+            {{- end }}
           - name: HangfireSettings__Storage__ConnectionString
+            {{- if .Values.mssql.create }}
             value: Server=mssql;Database=moda;User Id=sa;Password=ffadisodija1345@#;TrustServerCertificate=true
+            {{- else }}
+            value: {{ .Values.mssql.connectionString }}
+            {{- end }}
+          - name: SecuritySettings__AzureAd__ClientSecret
+            valueFrom:
+              secretKeyRef:
+                key: moda-api-client-secret
+                name: moda-api-secrets
+          - name: HangfireSettings__Credentials__Password
+            valueFrom:
+              secretKeyRef:
+                key: moda-api-hangfire-password
+                name: moda-api-secrets
+          envFrom:
+            - configMapRef:
+                name: moda-api-config
           image: awaldow/moda-api:{{.Values.api.tag | default "latest"}}
           name: moda.api
           ports:

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: moda-api-config
+  namespace: moda
+data:
+  SecuritySettings__AzureAd__ClientId: {{.Values.api.clientId}}
+  SecuritySettings__AzureAd__Domain: {{.Values.api.domain}}
+  SecuritySettings__AzureAd__RootIssuer: {{.Values.api.rootIssuer}}
+  SecuritySettings__AzureAd__TenantId: {{.Values.api.tenantId}}
+  SecuritySettings__Swagger__ApiScope: {{.Values.api.swaggerApiScope}}
+  SecuritySettings__Swagger__AuthorizationUrl: {{.Values.api.swaggerAuthUrl}}
+  SecuritySettings__Swagger__OpenIdClientId: {{.Values.api.swaggerClientId}}
+  SecuritySettings__Swagger__TokenUrl: {{.Values.api.swaggerTokenUrl}}
+  CorsSettings__WebClient: {{.Values.api.corsOrigins}}
+  HangfireSettings__Credentials__User: {{.Values.api.hangfireUser}}
+

@@ -19,7 +19,7 @@ spec:
       containers:
         - env:
           - name: NEXT_PUBLIC_API_BASE_URL
-            value: http://moda-api:5000
+            value: {{.Values.ui.apiBaseUrl}}
           - name: NEXT_PUBLIC_AZURE_AD_CLIENT_ID
             value: {{.Values.ui.clientId}}
           - name: NEXT_PUBLIC_AZURE_AD_TENANT_ID
