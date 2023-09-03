@@ -6074,7 +6074,7 @@ export class AzureDevOpsBoardsConnectionsClient {
     /**
      * Get Azure DevOps Boards connection based on id.
      */
-    getById(id: string, cancelToken?: CancelToken | undefined): Promise<ConnectionDetailsDto> {
+    getById(id: string, cancelToken?: CancelToken | undefined): Promise<AzureDevOpsBoardsConnectionDetailsDto> {
         let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -6101,7 +6101,7 @@ export class AzureDevOpsBoardsConnectionsClient {
         });
     }
 
-    protected processGetById(response: AxiosResponse): Promise<ConnectionDetailsDto> {
+    protected processGetById(response: AxiosResponse): Promise<AzureDevOpsBoardsConnectionDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -6116,7 +6116,7 @@ export class AzureDevOpsBoardsConnectionsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ConnectionDetailsDto>(result200);
+            return Promise.resolve<AzureDevOpsBoardsConnectionDetailsDto>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -6136,7 +6136,7 @@ export class AzureDevOpsBoardsConnectionsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ConnectionDetailsDto>(null as any);
+        return Promise.resolve<AzureDevOpsBoardsConnectionDetailsDto>(null as any);
     }
 
     /**
@@ -7333,11 +7333,12 @@ export interface ConnectionListDto {
     isValidConfiguration?: boolean;
 }
 
-export interface ConnectionDetailsDto {
+export interface AzureDevOpsBoardsConnectionDetailsDto {
     id?: string;
     name?: string;
     description?: string | undefined;
     connector?: string;
+    configuration?: AzureDevOpsBoardsConnectionConfigurationDto | undefined;
     isActive?: boolean;
     isValidConfiguration?: boolean;
 }
@@ -7363,6 +7364,10 @@ export interface UpdateAzureDevOpsBoardConnectionRequest {
     name: string;
     /** Gets or sets the description. */
     description?: string | undefined;
+    /** Gets the organization. */
+    organization?: string | undefined;
+    /** Gets the personal access token. */
+    personalAccessToken?: string | undefined;
 }
 
 export interface UpdateAzureDevOpsBoardConnectionConfigurationRequest {

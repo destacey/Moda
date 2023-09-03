@@ -10,12 +10,13 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         Configuration = new AzureDevOpsBoardsConnectionConfiguration(null, null);
     }
 
-    public Result Update(string name, string? description, Instant timestamp)
+    public Result Update(string name, string? description, AzureDevOpsBoardsConnectionConfiguration? configuration, Instant timestamp)
     {
         try
         {
             Name = name;
             Description = description;
+            Configuration = configuration;
 
             ValidateConfiguration();
 

@@ -3,13 +3,13 @@ import { Descriptions } from 'antd'
 
 const { Item } = Descriptions
 
-interface ConnectionConfigurationProps {
+interface AzdoBoardsConnectionConfigurationProps {
   configuration: AzureDevOpsBoardsConnectionConfigurationDto
 }
 
-const ConnectionConfiguration = ({
+const AzdoBoardsConnectionConfiguration = ({
   configuration,
-}: ConnectionConfigurationProps) => {
+}: AzdoBoardsConnectionConfigurationProps) => {
   if (!configuration) return null
 
   return (
@@ -22,4 +22,4 @@ const ConnectionConfiguration = ({
   )
 }
 
-export default ConnectionConfiguration
+export default AzdoBoardsConnectionConfiguration

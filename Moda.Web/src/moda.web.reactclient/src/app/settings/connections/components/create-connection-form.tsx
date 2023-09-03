@@ -1,6 +1,6 @@
 import useAuth from '@/src/app/components/contexts/auth'
 import { CreateAzureDevOpsBoardConnectionRequest } from '@/src/services/moda-api'
-import { useCreateAzDOBoardsConnectionMutation } from '@/src/services/queries/app-integration-queries'
+import { useCreateAzdoBoardsConnectionMutation } from '@/src/services/queries/app-integration-queries'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, message } from 'antd'
 import { useEffect, useState } from 'react'
@@ -35,7 +35,7 @@ const CreateConnectionForm = ({
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const createConnection = useCreateAzDOBoardsConnectionMutation()
+  const createConnection = useCreateAzdoBoardsConnectionMutation()
 
   const { hasClaim } = useAuth()
   const canCreateConnection = hasClaim(

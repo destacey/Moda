@@ -14,8 +14,16 @@ public sealed record UpdateAzureDevOpsBoardConnectionRequest
     /// <value>The connection description.</value>
     public string? Description { get; set; }
 
+    /// <summary>Gets the organization.</summary>
+    /// <value>The Azure DevOps Organization name.</value>
+    public string? Organization { get; }
+
+    /// <summary>Gets the personal access token.</summary>
+    /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
+    public string? PersonalAccessToken { get; }
+
     public UpdateAzureDevOpsBoardsConnectionCommand ToUpadateAzureDevOpsBoardsConnectionCommand()
-        => new(Id, Name, Description);
+        => new(Id, Name, Description, Organization, PersonalAccessToken);
 }
 
 public sealed class UpdateAzureDevOpsBoardConnectionRequestValidator : CustomValidator<UpdateAzureDevOpsBoardConnectionRequest>
@@ -30,5 +38,11 @@ public sealed class UpdateAzureDevOpsBoardConnectionRequestValidator : CustomVal
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);
+
+        RuleFor(c => c.Organization)
+            .MaximumLength(128);
+
+        RuleFor(c => c.PersonalAccessToken)
+            .MaximumLength(128);
     }
 }

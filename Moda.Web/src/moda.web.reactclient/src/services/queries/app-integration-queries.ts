@@ -7,7 +7,7 @@ import {
 } from '../moda-api'
 
 // AzDO BOARDS CONNECTIONS
-export const useGetAzDOBoardsConnections = (
+export const useGetAzdoBoardsConnections = (
   includeDisabled: boolean = false,
 ) => {
   return useQuery({
@@ -18,7 +18,7 @@ export const useGetAzDOBoardsConnections = (
   })
 }
 
-export const useGetAzDOBoardsConnectionById = (id: string) => {
+export const useGetAzdoBoardsConnectionById = (id: string) => {
   return useQuery({
     queryKey: [QK.AZDO_BOARDS_CONNECTIONS, id],
     queryFn: async () =>
@@ -27,7 +27,7 @@ export const useGetAzDOBoardsConnectionById = (id: string) => {
   })
 }
 
-export const useCreateAzDOBoardsConnectionMutation = () => {
+export const useCreateAzdoBoardsConnectionMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (connection: CreateAzureDevOpsBoardConnectionRequest) =>
@@ -38,7 +38,7 @@ export const useCreateAzDOBoardsConnectionMutation = () => {
   })
 }
 
-export const useUpdateAzDOBoardsConnectionMutation = () => {
+export const useUpdateAzdoBoardsConnectionMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (connection: UpdateAzureDevOpsBoardConnectionRequest) =>
@@ -54,7 +54,7 @@ export const useUpdateAzDOBoardsConnectionMutation = () => {
   })
 }
 
-export const useGetAzDOBoardsConfiguration = (id: string) => {
+export const useGetAzdoBoardsConfiguration = (id: string) => {
   return useQuery({
     queryKey: [QK.AZDO_BOARDS_CONNECTION_CONFIGURATIONS, id],
     queryFn: async () =>

@@ -5067,7 +5067,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConnectionDetailsDto"
+                  "$ref": "#/components/schemas/AzureDevOpsBoardsConnectionDetailsDto"
                 }
               }
             }
@@ -7980,7 +7980,7 @@
           }
         }
       },
-      "ConnectionDetailsDto": {
+      "AzureDevOpsBoardsConnectionDetailsDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -7997,6 +7997,14 @@
           },
           "connector": {
             "type": "string"
+          },
+          "configuration": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AzureDevOpsBoardsConnectionConfigurationDto"
+              }
+            ]
           },
           "isActive": {
             "type": "boolean"
@@ -8074,6 +8082,20 @@
             "type": "string",
             "description": "Gets or sets the description.",
             "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          },
+          "organization": {
+            "type": "string",
+            "description": "Gets the organization.",
+            "maxLength": 128,
+            "minLength": 0,
+            "nullable": true
+          },
+          "personalAccessToken": {
+            "type": "string",
+            "description": "Gets the personal access token.",
+            "maxLength": 128,
             "minLength": 0,
             "nullable": true
           }

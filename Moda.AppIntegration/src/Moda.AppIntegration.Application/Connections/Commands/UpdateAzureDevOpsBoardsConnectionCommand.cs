@@ -6,11 +6,13 @@ using Microsoft.Extensions.Logging;
 namespace Moda.AppIntegration.Application.Connections.Commands;
 public sealed record UpdateAzureDevOpsBoardsConnectionCommand : ICommand<Guid>
 {
-    public UpdateAzureDevOpsBoardsConnectionCommand(Guid id, string name, string? description)
+    public UpdateAzureDevOpsBoardsConnectionCommand(Guid id, string name, string? description, string? organization, string? personalAccessToken)
     {
         Id = id;
         Name = name;
         Description = description;
+        Organization = organization;
+        PersonalAccessToken = personalAccessToken;
     }
 
     /// <summary>Gets or sets the identifier.</summary>
@@ -24,6 +26,15 @@ public sealed record UpdateAzureDevOpsBoardsConnectionCommand : ICommand<Guid>
     /// <summary>Gets or sets the description.</summary>
     /// <value>The connection description.</value>
     public string? Description { get; }
+
+    /// <summary>Gets the organization.</summary>
+    /// <value>The Azure DevOps Organization name.</value>
+    public string? Organization { get; }
+
+    /// <summary>Gets the personal access token.</summary>
+    /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
+    public string? PersonalAccessToken { get; }
+
 }
 
 public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomValidator<UpdateAzureDevOpsBoardsConnectionCommand>
@@ -63,7 +74,14 @@ internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommand
             if (connection is null)
                 return Result.Failure<Guid>("Azure DevOps Boards connection not found.");
 
-            var updateResult = connection.Update(request.Name, request.Description, _dateTimeService.Now);
+            // do the first four characters of the PersonalAccessToken match the existing one?
+            var pat = connection.Configuration?.PersonalAccessToken?[..4] == request.PersonalAccessToken?[..4]
+                ? connection.Configuration?.PersonalAccessToken
+                : request.PersonalAccessToken;
+
+            var configuration = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, pat);
+
+            var updateResult = connection.Update(request.Name, request.Description, configuration, _dateTimeService.Now);
             if (updateResult.IsFailure)
             {
                 // Reset the entity

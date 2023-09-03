@@ -34,9 +34,11 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ConnectionDetailsDto>> GetById(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<AzureDevOpsBoardsConnectionDetailsDto>> GetById(Guid id, CancellationToken cancellationToken)
     {
-        var connection = await _sender.Send(new GetConnectionQuery(id), cancellationToken);
+        var connection = await _sender.Send(new GetAzureDevOpsBoardsConnectionQuery(id), cancellationToken);
+
+        connection?.Configuration?.MaskPersonalAccessToken();
 
         return connection is not null
             ? Ok(connection)

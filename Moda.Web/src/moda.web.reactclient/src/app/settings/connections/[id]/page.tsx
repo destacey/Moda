@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { useEffect, useState } from 'react'
-import ConnectionDetails from './connection-details'
+import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
 import { Button, Card } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
@@ -10,8 +10,8 @@ import useAuth from '@/src/app/components/contexts/auth'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { authorizePage } from '@/src/app/components/hoc'
 import {
-  useGetAzDOBoardsConfiguration,
-  useGetAzDOBoardsConnectionById,
+  useGetAzdoBoardsConfiguration,
+  useGetAzdoBoardsConnectionById,
 } from '@/src/services/queries/app-integration-queries'
 import { notFound } from 'next/navigation'
 import EditConnectionForm from '../components/edit-connection-form'
@@ -39,25 +39,13 @@ const ConnectionDetailsPage = ({ params }) => {
     isLoading,
     isFetching,
     refetch,
-  } = useGetAzDOBoardsConnectionById(params.id)
-
-  const {
-    data: configurationData,
-    isLoading: configurationIsLoading,
-    isFetching: configurationIsFetching,
-    refetch: configurationRefetch,
-  } = useGetAzDOBoardsConfiguration(params.id)
+  } = useGetAzdoBoardsConnectionById(params.id)
 
   const tabs = [
     {
       key: ConnectionTabs.Details,
       tab: 'Details',
-      content: (
-        <ConnectionDetails
-          connection={connectionData}
-          configuration={configurationData}
-        />
-      ),
+      content: <AzdoBoardsConnectionDetails connection={connectionData} />,
     },
   ]
 

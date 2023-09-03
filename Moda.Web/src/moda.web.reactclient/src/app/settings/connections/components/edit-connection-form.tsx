@@ -1,11 +1,11 @@
 import useAuth from '@/src/app/components/contexts/auth'
 import {
-  ConnectionDetailsDto,
+  AzureDevOpsBoardsConnectionDetailsDto,
   UpdateAzureDevOpsBoardConnectionRequest,
 } from '@/src/services/moda-api'
 import {
-  useGetAzDOBoardsConnectionById,
-  useUpdateAzDOBoardsConnectionMutation,
+  useGetAzdoBoardsConnectionById,
+  useUpdateAzdoBoardsConnectionMutation,
 } from '@/src/services/queries/app-integration-queries'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, message } from 'antd'
@@ -22,6 +22,8 @@ interface EditConnectionFormValues {
   id: string
   name: string
   description?: string | null
+  organization?: string | null
+  personalAccessToken?: string | null
 }
 
 const mapToRequestValues = (values: EditConnectionFormValues) => {
@@ -29,6 +31,8 @@ const mapToRequestValues = (values: EditConnectionFormValues) => {
     id: values.id,
     name: values.name,
     description: values.description,
+    organization: values.organization,
+    personalAccessToken: values.personalAccessToken,
   } as UpdateAzureDevOpsBoardConnectionRequest
 }
 
@@ -45,8 +49,8 @@ const EditConnectionForm = ({
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const { data: connectionData } = useGetAzDOBoardsConnectionById(id)
-  const updateConnection = useUpdateAzDOBoardsConnectionMutation()
+  const { data: connectionData } = useGetAzdoBoardsConnectionById(id)
+  const updateConnection = useUpdateAzdoBoardsConnectionMutation()
 
   const { hasClaim } = useAuth()
   const canUpdateConnection = hasClaim(
@@ -55,11 +59,13 @@ const EditConnectionForm = ({
   )
 
   const mapToFormValues = useCallback(
-    (connection: ConnectionDetailsDto) => {
+    (connection: AzureDevOpsBoardsConnectionDetailsDto) => {
       form.setFieldsValue({
         id: connection.id,
         name: connection.name,
         description: connection.description,
+        organization: connection.configuration?.organization,
+        personalAccessToken: connection.configuration?.personalAccessToken,
       })
     },
     [form],
@@ -174,6 +180,15 @@ const EditConnectionForm = ({
               showCount
               maxLength={1024}
             />
+          </Form.Item>
+
+          {/* TODO: make the configuration section dynamic based on the connector  */}
+
+          <Form.Item label="Organization" name="organization">
+            <Input showCount maxLength={128} />
+          </Form.Item>
+          <Form.Item label="Personal Access Token" name="personalAccessToken">
+            <Input showCount maxLength={128} />
           </Form.Item>
         </Form>
       </Modal>
