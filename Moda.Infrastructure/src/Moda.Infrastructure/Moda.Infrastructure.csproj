@@ -60,6 +60,7 @@
     <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
     <ProjectReference Include="..\..\..\Moda.Goals\src\Moda.Goals.Application\Moda.Goals.Application.csproj" />
     <ProjectReference Include="..\..\..\Moda.Goals\src\Moda.Goals.Domain\Moda.Goals.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Moda.Integrations\src\Moda.Integrations.AzureDevOps\Moda.Integrations.AzureDevOps.csproj" />
     <ProjectReference Include="..\..\..\Moda.Integrations\src\Moda.Integrations.MicrosoftGraph\Moda.Integrations.MicrosoftGraph.csproj" />
     <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
     <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Domain\Moda.Organization.Domain.csproj" />
