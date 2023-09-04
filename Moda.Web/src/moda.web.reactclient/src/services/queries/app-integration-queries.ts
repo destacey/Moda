@@ -56,16 +56,6 @@ export const useUpdateAzdoBoardsConnectionMutation = () => {
   })
 }
 
-export const useGetAzdoBoardsConfiguration = (id: string) => {
-  return useQuery({
-    queryKey: [QK.AZDO_BOARDS_CONNECTION_CONFIGURATIONS, id],
-    queryFn: async () =>
-      (await getAzureDevOpsBoardsConnectionsClient()).getConfig(id),
-    staleTime: 60000,
-    enabled: !!id,
-  })
-}
-
 export const testAzdoBoardsConfiguration = async (
   configuration: TestAzureDevOpsBoardConnectionRequest,
 ) => {

@@ -17,7 +17,6 @@ public sealed record AzureDevOpsBoardsConnectionConfigurationDto
     /// <value>The organization URL.</value>
     public string? OrganizationUrl { get; set; }
 
-
     public void MaskPersonalAccessToken()
     {
         if (!string.IsNullOrWhiteSpace(PersonalAccessToken) && PersonalAccessToken.Length > 4)

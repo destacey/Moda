@@ -9,10 +9,7 @@ import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { authorizePage } from '@/src/app/components/hoc'
-import {
-  useGetAzdoBoardsConfiguration,
-  useGetAzdoBoardsConnectionById,
-} from '@/src/services/queries/app-integration-queries'
+import { useGetAzdoBoardsConnectionById } from '@/src/services/queries/app-integration-queries'
 import { notFound } from 'next/navigation'
 import EditConnectionForm from '../components/edit-connection-form'
 

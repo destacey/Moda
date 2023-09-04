@@ -47,23 +47,6 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
             : NotFound();
     }
 
-    [HttpGet("{id}/config")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
-    [OpenApiOperation("Get Azure DevOps Boards connection configuration based on id.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<AzureDevOpsBoardsConnectionConfigurationDto>> GetConfig(Guid id, CancellationToken cancellationToken)
-    {
-        var config = await _sender.Send(new GetAzureDevOpsBoardsConnectionConfigurationQuery(id), cancellationToken);
-
-        config?.MaskPersonalAccessToken();
-
-        return config is not null
-            ? Ok(config)
-            : NotFound();
-    }
-
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Connections)]
     [OpenApiOperation("Create an Azure DevOps Boards connection.", "")]
@@ -94,25 +77,6 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
             ? NoContent()
             : BadRequest(result.Error);
     }
-
-    [HttpPut("{id}/config")]
-    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
-    [OpenApiOperation("Update an Azure DevOps Boards connection configuration.", "")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> UpdateConfig(Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request, CancellationToken cancellationToken)
-    {
-        if (id != request.ConnectionId)
-            return BadRequest();
-
-        var result = await _sender.Send(request.ToUpdateAzureDevOpsBoardsConnectionConfigurationCommand(), cancellationToken);
-
-        return result.IsSuccess
-            ? NoContent()
-            : BadRequest(result.Error);
-    }
-
 
 
     [HttpPost("test")]
