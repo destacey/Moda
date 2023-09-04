@@ -3,7 +3,7 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import { useEffect, useState } from 'react'
 import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
-import { Button, Card } from 'antd'
+import { Button, Card, Tabs } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
@@ -15,6 +15,7 @@ import EditConnectionForm from '../components/edit-connection-form'
 
 enum ConnectionTabs {
   Details = 'details',
+  WorkspaceConfiguration = 'workspace-configuration',
 }
 
 const ConnectionDetailsPage = ({ params }) => {
@@ -41,8 +42,13 @@ const ConnectionDetailsPage = ({ params }) => {
   const tabs = [
     {
       key: ConnectionTabs.Details,
-      tab: 'Details',
-      content: <AzdoBoardsConnectionDetails connection={connectionData} />,
+      label: 'Details',
+      children: <AzdoBoardsConnectionDetails connection={connectionData} />,
+    },
+    {
+      key: ConnectionTabs.WorkspaceConfiguration,
+      label: 'Workspace Configuration',
+      children: null,
     },
   ]
 
@@ -93,14 +99,14 @@ const ConnectionDetailsPage = ({ params }) => {
         subtitle="Connection Details"
         actions={showActions && <Actions />}
       />
-      <Card
-        style={{ width: '100%' }}
-        tabList={tabs}
-        activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key as ConnectionTabs)}
-      >
-        {tabs.find((t) => t.key === activeTab)?.content}
-      </Card>
+      <Tabs
+        tabPosition="left"
+        size="small"
+        tabBarGutter={0}
+        tabBarStyle={{ minHeight: 400 }}
+        defaultActiveKey={activeTab}
+        items={tabs}
+      />
       {openEditConnectionForm && (
         <EditConnectionForm
           showForm={openEditConnectionForm}
