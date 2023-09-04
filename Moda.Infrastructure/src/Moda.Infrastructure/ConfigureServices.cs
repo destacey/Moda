@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moda.Integrations.AzureDevOps;
 using Moda.Integrations.MicrosoftGraph;
 using NodaTime;
 
@@ -21,6 +22,7 @@ public static class ConfigureServices
         services.AddSingleton<IClock>(SystemClock.Instance);
 
         // INTEGRATIONS
+        services.AddTransient<IAzureDevOpsService, AzureDevOpsService>();
         services.AddScoped<IExternalEmployeeDirectoryService, MicrosoftGraphService>();
         services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, o) => { module.EnableSqlCommandTextInstrumentation = true; });
 

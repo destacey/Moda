@@ -1,20 +1,23 @@
-import { ConnectionDetailsDto } from '@/src/services/moda-api'
-import { Col, Descriptions, Row, Space } from 'antd'
+import { AzureDevOpsBoardsConnectionDetailsDto } from '@/src/services/moda-api'
+import { Col, Descriptions, Row, Space, Typography } from 'antd'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import AzdoBoardsConnectionConfiguration from './azdo-boards-connection-configuration'
 
 const { Item } = Descriptions
 
-interface ConnectionDetailsProps {
-  connection: ConnectionDetailsDto
+interface AzdoBoardsConnectionDetailsProps {
+  connection: AzureDevOpsBoardsConnectionDetailsDto
 }
 
-const ConnectionDetails = ({ connection }: ConnectionDetailsProps) => {
+const AzdoBoardsConnectionDetails = ({
+  connection,
+}: AzdoBoardsConnectionDetailsProps) => {
   if (!connection) return null
   return (
     <>
       <Row>
         <Col xs={24} md={12}>
-          <Descriptions column={2}>
+          <Descriptions column={1}>
             <Item label="Connector">{connection.connector}</Item>
             <Item label="Is Active?">{connection.isActive ? 'Yes' : 'No'}</Item>
             <Item label="Is Valid Configuration?">
@@ -32,8 +35,14 @@ const ConnectionDetails = ({ connection }: ConnectionDetailsProps) => {
           </Descriptions>
         </Col>
       </Row>
+      <Row>
+        <Typography.Title level={4}>Configuration</Typography.Title>
+        <AzdoBoardsConnectionConfiguration
+          configuration={connection.configuration}
+        />
+      </Row>
     </>
   )
 }
 
-export default ConnectionDetails
+export default AzdoBoardsConnectionDetails

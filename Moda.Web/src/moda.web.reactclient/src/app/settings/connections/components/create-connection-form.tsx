@@ -1,9 +1,15 @@
 import useAuth from '@/src/app/components/contexts/auth'
-import { CreateAzureDevOpsBoardConnectionRequest } from '@/src/services/moda-api'
-import { useCreateConnectionMutation } from '@/src/services/queries/app-integration-queries'
+import {
+  CreateAzureDevOpsBoardConnectionRequest,
+  TestAzureDevOpsBoardConnectionRequest,
+} from '@/src/services/moda-api'
+import {
+  testAzdoBoardsConfiguration,
+  useCreateAzdoBoardsConnectionMutation,
+} from '@/src/services/queries/app-integration-queries'
 import { toFormErrors } from '@/src/utils'
-import { Form, Input, Modal, message } from 'antd'
-import { useEffect, useState } from 'react'
+import { Button, Divider, Form, Input, Modal, Typography, message } from 'antd'
+import { useCallback, useEffect, useState } from 'react'
 
 export interface CreateConnectionFormProps {
   showForm: boolean
@@ -14,12 +20,16 @@ export interface CreateConnectionFormProps {
 interface CreateConnectionFormValues {
   name: string
   description?: string
+  organization?: string | null
+  personalAccessToken?: string | null
 }
 
 const mapToRequestValues = (values: CreateConnectionFormValues) => {
   return {
     name: values.name,
     description: values.description,
+    organization: values.organization,
+    personalAccessToken: values.personalAccessToken,
   } as CreateAzureDevOpsBoardConnectionRequest
 }
 
@@ -34,13 +44,26 @@ const CreateConnectionForm = ({
   const [form] = Form.useForm<CreateConnectionFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
+  const [testConfigurationResult, setTestConfigurationResult] =
+    useState<string>()
+  const [isTestingConfiguration, setTestingConfiguration] = useState(false)
 
-  const createConnection = useCreateConnectionMutation()
+  const createConnection = useCreateAzdoBoardsConnectionMutation()
 
   const { hasClaim } = useAuth()
   const canCreateConnection = hasClaim(
     'Permission',
     'Permissions.Connections.Create',
+  )
+
+  const testConnectionConfiguration = useCallback(
+    async (configuration: TestAzureDevOpsBoardConnectionRequest) => {
+      setTestConfigurationResult(
+        await testAzdoBoardsConfiguration(configuration),
+      )
+      setTestingConfiguration(false)
+    },
+    [],
   )
 
   const create = async (
@@ -139,6 +162,51 @@ const CreateConnectionForm = ({
               showCount
               maxLength={1024}
             />
+          </Form.Item>
+
+          {/* TODO: make the configuration section dynamic based on the connector  */}
+
+          <Divider orientation="left" style={{ marginTop: '50px' }}>
+            Azure DevOps Configuration
+          </Divider>
+          <Form.Item
+            label="Organization"
+            name="organization"
+            rules={[{ required: true }]}
+          >
+            <Input showCount maxLength={128} />
+          </Form.Item>
+          <Form.Item
+            label="Personal Access Token"
+            name="personalAccessToken"
+            rules={[{ required: true }]}
+          >
+            <Input showCount maxLength={128} />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              disabled={
+                !form.getFieldValue('organization') ||
+                !form.getFieldValue('personalAccessToken')
+              }
+              loading={isTestingConfiguration}
+              onClick={() => {
+                setTestingConfiguration(true)
+                testConnectionConfiguration({
+                  organization: form.getFieldValue('organization'),
+                  personalAccessToken: form.getFieldValue(
+                    'personalAccessToken',
+                  ),
+                })
+              }}
+            >
+              Test Configuration
+            </Button>
+            <Typography.Text type="secondary" style={{ marginLeft: '10px' }}>
+              {testConfigurationResult}
+            </Typography.Text>
           </Form.Item>
         </Form>
       </Modal>

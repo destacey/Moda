@@ -1,4 +1,6 @@
-﻿using Moda.Web.Api.Models.AppIntegrations.Connections;
+﻿using Moda.AppIntegration.Domain.Models;
+using Moda.Common.Application.Interfaces;
+using Moda.Web.Api.Models.AppIntegrations.Connections;
 
 namespace Moda.Web.Api.Controllers.AppIntegrations;
 
@@ -34,27 +36,14 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ConnectionDetailsDto>> GetById(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<AzureDevOpsBoardsConnectionDetailsDto>> GetById(Guid id, CancellationToken cancellationToken)
     {
-        var connection = await _sender.Send(new GetConnectionQuery(id), cancellationToken);
+        var connection = await _sender.Send(new GetAzureDevOpsBoardsConnectionQuery(id), cancellationToken);
+
+        connection?.Configuration?.MaskPersonalAccessToken();
 
         return connection is not null
             ? Ok(connection)
-            : NotFound();
-    }
-
-    [HttpGet("{id}/config")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
-    [OpenApiOperation("Get Azure DevOps Boards connection configuration based on id.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<AzureDevOpsBoardsConnectionConfigurationDto>> GetConfig(Guid id, CancellationToken cancellationToken)
-    {
-        var config = await _sender.Send(new GetAzureDevOpsBoardsConnectionConfigurationQuery(id), cancellationToken);
-
-        return config is not null
-            ? Ok(config)
             : NotFound();
     }
 
@@ -64,7 +53,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Guid))]
     public async Task<ActionResult> Create(CreateAzureDevOpsBoardConnectionRequest request, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(request.ToCreateConnectionCommand(), cancellationToken);
+        var result = await _sender.Send(request.ToCreateAzureDevOpsBoardsConnectionCommand(), cancellationToken);
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
@@ -89,21 +78,39 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
             : BadRequest(result.Error);
     }
 
-    [HttpPut("{id}/config")]
-    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
-    [OpenApiOperation("Update an Azure DevOps Boards connection configuration.", "")]
+
+    [HttpPost("test")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
+    [OpenApiOperation("Test Azure DevOps Boards connection configuration.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> UpdateConfig(Guid id, UpdateAzureDevOpsBoardConnectionConfigurationRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> TestConfig(TestAzureDevOpsBoardConnectionRequest request, [FromServices] IAzureDevOpsService azureDevOpsService)
     {
-        if (id != request.ConnectionId)
-            return BadRequest();
+        if (request is null || string.IsNullOrWhiteSpace(request.Organization) || string.IsNullOrWhiteSpace(request.PersonalAccessToken))
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = "The Organization and PersonalAccessToken values are required to test.",
+                Source = "AzureDevOpsBoardsConnectionsController.Test"
+            };
+            return BadRequest(error);
+        }
 
-        var result = await _sender.Send(request.ToUpdateAzureDevOpsBoardsConnectionConfigurationCommand(), cancellationToken);
+        var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, request.PersonalAccessToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : BadRequest(result.Error);
+        var result = await azureDevOpsService.TestConnection(config.OrganizationUrl, config.PersonalAccessToken);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "AzureDevOpsBoardsConnectionsController.Test"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
     }
 }

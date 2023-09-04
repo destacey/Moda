@@ -1,14 +1,16 @@
 import useAuth from '@/src/app/components/contexts/auth'
 import {
-  ConnectionDetailsDto,
+  AzureDevOpsBoardsConnectionDetailsDto,
+  TestAzureDevOpsBoardConnectionRequest,
   UpdateAzureDevOpsBoardConnectionRequest,
 } from '@/src/services/moda-api'
 import {
-  useGetConnectionById,
-  useUpdateConnectionMutation,
+  testAzdoBoardsConfiguration,
+  useGetAzdoBoardsConnectionById,
+  useUpdateAzdoBoardsConnectionMutation,
 } from '@/src/services/queries/app-integration-queries'
 import { toFormErrors } from '@/src/utils'
-import { Form, Input, Modal, message } from 'antd'
+import { Button, Divider, Form, Input, Modal, Typography, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 export interface EditConnectionFormProps {
@@ -22,6 +24,8 @@ interface EditConnectionFormValues {
   id: string
   name: string
   description?: string | null
+  organization?: string | null
+  personalAccessToken?: string | null
 }
 
 const mapToRequestValues = (values: EditConnectionFormValues) => {
@@ -29,6 +33,8 @@ const mapToRequestValues = (values: EditConnectionFormValues) => {
     id: values.id,
     name: values.name,
     description: values.description,
+    organization: values.organization,
+    personalAccessToken: values.personalAccessToken,
   } as UpdateAzureDevOpsBoardConnectionRequest
 }
 
@@ -44,9 +50,12 @@ const EditConnectionForm = ({
   const [form] = Form.useForm<EditConnectionFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
+  const [testConfigurationResult, setTestConfigurationResult] =
+    useState<string>()
+  const [isTestingConfiguration, setTestingConfiguration] = useState(false)
 
-  const { data: connectionData } = useGetConnectionById(id)
-  const updateConnection = useUpdateConnectionMutation()
+  const { data: connectionData } = useGetAzdoBoardsConnectionById(id)
+  const updateConnection = useUpdateAzdoBoardsConnectionMutation()
 
   const { hasClaim } = useAuth()
   const canUpdateConnection = hasClaim(
@@ -54,12 +63,24 @@ const EditConnectionForm = ({
     'Permissions.Connections.Update',
   )
 
+  const testConnectionConfiguration = useCallback(
+    async (configuration: TestAzureDevOpsBoardConnectionRequest) => {
+      setTestConfigurationResult(
+        await testAzdoBoardsConfiguration(configuration),
+      )
+      setTestingConfiguration(false)
+    },
+    [],
+  )
+
   const mapToFormValues = useCallback(
-    (connection: ConnectionDetailsDto) => {
+    (connection: AzureDevOpsBoardsConnectionDetailsDto) => {
       form.setFieldsValue({
         id: connection.id,
         name: connection.name,
         description: connection.description,
+        organization: connection.configuration?.organization,
+        personalAccessToken: connection.configuration?.personalAccessToken,
       })
     },
     [form],
@@ -174,6 +195,51 @@ const EditConnectionForm = ({
               showCount
               maxLength={1024}
             />
+          </Form.Item>
+
+          {/* TODO: make the configuration section dynamic based on the connector  */}
+
+          <Divider orientation="left" style={{ marginTop: '50px' }}>
+            Azure DevOps Configuration
+          </Divider>
+          <Form.Item
+            label="Organization"
+            name="organization"
+            rules={[{ required: true }]}
+          >
+            <Input showCount maxLength={128} />
+          </Form.Item>
+          <Form.Item
+            label="Personal Access Token"
+            name="personalAccessToken"
+            rules={[{ required: true }]}
+          >
+            <Input showCount maxLength={128} />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              disabled={
+                !form.getFieldValue('organization') ||
+                !form.getFieldValue('personalAccessToken')
+              }
+              loading={isTestingConfiguration}
+              onClick={() => {
+                setTestingConfiguration(true)
+                testConnectionConfiguration({
+                  organization: form.getFieldValue('organization'),
+                  personalAccessToken: form.getFieldValue(
+                    'personalAccessToken',
+                  ),
+                })
+              }}
+            >
+              Test Configuration
+            </Button>
+            <Typography.Text type="secondary" style={{ marginLeft: '10px' }}>
+              {testConfigurationResult}
+            </Typography.Text>
           </Form.Item>
         </Form>
       </Modal>

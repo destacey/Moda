@@ -6074,7 +6074,7 @@ export class AzureDevOpsBoardsConnectionsClient {
     /**
      * Get Azure DevOps Boards connection based on id.
      */
-    getById(id: string, cancelToken?: CancelToken | undefined): Promise<ConnectionDetailsDto> {
+    getById(id: string, cancelToken?: CancelToken | undefined): Promise<AzureDevOpsBoardsConnectionDetailsDto> {
         let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -6101,7 +6101,7 @@ export class AzureDevOpsBoardsConnectionsClient {
         });
     }
 
-    protected processGetById(response: AxiosResponse): Promise<ConnectionDetailsDto> {
+    protected processGetById(response: AxiosResponse): Promise<AzureDevOpsBoardsConnectionDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -6116,7 +6116,7 @@ export class AzureDevOpsBoardsConnectionsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ConnectionDetailsDto>(result200);
+            return Promise.resolve<AzureDevOpsBoardsConnectionDetailsDto>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -6136,7 +6136,7 @@ export class AzureDevOpsBoardsConnectionsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ConnectionDetailsDto>(null as any);
+        return Promise.resolve<AzureDevOpsBoardsConnectionDetailsDto>(null as any);
     }
 
     /**
@@ -6208,88 +6208,17 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Get Azure DevOps Boards connection configuration based on id.
+     * Test Azure DevOps Boards connection configuration.
      */
-    getConfig(id: string, cancelToken?: CancelToken | undefined): Promise<AzureDevOpsBoardsConnectionConfigurationDto> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/config";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetConfig(_response);
-        });
-    }
-
-    protected processGetConfig(response: AxiosResponse): Promise<AzureDevOpsBoardsConnectionConfigurationDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<AzureDevOpsBoardsConnectionConfigurationDto>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 404) {
-            const _responseText = response.data;
-            let result404: any = null;
-            let resultData404  = _responseText;
-            result404 = JSON.parse(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<AzureDevOpsBoardsConnectionConfigurationDto>(null as any);
-    }
-
-    /**
-     * Update an Azure DevOps Boards connection configuration.
-     */
-    updateConfig(id: string, request: UpdateAzureDevOpsBoardConnectionConfigurationRequest, cancelToken?: CancelToken | undefined): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/config";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    testConfig(request: TestAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/test";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            method: "PUT",
+            method: "POST",
             url: url_,
             headers: {
                 "Content-Type": "application/json",
@@ -6304,11 +6233,11 @@ export class AzureDevOpsBoardsConnectionsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processUpdateConfig(_response);
+            return this.processTestConfig(_response);
         });
     }
 
-    protected processUpdateConfig(response: AxiosResponse): Promise<void> {
+    protected processTestConfig(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -6328,13 +6257,6 @@ export class AzureDevOpsBoardsConnectionsClient {
             let resultData400  = _responseText;
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status === 422) {
-            const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = JSON.parse(resultData422);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -7333,11 +7255,12 @@ export interface ConnectionListDto {
     isValidConfiguration?: boolean;
 }
 
-export interface ConnectionDetailsDto {
+export interface AzureDevOpsBoardsConnectionDetailsDto {
     id?: string;
     name?: string;
     description?: string | undefined;
     connector?: string;
+    configuration?: AzureDevOpsBoardsConnectionConfigurationDto | undefined;
     isActive?: boolean;
     isValidConfiguration?: boolean;
 }
@@ -7354,6 +7277,10 @@ export interface CreateAzureDevOpsBoardConnectionRequest {
     name: string;
     /** Gets or sets the description. */
     description?: string | undefined;
+    /** Gets the organization. */
+    organization: string;
+    /** Gets the personal access token. */
+    personalAccessToken: string;
 }
 
 export interface UpdateAzureDevOpsBoardConnectionRequest {
@@ -7363,15 +7290,17 @@ export interface UpdateAzureDevOpsBoardConnectionRequest {
     name: string;
     /** Gets or sets the description. */
     description?: string | undefined;
+    /** Gets the organization. */
+    organization: string;
+    /** Gets the personal access token. */
+    personalAccessToken: string;
 }
 
-export interface UpdateAzureDevOpsBoardConnectionConfigurationRequest {
-    /** Gets the connection identifier. */
-    connectionId?: string;
+export interface TestAzureDevOpsBoardConnectionRequest {
     /** Gets the organization. */
-    organization?: string | undefined;
+    organization?: string;
     /** Gets the personal access token. */
-    personalAccessToken?: string | undefined;
+    personalAccessToken?: string;
 }
 
 export interface ConnectorListDto {
