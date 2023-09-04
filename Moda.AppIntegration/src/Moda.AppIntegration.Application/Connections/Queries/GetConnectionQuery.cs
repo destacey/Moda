@@ -3,15 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Moda.AppIntegration.Application.Connections.Queries;
-public sealed record GetConnectionQuery : IQuery<ConnectionDetailsDto?>
-{
-    public GetConnectionQuery(Guid connectionId)
-    {
-        ConnectionId = connectionId;
-    }
-
-    public Guid ConnectionId { get; }
-}
+public sealed record GetConnectionQuery(Guid ConnectionId) : IQuery<ConnectionDetailsDto?>;
 
 internal sealed class GetConnectionQueryHandler : IQueryHandler<GetConnectionQuery, ConnectionDetailsDto?>
 {

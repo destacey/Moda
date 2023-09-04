@@ -5067,7 +5067,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ConnectionDetailsDto"
+                  "$ref": "#/components/schemas/AzureDevOpsBoardsConnectionDetailsDto"
                 }
               }
             }
@@ -5161,92 +5161,24 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/config": {
-      "get": {
+    "/api/app-integrations/azure-devops-boards-connections/test": {
+      "post": {
         "tags": [
           "AzureDevOpsBoardsConnections"
         ],
-        "summary": "Get Azure DevOps Boards connection configuration based on id.",
-        "operationId": "AzureDevOpsBoardsConnections_GetConfig",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AzureDevOpsBoardsConnectionConfigurationDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "AzureDevOpsBoardsConnections"
-        ],
-        "summary": "Update an Azure DevOps Boards connection configuration.",
-        "operationId": "AzureDevOpsBoardsConnections_UpdateConfig",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid"
-            },
-            "x-position": 1
-          }
-        ],
+        "summary": "Test Azure DevOps Boards connection configuration.",
+        "operationId": "AzureDevOpsBoardsConnections_TestConfig",
         "requestBody": {
           "x-name": "request",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateAzureDevOpsBoardConnectionConfigurationRequest"
+                "$ref": "#/components/schemas/TestAzureDevOpsBoardConnectionRequest"
               }
             }
           },
           "required": true,
-          "x-position": 2
+          "x-position": 1
         },
         "responses": {
           "204": {
@@ -5258,16 +5190,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -7980,7 +7902,7 @@
           }
         }
       },
-      "ConnectionDetailsDto": {
+      "AzureDevOpsBoardsConnectionDetailsDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -7997,6 +7919,14 @@
           },
           "connector": {
             "type": "string"
+          },
+          "configuration": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AzureDevOpsBoardsConnectionConfigurationDto"
+              }
+            ]
           },
           "isActive": {
             "type": "boolean"
@@ -8032,7 +7962,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name"
+          "name",
+          "organization",
+          "personalAccessToken"
         ],
         "properties": {
           "name": {
@@ -8048,6 +7980,20 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
+          },
+          "organization": {
+            "type": "string",
+            "description": "Gets the organization.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "personalAccessToken": {
+            "type": "string",
+            "description": "Gets the personal access token.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
           }
         }
       },
@@ -8055,7 +8001,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name"
+          "name",
+          "organization",
+          "personalAccessToken"
         ],
         "properties": {
           "id": {
@@ -8076,27 +8024,34 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
-          }
-        }
-      },
-      "UpdateAzureDevOpsBoardConnectionConfigurationRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "connectionId": {
-            "type": "string",
-            "description": "Gets the connection identifier.",
-            "format": "guid"
           },
           "organization": {
             "type": "string",
             "description": "Gets the organization.",
-            "nullable": true
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
           },
           "personalAccessToken": {
             "type": "string",
             "description": "Gets the personal access token.",
-            "nullable": true
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          }
+        }
+      },
+      "TestAzureDevOpsBoardConnectionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "organization": {
+            "type": "string",
+            "description": "Gets the organization."
+          },
+          "personalAccessToken": {
+            "type": "string",
+            "description": "Gets the personal access token."
           }
         }
       },

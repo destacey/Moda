@@ -76,8 +76,6 @@ public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
 
         return Result.Success();
     }
-
-    public abstract void ValidateConfiguration();
 }
 
 public abstract class Connection<T> : Connection

@@ -1,3 +1,4 @@
+import { TestAzureDevOpsBoardConnectionRequest } from './../moda-api'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { QK } from './query-keys'
 import { getAzureDevOpsBoardsConnectionsClient } from '../clients'
@@ -6,37 +7,40 @@ import {
   UpdateAzureDevOpsBoardConnectionRequest,
 } from '../moda-api'
 
-// CONNECTIONS
-export const useGetConnections = (includeDisabled: boolean = false) => {
+// AzDO BOARDS CONNECTIONS
+export const useGetAzdoBoardsConnections = (
+  includeDisabled: boolean = false,
+) => {
   return useQuery({
-    queryKey: [QK.CONNECTIONS, includeDisabled],
+    queryKey: [QK.AZDO_BOARDS_CONNECTIONS, includeDisabled],
     queryFn: async () =>
       (await getAzureDevOpsBoardsConnectionsClient()).getList(includeDisabled),
     staleTime: 60000,
   })
 }
 
-export const useGetConnectionById = (id: string) => {
+export const useGetAzdoBoardsConnectionById = (id: string) => {
   return useQuery({
-    queryKey: [QK.CONNECTIONS, id],
+    queryKey: [QK.AZDO_BOARDS_CONNECTIONS, id],
     queryFn: async () =>
       (await getAzureDevOpsBoardsConnectionsClient()).getById(id),
     staleTime: 60000,
+    enabled: !!id,
   })
 }
 
-export const useCreateConnectionMutation = () => {
+export const useCreateAzdoBoardsConnectionMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (connection: CreateAzureDevOpsBoardConnectionRequest) =>
       (await getAzureDevOpsBoardsConnectionsClient()).create(connection),
     onSuccess: () => {
-      queryClient.invalidateQueries([QK.CONNECTIONS, false])
+      queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, false])
     },
   })
 }
 
-export const useUpdateConnectionMutation = () => {
+export const useUpdateAzdoBoardsConnectionMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (connection: UpdateAzureDevOpsBoardConnectionRequest) =>
@@ -45,9 +49,22 @@ export const useUpdateConnectionMutation = () => {
         connection,
       ),
     onSuccess: (data, context) => {
-      queryClient.invalidateQueries([QK.CONNECTIONS, false])
-      queryClient.invalidateQueries([QK.CONNECTIONS, true])
-      queryClient.invalidateQueries([QK.CONNECTIONS, context.id])
+      queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, false])
+      queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, true])
+      queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, context.id])
     },
   })
+}
+
+export const testAzdoBoardsConfiguration = async (
+  configuration: TestAzureDevOpsBoardConnectionRequest,
+) => {
+  try {
+    var result = await (
+      await getAzureDevOpsBoardsConnectionsClient()
+    ).testConfig(configuration)
+    return 'success'
+  } catch (error) {
+    return error.supportMessage
+  }
 }

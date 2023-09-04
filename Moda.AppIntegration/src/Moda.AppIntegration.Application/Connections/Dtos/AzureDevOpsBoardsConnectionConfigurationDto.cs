@@ -13,5 +13,13 @@ public sealed record AzureDevOpsBoardsConnectionConfigurationDto
     /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
     public string? PersonalAccessToken { get; set; }
 
+    /// <summary>Gets the organization URL.</summary>
+    /// <value>The organization URL.</value>
     public string? OrganizationUrl { get; set; }
+
+    public void MaskPersonalAccessToken()
+    {
+        if (!string.IsNullOrWhiteSpace(PersonalAccessToken) && PersonalAccessToken.Length > 4)
+            PersonalAccessToken = PersonalAccessToken.Substring(0, 4) + new string('*', PersonalAccessToken.Length - 4);
+    }
 }

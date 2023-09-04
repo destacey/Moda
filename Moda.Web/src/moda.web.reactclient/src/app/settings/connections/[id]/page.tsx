@@ -2,27 +2,25 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { useEffect, useState } from 'react'
-import ConnectionDetails from './connection-details'
+import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
 import { Button, Card } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { authorizePage } from '@/src/app/components/hoc'
-import { useGetConnectionById } from '@/src/services/queries/app-integration-queries'
+import { useGetAzdoBoardsConnectionById } from '@/src/services/queries/app-integration-queries'
 import { notFound } from 'next/navigation'
 import EditConnectionForm from '../components/edit-connection-form'
 
+enum ConnectionTabs {
+  Details = 'details',
+}
+
 const ConnectionDetailsPage = ({ params }) => {
   useDocumentTitle('Connection Details')
-  const {
-    data: connectionData,
-    isLoading,
-    isFetching,
-    refetch,
-  } = useGetConnectionById(params.id)
+  const [activeTab, setActiveTab] = useState(ConnectionTabs.Details)
   const { setBreadcrumbRoute } = useBreadcrumbs()
-  const [activeTab, setActiveTab] = useState('details')
   const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
 
@@ -33,11 +31,18 @@ const ConnectionDetailsPage = ({ params }) => {
   )
   const showActions = canUpdateConnections
 
+  const {
+    data: connectionData,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useGetAzdoBoardsConnectionById(params.id)
+
   const tabs = [
     {
-      key: 'details',
+      key: ConnectionTabs.Details,
       tab: 'Details',
-      content: <ConnectionDetails connection={connectionData} />,
+      content: <AzdoBoardsConnectionDetails connection={connectionData} />,
     },
   ]
 
@@ -92,7 +97,7 @@ const ConnectionDetailsPage = ({ params }) => {
         style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
+        onTabChange={(key) => setActiveTab(key as ConnectionTabs)}
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>

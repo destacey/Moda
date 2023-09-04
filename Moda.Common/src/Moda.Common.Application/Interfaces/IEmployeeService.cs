@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-
-namespace Moda.Common.Application.Interfaces;
+﻿namespace Moda.Common.Application.Interfaces;
 
 public interface IEmployeeService : ITransientService
 {
