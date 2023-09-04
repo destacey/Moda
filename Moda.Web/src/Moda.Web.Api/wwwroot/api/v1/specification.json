@@ -5280,6 +5280,47 @@
         ]
       }
     },
+    "/api/app-integrations/azure-devops-boards-connections/test": {
+      "post": {
+        "tags": [
+          "AzureDevOpsBoardsConnections"
+        ],
+        "summary": "Test Azure DevOps Boards connection configuration.",
+        "operationId": "AzureDevOpsBoardsConnections_TestConfig",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestAzureDevOpsBoardConnectionRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/app-integrations/connectors": {
       "get": {
         "tags": [
@@ -8040,7 +8081,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name"
+          "name",
+          "organization",
+          "personalAccessToken"
         ],
         "properties": {
           "name": {
@@ -8061,15 +8104,15 @@
             "type": "string",
             "description": "Gets the organization.",
             "maxLength": 128,
-            "minLength": 0,
-            "nullable": true
+            "minLength": 1,
+            "nullable": false
           },
           "personalAccessToken": {
             "type": "string",
             "description": "Gets the personal access token.",
             "maxLength": 128,
-            "minLength": 0,
-            "nullable": true
+            "minLength": 1,
+            "nullable": false
           }
         }
       },
@@ -8077,7 +8120,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name"
+          "name",
+          "organization",
+          "personalAccessToken"
         ],
         "properties": {
           "id": {
@@ -8103,15 +8148,15 @@
             "type": "string",
             "description": "Gets the organization.",
             "maxLength": 128,
-            "minLength": 0,
-            "nullable": true
+            "minLength": 1,
+            "nullable": false
           },
           "personalAccessToken": {
             "type": "string",
             "description": "Gets the personal access token.",
             "maxLength": 128,
-            "minLength": 0,
-            "nullable": true
+            "minLength": 1,
+            "nullable": false
           }
         }
       },
@@ -8133,6 +8178,20 @@
             "type": "string",
             "description": "Gets the personal access token.",
             "nullable": true
+          }
+        }
+      },
+      "TestAzureDevOpsBoardConnectionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "organization": {
+            "type": "string",
+            "description": "Gets the organization."
+          },
+          "personalAccessToken": {
+            "type": "string",
+            "description": "Gets the personal access token."
           }
         }
       },

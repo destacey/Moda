@@ -1,4 +1,6 @@
-﻿using Moda.Web.Api.Models.AppIntegrations.Connections;
+﻿using Moda.AppIntegration.Domain.Models;
+using Moda.Common.Application.Interfaces;
+using Moda.Web.Api.Models.AppIntegrations.Connections;
 
 namespace Moda.Web.Api.Controllers.AppIntegrations;
 
@@ -109,5 +111,42 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.Error);
+    }
+
+
+
+    [HttpPost("test")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
+    [OpenApiOperation("Test Azure DevOps Boards connection configuration.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> TestConfig(TestAzureDevOpsBoardConnectionRequest request, [FromServices] IAzureDevOpsService azureDevOpsService)
+    {
+        if (request is null || string.IsNullOrWhiteSpace(request.Organization) || string.IsNullOrWhiteSpace(request.PersonalAccessToken))
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = "The Organization and PersonalAccessToken values are required to test.",
+                Source = "AzureDevOpsBoardsConnectionsController.Test"
+            };
+            return BadRequest(error);
+        }
+
+        var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, request.PersonalAccessToken);
+
+        var result = await azureDevOpsService.TestConnection(config.OrganizationUrl, config.PersonalAccessToken);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "AzureDevOpsBoardsConnectionsController.Test"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace Moda.AppIntegration.Application.Connections.Commands;
 public sealed record UpdateAzureDevOpsBoardsConnectionCommand : ICommand<Guid>
 {
-    public UpdateAzureDevOpsBoardsConnectionCommand(Guid id, string name, string? description, string? organization, string? personalAccessToken)
+    public UpdateAzureDevOpsBoardsConnectionCommand(Guid id, string name, string? description, string organization, string personalAccessToken)
     {
         Id = id;
         Name = name;
@@ -29,12 +29,11 @@ public sealed record UpdateAzureDevOpsBoardsConnectionCommand : ICommand<Guid>
 
     /// <summary>Gets the organization.</summary>
     /// <value>The Azure DevOps Organization name.</value>
-    public string? Organization { get; }
+    public string Organization { get; }
 
     /// <summary>Gets the personal access token.</summary>
     /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
-    public string? PersonalAccessToken { get; }
-
+    public string PersonalAccessToken { get; }
 }
 
 public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomValidator<UpdateAzureDevOpsBoardsConnectionCommand>
@@ -55,10 +54,12 @@ public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
             .MaximumLength(1024);
 
         RuleFor(c => c.Organization)
+            .NotEmpty()
             .MaximumLength(128)
             .MustAsync(async (cmd, organization, cancellationToken) => await BeUniqueOrganization(cmd.Id, organization, cancellationToken)).WithMessage("The organization for this connection already exists.");
 
         RuleFor(c => c.PersonalAccessToken)
+            .NotEmpty()
             .MaximumLength(128);
     }
 
@@ -82,12 +83,14 @@ internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommand
     private readonly IAppIntegrationDbContext _appIntegrationDbContext;
     private readonly IDateTimeService _dateTimeService;
     private readonly ILogger<UpdateAzureDevOpsBoardsConnectionCommandHandler> _logger;
+    private readonly IAzureDevOpsService _azureDevOpsService;
 
-    public UpdateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeService dateTimeService, ILogger<UpdateAzureDevOpsBoardsConnectionCommandHandler> logger)
+    public UpdateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeService dateTimeService, ILogger<UpdateAzureDevOpsBoardsConnectionCommandHandler> logger, IAzureDevOpsService azureDevOpsService)
     {
         _appIntegrationDbContext = appIntegrationDbContext;
         _dateTimeService = dateTimeService;
         _logger = logger;
+        _azureDevOpsService = azureDevOpsService;
     }
 
     public async Task<Result<Guid>> Handle(UpdateAzureDevOpsBoardsConnectionCommand request, CancellationToken cancellationToken)
@@ -100,13 +103,14 @@ internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommand
                 return Result.Failure<Guid>("Azure DevOps Boards connection not found.");
 
             // do the first four characters of the PersonalAccessToken match the existing one?
-            var pat = connection.Configuration?.PersonalAccessToken?[..4] == request.PersonalAccessToken?[..4]
-                ? connection.Configuration?.PersonalAccessToken
+            var pat = connection.Configuration?.PersonalAccessToken?[..4] == request.PersonalAccessToken[..4]
+                ? connection.Configuration.PersonalAccessToken
                 : request.PersonalAccessToken;
 
-            var configuration = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, pat);
+            var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, pat);
+            var testConnectionResult = await _azureDevOpsService.TestConnection(config.OrganizationUrl, config.PersonalAccessToken);
 
-            var updateResult = connection.Update(request.Name, request.Description, configuration, _dateTimeService.Now);
+            var updateResult = connection.Update(request.Name, request.Description, config, testConnectionResult.IsSuccess, _dateTimeService.Now);
             if (updateResult.IsFailure)
             {
                 // Reset the entity

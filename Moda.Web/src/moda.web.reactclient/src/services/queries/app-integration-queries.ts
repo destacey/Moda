@@ -1,3 +1,4 @@
+import { TestAzureDevOpsBoardConnectionRequest } from './../moda-api'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { QK } from './query-keys'
 import { getAzureDevOpsBoardsConnectionsClient } from '../clients'
@@ -24,6 +25,7 @@ export const useGetAzdoBoardsConnectionById = (id: string) => {
     queryFn: async () =>
       (await getAzureDevOpsBoardsConnectionsClient()).getById(id),
     staleTime: 60000,
+    enabled: !!id,
   })
 }
 
@@ -60,5 +62,19 @@ export const useGetAzdoBoardsConfiguration = (id: string) => {
     queryFn: async () =>
       (await getAzureDevOpsBoardsConnectionsClient()).getConfig(id),
     staleTime: 60000,
+    enabled: !!id,
   })
+}
+
+export const testAzdoBoardsConfiguration = async (
+  configuration: TestAzureDevOpsBoardConnectionRequest,
+) => {
+  try {
+    var result = await (
+      await getAzureDevOpsBoardsConnectionsClient()
+    ).testConfig(configuration)
+    return 'success'
+  } catch (error) {
+    return error.supportMessage
+  }
 }

@@ -1,9 +1,15 @@
 import useAuth from '@/src/app/components/contexts/auth'
-import { CreateAzureDevOpsBoardConnectionRequest } from '@/src/services/moda-api'
-import { useCreateAzdoBoardsConnectionMutation } from '@/src/services/queries/app-integration-queries'
+import {
+  CreateAzureDevOpsBoardConnectionRequest,
+  TestAzureDevOpsBoardConnectionRequest,
+} from '@/src/services/moda-api'
+import {
+  testAzdoBoardsConfiguration,
+  useCreateAzdoBoardsConnectionMutation,
+} from '@/src/services/queries/app-integration-queries'
 import { toFormErrors } from '@/src/utils'
-import { Divider, Form, Input, Modal, message } from 'antd'
-import { useEffect, useState } from 'react'
+import { Button, Divider, Form, Input, Modal, Typography, message } from 'antd'
+import { useCallback, useEffect, useState } from 'react'
 
 export interface CreateConnectionFormProps {
   showForm: boolean
@@ -38,6 +44,9 @@ const CreateConnectionForm = ({
   const [form] = Form.useForm<CreateConnectionFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
+  const [testConfigurationResult, setTestConfigurationResult] =
+    useState<string>()
+  const [isTestingConfiguration, setTestingConfiguration] = useState(false)
 
   const createConnection = useCreateAzdoBoardsConnectionMutation()
 
@@ -45,6 +54,16 @@ const CreateConnectionForm = ({
   const canCreateConnection = hasClaim(
     'Permission',
     'Permissions.Connections.Create',
+  )
+
+  const testConnectionConfiguration = useCallback(
+    async (configuration: TestAzureDevOpsBoardConnectionRequest) => {
+      setTestConfigurationResult(
+        await testAzdoBoardsConfiguration(configuration),
+      )
+      setTestingConfiguration(false)
+    },
+    [],
   )
 
   const create = async (
@@ -150,11 +169,44 @@ const CreateConnectionForm = ({
           <Divider orientation="left" style={{ marginTop: '50px' }}>
             Azure DevOps Configuration
           </Divider>
-          <Form.Item label="Organization" name="organization">
+          <Form.Item
+            label="Organization"
+            name="organization"
+            rules={[{ required: true }]}
+          >
             <Input showCount maxLength={128} />
           </Form.Item>
-          <Form.Item label="Personal Access Token" name="personalAccessToken">
+          <Form.Item
+            label="Personal Access Token"
+            name="personalAccessToken"
+            rules={[{ required: true }]}
+          >
             <Input showCount maxLength={128} />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              disabled={
+                !form.getFieldValue('organization') ||
+                !form.getFieldValue('personalAccessToken')
+              }
+              loading={isTestingConfiguration}
+              onClick={() => {
+                setTestingConfiguration(true)
+                testConnectionConfiguration({
+                  organization: form.getFieldValue('organization'),
+                  personalAccessToken: form.getFieldValue(
+                    'personalAccessToken',
+                  ),
+                })
+              }}
+            >
+              Test Configuration
+            </Button>
+            <Typography.Text type="secondary" style={{ marginLeft: '10px' }}>
+              {testConfigurationResult}
+            </Typography.Text>
           </Form.Item>
         </Form>
       </Modal>

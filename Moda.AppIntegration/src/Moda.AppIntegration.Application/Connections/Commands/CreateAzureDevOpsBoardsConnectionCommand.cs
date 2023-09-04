@@ -7,7 +7,7 @@ using NodaTime;
 namespace Moda.AppIntegration.Application.Connections.Commands;
 public sealed record CreateAzureDevOpsBoardsConnectionCommand : ICommand<Guid>
 {
-    public CreateAzureDevOpsBoardsConnectionCommand(string name, string? description, string? organization, string? personalAccessToken)
+    public CreateAzureDevOpsBoardsConnectionCommand(string name, string? description, string organization, string personalAccessToken)
     {
         Name = name;
         Description = description;
@@ -25,11 +25,11 @@ public sealed record CreateAzureDevOpsBoardsConnectionCommand : ICommand<Guid>
 
     /// <summary>Gets the organization.</summary>
     /// <value>The Azure DevOps Organization name.</value>
-    public string? Organization { get; }
+    public string Organization { get; }
 
     /// <summary>Gets the personal access token.</summary>
     /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
-    public string? PersonalAccessToken { get; }
+    public string PersonalAccessToken { get; }
 }
 
 public sealed class CreateAzureDevOpsBoardsConnectionCommandValidator : CustomValidator<CreateAzureDevOpsBoardsConnectionCommand>
@@ -50,10 +50,12 @@ public sealed class CreateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
             .MaximumLength(1024);
 
         RuleFor(c => c.Organization)
+            .NotEmpty()
             .MaximumLength(128)
             .MustAsync(async (organization, cancellationToken) => await BeUniqueOrganization(organization, cancellationToken)).WithMessage("The organization for this connection already exists.");
 
         RuleFor(c => c.PersonalAccessToken)
+            .NotEmpty()
             .MaximumLength(128);
     }
 
@@ -77,12 +79,14 @@ internal sealed class CreateAzureDevOpsBoardsConnectionCommandHandler : ICommand
     private readonly IAppIntegrationDbContext _appIntegrationDbContext;
     private readonly IDateTimeService _dateTimeService;
     private readonly ILogger<CreateAzureDevOpsBoardsConnectionCommandHandler> _logger;
+    private readonly IAzureDevOpsService _azureDevOpsService;
 
-    public CreateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeService dateTimeService, ILogger<CreateAzureDevOpsBoardsConnectionCommandHandler> logger)
+    public CreateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeService dateTimeService, ILogger<CreateAzureDevOpsBoardsConnectionCommandHandler> logger, IAzureDevOpsService azureDevOpsService)
     {
         _appIntegrationDbContext = appIntegrationDbContext;
         _dateTimeService = dateTimeService;
         _logger = logger;
+        _azureDevOpsService = azureDevOpsService;
     }
 
     public async Task<Result<Guid>> Handle(CreateAzureDevOpsBoardsConnectionCommand request, CancellationToken cancellationToken)
@@ -91,7 +95,8 @@ internal sealed class CreateAzureDevOpsBoardsConnectionCommandHandler : ICommand
         {
             Instant timestamp = _dateTimeService.Now;
             var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, request.PersonalAccessToken);
-            var connection = AzureDevOpsBoardsConnection.Create(request.Name, request.Description, config, timestamp);
+            var testConnectionResult = await _azureDevOpsService.TestConnection(config.OrganizationUrl, config.PersonalAccessToken);
+            var connection = AzureDevOpsBoardsConnection.Create(request.Name, request.Description, config, testConnectionResult.IsSuccess, timestamp);
 
             await _appIntegrationDbContext.AzureDevOpsBoardsConnections.AddAsync(connection, cancellationToken);
 

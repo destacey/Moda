@@ -37,6 +37,7 @@
         <ProjectReference Include="..\..\..\Moda.Goals\src\Moda.Goals.Application\Moda.Goals.Application.csproj" />
         <ProjectReference Include="..\..\..\Moda.Infrastructure\src\Moda.Infrastructure.Migrators.MSSQL\Moda.Infrastructure.Migrators.MSSQL.csproj" />
         <ProjectReference Include="..\..\..\Moda.Infrastructure\src\Moda.Infrastructure\Moda.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\..\Moda.Integrations\src\Moda.Integrations.AzureDevOps\Moda.Integrations.AzureDevOps.csproj" />
         <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
         <ProjectReference Include="..\..\..\Moda.Planning\src\Moda.Planning.Application\Moda.Planning.Application.csproj" />
         <ProjectReference Include="..\..\..\Moda.Work\src\Moda.Work.Application\Moda.Work.Application.csproj" />
