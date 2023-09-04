@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.AppIntegration.Domain.Enums;
+using Moda.Planning.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
@@ -50,5 +51,37 @@ public class AzureDevOpsBoardsConnectionConfig : IEntityTypeConfiguration<AzureD
     {
         // Ignore
         builder.Ignore(c => c.Configuration);
+    }
+}
+
+public class AzureDevOpsBoardsWorkspaceConfigurationConfig : IEntityTypeConfiguration<AzureDevOpsBoardsWorkspaceConfiguration>
+{
+    public void Configure(EntityTypeBuilder<AzureDevOpsBoardsWorkspaceConfiguration> builder)
+    {
+        {
+            builder.ToTable("AzdoBoardsWorkspaceConfigurations", SchemaNames.AppIntegration);
+
+            builder.HasKey(c => c.Id);
+
+
+            builder.Property(c => c.Name).IsRequired().HasMaxLength(256);
+            builder.Property(c => c.Description).HasMaxLength(1024);
+            builder.Property(c => c.Import).IsRequired();
+
+            // Audit
+            builder.Property(c => c.Created);
+            builder.Property(c => c.CreatedBy);
+            builder.Property(c => c.LastModified);
+            builder.Property(c => c.LastModifiedBy);
+            builder.Property(c => c.Deleted);
+            builder.Property(c => c.DeletedBy);
+            builder.Property(c => c.IsDeleted);
+
+            // Relationships
+            builder.HasOne<AzureDevOpsBoardsConnection>()
+                .WithMany(p => p.Workspaces)
+                .HasForeignKey(o => o.ConnectionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
     }
 }
