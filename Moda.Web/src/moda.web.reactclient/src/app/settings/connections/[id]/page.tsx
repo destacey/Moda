@@ -3,13 +3,16 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import { useEffect, useState } from 'react'
 import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
-import { Button, Card, Tabs } from 'antd'
+import { Button, Divider, Space, Tabs, message } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { authorizePage } from '@/src/app/components/hoc'
-import { useGetAzdoBoardsConnectionById } from '@/src/services/queries/app-integration-queries'
+import {
+  useGetAzdoBoardsConnectionById,
+  useImportAzdoBoardsConnectionWorkspacesMutation,
+} from '@/src/services/queries/app-integration-queries'
 import { notFound } from 'next/navigation'
 import EditConnectionForm from '../components/edit-connection-form'
 
@@ -24,6 +27,7 @@ const ConnectionDetailsPage = ({ params }) => {
   const { setBreadcrumbRoute } = useBreadcrumbs()
   const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
+  const [messageApi, contextHolder] = message.useMessage()
 
   const { hasClaim } = useAuth()
   const canUpdateConnections = hasClaim(
@@ -38,6 +42,8 @@ const ConnectionDetailsPage = ({ params }) => {
     isFetching,
     refetch,
   } = useGetAzdoBoardsConnectionById(params.id)
+
+  const importWorkspaces = useImportAzdoBoardsConnectionWorkspacesMutation()
 
   const tabs = [
     {
@@ -78,11 +84,25 @@ const ConnectionDetailsPage = ({ params }) => {
     }
   }
 
+  const onImportWorkspaces = async () => {
+    try {
+      await importWorkspaces.mutateAsync(params.id)
+      messageApi.success('Successfully imported workspaces.')
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   const Actions = () => {
     return (
       <>
         {canUpdateConnections && (
-          <Button onClick={() => setOpenEditConnectionForm(true)}>Edit</Button>
+          <Space>
+            <Button onClick={() => setOpenEditConnectionForm(true)}>
+              Edit
+            </Button>
+            <Button onClick={onImportWorkspaces}>Import Workspaces</Button>
+          </Space>
         )}
       </>
     )
@@ -94,11 +114,13 @@ const ConnectionDetailsPage = ({ params }) => {
 
   return (
     <>
+      {contextHolder}
       <PageTitle
         title={connectionData?.name}
         subtitle="Connection Details"
         actions={showActions && <Actions />}
       />
+      <Divider />
       <Tabs
         tabPosition="left"
         size="small"

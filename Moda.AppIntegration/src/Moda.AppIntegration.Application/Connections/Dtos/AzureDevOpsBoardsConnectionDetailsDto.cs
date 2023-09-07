@@ -21,7 +21,7 @@ public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<Connection
 
     /// <summary>Gets the configuration.</summary>
     /// <value>The configuration.</value>
-    public AzureDevOpsBoardsConnectionConfigurationDto? Configuration { get; set; }
+    public required AzureDevOpsBoardsConnectionConfigurationDto Configuration { get; set; }
 
     /// <summary>
     /// Indicates whether the connection is active or not.  Inactive connections are not included in the synchronization process.

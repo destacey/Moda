@@ -104,55 +104,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("UserTokens", "Identity");
                 });
 
-            modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspaceConfiguration", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ConnectionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("Deleted")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
-
-                    b.Property<bool>("Import")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConnectionId");
-
-                    b.ToTable("AzdoBoardsWorkspaceConfigurations", "AppIntegrations");
-                });
-
             modelBuilder.Entity("Moda.AppIntegration.Domain.Models.Connection", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1326,15 +1277,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspaceConfiguration", b =>
-                {
-                    b.HasOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", null)
-                        .WithMany("Workspaces")
-                        .HasForeignKey("ConnectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Moda.Common.Domain.Employees.Employee", b =>
                 {
                     b.HasOne("Moda.Common.Domain.Employees.Employee", "Manager")
@@ -1342,7 +1284,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.OwnsOne("Moda.Common.Models.PersonName", "Name", b1 =>
+                    b.OwnsOne("Moda.Common.Domain.Employees.Employee.Name#Moda.Common.Models.PersonName", "Name", b1 =>
                         {
                             b1.Property<Guid>("EmployeeId")
                                 .HasColumnType("uniqueidentifier");
@@ -1421,7 +1363,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.OwnsOne("Moda.Organization.Domain.Models.MembershipDateRange", "DateRange", b1 =>
+                    b.OwnsOne("Moda.Organization.Domain.Models.TeamMembership.DateRange#Moda.Organization.Domain.Models.MembershipDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("TeamMembershipId")
                                 .HasColumnType("uniqueidentifier");
@@ -1454,7 +1396,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrement", b =>
                 {
-                    b.OwnsOne("Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
+                    b.OwnsOne("Moda.Planning.Domain.Models.ProgramIncrement.DateRange#Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("ProgramIncrementId")
                                 .HasColumnType("uniqueidentifier");
@@ -1574,11 +1516,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevelScheme", b =>
                 {
                     b.Navigation("BacklogLevels");
-                });
-
-            modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
-                {
-                    b.Navigation("Workspaces");
                 });
 
             modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOfTeams", b =>

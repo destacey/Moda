@@ -5202,6 +5202,47 @@
         ]
       }
     },
+    "/api/app-integrations/azure-devops-boards-connections/{id}/import-workspaces": {
+      "post": {
+        "tags": [
+          "AzureDevOpsBoardsConnections"
+        ],
+        "summary": "Import Azure DevOps Boards projects as Moda workspaces.",
+        "operationId": "AzureDevOpsBoardsConnections_ImportWorkspaces",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/app-integrations/connectors": {
       "get": {
         "tags": [
@@ -7921,12 +7962,7 @@
             "type": "string"
           },
           "configuration": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/AzureDevOpsBoardsConnectionConfigurationDto"
-              }
-            ]
+            "$ref": "#/components/schemas/AzureDevOpsBoardsConnectionConfigurationDto"
           },
           "isActive": {
             "type": "boolean"
@@ -7945,16 +7981,13 @@
             "format": "guid"
           },
           "organization": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "personalAccessToken": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "organizationUrl": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         }
       },

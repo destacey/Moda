@@ -1,18 +1,17 @@
 ﻿using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
-public sealed class AzureDevOpsBoardsWorkspaceConfiguration : BaseAuditableEntity<Guid>
+public sealed class AzureDevOpsBoardsWorkspace : BaseAuditableEntity<Guid>
 {
     private string _name = null!;
     private string? _description;
 
-    private AzureDevOpsBoardsWorkspaceConfiguration() { }
-    private AzureDevOpsBoardsWorkspaceConfiguration(Guid id, string name, string? description, Guid connectionId, bool import)
+    private AzureDevOpsBoardsWorkspace() { }
+    private AzureDevOpsBoardsWorkspace(Guid id, string name, string? description, bool import)
     {
         Id = id;
         Name = name;
         Description = description;
-        ConnectionId = connectionId;
         Import = import;
     }
 
@@ -31,10 +30,6 @@ public sealed class AzureDevOpsBoardsWorkspaceConfiguration : BaseAuditableEntit
         get => _description;
         private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
-
-    /// <summary>Gets the connection identifier.</summary>
-    /// <value>The connection identifier.</value>
-    public Guid ConnectionId { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether this workspace is configured to import data.
@@ -60,9 +55,9 @@ public sealed class AzureDevOpsBoardsWorkspaceConfiguration : BaseAuditableEntit
         }
     }
 
-    public static AzureDevOpsBoardsWorkspaceConfiguration Create(Guid id, string name, string? description, Guid connectionId, Instant timestamp)
+    public static AzureDevOpsBoardsWorkspace Create(Guid id, string name, string? description, Instant timestamp)
     {
-        var workspace = new AzureDevOpsBoardsWorkspaceConfiguration(id, name, description, connectionId, false);
+        var workspace = new AzureDevOpsBoardsWorkspace(id, name, description, false);
         workspace.AddDomainEvent(EntityCreatedEvent.WithEntity(workspace, timestamp));
         return workspace;
     }
