@@ -228,21 +228,21 @@ const ProgramIncrementDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {programIncrementData && (
-        <>
-          <EditProgramIncrementForm
-            showForm={openEditProgramIncrementForm}
-            id={programIncrementData?.id}
-            onFormUpdate={() => onEditFormClosed(true)}
-            onFormCancel={() => onEditFormClosed(false)}
-          />
-          <ManageProgramIncrementTeamsForm
-            showForm={openManageTeamsForm}
-            id={programIncrementData?.id}
-            onFormSave={() => onManageTeamsFormClosed(true)}
-            onFormCancel={() => onManageTeamsFormClosed(false)}
-          />
-        </>
+      {openEditProgramIncrementForm && (
+        <EditProgramIncrementForm
+          showForm={openEditProgramIncrementForm}
+          id={programIncrementData?.id}
+          onFormUpdate={() => onEditFormClosed(true)}
+          onFormCancel={() => onEditFormClosed(false)}
+        />
+      )}
+      {openManageTeamsForm && (
+        <ManageProgramIncrementTeamsForm
+          showForm={openManageTeamsForm}
+          id={programIncrementData?.id}
+          onFormSave={() => onManageTeamsFormClosed(true)}
+          onFormCancel={() => onManageTeamsFormClosed(false)}
+        />
       )}
     </>
   )

@@ -12,18 +12,14 @@ export interface TeamMembershipsGridProps {
 const ChildLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.child.type === 'Team' ? 'teams' : 'team-of-teams'
   return (
-    <Link href={`/organizations/${teamRoute}/${data.child.key}`}>
-      {value}
-    </Link>
+    <Link href={`/organizations/${teamRoute}/${data.child.key}`}>{value}</Link>
   )
 }
 
 const ParentLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.parent.type === 'Team' ? 'teams' : 'team-of-teams'
   return (
-    <Link href={`/organizations/${teamRoute}/${data.parent.key}`}>
-      {value}
-    </Link>
+    <Link href={`/organizations/${teamRoute}/${data.parent.key}`}>{value}</Link>
   )
 }
 
@@ -53,12 +49,13 @@ const TeamMembershipsGrid = ({
           params.data.end ? dayjs(params.data.end).format('M/D/YYYY') : null,
       },
     ],
-    []
+    [],
   )
 
   return (
     <>
       <ModaGrid
+        height={550}
         columnDefs={columnDefs}
         rowData={teamMemberships}
         loadData={loadTeamMemberships}
