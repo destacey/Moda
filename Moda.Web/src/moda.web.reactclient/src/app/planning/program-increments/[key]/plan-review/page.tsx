@@ -1,18 +1,19 @@
 'use client'
 
 import { PageTitle } from '@/src/app/components/common'
-import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { useDocumentTitle } from '@/src/app/hooks'
 import { getProgramIncrementsClient } from '@/src/services/clients'
 import {
   ProgramIncrementDetailsDto,
   ProgramIncrementTeamResponse,
 } from '@/src/services/moda-api'
-import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { useEffect, useState } from 'react'
 import { Card } from 'antd'
 import Link from 'next/link'
 import TeamPlanReview from './team-plan-review'
+import { useAppDispatch } from '@/src/app/hooks'
+import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
+import { usePathname } from 'next/navigation'
 
 const ProgramIncrementPlanReviewPage = ({ params }) => {
   useDocumentTitle('PI Plan Review')
@@ -20,10 +21,11 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
     useState<ProgramIncrementDetailsDto>()
   const [teams, setTeams] = useState<ProgramIncrementTeamResponse[]>([])
   const [activeTab, setActiveTab] = useState<string>()
-  const { setBreadcrumbRoute } = useBreadcrumbs()
+  const dispatch = useAppDispatch()
+  const pathname = usePathname()
 
   useEffect(() => {
-    const breadcrumbRoute: ItemType[] = [
+    const breadcrumbRoute: BreadcrumbItem[] = [
       {
         title: 'Planning',
       },
@@ -50,7 +52,7 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
         },
       )
       // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
-      setBreadcrumbRoute(breadcrumbRoute)
+      dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
 
       const teamData = await programIncrementsClient.getTeams(
         programIncrementDto.id,
@@ -67,7 +69,8 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
     params.key,
     programIncrement?.key,
     programIncrement?.name,
-    setBreadcrumbRoute,
+    dispatch,
+    pathname
   ])
 
   useEffect(() => {

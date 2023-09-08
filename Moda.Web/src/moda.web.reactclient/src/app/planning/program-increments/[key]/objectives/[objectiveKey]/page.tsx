@@ -5,16 +5,16 @@ import { Button, Card, Dropdown, MenuProps, Space } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import ProgramIncrementObjectiveDetails from './program-increment-objective-details'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
 import EditProgramIncrementObjectiveForm from '../../edit-program-increment-objective-form'
 import { DownOutlined } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
-import { BreadcrumbItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import DeleteProgramIncrementObjectiveForm from './delete-program-increment-objective-form'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useGetProgramIncrementObjectiveByKey } from '@/src/services/queries/planning-queries'
-import { notFound, useRouter } from 'next/navigation'
+import { notFound, useRouter, usePathname } from 'next/navigation'
+import { useAppDispatch } from '@/src/app/hooks'
+import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 
 const ObjectiveDetailsPage = ({ params }) => {
   useDocumentTitle('PI Objective Details')
@@ -27,7 +27,6 @@ const ObjectiveDetailsPage = ({ params }) => {
   } = useGetProgramIncrementObjectiveByKey(params.key, params.objectiveKey)
 
   const [activeTab, setActiveTab] = useState('details')
-  const { setBreadcrumbRoute } = useBreadcrumbs()
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
   const [openDeleteObjectiveForm, setOpenDeleteObjectiveForm] =
@@ -40,6 +39,8 @@ const ObjectiveDetailsPage = ({ params }) => {
     'Permissions.ProgramIncrementObjectives.Manage',
   )
   const showActions = canManageObjectives
+  const pathname = usePathname()
+  const dispatch = useAppDispatch()
 
   const tabs = [
     {
@@ -50,9 +51,10 @@ const ObjectiveDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
+    console.log("setting objective breadcrumb", {objectiveData, pathname})
     if (!objectiveData) return
 
-    const breadcrumbRoute: BreadcrumbItemType[] = [
+    const breadcrumbRoute: BreadcrumbItem[] = [
       {
         title: 'Planning',
       },
@@ -71,9 +73,13 @@ const ObjectiveDetailsPage = ({ params }) => {
         title: objectiveData.name,
       },
     )
+    console.log("breadcrumbRoute", breadcrumbRoute)
     // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
-    setBreadcrumbRoute(breadcrumbRoute)
-  }, [objectiveData, setBreadcrumbRoute])
+    dispatch(setBreadcrumbRoute({
+      pathname,
+      route: breadcrumbRoute
+    }))
+  }, [dispatch, objectiveData, pathname])
 
   const onUpdateObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
@@ -130,6 +136,9 @@ const ObjectiveDetailsPage = ({ params }) => {
     notFound()
   }
 
+  if (isLoading || isFetching) {
+    return <div>Loading...</div>
+  }
   return (
     <>
       <PageTitle

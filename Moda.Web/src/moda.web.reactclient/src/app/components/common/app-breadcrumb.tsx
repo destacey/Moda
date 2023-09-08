@@ -1,24 +1,47 @@
 'use client'
 
-import { Breadcrumb } from 'antd'
+import { Breadcrumb, Typography } from 'antd'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { useEffect, useState } from 'react'
-import useBreadcrumbs, { BreadcrumbSegment } from '../contexts/breadcrumbs'
+import { useAppSelector } from '../../hooks'
+import { selectBreadcrumb, BreadcrumbItem } from '@/src/store/breadcrumbs'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
+import { generateRoute } from '@/src/store/breadcrumbs/routes'
 
-export interface AppBreadcrumbProps {}
+const { Text } = Typography
+
+interface BreadcrumbSegmentProps {
+  route: BreadcrumbItem
+  paths: string[]
+  last?: boolean
+}
+
+const BreadcrumbSegment = ({ route, last }: BreadcrumbSegmentProps) => {
+  return ( last || !route.href ) 
+  ? <Text>{route.title}</Text> 
+  : <Link href={route.href}>{route.title}</Link>
+}
 
 const AppBreadcrumb = () => {
   const [pathItems, setPathItems] = useState<ItemType[]>([])
-  const { breadcrumbRoute, isVisible } = useBreadcrumbs()
+  const [isVisible, setIsVisible] = useState<boolean>(true)
+  const pathname = usePathname()
+  const breadcrumbRoute = useAppSelector(selectBreadcrumb)
+
 
   useEffect(() => {
-    if (breadcrumbRoute?.route !== undefined) {
-      setPathItems(breadcrumbRoute.route)
+    if(pathname === breadcrumbRoute.forPath) {
+      setPathItems(breadcrumbRoute.items)
+      setIsVisible(breadcrumbRoute.isVisible)
     }
-  }, [breadcrumbRoute])
+    else {
+      setPathItems(generateRoute(pathname))
+    }
+  }, [pathname, breadcrumbRoute])
 
   const itemRender = (
-    route: ItemType,
+    route: BreadcrumbItem,
     params: any,
     routes: ItemType[],
     paths: string[],

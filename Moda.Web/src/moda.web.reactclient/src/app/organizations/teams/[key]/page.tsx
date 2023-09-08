@@ -12,12 +12,12 @@ import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import { EditTeamForm } from '../../components'
 import useAuth from '@/src/app/components/contexts/auth'
-import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { useGetTeamRisks } from '@/src/services/queries/organization-queries'
 import { authorizePage } from '@/src/app/components/hoc'
-import { notFound } from 'next/navigation'
+import { notFound, usePathname } from 'next/navigation'
 import { resetActiveTeam, retrieveTeam, setEditTeamOpen, selectTeamDetail } from '../../teams-slice'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
+import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 
 enum TeamTabs {
   Details = 'details',
@@ -29,7 +29,6 @@ const TeamDetailsPage = ({ params }) => {
   useDocumentTitle('Team Details')
   const [activeTab, setActiveTab] = useState(TeamTabs.Details)
   const { key } = params
-  const { setBreadcrumbTitle } = useBreadcrumbs()
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
 
@@ -39,6 +38,7 @@ const TeamDetailsPage = ({ params }) => {
 
   const { team, error, isEditOpen, teamNotFound } = useAppSelector(selectTeamDetail)
   const dispatch = useAppDispatch()
+  const pathname = usePathname()
 
   const risksQuery = useGetTeamRisks(
     team?.id,
@@ -99,8 +99,8 @@ const TeamDetailsPage = ({ params }) => {
   }, [key, dispatch])
 
   useEffect(() => {
-    team && setBreadcrumbTitle(team.name)
-  }, [team, setBreadcrumbTitle])
+    team && dispatch(setBreadcrumbTitle({title: team.name, pathname}))
+  }, [team, dispatch, pathname])
 
   useEffect(() => {
     error && console.error(error)

@@ -15,7 +15,6 @@ import AppMenu from './components/common/menu'
 import AppBreadcrumb from './components/common/app-breadcrumb'
 import { ThemeProvider } from './components/contexts/theme'
 import { AuthProvider } from './components/contexts/auth'
-import { BreadcrumbsProvider } from './components/contexts/breadcrumbs'
 import { MenuToggleProvider } from './components/contexts/menu-toggle'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import LoadingAccount from './components/common/loading-account'
@@ -53,7 +52,6 @@ export default function RootLayout({
                           <Layout hasSider style={{ minHeight: '100vh' }}>
                             <AppMenu />
                             <Layout style={{ padding: '0 24px 24px' }}>
-                              <BreadcrumbsProvider>
                                 <AppBreadcrumb />
                                 <Content
                                   style={{
@@ -63,7 +61,6 @@ export default function RootLayout({
                                 >
                                   {children}
                                 </Content>
-                              </BreadcrumbsProvider>
                             </Layout>
                           </Layout>
                         </LoadingAccount>

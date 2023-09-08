@@ -7,17 +7,19 @@ import EmployeeDetails from './employee-details'
 import { getEmployeesClient } from '@/src/services/clients'
 import { Card } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { authorizePage } from '@/src/app/components/hoc'
-import { notFound } from 'next/navigation'
+import { notFound, usePathname } from 'next/navigation'
+import { useAppDispatch } from '@/src/app/hooks'
+import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 
 const EmployeeDetailsPage = ({ params }) => {
   useDocumentTitle('Employee Details')
   const [activeTab, setActiveTab] = useState('details')
   const [employee, setEmployee] = useState<EmployeeDetailsDto | null>(null)
   const { key } = params
-  const { setBreadcrumbTitle } = useBreadcrumbs()
   const [notEmployeeFound, setEmployeeNotFound] = useState<boolean>(false)
+  const pathname = usePathname()
+  const dispatch = useAppDispatch()
 
   const tabs = [
     {
@@ -32,7 +34,7 @@ const EmployeeDetailsPage = ({ params }) => {
       const employeesClient = await getEmployeesClient()
       const employeeDto = await employeesClient.getById(key)
       setEmployee(employeeDto)
-      setBreadcrumbTitle(employeeDto.displayName)
+      dispatch(setBreadcrumbTitle({ title: employeeDto.displayName, pathname }))
     }
 
     getEmployee().catch((error) => {
@@ -41,7 +43,7 @@ const EmployeeDetailsPage = ({ params }) => {
       }
       console.error('getEmployee error', error)
     })
-  }, [key, setBreadcrumbTitle])
+  }, [key, dispatch, pathname])
 
   if (notEmployeeFound) {
     return notFound()

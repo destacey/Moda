@@ -1,3 +1,5 @@
+import { BreadcrumbItem } from "./types"
+
 const routes = {
   organizations: {
     title: 'Organizations',
@@ -45,6 +47,25 @@ const routes = {
     title: 'Account',
     href: null,
   },
+}
+
+export const generateRoute = 
+(pathname: string, lastItemTitleOverride?: string): BreadcrumbItem[] => {
+  const pathSegments = pathname.split('/').filter((item) => item !== '')
+  return pathSegments.map((item, index) => {
+    // Set the title of the last path segment to the title passed in from the page
+    let titleOverride = {}
+    if (lastItemTitleOverride && index === pathSegments.length - 1) {
+      titleOverride = { title: lastItemTitleOverride }
+    }
+
+    return {
+      path: item,
+      href: '/' + pathSegments.slice(0, index + 1).join('/'),
+      ...routes[item],
+      ...titleOverride,
+    }
+  })
 }
 
 export default routes
