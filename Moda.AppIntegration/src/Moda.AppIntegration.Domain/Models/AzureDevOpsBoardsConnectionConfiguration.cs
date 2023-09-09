@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 
 namespace Moda.AppIntegration.Domain.Models;
-public sealed record AzureDevOpsBoardsConnectionConfiguration
+public sealed class AzureDevOpsBoardsConnectionConfiguration
 {
     // TODO: .net 8 provides improved json serialization options for unmapped properties
 

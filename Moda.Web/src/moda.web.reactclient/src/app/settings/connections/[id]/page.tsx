@@ -24,6 +24,7 @@ enum ConnectionTabs {
 const ConnectionDetailsPage = ({ params }) => {
   useDocumentTitle('Connection Details')
   const [activeTab, setActiveTab] = useState(ConnectionTabs.Details)
+  const [isImportingWorkspaces, setIsImportingWorkspaces] = useState(false)
   const { setBreadcrumbRoute } = useBreadcrumbs()
   const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
@@ -43,7 +44,8 @@ const ConnectionDetailsPage = ({ params }) => {
     refetch,
   } = useGetAzdoBoardsConnectionById(params.id)
 
-  const importWorkspaces = useImportAzdoBoardsConnectionWorkspacesMutation()
+  const importWorkspacesMutation =
+    useImportAzdoBoardsConnectionWorkspacesMutation()
 
   const tabs = [
     {
@@ -84,9 +86,10 @@ const ConnectionDetailsPage = ({ params }) => {
     }
   }
 
-  const onImportWorkspaces = async () => {
+  const importWorkspaces = async () => {
     try {
-      await importWorkspaces.mutateAsync(params.id)
+      await importWorkspacesMutation.mutateAsync(params.id)
+      setIsImportingWorkspaces(false)
       messageApi.success('Successfully imported workspaces.')
     } catch (error) {
       console.error(error)
@@ -101,7 +104,16 @@ const ConnectionDetailsPage = ({ params }) => {
             <Button onClick={() => setOpenEditConnectionForm(true)}>
               Edit
             </Button>
-            <Button onClick={onImportWorkspaces}>Import Workspaces</Button>
+            <Button
+              disabled={!connectionData?.isValidConfiguration ?? true}
+              loading={isImportingWorkspaces}
+              onClick={() => {
+                setIsImportingWorkspaces(true)
+                importWorkspaces()
+              }}
+            >
+              Import Workspaces
+            </Button>
           </Space>
         )}
       </>

@@ -1,7 +1,7 @@
 ﻿using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
-public sealed class AzureDevOpsBoardsWorkspace : BaseAuditableEntity<Guid>
+public sealed class AzureDevOpsBoardsWorkspace
 {
     private string _name = null!;
     private string? _description;
@@ -12,8 +12,10 @@ public sealed class AzureDevOpsBoardsWorkspace : BaseAuditableEntity<Guid>
         Id = id;
         Name = name;
         Description = description;
-        Import = import;
+        Sync = import;
     }
+
+    public Guid Id { get; private init; }
 
     /// <summary>Gets or sets the name of the connection.</summary>
     /// <value>The name of the connection.</value>
@@ -32,10 +34,10 @@ public sealed class AzureDevOpsBoardsWorkspace : BaseAuditableEntity<Guid>
     }
 
     /// <summary>
-    /// Gets a value indicating whether this workspace is configured to import data.
+    /// Gets a value indicating whether this workspace is configured to sync data.
     /// </summary>
-    /// <value><c>true</c> if import; otherwise, <c>false</c>.</value>
-    public bool Import { get; private set; }
+    /// <value><c>true</c> if sync; otherwise, <c>false</c>.</value>
+    public bool Sync { get; private set; }
 
     public Result Update(string name, string? description, bool import, Instant timestamp)
     {
@@ -43,9 +45,7 @@ public sealed class AzureDevOpsBoardsWorkspace : BaseAuditableEntity<Guid>
         {
             Name = name;
             Description = description;
-            Import = import;
-
-            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+            Sync = import;
 
             return Result.Success();
         }
@@ -57,8 +57,6 @@ public sealed class AzureDevOpsBoardsWorkspace : BaseAuditableEntity<Guid>
 
     public static AzureDevOpsBoardsWorkspace Create(Guid id, string name, string? description, Instant timestamp)
     {
-        var workspace = new AzureDevOpsBoardsWorkspace(id, name, description, false);
-        workspace.AddDomainEvent(EntityCreatedEvent.WithEntity(workspace, timestamp));
-        return workspace;
+        return new AzureDevOpsBoardsWorkspace(id, name, description, false);
     }
 }

@@ -15,17 +15,26 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
     {
         try
         {
+            Guard.Against.Null(Configuration, nameof(Configuration));
             Guard.Against.Null(organization, nameof(organization)); 
             Guard.Against.Null(personalAccessToken, nameof(personalAccessToken));
 
             Name = name;
             Description = description;
-            Configuration = Configuration! with
-            {
-                Organization = organization,
-                PersonalAccessToken = personalAccessToken
-            }; 
+            //Configuration = Configuration! with
+            //{
+            //    Organization = organization,
+            //    PersonalAccessToken = personalAccessToken
+            //}; 
+            //Configuration.Organization = organization;
+            //Configuration.PersonalAccessToken = personalAccessToken;
             IsValidConfiguration = configurationIsValid;
+
+            var newConfiguration = Configuration;
+            newConfiguration.Organization = organization;
+            newConfiguration.PersonalAccessToken = personalAccessToken;
+
+            Configuration = newConfiguration;
 
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
@@ -43,11 +52,14 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         {
             Guard.Against.Null(Configuration, nameof(Configuration));
 
+            var newConfiguration = Configuration;
+
             // remove workspaces that are not in the new list
-            var workspacesToRemove = Configuration.Workspaces.Where(w => !workspaces.Any(nw => nw.Id == w.Id)).ToList();
+            var workspacesToRemove = newConfiguration.Workspaces.Where(w => !workspaces.Any(nw => nw.Id == w.Id)).ToList();
             foreach (var workspace in workspacesToRemove)
             {
-                var result = Configuration.RemoveWorkspace(workspace);
+                // TODO - what if the workspace had been configured to sync and has data?
+                var result = newConfiguration.RemoveWorkspace(workspace);
                 if (result.IsFailure)
                     return result;
             }
@@ -55,13 +67,13 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
             // update existing or add new workspaces
             foreach (var workspace in workspaces)
             {
-                var existingWorkspace = Configuration.Workspaces.FirstOrDefault(w => w.Id == workspace.Id);
+                var existingWorkspace = newConfiguration.Workspaces.FirstOrDefault(w => w.Id == workspace.Id);
                 if (existingWorkspace is not null)
                 {
                     var result = existingWorkspace.Update(
                         workspace.Name, 
                         workspace.Description, 
-                        existingWorkspace.Import, 
+                        existingWorkspace.Sync, 
                         timestamp);
 
                     if (result.IsFailure)
@@ -69,7 +81,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 }
                 else
                 {
-                    var result = Configuration.AddWorkspace(AzureDevOpsBoardsWorkspace.Create(
+                    var result = newConfiguration.AddWorkspace(AzureDevOpsBoardsWorkspace.Create(
                         workspace.Id,
                         workspace.Name, 
                         workspace.Description,
@@ -79,6 +91,8 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                         return result;
                 }
             }
+
+            Configuration = newConfiguration;
 
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 

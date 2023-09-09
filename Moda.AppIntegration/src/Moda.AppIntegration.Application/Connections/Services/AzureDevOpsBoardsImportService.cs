@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Moda.AppIntegration.Application.Connections.Commands;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
 
@@ -10,12 +11,14 @@ public sealed class AzureDevOpsBoardsImportService : IAzureDevOpsBoardsImportSer
     private readonly ILogger<AzureDevOpsBoardsImportService> _logger;
     private readonly IAzureDevOpsService _azureDevOpsService;
     private readonly ISender _sender;
+    private readonly IDateTimeService _dateTimeService;
 
-    public AzureDevOpsBoardsImportService(ILogger<AzureDevOpsBoardsImportService> logger, IAzureDevOpsService azureDevOpsService, ISender sender)
+    public AzureDevOpsBoardsImportService(ILogger<AzureDevOpsBoardsImportService> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IDateTimeService dateTimeService)
     {
         _logger = logger;
         _azureDevOpsService = azureDevOpsService;
         _sender = sender;
+        _dateTimeService = dateTimeService;
     }
 
     public async Task<Result> ImportWorkspaces(Guid connectionId, CancellationToken cancellationToken)
@@ -31,15 +34,22 @@ public sealed class AzureDevOpsBoardsImportService : IAzureDevOpsBoardsImportSer
 
             if (connection.IsValidConfiguration is false)
             {
-                _logger.LogError("Azure DevOps Boards connection with id {ConnectionId} is not valid.", connectionId);
-                return Result.Failure($"Azure DevOps Boards connection with id {connectionId} is not valid.");
+                _logger.LogError("The configuration for Azure DevOps Boards connection {ConnectionId} is not valid.", connectionId);
+                return Result.Failure($"The configuration for connection {connectionId} is not valid.");
             }
 
             var importResult = await _azureDevOpsService.GetProjects(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken);
             if (importResult.IsFailure)
                 return importResult;
 
-            // bulk upsert projects
+            List<AzureDevOpsBoardsWorkspace> workspaces = new();
+            foreach (var externalWorkspace in importResult.Value)
+            {
+                var workspace = AzureDevOpsBoardsWorkspace.Create(externalWorkspace.Id, externalWorkspace.Name, externalWorkspace.Description, _dateTimeService.Now);
+                workspaces.Add(workspace);
+            }
+
+            var bulkUpsertResult = await _sender.Send(new BulkUpsertAzureDevOpsBoardsWorkspacesCommand(connectionId, workspaces), cancellationToken);
 
             return Result.Success();
         }
