@@ -103,14 +103,15 @@ internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommand
                 return Result.Failure<Guid>("Azure DevOps Boards connection not found.");
 
             // do the first four characters of the PersonalAccessToken match the existing one?
-            var pat = connection.Configuration?.PersonalAccessToken?[..4] == request.PersonalAccessToken[..4]
-                ? connection.Configuration.PersonalAccessToken
-                : request.PersonalAccessToken;
+            var pat = connection.Configuration!.PersonalAccessToken.Length == request.PersonalAccessToken.Length 
+                && connection.Configuration!.PersonalAccessToken?[..4] == request.PersonalAccessToken[..4]
+                    ? connection.Configuration.PersonalAccessToken
+                    : request.PersonalAccessToken;
 
-            var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, pat);
-            var testConnectionResult = await _azureDevOpsService.TestConnection(config.OrganizationUrl, config.PersonalAccessToken);
+            var testConfig = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, pat);
+            var testConnectionResult = await _azureDevOpsService.TestConnection(testConfig.OrganizationUrl, testConfig.PersonalAccessToken);
 
-            var updateResult = connection.Update(request.Name, request.Description, config, testConnectionResult.IsSuccess, _dateTimeService.Now);
+            var updateResult = connection.Update(request.Name, request.Description, request.Organization, pat, testConnectionResult.IsSuccess, _dateTimeService.Now);
             if (updateResult.IsFailure)
             {
                 // Reset the entity

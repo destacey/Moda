@@ -11,30 +11,21 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         IsValidConfiguration = configurationIsValid;
     }
 
-    public Result Update(string name, string? description, AzureDevOpsBoardsConnectionConfiguration configuration, bool configurationIsValid, Instant timestamp)
+    public Result Update(string name, string? description, string organization, string personalAccessToken, bool configurationIsValid, Instant timestamp)
     {
         try
         {
+            Guard.Against.Null(organization, nameof(organization)); 
+            Guard.Against.Null(personalAccessToken, nameof(personalAccessToken));
+
             Name = name;
             Description = description;
-            Configuration = Guard.Against.Null(configuration, nameof(Configuration));
+            Configuration = Configuration! with
+            {
+                Organization = organization,
+                PersonalAccessToken = personalAccessToken
+            }; 
             IsValidConfiguration = configurationIsValid;
-
-            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
-
-            return Result.Success();
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure(ex.ToString());
-        }
-    }
-
-    public Result UpdateConfiguration(AzureDevOpsBoardsConnectionConfiguration configuration, Instant timestamp)
-    {
-        try
-        {
-            Configuration = Guard.Against.Null(configuration, nameof(Configuration));
 
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 

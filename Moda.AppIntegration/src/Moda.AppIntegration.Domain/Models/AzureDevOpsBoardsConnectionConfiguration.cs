@@ -1,65 +1,49 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Moda.AppIntegration.Domain.Models;
 public sealed record AzureDevOpsBoardsConnectionConfiguration
 {
+    // TODO: .net 8 provides improved json serialization options for unmapped properties
+
     // TODO: Move _baseUrl to a configuration file.
     private readonly string _baseUrl = "https://dev.azure.com";
 
-    //private string _organization = null!;
-    //private string _personalAccessToken = null!;
-    //private readonly List<AzureDevOpsBoardsWorkspace> _workspaces = new();
-    
-    private AzureDevOpsBoardsConnectionConfiguration() { }
-    public AzureDevOpsBoardsConnectionConfiguration(string organization, string personalAccessToken)
+    public AzureDevOpsBoardsConnectionConfiguration() { }
+
+    [SetsRequiredMembers]
+    public AzureDevOpsBoardsConnectionConfiguration(string organization, string personalAccessToken, IEnumerable<AzureDevOpsBoardsWorkspace>? workspaces = null)
     {
-        Organization = organization;
-        PersonalAccessToken = personalAccessToken;
-        Workspaces = new List<AzureDevOpsBoardsWorkspace>();
-    }
-    public AzureDevOpsBoardsConnectionConfiguration(string organization, string personalAccessToken, IEnumerable<AzureDevOpsBoardsWorkspace> workspaces)
-    {
-        Organization = organization;
-        PersonalAccessToken = personalAccessToken;
-        Workspaces = workspaces.ToList();
+        Organization = organization.Trim();
+        PersonalAccessToken = personalAccessToken.Trim();
+        Workspaces = workspaces?.ToList() ?? new List<AzureDevOpsBoardsWorkspace>();
     }
 
     /// <summary>Gets the organization.</summary>
     /// <value>The Azure DevOps Organization name.</value>
-    public string Organization { get; private set; } = "invalid";
-    //public string Organization
-    //{
-    //    get => _organization;
-    //    private set => _organization = Guard.Against.NullOrWhiteSpace(value, nameof(Organization)).Trim();
-    //}
+    public required string Organization { get; set; }
 
     /// <summary>Gets the personal access token.</summary>
     /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
-    public string PersonalAccessToken { get; private set; } = "invalid";
-    //public string PersonalAccessToken
-    //{
-    //    get => _personalAccessToken;
-    //    private set => _personalAccessToken = Guard.Against.NullOrWhiteSpace(value, nameof(PersonalAccessToken)).Trim();
-    //}
+    public required string PersonalAccessToken { get; set; }
 
     public string OrganizationUrl
         => $"{_baseUrl}/{Organization}";
 
-    public List<AzureDevOpsBoardsWorkspace>? Workspaces { get; private set; } =
+    [JsonInclude]
+    public List<AzureDevOpsBoardsWorkspace> Workspaces { get; private set; } =
     new List<AzureDevOpsBoardsWorkspace>();
-
-    //public IReadOnlyCollection<AzureDevOpsBoardsWorkspace>? Workspaces => _workspaces.AsReadOnly();
 
     internal Result AddWorkspace(AzureDevOpsBoardsWorkspace workspace)
     {
         try
         {
-            //Guard.Against.Null(workspace, nameof(workspace));
+            Guard.Against.Null(workspace, nameof(workspace));
 
-            //if (_workspaces.Any(w => w.Id == workspace.Id))
-            //    return Result.Failure("Unable to add a duplicate workspace.");
+            if (Workspaces.Any(w => w.Id == workspace.Id))
+                return Result.Failure("Unable to add a duplicate workspace.");
 
-            //_workspaces.Add(workspace);
+            Workspaces.Add(workspace);
 
             return Result.Success();
         }
@@ -73,12 +57,12 @@ public sealed record AzureDevOpsBoardsConnectionConfiguration
     {
         try
         {
-            //Guard.Against.Null(workspace, nameof(workspace));
+            Guard.Against.Null(workspace, nameof(workspace));
 
-            //if (!_workspaces.Any(w => w.Id == workspace.Id))
-            //    return Result.Failure("Unable to remove a workspace that does not exist.");
+            if (!Workspaces.Any(w => w.Id == workspace.Id))
+                return Result.Failure("Unable to remove a workspace that does not exist.");
 
-            //_workspaces.Remove(workspace);
+            Workspaces.Remove(workspace);
 
             return Result.Success();
         }
