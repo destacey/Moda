@@ -3,7 +3,7 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import { useEffect, useState } from 'react'
 import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
-import { Button, Divider, Space, Tabs, message } from 'antd'
+import { Button, Card, Divider, Space, Tabs, message } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
@@ -15,6 +15,9 @@ import {
 } from '@/src/services/queries/app-integration-queries'
 import { notFound } from 'next/navigation'
 import EditConnectionForm from '../components/edit-connection-form'
+import AzdoBoardsWorkspaces from './azdo-boards-workspaces'
+import { ExportOutlined } from '@ant-design/icons'
+import Link from 'next/link'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -43,6 +46,7 @@ const ConnectionDetailsPage = ({ params }) => {
     isFetching,
     refetch,
   } = useGetAzdoBoardsConnectionById(params.id)
+  const azdoOrgUrl = connectionData?.configuration?.organizationUrl
 
   const importWorkspacesMutation =
     useImportAzdoBoardsConnectionWorkspacesMutation()
@@ -50,13 +54,18 @@ const ConnectionDetailsPage = ({ params }) => {
   const tabs = [
     {
       key: ConnectionTabs.Details,
-      label: 'Details',
-      children: <AzdoBoardsConnectionDetails connection={connectionData} />,
+      tab: 'Details',
+      content: <AzdoBoardsConnectionDetails connection={connectionData} />,
     },
     {
       key: ConnectionTabs.WorkspaceConfiguration,
-      label: 'Workspace Configuration',
-      children: null,
+      tab: 'Workspace Configuration',
+      content: (
+        <AzdoBoardsWorkspaces
+          workspaces={connectionData?.configuration?.workspaces}
+          organizationUrl={connectionData?.configuration?.organizationUrl}
+        />
+      ),
     },
   ]
 
@@ -128,19 +137,30 @@ const ConnectionDetailsPage = ({ params }) => {
     <>
       {contextHolder}
       <PageTitle
-        title={connectionData?.name}
+        title={
+          <>
+            {connectionData?.name}{' '}
+            {azdoOrgUrl && (
+              <Link
+                href={azdoOrgUrl}
+                target="_blank"
+                title="Open in Azure DevOps"
+              >
+                <ExportOutlined style={{ width: '12px' }} />
+              </Link>
+            )}
+          </>
+        }
         subtitle="Connection Details"
         actions={showActions && <Actions />}
       />
-      <Divider />
-      <Tabs
-        tabPosition="left"
-        size="small"
-        tabBarGutter={0}
-        tabBarStyle={{ minHeight: 400 }}
-        defaultActiveKey={activeTab}
-        items={tabs}
-      />
+      <Card
+        tabList={tabs}
+        activeTabKey={activeTab}
+        onTabChange={(key: ConnectionTabs) => setActiveTab(key)}
+      >
+        {tabs.find((t) => t.key === activeTab)?.content}
+      </Card>
       {openEditConnectionForm && (
         <EditConnectionForm
           showForm={openEditConnectionForm}

@@ -3,7 +3,7 @@ import { Col, Row, Space, Typography } from 'antd'
 const { Title, Text } = Typography
 
 export interface PageTitleProps {
-  title: string
+  title: string | React.ReactNode
   subtitle?: string
   actions?: React.ReactNode | null
 }

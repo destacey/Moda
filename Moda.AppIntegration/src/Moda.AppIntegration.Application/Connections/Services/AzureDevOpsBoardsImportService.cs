@@ -45,7 +45,7 @@ public sealed class AzureDevOpsBoardsImportService : IAzureDevOpsBoardsImportSer
             List<AzureDevOpsBoardsWorkspace> workspaces = new();
             foreach (var externalWorkspace in importResult.Value)
             {
-                var workspace = AzureDevOpsBoardsWorkspace.Create(externalWorkspace.Id, externalWorkspace.Name, externalWorkspace.Description, _dateTimeService.Now);
+                var workspace = AzureDevOpsBoardsWorkspace.Create(externalWorkspace.Id, externalWorkspace.Name, externalWorkspace.Description);
                 workspaces.Add(workspace);
             }
 

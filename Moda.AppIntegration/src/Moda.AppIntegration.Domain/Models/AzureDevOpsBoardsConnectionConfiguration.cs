@@ -30,6 +30,8 @@ public sealed class AzureDevOpsBoardsConnectionConfiguration
     public string OrganizationUrl
         => $"{_baseUrl}/{Organization}";
 
+    /// <summary>Gets the workspaces.</summary>
+    /// <value>The workspaces.</value>
     [JsonInclude]
     public List<AzureDevOpsBoardsWorkspace> Workspaces { get; private set; } =
     new List<AzureDevOpsBoardsWorkspace>();

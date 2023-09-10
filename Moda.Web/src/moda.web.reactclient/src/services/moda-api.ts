@@ -7323,10 +7323,17 @@ export interface AzureDevOpsBoardsConnectionDetailsDto {
 }
 
 export interface AzureDevOpsBoardsConnectionConfigurationDto {
-    connectionId?: string;
     organization?: string;
     personalAccessToken?: string;
     organizationUrl?: string;
+    workspaces?: AzureDevOpsBoardsWorkspaceDto[];
+}
+
+export interface AzureDevOpsBoardsWorkspaceDto {
+    externalId?: string;
+    name?: string;
+    description?: string | undefined;
+    sync?: boolean;
 }
 
 export interface CreateAzureDevOpsBoardConnectionRequest {

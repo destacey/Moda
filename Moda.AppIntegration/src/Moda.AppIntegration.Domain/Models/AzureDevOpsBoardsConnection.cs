@@ -67,8 +67,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                     var result = existingWorkspace.Update(
                         workspace.Name, 
                         workspace.Description, 
-                        existingWorkspace.Sync, 
-                        timestamp);
+                        existingWorkspace.Sync);
 
                     if (result.IsFailure)
                         return result;
@@ -78,8 +77,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                     var result = Configuration.AddWorkspace(AzureDevOpsBoardsWorkspace.Create(
                         workspace.ExternalId,
                         workspace.Name, 
-                        workspace.Description,
-                        timestamp));
+                        workspace.Description));
 
                     if (result.IsFailure)
                         return result;

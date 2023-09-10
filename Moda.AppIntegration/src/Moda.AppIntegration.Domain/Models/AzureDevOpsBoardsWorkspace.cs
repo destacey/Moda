@@ -40,7 +40,7 @@ public sealed class AzureDevOpsBoardsWorkspace
     /// <value><c>true</c> if sync; otherwise, <c>false</c>.</value>
     public bool Sync { get; private set; }
 
-    public Result Update(string name, string? description, bool import, Instant timestamp)
+    public Result Update(string name, string? description, bool import)
     {
         try
         {
@@ -56,7 +56,7 @@ public sealed class AzureDevOpsBoardsWorkspace
         }
     }
 
-    public static AzureDevOpsBoardsWorkspace Create(Guid id, string name, string? description, Instant timestamp)
+    public static AzureDevOpsBoardsWorkspace Create(Guid id, string name, string? description)
     {
         return new AzureDevOpsBoardsWorkspace(id, name, description, false);
     }

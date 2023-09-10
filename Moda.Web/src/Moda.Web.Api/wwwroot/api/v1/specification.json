@@ -7976,10 +7976,6 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "connectionId": {
-            "type": "string",
-            "format": "guid"
-          },
           "organization": {
             "type": "string"
           },
@@ -7988,6 +7984,32 @@
           },
           "organizationUrl": {
             "type": "string"
+          },
+          "workspaces": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AzureDevOpsBoardsWorkspaceDto"
+            }
+          }
+        }
+      },
+      "AzureDevOpsBoardsWorkspaceDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "externalId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "sync": {
+            "type": "boolean"
           }
         }
       },
