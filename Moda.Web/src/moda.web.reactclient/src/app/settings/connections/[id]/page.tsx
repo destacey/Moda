@@ -98,11 +98,12 @@ const ConnectionDetailsPage = ({ params }) => {
   const importWorkspaces = async () => {
     try {
       await importWorkspacesMutation.mutateAsync(params.id)
-      setIsImportingWorkspaces(false)
       messageApi.success('Successfully imported workspaces.')
     } catch (error) {
       console.error(error)
+      messageApi.error('Failed to import workspaces.')
     }
+    setIsImportingWorkspaces(false)
   }
 
   const Actions = () => {
