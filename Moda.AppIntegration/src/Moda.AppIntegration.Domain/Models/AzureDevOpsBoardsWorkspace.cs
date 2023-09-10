@@ -7,15 +7,16 @@ public sealed class AzureDevOpsBoardsWorkspace
     private string? _description;
 
     private AzureDevOpsBoardsWorkspace() { }
-    private AzureDevOpsBoardsWorkspace(Guid id, string name, string? description, bool import)
+    private AzureDevOpsBoardsWorkspace(Guid externalId, string name, string? description, bool import)
     {
-        Id = id;
+        ExternalId = externalId;
         Name = name;
         Description = description;
         Sync = import;
     }
 
-    public Guid Id { get; private init; }
+
+    public Guid ExternalId { get; private set; }
 
     /// <summary>Gets or sets the name of the connection.</summary>
     /// <value>The name of the connection.</value>

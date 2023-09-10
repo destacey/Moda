@@ -1,5 +1,7 @@
-﻿namespace Moda.AppIntegration.Application.Connections.Dtos;
-public sealed record AzureDevOpsBoardsConnectionConfigurationDto
+﻿using Mapster;
+
+namespace Moda.AppIntegration.Application.Connections.Dtos;
+public sealed record AzureDevOpsBoardsConnectionConfigurationDto : IMapFrom<AzureDevOpsBoardsConnectionConfiguration>
 {
     /// <summary>Gets the connection identifier.</summary>
     /// <value>The connection identifier.</value>
@@ -21,5 +23,10 @@ public sealed record AzureDevOpsBoardsConnectionConfigurationDto
     {
         if (!string.IsNullOrWhiteSpace(PersonalAccessToken) && PersonalAccessToken.Length > 4)
             PersonalAccessToken = PersonalAccessToken.Substring(0, 4) + new string('*', PersonalAccessToken.Length - 4);
+    }
+
+    public void Register(TypeAdapterConfig config)
+    {
+        config.NewConfig<AzureDevOpsBoardsConnectionConfiguration, AzureDevOpsBoardsConnectionDetailsDto>();
     }
 }

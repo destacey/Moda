@@ -44,7 +44,7 @@ public sealed class CreateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
 
         RuleFor(c => c.Name)
             .NotEmpty()
-            .MaximumLength(256);
+            .MaximumLength(128);
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);
@@ -52,25 +52,17 @@ public sealed class CreateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
         RuleFor(c => c.Organization)
             .NotEmpty()
             .MaximumLength(128)
-            .MustAsync(async (organization, cancellationToken) => await BeUniqueOrganization(organization, cancellationToken)).WithMessage("The organization for this connection already exists.");
+            .MustAsync(BeUniqueOrganization).WithMessage("The organization for this connection already exists in an existing connection.");
 
         RuleFor(c => c.PersonalAccessToken)
             .NotEmpty()
             .MaximumLength(128);
     }
 
-    public async Task<bool> BeUniqueOrganization(string? organization, CancellationToken cancellationToken)
+    public async Task<bool> BeUniqueOrganization(string organization, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(organization))
-            return true;
-
-        var connections = await _appIntegrationDbContext.AzureDevOpsBoardsConnections
-            .Where(c => !string.IsNullOrWhiteSpace(c.ConfigurationString))
-            .ToListAsync(cancellationToken);
-
-        return connections
-            .Where(c => c.Configuration is not null && !string.IsNullOrWhiteSpace(c.Configuration.Organization))
-            .All(c => c.Configuration!.Organization != organization);
+        return await _appIntegrationDbContext.AzureDevOpsBoardsConnections
+            .AllAsync(c => c.Configuration!.Organization != organization, cancellationToken);
     }
 }
 

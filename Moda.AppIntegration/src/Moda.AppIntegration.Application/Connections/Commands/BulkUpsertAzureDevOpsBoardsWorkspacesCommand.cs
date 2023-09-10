@@ -1,7 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces.ExternalWork;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
 

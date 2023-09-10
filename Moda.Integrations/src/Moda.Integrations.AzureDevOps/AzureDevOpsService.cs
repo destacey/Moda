@@ -30,6 +30,8 @@ public class AzureDevOpsService : IAzureDevOpsService
             var connection = CreateVssConnection(organizationUrl, token);
             await connection.ConnectAsync().ConfigureAwait(false);
 
+            // there is weired behavior where this returns success if the organization in the url is 'test3' or 'test4' regardless of the token
+
             return Result.Success();
         }
         catch (Exception ex)

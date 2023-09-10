@@ -1,7 +1,11 @@
 ﻿namespace Moda.AppIntegration.Domain.Models;
 public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsConnectionConfiguration>
 {
-    private AzureDevOpsBoardsConnection() : base() { }
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    private AzureDevOpsBoardsConnection() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
     private AzureDevOpsBoardsConnection(string name, string? description, AzureDevOpsBoardsConnectionConfiguration configuration, bool configurationIsValid)
     {
         Name = name;
@@ -10,6 +14,8 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         Configuration = Guard.Against.Null(configuration, nameof(Configuration));
         IsValidConfiguration = configurationIsValid;
     }
+
+    public override AzureDevOpsBoardsConnectionConfiguration Configuration { get; protected set; }
 
     public Result Update(string name, string? description, string organization, string personalAccessToken, bool configurationIsValid, Instant timestamp)
     {
@@ -21,20 +27,10 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
 
             Name = name;
             Description = description;
-            //Configuration = Configuration! with
-            //{
-            //    Organization = organization,
-            //    PersonalAccessToken = personalAccessToken
-            //}; 
-            //Configuration.Organization = organization;
-            //Configuration.PersonalAccessToken = personalAccessToken;
             IsValidConfiguration = configurationIsValid;
 
-            var newConfiguration = Configuration;
-            newConfiguration.Organization = organization;
-            newConfiguration.PersonalAccessToken = personalAccessToken;
-
-            Configuration = newConfiguration;
+            Configuration.Organization = organization;
+            Configuration.PersonalAccessToken = personalAccessToken;
 
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
@@ -52,14 +48,12 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         {
             Guard.Against.Null(Configuration, nameof(Configuration));
 
-            var newConfiguration = Configuration;
-
             // remove workspaces that are not in the new list
-            var workspacesToRemove = newConfiguration.Workspaces.Where(w => !workspaces.Any(nw => nw.Id == w.Id)).ToList();
+            var workspacesToRemove = Configuration.Workspaces.Where(w => !workspaces.Any(nw => nw.ExternalId == w.ExternalId)).ToList();
             foreach (var workspace in workspacesToRemove)
             {
                 // TODO - what if the workspace had been configured to sync and has data?
-                var result = newConfiguration.RemoveWorkspace(workspace);
+                var result = Configuration.RemoveWorkspace(workspace);
                 if (result.IsFailure)
                     return result;
             }
@@ -67,7 +61,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
             // update existing or add new workspaces
             foreach (var workspace in workspaces)
             {
-                var existingWorkspace = newConfiguration.Workspaces.FirstOrDefault(w => w.Id == workspace.Id);
+                var existingWorkspace = Configuration.Workspaces.FirstOrDefault(w => w.ExternalId == workspace.ExternalId);
                 if (existingWorkspace is not null)
                 {
                     var result = existingWorkspace.Update(
@@ -81,8 +75,8 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 }
                 else
                 {
-                    var result = newConfiguration.AddWorkspace(AzureDevOpsBoardsWorkspace.Create(
-                        workspace.Id,
+                    var result = Configuration.AddWorkspace(AzureDevOpsBoardsWorkspace.Create(
+                        workspace.ExternalId,
                         workspace.Name, 
                         workspace.Description,
                         timestamp));
@@ -91,8 +85,6 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                         return result;
                 }
             }
-
-            Configuration = newConfiguration;
 
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 

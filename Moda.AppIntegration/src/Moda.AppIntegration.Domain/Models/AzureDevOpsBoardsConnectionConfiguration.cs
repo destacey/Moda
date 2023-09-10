@@ -40,7 +40,7 @@ public sealed class AzureDevOpsBoardsConnectionConfiguration
         {
             Guard.Against.Null(workspace, nameof(workspace));
 
-            if (Workspaces.Any(w => w.Id == workspace.Id))
+            if (Workspaces.Any(w => w.ExternalId == workspace.ExternalId))
                 return Result.Failure("Unable to add a duplicate workspace.");
 
             Workspaces.Add(workspace);
@@ -59,7 +59,7 @@ public sealed class AzureDevOpsBoardsConnectionConfiguration
         {
             Guard.Against.Null(workspace, nameof(workspace));
 
-            if (!Workspaces.Any(w => w.Id == workspace.Id))
+            if (!Workspaces.Any(w => w.ExternalId == workspace.ExternalId))
                 return Result.Failure("Unable to remove a workspace that does not exist.");
 
             Workspaces.Remove(workspace);

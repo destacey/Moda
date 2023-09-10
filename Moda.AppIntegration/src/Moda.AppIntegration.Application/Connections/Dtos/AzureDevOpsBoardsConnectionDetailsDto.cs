@@ -1,7 +1,7 @@
 ﻿using Mapster;
 
 namespace Moda.AppIntegration.Application.Connections.Dtos;
-public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<Connection>
+public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<Connection<AzureDevOpsBoardsConnectionConfiguration>>
 {
     /// <summary>Gets the identifier.</summary>
     /// <value>The identifier.</value>
@@ -39,7 +39,7 @@ public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<Connection
 
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<Connection, AzureDevOpsBoardsConnectionDetailsDto>()
+        config.NewConfig<Connection<AzureDevOpsBoardsConnectionConfiguration>, AzureDevOpsBoardsConnectionDetailsDto>()
             .Map(dest => dest.Connector, src => src.Connector.GetDisplayName());
     }
 }
