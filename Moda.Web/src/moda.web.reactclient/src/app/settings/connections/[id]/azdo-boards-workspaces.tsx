@@ -42,7 +42,6 @@ const AzdoBoardsWorkspaces = ({
           renderItem={(item) => (
             <List.Item>
               <Card
-                type=""
                 title={
                   <>
                     {item.name}{' '}
