@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Moda.Common.Extensions;
+﻿using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
 public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
@@ -26,8 +25,6 @@ public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
     /// <summary>Gets the type of connector.  This value cannot change.</summary>
     /// <value>The type of connector.</value>
     public Connector Connector { get; protected set; }
-
-    public string? ConfigurationString { get; protected set; }
 
     /// <summary>
     /// Indicates whether the connection is active or not.  Inactive connection are not included in the synchronization process.
@@ -80,9 +77,7 @@ public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
 
 public abstract class Connection<T> : Connection
 {
-    public T? Configuration
-    {
-        get => ConfigurationString is null ? default : JsonSerializer.Deserialize<T>(ConfigurationString);
-        protected set => ConfigurationString = JsonSerializer.Serialize(value);
-    }
+    /// <summary>Gets the configuration.</summary>
+    /// <value>The configuration.</value>
+    public abstract T Configuration { get; protected set; }
 }

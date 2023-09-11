@@ -20,14 +20,13 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
         builder.HasIndex(c => c.IsActive);
         builder.HasIndex(c => c.IsDeleted);
 
-        builder.Property(c => c.Name).IsRequired().HasMaxLength(256);
+        builder.Property(c => c.Name).IsRequired().HasMaxLength(128);
         builder.Property(c => c.Description).HasMaxLength(1024);
         builder.Property(c => c.Connector)
             .HasConversion(
                 c => c.ToString(),
                 c => (Connector)Enum.Parse(typeof(Connector), c))
             .HasMaxLength(128);
-        builder.Property(c => c.ConfigurationString);
         builder.Property(c => c.IsActive);
         builder.Property(c => c.IsValidConfiguration);
 
@@ -48,7 +47,10 @@ public class AzureDevOpsBoardsConnectionConfig : IEntityTypeConfiguration<AzureD
 {
     public void Configure(EntityTypeBuilder<AzureDevOpsBoardsConnection> builder)
     {
-        // Ignore
-        builder.Ignore(c => c.Configuration);
+        builder.OwnsOne(c => c.Configuration, ownedBuilder =>
+        {
+            ownedBuilder.ToJson();
+            ownedBuilder.OwnsMany(conf => conf.Workspaces);
+        });
     }
 }

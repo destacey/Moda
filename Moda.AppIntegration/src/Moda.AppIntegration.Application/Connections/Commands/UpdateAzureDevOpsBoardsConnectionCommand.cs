@@ -48,7 +48,7 @@ public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
 
         RuleFor(c => c.Name)
             .NotEmpty()
-            .MaximumLength(256);
+            .MaximumLength(128);
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);
@@ -56,25 +56,18 @@ public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
         RuleFor(c => c.Organization)
             .NotEmpty()
             .MaximumLength(128)
-            .MustAsync(async (cmd, organization, cancellationToken) => await BeUniqueOrganization(cmd.Id, organization, cancellationToken)).WithMessage("The organization for this connection already exists.");
+            .MustAsync(async (cmd, organization, cancellationToken) => await BeUniqueOrganization(cmd.Id, organization, cancellationToken)).WithMessage("The organization for this connection already exists in an existing connection.");
 
         RuleFor(c => c.PersonalAccessToken)
             .NotEmpty()
             .MaximumLength(128);
     }
 
-    public async Task<bool> BeUniqueOrganization(Guid id, string? organization, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(organization))
-            return true;
-
-        var connections = await _appIntegrationDbContext.AzureDevOpsBoardsConnections
-            .Where(c => c.Id != id && !string.IsNullOrWhiteSpace(c.ConfigurationString))
-            .ToListAsync(cancellationToken);
-
-        return connections
-            .Where(c => c.Configuration is not null && !string.IsNullOrWhiteSpace(c.Configuration.Organization))
-            .All(c => c.Configuration!.Organization != organization);
+    public async Task<bool> BeUniqueOrganization(Guid id, string organization, CancellationToken cancellationToken)
+    {        
+        return await _appIntegrationDbContext.AzureDevOpsBoardsConnections
+            .Where(c => c.Id != id)
+            .AllAsync(c => c.Configuration!.Organization != organization, cancellationToken);
     }
 }
 
@@ -98,19 +91,20 @@ internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommand
         try
         {
             var connection = await _appIntegrationDbContext.AzureDevOpsBoardsConnections
-                .FirstAsync(c => c.Id == request.Id, cancellationToken);
+                .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
             if (connection is null)
                 return Result.Failure<Guid>("Azure DevOps Boards connection not found.");
 
             // do the first four characters of the PersonalAccessToken match the existing one?
-            var pat = connection.Configuration?.PersonalAccessToken?[..4] == request.PersonalAccessToken[..4]
-                ? connection.Configuration.PersonalAccessToken
-                : request.PersonalAccessToken;
+            var pat = connection.Configuration!.PersonalAccessToken.Length == request.PersonalAccessToken.Length 
+                && connection.Configuration!.PersonalAccessToken?[..4] == request.PersonalAccessToken[..4]
+                    ? connection.Configuration.PersonalAccessToken
+                    : request.PersonalAccessToken;
 
-            var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, pat);
-            var testConnectionResult = await _azureDevOpsService.TestConnection(config.OrganizationUrl, config.PersonalAccessToken);
+            var testConfig = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, pat);
+            var testConnectionResult = await _azureDevOpsService.TestConnection(testConfig.OrganizationUrl, testConfig.PersonalAccessToken);
 
-            var updateResult = connection.Update(request.Name, request.Description, config, testConnectionResult.IsSuccess, _dateTimeService.Now);
+            var updateResult = connection.Update(request.Name, request.Description, request.Organization, pat, testConnectionResult.IsSuccess, _dateTimeService.Now);
             if (updateResult.IsFailure)
             {
                 // Reset the entity

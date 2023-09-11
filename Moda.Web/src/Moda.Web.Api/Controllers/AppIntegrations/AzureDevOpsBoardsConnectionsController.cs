@@ -1,4 +1,5 @@
-﻿using Moda.AppIntegration.Domain.Models;
+﻿using Moda.AppIntegration.Application.Interfaces;
+using Moda.AppIntegration.Domain.Models;
 using Moda.Common.Application.Interfaces;
 using Moda.Web.Api.Models.AppIntegrations.Connections;
 
@@ -78,9 +79,8 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
             : BadRequest(result.Error);
     }
 
-
     [HttpPost("test")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
     [OpenApiOperation("Test Azure DevOps Boards connection configuration.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
@@ -112,5 +112,19 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpPost("{id}/import-workspaces")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
+    [OpenApiOperation("Import Azure DevOps Boards projects as Moda workspaces.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> ImportWorkspaces(Guid id, CancellationToken cancellationToken, [FromServices] IAzureDevOpsBoardsImportService azureDevOpsBoardsImportService)
+    {
+        var result = await azureDevOpsBoardsImportService.ImportWorkspaces(id, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok()
+            : BadRequest(result.Error);
     }
 }

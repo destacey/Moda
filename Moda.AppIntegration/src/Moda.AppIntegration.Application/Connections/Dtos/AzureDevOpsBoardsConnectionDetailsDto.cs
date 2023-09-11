@@ -1,7 +1,7 @@
 ﻿using Mapster;
 
 namespace Moda.AppIntegration.Application.Connections.Dtos;
-public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<Connection>
+public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<AzureDevOpsBoardsConnection>
 {
     /// <summary>Gets the identifier.</summary>
     /// <value>The identifier.</value>
@@ -21,7 +21,7 @@ public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<Connection
 
     /// <summary>Gets the configuration.</summary>
     /// <value>The configuration.</value>
-    public AzureDevOpsBoardsConnectionConfigurationDto? Configuration { get; set; }
+    public required AzureDevOpsBoardsConnectionConfigurationDto Configuration { get; set; }
 
     /// <summary>
     /// Indicates whether the connection is active or not.  Inactive connections are not included in the synchronization process.
@@ -39,7 +39,7 @@ public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<Connection
 
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<Connection, AzureDevOpsBoardsConnectionDetailsDto>()
+        config.NewConfig<AzureDevOpsBoardsConnection, AzureDevOpsBoardsConnectionDetailsDto>()
             .Map(dest => dest.Connector, src => src.Connector.GetDisplayName());
     }
 }

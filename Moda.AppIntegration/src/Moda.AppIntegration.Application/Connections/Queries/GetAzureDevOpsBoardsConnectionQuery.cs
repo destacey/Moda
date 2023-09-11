@@ -18,8 +18,12 @@ internal sealed class GetAzureDevOpsBoardsConnectionQueryHandler : IQueryHandler
 
     public async Task<AzureDevOpsBoardsConnectionDetailsDto?> Handle(GetAzureDevOpsBoardsConnectionQuery request, CancellationToken cancellationToken)
     {
-        return await _appIntegrationDbContext.AzureDevOpsBoardsConnections
-            .ProjectToType<AzureDevOpsBoardsConnectionDetailsDto>()
+        var connection = await _appIntegrationDbContext.AzureDevOpsBoardsConnections
+            .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == request.ConnectionId, cancellationToken);
+
+        return connection?.Adapt<AzureDevOpsBoardsConnectionDetailsDto>();
+
+        // TODO: using ProjectTo is not working with the JSON Column - .ProjectToType<AzureDevOpsBoardsConnectionDetailsDto>()
     }
 }

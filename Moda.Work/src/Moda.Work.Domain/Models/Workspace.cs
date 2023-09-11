@@ -47,12 +47,6 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     /// </summary>
     public Ownership Ownership { get; }
 
-    ///// <summary>
-    ///// The foreign key for the organization that ownes the workspace.  This value should not change.
-    ///// TODO should this be able to change over time?  Add functionality to transfer organizational ownership.
-    ///// </summary>
-    //public Guid OrganizationId { get; }
-
     /// <summary>
     /// The foreign key for the work process.
     /// </summary>
