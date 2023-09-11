@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
+    <ProjectReference Include="..\..\..\Moda.Services\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
   </ItemGroup>
 
 </Project>
