@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Common.Domain", "Moda.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Common.Application", "Moda.Common\src\Moda.Common.Application\Moda.Common.Application.csproj", "{E1026201-E783-4BA9-B1F7-DB4A247ACA80}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Work.Domain", "Moda.Work\src\Moda.Work.Domain\Moda.Work.Domain.csproj", "{B1E169E8-9ACA-45B2-B955-43FF12D1465F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Work.Domain", "Moda.Services\Moda.Work\src\Moda.Work.Domain\Moda.Work.Domain.csproj", "{B1E169E8-9ACA-45B2-B955-43FF12D1465F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Infrastructure", "Moda.Infrastructure\src\Moda.Infrastructure\Moda.Infrastructure.csproj", "{63A0C9A3-F296-4A82-B47C-2AB27A351747}"
 EndProject
@@ -51,15 +51,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Web.Api", "Moda.Web\sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Services", "Moda.Services", "{A6D1C8F1-0406-4A6E-832E-EE23D40202F9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Organization", "Moda.Organization", "{D4DE971F-FA6B-4B0F-B4CF-4A3072A7A749}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Organization", "Moda.Services\Moda.Organization", "{D4DE971F-FA6B-4B0F-B4CF-4A3072A7A749}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{86D48B56-16A1-407E-A7A4-B04B8B38F215}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F83D8FD2-2D7D-422D-B20C-821B701DFBE7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Organization.Domain", "Moda.Organization\src\Moda.Organization.Domain\Moda.Organization.Domain.csproj", "{A479EC5B-EA3A-4A89-98AD-077998E3C728}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Organization.Domain", "Moda.Services\Moda.Organization\src\Moda.Organization.Domain\Moda.Organization.Domain.csproj", "{A479EC5B-EA3A-4A89-98AD-077998E3C728}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Organization.Application", "Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj", "{4D6C1603-B600-4931-8CFE-592B46B9203C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Organization.Application", "Moda.Services\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj", "{4D6C1603-B600-4931-8CFE-592B46B9203C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Integrations", "Moda.Integrations", "{409DFB83-5547-4E01-8AC9-BFE3793FDA19}"
 EndProject
@@ -69,41 +69,41 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{76EDC9D4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Integrations.AzureDevOps", "Moda.Integrations\src\Moda.Integrations.AzureDevOps\Moda.Integrations.AzureDevOps.csproj", "{597DBAFF-559D-4161-BA12-23926DF7367C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.AppIntegration", "Moda.AppIntegration", "{91FB4522-9A0A-4AA8-9F07-C70EB446E8C7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.AppIntegration", "Moda.Services\Moda.AppIntegration", "{91FB4522-9A0A-4AA8-9F07-C70EB446E8C7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B9A56ED1-5AB2-43CD-AE6E-8845F7C56496}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AF4E9F52-9637-4300-AA04-DFB05160085F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.AppIntegration.Domain", "Moda.AppIntegration\src\Moda.AppIntegration.Domain\Moda.AppIntegration.Domain.csproj", "{022242B9-8F52-4263-88E3-85DC0B42C71E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.AppIntegration.Domain", "Moda.Services\Moda.AppIntegration\src\Moda.AppIntegration.Domain\Moda.AppIntegration.Domain.csproj", "{022242B9-8F52-4263-88E3-85DC0B42C71E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.AppIntegration.Application", "Moda.AppIntegration\src\Moda.AppIntegration.Application\Moda.AppIntegration.Application.csproj", "{BC7412DD-9884-42D4-844C-4C891AA1B3E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.AppIntegration.Application", "Moda.Services\Moda.AppIntegration\src\Moda.AppIntegration.Application\Moda.AppIntegration.Application.csproj", "{BC7412DD-9884-42D4-844C-4C891AA1B3E3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Work.Application", "Moda.Work\src\Moda.Work.Application\Moda.Work.Application.csproj", "{15095DC2-7C29-45BE-BF7E-1BEA769FEDC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Work.Application", "Moda.Services\Moda.Work\src\Moda.Work.Application\Moda.Work.Application.csproj", "{15095DC2-7C29-45BE-BF7E-1BEA769FEDC2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Integrations.MicrosoftGraph", "Moda.Integrations\src\Moda.Integrations.MicrosoftGraph\Moda.Integrations.MicrosoftGraph.csproj", "{65BBD71B-9734-4F10-BE7A-168E9FAEFF75}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Organization.Domain.Tests", "Moda.Organization\tests\Moda.Organization.Domain.Tests\Moda.Organization.Domain.Tests.csproj", "{BADF979B-908E-47C3-8EF8-8665B43B11E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Organization.Domain.Tests", "Moda.Services\Moda.Organization\tests\Moda.Organization.Domain.Tests\Moda.Organization.Domain.Tests.csproj", "{BADF979B-908E-47C3-8EF8-8665B43B11E6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Planning", "Moda.Planning", "{1EC5C435-E679-46B1-8F49-2CA02992F5D2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Planning", "Moda.Services\Moda.Planning", "{1EC5C435-E679-46B1-8F49-2CA02992F5D2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AEA8F168-063D-4CD7-9A20-0A761926A76A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C7667C91-8900-4EA2-AE93-D0E8A044414C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Planning.Domain", "Moda.Planning\src\Moda.Planning.Domain\Moda.Planning.Domain.csproj", "{BD83D8B0-82F6-4350-B83A-300F3FD3F141}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Planning.Domain", "Moda.Services\Moda.Planning\src\Moda.Planning.Domain\Moda.Planning.Domain.csproj", "{BD83D8B0-82F6-4350-B83A-300F3FD3F141}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Planning.Application", "Moda.Planning\src\Moda.Planning.Application\Moda.Planning.Application.csproj", "{D2FA2C83-348F-48F5-8032-CF13B543EC65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Planning.Application", "Moda.Services\Moda.Planning\src\Moda.Planning.Application\Moda.Planning.Application.csproj", "{D2FA2C83-348F-48F5-8032-CF13B543EC65}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Goals", "Moda.Goals", "{A4C0AF56-A24A-44B6-8DDA-60C3B24F2E1A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Goals", "Moda.Services\Moda.Goals", "{A4C0AF56-A24A-44B6-8DDA-60C3B24F2E1A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2483A2F4-1542-40C2-83CE-EC51D46F1AEB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{26A25A3E-1E9F-4687-A611-457F6F3C8F85}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Goals.Domain", "Moda.Goals\src\Moda.Goals.Domain\Moda.Goals.Domain.csproj", "{02E4BD84-FF5E-4A4A-B9F4-736C44B5D5D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Goals.Domain", "Moda.Services\Moda.Goals\src\Moda.Goals.Domain\Moda.Goals.Domain.csproj", "{02E4BD84-FF5E-4A4A-B9F4-736C44B5D5D1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Goals.Application", "Moda.Goals\src\Moda.Goals.Application\Moda.Goals.Application.csproj", "{F270ADA4-BFF3-43B4-BE64-BF7D80410B4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Goals.Application", "Moda.Services\Moda.Goals\src\Moda.Goals.Application\Moda.Goals.Application.csproj", "{F270ADA4-BFF3-43B4-BE64-BF7D80410B4E}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "moda.web.reactclient", "Moda.Web\src\moda.web.reactclient\moda.web.reactclient.esproj", "{D566A94B-2FAB-4B43-8889-1844C2E0BC86}"
 EndProject
