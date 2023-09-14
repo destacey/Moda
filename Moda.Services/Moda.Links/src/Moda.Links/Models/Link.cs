@@ -29,7 +29,6 @@ public sealed class Link : BaseEntity<Guid>
         private set => _url = Guard.Against.NullOrWhiteSpace(value, nameof(Url)).Trim();
     }
 
-    // update
     public Result Update(string name, string url)
     {
         Name = name;
