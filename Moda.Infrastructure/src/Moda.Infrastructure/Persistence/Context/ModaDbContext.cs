@@ -3,13 +3,15 @@ using Microsoft.Extensions.Options;
 using Moda.Common.Domain.Employees;
 using Moda.Goals.Application.Persistence;
 using Moda.Goals.Domain.Models;
+using Moda.Links;
+using Moda.Links.Models;
 using Moda.Planning.Application.Persistence;
 using Moda.Planning.Domain.Models;
 using Moda.Work.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Context;
 
-public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, IOrganizationDbContext, IPlanningDbContext, IWorkDbContext
+public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IWorkDbContext
 {
     public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeService dateTimeService, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
         : base(options, currentUser, dateTimeService, serializer, dbSettings, events)
@@ -34,6 +36,12 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<Objective> Objectives => Set<Objective>();
 
     #endregion IGoals
+
+    #region ILinks
+
+    public DbSet<Link> Links => Set<Link>();
+
+    #endregion ILinks
 
     #region IOrganization
 
