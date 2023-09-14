@@ -45,6 +45,8 @@ public static class ApplicationResource
     public const string WorkStateCategories = nameof(WorkStateCategories);
     public const string WorkStates = nameof(WorkStates);
     public const string WorkTypes = nameof(WorkTypes);
+
+    public const string Links = nameof(Links);
 }
 
 public static class ApplicationPermissions
@@ -90,6 +92,14 @@ public static class ApplicationPermissions
         new("Delete Connections", ApplicationAction.Delete, ApplicationResource.Connections),
 
         new("View Connectors", ApplicationAction.View, ApplicationResource.Connectors),
+    }; 
+    
+    private static readonly ApplicationPermission[] _links = new ApplicationPermission[]
+    {
+        new("View Links", ApplicationAction.View, ApplicationResource.Links, IsBasic: true),
+        new("Create Links", ApplicationAction.Create, ApplicationResource.Links, IsBasic: true),
+        new("Update Links", ApplicationAction.Update, ApplicationResource.Links, IsBasic: true),
+        new("Delete Links", ApplicationAction.Delete, ApplicationResource.Links, IsBasic: true),
     };
 
     private static readonly ApplicationPermission[] _organization = new ApplicationPermission[]
@@ -159,6 +169,7 @@ public static class ApplicationPermissions
         .Union(_backgroundJobs)
         .Union(_identity)
         .Union(_appIntegration)
+        .Union(_links)
         .Union(_organization)
         .Union(_planning)
         .Union(_work)
