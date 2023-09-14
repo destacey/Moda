@@ -6071,7 +6071,7 @@ export class LinksClient {
     /**
      * Update a link.
      */
-    update(id: string, request: UpdateLinkRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+    update(id: string, request: UpdateLinkRequest, cancelToken?: CancelToken | undefined): Promise<LinkDto> {
         let url_ = this.baseUrl + "/api/links/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -6086,6 +6086,7 @@ export class LinksClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -6101,7 +6102,7 @@ export class LinksClient {
         });
     }
 
-    protected processUpdate(response: AxiosResponse): Promise<void> {
+    protected processUpdate(response: AxiosResponse): Promise<LinkDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -6111,9 +6112,12 @@ export class LinksClient {
                 }
             }
         }
-        if (status === 204) {
+        if (status === 200) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<LinkDto>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -6133,7 +6137,7 @@ export class LinksClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<void>(null as any);
+        return Promise.resolve<LinkDto>(null as any);
     }
 
     /**

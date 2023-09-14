@@ -1,4 +1,5 @@
-﻿using Moda.Links.Commands;
+﻿using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Moda.Links.Commands;
 using Moda.Links.Models;
 using Moda.Links.Queries;
 using Moda.Web.Api.Models.Links;
@@ -61,10 +62,10 @@ public class LinksController : ControllerBase
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Links)]
     [OpenApiOperation("Update a link.", "")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> Update(Guid id, [FromBody] UpdateLinkRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<LinkDto>> Update(Guid id, [FromBody] UpdateLinkRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
             return BadRequest();
@@ -72,7 +73,7 @@ public class LinksController : ControllerBase
         var result = await _sender.Send(request.ToUpdateLinkCommand(), cancellationToken);
 
         return result.IsSuccess
-            ? NoContent()
+            ? Ok(result.Value)
             : BadRequest(result.Error);
     }
 

@@ -1,12 +1,14 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Interfaces;
 using Moda.Common.Application.Validation;
+using Moda.Links.Models;
 
 namespace Moda.Links.Commands;
-public sealed record UpdateLinkCommand(Guid LinkId, string Name, string Url): ICommand;
+public sealed record UpdateLinkCommand(Guid LinkId, string Name, string Url): ICommand<LinkDto>;
 
 public sealed class UpdateLinkCommandValidator : CustomValidator<UpdateLinkCommand>
 {
@@ -27,7 +29,7 @@ public sealed class UpdateLinkCommandValidator : CustomValidator<UpdateLinkComma
     }
 }
 
-internal sealed class UpdateLinkCommandHandler : ICommandHandler<UpdateLinkCommand>
+internal sealed class UpdateLinkCommandHandler : ICommandHandler<UpdateLinkCommand, LinkDto>
 {
     private readonly ILinksDbContext _linksDbContext;
     private readonly ILogger<UpdateLinkCommandHandler> _logger;
@@ -38,7 +40,7 @@ internal sealed class UpdateLinkCommandHandler : ICommandHandler<UpdateLinkComma
         _logger = logger;
     }
 
-    public async Task<Result> Handle(UpdateLinkCommand request, CancellationToken cancellationToken)
+    public async Task<Result<LinkDto>> Handle(UpdateLinkCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -47,7 +49,7 @@ internal sealed class UpdateLinkCommandHandler : ICommandHandler<UpdateLinkComma
             if (link is null)
             {
                 _logger.LogError("Unable to edit link. Link with id {LinkId} not found.", request.LinkId);
-                return Result.Failure($"Link with id {request.LinkId} not found.");
+                return Result.Failure<LinkDto>($"Link with id {request.LinkId} not found.");
             }
 
             var updateResult = link.Update(request.Name, request.Url);
@@ -59,12 +61,12 @@ internal sealed class UpdateLinkCommandHandler : ICommandHandler<UpdateLinkComma
 
                 var requestName = request.GetType().Name;
                 _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
-                return Result.Failure(updateResult.Error);
+                return Result.Failure<LinkDto>(updateResult.Error);
             }
 
             await _linksDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success();
+            return Result.Success(link.Adapt<LinkDto>());
         }
         catch (Exception ex)
         {
@@ -72,7 +74,7 @@ internal sealed class UpdateLinkCommandHandler : ICommandHandler<UpdateLinkComma
 
             _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
 
-            return Result.Failure($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<LinkDto>($"Moda Request: Exception for Request {requestName} {request}");
         }
     }
 }
