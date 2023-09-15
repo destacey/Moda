@@ -147,9 +147,9 @@ const CreateConnectionForm = ({
         >
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
             <Input.TextArea
-              autoSize={{ minRows: 1, maxRows: 4 }}
+              autoSize={{ minRows: 1, maxRows: 2 }}
               showCount
-              maxLength={256}
+              maxLength={128}
             />
           </Form.Item>
           <Form.Item

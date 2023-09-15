@@ -56,6 +56,21 @@ export const useUpdateAzdoBoardsConnectionMutation = () => {
   })
 }
 
+export const useImportAzdoBoardsConnectionWorkspacesMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (connectionId: string) =>
+      (await getAzureDevOpsBoardsConnectionsClient()).importWorkspaces(
+        connectionId,
+      ),
+    onSuccess: (data, context) => {
+      // queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, false])
+      // queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, true])
+      // queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, context.id])
+    },
+  })
+}
+
 export const testAzdoBoardsConfiguration = async (
   configuration: TestAzureDevOpsBoardConnectionRequest,
 ) => {

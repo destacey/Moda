@@ -28,14 +28,16 @@ public class AzureDevOpsService : IAzureDevOpsService
         try
         {
             var connection = CreateVssConnection(organizationUrl, token);
-            var projectService = GetService<ProjectService>(connection);
+            await connection.ConnectAsync().ConfigureAwait(false);
 
-            return await projectService.GetProjects();
+            // there is weired behavior where this returns success if the organization in the url is 'test3' or 'test4' regardless of the token
+
+            return Result.Success();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error testing Azure DevOps connection.");
-            return Result.Failure(ex.Message);
+            return Result.Failure(ex.InnerException?.Message ?? ex.Message);
         }
     }
 

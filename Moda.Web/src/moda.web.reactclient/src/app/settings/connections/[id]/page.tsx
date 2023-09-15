@@ -3,25 +3,34 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import { useEffect, useState } from 'react'
 import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
-import { Button, Card } from 'antd'
+import { Button, Card, Divider, Space, Tabs, message } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
-import { useGetAzdoBoardsConnectionById } from '@/src/services/queries/app-integration-queries'
+import {
+  useGetAzdoBoardsConnectionById,
+  useImportAzdoBoardsConnectionWorkspacesMutation,
+} from '@/src/services/queries/app-integration-queries'
 import { notFound, usePathname } from 'next/navigation'
 import EditConnectionForm from '../components/edit-connection-form'
+import AzdoBoardsWorkspaces from './azdo-boards-workspaces'
+import { ExportOutlined } from '@ant-design/icons'
+import Link from 'next/link'
 import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 
 enum ConnectionTabs {
   Details = 'details',
+  WorkspaceConfiguration = 'workspace-configuration',
 }
 
 const ConnectionDetailsPage = ({ params }) => {
   useDocumentTitle('Connection Details')
   const [activeTab, setActiveTab] = useState(ConnectionTabs.Details)
+  const [isImportingWorkspaces, setIsImportingWorkspaces] = useState(false)
   const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
+  const [messageApi, contextHolder] = message.useMessage()
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
@@ -38,12 +47,26 @@ const ConnectionDetailsPage = ({ params }) => {
     isFetching,
     refetch,
   } = useGetAzdoBoardsConnectionById(params.id)
+  const azdoOrgUrl = connectionData?.configuration?.organizationUrl
+
+  const importWorkspacesMutation =
+    useImportAzdoBoardsConnectionWorkspacesMutation()
 
   const tabs = [
     {
       key: ConnectionTabs.Details,
       tab: 'Details',
       content: <AzdoBoardsConnectionDetails connection={connectionData} />,
+    },
+    {
+      key: ConnectionTabs.WorkspaceConfiguration,
+      tab: 'Workspace Configuration',
+      content: (
+        <AzdoBoardsWorkspaces
+          workspaces={connectionData?.configuration?.workspaces}
+          organizationUrl={connectionData?.configuration?.organizationUrl}
+        />
+      ),
     },
   ]
 
@@ -73,11 +96,36 @@ const ConnectionDetailsPage = ({ params }) => {
     }
   }
 
+  const importWorkspaces = async () => {
+    try {
+      await importWorkspacesMutation.mutateAsync(params.id)
+      messageApi.success('Successfully imported workspaces.')
+    } catch (error) {
+      console.error(error)
+      messageApi.error('Failed to import workspaces.')
+    }
+    setIsImportingWorkspaces(false)
+  }
+
   const Actions = () => {
     return (
       <>
         {canUpdateConnections && (
-          <Button onClick={() => setOpenEditConnectionForm(true)}>Edit</Button>
+          <Space>
+            <Button onClick={() => setOpenEditConnectionForm(true)}>
+              Edit
+            </Button>
+            <Button
+              disabled={!connectionData?.isValidConfiguration ?? true}
+              loading={isImportingWorkspaces}
+              onClick={() => {
+                setIsImportingWorkspaces(true)
+                importWorkspaces()
+              }}
+            >
+              Import Workspaces
+            </Button>
+          </Space>
         )}
       </>
     )
@@ -89,16 +137,29 @@ const ConnectionDetailsPage = ({ params }) => {
 
   return (
     <>
+      {contextHolder}
       <PageTitle
-        title={connectionData?.name}
+        title={
+          <>
+            {connectionData?.name}{' '}
+            {azdoOrgUrl && (
+              <Link
+                href={azdoOrgUrl}
+                target="_blank"
+                title="Open in Azure DevOps"
+              >
+                <ExportOutlined style={{ width: '12px' }} />
+              </Link>
+            )}
+          </>
+        }
         subtitle="Connection Details"
         actions={showActions && <Actions />}
       />
       <Card
-        style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key as ConnectionTabs)}
+        onTabChange={(key: ConnectionTabs) => setActiveTab(key)}
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>

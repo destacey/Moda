@@ -1,45 +1,57 @@
 # App Integration
+
 The app integratin domain enables the ability to define and manage integrations with external applications.
 
-# Models
-- [Connector](#connector)
-- [Connector Type](#connector-type)
+## Models
 
-## Connection
+- [Connection](#connection)
+- [Connector](#connector)
+
+### Connection
+
 A connection represents an integration with an external application via a Moda connector.  This includes information needed to establish a connection like authentication and endoint configuration data.
 
-## Connector
+### Connector
+
 A connector represents an API that allows an external service to integrate with Moda.  Current options:
-- Azure DevOps
+
+- Azure DevOps Boards
 
 Multiple connections for the same connector can be configured.  This is expected when an organization has multiple instances or requires different authentication to connect for different data.
 
+## ERD
 
-# ERD
 ```mermaid
 erDiagram
     Connector ||--o{ Connection : "has many"
 ```
 
+## Architecture
 
-# Architecture
 The following diagram shows the high-level architecture:
 
 ![architecture](./app-integration-architecture.drawio.svg)
 
-# Available Connectors
+## Available Connectors
+
 - [Azure DevOps Boards](#azure-devops-boards)
 
-## Azure DevOps Boards
-The Azure DevOps Boards connector enables Moda to connect and retrieve data for the areas below and sychronize the it.  This sychronization is one-way.
-- Projects
-- Areas
-- Iterations
-- Work Items
-- Work Item Types
+### Azure DevOps Boards
 
-### Configuration
+The Azure DevOps Boards connector enables Moda to connect and retrieve data for the areas below and sychronize the it.  This sychronization is one-way.
+
+| Azure DevOps Boards | Moda |
+|--|--|
+| Project | Workspace |
+| Work Item | Work Item |
+| Work Item Type | Work Type |
+| Area | establishes the link between a Work Item and a Team |
+| Iteration | establishes the link between a Work Item and a Sprint, Iteration, or Program Increment |
+
+#### Configuration
+
 The information required to configure the connector is:
+
 - Organization - this is the Azure DevOps Organization name.
 - PersonalAccessToken - this is the token that enables Moda to connect into an instance of Azure DevOps and read work item data.
   - The required access for the token within Azure DevOps is
