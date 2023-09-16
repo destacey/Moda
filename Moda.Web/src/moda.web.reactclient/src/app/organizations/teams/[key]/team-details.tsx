@@ -1,3 +1,4 @@
+import LinksCard from '@/src/app/components/common/links/links-card'
 import { TeamDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Row, Space } from 'antd'
 import Link from 'next/link'
@@ -38,6 +39,7 @@ const TeamDetails = ({ team }: TeamDetailsProps) => {
           </Descriptions>
         </Col>
       </Row>
+      <LinksCard objectId={team.id} />
     </>
   )
 }

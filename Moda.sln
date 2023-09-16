@@ -51,7 +51,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Web.Api", "Moda.Web\sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Services", "Moda.Services", "{A6D1C8F1-0406-4A6E-832E-EE23D40202F9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Organization", "Moda.Services\Moda.Organization", "{D4DE971F-FA6B-4B0F-B4CF-4A3072A7A749}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Organization", "Moda.Organization", "{D4DE971F-FA6B-4B0F-B4CF-4A3072A7A749}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{86D48B56-16A1-407E-A7A4-B04B8B38F215}"
 EndProject
@@ -69,7 +69,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{76EDC9D4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Integrations.AzureDevOps", "Moda.Integrations\src\Moda.Integrations.AzureDevOps\Moda.Integrations.AzureDevOps.csproj", "{597DBAFF-559D-4161-BA12-23926DF7367C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.AppIntegration", "Moda.Services\Moda.AppIntegration", "{91FB4522-9A0A-4AA8-9F07-C70EB446E8C7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.AppIntegration", "Moda.AppIntegration", "{91FB4522-9A0A-4AA8-9F07-C70EB446E8C7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B9A56ED1-5AB2-43CD-AE6E-8845F7C56496}"
 EndProject
@@ -85,7 +85,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Integrations.Microsoft
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Organization.Domain.Tests", "Moda.Services\Moda.Organization\tests\Moda.Organization.Domain.Tests\Moda.Organization.Domain.Tests.csproj", "{BADF979B-908E-47C3-8EF8-8665B43B11E6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Planning", "Moda.Services\Moda.Planning", "{1EC5C435-E679-46B1-8F49-2CA02992F5D2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Planning", "Moda.Planning", "{1EC5C435-E679-46B1-8F49-2CA02992F5D2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AEA8F168-063D-4CD7-9A20-0A761926A76A}"
 EndProject
@@ -95,7 +95,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Planning.Domain", "Mod
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Planning.Application", "Moda.Services\Moda.Planning\src\Moda.Planning.Application\Moda.Planning.Application.csproj", "{D2FA2C83-348F-48F5-8032-CF13B543EC65}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Goals", "Moda.Services\Moda.Goals", "{A4C0AF56-A24A-44B6-8DDA-60C3B24F2E1A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Goals", "Moda.Goals", "{A4C0AF56-A24A-44B6-8DDA-60C3B24F2E1A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2483A2F4-1542-40C2-83CE-EC51D46F1AEB}"
 EndProject
@@ -106,6 +106,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Goals.Application", "Moda.Services\Moda.Goals\src\Moda.Goals.Application\Moda.Goals.Application.csproj", "{F270ADA4-BFF3-43B4-BE64-BF7D80410B4E}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "moda.web.reactclient", "Moda.Web\src\moda.web.reactclient\moda.web.reactclient.esproj", "{D566A94B-2FAB-4B43-8889-1844C2E0BC86}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.Links", "Moda.Links", "{4BDE259E-2512-4526-BBB0-E1EF9AE32109}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8FF8FA40-F0B5-43BC-9DD7-E032E8339F4A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{445BE5CB-C3AB-4161-83AC-46E8DAF16FAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Links", "Moda.Services\Moda.Links\src\Moda.Links\Moda.Links.csproj", "{BCDDBE8E-C688-43F2-A737-C915F2EA2CF4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -199,6 +207,10 @@ Global
 		{D566A94B-2FAB-4B43-8889-1844C2E0BC86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D566A94B-2FAB-4B43-8889-1844C2E0BC86}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D566A94B-2FAB-4B43-8889-1844C2E0BC86}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{BCDDBE8E-C688-43F2-A737-C915F2EA2CF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCDDBE8E-C688-43F2-A737-C915F2EA2CF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCDDBE8E-C688-43F2-A737-C915F2EA2CF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCDDBE8E-C688-43F2-A737-C915F2EA2CF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -248,6 +260,10 @@ Global
 		{02E4BD84-FF5E-4A4A-B9F4-736C44B5D5D1} = {2483A2F4-1542-40C2-83CE-EC51D46F1AEB}
 		{F270ADA4-BFF3-43B4-BE64-BF7D80410B4E} = {2483A2F4-1542-40C2-83CE-EC51D46F1AEB}
 		{D566A94B-2FAB-4B43-8889-1844C2E0BC86} = {D7318832-400B-4E4B-9948-7E4E26E6CE7E}
+		{4BDE259E-2512-4526-BBB0-E1EF9AE32109} = {A6D1C8F1-0406-4A6E-832E-EE23D40202F9}
+		{8FF8FA40-F0B5-43BC-9DD7-E032E8339F4A} = {4BDE259E-2512-4526-BBB0-E1EF9AE32109}
+		{445BE5CB-C3AB-4161-83AC-46E8DAF16FAE} = {4BDE259E-2512-4526-BBB0-E1EF9AE32109}
+		{BCDDBE8E-C688-43F2-A737-C915F2EA2CF4} = {8FF8FA40-F0B5-43BC-9DD7-E032E8339F4A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A287E480-E0D5-4A33-9958-D4A8F7DC3F31}
