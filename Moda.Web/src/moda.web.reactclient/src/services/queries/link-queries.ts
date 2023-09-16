@@ -48,7 +48,7 @@ export const useUpdateLinkMutation = () => {
   )
 }
 
-interface DeleteLinkMutationRequest {
+export interface DeleteLinkMutationRequest {
   id: string
   objectId: string
 }

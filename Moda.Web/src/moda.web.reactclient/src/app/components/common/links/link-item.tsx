@@ -1,9 +1,13 @@
 import { LinkDto } from '@/src/services/moda-api'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
-import { Button, Space } from 'antd'
+import { Button, Popconfirm, Space, message } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
 import EditLinkForm from './edit-link-form'
+import {
+  DeleteLinkMutationRequest,
+  useDeleteLinkMutation,
+} from '@/src/services/queries/link-queries'
 
 export interface LinkItemProps {
   link: LinkDto
@@ -19,7 +23,43 @@ const LinkItem = ({
   canDeleteLinks,
 }: LinkItemProps) => {
   const [openEditLinkForm, setOpenEditLinkForm] = useState<boolean>(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false)
+  const [deleteConfirmLoading, setDeleteConfirmLoading] =
+    useState<boolean>(false)
+  const [messageApi, contextHolder] = message.useMessage()
+
+  const deleteLinkMutation = useDeleteLinkMutation()
+
   if (!link) return null
+
+  const deleteLink = async (request: DeleteLinkMutationRequest) => {
+    try {
+      await deleteLinkMutation.mutateAsync(request)
+      return true
+    } catch (error) {
+      messageApi.error('An unexpected error occurred while deleting the Link.')
+      console.log(error)
+      return false
+    }
+  }
+
+  const handleDeleteConfirm = async () => {
+    setDeleteConfirmLoading(true)
+    try {
+      if (await deleteLink({ id: link.id, objectId: link.objectId })) {
+        messageApi.success('Successfully deleted Link.')
+      }
+    } catch (errorInfo) {
+      messageApi.error('An unexpected error occurred while deleting the Link.')
+      console.log('handleOk error', errorInfo)
+    } finally {
+      setDeleteConfirmLoading(false)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirm(false)
+  }
 
   // without this, pages without http or https will open as a relative path
   const url = link.url.match(/^.{3,5}\:\/\//) ? link.url : `//${link.url}`
@@ -37,6 +77,7 @@ const LinkItem = ({
   } else {
     return (
       <>
+        {contextHolder}
         <Space
           style={{
             display: 'flex',
@@ -53,11 +94,22 @@ const LinkItem = ({
               />
             )}
             {canDeleteLinks && (
-              <Button
-                type="text"
-                icon={<DeleteOutlined style={{ width: '14px' }} />}
-                onClick={() => setOpenEditLinkForm(true)}
-              />
+              <Popconfirm
+                title="Delete the Link"
+                description="Are you sure you want to delete this Link?"
+                open={showDeleteConfirm}
+                onConfirm={handleDeleteConfirm}
+                okButtonProps={{ loading: deleteConfirmLoading }}
+                onCancel={handleDeleteCancel}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button
+                  type="text"
+                  icon={<DeleteOutlined style={{ width: '14px' }} />}
+                  onClick={() => setShowDeleteConfirm(true)}
+                />
+              </Popconfirm>
             )}
           </Space>
         </Space>
