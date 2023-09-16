@@ -1,3 +1,4 @@
+import LinksCard from '@/src/app/components/common/links/links-card'
 import { ProgramIncrementDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Row, Space, Typography } from 'antd'
 import dayjs from 'dayjs'
@@ -41,6 +42,7 @@ const ProgramIncrementDetails = ({
           </Descriptions>
         </Col>
       </Row>
+      <LinksCard objectId={programIncrement.id} />
     </>
   )
 }

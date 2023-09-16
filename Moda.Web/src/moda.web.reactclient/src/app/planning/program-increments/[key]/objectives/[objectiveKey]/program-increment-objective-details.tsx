@@ -1,3 +1,4 @@
+import LinksCard from '@/src/app/components/common/links/links-card'
 import { ProgramIncrementObjectiveDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Progress, Row, Space, Tooltip } from 'antd'
 import dayjs from 'dayjs'
@@ -68,6 +69,7 @@ const ProgramIncrementObjectiveDetails = ({
           </Descriptions>
         </Col>
       </Row>
+      <LinksCard objectId={objective.id} />
     </>
   )
 }

@@ -52,7 +52,12 @@ const LinksCard = ({ objectId }: LinksCardProps) => {
       return <ModaEmpty message="No links found" />
     } else {
       return (
-        <Space direction="vertical">
+        <Space
+          direction="vertical"
+          style={{
+            width: '100%',
+          }}
+        >
           {linksData
             .sort((a, b) => a.name.localeCompare(b.name))
             .map((item) => (

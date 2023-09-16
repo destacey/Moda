@@ -39,7 +39,6 @@ const LinkItem = ({
       <>
         <Space
           style={{
-            width: '100%',
             display: 'flex',
             justifyContent: 'space-between',
           }}
