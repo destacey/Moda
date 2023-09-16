@@ -90,7 +90,7 @@ const EditProgramIncrementForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          'An error occurred while editing the program increment.',
+          'An error occurred while updating the program increment.',
         )
         console.error(error)
       }

@@ -45,9 +45,9 @@ public class ProgramIncrementsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult<ProgramIncrementDetailsDto>> GetById(Guid id)
+    public async Task<ActionResult<ProgramIncrementDetailsDto>> GetById(Guid id, CancellationToken cancellationToken)
     {
-        var programIncrement = await _sender.Send(new GetProgramIncrementQuery(id));
+        var programIncrement = await _sender.Send(new GetProgramIncrementQuery(id), cancellationToken);
 
         return programIncrement is not null
             ? Ok(programIncrement)

@@ -1,3 +1,4 @@
+import LinksCard from '@/src/app/components/common/links/links-card'
 import { RiskDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Row, Space } from 'antd'
 import dayjs from 'dayjs'
@@ -67,6 +68,7 @@ const RiskDetails = ({ risk }: RiskDetailsProps) => {
           {risk.reportedOn && dayjs(risk.reportedOn).format('M/D/YYYY')}
         </Item>
       </Descriptions>
+      <LinksCard objectId={risk.id} />
     </>
   )
 }
