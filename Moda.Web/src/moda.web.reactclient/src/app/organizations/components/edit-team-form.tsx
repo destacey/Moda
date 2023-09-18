@@ -8,7 +8,7 @@ import {
 } from '@/src/services/moda-api'
 import { EditTeamFormValues } from '../types'
 import withModalForm, { FormProps } from '../../components/hoc/withModalForm'
-import { refreshActiveTeam, retrieveTeams, setEditTeamOpen, updateTeam, selectEditTeam } from '../teams-slice'
+import { retrieveTeams, setEditMode, updateTeam, selectEditTeamContext } from '../team-slice'
 import { AppDispatch } from '@/src/store'
 import { useAppSelector } from '../../hooks'
 
@@ -98,17 +98,16 @@ const EditTeamForm = ({form, team}: EditTeamFormProps) => {
 const ModalEditTeamForm = withModalForm(EditTeamForm, {
   title: 'Edit Team',
   okText: 'Save',
-  useFormState: () => useAppSelector(selectEditTeam),
+  useFormState: () => useAppSelector(selectEditTeamContext),
   onOk: async (values: EditTeamFormValues, dispatch: AppDispatch) => {
     // TODO: With RTK Query, we could have create team mutation automatically refetch teams
     const result = await dispatch(updateTeam(values))
     if(result.meta.requestStatus === 'fulfilled') {
       dispatch(retrieveTeams())
-      dispatch(refreshActiveTeam())
     }
   },
   onCancel: (dispatch: AppDispatch) => {
-    dispatch(setEditTeamOpen(false))
+    dispatch(setEditMode(false))
   }
 })
 

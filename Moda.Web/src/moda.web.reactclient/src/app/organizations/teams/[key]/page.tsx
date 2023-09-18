@@ -15,7 +15,7 @@ import useAuth from '@/src/app/components/contexts/auth'
 import { useGetTeamRisks } from '@/src/services/queries/organization-queries'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
-import { resetActiveTeam, retrieveTeam, setEditTeamOpen, selectTeamDetail } from '../../teams-slice'
+import { retrieveTeam, setEditMode, selectEditTeamContext } from '../../team-slice'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 
@@ -36,7 +36,7 @@ const TeamDetailsPage = ({ params }) => {
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
   const showActions = canUpdateTeam
 
-  const { team, error, isEditOpen, teamNotFound } = useAppSelector(selectTeamDetail)
+  const { item:team, error, isInEditMode, notFound:teamNotFound } = useAppSelector(selectEditTeamContext)
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
@@ -59,7 +59,7 @@ const TeamDetailsPage = ({ params }) => {
     return (
       <>
         {canUpdateTeam && (
-          <Button onClick={() => dispatch(setEditTeamOpen(true))}>Edit Team</Button>
+          <Button onClick={() => dispatch(setEditMode(true))}>Edit Team</Button>
         )}
       </>
     )
@@ -94,7 +94,6 @@ const TeamDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
-    dispatch(resetActiveTeam)
     dispatch(retrieveTeam({key, type: 'Team'}))
   }, [key, dispatch])
 
@@ -138,7 +137,7 @@ const TeamDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {isEditOpen && team && canUpdateTeam && (
+      {isInEditMode && team && canUpdateTeam && (
         <EditTeamForm team={team} />
       )}
     </>

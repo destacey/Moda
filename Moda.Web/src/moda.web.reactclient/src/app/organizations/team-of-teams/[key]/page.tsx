@@ -15,7 +15,7 @@ import useAuth from '@/src/app/components/contexts/auth'
 import { useGetTeamOfTeamsRisks } from '@/src/services/queries/organization-queries'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
-import { resetActiveTeam, retrieveTeam, setEditTeamOpen, selectTeamDetail } from '../../teams-slice'
+import { refreshActiveTeam, retrieveTeam, setEditMode, selectTeamContext } from '../../team-slice'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 
@@ -31,13 +31,12 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   const { key } = params
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
-  const [notTeamFound, setTeamNotFound] = useState<boolean>(false)
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
   const showActions = canUpdateTeam
 
-  const {team, error, isEditOpen} = useAppSelector(selectTeamDetail)
+  const {item:team, isInEditMode, notFound: teamNotFound, error} = useAppSelector(selectTeamContext)
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
@@ -60,7 +59,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     return (
       <>
         {canUpdateTeam && (
-          <Button onClick={() => dispatch(setEditTeamOpen(true))}>Edit Team</Button>
+          <Button onClick={() => dispatch(setEditMode(true))}>Edit Team</Button>
         )}
       </>
     )
@@ -94,13 +93,16 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
-    dispatch(resetActiveTeam)
     dispatch(retrieveTeam({key, type: 'Team of Teams'}))
   }, [key, dispatch])
 
   useEffect(() => {
     team && dispatch(setBreadcrumbTitle({title: team.name, pathname}))
   }, [team, dispatch, pathname])
+
+  useEffect(() => {
+    error && console.error(error)
+  }, [error])
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
@@ -115,7 +117,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     [risksQueryEnabled],
   )
 
-  if (notTeamFound) {
+  if (teamNotFound) {
     return notFound()
   }
 
@@ -134,7 +136,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {isEditOpen && team && canUpdateTeam && (
+      {isInEditMode && team && canUpdateTeam && (
         <EditTeamForm team={team} />
       )}
     </>

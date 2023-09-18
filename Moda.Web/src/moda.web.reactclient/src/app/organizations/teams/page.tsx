@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import ModaGrid from '../../components/common/moda-grid'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { Button, Space, Switch } from 'antd'
@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { useDocumentTitle } from '../../hooks/use-document-title'
 import useAuth from '../../components/contexts/auth'
 import { useAppSelector, useAppDispatch } from '../../hooks'
-import { retrieveTeams, setIncludeDisabled, setCreateTeamOpen, selectAllTeams } from '../teams-slice'
+import { retrieveTeams, setIncludeInactive, setEditMode, selectTeamsContext, selectTeamIsInEditMode } from '../team-slice'
 import { ModalCreateTeamForm } from '../components/create-team-form'
 
 const TeamLinkCellRenderer = ({ value, data }) => {
@@ -29,10 +29,9 @@ const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {
 
 const TeamListPage = () => {
   useDocumentTitle('Teams')
-  const teams = useAppSelector(selectAllTeams)
-  const teamsLoadingstatus = useAppSelector((state) => state.teams.isLoading)
-  const includeDisabled = useAppSelector((state) => state.teams.includeInactiveTeams)
-  const createTeamOpen = useAppSelector((state) => state.teams.createTeam.isOpen)
+  const {data:teams, isLoading, error} = useAppSelector(selectTeamsContext)
+  const isInEditMode = useAppSelector(selectTeamIsInEditMode)
+  const includeDisabled = useAppSelector((state) => state.team.includeInactive)
 
   const dispatch = useAppDispatch()
 
@@ -61,7 +60,7 @@ const TeamListPage = () => {
     return (
       <>
         {canCreateTeam && (
-          <Button onClick={() => dispatch(setCreateTeamOpen(true))}>
+          <Button onClick={() => dispatch(setEditMode(true))}>
             Create Team
           </Button>
         )}
@@ -69,8 +68,12 @@ const TeamListPage = () => {
     )
   }
 
+  useEffect(() => {
+    error && console.error(error)
+  }, [error])
+  
   const onIncludeDisabledChange = (checked: boolean) => {
-    dispatch(setIncludeDisabled(checked))
+    dispatch(setIncludeInactive(checked))
     dispatch(retrieveTeams())
   }
 
@@ -98,9 +101,9 @@ const TeamListPage = () => {
         gridControlMenuItems={controlItems}
         rowData={teams}
         loadData={() => {dispatch(retrieveTeams())}}
-        isDataLoading={teamsLoadingstatus}
+        isDataLoading={isLoading}
       />
-      ({ createTeamOpen && 
+      ({ isInEditMode && 
       <ModalCreateTeamForm />})
     </>
   )

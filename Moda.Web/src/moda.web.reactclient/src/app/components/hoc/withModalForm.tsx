@@ -17,9 +17,9 @@ export interface FormProps<T> {
   }
 
 export interface FormState {
-    isOpen: boolean
+    isInEditMode: boolean
     isSaving: boolean
-    saveError: any
+    error: any
     validationErrors: FieldData[]
 }
 
@@ -42,7 +42,7 @@ const withModalForm = <P extends FormProps<T>, T>(
         const [messageApi, contextHolder] = message.useMessage()
 
         const dispatch = useAppDispatch()
-        const { isOpen, isSaving, saveError, validationErrors } = modalFormProps.useFormState()
+        const { isInEditMode, isSaving, error, validationErrors } = modalFormProps.useFormState()
 
         const handleOk = async () => {
             try {
@@ -66,11 +66,11 @@ const withModalForm = <P extends FormProps<T>, T>(
           }, [form, formValues])
 
           useEffect(() => {
-            if(saveError) {
-              console.error(saveError)
+            if(error) {
+              console.error(error)
               messageApi.error('An unexpected error occurred while saving.')
             }
-          }, [saveError, messageApi])
+          }, [error, messageApi])
         
           useEffect(() => {
             if(form && validationErrors?.length > 0) {
@@ -84,7 +84,7 @@ const withModalForm = <P extends FormProps<T>, T>(
                 {contextHolder}
                 <Modal
                     title={modalFormProps.title}
-                    open={isOpen}
+                    open={isInEditMode}
                     onOk={handleOk}
                     okButtonProps={{ disabled: !isValid }}
                     okText={modalFormProps.okText ?? "Save"}

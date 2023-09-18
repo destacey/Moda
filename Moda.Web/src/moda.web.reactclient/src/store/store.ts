@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit"
-import teamsReducer from "../app/organizations/teams-slice"
+import teamReducer from "../app/organizations/team-slice"
 import breadcrumbReducer from "./breadcrumbs/breadcrumb-slice"
 
 export const store = configureStore({
     reducer: {
-        teams: teamsReducer,
+        team: teamReducer,
         breadcrumb: breadcrumbReducer
     },
 })
