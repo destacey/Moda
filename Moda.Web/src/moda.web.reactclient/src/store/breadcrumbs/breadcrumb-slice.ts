@@ -8,8 +8,8 @@ const initialState: BreadcrumbState = {
     forPath: '',
 }
 
-const pageSlice = createSlice({
-  name: 'page',
+const breadcrumbSlice = createSlice({
+  name: 'breadcrumb',
   initialState,
   reducers: {
     disableBreadcrumb(state, action: PayloadAction<string>) {
@@ -30,8 +30,8 @@ const pageSlice = createSlice({
   }
 })
 
-export const { setBreadcrumbTitle, setBreadcrumbRoute, disableBreadcrumb } = pageSlice.actions;
+export const { setBreadcrumbTitle, setBreadcrumbRoute, disableBreadcrumb } = breadcrumbSlice.actions;
 
 export const selectBreadcrumb = (state: { breadcrumb: BreadcrumbState }) => state.breadcrumb;
 
-export default pageSlice.reducer;
+export default breadcrumbSlice.reducer;

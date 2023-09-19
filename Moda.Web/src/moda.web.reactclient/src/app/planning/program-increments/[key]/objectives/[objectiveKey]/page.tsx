@@ -51,7 +51,6 @@ const ObjectiveDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
-    console.log("setting objective breadcrumb", {objectiveData, pathname})
     if (!objectiveData) return
 
     const breadcrumbRoute: BreadcrumbItem[] = [
@@ -73,7 +72,6 @@ const ObjectiveDetailsPage = ({ params }) => {
         title: objectiveData.name,
       },
     )
-    console.log("breadcrumbRoute", breadcrumbRoute)
     // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
     dispatch(setBreadcrumbRoute({
       pathname,
