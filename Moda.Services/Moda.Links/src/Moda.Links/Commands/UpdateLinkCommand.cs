@@ -8,7 +8,7 @@ using Moda.Common.Application.Validation;
 using Moda.Links.Models;
 
 namespace Moda.Links.Commands;
-public sealed record UpdateLinkCommand(Guid LinkId, string Name, string Url): ICommand<LinkDto>;
+public sealed record UpdateLinkCommand(Guid LinkId, string Name, string Url) : ICommand<LinkDto>;
 
 public sealed class UpdateLinkCommandValidator : CustomValidator<UpdateLinkCommand>
 {
@@ -24,8 +24,7 @@ public sealed class UpdateLinkCommandValidator : CustomValidator<UpdateLinkComma
             .MaximumLength(128);
 
         RuleFor(l => l.Url)
-            .NotEmpty()
-            .MaximumLength(1024);
+            .NotEmpty();
     }
 }
 
