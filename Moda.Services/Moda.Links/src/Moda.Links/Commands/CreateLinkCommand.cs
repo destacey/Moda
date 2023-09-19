@@ -6,7 +6,7 @@ using Moda.Common.Application.Validation;
 using Moda.Links.Models;
 
 namespace Moda.Links.Commands;
-public sealed record CreateLinkCommand(Guid ObjectId, string Name, string Url): ICommand<Guid>;
+public sealed record CreateLinkCommand(Guid ObjectId, string Name, string Url) : ICommand<Guid>;
 
 public sealed class CreateLinkCommandValidator : CustomValidator<CreateLinkCommand>
 {
@@ -22,8 +22,7 @@ public sealed class CreateLinkCommandValidator : CustomValidator<CreateLinkComma
             .MaximumLength(128);
 
         RuleFor(l => l.Url)
-            .NotEmpty()
-            .MaximumLength(1024);
+            .NotEmpty();
     }
 }
 

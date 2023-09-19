@@ -28,7 +28,6 @@ public sealed class CreateLinkRequestValidator : CustomValidator<CreateLinkReque
             .MaximumLength(128);
 
         RuleFor(l => l.Url)
-            .NotEmpty()
-            .MaximumLength(1024);
+            .NotEmpty();
     }
 }
