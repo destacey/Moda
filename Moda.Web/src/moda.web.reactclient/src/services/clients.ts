@@ -21,7 +21,7 @@ const createDefaultAxiosInstance = async (accessToken?: string) =>
   axios.create({
     baseURL: apiUrl,
     headers: {
-      Authorization: `Bearer ${accessToken ?? (await auth.acquireToken())}`,
+      Authorization: `Bearer ${accessToken ?? (await auth.acquireToken())?.token}`,
     },
     //Removing the transformResponse will cause the response to be a string instead of an object
     transformResponse: (data) => data,

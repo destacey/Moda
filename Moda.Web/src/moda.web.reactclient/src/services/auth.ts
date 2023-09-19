@@ -1,5 +1,6 @@
 import { msalConfig, tokenRequest } from '@/authConfig'
 import {
+  AuthenticationResult,
   InteractionRequiredAuthError,
   PublicClientApplication,
 } from '@azure/msal-browser'
@@ -13,22 +14,20 @@ const auth = {
       ...tokenRequest,
       ...request,
     }
-    let tokenResponse: string | null = null
+    let tokenResponse: AuthenticationResult | null = null
     try {
       tokenResponse = (await msalInstance.acquireTokenSilent(acquireRequest))
-        .accessToken
     } catch (error) {
       console.warn(error)
       if (error instanceof InteractionRequiredAuthError) {
         try {
           tokenResponse = (await msalInstance.acquireTokenPopup(acquireRequest))
-            .accessToken
         } catch (err) {
           console.error(err)
         }
       }
     }
-    return tokenResponse
+    return {token: tokenResponse?.accessToken, expiresAt: tokenResponse?.expiresOn.getTime()}
   },
   hasClaim: (claimType: string, claimValue: string) => {
     const claims = msalInstance.getAllAccounts()[0].idTokenClaims

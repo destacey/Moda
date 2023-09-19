@@ -8,12 +8,12 @@ export const useLocalStorageState = <T = any>(
     // If window is undefined, we are on the server and localStorage is not available
     if (typeof window !== 'undefined') {
       const storedValue = window.localStorage.getItem(key)
-      return storedValue ? JSON.parse(storedValue) : defaultValue
+      return storedValue && storedValue !== 'undefined' ? JSON.parse(storedValue) : defaultValue
     }
   })
 
   useEffect(() => {
-    window.localStorage.setItem(key, JSON.stringify(value))
+    window.localStorage.setItem(key, value ? JSON.stringify(value) : undefined)
   }, [key, value])
 
   return [value, setValue]

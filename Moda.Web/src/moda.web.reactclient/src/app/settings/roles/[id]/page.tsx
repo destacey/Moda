@@ -6,15 +6,19 @@ import { useEffect, useState } from 'react'
 import RoleDetails from './components/role-details'
 import Permissions from './components/permissions'
 import useAuth from '@/src/app/components/contexts/auth'
-import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { useGetRoleById } from '@/src/services/queries/user-management-queries'
 import { authorizePage } from '@/src/app/components/hoc'
-import { notFound } from 'next/navigation'
+import { notFound, usePathname } from 'next/navigation'
+import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
+import { useAppDispatch } from '@/src/app/hooks'
 
 const RoleDetailsPage = ({ params }) => {
   const { data: roleData, isLoading, isFetching } = useGetRoleById(params.id)
 
   const [activeTab, setActiveTab] = useState('details')
+  const pathname = usePathname()
+  const dispatch = useAppDispatch()
+
   const { hasClaim } = useAuth()
 
   const canUpdateRole = hasClaim('Permission', 'Permissions.Roles.Update')
@@ -23,11 +27,10 @@ const RoleDetailsPage = ({ params }) => {
     'Permissions.Permissions.View',
   )
 
-  const { setBreadcrumbTitle } = useBreadcrumbs()
 
   useEffect(() => {
-    setBreadcrumbTitle(roleData?.name)
-  }, [roleData?.name, setBreadcrumbTitle])
+    roleData && dispatch(setBreadcrumbTitle({title: roleData?.name, pathname}))
+  }, [roleData, dispatch, pathname])
 
   const tabs = [
     {

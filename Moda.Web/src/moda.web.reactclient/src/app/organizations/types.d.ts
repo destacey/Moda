@@ -9,3 +9,20 @@ export interface TeamListItem {
   isActive: boolean
   teamOfTeams?: TeamNavigationDto | undefined
 }
+
+export interface CreateTeamFormValues {
+  type: TeamType
+  name: string
+  code: string
+  description: string
+}
+
+export interface EditTeamFormValues {
+  id: string
+  name: string
+  code: string
+  description: string
+  type?: TeamType
+}
+
+export type TeamType = 'Team' | 'Team of Teams'

@@ -1,7 +1,6 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
 import { Button, Card } from 'antd'
 import { createElement, useCallback, useEffect, useState } from 'react'
 import TeamOfTeamsDetails from './team-of-teams-details'
@@ -13,10 +12,12 @@ import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import { EditTeamForm } from '../../components'
 import useAuth from '@/src/app/components/contexts/auth'
-import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import { useGetTeamOfTeamsRisks } from '@/src/services/queries/organization-queries'
 import { authorizePage } from '@/src/app/components/hoc'
-import { notFound } from 'next/navigation'
+import { notFound, usePathname } from 'next/navigation'
+import { refreshActiveTeam, retrieveTeam, setEditMode, selectTeamContext } from '../../team-slice'
+import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
+import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 
 enum TeamOfTeamsTabs {
   Details = 'details',
@@ -27,18 +28,17 @@ enum TeamOfTeamsTabs {
 const TeamOfTeamsDetailsPage = ({ params }) => {
   useDocumentTitle('Team of Teams Details')
   const [activeTab, setActiveTab] = useState(TeamOfTeamsTabs.Details)
-  const [team, setTeam] = useState<TeamOfTeamsDetailsDto | null>(null)
-  const [openUpdateTeamForm, setOpenUpdateTeamForm] = useState<boolean>(false)
-  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
   const { key } = params
-  const { setBreadcrumbTitle } = useBreadcrumbs()
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
-  const [notTeamFound, setTeamNotFound] = useState<boolean>(false)
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
   const showActions = canUpdateTeam
+
+  const {item:team, isInEditMode, notFound: teamNotFound, error} = useAppSelector(selectTeamContext)
+  const dispatch = useAppDispatch()
+  const pathname = usePathname()
 
   const risksQuery = useGetTeamOfTeamsRisks(
     team?.id,
@@ -59,7 +59,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     return (
       <>
         {canUpdateTeam && (
-          <Button onClick={() => setOpenUpdateTeamForm(true)}>Edit</Button>
+          <Button onClick={() => dispatch(setEditMode(true))}>Edit Team</Button>
         )}
       </>
     )
@@ -93,27 +93,16 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
-    const getTeam = async () => {
-      const teamsOfTeamsClient = await getTeamsOfTeamsClient()
-      const teamDto = await teamsOfTeamsClient.getById(key)
-      setTeam(teamDto)
-      setBreadcrumbTitle(teamDto.name)
-    }
+    dispatch(retrieveTeam({key, type: 'Team of Teams'}))
+  }, [key, dispatch])
 
-    getTeam().catch((error) => {
-      if (error.status === 404) {
-        setTeamNotFound(true)
-      }
-      console.error('getTeam error', error)
-    })
-  }, [key, setBreadcrumbTitle, lastRefresh])
+  useEffect(() => {
+    team && dispatch(setBreadcrumbTitle({title: team.name, pathname}))
+  }, [team, dispatch, pathname])
 
-  const onUpdateTeamFormClosed = (wasUpdated: boolean) => {
-    setOpenUpdateTeamForm(false)
-    if (wasUpdated) {
-      setLastRefresh(Date.now())
-    }
-  }
+  useEffect(() => {
+    error && console.error(error)
+  }, [error])
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
@@ -128,7 +117,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     [risksQueryEnabled],
   )
 
-  if (notTeamFound) {
+  if (teamNotFound) {
     return notFound()
   }
 
@@ -147,14 +136,8 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {openUpdateTeamForm && (
-        <EditTeamForm
-          showForm={openUpdateTeamForm}
-          teamKey={team.key}
-          type={team.type}
-          onFormUpdate={() => onUpdateTeamFormClosed(true)}
-          onFormCancel={() => onUpdateTeamFormClosed(false)}
-        />
+      {isInEditMode && team && canUpdateTeam && (
+        <EditTeamForm team={team} />
       )}
     </>
   )

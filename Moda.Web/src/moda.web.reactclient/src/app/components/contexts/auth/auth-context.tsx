@@ -10,7 +10,7 @@ import { AuthContextType, Claim, User } from './types'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
-const { msalInstance, acquireToken } = auth
+const { msalInstance, acquireToken: authAcquire } = auth
 
 if (msalInstance.getAllAccounts().length > 0) {
   msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0])
@@ -25,6 +25,10 @@ const AuthProvider = ({ children }) => {
   })
   const [isLoading, setIsLoading] = useState(false)
 
+  const acquireToken = useCallback(async () => {
+    return (await authAcquire())?.token
+  }, [])
+  
   const refreshUser = async () => {
     setIsLoading(true)
     try {

@@ -5,19 +5,19 @@ import { useEffect, useState } from 'react'
 import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
 import { Button, Card, Divider, Space, Tabs, message } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
-import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { authorizePage } from '@/src/app/components/hoc'
 import {
   useGetAzdoBoardsConnectionById,
   useImportAzdoBoardsConnectionWorkspacesMutation,
 } from '@/src/services/queries/app-integration-queries'
-import { notFound } from 'next/navigation'
+import { notFound, usePathname } from 'next/navigation'
 import EditConnectionForm from '../components/edit-connection-form'
 import AzdoBoardsWorkspaces from './azdo-boards-workspaces'
 import { ExportOutlined } from '@ant-design/icons'
 import Link from 'next/link'
+import { useAppDispatch } from '@/src/app/hooks'
+import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -28,10 +28,11 @@ const ConnectionDetailsPage = ({ params }) => {
   useDocumentTitle('Connection Details')
   const [activeTab, setActiveTab] = useState(ConnectionTabs.Details)
   const [isImportingWorkspaces, setIsImportingWorkspaces] = useState(false)
-  const { setBreadcrumbRoute } = useBreadcrumbs()
   const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
   const [messageApi, contextHolder] = message.useMessage()
+  const dispatch = useAppDispatch()
+  const pathname = usePathname()
 
   const { hasClaim } = useAuth()
   const canUpdateConnections = hasClaim(
@@ -72,7 +73,7 @@ const ConnectionDetailsPage = ({ params }) => {
   useEffect(() => {
     if (!connectionData) return
 
-    const breadcrumbRoute: ItemType[] = [
+    const breadcrumbRoute: BreadcrumbItem[] = [
       {
         title: 'Settings',
       },
@@ -85,8 +86,8 @@ const ConnectionDetailsPage = ({ params }) => {
       },
     ]
     // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
-    setBreadcrumbRoute(breadcrumbRoute)
-  }, [connectionData, setBreadcrumbRoute])
+    dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
+  }, [connectionData, dispatch, pathname])
 
   const onEditConnectionFormClosed = (wasSaved: boolean) => {
     setOpenEditConnectionForm(false)

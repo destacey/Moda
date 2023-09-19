@@ -1,16 +1,16 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { useCallback, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import ModaGrid from '../../components/common/moda-grid'
-import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { Button, Space, Switch } from 'antd'
 import Link from 'next/link'
-import { TeamListItem } from '../types'
 import { useDocumentTitle } from '../../hooks/use-document-title'
-import { CreateTeamForm } from '../components'
 import useAuth from '../../components/contexts/auth'
+import { useAppSelector, useAppDispatch } from '../../hooks'
+import { retrieveTeams, setIncludeInactive, setEditMode, selectTeamsContext, selectTeamIsInEditMode } from '../team-slice'
+import { ModalCreateTeamForm } from '../components/create-team-form'
 
 const TeamLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.type === 'Team' ? 'teams' : 'team-of-teams'
@@ -29,10 +29,11 @@ const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {
 
 const TeamListPage = () => {
   useDocumentTitle('Teams')
-  const [teams, setTeams] = useState<TeamListItem[]>([])
-  const [includeDisabled, setIncludeDisabled] = useState<boolean>(false)
-  const [openCreateTeamForm, setOpenCreateTeamForm] = useState<boolean>(false)
-  const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
+  const {data:teams, isLoading, error} = useAppSelector(selectTeamsContext)
+  const isInEditMode = useAppSelector(selectTeamIsInEditMode)
+  const includeDisabled = useAppSelector((state) => state.team.includeInactive)
+
+  const dispatch = useAppDispatch()
 
   const { hasClaim } = useAuth()
   const canCreateTeam = hasClaim('Permission', 'Permissions.Teams.Create')
@@ -59,7 +60,7 @@ const TeamListPage = () => {
     return (
       <>
         {canCreateTeam && (
-          <Button onClick={() => setOpenCreateTeamForm(true)}>
+          <Button onClick={() => dispatch(setEditMode(true))}>
             Create Team
           </Button>
         )}
@@ -67,8 +68,13 @@ const TeamListPage = () => {
     )
   }
 
+  useEffect(() => {
+    error && console.error(error)
+  }, [error])
+  
   const onIncludeDisabledChange = (checked: boolean) => {
-    setIncludeDisabled(checked)
+    dispatch(setIncludeInactive(checked))
+    dispatch(retrieveTeams())
   }
 
   const controlItems: ItemType[] = [
@@ -87,27 +93,6 @@ const TeamListPage = () => {
     },
   ]
 
-  const getTeams = useCallback(async () => {
-    const teamsClient = await getTeamsClient()
-    const teamsDtos = await teamsClient.getList(includeDisabled)
-    const teamOfTeamsClient = await getTeamsOfTeamsClient()
-    const teamOfTeamsDtos = await teamOfTeamsClient.getList(includeDisabled)
-    const teamVMs = [
-      ...(teamsDtos as TeamListItem[]),
-      ...(teamOfTeamsDtos as TeamListItem[]),
-    ]
-    setTeams(teamVMs)
-    // Disabling warning because we want to refresh the list when the lastRefresh value changes even though it is not used in the callback
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [includeDisabled, lastRefresh])
-
-  const onCreateTeamFormClosed = (wasCreated: boolean) => {
-    setOpenCreateTeamForm(false)
-    if (wasCreated) {
-      setLastRefresh(Date.now())
-    }
-  }
-
   return (
     <>
       <PageTitle title="Teams" actions={<Actions />} />
@@ -115,15 +100,11 @@ const TeamListPage = () => {
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
         rowData={teams}
-        loadData={getTeams}
+        loadData={() => {dispatch(retrieveTeams())}}
+        isDataLoading={isLoading}
       />
-      {canCreateTeam && (
-        <CreateTeamForm
-          showForm={openCreateTeamForm}
-          onFormCreate={() => onCreateTeamFormClosed(true)}
-          onFormCancel={() => onCreateTeamFormClosed(false)}
-        />
-      )}
+      ({ isInEditMode && 
+      <ModalCreateTeamForm />})
     </>
   )
 }

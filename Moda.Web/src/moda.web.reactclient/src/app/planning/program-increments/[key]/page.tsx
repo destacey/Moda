@@ -14,7 +14,6 @@ import RisksGrid, {
   RisksGridProps,
 } from '@/src/app/components/common/planning/risks-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import useBreadcrumbs from '@/src/app/components/contexts/breadcrumbs'
 import useAuth from '@/src/app/components/contexts/auth'
 import ManageProgramIncrementTeamsForm from './manage-program-increment-teams-form'
 import Link from 'next/link'
@@ -28,7 +27,9 @@ import {
   useGetProgramIncrementTeams,
 } from '@/src/services/queries/planning-queries'
 import { authorizePage } from '@/src/app/components/hoc'
-import { notFound } from 'next/navigation'
+import { notFound, usePathname } from 'next/navigation'
+import { useAppDispatch } from '@/src/app/hooks'
+import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 
 enum ProgramIncrementTabs {
   Details = 'details',
@@ -39,7 +40,6 @@ enum ProgramIncrementTabs {
 
 const ProgramIncrementDetailsPage = ({ params }) => {
   useDocumentTitle('PI Details')
-  const { setBreadcrumbTitle } = useBreadcrumbs()
   const [activeTab, setActiveTab] = useState(ProgramIncrementTabs.Details)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
   const [openEditProgramIncrementForm, setOpenEditProgramIncrementForm] =
@@ -49,6 +49,9 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     useState<boolean>(false)
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [openManageTeamsForm, setOpenManageTeamsForm] = useState<boolean>(false)
+
+  const pathname = usePathname()
+  const dispatch = useAppDispatch()  
 
   const { hasClaim } = useAuth()
   const canUpdateProgramIncrement = hasClaim(
@@ -163,8 +166,8 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
-    programIncrementData && setBreadcrumbTitle(programIncrementData.name)
-  }, [setBreadcrumbTitle, programIncrementData])
+    programIncrementData && dispatch(setBreadcrumbTitle({title: programIncrementData.name, pathname}))
+  }, [dispatch, pathname, programIncrementData])
 
   const onEditFormClosed = useCallback((wasSaved: boolean) => {
     setOpenEditProgramIncrementForm(false)

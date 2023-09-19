@@ -2,21 +2,24 @@
 
 import React, { useEffect, useState } from 'react'
 import { Card } from 'antd'
+import { usePathname } from 'next/navigation'
 import PageTitle from '../../components/common/page-title'
 import ProfileForm from './profile-form'
 import ClaimsGrid from './claims-grid'
 import useAuth from '../../components/contexts/auth'
 import { useDocumentTitle } from '../../hooks/use-document-title'
-import useBreadcrumbs from '../../components/contexts/breadcrumbs'
 import { getProfileClient } from '@/src/services/clients'
 import { UserDetailsDto } from '@/src/services/moda-api'
+import { useAppDispatch } from '@/src/app/hooks'
+import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 
 const AccountProfilePage = () => {
   useDocumentTitle('Account Profile')
   const { user, isLoading, refreshUser } = useAuth()
   const [profile, setProfile] = useState<UserDetailsDto>()
   const [activeTab, setActiveTab] = useState('profile')
-  const { setBreadcrumbTitle } = useBreadcrumbs()
+  const dispatch = useAppDispatch()
+  const pathname = usePathname()
 
   const tabs = [
     {
@@ -43,9 +46,9 @@ const AccountProfilePage = () => {
 
   useEffect(() => {
     if (!isLoading && user) {
-      setBreadcrumbTitle(user.name)
+      dispatch(setBreadcrumbTitle({title: user.name, pathname}))
     }
-  }, [user, isLoading, setBreadcrumbTitle])
+  }, [user, isLoading, pathname, dispatch])
 
   return (
     <>
