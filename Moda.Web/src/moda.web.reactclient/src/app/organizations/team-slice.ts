@@ -10,6 +10,10 @@ interface TeamState extends CrudState<TeamListItem, TeamDetails> {
 
 const teamSlice = createCrudSlice({
   name: 'team',
+  createAdapterOptions: {
+    selectId: (team) => team.key,
+    sortComparer: (a, b) => a.key - b.key
+  },
   initialState: (defaultState: CrudState<TeamListItem, TeamDetails>): TeamState => ({
     ...defaultState,
     includeInactive: false
