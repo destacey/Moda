@@ -166,7 +166,6 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
-    console.log('setting PI breadcrumb', {pathname, programIncrementData})
     programIncrementData && dispatch(setBreadcrumbTitle({title: programIncrementData.name, pathname}))
   }, [dispatch, pathname, programIncrementData])
 
