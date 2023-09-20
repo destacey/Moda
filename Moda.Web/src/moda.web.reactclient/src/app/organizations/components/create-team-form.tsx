@@ -2,9 +2,8 @@
 
 import { Form, Input, Radio } from 'antd'
 import { CreateTeamFormValues } from '../types'
-import { createTeam, retrieveTeams, setEditMode, selectEditTeamContext } from '../team-slice'
+import { createTeam, setEditMode, selectEditTeamContext } from '../team-slice'
 import withModalForm, { FormProps } from '../../components/hoc/withModalForm'
-import { AppDispatch } from '@/src/store'
 import { useAppSelector } from '../../hooks'
 
 const CreateTeamForm = ({form}: FormProps<CreateTeamFormValues>) => {
@@ -70,16 +69,8 @@ export const ModalCreateTeamForm = withModalForm(CreateTeamForm, {
   title: "Create Team", 
   okText: "Create", 
   useFormState: () => useAppSelector(selectEditTeamContext),
-  onOk: async (values: CreateTeamFormValues, dispatch: AppDispatch) => {
-    // TODO: With RTK Query, we could have create team mutation automatically refetch teams
-    const result = await dispatch(createTeam(values))
-    if(result.meta.requestStatus === 'fulfilled') {
-      dispatch(retrieveTeams())
-    }
-  },
-  onCancel: (dispatch: AppDispatch) => {
-    dispatch(setEditMode(false))
-  }
+  onOk: (values: CreateTeamFormValues) => createTeam(values),
+  onCancel: setEditMode(false)
 })
 
 export default ModalCreateTeamForm
