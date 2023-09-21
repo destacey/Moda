@@ -1,7 +1,8 @@
 ﻿using MediatR;
 using Moda.Goals.Application.Objectives.Commands;
 using Moda.Goals.Application.Objectives.Queries;
-using Moda.Goals.Domain.Enums;
+using Moda.Planning.Application.ProgramIncrements.Extensions;
+using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.ProgramIncrements.Commands;
 public sealed record UpdateProgramIncrementObjectiveCommand(Guid ProgramIncrementId, Guid ProgramIncrementObjectiveId, string Name, string? Description, ObjectiveStatus Status, double Progress, LocalDate? StartDate, LocalDate? TargetDate, bool IsStretch) : ICommand<int>;
@@ -84,7 +85,7 @@ internal sealed class UpdateProgramIncrementObjectiveCommandHandler : ICommandHa
             if (programIncrement is null)
                 return Result.Failure<int>($"Program Increment {request.ProgramIncrementId} not found.");
 
-            var updatePiObjectiveResult = programIncrement.UpdateObjective(request.ProgramIncrementObjectiveId, request.IsStretch);
+            var updatePiObjectiveResult = programIncrement.UpdateObjective(request.ProgramIncrementObjectiveId, request.Status, request.IsStretch);
             if (updatePiObjectiveResult.IsFailure)
             {
                 _logger.LogError("Unable to update PI objective.  Error: {Error}", updatePiObjectiveResult.Error);
@@ -103,11 +104,13 @@ internal sealed class UpdateProgramIncrementObjectiveCommandHandler : ICommandHa
                 objectiveName = currentObjective.Name;
             }
 
+            var mappedStatus = request.Status.ToGoalObjectiveStatus();
+
             var objectiveResult = await _sender.Send(new UpdateObjectiveCommand(
                 updatePiObjectiveResult.Value.ObjectiveId,
                 objectiveName,
                 request.Description,
-                request.Status,
+                mappedStatus,
                 request.Progress,
                 updatePiObjectiveResult.Value.TeamId,
                 request.StartDate,

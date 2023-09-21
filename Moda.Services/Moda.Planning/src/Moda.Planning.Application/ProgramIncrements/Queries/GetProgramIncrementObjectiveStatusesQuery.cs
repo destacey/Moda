@@ -1,6 +1,6 @@
 ﻿using Moda.Common.Extensions;
-using Moda.Goals.Domain.Enums;
 using Moda.Planning.Application.ProgramIncrements.Dtos;
+using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.ProgramIncrements.Queries;
 

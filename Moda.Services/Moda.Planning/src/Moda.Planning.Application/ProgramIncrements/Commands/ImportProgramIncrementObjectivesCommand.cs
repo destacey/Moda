@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Moda.Goals.Application.Objectives.Commands;
 using Moda.Planning.Application.ProgramIncrements.Dtos;
+using Moda.Planning.Application.ProgramIncrements.Extensions;
 
 namespace Moda.Planning.Application.ProgramIncrements.Commands;
 public sealed record ImportProgramIncrementObjectivesCommand : ICommand
@@ -68,11 +69,13 @@ internal sealed class ImportProgramIncrementObjectivesCommandHandler : ICommandH
                 if (team is null)
                     return Result.Failure<int>($"Team {importedObjective.TeamId} not found. (Record Id: {importedObjective.ImportId})");
 
+                var mappedStatus = importedObjective.Status.ToGoalObjectiveStatus();
+
                 var objectiveResult = await _sender.Send(new ImportObjectiveCommand(
                     importedObjective.Name,
                     importedObjective.Description,
                     Goals.Domain.Enums.ObjectiveType.ProgramIncrement,
-                    importedObjective.Status,
+                    mappedStatus,
                     importedObjective.Progress,
                     importedObjective.TeamId,
                     importedObjective.ProgramIncrementId,

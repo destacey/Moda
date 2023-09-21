@@ -163,7 +163,7 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         }
     }
 
-    public Result<ProgramIncrementObjective> UpdateObjective(Guid piObjectiveId, bool isStretch)
+    public Result<ProgramIncrementObjective> UpdateObjective(Guid piObjectiveId, ObjectiveStatus status, bool isStretch)
     {
         try
         {
@@ -174,7 +174,7 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
             if (ObjectivesLocked)
                 isStretch = existingObjective.IsStretch;
 
-            var updateResult = existingObjective.Update(isStretch);
+            var updateResult = existingObjective.Update(status, isStretch);
             if (updateResult.IsFailure)
                 return Result.Failure<ProgramIncrementObjective>(updateResult.Error);
 

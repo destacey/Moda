@@ -1,5 +1,5 @@
-﻿using Moda.Goals.Domain.Enums;
-using Moda.Planning.Application.ProgramIncrements.Dtos;
+﻿using Moda.Planning.Application.ProgramIncrements.Dtos;
+using Moda.Planning.Domain.Enums;
 using NodaTime.Extensions;
 
 namespace Moda.Web.Api.Models.Planning.ProgramIncrements;

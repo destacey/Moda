@@ -121,7 +121,12 @@ public class ProgramIncrementObjectiveConfig : IEntityTypeConfiguration<ProgramI
         builder.Property(o => o.ObjectiveId).IsRequired();
         builder.Property(o => o.Type).IsRequired()
             .HasConversion<EnumConverter<ProgramIncrementObjectiveType>>()
-            .HasMaxLength(64);
+            .HasMaxLength(64)
+            .HasColumnType("varchar");
+        builder.Property(o => o.Status).IsRequired()
+            .HasConversion<EnumConverter<ObjectiveStatus>>()
+            .HasMaxLength(64)
+            .HasColumnType("varchar");
         builder.Property(o => o.IsStretch).IsRequired();
 
         // Audit
