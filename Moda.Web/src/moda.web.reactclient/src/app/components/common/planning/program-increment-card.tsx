@@ -1,4 +1,5 @@
 import { ProgramIncrementListDto } from '@/src/services/moda-api'
+import { programIncrementDaysRemaining } from '@/src/utils'
 import { Card, Space, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
@@ -10,15 +11,12 @@ export interface ProgramIncrementCardProps {
 const ProgramIncrementCard = ({
   programIncrement,
 }: ProgramIncrementCardProps) => {
-  const start = new Date(programIncrement.start)
-  const end = new Date(programIncrement.end)
-  const now = new Date()
+  const daysRemaining = programIncrementDaysRemaining(programIncrement.end)
 
-  const daysRemaining = Math.ceil(
-    (end.getTime() - now.getTime()) / (1000 * 3600 * 24)
-  )
+  const start = new Date(programIncrement.start)
+  const now = new Date()
   const daysUntilStart = Math.ceil(
-    (start.getTime() - now.getTime()) / (1000 * 3600 * 24)
+    (start.getTime() - now.getTime()) / (1000 * 3600 * 24),
   )
 
   const daysRemainingText = () => {
@@ -40,9 +38,7 @@ const ProgramIncrementCard = ({
           <Typography.Text> ({daysRemainingText()})</Typography.Text>
         </Space>
         <Space>
-          <Link
-            href={`/planning/program-increments/${programIncrement.key}`}
-          >
+          <Link href={`/planning/program-increments/${programIncrement.key}`}>
             Details
           </Link>
           <Typography.Text type="secondary"> | </Typography.Text>

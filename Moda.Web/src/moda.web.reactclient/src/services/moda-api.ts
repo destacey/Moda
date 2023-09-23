@@ -7047,6 +7047,7 @@ export interface ProgramIncrementDetailsDto {
     end?: Date;
     state?: string;
     objectivesLocked?: boolean;
+    predictability?: number | undefined;
 }
 
 export interface CreateProgramIncrementRequest {

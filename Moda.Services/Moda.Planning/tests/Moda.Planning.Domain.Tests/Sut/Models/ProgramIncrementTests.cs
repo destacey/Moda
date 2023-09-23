@@ -1,4 +1,5 @@
-﻿using Moda.Organization.Domain.Enums;
+﻿using Moda.Common.Models;
+using Moda.Organization.Domain.Enums;
 using Moda.Planning.Domain.Tests.Data;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
@@ -18,7 +19,7 @@ public class ProgramIncrementTests
     #region CalculatePredictability
 
     [Fact]
-    public void CalculatePredictability_WhenNoObjectives_Returns0()
+    public void CalculatePredictability_WhenStartedAndNoObjectives_Returns0()
     {
         // Arrange
         var sut = _programIncrementFaker.UsePrivateConstructor().Generate();
@@ -28,6 +29,21 @@ public class ProgramIncrementTests
 
         // Assert
         result.Should().Be(0);
+    }
+
+    [Fact]
+    public void CalculatePredictability_WhenFuture_ReturnsNull()
+    {
+        // Arrange
+        var sut = _programIncrementFaker.UsePrivateConstructor().Generate();
+        LocalDateRange dateRange = new(_dateTimeService.Today.PlusDays(10), _dateTimeService.Today.PlusDays(70));
+        sut.Update(sut.Name, sut.Description, dateRange, false);
+
+        // Act
+        var result = sut.CalculatePredictability(_dateTimeService.Today);
+
+        // Assert
+        result.Should().BeNull();
     }
 
     [Fact]

@@ -6118,6 +6118,11 @@
           },
           "objectivesLocked": {
             "type": "boolean"
+          },
+          "predictability": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         }
       },
