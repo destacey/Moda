@@ -1,4 +1,5 @@
-﻿using Moda.Planning.Application.ProgramIncrements.Dtos;
+﻿
+using Moda.Planning.Application.ProgramIncrements.Dtos;
 
 namespace Moda.Planning.Application.ProgramIncrements.Queries;
 public sealed record GetProgramIncrementQuery : IQuery<ProgramIncrementDetailsDto?>
@@ -31,7 +32,9 @@ internal sealed class GetProgramIncrementQueryHandler : IQueryHandler<GetProgram
 
     public async Task<ProgramIncrementDetailsDto?> Handle(GetProgramIncrementQuery request, CancellationToken cancellationToken)
     {
-        var query = _planningDbContext.ProgramIncrements.AsQueryable();
+        var query = _planningDbContext.ProgramIncrements
+            .Include(p => p.Objectives)
+            .AsQueryable();
 
         if (request.ProgramIncrementId.HasValue)
         {
