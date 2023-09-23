@@ -10,6 +10,7 @@ import useAuth from '@/src/app/components/contexts/auth'
 import CreateProgramIncrementObjectiveForm from '../create-program-increment-objective-form'
 import dayjs from 'dayjs'
 import { UseQueryResult } from 'react-query'
+import useTheme from '@/src/app/components/contexts/theme'
 
 export interface TeamObjectivesListCardProps {
   objectivesQuery: UseQueryResult<ProgramIncrementObjectiveListDto[], unknown>
@@ -28,6 +29,7 @@ const TeamObjectivesListCard = ({
 }: TeamObjectivesListCardProps) => {
   const [openCreateObjectiveForm, setOpenCreateObjectiveForm] =
     useState<boolean>(false)
+  const { badgeColor } = useTheme()
 
   const { hasClaim } = useAuth()
   const canManageObjectives = hasClaim(
@@ -48,7 +50,7 @@ const TeamObjectivesListCard = ({
     return (
       <Space>
         {'Objectives'}
-        {showBadge && <Badge color="white" size="small" count={count} />}
+        {showBadge && <Badge color={badgeColor} size="small" count={count} />}
       </Space>
     )
   }

@@ -2,13 +2,14 @@
 
 import { RiskListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
-import { Badge, Button, Card, Empty, List, Space } from 'antd'
+import { Badge, Button, Card, List, Space } from 'antd'
 import RiskListItem from './risk-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import useAuth from '@/src/app/components/contexts/auth'
 import CreateRiskForm from '@/src/app/components/common/planning/create-risk-form'
 import { UseQueryResult } from 'react-query'
+import useTheme from '@/src/app/components/contexts/theme'
 
 export interface TeamRisksListCardProps {
   riskQuery: UseQueryResult<RiskListDto[], unknown>
@@ -17,6 +18,7 @@ export interface TeamRisksListCardProps {
 
 const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
+  const theme = useTheme()
 
   const { hasClaim } = useAuth()
   const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
@@ -33,7 +35,9 @@ const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
     return (
       <Space>
         {'Risks'}
-        {showBadge && <Badge color="white" size="small" count={count} />}
+        {showBadge && (
+          <Badge color={theme.badgeColor} size="small" count={count} />
+        )}
       </Space>
     )
   }
@@ -96,7 +100,7 @@ const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
       >
         <RisksList />
       </Card>
-      {openCreateRiskForm && canCreateRisks && (
+      {openCreateRiskForm && (
         <CreateRiskForm
           createForTeamId={teamId}
           showForm={openCreateRiskForm}
