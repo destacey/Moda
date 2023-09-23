@@ -14,9 +14,9 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
     protected readonly List<ProgramIncrementTeam> _teams = new();
     protected readonly List<ProgramIncrementObjective> _objectives = new();
 
-    private ProgramIncrement() { }
+    protected ProgramIncrement() { }
 
-    private ProgramIncrement(string name, string? description, LocalDateRange dateRange)
+    protected ProgramIncrement(string name, string? description, LocalDateRange dateRange)
     {
         Name = name;
         Description = description;
@@ -64,6 +64,22 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
     /// <summary>Gets the objectives.</summary>
     /// <value>The PI objectives.</value>
     public IReadOnlyCollection<ProgramIncrementObjective> Objectives => _objectives.AsReadOnly();
+
+    public double? CalculatePredictability(LocalDate date, Guid? teamId = null)
+    {
+        if (StateOn(date) == IterationState.Future)
+            return null;
+
+        var objectives = _objectives.Where(o => o.Type == ProgramIncrementObjectiveType.Team);
+        if (teamId.HasValue)
+            objectives = _objectives.Where(o => o.TeamId == teamId.Value).ToList();
+
+        var nonstretchCount = objectives.Count(o => !o.IsStretch);
+        if (nonstretchCount == 0) { return 0; }
+
+        var completedCount = objectives.Count(o => o.Status == ObjectiveStatus.Closed);
+        return completedCount >= nonstretchCount ? 100.0d : Math.Round(100 * ((double)completedCount / nonstretchCount), 2);
+    }
 
     /// <summary>Updates the specified name.</summary>
     /// <param name="name">The name.</param>
