@@ -10,8 +10,8 @@ const darkTheme: ThemeConfig = {
   components: {
     Layout: {
       // controls the background color for all layout components
-      colorBgHeader: '#313131',
-      colorBgTrigger: '#313131',
+      headerBg: '#313131',
+      triggerBg: '#313131',
     },
   },
 }
