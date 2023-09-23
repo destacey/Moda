@@ -1,6 +1,5 @@
 'use client'
 
-import { PageTitle } from '@/src/app/components/common'
 import { useDocumentTitle } from '@/src/app/hooks'
 import { getProgramIncrementsClient } from '@/src/services/clients'
 import {
@@ -8,12 +7,13 @@ import {
   ProgramIncrementTeamResponse,
 } from '@/src/services/moda-api'
 import { useEffect, useState } from 'react'
-import { Card } from 'antd'
+import { Card, Tag } from 'antd'
 import Link from 'next/link'
 import TeamPlanReview from './team-plan-review'
 import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { usePathname } from 'next/navigation'
+import { ModaEmpty, PageTitle } from '@/src/app/components/common'
 
 const ProgramIncrementPlanReviewPage = ({ params }) => {
   useDocumentTitle('PI Plan Review')
@@ -70,7 +70,7 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
     programIncrement?.key,
     programIncrement?.name,
     dispatch,
-    pathname
+    pathname,
   ])
 
   useEffect(() => {
@@ -101,13 +101,13 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
     )
   }
 
-  return (
-    <>
-      <PageTitle
-        title={programIncrement?.name}
-        subtitle="PI Plan Review"
-        actions={<Actions />}
-      />
+  const PageContent = () => {
+    if (programIncrement == null) return null
+    if (tabs.length === 0) {
+      return <ModaEmpty message="No teams found for this PI" />
+    }
+
+    return (
       <Card
         style={{ width: '100%' }}
         tabList={tabs}
@@ -119,6 +119,22 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
           team={activeTeam()}
         />
       </Card>
+    )
+  }
+
+  return (
+    <>
+      <PageTitle
+        title={programIncrement?.name}
+        subtitle="PI Plan Review"
+        tags={
+          programIncrement?.predictability != null && (
+            <Tag title="PI Predictability">{`${programIncrement?.predictability}%`}</Tag>
+          )
+        }
+        actions={<Actions />}
+      />
+      <PageContent />
     </>
   )
 }
