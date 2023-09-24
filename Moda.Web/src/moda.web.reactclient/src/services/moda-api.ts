@@ -1533,6 +1533,70 @@ export class ProgramIncrementsClient {
     }
 
     /**
+     * Get the PI predictability for a team.
+     */
+    getTeamPredictability(id: string, teamId: string, cancelToken?: CancelToken | undefined): Promise<number | null> {
+        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/teams/{teamId}/predictability";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (teamId === undefined || teamId === null)
+            throw new Error("The parameter 'teamId' must be defined.");
+        url_ = url_.replace("{teamId}", encodeURIComponent("" + teamId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetTeamPredictability(_response);
+        });
+    }
+
+    protected processGetTeamPredictability(response: AxiosResponse): Promise<number | null> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<number | null>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<number | null>(null as any);
+    }
+
+    /**
      * Get a list of program increment teams.
      * @param teamId (optional) 
      */

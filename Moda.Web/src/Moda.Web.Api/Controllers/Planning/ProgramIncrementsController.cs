@@ -122,6 +122,19 @@ public class ProgramIncrementsController : ControllerBase
         return Ok(piTeams);
     }
 
+    [HttpGet("{id}/teams/{teamId}/predictability")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
+    [OpenApiOperation("Get the PI predictability for a team.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<double?>> GetTeamPredictability(Guid id, Guid teamId, CancellationToken cancellationToken)
+    {
+        
+        var predictability = await _sender.Send(new GetTeamProgramIncrementPredictabilityQuery(id, teamId), cancellationToken);
+
+        return Ok(predictability);
+    }
+
     [HttpPost("{id}/teams")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.ProgramIncrements)]
     [OpenApiOperation("Manager program increment teams.", "")]

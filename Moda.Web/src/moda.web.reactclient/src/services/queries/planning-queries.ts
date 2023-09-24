@@ -165,6 +165,19 @@ export const useGetProgramIncrementObjectiveStatusOptions = () => {
   })
 }
 
+export const useGetTeamProgramIncrementPredictability = (
+  id: string,
+  teamId: string,
+) => {
+  return useQuery({
+    queryKey: [QK.PROGRAM_INCREMENT_TEAM_PREDICTABILITY, id, teamId],
+    queryFn: async () =>
+      (await getProgramIncrementsClient()).getTeamPredictability(id, teamId),
+    staleTime: 10000,
+    enabled: !!id && !!teamId,
+  })
+}
+
 export const useCreateProgramIncrementObjectiveMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -198,6 +211,10 @@ export const useUpdateProgramIncrementObjectiveMutation = () => {
         QK.PROGRAM_INCREMENT_OBJECTIVES,
         context.programIncrementId,
         context.objectiveId,
+      ])
+      queryClient.invalidateQueries([
+        QK.PROGRAM_INCREMENT_TEAM_PREDICTABILITY,
+        context.programIncrementId,
       ])
     },
   })

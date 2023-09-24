@@ -1,30 +1,42 @@
 'use client'
 
 import { useDocumentTitle } from '@/src/app/hooks'
-import { getProgramIncrementsClient } from '@/src/services/clients'
-import {
-  ProgramIncrementDetailsDto,
-  ProgramIncrementTeamResponse,
-} from '@/src/services/moda-api'
+import { ProgramIncrementTeamResponse } from '@/src/services/moda-api'
 import { useEffect, useState } from 'react'
 import { Card, Tag } from 'antd'
 import Link from 'next/link'
 import TeamPlanReview from './team-plan-review'
 import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
-import { usePathname } from 'next/navigation'
+import { notFound, usePathname } from 'next/navigation'
 import { ModaEmpty, PageTitle } from '@/src/app/components/common'
+import {
+  useGetProgramIncrementByKey,
+  useGetProgramIncrementTeams,
+} from '@/src/services/queries/planning-queries'
 
 const ProgramIncrementPlanReviewPage = ({ params }) => {
   useDocumentTitle('PI Plan Review')
-  const [programIncrement, setProgramIncrement] =
-    useState<ProgramIncrementDetailsDto>()
   const [teams, setTeams] = useState<ProgramIncrementTeamResponse[]>([])
   const [activeTab, setActiveTab] = useState<string>()
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
+  const {
+    data: programIncrementData,
+    isLoading,
+    isFetching,
+    refetch: refetchProgramIncrement,
+  } = useGetProgramIncrementByKey(params.key)
+
+  const { data: teamData } = useGetProgramIncrementTeams(
+    programIncrementData?.id,
+    true,
+  )
+
   useEffect(() => {
+    if (programIncrementData == null) return
+
     const breadcrumbRoute: BreadcrumbItem[] = [
       {
         title: 'Planning',
@@ -33,53 +45,30 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
         href: `/planning/program-increments`,
         title: 'Program Increments',
       },
+      {
+        href: `/planning/program-increments/${programIncrementData?.key}`,
+        title: programIncrementData?.name,
+      },
+      {
+        title: 'Plan Review',
+      },
     ]
+    dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
 
-    const getProgramIncrement = async () => {
-      const programIncrementsClient = await getProgramIncrementsClient()
-      const programIncrementDto = await programIncrementsClient.getByKey(
-        params.key,
-      )
-      setProgramIncrement(programIncrementDto)
-
-      breadcrumbRoute.push(
-        {
-          href: `/planning/program-increments/${programIncrement?.key}`,
-          title: programIncrement?.name,
-        },
-        {
-          title: 'Plan Review',
-        },
-      )
-      // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
-      dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
-
-      const teamData = await programIncrementsClient.getTeams(
-        programIncrementDto.id,
-      )
-      setTeams(
-        teamData
-          .sort((a, b) => a.code.localeCompare(b.code))
-          .filter((t) => t.type === 'Team'),
-      )
-    }
-
-    getProgramIncrement()
-  }, [
-    params.key,
-    programIncrement?.key,
-    programIncrement?.name,
-    dispatch,
-    pathname,
-  ])
+    setTeams(
+      teamData
+        ?.sort((a, b) => a.code.localeCompare(b.code))
+        .filter((t) => t.type === 'Team'),
+    )
+  }, [dispatch, params.key, pathname, programIncrementData, teamData])
 
   useEffect(() => {
-    if (teams.length > 0) {
+    if (teams?.length > 0) {
       setActiveTab(teams[0].key.toString())
     }
   }, [teams])
 
-  const tabs = teams.map((team) => {
+  const tabs = teams?.map((team) => {
     return {
       key: team.key.toString(),
       tab: team.code,
@@ -88,13 +77,19 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
   })
 
   const activeTeam = () => {
-    return teams.find((t) => t.key.toString() === activeTab)
+    return teams?.find((t) => t.key.toString() === activeTab)
+  }
+
+  if (!isLoading && !isFetching && !programIncrementData) {
+    notFound()
   }
 
   const Actions = () => {
     return (
       <>
-        <Link href={`/planning/program-increments/${programIncrement?.key}`}>
+        <Link
+          href={`/planning/program-increments/${programIncrementData?.key}`}
+        >
           PI Details
         </Link>
       </>
@@ -102,8 +97,8 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
   }
 
   const PageContent = () => {
-    if (programIncrement == null) return null
-    if (tabs.length === 0) {
+    if (programIncrementData == null) return null
+    if (tabs?.length === 0) {
       return <ModaEmpty message="No teams found for this PI" />
     }
 
@@ -115,7 +110,7 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
         onTabChange={(key) => setActiveTab(key)}
       >
         <TeamPlanReview
-          programIncrement={programIncrement}
+          programIncrement={programIncrementData}
           team={activeTeam()}
         />
       </Card>
@@ -125,11 +120,11 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
   return (
     <>
       <PageTitle
-        title={programIncrement?.name}
+        title={programIncrementData?.name}
         subtitle="PI Plan Review"
         tags={
-          programIncrement?.predictability != null && (
-            <Tag title="PI Predictability">{`${programIncrement?.predictability}%`}</Tag>
+          programIncrementData?.predictability != null && (
+            <Tag title="PI Predictability">{`${programIncrementData?.predictability}%`}</Tag>
           )
         }
         actions={<Actions />}

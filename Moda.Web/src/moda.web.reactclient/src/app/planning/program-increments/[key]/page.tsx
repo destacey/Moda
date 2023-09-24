@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { Button, Card, Dropdown, MenuProps, Space, Statistic } from 'antd'
+import { Button, Card, Dropdown, MenuProps, Space } from 'antd'
 import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
 import ProgramIncrementDetails from './program-increment-details'
 import ProgramIncrementObjectivesGrid, {
