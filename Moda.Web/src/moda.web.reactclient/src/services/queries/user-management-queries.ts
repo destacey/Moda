@@ -42,8 +42,8 @@ export const useUpdatePermissionsMutation = () => {
         roleId: params.roleId,
         permissions: params.permissions,
       }),
-    onSuccess: (data, context) => {
-      queryClient.invalidateQueries([QK.ROLES, context.roleId])
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([QK.ROLES, variables.roleId])
     },
   })
 }

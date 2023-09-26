@@ -59,9 +59,9 @@ export const useUpdateProgramIncrementMutation = () => {
         programIncrement.id,
         programIncrement,
       ),
-    onSuccess: (data, context) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries([QK.PROGRAM_INCREMENTS])
-      queryClient.invalidateQueries([QK.PROGRAM_INCREMENTS, context.id])
+      queryClient.invalidateQueries([QK.PROGRAM_INCREMENTS, variables.id])
     },
   })
 }
@@ -178,46 +178,90 @@ export const useGetTeamProgramIncrementPredictability = (
   })
 }
 
+export interface CreateProgramIncrementObjectiveMutationRequest {
+  objective: CreateProgramIncrementObjectiveRequest
+  programIncrementKey: number
+}
+
 export const useCreateProgramIncrementObjectiveMutation = () => {
   const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: async (objective: CreateProgramIncrementObjectiveRequest) =>
+  return useMutation(
+    async ({
+      objective,
+      programIncrementKey,
+    }: CreateProgramIncrementObjectiveMutationRequest) =>
       (await getProgramIncrementsClient()).createObjective(
         objective.programIncrementId,
         objective,
       ),
-    onSuccess: () => {
-      queryClient.invalidateQueries([QK.PROGRAM_INCREMENT_OBJECTIVES])
+    {
+      onSuccess: (data, variables) => {
+        queryClient.invalidateQueries([QK.PROGRAM_INCREMENT_OBJECTIVES])
+        queryClient.invalidateQueries([
+          QK.PROGRAM_INCREMENT_TEAM_PREDICTABILITY,
+          variables.objective.programIncrementId,
+        ])
+        queryClient.invalidateQueries([
+          QK.PROGRAM_INCREMENTS,
+          variables.objective.programIncrementId,
+        ])
+        queryClient.invalidateQueries([
+          QK.PROGRAM_INCREMENTS,
+          variables.programIncrementKey,
+        ])
+      },
     },
-  })
+  )
+}
+
+export interface UpdateProgramIncrementObjectiveMutationRequest {
+  objective: UpdateProgramIncrementObjectiveRequest
+  programIncrementKey: number
 }
 
 export const useUpdateProgramIncrementObjectiveMutation = () => {
   const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: async (objective: UpdateProgramIncrementObjectiveRequest) =>
+  return useMutation(
+    async ({
+      objective,
+      programIncrementKey,
+    }: UpdateProgramIncrementObjectiveMutationRequest) =>
       (await getProgramIncrementsClient()).updateObjective(
         objective.programIncrementId,
         objective.objectiveId,
         objective,
       ),
-    onSuccess: (data, context) => {
-      queryClient.invalidateQueries([QK.PROGRAM_INCREMENT_OBJECTIVES])
-      queryClient.invalidateQueries([
-        QK.PROGRAM_INCREMENT_OBJECTIVES,
-        context.programIncrementId,
-      ])
-      queryClient.invalidateQueries([
-        QK.PROGRAM_INCREMENT_OBJECTIVES,
-        context.programIncrementId,
-        context.objectiveId,
-      ])
-      queryClient.invalidateQueries([
-        QK.PROGRAM_INCREMENT_TEAM_PREDICTABILITY,
-        context.programIncrementId,
-      ])
+    {
+      onSuccess: (data, variables) => {
+        queryClient.invalidateQueries([QK.PROGRAM_INCREMENT_OBJECTIVES])
+        queryClient.invalidateQueries([
+          QK.PROGRAM_INCREMENT_OBJECTIVES,
+          variables.objective.programIncrementId,
+        ])
+        queryClient.invalidateQueries([
+          QK.PROGRAM_INCREMENT_OBJECTIVES,
+          variables.programIncrementKey,
+        ])
+        queryClient.invalidateQueries([
+          QK.PROGRAM_INCREMENT_OBJECTIVES,
+          variables.objective.programIncrementId,
+          variables.objective.objectiveId,
+        ])
+        queryClient.invalidateQueries([
+          QK.PROGRAM_INCREMENT_TEAM_PREDICTABILITY,
+          variables.objective.programIncrementId,
+        ])
+        queryClient.invalidateQueries([
+          QK.PROGRAM_INCREMENTS,
+          variables.objective.programIncrementId,
+        ])
+        queryClient.invalidateQueries([
+          QK.PROGRAM_INCREMENTS,
+          variables.programIncrementKey,
+        ])
+      },
     },
-  })
+  )
 }
 
 // PROGRAM INCREMENT - RISKS
@@ -339,12 +383,12 @@ export const useCreateRiskMutation = () => {
   return useMutation({
     mutationFn: async (risk: CreateRiskRequest) =>
       (await getRisksClient()).createRisk(risk),
-    onSuccess: (data, context) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries([QK.PROGRAM_INCREMENT_RISKS])
       queryClient.invalidateQueries([QK.TEAM_RISKS])
-      queryClient.invalidateQueries([QK.TEAM_RISKS, context.teamId])
+      queryClient.invalidateQueries([QK.TEAM_RISKS, variables.teamId])
       queryClient.invalidateQueries([QK.TEAM_OF_TEAMS_RISKS])
-      queryClient.invalidateQueries([QK.TEAM_OF_TEAMS_RISKS, context.teamId])
+      queryClient.invalidateQueries([QK.TEAM_OF_TEAMS_RISKS, variables.teamId])
       queryClient.invalidateQueries([QK.MY_RISKS])
     },
   })
@@ -355,13 +399,13 @@ export const useUpdateRiskMutation = () => {
   return useMutation({
     mutationFn: async (risk: UpdateRiskRequest) =>
       (await getRisksClient()).update(risk.riskId, risk),
-    onSuccess: (data, context) => {
-      queryClient.invalidateQueries([QK.RISKS, context.riskId])
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([QK.RISKS, variables.riskId])
       queryClient.invalidateQueries([QK.PROGRAM_INCREMENT_RISKS])
       queryClient.invalidateQueries([QK.TEAM_RISKS])
-      queryClient.invalidateQueries([QK.TEAM_RISKS, context.teamId])
+      queryClient.invalidateQueries([QK.TEAM_RISKS, variables.teamId])
       queryClient.invalidateQueries([QK.TEAM_OF_TEAMS_RISKS])
-      queryClient.invalidateQueries([QK.TEAM_OF_TEAMS_RISKS, context.teamId])
+      queryClient.invalidateQueries([QK.TEAM_OF_TEAMS_RISKS, variables.teamId])
       queryClient.invalidateQueries([QK.MY_RISKS])
     },
   })

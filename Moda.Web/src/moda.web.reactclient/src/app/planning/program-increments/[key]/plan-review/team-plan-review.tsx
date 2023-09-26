@@ -19,9 +19,14 @@ import {
 export interface TeamPlanReviewProps {
   programIncrement: ProgramIncrementDetailsDto
   team: ProgramIncrementTeamResponse
+  refreshProgramIncrement: () => void
 }
 
-const TeamPlanReview = ({ programIncrement, team }: TeamPlanReviewProps) => {
+const TeamPlanReview = ({
+  programIncrement,
+  team,
+  refreshProgramIncrement,
+}: TeamPlanReviewProps) => {
   const [currentView, setCurrentView] = useState<string | number>('List')
 
   const objectivesQuery = useGetProgramIncrementObjectivesByTeamId(
@@ -59,6 +64,7 @@ const TeamPlanReview = ({ programIncrement, team }: TeamPlanReviewProps) => {
             teamId={team?.id}
             programIncrementId={programIncrement?.id}
             newObjectivesAllowed={!programIncrement?.objectivesLocked ?? false}
+            refreshProgramIncrement={() => refreshProgramIncrement()}
           />
         </Col>
         <Col xs={24} sm={24} md={24} lg={12}>

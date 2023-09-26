@@ -2,7 +2,7 @@
 
 import { useDocumentTitle } from '@/src/app/hooks'
 import { ProgramIncrementTeamResponse } from '@/src/services/moda-api'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card, Tag } from 'antd'
 import Link from 'next/link'
 import TeamPlanReview from './team-plan-review'
@@ -19,6 +19,7 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
   useDocumentTitle('PI Plan Review')
   const [teams, setTeams] = useState<ProgramIncrementTeamResponse[]>([])
   const [activeTab, setActiveTab] = useState<string>()
+  const [predictability, setPredictability] = useState<number>()
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
@@ -36,6 +37,7 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
 
   useEffect(() => {
     if (programIncrementData == null) return
+    setPredictability(programIncrementData?.predictability)
 
     const breadcrumbRoute: BreadcrumbItem[] = [
       {
@@ -63,25 +65,35 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
   }, [dispatch, params.key, pathname, programIncrementData, teamData])
 
   useEffect(() => {
-    if (teams?.length > 0) {
-      setActiveTab(teams[0].key.toString())
+    if (!activeTab && teams?.length > 0) {
+      const active = teams[0].code
+      setActiveTab(active)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [teams])
 
-  const tabs = teams?.map((team) => {
-    return {
-      key: team.key.toString(),
-      tab: team.code,
-      content: <div>{team.code}</div>,
-    }
-  })
+  const tabs = useMemo(
+    () =>
+      teams?.map((team) => {
+        return {
+          key: team.code,
+          tab: team.code,
+          content: <div>{team.code}</div>,
+        }
+      }),
+    [teams],
+  )
 
   const activeTeam = () => {
-    return teams?.find((t) => t.key.toString() === activeTab)
+    return teams?.find((t) => t.code === activeTab)
   }
 
   if (!isLoading && !isFetching && !programIncrementData) {
     notFound()
+  }
+
+  const refreshProgramIncrement = () => {
+    refetchProgramIncrement()
   }
 
   const Actions = () => {
@@ -112,6 +124,7 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
         <TeamPlanReview
           programIncrement={programIncrementData}
           team={activeTeam()}
+          refreshProgramIncrement={() => refreshProgramIncrement()}
         />
       </Card>
     )
@@ -123,8 +136,8 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
         title={programIncrementData?.name}
         subtitle="PI Plan Review"
         tags={
-          programIncrementData?.predictability != null && (
-            <Tag title="PI Predictability">{`${programIncrementData?.predictability}%`}</Tag>
+          predictability != null && (
+            <Tag title="PI Predictability">{`${predictability}%`}</Tag>
           )
         }
         actions={<Actions />}

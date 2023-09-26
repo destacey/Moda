@@ -19,7 +19,7 @@ public class ProgramIncrementTests
     #region CalculatePredictability
 
     [Fact]
-    public void CalculatePredictability_WhenStartedAndNoObjectives_Returns0()
+    public void CalculatePredictability_WhenStartedAndNoObjectives_ReturnsNull()
     {
         // Arrange
         var sut = _programIncrementFaker.UsePrivateConstructor().Generate();
@@ -28,7 +28,7 @@ public class ProgramIncrementTests
         var result = sut.CalculatePredictability(_dateTimeService.Today);
 
         // Assert
-        result.Should().Be(0);
+        result.Should().BeNull();
     }
 
     [Fact]

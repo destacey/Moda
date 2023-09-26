@@ -48,10 +48,10 @@ export const useUpdateAzdoBoardsConnectionMutation = () => {
         connection.id,
         connection,
       ),
-    onSuccess: (data, context) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, false])
       queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, true])
-      queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, context.id])
+      queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, variables.id])
     },
   })
 }

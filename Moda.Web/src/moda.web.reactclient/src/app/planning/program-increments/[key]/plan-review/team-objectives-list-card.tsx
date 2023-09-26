@@ -2,7 +2,7 @@
 
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
-import { Badge, Button, Card, List, Space } from 'antd'
+import { Badge, Button, Card, List, Space, message } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
 import { useCallback, useState } from 'react'
@@ -17,6 +17,7 @@ export interface TeamObjectivesListCardProps {
   programIncrementId: string
   teamId: string
   newObjectivesAllowed?: boolean
+  refreshProgramIncrement: () => void
 }
 
 const statusOrder = ['Not Started', 'In Progress', 'Closed', 'Canceled']
@@ -26,6 +27,7 @@ const TeamObjectivesListCard = ({
   programIncrementId,
   teamId,
   newObjectivesAllowed = false,
+  refreshProgramIncrement,
 }: TeamObjectivesListCardProps) => {
   const [openCreateObjectiveForm, setOpenCreateObjectiveForm] =
     useState<boolean>(false)
@@ -41,6 +43,8 @@ const TeamObjectivesListCard = ({
 
   const refreshObjectives = useCallback(() => {
     objectivesQuery.refetch()
+    // this will update the PI predictability on the plan review page title
+    refreshProgramIncrement()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

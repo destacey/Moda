@@ -23,6 +23,7 @@ import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
 import _ from 'lodash'
 import {
+  UpdateProgramIncrementObjectiveMutationRequest,
   useGetProgramIncrementById,
   useGetProgramIncrementObjectiveById,
   useGetProgramIncrementObjectiveStatusOptions,
@@ -52,8 +53,9 @@ interface EditProgramIncrementObjectiveFormValues {
 
 const mapToRequestValues = (
   values: EditProgramIncrementObjectiveFormValues,
+  programIncrementKey: number,
 ) => {
-  return {
+  const objective = {
     objectiveId: values.objectiveId,
     programIncrementId: values.programIncrementId,
     teamId: values.teamId,
@@ -65,6 +67,10 @@ const mapToRequestValues = (
     startDate: (values.startDate as any)?.format('YYYY-MM-DD'),
     targetDate: (values.targetDate as any)?.format('YYYY-MM-DD'),
   } as UpdateProgramIncrementObjectiveRequest
+  return {
+    objective,
+    programIncrementKey,
+  } as UpdateProgramIncrementObjectiveMutationRequest
 }
 
 const EditProgramIncrementObjectiveForm = ({
@@ -119,9 +125,12 @@ const EditProgramIncrementObjectiveForm = ({
     [form],
   )
 
-  const update = async (values: EditProgramIncrementObjectiveFormValues) => {
+  const update = async (
+    values: EditProgramIncrementObjectiveFormValues,
+    programIncrementKey: number,
+  ) => {
     try {
-      const request = mapToRequestValues(values)
+      const request = mapToRequestValues(values, programIncrementKey)
       await updateObjective.mutateAsync(request)
       return true
     } catch (error) {
@@ -143,7 +152,7 @@ const EditProgramIncrementObjectiveForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await update(values)) {
+      if (await update(values, objectiveData?.programIncrement.key)) {
         setIsOpen(false)
         onFormSave()
         form.resetFields()

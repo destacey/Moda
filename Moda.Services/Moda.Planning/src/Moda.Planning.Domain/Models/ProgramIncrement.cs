@@ -74,6 +74,9 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         if (teamId.HasValue)
             objectives = _objectives.Where(o => o.TeamId == teamId.Value).ToList();
 
+        if (!objectives.Any())
+            return null;
+
         var nonstretchCount = objectives.Count(o => !o.IsStretch);
         if (nonstretchCount == 0) { return 0; }
 

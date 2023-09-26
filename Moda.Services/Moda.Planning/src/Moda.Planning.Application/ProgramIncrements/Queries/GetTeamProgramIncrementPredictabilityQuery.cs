@@ -18,15 +18,12 @@ internal sealed class GetTeamProgramIncrementPredictabilityQueryHandler : IQuery
     {
         // TODO: filter by team on teams and objectives
         var programIncrement = await _planningDbContext.ProgramIncrements
-            .Include(p => p.Teams)
-            .Include(p => p.Objectives)
+            .Include(p => p.Teams.Where(t => t.TeamId == request.TeamId))
+            .Include(p => p.Objectives.Where(o => o.TeamId == request.TeamId))
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
-        if (programIncrement is null)
+        if (programIncrement is null || !programIncrement.Teams.Any())
             return null;
-
-        // does team belong to PI?
-
 
         return programIncrement.CalculatePredictability(_dateTimeService.Now.InUtc().Date, request.TeamId);
     }
