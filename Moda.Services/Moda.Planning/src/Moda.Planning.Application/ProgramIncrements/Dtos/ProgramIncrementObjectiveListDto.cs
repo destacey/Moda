@@ -53,7 +53,7 @@ public sealed record ProgramIncrementObjectiveListDto
             Key = piObjective.Key,
             Name = objective.Name,
             ProgramIncrement = piNavigationDto,
-            Status = objective.Status,
+            Status = SimpleNavigationDto.FromEnum(piObjective.Status),
             Progress = objective.Progress,
             Team = PlanningTeamNavigationDto.FromPlanningTeam(piObjective.Team),
             Type = SimpleNavigationDto.FromEnum(piObjective.Type),

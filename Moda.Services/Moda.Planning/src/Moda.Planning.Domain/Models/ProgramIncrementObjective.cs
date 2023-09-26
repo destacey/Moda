@@ -8,6 +8,8 @@ public class ProgramIncrementObjective : BaseAuditableEntity<Guid>
 
     internal ProgramIncrementObjective(Guid programIncrementId, Guid teamId, Guid objectiveId, ProgramIncrementObjectiveType type, bool isStretch)
     {
+        Status = ObjectiveStatus.NotStarted;
+
         ProgramIncrementId = programIncrementId;
         TeamId = teamId;
         ObjectiveId = objectiveId;
@@ -39,15 +41,21 @@ public class ProgramIncrementObjective : BaseAuditableEntity<Guid>
     /// <value>The PI objective type.</value>
     public ProgramIncrementObjectiveType Type { get; init; }
 
+    /// <summary>Gets or sets the status.</summary>
+    /// <value>The status.</value>
+    public ObjectiveStatus Status { get; private set; }
+
     /// <summary>Gets a value indicating whether this instance is stretch.</summary>
     /// <value><c>true</c> if this instance is stretch; otherwise, <c>false</c>.</value>
     public bool IsStretch { get; private set; } = false;
 
     /// <summary>Updates the specified PI objective.</summary>
+    /// <param name="status">The status.</param>
     /// <param name="isStretch">if set to <c>true</c> [is stretch].</param>
     /// <returns></returns>
-    public Result Update(bool isStretch)
+    public Result Update(ObjectiveStatus status, bool isStretch)
     {
+        Status = status;
         IsStretch = isStretch;
 
         return Result.Success();

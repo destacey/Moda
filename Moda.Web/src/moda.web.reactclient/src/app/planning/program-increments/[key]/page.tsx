@@ -51,7 +51,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   const [openManageTeamsForm, setOpenManageTeamsForm] = useState<boolean>(false)
 
   const pathname = usePathname()
-  const dispatch = useAppDispatch()  
+  const dispatch = useAppDispatch()
 
   const { hasClaim } = useAuth()
   const canUpdateProgramIncrement = hasClaim(
@@ -166,7 +166,10 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
-    programIncrementData && dispatch(setBreadcrumbTitle({title: programIncrementData.name, pathname}))
+    programIncrementData &&
+      dispatch(
+        setBreadcrumbTitle({ title: programIncrementData.name, pathname }),
+      )
   }, [dispatch, pathname, programIncrementData])
 
   const onEditFormClosed = useCallback((wasSaved: boolean) => {

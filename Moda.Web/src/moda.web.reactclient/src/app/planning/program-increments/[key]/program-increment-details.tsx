@@ -1,8 +1,9 @@
 import LinksCard from '@/src/app/components/common/links/links-card'
 import { ProgramIncrementDetailsDto } from '@/src/services/moda-api'
-import { Col, Descriptions, Row, Space, Typography } from 'antd'
-import dayjs from 'dayjs'
+import { Card, Col, Descriptions, Row, Space, Statistic } from 'antd'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import dayjs from 'dayjs'
+import { programIncrementDaysRemaining } from '@/src/utils'
 
 const { Item } = Descriptions
 
@@ -14,6 +15,29 @@ const ProgramIncrementDetails = ({
   programIncrement,
 }: ProgramIncrementDetailsProps) => {
   if (!programIncrement) return null
+
+  const DaysRemaining = () => {
+    const daysRemaining = programIncrementDaysRemaining(programIncrement.end)
+    if (daysRemaining < 0) return null
+    return (
+      <Card>
+        <Statistic title="Days Remaining" value={daysRemaining} suffix="days" />
+      </Card>
+    )
+  }
+
+  const ProgramIncrementPredictability = () => {
+    if (programIncrement.predictability == null) return null
+    return (
+      <Card>
+        <Statistic
+          title="PI Predictability"
+          value={programIncrement.predictability}
+          suffix="%"
+        />
+      </Card>
+    )
+  }
 
   return (
     <>
@@ -42,7 +66,11 @@ const ProgramIncrementDetails = ({
           </Descriptions>
         </Col>
       </Row>
-      <LinksCard objectId={programIncrement.id} />
+      <Space align="start">
+        <DaysRemaining />
+        <ProgramIncrementPredictability />
+        <LinksCard objectId={programIncrement.id} />
+      </Space>
     </>
   )
 }

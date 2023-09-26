@@ -8,6 +8,7 @@ import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
 import {
+  CreateProgramIncrementObjectiveMutationRequest,
   useCreateProgramIncrementObjectiveMutation,
   useGetProgramIncrementById,
   useGetProgramIncrementObjectiveStatuses,
@@ -40,8 +41,9 @@ interface ProgramIncrementTeamSelectItem {
 
 const mapToRequestValues = (
   values: CreateProgramIncrementObjectiveFormValues,
+  programIncrementKey: number,
 ) => {
-  return {
+  const objective = {
     programIncrementId: values.programIncrementId,
     teamId: values.teamId,
     name: values.name,
@@ -51,6 +53,10 @@ const mapToRequestValues = (
     startDate: (values.startDate as any)?.format('YYYY-MM-DD'),
     targetDate: (values.targetDate as any)?.format('YYYY-MM-DD'),
   } as CreateProgramIncrementObjectiveRequest
+  return {
+    objective,
+    programIncrementKey,
+  } as CreateProgramIncrementObjectiveMutationRequest
 }
 
 const CreateProgramIncrementObjectiveForm = ({
@@ -68,7 +74,6 @@ const CreateProgramIncrementObjectiveForm = ({
   const [messageApi, contextHolder] = message.useMessage()
   const [teams, setTeams] = useState<ProgramIncrementTeamSelectItem[]>([])
   const [defaultStatusId, setDefaultStatusId] = useState<number>(null)
-  const [newObjectiveKey, setNewObjectiveKey] = useState<number>(null)
 
   const { data: programIncrementData } =
     useGetProgramIncrementById(programIncrementId)
@@ -97,11 +102,11 @@ const CreateProgramIncrementObjectiveForm = ({
 
   const create = async (
     values: CreateProgramIncrementObjectiveFormValues,
+    programIncrementKey: number,
   ): Promise<boolean> => {
     try {
-      const request = mapToRequestValues(values)
+      const request = mapToRequestValues(values, programIncrementKey)
       const key = await createObjective.mutateAsync(request)
-      setNewObjectiveKey(key)
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -123,7 +128,13 @@ const CreateProgramIncrementObjectiveForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      await create(values)
+      if (await create(values, programIncrementData?.key)) {
+        setIsOpen(false)
+        form.resetFields()
+        onFormCreate()
+        // TODO: this message is not displaying
+        messageApi.success('Successfully created PI objective.')
+      }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
     } finally {
@@ -182,17 +193,6 @@ const CreateProgramIncrementObjectiveForm = ({
       () => setIsValid(false),
     )
   }, [form, formValues])
-
-  useEffect(() => {
-    if (newObjectiveKey) {
-      setIsOpen(false)
-      form.resetFields()
-      onFormCreate()
-      messageApi.success('Successfully created PI objective.')
-    }
-    // we don't want a trigger on the other dependencies
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newObjectiveKey])
 
   const disabledDate: RangePickerProps['disabledDate'] = useCallback(
     (current) => {

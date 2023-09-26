@@ -37,6 +37,8 @@ public sealed record ProgramIncrementDetailsDto
     /// <value><c>true</c> if [objectives locked]; otherwise, <c>false</c>.</value>
     public bool ObjectivesLocked { get; set; }
 
+    public double? Predictability { get; set; }
+
     // TODO: do this with Mapster
     public static ProgramIncrementDetailsDto Create(ProgramIncrement programIncrement, IDateTimeService dateTimeService)
     {
@@ -49,7 +51,8 @@ public sealed record ProgramIncrementDetailsDto
             Start = programIncrement.DateRange.Start,
             End = programIncrement.DateRange.End,
             State = programIncrement.StateOn(dateTimeService.Now.InUtc().Date).GetDisplayName(),
-            ObjectivesLocked = programIncrement.ObjectivesLocked
+            ObjectivesLocked = programIncrement.ObjectivesLocked,
+            Predictability = programIncrement.CalculatePredictability(dateTimeService.Now.InUtc().Date)
         };
     }
 }

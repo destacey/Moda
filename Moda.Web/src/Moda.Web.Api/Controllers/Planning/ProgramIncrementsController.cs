@@ -60,9 +60,9 @@ public class ProgramIncrementsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult<ProgramIncrementDetailsDto>> GetByKey(int id)
+    public async Task<ActionResult<ProgramIncrementDetailsDto>> GetByKey(int id, CancellationToken cancellationToken)
     {
-        var programIncrement = await _sender.Send(new GetProgramIncrementQuery(id));
+        var programIncrement = await _sender.Send(new GetProgramIncrementQuery(id), cancellationToken);
 
         return programIncrement is not null
             ? Ok(programIncrement)
@@ -120,6 +120,19 @@ public class ProgramIncrementsController : ControllerBase
         }
 
         return Ok(piTeams);
+    }
+
+    [HttpGet("{id}/teams/{teamId}/predictability")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
+    [OpenApiOperation("Get the PI predictability for a team.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<double?>> GetTeamPredictability(Guid id, Guid teamId, CancellationToken cancellationToken)
+    {
+        
+        var predictability = await _sender.Send(new GetTeamProgramIncrementPredictabilityQuery(id, teamId), cancellationToken);
+
+        return Ok(predictability);
     }
 
     [HttpPost("{id}/teams")]

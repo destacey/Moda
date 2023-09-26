@@ -8,18 +8,22 @@ import { ThemeContextType, ThemeName } from './types'
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
 export const ThemeProvider = ({ children }) => {
+  const { token } = theme.useToken()
   const [currentThemeName, setCurrentThemeName] =
     useLocalStorageState<ThemeName>('modaTheme', 'light')
   const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(lightTheme)
   const [agGridTheme, setAgGridTheme] = useState('ag-theme-balham')
-  const { token } = theme.useToken()
+  const [badgeColor, setBadgeColor] = useState<string>(null)
 
   useEffect(() => {
     setCurrentTheme(currentThemeName === 'light' ? lightTheme : darkTheme)
     setAgGridTheme(
       currentThemeName === 'light' ? 'ag-theme-balham' : 'ag-theme-balham-dark',
     )
-  }, [currentThemeName])
+    setBadgeColor(
+      currentThemeName === 'light' ? token.colorPrimary : token.colorBorderBg,
+    )
+  }, [currentThemeName, token.colorBorderBg, token.colorPrimary])
 
   return (
     <ThemeContext.Provider
@@ -28,6 +32,7 @@ export const ThemeProvider = ({ children }) => {
         setCurrentThemeName,
         agGridTheme,
         token,
+        badgeColor,
       }}
     >
       <ConfigProvider theme={currentTheme}>{children}</ConfigProvider>

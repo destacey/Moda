@@ -18,7 +18,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "7.0.10")
+                .HasAnnotation("ProductVersion", "7.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -880,13 +880,18 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid>("ProgramIncrementId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar");
+
                     b.Property<Guid>("TeamId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("varchar");
 
                     b.HasKey("Id");
 

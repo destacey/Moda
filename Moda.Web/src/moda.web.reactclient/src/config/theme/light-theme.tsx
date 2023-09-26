@@ -10,7 +10,7 @@ const lightTheme: ThemeConfig = {
   components: {
     Layout: {
       // controls the background color for all layout components
-      colorBgHeader: '#2196f3',
+      headerBg: '#2196f3',
     },
   },
 }

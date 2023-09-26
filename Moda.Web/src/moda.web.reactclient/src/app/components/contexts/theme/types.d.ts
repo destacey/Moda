@@ -7,4 +7,5 @@ export interface ThemeContextType {
   setCurrentThemeName: (themeName: ThemeName) => void
   agGridTheme: string
   token: GlobalToken
+  badgeColor: string
 }

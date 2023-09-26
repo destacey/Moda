@@ -1,4 +1,4 @@
-﻿using Moda.Goals.Domain.Enums;
+﻿using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.ProgramIncrements.Dtos;
 public sealed record ImportProgramIncrementObjectiveDto(
