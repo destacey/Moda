@@ -78,14 +78,13 @@ const ModaGrid = ({
   }, [])
 
   useEffect(() => {
-    if(!gridRef.current?.api) return
+    if (!gridRef.current?.api) return
 
-    if(isDataLoading) {
+    if (isDataLoading) {
       gridRef.current?.api.showLoadingOverlay()
     } else {
       gridRef.current?.api.hideOverlay()
     }
-
   }, [isDataLoading])
 
   return (
@@ -110,18 +109,19 @@ const ModaGrid = ({
                 />
               )}
               {showGridControls && (
-                <Tooltip title="Grid Controls">
-                  <Dropdown
-                    menu={{ items: gridControlMenuItems }}
-                    trigger={['click']}
-                  >
-                    <Button
-                      type="text"
-                      shape="circle"
-                      icon={<ControlOutlined />}
-                    />
-                  </Dropdown>
-                </Tooltip>
+                // TODO: this tooltip is triggering "findDOMNode is deprecated in StrictMode" warnings
+                // <Tooltip title="Grid Controls">
+                <Dropdown
+                  menu={{ items: gridControlMenuItems }}
+                  trigger={['click']}
+                >
+                  <Button
+                    type="text"
+                    shape="circle"
+                    icon={<ControlOutlined />}
+                  />
+                </Dropdown>
+                // </Tooltip>
               )}
               {loadData && (
                 <Tooltip title="Refresh Grid">
@@ -151,7 +151,7 @@ const ModaGrid = ({
           <AgGridReact
             ref={gridRef}
             defaultColDef={defaultColDef ?? modaDefaultColDef}
-            onGridReady={()=> loadData?.()}
+            onGridReady={() => loadData?.()}
             animateRows={true}
             rowData={rowData}
             onModelUpdated={onModelUpdated}
