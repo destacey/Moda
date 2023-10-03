@@ -94,6 +94,61 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         }
     }
 
+    public Result ImportProcesses(IEnumerable<AzureDevOpsBoardsProcess> processes, Instant timestamp)
+    {
+        try
+        {
+            Guard.Against.Null(Configuration, nameof(Configuration));
+
+            // remove processes that are not in the new list
+            var processesToRemove = Configuration.Processes.Where(w => !processes.Any(nw => nw.ExternalId == w.ExternalId)).ToList();
+            foreach (var process in processesToRemove)
+            {
+                // TODO - what if the process had been configured to sync and has data?
+                var result = Configuration.RemoveProcess(process);
+                if (result.IsFailure)
+                    return result;
+            }
+
+            // update existing or add new processes
+            foreach (var process in processes)
+            {
+                var existingProcess = Configuration.Processes.FirstOrDefault(w => w.ExternalId == process.ExternalId);
+                if (existingProcess is not null)
+                {
+                    var result = existingProcess.Update(
+                        process.Name,
+                        process.Description,
+                        process.WorkspaceIds,
+                        process.IsEnabled);
+
+                    if (result.IsFailure)
+                        return result;
+                }
+                else
+                {
+                    var result = Configuration.AddProcess(AzureDevOpsBoardsProcess.Create(
+                        process.ExternalId,
+                        process.Name,
+                        process.Description,
+                        process.WorkspaceIds,
+                        process.IsEnabled));
+
+                    if (result.IsFailure)
+                        return result;
+                }
+            }
+
+            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
     public static AzureDevOpsBoardsConnection Create(string name, string? description, AzureDevOpsBoardsConnectionConfiguration configuration, bool configurationIsValid, Instant timestamp)
     {
         var connector = new AzureDevOpsBoardsConnection(name, description, configuration, configurationIsValid);
