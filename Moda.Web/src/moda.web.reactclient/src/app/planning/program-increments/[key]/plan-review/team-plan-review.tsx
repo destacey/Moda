@@ -22,6 +22,17 @@ export interface TeamPlanReviewProps {
   refreshProgramIncrement: () => void
 }
 
+const viewSelectorOptions: SegmentedLabeledOption[] = [
+  {
+    value: 'List',
+    icon: <BarsOutlined alt="List" title="List" />,
+  },
+  {
+    value: 'Timeline',
+    icon: <BuildOutlined alt="Timeline" title="Timeline" />,
+  },
+]
+
 const TeamPlanReview = ({
   programIncrement,
   team,
@@ -44,17 +55,6 @@ const TeamPlanReview = ({
     team?.id,
   )
 
-  const viewSelectorOptions: SegmentedLabeledOption[] = [
-    {
-      value: 'List',
-      icon: <BarsOutlined alt="List" title="List" />,
-    },
-    {
-      value: 'Timeline',
-      icon: <BuildOutlined alt="Timeline" title="Timeline" />,
-    },
-  ]
-
   const ListView = () => {
     return (
       <Row gutter={[16, 16]}>
@@ -64,7 +64,7 @@ const TeamPlanReview = ({
             teamId={team?.id}
             programIncrementId={programIncrement?.id}
             newObjectivesAllowed={!programIncrement?.objectivesLocked ?? false}
-            refreshProgramIncrement={() => refreshProgramIncrement()}
+            refreshProgramIncrement={refreshProgramIncrement}
           />
         </Col>
         <Col xs={24} sm={24} md={24} lg={12}>
