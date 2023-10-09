@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CSharpFunctionalExtensions" Version="2.40.1" />
+        <PackageReference Include="CSharpFunctionalExtensions" Version="2.40.2" />
         <PackageReference Include="FluentValidation" Version="11.7.1" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.7.1" />
         <PackageReference Include="Mapster" Version="7.3.0" />

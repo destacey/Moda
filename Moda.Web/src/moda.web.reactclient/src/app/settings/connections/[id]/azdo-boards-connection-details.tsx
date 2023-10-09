@@ -1,6 +1,6 @@
 import { AzureDevOpsBoardsConnectionDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Row, Space, Typography } from 'antd'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import ReactMarkdown from 'react-markdown'
 import AzdoBoardsConnectionConfiguration from './azdo-boards-connection-configuration'
 
 const { Item } = Descriptions
