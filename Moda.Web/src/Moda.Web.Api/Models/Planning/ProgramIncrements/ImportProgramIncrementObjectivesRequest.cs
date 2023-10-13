@@ -21,7 +21,7 @@ public class ImportProgramIncrementObjectivesRequest
     public ImportProgramIncrementObjectiveDto ToImportProgramIncrementObjectiveDto()
     {
         LocalDate? startDate = StartDate?.ToLocalDateTime().Date;
-        LocalDate? targetDate = TargetDate?.ToLocalDateTime().Date; 
+        LocalDate? targetDate = TargetDate?.ToLocalDateTime().Date;
         Instant? closedDateUtc = ClosedDateUtc.HasValue ? Instant.FromDateTimeUtc(DateTime.SpecifyKind(ClosedDateUtc.Value, DateTimeKind.Utc)) : null;
         return new ImportProgramIncrementObjectiveDto(ImportId, ProgramIncrementId, TeamId, Name, Description, (ObjectiveStatus)StatusId, Progress, startDate, targetDate, IsStretch, closedDateUtc);
     }
@@ -59,12 +59,12 @@ public sealed class ImportProgramIncrementObjectivesRequestValidator : CustomVal
                 .WithMessage("The start date must be before the target date.");
         });
 
-        When(o => (ObjectiveStatus)o.StatusId is ObjectiveStatus.Closed or ObjectiveStatus.Canceled,
+        When(o => (ObjectiveStatus)o.StatusId is ObjectiveStatus.Completed or ObjectiveStatus.Canceled,
             () => RuleFor(o => o.ClosedDateUtc)
                 .NotEmpty()
-                    .WithMessage("The ClosedDateUtc can not be empty if the status is Closed or Canceled."))
+                    .WithMessage("The ClosedDateUtc can not be empty if the status is Completed or Canceled."))
             .Otherwise(() => RuleFor(o => o.ClosedDateUtc)
                 .Empty()
-                    .WithMessage("The ClosedDateUtc must be empty if the status is not Closed or Canceled"));
+                    .WithMessage("The ClosedDateUtc must be empty if the status is not Completed or Canceled"));
     }
 }

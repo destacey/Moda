@@ -1,9 +1,9 @@
 import LinksCard from '@/src/app/components/common/links/links-card'
 import { ProgramIncrementDetailsDto } from '@/src/services/moda-api'
 import { Card, Col, Descriptions, Row, Space, Statistic } from 'antd'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import dayjs from 'dayjs'
 import { programIncrementDaysRemaining } from '@/src/utils'
+import ReactMarkdown from 'react-markdown'
 
 const { Item } = Descriptions
 

@@ -51,7 +51,7 @@ public class ProgramIncrementTests
     {
         // Arrange
         var team = new PlanningTeamFaker(TeamType.Team).UsePrivateConstructor().Generate();
-        var sut = _programIncrementFaker.WithObjectives(team,2).UsePrivateConstructor().Generate();
+        var sut = _programIncrementFaker.WithObjectives(team, 2).UsePrivateConstructor().Generate();
 
         // Act
         var result = sut.CalculatePredictability(_dateTimeService.Today);
@@ -61,7 +61,7 @@ public class ProgramIncrementTests
     }
 
     [Fact]
-    public void CalculatePredictability_WhenHalfOfObjectivesClosed_Returns50()
+    public void CalculatePredictability_WhenHalfOfObjectivesCompleted_Returns50()
     {
         // Arrange
         var team = new PlanningTeamFaker(TeamType.Team).UsePrivateConstructor().Generate();
@@ -70,7 +70,7 @@ public class ProgramIncrementTests
         var objectiveIds = sut.Objectives.Select(o => o.Id).ToArray();
         for (int i = 0; i < 3; i++)
         {
-            sut.UpdateObjective(objectiveIds[i], Enums.ObjectiveStatus.Closed, false);
+            sut.UpdateObjective(objectiveIds[i], Enums.ObjectiveStatus.Completed, false);
         }
 
         // Act
@@ -81,7 +81,7 @@ public class ProgramIncrementTests
     }
 
     [Fact]
-    public void CalculatePredictability_WithStretchAndWhenAllClosed_Returns100()
+    public void CalculatePredictability_WithStretchAndWhenAllCompleted_Returns100()
     {
         // Arrange
         var objectiveCount = 6;
@@ -92,7 +92,7 @@ public class ProgramIncrementTests
         for (int i = 0; i < objectiveCount; i++)
         {
             var isStretch = i >= objectiveCount - 2;
-            sut.UpdateObjective(objectiveIds[i], Enums.ObjectiveStatus.Closed, isStretch);
+            sut.UpdateObjective(objectiveIds[i], Enums.ObjectiveStatus.Completed, isStretch);
         }
 
         // Act
@@ -103,7 +103,7 @@ public class ProgramIncrementTests
     }
 
     [Fact]
-    public void CalculatePredictability_WhenAllButOneNonStretchClosed_Returns100()
+    public void CalculatePredictability_WhenAllButOneNonStretchCompleted_Returns100()
     {
         // Arrange
         var objectiveCount = 6;
@@ -114,7 +114,7 @@ public class ProgramIncrementTests
         for (int i = 1; i < objectiveCount; i++) // skip the first one so it is still open
         {
             var isStretch = i >= objectiveCount - 2;
-            sut.UpdateObjective(objectiveIds[i], Enums.ObjectiveStatus.Closed, isStretch);
+            sut.UpdateObjective(objectiveIds[i], Enums.ObjectiveStatus.Completed, isStretch);
         }
 
         // Act
@@ -125,7 +125,7 @@ public class ProgramIncrementTests
     }
 
     [Fact]
-    public void CalculatePredictability_WhenAllClosedExceptStretch_ReturnsOneHundred()
+    public void CalculatePredictability_WhenAllCompletedExceptStretch_ReturnsOneHundred()
     {
         // Arrange
         var objectiveCount = 6;
@@ -136,7 +136,7 @@ public class ProgramIncrementTests
         for (int i = 0; i < objectiveCount; i++)
         {
             var isStretch = i >= objectiveCount - 2;
-            var status = isStretch ? Enums.ObjectiveStatus.InProgress : Enums.ObjectiveStatus.Closed;
+            var status = isStretch ? Enums.ObjectiveStatus.InProgress : Enums.ObjectiveStatus.Completed;
             sut.UpdateObjective(objectiveIds[i], status, isStretch);
         }
 
@@ -160,7 +160,7 @@ public class ProgramIncrementTests
         {
             var isStretch = i >= objectiveCount - 2;
             var isComplete = i < 3;
-            var status = isComplete ? Enums.ObjectiveStatus.Closed : Enums.ObjectiveStatus.InProgress;
+            var status = isComplete ? Enums.ObjectiveStatus.Completed : Enums.ObjectiveStatus.InProgress;
             sut.UpdateObjective(objectiveIds[i], status, isStretch);
         }
 
@@ -185,7 +185,7 @@ public class ProgramIncrementTests
         {
             var isStretch = i >= objectiveCount - 2;
             var isComplete = i < 3;
-            var status = isStretch ? Enums.ObjectiveStatus.Closed : Enums.ObjectiveStatus.InProgress;
+            var status = isStretch ? Enums.ObjectiveStatus.Completed : Enums.ObjectiveStatus.InProgress;
             sut.UpdateObjective(objectiveIds[i], status, isStretch);
         }
 

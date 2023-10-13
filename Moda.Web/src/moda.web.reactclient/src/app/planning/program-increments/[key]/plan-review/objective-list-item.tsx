@@ -13,6 +13,19 @@ export interface ObjectiveListItemProps {
   refreshObjectives: () => void
 }
 
+const getColorForStatus = (status: string) => {
+  switch (status) {
+    case 'In Progress':
+      return 'blue'
+    case 'Completed':
+      return 'green'
+    case 'Canceled':
+      return 'red'
+    default:
+      return 'default'
+  }
+}
+
 const ObjectiveListItem = ({
   objective,
   piKey,
@@ -29,19 +42,6 @@ const ObjectiveListItem = ({
         {objective.key} - {objective.name}
       </Link>
     )
-  }
-
-  const getColorForStatus = (status: string) => {
-    switch (status) {
-      case 'In Progress':
-        return 'blue'
-      case 'Closed':
-        return 'green'
-      case 'Canceled':
-        return 'red'
-      default:
-        return 'default'
-    }
   }
 
   const description = () => {

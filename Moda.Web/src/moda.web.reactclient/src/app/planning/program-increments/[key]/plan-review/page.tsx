@@ -84,7 +84,7 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
     [teams],
   )
 
-  const activeTeam = () => {
+  const activeTeam = (): ProgramIncrementTeamResponse => {
     return teams?.find((t) => t.code === activeTab)
   }
 
@@ -124,7 +124,7 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
         <TeamPlanReview
           programIncrement={programIncrementData}
           team={activeTeam()}
-          refreshProgramIncrement={() => refreshProgramIncrement()}
+          refreshProgramIncrement={refreshProgramIncrement}
         />
       </Card>
     )

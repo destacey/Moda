@@ -80,7 +80,7 @@ public class ProgramIncrement : BaseAuditableEntity<Guid>
         var nonstretchCount = objectives.Count(o => !o.IsStretch);
         if (nonstretchCount == 0) { return 0; }
 
-        var completedCount = objectives.Count(o => o.Status == ObjectiveStatus.Closed);
+        var completedCount = objectives.Count(o => o.Status == ObjectiveStatus.Completed);
         return completedCount >= nonstretchCount ? 100.0d : Math.Round(100 * ((double)completedCount / nonstretchCount), 2);
     }
 

@@ -20,7 +20,7 @@ export interface TeamObjectivesListCardProps {
   refreshProgramIncrement: () => void
 }
 
-const statusOrder = ['Not Started', 'In Progress', 'Closed', 'Canceled']
+const statusOrder = ['Not Started', 'In Progress', 'Completed', 'Canceled']
 
 const TeamObjectivesListCard = ({
   objectivesQuery,
