@@ -61,19 +61,35 @@ public class AzureDevOpsService : IAzureDevOpsService
         return iterations; // map to local type and return interface instead of concrete type
     }
 
-    public async Task<Result<IExternalWorkspace>> GetProject(string organizationUrl, string token, Guid projectId)
+    public async Task<Result<List<IExternalWorkProcess>>> GetWorkProcesses(string organizationUrl, string token)
+    {
+        var connection = CreateVssConnection(organizationUrl, token);
+        var processService = GetService<ProcessService>(connection);
+
+        var result = await processService.GetProcesses();
+        if (result.IsFailure)
+            return Result.Failure<List<IExternalWorkProcess>>(result.Error);
+
+        var workProcesses = result.Value
+            .Select(w => new AzdoWorkProcess(w))
+            .ToList<IExternalWorkProcess>();
+
+        return Result.Success(workProcesses);
+    }
+
+    public async Task<Result<IExternalWorkspace>> GetWorkspace(string organizationUrl, string token, Guid workspaceId)
     {
         var connection = CreateVssConnection(organizationUrl, token);
         var projectService = GetService<ProjectService>(connection);
 
-        var result = await projectService.GetProject(projectId);
+        var result = await projectService.GetProject(workspaceId);
 
         return result.IsSuccess
             ? Result.Success<IExternalWorkspace>(new AzdoWorkspace(result.Value))
             : Result.Failure<IExternalWorkspace>(result.Error);
     }
 
-    public async Task<Result<List<IExternalWorkspace>>> GetProjects(string organizationUrl, string token)
+    public async Task<Result<List<IExternalWorkspace>>> GetWorkspaces(string organizationUrl, string token)
     {
         var connection = CreateVssConnection(organizationUrl, token);
         var projectService = GetService<ProjectService>(connection);
@@ -160,6 +176,7 @@ public class AzureDevOpsService : IAzureDevOpsService
         {
             Type type when type == typeof(AreaService) => (TService)Activator.CreateInstance(typeof(AreaService), connection, logger!)!,
             Type type when type == typeof(IterationService) => (TService)Activator.CreateInstance(typeof(IterationService), connection, logger!)!,
+            Type type when type == typeof(ProcessService) => (TService)Activator.CreateInstance(typeof(ProcessService), connection, logger!)!,
             Type type when type == typeof(ProjectService) => (TService)Activator.CreateInstance(typeof(ProjectService), connection, logger!)!,
             Type type when type == typeof(WorkItemService) => (TService)Activator.CreateInstance(typeof(WorkItemService), connection, logger!)!,
             Type type when type == typeof(WorkItemTypeService) => (TService)Activator.CreateInstance(typeof(WorkItemTypeService), connection, logger!)!,
