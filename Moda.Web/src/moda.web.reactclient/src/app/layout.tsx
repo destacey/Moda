@@ -6,7 +6,6 @@ import 'ag-grid-community/styles/ag-theme-balham.css'
 import React from 'react'
 import { Provider } from 'react-redux'
 import { Inter } from 'next/font/google'
-import StyledComponentsRegistry from '../lib/antd-registry'
 import { Layout } from 'antd'
 import { AuthenticatedTemplate } from '@azure/msal-react'
 import { store } from '../store'
@@ -27,6 +26,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
+      refetchOnWindowFocus: false,
     },
   },
 })
@@ -41,35 +41,35 @@ export default function RootLayout({
       <body className={inter.className}>
         <Provider store={store}>
           {/* <StyledComponentsRegistry> */}
-            <AuthProvider>
-              <ThemeProvider>
-                <AuthenticatedTemplate>
-                  <QueryClientProvider client={queryClient}>
-                    <MenuToggleProvider>
-                      <Layout>
-                        <AppHeader />
-                        <LoadingAccount>
-                          <Layout hasSider style={{ minHeight: '100vh' }}>
-                            <AppMenu />
-                            <Layout style={{ padding: '0 24px 24px' }}>
-                                <AppBreadcrumb />
-                                <Content
-                                  style={{
-                                    margin: 0,
-                                    height: '100%',
-                                  }}
-                                >
-                                  {children}
-                                </Content>
-                            </Layout>
+          <AuthProvider>
+            <ThemeProvider>
+              <AuthenticatedTemplate>
+                <QueryClientProvider client={queryClient}>
+                  <MenuToggleProvider>
+                    <Layout>
+                      <AppHeader />
+                      <LoadingAccount>
+                        <Layout hasSider style={{ minHeight: '100vh' }}>
+                          <AppMenu />
+                          <Layout style={{ padding: '0 24px 24px' }}>
+                            <AppBreadcrumb />
+                            <Content
+                              style={{
+                                margin: 0,
+                                height: '100%',
+                              }}
+                            >
+                              {children}
+                            </Content>
                           </Layout>
-                        </LoadingAccount>
-                      </Layout>
-                    </MenuToggleProvider>
-                  </QueryClientProvider>
-                </AuthenticatedTemplate>
-              </ThemeProvider>
-            </AuthProvider>
+                        </Layout>
+                      </LoadingAccount>
+                    </Layout>
+                  </MenuToggleProvider>
+                </QueryClientProvider>
+              </AuthenticatedTemplate>
+            </ThemeProvider>
+          </AuthProvider>
           {/* </StyledComponentsRegistry> */}
         </Provider>
       </body>

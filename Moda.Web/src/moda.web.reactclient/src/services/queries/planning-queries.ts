@@ -26,7 +26,7 @@ export const useGetProgramIncrementById = (id: string) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENTS, id],
     queryFn: async () => (await getProgramIncrementsClient()).getById(id),
-    staleTime: 60000,
+    // staleTime: 60000,
     enabled: !!id,
   })
 }
@@ -35,7 +35,7 @@ export const useGetProgramIncrementByKey = (key: number) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENTS, key],
     queryFn: async () => (await getProgramIncrementsClient()).getByKey(key),
-    staleTime: 60000,
+    // staleTime: 60000,
     enabled: !!key,
   })
 }
@@ -74,7 +74,7 @@ export const useGetProgramIncrementTeams = (
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_TEAMS, id],
     queryFn: async () => (await getProgramIncrementsClient()).getTeams(id),
-    staleTime: 60000,
+    // staleTime: 60000,
     enabled: !!id && enabled,
   })
 }
@@ -88,7 +88,7 @@ export const useGetProgramIncrementObjectives = (
     queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVES, id],
     queryFn: async () =>
       (await getProgramIncrementsClient()).getObjectives(id, null),
-    staleTime: 10000,
+    // staleTime: 10000,
     enabled: !!id && enabled,
   })
 }
@@ -102,7 +102,7 @@ export const useGetProgramIncrementObjectivesByTeamId = (
     queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVES, id, teamId],
     queryFn: async () =>
       (await getProgramIncrementsClient()).getObjectives(id, teamId),
-    staleTime: 10000,
+    // staleTime: 20000,
     enabled: !!id && !!teamId && enabled,
   })
 }
@@ -118,7 +118,7 @@ export const useGetProgramIncrementObjectiveById = (
     onError: (error) => {
       console.log(error)
     },
-    staleTime: 10000,
+    // staleTime: 10000,
     enabled: !!id && !!objectiveId,
   })
 }
@@ -131,7 +131,7 @@ export const useGetProgramIncrementObjectiveByKey = (
     queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVES, key, objectiveKey],
     queryFn: async () =>
       (await getProgramIncrementsClient()).getObjectiveByKey(key, objectiveKey),
-    staleTime: 10000,
+    // staleTime: 10000,
     enabled: !!key && !!objectiveKey,
   })
 }
@@ -143,7 +143,7 @@ export const useGetProgramIncrementObjectiveStatuses = (
     queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVE_STATUSES],
     queryFn: async () =>
       (await getProgramIncrementsClient()).getObjectiveStatuses(),
-    staleTime: 300000,
+    // staleTime: 300000,
     enabled: enabled,
   })
 }
@@ -161,7 +161,7 @@ export const useGetProgramIncrementObjectiveStatusOptions = () => {
       }))
       return options
     },
-    staleTime: 300000,
+    // staleTime: 300000,
   })
 }
 
@@ -173,7 +173,7 @@ export const useGetTeamProgramIncrementPredictability = (
     queryKey: [QK.PROGRAM_INCREMENT_TEAM_PREDICTABILITY, id, teamId],
     queryFn: async () =>
       (await getProgramIncrementsClient()).getTeamPredictability(id, teamId),
-    staleTime: 10000,
+    //staleTime: 30000,
     enabled: !!id && !!teamId,
   })
 }
@@ -278,7 +278,7 @@ export const useGetProgramIncrementRisks = (
     ],
     queryFn: async () =>
       (await getProgramIncrementsClient()).getRisks(id, null, includeClosed),
-    staleTime: 10000,
+    // staleTime: 10000,
     enabled: !!id && enabled,
   })
 }
@@ -298,7 +298,7 @@ export const useGetProgramIncrementRisksByTeamId = (
     ],
     queryFn: async () =>
       (await getProgramIncrementsClient()).getRisks(id, teamId, includeClosed),
-    staleTime: 10000,
+    // staleTime: 20000,
     enabled: !!id && !!teamId && enabled,
   })
 }
@@ -308,7 +308,7 @@ export const useGetRiskById = (id: string) => {
   return useQuery({
     queryKey: [QK.RISKS, id],
     queryFn: async () => (await getRisksClient()).getById(id),
-    staleTime: 10000,
+    // staleTime: 10000,
     enabled: !!id,
   })
 }
@@ -317,7 +317,7 @@ export const useGetRiskByKey = (key: number) => {
   return useQuery({
     queryKey: [QK.RISKS, key],
     queryFn: async () => (await getRisksClient()).getByKey(key),
-    staleTime: 10000,
+    // staleTime: 10000,
     enabled: !!key,
   })
 }
@@ -326,7 +326,7 @@ export const useGetMyRisks = () => {
   return useQuery({
     queryKey: [QK.MY_RISKS],
     queryFn: async () => (await getRisksClient()).getMyRisks(),
-    staleTime: 10000,
+    // staleTime: 10000,
   })
 }
 
@@ -342,7 +342,7 @@ export const useGetRiskStatusOptions = () => {
       }))
       return options
     },
-    staleTime: 300000,
+    // staleTime: 300000,
   })
 }
 
@@ -358,7 +358,7 @@ export const useGetRiskCategoryOptions = () => {
       }))
       return options
     },
-    staleTime: 300000,
+    // staleTime: 300000,
   })
 }
 
@@ -374,7 +374,7 @@ export const useGetRiskGradeOptions = () => {
       }))
       return options
     },
-    staleTime: 300000,
+    // staleTime: 300000,
   })
 }
 

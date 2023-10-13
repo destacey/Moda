@@ -3,7 +3,7 @@ import { RiskDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Row, Space } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import ReactMarkdown from 'react-markdown'
 
 const { Item } = Descriptions
 

@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CSharpFunctionalExtensions" Version="2.40.1" />
+        <PackageReference Include="CSharpFunctionalExtensions" Version="2.40.2" />
         <PackageReference Include="FluentValidation" Version="11.7.1" />
         <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
         <PackageReference Include="NodaTime" Version="3.1.9" />
