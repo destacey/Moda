@@ -25,7 +25,7 @@ public class ObjectiveFaker : Faker<Objective>
         {
             ObjectiveStatus.NotStarted => 0.0d,
             ObjectiveStatus.InProgress => progress,
-            ObjectiveStatus.Closed => 100.0d,
+            ObjectiveStatus.Completed => 100.0d,
             ObjectiveStatus.Canceled => progress,
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };

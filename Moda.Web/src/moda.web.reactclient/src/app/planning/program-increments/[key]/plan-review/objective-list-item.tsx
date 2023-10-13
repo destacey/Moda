@@ -17,7 +17,7 @@ const getColorForStatus = (status: string) => {
   switch (status) {
     case 'In Progress':
       return 'blue'
-    case 'Closed':
+    case 'Completed':
       return 'green'
     case 'Canceled':
       return 'red'

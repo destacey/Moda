@@ -9,7 +9,7 @@ public static class ObjectiveStatusExtension
         {
             ObjectiveStatus.NotStarted => Goals.Domain.Enums.ObjectiveStatus.NotStarted,
             ObjectiveStatus.InProgress => Goals.Domain.Enums.ObjectiveStatus.InProgress,
-            ObjectiveStatus.Closed => Goals.Domain.Enums.ObjectiveStatus.Closed,
+            ObjectiveStatus.Completed => Goals.Domain.Enums.ObjectiveStatus.Completed,
             ObjectiveStatus.Canceled => Goals.Domain.Enums.ObjectiveStatus.Canceled,
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };
