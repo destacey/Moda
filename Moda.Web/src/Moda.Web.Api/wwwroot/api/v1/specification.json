@@ -7462,7 +7462,7 @@
           "name": {
             "type": "string",
             "description": "The name of the work state.  The name cannot be changed.",
-            "maxLength": 256,
+            "maxLength": 64,
             "minLength": 1,
             "nullable": false
           },
@@ -7522,7 +7522,7 @@
           "name": {
             "type": "string",
             "description": "The name of the work type.  The name cannot be changed.",
-            "maxLength": 256,
+            "maxLength": 64,
             "minLength": 1,
             "nullable": false
           },

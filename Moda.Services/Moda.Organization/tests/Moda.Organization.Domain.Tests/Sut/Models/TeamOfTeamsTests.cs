@@ -1,9 +1,8 @@
 ﻿using System.Security.Cryptography;
-using FluentAssertions;
 using Moda.Common.Domain.Events;
 using Moda.Organization.Domain.Enums;
 using Moda.Organization.Domain.Models;
-using Moda.Organization.Domain.Tests.Extensions;
+using Moda.Tests.Shared.Extensions;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Tests.Sut.Models;

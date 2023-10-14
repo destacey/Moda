@@ -24,7 +24,7 @@ public sealed class CreateWorkStateRequestValidator : CustomValidator<CreateWork
 
         RuleFor(c => c.Name)
             .NotEmpty()
-            .MaximumLength(256);
+            .MaximumLength(64);
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);

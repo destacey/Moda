@@ -17,17 +17,29 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     private string _name = null!;
     private string? _description;
 
-    private readonly List<WorkProcessScheme> _schemes = new();
+    //private readonly List<WorkProcessScheme> _schemes = new();
     private readonly List<Workspace> _workspaces = new();
 
     private WorkProcess() { }
 
-    private WorkProcess(string name, string? description, Ownership ownership)
+    private WorkProcess(string name, string? description, Ownership ownership, Guid? externalId)
     {
         Name = name;
         Description = description;
         Ownership = ownership;
+
+        if (ownership is Ownership.Managed)
+        {
+            if (!externalId.HasValue)
+                throw new ArgumentException("The external identifier is required when the ownership is managed.", nameof(externalId));
+
+            ExternalId = externalId.Value;
+        }
     }
+
+    /// <summary>Gets the key.</summary>
+    /// <value>The key.</value>
+    public int Key { get; private set; }
 
     /// <summary>
     /// The name of the work process.
@@ -51,7 +63,11 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     /// Indicates whether the work process is owned by Moda or a third party system.  This value should not change.
     /// </summary>
     /// <value>The ownership.</value>
-    public Ownership Ownership { get; init; }
+    public Ownership Ownership { get; private init; }
+
+    /// <summary>Gets the external identifier. The value is required when Ownership is managed; otherwise it's null.</summary>
+    /// <value>The external identifier.</value>
+    public Guid? ExternalId { get; private init; }
 
     /// <summary>
     /// Indicates whether the work process is active or not.  Only active work processes can be assigned
@@ -60,7 +76,7 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; private set; } = false;
 
-    public IReadOnlyCollection<WorkProcessScheme> Schemes => _schemes.AsReadOnly();
+    //public IReadOnlyCollection<WorkProcessScheme> Schemes => _schemes.AsReadOnly();
 
     public IReadOnlyCollection<Workspace> Workspaces => _workspaces.AsReadOnly();
 
@@ -120,15 +136,29 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
         return Result.Success();
     }
 
-    /// <summary>Creates the specified name.</summary>
+    /// <summary>Creates an owned Work Process.</summary>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
     /// <param name="ownership">The ownership.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public static WorkProcess Create(string name, string? description, Ownership ownership, Instant timestamp)
+    public static WorkProcess Create(string name, string? description, Instant timestamp)
     {
-        WorkProcess workProcess = new(name, description, ownership);
+        WorkProcess workProcess = new(name, description, Ownership.Owned, null);
+
+        workProcess.AddDomainEvent(EntityCreatedEvent.WithEntity(workProcess, timestamp));
+        return workProcess;
+    }
+
+    /// <summary>Creates a managed Work Process linked to a external id.</summary>
+    /// <param name="name">The name.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="externalId">The external identifier.</param>
+    /// <param name="timestamp">The timestamp.</param>
+    /// <returns></returns>
+    public static WorkProcess CreateExternal(string name, string? description, Guid externalId, Instant timestamp)
+    {
+        WorkProcess workProcess = new(name, description, Ownership.Managed, externalId);
 
         workProcess.AddDomainEvent(EntityCreatedEvent.WithEntity(workProcess, timestamp));
         return workProcess;

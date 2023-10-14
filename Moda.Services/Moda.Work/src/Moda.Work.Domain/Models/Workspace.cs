@@ -10,18 +10,36 @@ namespace Moda.Work.Domain.Models;
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;Moda.Work.Domain.Models.WorkspaceActivatableArgs, NodaTime.Instant&gt;" />
 public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<WorkspaceActivatableArgs, Instant>
 {
+    private WorkspaceKey _key = null!;
     private string _name = null!;
     private string? _description;
-    private readonly List<WorkItem> _workItems = new();
+    //private readonly List<WorkItem> _workItems = new();
 
     private Workspace() { }
 
-    public Workspace(string name, string? description, Ownership ownership, Guid workProcessId)
+    private Workspace(WorkspaceKey key, string name, string? description, Ownership ownership, Guid? externalId, Guid workProcessId)
     {
+        Key = key;
         Name = name;
         Description = description;
         Ownership = ownership;
         WorkProcessId = workProcessId;
+
+        if (ownership is Ownership.Managed)
+        {
+            if (!externalId.HasValue)
+                throw new ArgumentException("The external identifier is required when the ownership is managed.", nameof(externalId));
+
+            ExternalId = externalId.Value;
+        }
+    }
+
+    /// <summary>A unique key to identify the workspace.</summary>
+    /// <value>The key.</value>
+    public WorkspaceKey Key 
+    { 
+        get => _key;
+        private set => _key = Guard.Against.Null(value, nameof(Key));
     }
 
     /// <summary>
@@ -45,7 +63,11 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     /// <summary>
     /// Indicates whether the workspace is owned by Moda or a third party system.  This value should not change.
     /// </summary>
-    public Ownership Ownership { get; }
+    public Ownership Ownership { get; private init; }
+
+    /// <summary>Gets the external identifier. The value is required when Ownership is managed; otherwise it's null.</summary>
+    /// <value>The external identifier.</value>
+    public Guid? ExternalId { get; private init; }
 
     /// <summary>
     /// The foreign key for the work process.
@@ -61,21 +83,21 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     /// <summary>
     /// A collection of work items in the workspace.
     /// </summary>
-    public IReadOnlyCollection<WorkItem> WorkItems => _workItems.AsReadOnly();
+    //public IReadOnlyCollection<WorkItem> WorkItems => _workItems.AsReadOnly();
 
     /// <summary>
     /// The process for adding a work item to the workspace.
     /// </summary>
     /// <param name="workItem"></param>
     /// <returns></returns>
-    public Result AddWorkItem(WorkItem workItem)
-    {
-        if (!IsActive)
-            return Result.Failure("Unable to add work items to an inactive work space.");
+    //public Result AddWorkItem(WorkItem workItem)
+    //{
+    //    if (!IsActive)
+    //        return Result.Failure("Unable to add work items to an inactive work space.");
 
-        _workItems.Add(workItem);
-        return Result.Success();
-    }
+    //    _workItems.Add(workItem);
+    //    return Result.Success();
+    //}
 
     /// <summary>
     /// The process for updating the workspace properties.
@@ -83,10 +105,12 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     /// <param name="name"></param>
     /// <param name="description"></param>
     /// <returns></returns>
-    public Result Update(string name, string? description)
+    public Result Update(string name, string? description, Instant timestamp)
     {
         Name = name.Trim();
         Description = description?.Trim();
+
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
         return Result.Success();
     }
@@ -95,21 +119,21 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     /// The process for changing the work process assigned to the workspace.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Result ChangeWorkspaceProcess(WorkProcess workProcess)
-    {
-        if (workProcess.Ownership != Ownership)
-            return Result.Failure($"Unable to assign the work process because the ownership does not match the workspace ownership.");
+    //public Result ChangeWorkspaceProcess(WorkProcess workProcess)
+    //{
+    //    if (workProcess.Ownership != Ownership)
+    //        return Result.Failure($"Unable to assign the work process because the ownership does not match the workspace ownership.");
 
-        if (!WorkItems.Any())
-        {
-            WorkProcessId = workProcess.Id;
-            return Result.Success();
-        }
+    //    if (!WorkItems.Any())
+    //    {
+    //        WorkProcessId = workProcess.Id;
+    //        return Result.Success();
+    //    }
 
-        // TODO what if the work process doesn't cover all of the work types for existing work items
-        //
-        throw new NotImplementedException();
-    }
+    //    // TODO what if the work process doesn't cover all of the work types for existing work items
+    //    //
+    //    throw new NotImplementedException();
+    //}
 
     /// <summary>The process for activating a workspace.</summary>
     /// <param name="args">The arguments.</param>
@@ -144,5 +168,36 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
         }
 
         return Result.Success();
+    }
+
+    /// <summary>Creates an owned Workspace.</summary>
+    /// <param name="key">The key.</param>
+    /// <param name="name">The name.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="workProcessId">The work process.</param>
+    /// <param name="timestamp">The timestamp.</param>
+    /// <returns></returns>
+    public static Workspace Create(WorkspaceKey key, string name, string? description, Guid workProcessId, Instant timestamp)
+    {
+        var workspace = new Workspace(key, name, description, Ownership.Owned, null, workProcessId);
+
+        workspace.AddDomainEvent(EntityCreatedEvent.WithEntity(workspace, timestamp));
+        return workspace;
+    }
+
+    /// <summary>Creates a managed Workspace linked to a external id.</summary>
+    /// <param name="key">The key.</param>
+    /// <param name="name">The name.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="externalId">The external identifier.</param>
+    /// <param name="workProcess">The work process.</param>
+    /// <param name="timestamp">The timestamp.</param>
+    /// <returns></returns>
+    public static Workspace CreateExternal(WorkspaceKey key, string name, string? description, Guid externalId, Guid workProcessId, Instant timestamp)
+    {
+        var workspace = new Workspace(key, name, description, Ownership.Managed, externalId, workProcessId);
+
+        workspace.AddDomainEvent(EntityCreatedEvent.WithEntity(workspace, timestamp));
+        return workspace;
     }
 }

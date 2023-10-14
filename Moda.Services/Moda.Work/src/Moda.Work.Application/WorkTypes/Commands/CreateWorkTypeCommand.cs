@@ -34,7 +34,7 @@ public sealed class CreateWorkTypeCommandValidator : CustomValidator<CreateWorkT
 
         RuleFor(c => c.Name)
             .NotEmpty()
-            .MaximumLength(256)
+            .MaximumLength(64)
             .MustAsync(BeUniqueName).WithMessage("The work type already exists.");
 
         RuleFor(c => c.Description)

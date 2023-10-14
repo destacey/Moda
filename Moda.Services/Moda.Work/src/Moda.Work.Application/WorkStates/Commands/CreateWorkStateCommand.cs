@@ -34,7 +34,7 @@ public sealed class CreateWorkStateCommandValidator : CustomValidator<CreateWork
 
         RuleFor(c => c.Name)
             .NotEmpty()
-            .MaximumLength(256)
+            .MaximumLength(64)
             .MustAsync(BeUniqueName).WithMessage("The work state already exists.");
 
         RuleFor(c => c.Description)

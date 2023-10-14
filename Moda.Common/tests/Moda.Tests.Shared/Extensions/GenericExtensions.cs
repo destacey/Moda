@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Moda.Organization.Domain.Tests.Extensions;
+namespace Moda.Tests.Shared.Extensions;
 public static class GenericExtensions
 {
     public static void SetPrivate<T, TValue>(this T instance, Expression<Func<T, TValue>> propertyExpression, TValue value)
