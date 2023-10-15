@@ -51,6 +51,7 @@ public class AzureDevOpsBoardsConnectionConfig : IEntityTypeConfiguration<AzureD
         {
             ownedBuilder.ToJson();
             ownedBuilder.OwnsMany(conf => conf.Workspaces);
+            ownedBuilder.OwnsMany(conf => conf.WorkProcesses);
         });
     }
 }

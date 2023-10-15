@@ -12,12 +12,12 @@ public sealed class AzureDevOpsBoardsConnectionConfiguration
     public AzureDevOpsBoardsConnectionConfiguration() { }
 
     [SetsRequiredMembers]
-    public AzureDevOpsBoardsConnectionConfiguration(string organization, string personalAccessToken, IEnumerable<AzureDevOpsBoardsWorkspace>? workspaces = null, IEnumerable<AzureDevOpsBoardsProcess>? processes = null)
+    public AzureDevOpsBoardsConnectionConfiguration(string organization, string personalAccessToken, IEnumerable<AzureDevOpsBoardsWorkspace>? workspaces = null, IEnumerable<AzureDevOpsBoardsWorkProcess>? processes = null)
     {
         Organization = organization.Trim();
         PersonalAccessToken = personalAccessToken.Trim();
         Workspaces = workspaces?.ToList() ?? new List<AzureDevOpsBoardsWorkspace>();
-        Processes = processes?.ToList() ?? new List<AzureDevOpsBoardsProcess>();
+        WorkProcesses = processes?.ToList() ?? new List<AzureDevOpsBoardsWorkProcess>();
     }
 
     /// <summary>Gets the organization.</summary>
@@ -36,8 +36,9 @@ public sealed class AzureDevOpsBoardsConnectionConfiguration
     [JsonInclude]
     public List<AzureDevOpsBoardsWorkspace> Workspaces { get; private set; } = new ();
 
+    /// <summary>Gets the work processes.</summary>
     [JsonInclude]
-    public List<AzureDevOpsBoardsProcess> Processes { get; private set; } = new ();
+    public List<AzureDevOpsBoardsWorkProcess> WorkProcesses { get; private set; } = new ();
 
     internal Result AddWorkspace(AzureDevOpsBoardsWorkspace workspace)
     {
@@ -77,16 +78,16 @@ public sealed class AzureDevOpsBoardsConnectionConfiguration
         }
     }
 
-    internal Result AddProcess(AzureDevOpsBoardsProcess process)
+    internal Result AddWorkProcess(AzureDevOpsBoardsWorkProcess process)
     {
         try
         {
             Guard.Against.Null(process, nameof(process));
 
-            if (Processes.Any(w => w.ExternalId == process.ExternalId))
+            if (WorkProcesses.Any(w => w.ExternalId == process.ExternalId))
                 return Result.Failure("Unable to add a duplicate process.");
 
-            Processes.Add(process);
+            WorkProcesses.Add(process);
 
             return Result.Success();
         }
@@ -96,16 +97,16 @@ public sealed class AzureDevOpsBoardsConnectionConfiguration
         }
     }
 
-    internal Result RemoveProcess(AzureDevOpsBoardsProcess process)
+    internal Result RemoveWorkProcess(AzureDevOpsBoardsWorkProcess process)
     {
         try
         {
             Guard.Against.Null(process, nameof(process));
 
-            if (!Processes.Any(w => w.ExternalId == process.ExternalId))
+            if (!WorkProcesses.Any(w => w.ExternalId == process.ExternalId))
                 return Result.Failure("Unable to remove a process that does not exist.");
 
-            Processes.Remove(process);
+            WorkProcesses.Remove(process);
 
             return Result.Success();
         }
