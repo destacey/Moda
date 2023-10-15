@@ -1,15 +1,20 @@
-import { AzureDevOpsBoardsWorkspaceDto } from '@/src/services/moda-api'
+import {
+  AzureDevOpsBoardsWorkProcessDto,
+  AzureDevOpsBoardsWorkspaceDto,
+} from '@/src/services/moda-api'
 import { ExportOutlined } from '@ant-design/icons'
-import { Alert, Card, List, Space, Typography } from 'antd'
+import { Alert, Card, Descriptions, List, Space, Typography } from 'antd'
 import Link from 'next/link'
 
 interface AzdoBoardsWorkspacesProps {
   workspaces: AzureDevOpsBoardsWorkspaceDto[]
+  workProcesses: AzureDevOpsBoardsWorkProcessDto[]
   organizationUrl: string
 }
 
 const AzdoBoardsWorkspaces = ({
   workspaces,
+  workProcesses,
   organizationUrl,
 }: AzdoBoardsWorkspacesProps) => {
   if (!workspaces) return null
@@ -53,8 +58,14 @@ const AzdoBoardsWorkspaces = ({
                     </>
                   }
                 >
-                  {/* adds a non-breaking space if the description is null */}
-                  {item.description ?? '\u00A0'}
+                  <Descriptions column={1} size="small">
+                    <Descriptions.Item>{item.description}</Descriptions.Item>
+                    <Descriptions.Item label="Work Process">
+                      {workProcesses.find(
+                        (x) => x.externalId === item.workProcessId,
+                      )?.name ?? 'Not Found'}
+                    </Descriptions.Item>
+                  </Descriptions>
                 </Card>
               </List.Item>
             )}

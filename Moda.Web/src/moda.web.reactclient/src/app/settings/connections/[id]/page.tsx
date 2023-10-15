@@ -64,6 +64,7 @@ const ConnectionDetailsPage = ({ params }) => {
       content: (
         <AzdoBoardsWorkspaces
           workspaces={connectionData?.configuration?.workspaces}
+          workProcesses={connectionData?.configuration?.workProcesses}
           organizationUrl={connectionData?.configuration?.organizationUrl}
         />
       ),
