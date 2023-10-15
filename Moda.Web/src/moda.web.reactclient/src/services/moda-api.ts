@@ -7744,13 +7744,21 @@ export interface AzureDevOpsBoardsConnectionConfigurationDto {
     personalAccessToken?: string;
     organizationUrl?: string;
     workspaces?: AzureDevOpsBoardsWorkspaceDto[];
+    workProcesses?: AzureDevOpsBoardsWorkProcessDto[];
 }
 
 export interface AzureDevOpsBoardsWorkspaceDto {
     externalId?: string;
     name?: string;
     description?: string | undefined;
+    workProcessId?: string | undefined;
     sync?: boolean;
+}
+
+export interface AzureDevOpsBoardsWorkProcessDto {
+    externalId?: string;
+    name?: string;
+    description?: string | undefined;
 }
 
 export interface CreateAzureDevOpsBoardConnectionRequest {

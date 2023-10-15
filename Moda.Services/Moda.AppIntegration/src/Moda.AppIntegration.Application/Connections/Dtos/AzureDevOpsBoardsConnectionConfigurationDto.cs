@@ -19,6 +19,8 @@ public sealed record AzureDevOpsBoardsConnectionConfigurationDto : IMapFrom<Azur
     /// <value>The workspaces.</value>
     public required List<AzureDevOpsBoardsWorkspaceDto> Workspaces { get; set; }
 
+    public required List<AzureDevOpsBoardsWorkProcessDto> WorkProcesses { get; set; }
+
     public void MaskPersonalAccessToken()
     {
         if (!string.IsNullOrWhiteSpace(PersonalAccessToken) && PersonalAccessToken.Length > 4)

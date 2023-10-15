@@ -8406,6 +8406,12 @@
             "items": {
               "$ref": "#/components/schemas/AzureDevOpsBoardsWorkspaceDto"
             }
+          },
+          "workProcesses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AzureDevOpsBoardsWorkProcessDto"
+            }
           }
         }
       },
@@ -8424,8 +8430,30 @@
             "type": "string",
             "nullable": true
           },
+          "workProcessId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
           "sync": {
             "type": "boolean"
+          }
+        }
+      },
+      "AzureDevOpsBoardsWorkProcessDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "externalId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
