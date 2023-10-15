@@ -38,18 +38,32 @@ public sealed class AzureDevOpsBoardsImportService : IAzureDevOpsBoardsImportSer
                 return Result.Failure($"The configuration for connection {connectionId} is not valid.");
             }
 
-            var importResult = await _azureDevOpsService.GetProjects(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken);
-            if (importResult.IsFailure)
-                return importResult;
+            // Load Processes
+            var workProcessesResult = await _azureDevOpsService.GetWorkProcesses(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, cancellationToken);
+            if (workProcessesResult.IsFailure)
+                return workProcessesResult;
+
+            List<AzureDevOpsBoardsWorkProcess> processes = new();
+            foreach (var externalProcess in workProcessesResult.Value)
+            {
+                var process = AzureDevOpsBoardsWorkProcess.Create(externalProcess.Id, externalProcess.Name, externalProcess.Description);
+                processes.Add(process);
+            }
+
+            // Load workspaces
+            var workspacesResult = await _azureDevOpsService.GetWorkspaces(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken);
+            if (workspacesResult.IsFailure)
+                return workspacesResult;
 
             List<AzureDevOpsBoardsWorkspace> workspaces = new();
-            foreach (var externalWorkspace in importResult.Value)
+            foreach (var externalWorkspace in workspacesResult.Value)
             {
-                var workspace = AzureDevOpsBoardsWorkspace.Create(externalWorkspace.Id, externalWorkspace.Name, externalWorkspace.Description);
+                var workProcessId = workProcessesResult.Value.FirstOrDefault(p => p.WorkspaceIds.Contains(externalWorkspace.Id))?.Id;
+                var workspace = AzureDevOpsBoardsWorkspace.Create(externalWorkspace.Id, externalWorkspace.Name, externalWorkspace.Description, workProcessId);
                 workspaces.Add(workspace);
             }
 
-            var bulkUpsertResult = await _sender.Send(new BulkUpsertAzureDevOpsBoardsWorkspacesCommand(connectionId, workspaces), cancellationToken);
+            var bulkUpsertResult = await _sender.Send(new BulkUpsertAzureDevOpsBoardsWorkspacesCommand(connectionId, processes, workspaces), cancellationToken);
 
             return Result.Success();
         }

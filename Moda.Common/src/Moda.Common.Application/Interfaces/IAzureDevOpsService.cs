@@ -4,8 +4,9 @@ using Moda.Common.Application.Interfaces.Work;
 namespace Moda.Common.Application.Interfaces;
 public interface IAzureDevOpsService
 {
-    Task<Result<IExternalWorkspace>> GetProject(string organizationUrl, string token, Guid projectId);
-    Task<Result<List<IExternalWorkspace>>> GetProjects(string organizationUrl, string token);
+    Task<Result<List<IExternalWorkProcess>>> GetWorkProcesses(string organizationUrl, string token, CancellationToken cancellationToken);
+    Task<Result<IExternalWorkspace>> GetWorkspace(string organizationUrl, string token, Guid workspaceId);
+    Task<Result<List<IExternalWorkspace>>> GetWorkspaces(string organizationUrl, string token);
     Task<Result<IExternalWorkItem>> GetWorkItem(string organizationUrl, string token, Guid projectId, int workItemId, CancellationToken cancellationToken);
     Task<Result<List<IExternalWorkItem>>> GetWorkItems(string organizationUrl, string token, Guid projectId, int[] workItemIds, CancellationToken cancellationToken);
     Task<Result<List<IExternalWorkItem>>> GetWorkItems(string organizationUrl, string token, Guid projectId, string projectName, CancellationToken cancellationToken);

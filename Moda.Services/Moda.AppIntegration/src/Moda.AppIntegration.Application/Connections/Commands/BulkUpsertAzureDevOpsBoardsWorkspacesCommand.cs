@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
 
-public sealed record BulkUpsertAzureDevOpsBoardsWorkspacesCommand(Guid ConnectionId, IEnumerable<AzureDevOpsBoardsWorkspace> Workspaces) : ICommand;
+public sealed record BulkUpsertAzureDevOpsBoardsWorkspacesCommand(Guid ConnectionId, IEnumerable<AzureDevOpsBoardsWorkProcess> WorkProcesses, IEnumerable<AzureDevOpsBoardsWorkspace> Workspaces) : ICommand;
 
 internal sealed class BulkUpsertAzureDevOpsBoardsWorkspacesCommandHandler : ICommandHandler<BulkUpsertAzureDevOpsBoardsWorkspacesCommand>
 {
@@ -28,11 +28,20 @@ internal sealed class BulkUpsertAzureDevOpsBoardsWorkspacesCommandHandler : ICom
             return Result.Failure($"Unable to find Azure DevOps Boards connection with id {request.ConnectionId}.");
         }
 
-        var importResult = connection.ImportWorkspaces(request.Workspaces, _dateTimeService.Now);
-        if (importResult.IsFailure)
+        var importWorkProcessesResult = connection.ImportProcesses(request.WorkProcesses, _dateTimeService.Now);
+        if (importWorkProcessesResult.IsFailure)
         {
             string requestName = request.GetType().Name;
-            _logger.LogError("Errors occurred while processing {RequestName}. {Error}", requestName, importResult.Error);
+            _logger.LogError("Errors occurred while processing {RequestName}. {Error}", requestName, importWorkProcessesResult.Error);
+
+            return Result.Failure($"Errors occurred while processing {requestName}.");
+        }
+
+        var importWorkspacesResult = connection.ImportWorkspaces(request.Workspaces, _dateTimeService.Now);
+        if (importWorkspacesResult.IsFailure)
+        {
+            string requestName = request.GetType().Name;
+            _logger.LogError("Errors occurred while processing {RequestName}. {Error}", requestName, importWorkspacesResult.Error);
 
             return Result.Failure($"Errors occurred while processing {requestName}.");
         }

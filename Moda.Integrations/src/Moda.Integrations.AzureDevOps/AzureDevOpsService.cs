@@ -17,6 +17,9 @@ public class AzureDevOpsService : IAzureDevOpsService
     private readonly ILogger<AzureDevOpsService> _logger;
     private readonly IServiceProvider _serviceProvider;
 
+    // https://learn.microsoft.com/en-us/azure/devops/integrate/concepts/rest-api-versioning?view=azure-devops#supported-versions
+    private readonly string _apiVersion = "7.0";
+
     public AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProvider serviceProvider)
     {
         _logger = logger;
@@ -61,19 +64,29 @@ public class AzureDevOpsService : IAzureDevOpsService
         return iterations; // map to local type and return interface instead of concrete type
     }
 
-    public async Task<Result<IExternalWorkspace>> GetProject(string organizationUrl, string token, Guid projectId)
+    public async Task<Result<List<IExternalWorkProcess>>> GetWorkProcesses(string organizationUrl, string token, CancellationToken cancellationToken)
+    {
+        var processService = GetService<ProcessService>(organizationUrl, token);
+
+        var result = await processService.GetProcesses(cancellationToken);
+        return result.IsSuccess
+            ? Result.Success(result.Value.ToList<IExternalWorkProcess>())
+            : Result.Failure<List<IExternalWorkProcess>>(result.Error);
+    }
+
+    public async Task<Result<IExternalWorkspace>> GetWorkspace(string organizationUrl, string token, Guid workspaceId)
     {
         var connection = CreateVssConnection(organizationUrl, token);
         var projectService = GetService<ProjectService>(connection);
 
-        var result = await projectService.GetProject(projectId);
+        var result = await projectService.GetProject(workspaceId);
 
         return result.IsSuccess
             ? Result.Success<IExternalWorkspace>(new AzdoWorkspace(result.Value))
             : Result.Failure<IExternalWorkspace>(result.Error);
     }
 
-    public async Task<Result<List<IExternalWorkspace>>> GetProjects(string organizationUrl, string token)
+    public async Task<Result<List<IExternalWorkspace>>> GetWorkspaces(string organizationUrl, string token)
     {
         var connection = CreateVssConnection(organizationUrl, token);
         var projectService = GetService<ProjectService>(connection);
@@ -150,7 +163,7 @@ public class AzureDevOpsService : IAzureDevOpsService
     }
 
     // TODO should these be cached?  any impact on GC if cached?  // should the client be created and cached here rather than in the service constructor?
-    private TService GetService<TService>(VssConnection connection)
+    private TService GetService<TService>(VssConnection? connection)
     {
         Guard.Against.Null(connection);
         var logger = _serviceProvider.GetService(typeof(ILogger<TService>)) as ILogger<TService>;
@@ -163,6 +176,19 @@ public class AzureDevOpsService : IAzureDevOpsService
             Type type when type == typeof(ProjectService) => (TService)Activator.CreateInstance(typeof(ProjectService), connection, logger!)!,
             Type type when type == typeof(WorkItemService) => (TService)Activator.CreateInstance(typeof(WorkItemService), connection, logger!)!,
             Type type when type == typeof(WorkItemTypeService) => (TService)Activator.CreateInstance(typeof(WorkItemTypeService), connection, logger!)!,
+            _ => throw new NotImplementedException(),
+        };
+    }
+    private TService GetService<TService>(string organizationUrl, string token)
+    {
+        Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
+        Guard.Against.NullOrWhiteSpace(token, nameof(token));
+        var logger = _serviceProvider.GetService(typeof(ILogger<TService>)) as ILogger<TService>;
+        Guard.Against.Null(logger);
+
+        return typeof(TService) switch
+        {
+            Type type when type == typeof(ProcessService) => (TService)Activator.CreateInstance(typeof(ProcessService), organizationUrl, token, _apiVersion, logger!)!,
             _ => throw new NotImplementedException(),
         };
     }

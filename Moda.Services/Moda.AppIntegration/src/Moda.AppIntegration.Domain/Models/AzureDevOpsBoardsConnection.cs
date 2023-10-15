@@ -66,7 +66,8 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 {
                     var result = existingWorkspace.Update(
                         workspace.Name, 
-                        workspace.Description, 
+                        workspace.Description,
+                        workspace.WorkProcessId, 
                         existingWorkspace.Sync);
 
                     if (result.IsFailure)
@@ -77,7 +78,59 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                     var result = Configuration.AddWorkspace(AzureDevOpsBoardsWorkspace.Create(
                         workspace.ExternalId,
                         workspace.Name, 
-                        workspace.Description));
+                        workspace.Description,
+                        workspace.WorkProcessId));
+
+                    if (result.IsFailure)
+                        return result;
+                }
+            }
+
+            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
+    public Result ImportProcesses(IEnumerable<AzureDevOpsBoardsWorkProcess> processes, Instant timestamp)
+    {
+        try
+        {
+            Guard.Against.Null(Configuration, nameof(Configuration));
+
+            // remove processes that are not in the new list
+            var processesToRemove = Configuration.WorkProcesses.Where(w => !processes.Any(nw => nw.ExternalId == w.ExternalId)).ToList();
+            foreach (var process in processesToRemove)
+            {
+                // TODO - what if the process had been configured to sync and has data?
+                var result = Configuration.RemoveWorkProcess(process);
+                if (result.IsFailure)
+                    return result;
+            }
+
+            // update existing or add new processes
+            foreach (var process in processes)
+            {
+                var existingProcess = Configuration.WorkProcesses.FirstOrDefault(w => w.ExternalId == process.ExternalId);
+                if (existingProcess is not null)
+                {
+                    var result = existingProcess.Update(
+                        process.Name,
+                        process.Description);
+
+                    if (result.IsFailure)
+                        return result;
+                }
+                else
+                {
+                    var result = Configuration.AddWorkProcess(AzureDevOpsBoardsWorkProcess.Create(
+                        process.ExternalId,
+                        process.Name,
+                        process.Description));
 
                     if (result.IsFailure)
                         return result;
