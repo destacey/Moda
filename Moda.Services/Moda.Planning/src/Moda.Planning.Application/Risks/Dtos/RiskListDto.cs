@@ -16,7 +16,7 @@ public class RiskListDto : IMapFrom<Risk>
     public NavigationDto? Assignee { get; set; }
     public LocalDate? FollowUpDate { get; set; }
 
-    public void Register(TypeAdapterConfig config)
+    public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Risk, RiskListDto>()
             .Map(dest => dest.Status, src => src.Status.GetDisplayName())

@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using FluentValidation;
 using Mapster;
+using Mapster.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Moda.Work.Application;
@@ -14,6 +15,7 @@ public static class ConfigureServices
         services.AddMediatR(options => options.RegisterServicesFromAssembly(assembly));
 
         TypeAdapterConfig.GlobalSettings.Scan(assembly);
+        TypeAdapterConfig.GlobalSettings.ScanInheritedTypes(assembly);
 
         return services;
     }

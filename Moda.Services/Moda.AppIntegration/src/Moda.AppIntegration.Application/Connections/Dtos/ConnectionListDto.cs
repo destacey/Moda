@@ -29,7 +29,7 @@ public sealed record ConnectionListDto : IMapFrom<Connection>
     /// </value>
     public bool IsValidConfiguration { get; set; }
 
-    public void Register(TypeAdapterConfig config)
+    public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Connection, ConnectionListDto>()
             .Map(dest => dest.Connector, src => src.Connector.GetDisplayName());

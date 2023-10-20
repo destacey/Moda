@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Mapster;
+using Mapster.Utils;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +18,7 @@ public static class ConfigureServices
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
 
         TypeAdapterConfig.GlobalSettings.Scan(assembly);
+        TypeAdapterConfig.GlobalSettings.ScanInheritedTypes(assembly);
 
         return services;
     }

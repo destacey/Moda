@@ -54,7 +54,7 @@ public sealed record ObjectiveDetailsDto : IMapFrom<Objective>
     /// <value>The closed date.</value>
     public Instant? ClosedDate { get; private set; }
 
-    public void Register(TypeAdapterConfig config)
+    public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Objective, ObjectiveDetailsDto>()
             .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))

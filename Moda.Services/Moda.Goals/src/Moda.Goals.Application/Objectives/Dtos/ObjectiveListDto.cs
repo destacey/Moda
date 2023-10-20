@@ -45,7 +45,7 @@ public sealed record ObjectiveListDto : IMapFrom<Objective>
     /// <value>The target date.</value>
     public LocalDate? TargetDate { get; set; }
 
-    public void Register(TypeAdapterConfig config)
+    public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Objective, ObjectiveListDto>()
             .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Mapster;
+using Mapster.Utils;
 using Microsoft.ApplicationInsights.DependencyCollector;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,7 @@ public static class ConfigureServices
     {
         var assembly = Assembly.GetExecutingAssembly();
         TypeAdapterConfig.GlobalSettings.Scan(assembly);
+        TypeAdapterConfig.GlobalSettings.ScanInheritedTypes(assembly);
 
         services.AddSingleton<IClock>(SystemClock.Instance);
 

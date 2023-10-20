@@ -6,7 +6,7 @@ public record PlanningTeamNavigationDto : NavigationDto, IMapFrom<PlanningTeam>
 {
     public required string Type { get; set; }
 
-    public void Register(TypeAdapterConfig config)
+    public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<PlanningTeam, PlanningTeamNavigationDto>()
             .Map(dest => dest.Type, src => src.Type.GetDisplayName());

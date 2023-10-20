@@ -1,4 +1,6 @@
-﻿namespace Moda.Work.Application.BacklogLevels.Dtos;
+﻿using Mapster;
+
+namespace Moda.Work.Application.BacklogLevels.Dtos;
 public sealed record BacklogLevelDto : IMapFrom<BacklogLevel>
 {
     public int Id { get; set; }
