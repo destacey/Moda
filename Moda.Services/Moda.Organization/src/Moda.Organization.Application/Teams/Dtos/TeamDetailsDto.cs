@@ -37,7 +37,7 @@ public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
 
     public TeamNavigationDto? TeamOfTeams { get; set; }
 
-    public void Register(TypeAdapterConfig config)
+    public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<BaseTeam, TeamDetailsDto>()
             .Map(dest => dest.Code, src => src.Code.Value)

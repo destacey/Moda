@@ -1,4 +1,5 @@
-﻿global using FluentValidation;
+﻿global using Asp.Versioning;
+global using FluentValidation;
 global using MediatR;
 global using Microsoft.AspNetCore.Mvc;
 global using Moda.AppIntegration.Application.Connections.Commands;

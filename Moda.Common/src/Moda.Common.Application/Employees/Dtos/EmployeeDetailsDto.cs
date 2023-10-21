@@ -82,7 +82,7 @@ public sealed record EmployeeDetailsDto : IMapFrom<Employee>
     /// </summary>
     public bool IsActive { get; set; }
 
-    public void Register(TypeAdapterConfig config)
+    public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Employee, EmployeeDetailsDto>()
             .Map(dest => dest.DisplayName, src => $"{StringHelpers.Concat(src.Name.FirstName, src.Name.LastName)}")

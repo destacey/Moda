@@ -7,7 +7,7 @@ public sealed record AzureDevOpsBoardsWorkProcessDto : IMapFrom<AzureDevOpsBoard
     public required string Name { get; set; }
     public string? Description { get; set; }
 
-    public void Register(TypeAdapterConfig config)
+    public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<AzureDevOpsBoardsWorkProcess, AzureDevOpsBoardsWorkProcessDto>();
     }

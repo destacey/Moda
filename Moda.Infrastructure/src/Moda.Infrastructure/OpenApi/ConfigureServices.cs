@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +19,6 @@ internal static class ConfigureServices
         var settings = config.GetSection(nameof(SwaggerSettings)).Get<SwaggerSettings>()!;
         if (settings.Enable)
         {
-            services.AddVersionedApiExplorer(o => o.SubstituteApiVersionInUrl = true);
             services.AddEndpointsApiExplorer();
             services.AddOpenApiDocument((document, serviceProvider) =>
             {

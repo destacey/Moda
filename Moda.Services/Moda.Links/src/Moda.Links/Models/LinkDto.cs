@@ -9,7 +9,7 @@ public sealed record LinkDto : IMapFrom<Link>
     public required string Name { get; set; }
     public required string Url { get; set; }
 
-    public void Register(TypeAdapterConfig config)
+    public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Link, LinkDto>();
     }

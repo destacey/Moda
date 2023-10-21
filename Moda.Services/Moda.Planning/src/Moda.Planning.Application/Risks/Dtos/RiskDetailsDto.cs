@@ -21,7 +21,7 @@ public class RiskDetailsDto : IMapFrom<Risk>
     public string? Response { get; set; }
     public Instant? ClosedDate { get; set; }
 
-    public void Register(TypeAdapterConfig config)
+    public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Risk, RiskDetailsDto>()
             .Map(dest => dest.ReportedBy, src => NavigationDto.Create(src.ReportedBy.Id, src.ReportedBy.Key, src.ReportedBy.Name.FullName))

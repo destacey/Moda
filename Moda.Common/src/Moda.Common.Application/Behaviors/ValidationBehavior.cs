@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
-using MediatR;
+﻿using MediatR;
 using ValidationException = Moda.Common.Application.Exceptions.ValidationException;
 
 namespace Moda.Common.Application.Behaviors;
