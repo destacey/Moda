@@ -2,7 +2,6 @@
 
 import ModaGrid from '@/src/app/components/common/moda-grid'
 import PageTitle from '@/src/app/components/common/page-title'
-import { ProgramIncrementListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import { useDocumentTitle } from '../../hooks/use-document-title'
@@ -13,22 +12,7 @@ import { Button } from 'antd'
 import { useGetProgramIncrements } from '@/src/services/queries/planning-queries'
 
 const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
-  return (
-    <Link href={`/planning/program-increments/${data.key}`}>{value}</Link>
-  )
-}
-
-const stateOrder = ['Active', 'Future', 'Completed']
-const sortProgramIncrements = (data: ProgramIncrementListDto[]) => {
-  return data?.sort((a, b) => {
-    const aStateIndex = stateOrder.indexOf(a.state)
-    const bStateIndex = stateOrder.indexOf(b.state)
-    if (aStateIndex !== bStateIndex) {
-      return aStateIndex - bStateIndex
-    } else {
-      return dayjs(b.start).unix() - dayjs(a.start).unix()
-    }
-  })
+  return <Link href={`/planning/program-increments/${data.key}`}>{value}</Link>
 }
 
 const ProgramIncrementListPage = () => {
@@ -95,11 +79,7 @@ const ProgramIncrementListPage = () => {
         title="Program Increments"
         actions={showActions && <Actions />}
       />
-      <ModaGrid
-        columnDefs={columnDefs}
-        rowData={sortProgramIncrements(data)}
-        loadData={refresh}
-      />
+      <ModaGrid columnDefs={columnDefs} rowData={data} loadData={refresh} />
       {openCreateProgramIncrementForm && (
         <CreateProgramIncrementForm
           showForm={openCreateProgramIncrementForm}

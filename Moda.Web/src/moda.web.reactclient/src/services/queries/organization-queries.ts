@@ -42,6 +42,6 @@ export const useGetEmployees = (includeInactive: boolean = false) => {
     queryFn: async () => (await getEmployeesClient()).getList(includeInactive),
     select: (data) =>
       data.sort((a, b) => a.displayName.localeCompare(b.displayName)),
-    //staleTime: 60000,
+    staleTime: 60000,
   })
 }
