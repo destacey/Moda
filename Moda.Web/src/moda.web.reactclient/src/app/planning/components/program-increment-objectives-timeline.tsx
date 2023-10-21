@@ -8,10 +8,16 @@ import dayjs from 'dayjs'
 import { useEffect, useMemo, useState } from 'react'
 import { ModaEmpty } from '../../components/common'
 import { UseQueryResult } from 'react-query'
+import {
+  DataGroup,
+  DataGroupCollectionType,
+} from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 
 interface ProgramIncrementObjectivesTimelineProps {
   objectivesQuery: UseQueryResult<ProgramIncrementObjectiveListDto[], unknown>
   programIncrement: ProgramIncrementDetailsDto
+  enableGroups?: boolean
+  teamNames?: string[]
 }
 
 interface TimelineItem extends vis.DataItem {
@@ -66,6 +72,8 @@ interface TimelineItem extends vis.DataItem {
 const ProgramIncrementObjectivesTimeline = ({
   objectivesQuery,
   programIncrement,
+  enableGroups = false,
+  teamNames,
 }: ProgramIncrementObjectivesTimelineProps) => {
   const [objectives, setObjectives] = useState<TimelineItem[]>([])
 
@@ -83,6 +91,7 @@ const ProgramIncrementObjectivesTimeline = ({
       zoomKey: 'ctrlKey',
       start: dayjs(programIncrement.start).subtract(1, 'week').toDate(),
       end: dayjs(programIncrement.end).add(1, 'week').toDate(),
+      groupOrder: 'content',
     }
   }, [programIncrement])
 
@@ -133,7 +142,34 @@ const ProgramIncrementObjectivesTimeline = ({
 
     var container = document.getElementById('timeline-vis')
     const timeline = new vis.Timeline(container, items, options)
-  }, [objectives, options, programIncrement.end, programIncrement.start])
+
+    if (enableGroups === true) {
+      let teams = []
+      if (!teamNames || teamNames.length === 0) {
+        teams = objectives.reduce((acc, obj) => {
+          if (!acc.includes(obj.group)) {
+            acc.push(obj.group)
+          }
+          return acc
+        }, [])
+      } else {
+        teams = teamNames
+      }
+
+      const groups = teams.map((team) => {
+        return { id: team, content: team } as DataGroup
+      })
+
+      timeline.setGroups(groups)
+    }
+  }, [
+    enableGroups,
+    objectives,
+    options,
+    programIncrement.end,
+    programIncrement.start,
+    teamNames,
+  ])
 
   const TimelineChart = () => {
     if (!objectives || objectives.length === 0) {

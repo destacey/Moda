@@ -143,11 +143,12 @@ const ProgramIncrementDetailsPage = ({ params }) => {
       tab: 'Objectives',
       content: (
         <ProgramIncrementObjectives
-          programIncrementId={programIncrementData?.id}
+          programIncrement={programIncrementData}
           objectivesQueryEnabled={objectivesQueryEnabled}
           newObjectivesAllowed={
             !programIncrementData?.objectivesLocked ?? false
           }
+          teamNames={teamsQuery?.data?.map((t) => t.name)}
         />
       ),
     },
