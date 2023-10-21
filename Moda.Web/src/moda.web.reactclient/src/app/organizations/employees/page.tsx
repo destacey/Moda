@@ -3,12 +3,11 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import ModaGrid from '../../components/common/moda-grid'
 import { useCallback, useMemo, useState } from 'react'
-import { EmployeeListDto } from '@/src/services/moda-api'
-import { getEmployeesClient } from '@/src/services/clients'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { Space, Switch } from 'antd'
 import Link from 'next/link'
 import { useDocumentTitle } from '../../hooks/use-document-title'
+import { useGetEmployees } from '@/src/services/queries/organization-queries'
 
 const EmployeeLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/organizations/employees/${data.key}`}>{value}</Link>
@@ -16,16 +15,15 @@ const EmployeeLinkCellRenderer = ({ value, data }) => {
 
 const ManagerLinkCellRenderer = ({ value, data }) => {
   return (
-    <Link href={`/organizations/employees/${data.managerKey}`}>
-      {value}
-    </Link>
+    <Link href={`/organizations/employees/${data.managerKey}`}>{value}</Link>
   )
 }
 
 const EmployeeListPage = () => {
   useDocumentTitle('Employees')
-  const [employees, setEmployees] = useState<EmployeeListDto[]>([])
   const [includeInactive, setIncludeInactive] = useState<boolean>(false)
+
+  const { data: employeesData, refetch } = useGetEmployees(includeInactive)
 
   const columnDefs = useMemo(
     () => [
@@ -49,6 +47,10 @@ const EmployeeListPage = () => {
     [],
   )
 
+  const refresh = useCallback(async () => {
+    refetch
+  }, [refetch])
+
   const onIncludeInactiveChange = (checked: boolean) => {
     setIncludeInactive(checked)
   }
@@ -69,20 +71,14 @@ const EmployeeListPage = () => {
     },
   ]
 
-  const getEmployees = useCallback(async () => {
-    const employeesClient = await getEmployeesClient()
-    const employeeDtos = await employeesClient.getList(includeInactive)
-    setEmployees(employeeDtos)
-  }, [includeInactive])
-
   return (
     <>
       <PageTitle title="Employees" />
       <ModaGrid
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
-        rowData={employees}
-        loadData={getEmployees}
+        rowData={employeesData}
+        loadData={refresh}
       />
     </>
   )

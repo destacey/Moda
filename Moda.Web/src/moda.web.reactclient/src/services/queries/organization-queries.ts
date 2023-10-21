@@ -1,6 +1,10 @@
 import { useQuery } from 'react-query'
 import { QK } from './query-keys'
-import { getTeamsClient, getTeamsOfTeamsClient } from '../clients'
+import {
+  getEmployeesClient,
+  getTeamsClient,
+  getTeamsOfTeamsClient,
+} from '../clients'
 
 // TEAMS - RISKS
 export const useGetTeamRisks = (
@@ -28,5 +32,16 @@ export const useGetTeamOfTeamsRisks = (
       (await getTeamsOfTeamsClient()).getRisks(id, includeClosed),
     staleTime: 10000,
     enabled: !!id && enabled,
+  })
+}
+
+// EMPLOYEES
+export const useGetEmployees = (includeInactive: boolean = false) => {
+  return useQuery({
+    queryKey: [QK.EMPLOYEES, includeInactive],
+    queryFn: async () => (await getEmployeesClient()).getList(includeInactive),
+    select: (data) =>
+      data.sort((a, b) => a.displayName.localeCompare(b.displayName)),
+    //staleTime: 60000,
   })
 }
