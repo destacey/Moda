@@ -8,7 +8,7 @@ import dayjs from 'dayjs'
 import useAuth from '../../contexts/auth'
 import CreateRiskForm from './create-risk-form'
 import { EditOutlined } from '@ant-design/icons'
-import UpdateRiskForm from './edit-risk-form'
+import EditRiskForm from './edit-risk-form'
 import { UseQueryResult } from 'react-query'
 
 export interface RisksGridProps {
@@ -193,7 +193,7 @@ const RisksGrid = ({
         actions={showActions && <Actions />}
         gridControlMenuItems={controlItems}
       />
-      {openCreateRiskForm && canCreateRisks && (
+      {openCreateRiskForm && (
         <CreateRiskForm
           createForTeamId={teamId}
           showForm={openCreateRiskForm}
@@ -201,8 +201,8 @@ const RisksGrid = ({
           onFormCancel={() => onCreateRiskFormClosed(false)}
         />
       )}
-      {openUpdateRiskForm && canUpdateRisks && (
-        <UpdateRiskForm
+      {openUpdateRiskForm && (
+        <EditRiskForm
           showForm={openUpdateRiskForm}
           riskId={editRiskId}
           onFormSave={() => onEditRiskFormClosed(true)}

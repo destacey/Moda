@@ -106,7 +106,7 @@ const ObjectiveListItem = ({
           />
         )}
       </List.Item>
-      {canUpdateObjectives && (
+      {openUpdateObjectiveForm && (
         <EditProgramIncrementObjectiveForm
           showForm={openUpdateObjectiveForm}
           objectiveId={objective?.id}

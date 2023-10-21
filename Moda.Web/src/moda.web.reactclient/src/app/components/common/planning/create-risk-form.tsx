@@ -3,11 +3,7 @@
 import { DatePicker, Form, Input, Modal, Radio, Select, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
-import {
-  getEmployeesClient,
-  getTeamsClient,
-  getTeamsOfTeamsClient,
-} from '@/src/services/clients'
+import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
 import { CreateRiskRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { TeamListItem } from '@/src/app/organizations/types'
@@ -18,6 +14,7 @@ import {
   useGetRiskCategoryOptions,
   useGetRiskGradeOptions,
 } from '@/src/services/queries/planning-queries'
+import { useGetEmployeeOptions } from '@/src/services/queries/organization-queries'
 
 export interface CreateRiskFormProps {
   showForm: boolean
@@ -66,7 +63,6 @@ const CreateRiskForm = ({
   const [messageApi, contextHolder] = message.useMessage()
 
   const [teamOptions, setTeamOptions] = useState<OptionModel[]>()
-  const [employeeOptions, setEmployeeOptions] = useState<OptionModel[]>()
 
   const [newRiskKey, setNewRiskKey] = useState<number>(null)
 
@@ -76,6 +72,7 @@ const CreateRiskForm = ({
   const createRisk = useCreateRiskMutation()
   const { data: riskCategoryOptions } = useGetRiskCategoryOptions()
   const { data: riskGradeOptions } = useGetRiskGradeOptions()
+  const { data: employeeOptions } = useGetEmployeeOptions()
 
   const mapToFormValues = useCallback(
     (teamId: string | undefined) => {
@@ -97,16 +94,6 @@ const CreateRiskForm = ({
     ].map((t) => ({ value: t.id, label: t.name }))
 
     return _.sortBy(teams, ['label'])
-  }, [])
-
-  const getEmployeeOptions = useCallback(async () => {
-    const employeesClient = await getEmployeesClient()
-    const employeeDtos = await employeesClient.getList(false)
-    const employees: OptionModel[] = employeeDtos
-      .filter((e) => e.isActive === true)
-      .map((e) => ({ value: e.id, label: e.displayName }))
-
-    return _.sortBy(employees, ['label'])
   }, [])
 
   const create = async (values: CreateRiskFormValues) => {
@@ -155,7 +142,6 @@ const CreateRiskForm = ({
         try {
           const loadData = async () => {
             setTeamOptions(await getTeamOptions())
-            setEmployeeOptions(await getEmployeeOptions())
           }
           loadData()
           mapToFormValues(createForTeamId)
@@ -174,7 +160,6 @@ const CreateRiskForm = ({
   }, [
     canCreateRisks,
     createForTeamId,
-    getEmployeeOptions,
     getTeamOptions,
     handleCancel,
     mapToFormValues,
