@@ -1,17 +1,22 @@
-import * as vis from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
+import {
+  DataItem,
+  Timeline,
+  TimelineOptions,
+} from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import 'vis-timeline/styles/vis-timeline-graph2d.css'
+import './program-increment-objectives-timeline.css'
+import { renderToString } from 'react-dom/server'
 import {
   ProgramIncrementDetailsDto,
   ProgramIncrementObjectiveListDto,
 } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
-import { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ModaEmpty } from '../../components/common'
 import { UseQueryResult } from 'react-query'
-import {
-  DataGroup,
-  DataGroupCollectionType,
-} from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
+import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
+import Link from 'next/link'
+import { Typography } from 'antd'
 
 interface ProgramIncrementObjectivesTimelineProps {
   objectivesQuery: UseQueryResult<ProgramIncrementObjectiveListDto[], unknown>
@@ -20,54 +25,16 @@ interface ProgramIncrementObjectivesTimelineProps {
   teamNames?: string[]
 }
 
-interface TimelineItem extends vis.DataItem {
+interface TimelineItem extends DataItem {
   id: number
   programIncrementKey: number
-  title?: string | undefined
+  title?: string
   content: string
   start: Date
   end: Date
-  group?: string | undefined
-  type?: string | undefined
+  group?: string
+  type?: string
 }
-
-// TODO: get this working with the template function
-// const TimelineContentTemplate = (objective: ProgramIncrementObjectiveListDto) => {
-//   const content = `Status: ${objective.status?.name} | Stretch?: ${objective.isStretch}`
-//   const startDate = objective.startDate
-//     ? ` | Start: ${
-//         objective.startDate
-//           ? dayjs(objective.startDate)?.format('M/D/YYYY')
-//           : ''
-//       }`
-//     : null
-//   const targetDate = objective.targetDate
-//     ? ` | Target: ${
-//         objective.targetDate
-//           ? dayjs(objective.targetDate)?.format('M/D/YYYY')
-//           : ''
-//       }`
-//     : null
-//   const showProgress = objective.status?.name !== 'Not Started'
-//   const progressStatus =
-//     objective.status?.name === 'Canceled' ? 'exception' : undefined
-//   return (
-//     <>
-//       <Typography.Text>
-//         {content}
-//         {startDate}
-//         {targetDate}
-//       </Typography.Text>
-//       {showProgress && (
-//         <Progress
-//           percent={objective.progress}
-//           status={progressStatus}
-//           size="small"
-//         />
-//       )}
-//     </>
-//   )
-// }
 
 const ProgramIncrementObjectivesTimeline = ({
   objectivesQuery,
@@ -77,9 +44,10 @@ const ProgramIncrementObjectivesTimeline = ({
 }: ProgramIncrementObjectivesTimelineProps) => {
   const [objectives, setObjectives] = useState<TimelineItem[]>([])
 
+  // TODO: setup the template function to render the content
   // TODO: add the ability to export/save as svg or png
   // TODO: update the styles to match the rest of the app.  Especially for dark mode.
-  const options: vis.TimelineOptions = useMemo(() => {
+  const options: TimelineOptions = useMemo(() => {
     return {
       editable: false,
       orientation: 'top',
@@ -91,32 +59,72 @@ const ProgramIncrementObjectivesTimeline = ({
       zoomKey: 'ctrlKey',
       start: dayjs(programIncrement.start).subtract(1, 'week').toDate(),
       end: dayjs(programIncrement.end).add(1, 'week').toDate(),
+      min: dayjs(programIncrement.start).subtract(4, 'week').toDate(),
+      max: dayjs(programIncrement.end).add(4, 'week').toDate(),
       groupOrder: 'content',
+      xss: { disabled: true },
     }
   }, [programIncrement])
 
+  const ObjectiveContent = useCallback(
+    (objective: ProgramIncrementObjectiveListDto) => {
+      return (
+        <div
+          style={{
+            width: `${objective.progress}%`,
+            backgroundColor: '#C7C7C7',
+          }}
+        >
+          <Typography.Text
+            delete={objective.status?.name === 'Canceled'}
+            style={{ padding: '5px' }}
+          >
+            <Link
+              href={`/planning/program-increments/${objective.programIncrement.key}/objectives/${objective.key}`}
+            >
+              {objective.key}
+            </Link>
+            <span> - </span> {objective.name}
+          </Typography.Text>
+        </div>
+      )
+    },
+    [],
+  )
+
   useEffect(() => {
+    if (!objectivesQuery?.data) return
+
     setObjectives(
       objectivesQuery?.data
-        ?.filter((obj) => obj.status?.name !== 'Canceled')
+        .filter((obj) => obj.status?.name !== 'Canceled')
         .map((obj, index) => {
           return {
             id: obj.key,
             programIncrementKey: obj.programIncrement.key,
             title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
-            content: `${obj.name} (${obj.status?.name})`,
+            content: renderToString(ObjectiveContent(obj)),
             start: dayjs(obj.startDate ?? programIncrement.start).toDate(),
             end: dayjs(obj.targetDate ?? programIncrement.end).toDate(),
             group: obj.team?.name,
+            type: 'range',
+            style:
+              'background: #E8E8E8; border-color: #E8E8E8; opacity: 0.99 !important;',
+            zIndex: 1,
           }
         }),
     )
-  }, [objectivesQuery?.data, programIncrement.end, programIncrement.start])
+  }, [
+    ObjectiveContent,
+    objectivesQuery?.data,
+    programIncrement.end,
+    programIncrement.key,
+    programIncrement.start,
+  ])
 
   useEffect(() => {
-    if (!objectives || objectives.length === 0) {
-      return
-    }
+    if (!objectives || objectives.length === 0) return
+
     // TODO: add the ability for content to overflow if the text is too long
     const items: TimelineItem[] = [
       {
@@ -141,7 +149,7 @@ const ProgramIncrementObjectivesTimeline = ({
     ]
 
     var container = document.getElementById('timeline-vis')
-    const timeline = new vis.Timeline(container, items, options)
+    const timeline = new Timeline(container, items, options)
 
     if (enableGroups === true) {
       let teams = []
