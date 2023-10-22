@@ -6,7 +6,7 @@ import RiskDetails from './risk-details'
 import { Button, Card } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
-import UpdateRiskForm from '@/src/app/components/common/planning/edit-risk-form'
+import EditRiskForm from '@/src/app/components/common/planning/edit-risk-form'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import { useGetRiskByKey } from '@/src/services/queries/planning-queries'
@@ -63,7 +63,7 @@ const RiskDetailsPage = ({ params }) => {
       },
     )
     // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
-    dispatch(setBreadcrumbRoute({route: breadcrumbRoute, pathname}))
+    dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [riskData, dispatch, pathname])
 
   const onUpdateRiskFormClosed = (wasSaved: boolean) => {
@@ -103,7 +103,7 @@ const RiskDetailsPage = ({ params }) => {
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
       {openUpdateRiskForm && (
-        <UpdateRiskForm
+        <EditRiskForm
           showForm={openUpdateRiskForm}
           riskId={riskData?.id}
           onFormSave={() => onUpdateRiskFormClosed(true)}

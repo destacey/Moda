@@ -1,6 +1,12 @@
 import { useQuery } from 'react-query'
 import { QK } from './query-keys'
-import { getTeamsClient, getTeamsOfTeamsClient } from '../clients'
+import {
+  getEmployeesClient,
+  getTeamsClient,
+  getTeamsOfTeamsClient,
+} from '../clients'
+import _ from 'lodash'
+import { OptionModel } from '@/src/app/components/types'
 
 // TEAMS - RISKS
 export const useGetTeamRisks = (
@@ -28,5 +34,30 @@ export const useGetTeamOfTeamsRisks = (
       (await getTeamsOfTeamsClient()).getRisks(id, includeClosed),
     staleTime: 10000,
     enabled: !!id && enabled,
+  })
+}
+
+// EMPLOYEES
+export const useGetEmployees = (includeInactive: boolean = false) => {
+  return useQuery({
+    queryKey: [QK.EMPLOYEES, includeInactive],
+    queryFn: async () => (await getEmployeesClient()).getList(includeInactive),
+    select: (data) => _.sortBy(data, ['displayName']),
+    staleTime: 60000,
+  })
+}
+
+export const useGetEmployeeOptions = (includeInactive: boolean = false) => {
+  return useQuery({
+    queryKey: [QK.EMPLOYEE_OPTIONS, includeInactive],
+    queryFn: async () => (await getEmployeesClient()).getList(includeInactive),
+    select: (data) => {
+      const statuses = _.sortBy(data, ['displayName'])
+      const options: OptionModel[] = statuses.map((e) => ({
+        value: e.id,
+        label: e.displayName,
+      }))
+      return options
+    },
   })
 }

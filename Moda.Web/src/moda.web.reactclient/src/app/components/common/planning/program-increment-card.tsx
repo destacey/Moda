@@ -1,5 +1,5 @@
 import { ProgramIncrementListDto } from '@/src/services/moda-api'
-import { programIncrementDaysRemaining } from '@/src/utils'
+import { daysRemaining } from '@/src/utils'
 import { Card, Space, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
@@ -11,23 +11,27 @@ export interface ProgramIncrementCardProps {
 const ProgramIncrementCard = ({
   programIncrement,
 }: ProgramIncrementCardProps) => {
-  const daysRemaining = programIncrementDaysRemaining(programIncrement.end)
+  if (!programIncrement) return null
 
-  const start = new Date(programIncrement.start)
-  const now = new Date()
-  const daysUntilStart = Math.ceil(
-    (start.getTime() - now.getTime()) / (1000 * 3600 * 24),
-  )
-
-  const daysRemainingText = () => {
-    if (programIncrement.state === 'Active') {
-      return `${daysRemaining} days remaining`
-    }
-
-    if (programIncrement.state === 'Future') {
-      return `${daysUntilStart} days until start`
+  const DaysCountdownLabel = () => {
+    switch (programIncrement.state) {
+      case 'Future':
+        return (
+          <Typography.Text>
+            ({daysRemaining(programIncrement.start)} days until start)
+          </Typography.Text>
+        )
+      case 'Active':
+        return (
+          <Typography.Text>
+            ({daysRemaining(programIncrement.end)} days remaining)
+          </Typography.Text>
+        )
+      default:
+        return null
     }
   }
+
   return (
     <Card size="small" title={programIncrement.name}>
       <Space direction="vertical">
@@ -35,7 +39,7 @@ const ProgramIncrementCard = ({
           {dayjs(programIncrement.start).format('M/D/YYYY')}
           <Typography.Text type="secondary"> - </Typography.Text>
           {dayjs(programIncrement.end).format('M/D/YYYY')}
-          <Typography.Text> ({daysRemainingText()})</Typography.Text>
+          <DaysCountdownLabel />
         </Space>
         <Space>
           <Link href={`/planning/program-increments/${programIncrement.key}`}>

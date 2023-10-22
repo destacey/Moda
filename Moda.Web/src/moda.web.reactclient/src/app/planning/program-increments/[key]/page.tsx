@@ -30,6 +30,7 @@ import { authorizePage } from '@/src/app/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import { useAppDispatch } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
+import ProgramIncrementObjectives from './program-increment-objectives'
 
 enum ProgramIncrementTabs {
   Details = 'details',
@@ -69,11 +70,6 @@ const ProgramIncrementDetailsPage = ({ params }) => {
   const teamsQuery = useGetProgramIncrementTeams(
     programIncrementData?.id,
     teamsQueryEnabled,
-  )
-
-  const objectivesQuery = useGetProgramIncrementObjectives(
-    programIncrementData?.id,
-    objectivesQueryEnabled,
   )
 
   const risksQuery = useGetProgramIncrementRisks(
@@ -145,13 +141,16 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     {
       key: ProgramIncrementTabs.Objectives,
       tab: 'Objectives',
-      content: createElement(ProgramIncrementObjectivesGrid, {
-        objectivesQuery: objectivesQuery,
-        programIncrementId: programIncrementData?.id,
-        hideProgramIncrementColumn: true,
-        hideTeamColumn: false,
-        newObjectivesAllowed: !programIncrementData?.objectivesLocked ?? false,
-      } as ProgramIncrementObjectivesGridProps),
+      content: (
+        <ProgramIncrementObjectives
+          programIncrement={programIncrementData}
+          objectivesQueryEnabled={objectivesQueryEnabled}
+          newObjectivesAllowed={
+            !programIncrementData?.objectivesLocked ?? false
+          }
+          teamNames={teamsQuery?.data?.map((t) => t.name)}
+        />
+      ),
     },
     {
       key: ProgramIncrementTabs.RiskManagement,

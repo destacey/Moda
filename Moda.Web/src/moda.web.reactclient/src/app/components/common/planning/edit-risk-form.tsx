@@ -12,12 +12,10 @@ import {
 } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
-import { getEmployeesClient } from '@/src/services/clients'
 import { RiskDetailsDto, UpdateRiskRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import _ from 'lodash'
 import dayjs from 'dayjs'
-import { OptionModel } from '../../types'
 import {
   useGetRiskById,
   useGetRiskCategoryOptions,
@@ -25,15 +23,16 @@ import {
   useGetRiskStatusOptions,
   useUpdateRiskMutation,
 } from '@/src/services/queries/planning-queries'
+import { useGetEmployeeOptions } from '@/src/services/queries/organization-queries'
 
-export interface UpdateRiskFormProps {
+export interface EditRiskFormProps {
   showForm: boolean
   riskId: string
   onFormSave: () => void
   onFormCancel: () => void
 }
 
-interface UpdateRiskFormValues {
+interface EditRiskFormValues {
   riskId: string
   teamId: string
   summary: string
@@ -47,7 +46,7 @@ interface UpdateRiskFormValues {
   response?: string | undefined
 }
 
-const mapToRequestValues = (values: UpdateRiskFormValues) => {
+const mapToRequestValues = (values: EditRiskFormValues) => {
   return {
     riskId: values.riskId,
     teamId: values.teamId,
@@ -63,27 +62,27 @@ const mapToRequestValues = (values: UpdateRiskFormValues) => {
   } as UpdateRiskRequest
 }
 
-const UpdateRiskForm = ({
+const EditRiskForm = ({
   showForm,
   riskId,
   onFormSave,
   onFormCancel,
-}: UpdateRiskFormProps) => {
+}: EditRiskFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<UpdateRiskFormValues>()
+  const [form] = Form.useForm<EditRiskFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
   const { data: riskData } = useGetRiskById(riskId)
   const [riskNumber, setRiskNumber] = useState<number>(undefined)
   const [teamName, setTeamName] = useState<string>('')
-  const [employeeOptions, setEmployeeOptions] = useState<OptionModel[]>()
   const updateRisk = useUpdateRiskMutation()
   const { data: riskStatusOptions } = useGetRiskStatusOptions()
   const { data: riskCategoryOptions } = useGetRiskCategoryOptions()
   const { data: riskGradeOptions } = useGetRiskGradeOptions()
+  const { data: employeeOptions } = useGetEmployeeOptions()
 
   const { hasClaim } = useAuth()
   const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
@@ -107,17 +106,7 @@ const UpdateRiskForm = ({
     [form],
   )
 
-  const getEmployeeOptions = useCallback(async () => {
-    const employeesClient = await getEmployeesClient()
-    const employeeDtos = await employeesClient.getList(false)
-    const employees: OptionModel[] = employeeDtos
-      .filter((e) => e.isActive === true)
-      .map((e) => ({ value: e.id, label: e.displayName }))
-
-    return _.sortBy(employees, ['label'])
-  }, [])
-
-  const update = async (values: UpdateRiskFormValues) => {
+  const update = async (values: EditRiskFormValues) => {
     try {
       const request = mapToRequestValues(values)
       await updateRisk.mutateAsync(request)
@@ -171,7 +160,6 @@ const UpdateRiskForm = ({
             setRiskNumber(riskData?.key)
             setTeamName(riskData?.team.name)
             mapToFormValues(riskData)
-            setEmployeeOptions(await getEmployeeOptions())
           }
           loadData()
         } catch (error) {
@@ -188,7 +176,6 @@ const UpdateRiskForm = ({
     }
   }, [
     canUpdateRisks,
-    getEmployeeOptions,
     handleCancel,
     mapToFormValues,
     messageApi,
@@ -335,4 +322,4 @@ const UpdateRiskForm = ({
   )
 }
 
-export default UpdateRiskForm
+export default EditRiskForm

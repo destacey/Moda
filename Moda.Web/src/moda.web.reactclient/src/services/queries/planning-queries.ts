@@ -11,13 +11,25 @@ import {
 } from '../moda-api'
 import _ from 'lodash'
 import { OptionModel } from '@/src/app/components/types'
+import dayjs from 'dayjs'
 
 // PROGRAM INCREMENTS
 
+const stateOrder = ['Active', 'Future', 'Completed']
 export const useGetProgramIncrements = () => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENTS],
     queryFn: async () => (await getProgramIncrementsClient()).getList(),
+    select: (data) =>
+      data?.sort((a, b) => {
+        const aStateIndex = stateOrder.indexOf(a.state)
+        const bStateIndex = stateOrder.indexOf(b.state)
+        if (aStateIndex !== bStateIndex) {
+          return aStateIndex - bStateIndex
+        } else {
+          return dayjs(b.start).unix() - dayjs(a.start).unix()
+        }
+      }),
     staleTime: 60000,
   })
 }
