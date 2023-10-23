@@ -1,9 +1,12 @@
+'use client'
+
 import LinksCard from '@/src/app/components/common/links/links-card'
 import { ProgramIncrementDetailsDto } from '@/src/services/moda-api'
 import { Card, Col, Descriptions, Row, Space, Statistic } from 'antd'
 import dayjs from 'dayjs'
 import { daysRemaining } from '@/src/utils'
 import ReactMarkdown from 'react-markdown'
+import TeamPredictabilityRadarChart from './team-predictability-radar-chart'
 
 const { Item } = Descriptions
 
@@ -56,6 +59,15 @@ const ProgramIncrementDetails = ({
     )
   }
 
+  const TeamPredictabilityChart = () => {
+    if (programIncrement.state === 'Future') return null
+    return (
+      <Card size="small">
+        <TeamPredictabilityRadarChart />
+      </Card>
+    )
+  }
+
   return (
     <>
       <Row>
@@ -83,9 +95,10 @@ const ProgramIncrementDetails = ({
           </Descriptions>
         </Col>
       </Row>
-      <Space align="start">
+      <Space align="start" wrap={true}>
         <DaysCountdownMetric />
         <ProgramIncrementPredictability />
+        <TeamPredictabilityChart />
         <LinksCard objectId={programIncrement.id} />
       </Space>
     </>
