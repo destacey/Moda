@@ -1084,6 +1084,64 @@
         ]
       }
     },
+    "/api/planning/program-increments/{id}/predictability": {
+      "get": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Get the PI predictability for all teams.",
+        "operationId": "ProgramIncrements_GetPredictability",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgramIncrementPredictabilityDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/program-increments/{id}/teams": {
       "get": {
         "tags": [
@@ -6186,6 +6244,51 @@
           }
         }
       },
+      "ProgramIncrementPredictabilityDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "predictability": {
+            "type": "number",
+            "format": "double"
+          },
+          "teamPredictabilities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProgramIncrementTeamPredictabilityDto"
+            }
+          }
+        }
+      },
+      "ProgramIncrementTeamPredictabilityDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "team": {
+            "$ref": "#/components/schemas/PlanningTeamNavigationDto"
+          },
+          "predictability": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "PlanningTeamNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
       "CreateProgramIncrementRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -6400,22 +6503,6 @@
             "type": "string"
           }
         }
-      },
-      "PlanningTeamNavigationDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/NavigationDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "type": {
-                "type": "string"
-              }
-            }
-          }
-        ]
       },
       "ProgramIncrementObjectiveDetailsDto": {
         "type": "object",

@@ -52,6 +52,17 @@ export const useGetProgramIncrementByKey = (key: number) => {
   })
 }
 
+export const useGetProgramIncrementPredictability = (
+  id: string,
+) => {
+  return useQuery({
+    queryKey: [QK.PROGRAM_INCREMENT_PREDICTABILITY, id],
+    queryFn: async () =>
+      (await getProgramIncrementsClient()).getPredictability(id),
+    enabled: !!id,
+  })
+}
+
 export const useCreateProgramIncrementMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
