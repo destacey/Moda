@@ -1413,7 +1413,7 @@ export class ProgramIncrementsClient {
     /**
      * Get the PI predictability for all teams.
      */
-    getPredictability(id: string, cancelToken?: CancelToken | undefined): Promise<number | null> {
+    getPredictability(id: string, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementPredictabilityDto> {
         let url_ = this.baseUrl + "/api/planning/program-increments/{id}/predictability";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -1440,7 +1440,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processGetPredictability(response: AxiosResponse): Promise<number | null> {
+    protected processGetPredictability(response: AxiosResponse): Promise<ProgramIncrementPredictabilityDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1455,7 +1455,14 @@ export class ProgramIncrementsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<number | null>(result200);
+            return Promise.resolve<ProgramIncrementPredictabilityDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -1468,7 +1475,7 @@ export class ProgramIncrementsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<number | null>(null as any);
+        return Promise.resolve<ProgramIncrementPredictabilityDto>(null as any);
     }
 
     /**
@@ -7175,6 +7182,20 @@ export interface ProgramIncrementDetailsDto {
     predictability?: number | undefined;
 }
 
+export interface ProgramIncrementPredictabilityDto {
+    predictability?: number;
+    teamPredictabilities?: ProgramIncrementTeamPredictabilityDto[];
+}
+
+export interface ProgramIncrementTeamPredictabilityDto {
+    team?: PlanningTeamNavigationDto;
+    predictability?: number;
+}
+
+export interface PlanningTeamNavigationDto extends NavigationDto {
+    type?: string;
+}
+
 export interface CreateProgramIncrementRequest {
     /** Gets the team name. */
     name: string;
@@ -7243,10 +7264,6 @@ export interface ProgramIncrementObjectiveListDto {
 export interface SimpleNavigationDto {
     id?: number;
     name?: string;
-}
-
-export interface PlanningTeamNavigationDto extends NavigationDto {
-    type?: string;
 }
 
 export interface ProgramIncrementObjectiveDetailsDto {

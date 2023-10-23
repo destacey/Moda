@@ -30,7 +30,9 @@ internal sealed class GetProgramIncrementPredictabilityQueryHandler : IQueryHand
         var currentDate = _dateTimeService.Now.InUtc().Date;
 
         var teamPredictabilities = programIncrement.Teams
-            .Select(t => new ProgramIncrementTeamPredictabilityDto(t.Team, programIncrement.CalculatePredictability(currentDate, t.TeamId) ?? 0)).ToList();
+            .Select(t => new ProgramIncrementTeamPredictabilityDto(t.Team, programIncrement.CalculatePredictability(currentDate, t.TeamId) ?? 0))
+            .OrderBy(t => t.Team.Name)
+            .ToList();
 
         return new ProgramIncrementPredictabilityDto(programIncrement.CalculatePredictability(currentDate) ?? 0, teamPredictabilities);
     }

@@ -7,6 +7,7 @@ import dayjs from 'dayjs'
 import { daysRemaining } from '@/src/utils'
 import ReactMarkdown from 'react-markdown'
 import TeamPredictabilityRadarChart from './team-predictability-radar-chart'
+import { useGetProgramIncrementPredictability } from '@/src/services/queries/planning-queries'
 
 const { Item } = Descriptions
 
@@ -17,6 +18,9 @@ interface ProgramIncrementDetailsProps {
 const ProgramIncrementDetails = ({
   programIncrement,
 }: ProgramIncrementDetailsProps) => {
+  const { data: programPredictabilityData } =
+    useGetProgramIncrementPredictability(programIncrement?.id)
+
   if (!programIncrement) return null
 
   const DaysCountdownMetric = () => {
@@ -63,7 +67,9 @@ const ProgramIncrementDetails = ({
     if (programIncrement.state === 'Future') return null
     return (
       <Card size="small">
-        <TeamPredictabilityRadarChart />
+        <TeamPredictabilityRadarChart
+          predictability={programPredictabilityData}
+        />
       </Card>
     )
   }

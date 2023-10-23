@@ -73,12 +73,15 @@ public class ProgramIncrementsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrements)]
     [OpenApiOperation("Get the PI predictability for all teams.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<double?>> GetPredictability(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<ProgramIncrementPredictabilityDto>> GetPredictability(Guid id, CancellationToken cancellationToken)
     {
         var predictability = await _sender.Send(new GetProgramIncrementPredictabilityQuery(id), cancellationToken);
 
-        return Ok(predictability);
+        return predictability is not null
+            ? Ok(predictability)
+            : NotFound();
     }
 
     [HttpPost]

@@ -1,12 +1,19 @@
 'use client'
 
 import useTheme from '@/src/app/components/contexts/theme'
+import { ProgramIncrementPredictabilityDto } from '@/src/services/moda-api'
 
 import dynamic from 'next/dynamic'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
-const TeamPredictabilityRadarChart = () => {
+interface TeamPredictabilityRadarChartProps {
+  predictability: ProgramIncrementPredictabilityDto
+}
+
+const TeamPredictabilityRadarChart = ({
+  predictability,
+}: TeamPredictabilityRadarChartProps) => {
   const { currentThemeName } = useTheme()
   const fontColor =
     currentThemeName === 'light'
@@ -17,10 +24,15 @@ const TeamPredictabilityRadarChart = () => {
   const polygonsNeutralColor =
     currentThemeName === 'light' ? '#ffffff' : '#141414'
 
+  if (!predictability) return null
+
+  const teams = predictability.teamPredictabilities.map((x) => x.team.name)
+  const data = predictability.teamPredictabilities.map((x) => x.predictability)
+
   const series = [
     {
       name: 'Predictability',
-      data: [80, 50, 30, 40, 100, 20],
+      data: data,
     },
   ]
   const options = {
@@ -64,14 +76,7 @@ const TeamPredictabilityRadarChart = () => {
       },
     },
     xaxis: {
-      categories: [
-        'Core Services',
-        'Data Analytics',
-        'Insight',
-        'Poly',
-        'Team Juice',
-        'Team Sauce',
-      ],
+      categories: teams,
     },
     yaxis: {
       min: 0,
