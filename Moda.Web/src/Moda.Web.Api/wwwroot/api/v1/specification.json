@@ -1084,6 +1084,56 @@
         ]
       }
     },
+    "/api/planning/program-increments/{id}/predictability": {
+      "get": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Get the PI predictability for all teams.",
+        "operationId": "ProgramIncrements_GetPredictability",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "format": "double",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/program-increments/{id}/teams": {
       "get": {
         "tags": [
