@@ -19,12 +19,13 @@ internal sealed class GetProgramIncrementPredictabilityQueryHandler : IQueryHand
     public async Task<ProgramIncrementPredictabilityDto?> Handle(GetProgramIncrementPredictabilityQuery request, CancellationToken cancellationToken)
     {
         var programIncrement = await _planningDbContext.ProgramIncrements
-            .Include(p => p.Teams.Select(t => t.Team))
+            .Include(p => p.Teams)
+                .ThenInclude(t => t.Team)
             .Include(p => p.Objectives)
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
 
-        if (programIncrement is null || !programIncrement.Teams.Any())
+        if (programIncrement is null || !programIncrement.Teams.Any() || !programIncrement.Objectives.Any())
             return null;
 
         var currentDate = _dateTimeService.Now.InUtc().Date;

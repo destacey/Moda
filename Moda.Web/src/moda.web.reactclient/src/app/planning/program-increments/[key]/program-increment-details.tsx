@@ -64,7 +64,8 @@ const ProgramIncrementDetails = ({
   }
 
   const TeamPredictabilityChart = () => {
-    if (programIncrement.state === 'Future') return null
+    if (programIncrement.state === 'Future' || !programPredictabilityData)
+      return null
     return (
       <Card size="small">
         <TeamPredictabilityRadarChart

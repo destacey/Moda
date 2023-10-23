@@ -40,10 +40,11 @@ const TeamPredictabilityRadarChart = ({
       fontFamily: 'inherit',
       parentHeightOffset: 0,
     },
-    theme: {
-      mode: currentThemeName,
-      palette: 'palette1',
-    },
+    // TODO: using this setting causes the chart to render with the wrong background
+    // theme: {
+    //   mode: currentThemeName,
+    //   palette: 'palette1',
+    // },
     title: {
       text: 'Team Predictability',
       style: {
