@@ -40,29 +40,6 @@ const ProgramIncrementObjectives = ({
 
   if (!programIncrement) return null
 
-  const ListView = () => {
-    return (
-      <ProgramIncrementObjectivesGrid
-        objectivesQuery={objectivesQuery}
-        programIncrementId={programIncrement?.id}
-        hideProgramIncrementColumn={true}
-        hideTeamColumn={true}
-        newObjectivesAllowed={newObjectivesAllowed}
-      />
-    )
-  }
-
-  const TimelineView = () => {
-    return (
-      <ProgramIncrementObjectivesTimeline
-        objectivesQuery={objectivesQuery}
-        programIncrement={programIncrement}
-        enableGroups={true}
-        teamNames={teamNames}
-      />
-    )
-  }
-
   return (
     <>
       <Space
@@ -79,8 +56,23 @@ const ProgramIncrementObjectives = ({
           onChange={setCurrentView}
         />
       </Space>
-      {currentView === 'List' && <ListView />}
-      {currentView === 'Timeline' && <TimelineView />}
+      {currentView === 'List' && (
+        <ProgramIncrementObjectivesGrid
+          objectivesQuery={objectivesQuery}
+          programIncrementId={programIncrement?.id}
+          hideProgramIncrementColumn={true}
+          hideTeamColumn={true}
+          newObjectivesAllowed={newObjectivesAllowed}
+        />
+      )}
+      {currentView === 'Timeline' && (
+        <ProgramIncrementObjectivesTimeline
+          objectivesQuery={objectivesQuery}
+          programIncrement={programIncrement}
+          enableGroups={true}
+          teamNames={teamNames}
+        />
+      )}
     </>
   )
 }
