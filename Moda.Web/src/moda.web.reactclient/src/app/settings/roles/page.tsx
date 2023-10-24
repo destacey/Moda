@@ -44,7 +44,7 @@ const RoleListPage = () => {
     refetch()
   }, [refetch])
 
-  const Actions = () => {
+  const actions = () => {
     return (
       <>
         {canCreateRole && (
@@ -58,7 +58,7 @@ const RoleListPage = () => {
 
   return (
     <>
-      <PageTitle title="Roles" actions={<Actions />} />
+      <PageTitle title="Roles" actions={actions()} />
 
       <ModaGrid
         columnDefs={columnDefs}

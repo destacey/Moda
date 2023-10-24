@@ -73,10 +73,12 @@ const ObjectiveDetailsPage = ({ params }) => {
       },
     )
     // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
-    dispatch(setBreadcrumbRoute({
-      pathname,
-      route: breadcrumbRoute
-    }))
+    dispatch(
+      setBreadcrumbRoute({
+        pathname,
+        route: breadcrumbRoute,
+      }),
+    )
   }, [dispatch, objectiveData, pathname])
 
   const onUpdateObjectiveFormClosed = (wasSaved: boolean) => {
@@ -113,7 +115,7 @@ const ObjectiveDetailsPage = ({ params }) => {
     return items
   }, [canManageObjectives])
 
-  const Actions = () => {
+  const actions = () => {
     return (
       <>
         {canManageObjectives && (
@@ -142,7 +144,7 @@ const ObjectiveDetailsPage = ({ params }) => {
       <PageTitle
         title={`${objectiveData?.key} - ${objectiveData?.name}`}
         subtitle="PI Objective Details"
-        actions={showActions && <Actions />}
+        actions={showActions && actions()}
       />
       <Card
         style={{ width: '100%' }}

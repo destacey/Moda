@@ -87,7 +87,7 @@ const BackgroundJobsListPage = () => {
     return items
   }, [canViewHangfire, canRunBackgroundJobs, jobTypes, runJob])
 
-  const Actions = () => {
+  const actions = () => {
     return (
       <>
         <Dropdown menu={{ items: actionsMenuItems }}>
@@ -108,7 +108,7 @@ const BackgroundJobsListPage = () => {
 
   return (
     <>
-      <PageTitle title="Background Jobs" actions={showActions && <Actions />} />
+      <PageTitle title="Background Jobs" actions={showActions && actions()} />
 
       <ModaGrid
         columnDefs={columnDefs}

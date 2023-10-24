@@ -101,7 +101,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     return items
   }, [canUpdateProgramIncrement])
 
-  const Actions = () => {
+  const actions = () => {
     return (
       <>
         <Space>
@@ -219,7 +219,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
       <PageTitle
         title={programIncrementData?.name}
         subtitle="Program Increment Details"
-        actions={<Actions />}
+        actions={actions()}
       />
       <Card
         style={{ width: '100%' }}

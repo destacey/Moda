@@ -77,7 +77,7 @@ const RiskDetailsPage = ({ params }) => {
     notFound()
   }
 
-  const Actions = () => {
+  const actions = () => {
     return (
       <>
         {canUpdateRisks && (
@@ -92,7 +92,7 @@ const RiskDetailsPage = ({ params }) => {
       <PageTitle
         title={`${riskData?.key} - ${riskData?.summary}`}
         subtitle="Risk Details"
-        actions={showActions && <Actions />}
+        actions={showActions && actions()}
       />
       <Card
         style={{ width: '100%' }}

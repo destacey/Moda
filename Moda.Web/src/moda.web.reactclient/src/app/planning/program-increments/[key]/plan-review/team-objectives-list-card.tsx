@@ -5,7 +5,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import { Badge, Button, Card, List, Space, message } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import useAuth from '@/src/app/components/contexts/auth'
 import CreateProgramIncrementObjectiveForm from '../create-program-increment-objective-form'
 import dayjs from 'dayjs'
@@ -48,7 +48,7 @@ const TeamObjectivesListCard = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const CardTitle = () => {
+  const cardTitle = useMemo(() => {
     const count = objectivesQuery?.data?.length ?? 0
     const showBadge = count > 0
     return (
@@ -57,9 +57,9 @@ const TeamObjectivesListCard = ({
         {showBadge && <Badge color={badgeColor} size="small" count={count} />}
       </Space>
     )
-  }
+  }, [objectivesQuery?.data?.length, badgeColor])
 
-  const ObjectivesList = () => {
+  const objectivesList = useMemo(() => {
     if (!objectivesQuery?.data || objectivesQuery?.data.length === 0) {
       return <ModaEmpty message="No objectives" />
     }
@@ -104,7 +104,7 @@ const TeamObjectivesListCard = ({
         )}
       />
     )
-  }
+  }, [canManageObjectives, objectivesQuery?.data, refreshObjectives])
 
   const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
     setOpenCreateObjectiveForm(false)
@@ -117,7 +117,7 @@ const TeamObjectivesListCard = ({
     <>
       <Card
         size="small"
-        title={<CardTitle />}
+        title={cardTitle}
         extra={
           canCreateObjectives && (
             <Button
@@ -128,7 +128,7 @@ const TeamObjectivesListCard = ({
           )
         }
       >
-        <ObjectivesList />
+        {objectivesList}
       </Card>
       {openCreateObjectiveForm && (
         <CreateProgramIncrementObjectiveForm

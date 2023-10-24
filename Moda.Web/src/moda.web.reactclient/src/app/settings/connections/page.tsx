@@ -40,7 +40,7 @@ const ConnectionsPage = () => {
     [],
   )
 
-  const Actions = () => {
+  const actions = () => {
     if (!showActions) return null
     return (
       <>
@@ -79,7 +79,7 @@ const ConnectionsPage = () => {
 
   return (
     <>
-      <PageTitle title="Connections" actions={<Actions />} />
+      <PageTitle title="Connections" actions={actions()} />
 
       <ModaGrid
         columnDefs={columnDefs}

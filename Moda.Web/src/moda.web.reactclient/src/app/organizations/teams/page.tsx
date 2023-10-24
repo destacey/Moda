@@ -9,14 +9,18 @@ import Link from 'next/link'
 import { useDocumentTitle } from '../../hooks/use-document-title'
 import useAuth from '../../components/contexts/auth'
 import { useAppSelector, useAppDispatch } from '../../hooks'
-import { retrieveTeams, setIncludeInactive, setEditMode, selectTeamsContext, selectTeamIsInEditMode } from '../team-slice'
+import {
+  retrieveTeams,
+  setIncludeInactive,
+  setEditMode,
+  selectTeamsContext,
+  selectTeamIsInEditMode,
+} from '../team-slice'
 import { ModalCreateTeamForm } from '../components/create-team-form'
 
 const TeamLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.type === 'Team' ? 'teams' : 'team-of-teams'
-  return (
-    <Link href={`/organizations/${teamRoute}/${data.key}`}>{value}</Link>
-  )
+  return <Link href={`/organizations/${teamRoute}/${data.key}`}>{value}</Link>
 }
 
 const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {
@@ -29,7 +33,7 @@ const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {
 
 const TeamListPage = () => {
   useDocumentTitle('Teams')
-  const {data:teams, isLoading, error} = useAppSelector(selectTeamsContext)
+  const { data: teams, isLoading, error } = useAppSelector(selectTeamsContext)
   const isInEditMode = useAppSelector(selectTeamIsInEditMode)
   const includeDisabled = useAppSelector((state) => state.team.includeInactive)
 
@@ -55,7 +59,7 @@ const TeamListPage = () => {
     [],
   )
 
-  const Actions = () => {
+  const actions = () => {
     if (!showActions) return null
     return (
       <>
@@ -71,7 +75,7 @@ const TeamListPage = () => {
   useEffect(() => {
     error && console.error(error)
   }, [error])
-  
+
   const onIncludeDisabledChange = (checked: boolean) => {
     dispatch(setIncludeInactive(checked))
     dispatch(retrieveTeams())
@@ -95,16 +99,17 @@ const TeamListPage = () => {
 
   return (
     <>
-      <PageTitle title="Teams" actions={<Actions />} />
+      <PageTitle title="Teams" actions={actions()} />
       <ModaGrid
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
         rowData={teams}
-        loadData={() => {dispatch(retrieveTeams())}}
+        loadData={() => {
+          dispatch(retrieveTeams())
+        }}
         isDataLoading={isLoading}
       />
-      ({ isInEditMode && 
-      <ModalCreateTeamForm />})
+      ({isInEditMode && <ModalCreateTeamForm />})
     </>
   )
 }
