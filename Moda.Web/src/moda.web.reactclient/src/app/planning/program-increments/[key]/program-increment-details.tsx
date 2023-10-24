@@ -8,6 +8,7 @@ import { daysRemaining } from '@/src/utils'
 import ReactMarkdown from 'react-markdown'
 import TeamPredictabilityRadarChart from './team-predictability-radar-chart'
 import { useGetProgramIncrementPredictability } from '@/src/services/queries/planning-queries'
+import { useMemo } from 'react'
 
 const { Item } = Descriptions
 
@@ -21,9 +22,9 @@ const ProgramIncrementDetails = ({
   const { data: programPredictabilityData } =
     useGetProgramIncrementPredictability(programIncrement?.id)
 
-  if (!programIncrement) return null
+  const daysCountdownMetric = useMemo(() => {
+    if (!programIncrement) return null
 
-  const DaysCountdownMetric = () => {
     switch (programIncrement.state) {
       case 'Future':
         return (
@@ -48,10 +49,11 @@ const ProgramIncrementDetails = ({
       default:
         return null
     }
-  }
+  }, [programIncrement])
 
-  const ProgramIncrementPredictability = () => {
-    if (programIncrement.predictability == null) return null
+  const programIncrementPredictability = useMemo(() => {
+    if (!programIncrement || programIncrement.predictability == null)
+      return null
     return (
       <Card>
         <Statistic
@@ -61,10 +63,14 @@ const ProgramIncrementDetails = ({
         />
       </Card>
     )
-  }
+  }, [programIncrement])
 
-  const TeamPredictabilityChart = () => {
-    if (programIncrement.state === 'Future' || !programPredictabilityData)
+  const teamPredictabilityChart = useMemo(() => {
+    if (
+      !programIncrement ||
+      programIncrement.state === 'Future' ||
+      !programPredictabilityData
+    )
       return null
     return (
       <Card size="small">
@@ -73,7 +79,9 @@ const ProgramIncrementDetails = ({
         />
       </Card>
     )
-  }
+  }, [programIncrement, programPredictabilityData])
+
+  if (!programIncrement) return null
 
   return (
     <>
@@ -103,9 +111,9 @@ const ProgramIncrementDetails = ({
         </Col>
       </Row>
       <Space align="start" wrap={true}>
-        <DaysCountdownMetric />
-        <ProgramIncrementPredictability />
-        <TeamPredictabilityChart />
+        {daysCountdownMetric}
+        {programIncrementPredictability}
+        {teamPredictabilityChart}
         <LinksCard objectId={programIncrement.id} />
       </Space>
     </>

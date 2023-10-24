@@ -55,34 +55,6 @@ const TeamPlanReview = ({
     team?.id,
   )
 
-  const ListView = () => {
-    return (
-      <Row gutter={[16, 16]}>
-        <Col xs={24} sm={24} md={24} lg={12}>
-          <TeamObjectivesListCard
-            objectivesQuery={objectivesQuery}
-            teamId={team?.id}
-            programIncrementId={programIncrement?.id}
-            newObjectivesAllowed={!programIncrement?.objectivesLocked ?? false}
-            refreshProgramIncrement={refreshProgramIncrement}
-          />
-        </Col>
-        <Col xs={24} sm={24} md={24} lg={12}>
-          <TeamRisksListCard riskQuery={risksQuery} teamId={team?.id} />
-        </Col>
-      </Row>
-    )
-  }
-
-  const TimelineView = () => {
-    return (
-      <ProgramIncrementObjectivesTimeline
-        objectivesQuery={objectivesQuery}
-        programIncrement={programIncrement}
-      />
-    )
-  }
-
   return (
     <>
       <Space
@@ -108,8 +80,30 @@ const TeamPlanReview = ({
           onChange={setCurrentView}
         />
       </Space>
-      {currentView === 'List' && <ListView />}
-      {currentView === 'Timeline' && <TimelineView />}
+      {currentView === 'List' && (
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={24} md={24} lg={12}>
+            <TeamObjectivesListCard
+              objectivesQuery={objectivesQuery}
+              teamId={team?.id}
+              programIncrementId={programIncrement?.id}
+              newObjectivesAllowed={
+                !programIncrement?.objectivesLocked ?? false
+              }
+              refreshProgramIncrement={refreshProgramIncrement}
+            />
+          </Col>
+          <Col xs={24} sm={24} md={24} lg={12}>
+            <TeamRisksListCard riskQuery={risksQuery} teamId={team?.id} />
+          </Col>
+        </Row>
+      )}
+      {currentView === 'Timeline' && (
+        <ProgramIncrementObjectivesTimeline
+          objectivesQuery={objectivesQuery}
+          programIncrement={programIncrement}
+        />
+      )}
     </>
   )
 }

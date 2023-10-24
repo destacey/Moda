@@ -91,7 +91,7 @@ const RisksGrid = ({
     }
   }
 
-  const Actions = () => {
+  const actions = () => {
     return (
       <>
         {canCreateRisks && (
@@ -190,7 +190,7 @@ const RisksGrid = ({
         columnDefs={columnDefs}
         rowData={risksQuery.data}
         loadData={refresh}
-        actions={showActions && <Actions />}
+        actions={showActions && actions()}
         gridControlMenuItems={controlItems}
       />
       {openCreateRiskForm && (

@@ -171,7 +171,7 @@ const ProgramIncrementObjectivesGrid = ({
     setHideTeam(checked)
   }
 
-  const Actions = () => {
+  const actions = () => {
     return (
       <>
         {canCreateObjectives && (
@@ -227,7 +227,7 @@ const ProgramIncrementObjectivesGrid = ({
         columnDefs={columnDefs}
         rowData={objectivesQuery.data}
         loadData={refresh}
-        actions={showActions && <Actions />}
+        actions={showActions && actions()}
         gridControlMenuItems={controlItems}
       />
       {openCreateObjectiveForm && (

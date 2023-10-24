@@ -5,7 +5,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import { Badge, Button, Card, List, Space } from 'antd'
 import RiskListItem from './risk-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import useAuth from '@/src/app/components/contexts/auth'
 import CreateRiskForm from '@/src/app/components/common/planning/create-risk-form'
 import { UseQueryResult } from 'react-query'
@@ -29,7 +29,7 @@ const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const CardTitle = () => {
+  const cardTitle = useMemo(() => {
     const count = riskQuery?.data?.length ?? 0
     const showBadge = count > 0
     return (
@@ -40,9 +40,9 @@ const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
         )}
       </Space>
     )
-  }
+  }, [riskQuery?.data?.length, theme.badgeColor])
 
-  const RisksList = () => {
+  const risksList = useMemo(() => {
     if (!riskQuery?.data || riskQuery?.data.length === 0) {
       return <ModaEmpty message="No risks" />
     }
@@ -74,7 +74,7 @@ const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
         )}
       />
     )
-  }
+  }, [canUpdateRisks, refreshRisks, riskQuery?.data])
 
   const onCreateRiskFormClosed = (wasCreated: boolean) => {
     setOpenCreateRiskForm(false)
@@ -87,7 +87,7 @@ const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
     <>
       <Card
         size="small"
-        title={<CardTitle />}
+        title={cardTitle}
         extra={
           canCreateRisks && (
             <Button
@@ -98,7 +98,7 @@ const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
           )
         }
       >
-        <RisksList />
+        {risksList}
       </Card>
       {openCreateRiskForm && (
         <CreateRiskForm

@@ -2,7 +2,7 @@
 
 import { useDocumentTitle } from '@/src/app/hooks'
 import { ProgramIncrementTeamResponse } from '@/src/services/moda-api'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Card, Tag } from 'antd'
 import Link from 'next/link'
 import TeamPlanReview from './team-plan-review'
@@ -84,19 +84,19 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
     [teams],
   )
 
-  const activeTeam = (): ProgramIncrementTeamResponse => {
+  const activeTeam = useMemo((): ProgramIncrementTeamResponse => {
     return teams?.find((t) => t.code === activeTab)
-  }
+  }, [activeTab, teams])
 
   if (!isLoading && !isFetching && !programIncrementData) {
     notFound()
   }
 
-  const refreshProgramIncrement = () => {
+  const refreshProgramIncrement = useCallback(() => {
     refetchProgramIncrement()
-  }
+  }, [refetchProgramIncrement])
 
-  const Actions = () => {
+  const actions = useMemo(() => {
     return (
       <>
         <Link
@@ -106,9 +106,9 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
         </Link>
       </>
     )
-  }
+  }, [programIncrementData?.key])
 
-  const PageContent = () => {
+  const pageContent = useMemo(() => {
     if (programIncrementData == null) return null
     if (tabs?.length === 0) {
       return <ModaEmpty message="No teams found for this PI" />
@@ -123,12 +123,18 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
       >
         <TeamPlanReview
           programIncrement={programIncrementData}
-          team={activeTeam()}
+          team={activeTeam}
           refreshProgramIncrement={refreshProgramIncrement}
         />
       </Card>
     )
-  }
+  }, [
+    activeTab,
+    activeTeam,
+    programIncrementData,
+    refreshProgramIncrement,
+    tabs,
+  ])
 
   return (
     <>
@@ -140,9 +146,9 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
             <Tag title="PI Predictability">{`${predictability}%`}</Tag>
           )
         }
-        actions={<Actions />}
+        actions={actions}
       />
-      <PageContent />
+      {pageContent}
     </>
   )
 }

@@ -15,7 +15,11 @@ import useAuth from '@/src/app/components/contexts/auth'
 import { useGetTeamRisks } from '@/src/services/queries/organization-queries'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
-import { retrieveTeam, setEditMode, selectEditTeamContext } from '../../team-slice'
+import {
+  retrieveTeam,
+  setEditMode,
+  selectEditTeamContext,
+} from '../../team-slice'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 
@@ -36,7 +40,12 @@ const TeamDetailsPage = ({ params }) => {
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
   const showActions = canUpdateTeam
 
-  const { item:team, error, isInEditMode, notFound:teamNotFound } = useAppSelector(selectEditTeamContext)
+  const {
+    item: team,
+    error,
+    isInEditMode,
+    notFound: teamNotFound,
+  } = useAppSelector(selectEditTeamContext)
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
@@ -55,7 +64,7 @@ const TeamDetailsPage = ({ params }) => {
     return await teamsClient.getTeamMemberships(teamId)
   }, [])
 
-  const Actions = () => {
+  const actions = () => {
     return (
       <>
         {canUpdateTeam && (
@@ -94,11 +103,11 @@ const TeamDetailsPage = ({ params }) => {
   ]
 
   useEffect(() => {
-    dispatch(retrieveTeam({key, type: 'Team'}))
+    dispatch(retrieveTeam({ key, type: 'Team' }))
   }, [key, dispatch])
 
   useEffect(() => {
-    team && dispatch(setBreadcrumbTitle({title: team.name, pathname}))
+    team && dispatch(setBreadcrumbTitle({ title: team.name, pathname }))
   }, [team, dispatch, pathname])
 
   useEffect(() => {
@@ -127,7 +136,7 @@ const TeamDetailsPage = ({ params }) => {
       <PageTitle
         title={team?.name}
         subtitle="Team Details"
-        actions={showActions && <Actions />}
+        actions={showActions && actions()}
       />
       <Card
         style={{ width: '100%' }}
@@ -137,9 +146,7 @@ const TeamDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
-      {isInEditMode && team && canUpdateTeam && (
-        <EditTeamForm team={team} />
-      )}
+      {isInEditMode && team && canUpdateTeam && <EditTeamForm team={team} />}
     </>
   )
 }

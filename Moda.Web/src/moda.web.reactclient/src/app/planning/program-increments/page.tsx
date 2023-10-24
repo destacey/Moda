@@ -61,7 +61,7 @@ const ProgramIncrementListPage = () => {
     }
   }
 
-  const Actions = () => {
+  const actions = () => {
     return (
       <>
         {canCreateProgramIncrement && (
@@ -77,7 +77,7 @@ const ProgramIncrementListPage = () => {
     <>
       <PageTitle
         title="Program Increments"
-        actions={showActions && <Actions />}
+        actions={showActions && actions()}
       />
       <ModaGrid columnDefs={columnDefs} rowData={data} loadData={refresh} />
       {openCreateProgramIncrementForm && (

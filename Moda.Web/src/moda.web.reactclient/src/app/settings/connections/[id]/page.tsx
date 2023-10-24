@@ -108,7 +108,7 @@ const ConnectionDetailsPage = ({ params }) => {
     setIsImportingWorkspaces(false)
   }
 
-  const Actions = () => {
+  const actions = () => {
     return (
       <>
         {canUpdateConnections && (
@@ -155,7 +155,7 @@ const ConnectionDetailsPage = ({ params }) => {
           </>
         }
         subtitle="Connection Details"
-        actions={showActions && <Actions />}
+        actions={showActions && actions()}
       />
       <Card
         tabList={tabs}
