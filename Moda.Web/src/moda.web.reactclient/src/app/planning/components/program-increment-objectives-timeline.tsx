@@ -4,17 +4,16 @@ import {
   DataItem,
   Timeline,
   TimelineOptions,
-  TimelineOptionsTemplateFunction,
 } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import 'vis-timeline/styles/vis-timeline-graph2d.css'
 import './program-increment-objectives-timeline.css'
-import { createRoot } from 'react-dom/client'
 import {
   ProgramIncrementDetailsDto,
   ProgramIncrementObjectiveListDto,
 } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { createRoot } from 'react-dom/client'
 import { ModaEmpty } from '../../components/common'
 import { UseQueryResult } from 'react-query'
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
@@ -42,6 +41,35 @@ interface TimelineItem extends DataItem {
   objective?: ProgramIncrementObjectiveListDto
 }
 
+interface ObjectiveTimelineTemplateProps {
+  objective: ProgramIncrementObjectiveListDto
+  timelineFontColor: string
+  timelineForegroundColor: string
+}
+export const ObjectiveTimelineTemplate = ({
+  objective,
+  timelineFontColor,
+  timelineForegroundColor,
+}: ObjectiveTimelineTemplateProps) => {
+  return (
+    <div
+      style={{
+        width: `${objective.progress}%`,
+        backgroundColor: timelineForegroundColor,
+      }}
+    >
+      <Typography.Text style={{ padding: '5px', color: timelineFontColor }}>
+        <Link
+          href={`/planning/program-increments/${objective.programIncrement.key}/objectives/${objective.key}`}
+        >
+          {objective.key}
+        </Link>
+        <span> - </span> {objective.name}
+      </Typography.Text>
+    </div>
+  )
+}
+
 const ProgramIncrementObjectivesTimeline = ({
   objectivesQuery,
   programIncrement,
@@ -56,40 +84,6 @@ const ProgramIncrementObjectivesTimeline = ({
   const timelineForegroundColor =
     currentThemeName === 'light' ? '#c7edff' : '#13283a'
   const timelineFontColor = currentThemeName === 'light' ? '#4d4d4d' : '#FFFFFF'
-
-  const objectiveTemplate = useCallback(
-    (objective: ProgramIncrementObjectiveListDto) => {
-      return (
-        <div
-          style={{
-            width: `${objective.progress}%`,
-            backgroundColor: timelineForegroundColor,
-          }}
-        >
-          <Typography.Text style={{ padding: '5px', color: timelineFontColor }}>
-            <Link
-              href={`/planning/program-increments/${objective.programIncrement.key}/objectives/${objective.key}`}
-            >
-              {objective.key}
-            </Link>
-            <span> - </span> {objective.name}
-          </Typography.Text>
-        </div>
-      )
-    },
-    [timelineFontColor, timelineForegroundColor],
-  )
-
-  const template: TimelineOptionsTemplateFunction = useCallback(
-    (item: TimelineItem, element: HTMLElement, data: any): HTMLElement => {
-      if (item.type === 'range') {
-        return createRoot(element).render(
-          objectiveTemplate(item.objective),
-        ) as unknown as HTMLElement
-      }
-    },
-    [objectiveTemplate],
-  )
 
   // TODO: add the ability to export/save as svg or png
   // TODO: update the styles to match the rest of the app.  Especially for dark mode.
@@ -108,10 +102,26 @@ const ProgramIncrementObjectivesTimeline = ({
       min: dayjs(programIncrement.start).subtract(4, 'week').toDate(),
       max: dayjs(programIncrement.end).add(4, 'week').toDate(),
       groupOrder: 'content',
-      xss: { disabled: true },
-      template: template,
+      xss: { disabled: false },
+      template: (item: TimelineItem, element: HTMLElement, data: any) => {
+        if (item.type === 'range') {
+          // TODO: this is throwing a lot of warnings in the console.  You are calling ReactDOMClient.createRoot() on a container that has already been passed to createRoot() before. Instead, call root.render() on the existing root instead if you want to update it.
+          createRoot(element).render(
+            <ObjectiveTimelineTemplate
+              objective={item.objective}
+              timelineFontColor={timelineFontColor}
+              timelineForegroundColor={timelineForegroundColor}
+            />,
+          )
+        }
+      },
     }
-  }, [programIncrement.end, programIncrement.start, template])
+  }, [
+    programIncrement.end,
+    programIncrement.start,
+    timelineFontColor,
+    timelineForegroundColor,
+  ])
 
   useEffect(() => {
     if (!objectivesQuery?.data) return
@@ -136,7 +146,6 @@ const ProgramIncrementObjectivesTimeline = ({
         }),
     )
   }, [
-    objectiveTemplate,
     objectivesQuery?.data,
     programIncrement.end,
     programIncrement.key,
