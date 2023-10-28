@@ -4,10 +4,11 @@ import {
   DataItem,
   Timeline,
   TimelineOptions,
+  TimelineOptionsTemplateFunction,
 } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import 'vis-timeline/styles/vis-timeline-graph2d.css'
 import './program-increment-objectives-timeline.css'
-import { renderToString } from 'react-dom/server'
+import { createRoot } from 'react-dom/client'
 import {
   ProgramIncrementDetailsDto,
   ProgramIncrementObjectiveListDto,
@@ -26,7 +27,7 @@ interface ProgramIncrementObjectivesTimelineProps {
   programIncrement: ProgramIncrementDetailsDto
   enableGroups?: boolean
   teamNames?: string[]
-  viewSelector?: JSX.Element
+  viewSelector?: React.ReactNode
 }
 
 interface TimelineItem extends DataItem {
@@ -38,6 +39,7 @@ interface TimelineItem extends DataItem {
   end: Date
   group?: string
   type?: string
+  objective?: ProgramIncrementObjectiveListDto
 }
 
 const ProgramIncrementObjectivesTimeline = ({
@@ -55,7 +57,40 @@ const ProgramIncrementObjectivesTimeline = ({
     currentThemeName === 'light' ? '#c7edff' : '#13283a'
   const timelineFontColor = currentThemeName === 'light' ? '#4d4d4d' : '#FFFFFF'
 
-  // TODO: setup the template function to render the content
+  const objectiveTemplate = useCallback(
+    (objective: ProgramIncrementObjectiveListDto) => {
+      return (
+        <div
+          style={{
+            width: `${objective.progress}%`,
+            backgroundColor: timelineForegroundColor,
+          }}
+        >
+          <Typography.Text style={{ padding: '5px', color: timelineFontColor }}>
+            <Link
+              href={`/planning/program-increments/${objective.programIncrement.key}/objectives/${objective.key}`}
+            >
+              {objective.key}
+            </Link>
+            <span> - </span> {objective.name}
+          </Typography.Text>
+        </div>
+      )
+    },
+    [timelineFontColor, timelineForegroundColor],
+  )
+
+  const template: TimelineOptionsTemplateFunction = useCallback(
+    (item: TimelineItem, element: HTMLElement, data: any): HTMLElement => {
+      if (item.type === 'range') {
+        return createRoot(element).render(
+          objectiveTemplate(item.objective),
+        ) as unknown as HTMLElement
+      }
+    },
+    [objectiveTemplate],
+  )
+
   // TODO: add the ability to export/save as svg or png
   // TODO: update the styles to match the rest of the app.  Especially for dark mode.
   const options: TimelineOptions = useMemo(() => {
@@ -74,31 +109,9 @@ const ProgramIncrementObjectivesTimeline = ({
       max: dayjs(programIncrement.end).add(4, 'week').toDate(),
       groupOrder: 'content',
       xss: { disabled: true },
+      template: template,
     }
-  }, [programIncrement.end, programIncrement.start])
-
-  const ObjectiveContent = useCallback(
-    (objective: ProgramIncrementObjectiveListDto) => {
-      return (
-        <div
-          style={{
-            width: `${objective.progress}%`,
-            backgroundColor: `${timelineForegroundColor}`,
-          }}
-        >
-          <Typography.Text style={{ padding: '5px' }}>
-            <Link
-              href={`/planning/program-increments/${objective.programIncrement.key}/objectives/${objective.key}`}
-            >
-              {objective.key}
-            </Link>
-            <span> - </span> {objective.name}
-          </Typography.Text>
-        </div>
-      )
-    },
-    [timelineForegroundColor],
-  )
+  }, [programIncrement.end, programIncrement.start, template])
 
   useEffect(() => {
     if (!objectivesQuery?.data) return
@@ -111,18 +124,19 @@ const ProgramIncrementObjectivesTimeline = ({
             id: obj.key,
             programIncrementKey: obj.programIncrement.key,
             title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
-            content: renderToString(ObjectiveContent(obj)),
+            content: '',
             start: dayjs(obj.startDate ?? programIncrement.start).toDate(),
             end: dayjs(obj.targetDate ?? programIncrement.end).toDate(),
             group: obj.team?.name,
             type: 'range',
-            style: `background: ${timelineBackgroundColor}; border-color: ${timelineBackgroundColor}; color: ${timelineFontColor};`,
+            style: `background: ${timelineBackgroundColor}; border-color: ${timelineBackgroundColor};`,
             zIndex: 1,
+            objective: obj,
           }
         }),
     )
   }, [
-    ObjectiveContent,
+    objectiveTemplate,
     objectivesQuery?.data,
     programIncrement.end,
     programIncrement.key,
