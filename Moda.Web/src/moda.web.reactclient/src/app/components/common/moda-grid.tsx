@@ -139,7 +139,7 @@ const ModaGrid = ({
                 </Tooltip>
               )}
               {(showExportButton || toolbarActions) && (
-                <Divider type="vertical" />
+                <Divider type="vertical" style={{ height: '30px' }} />
               )}
               {showExportButton && (
                 <Tooltip title="Export to CSV">
