@@ -87,7 +87,7 @@ const ProgramIncrementObjectivesTimeline = ({
 
   // TODO: add the ability to export/save as svg or png
   // TODO: update the styles to match the rest of the app.  Especially for dark mode.
-  const options: TimelineOptions = useMemo(() => {
+  const options = useMemo(() => {
     return {
       editable: false,
       orientation: 'top',
@@ -181,7 +181,7 @@ const ProgramIncrementObjectivesTimeline = ({
     ]
 
     var container = document.getElementById('timeline-vis')
-    const timeline = new Timeline(container, items, options)
+    const timeline = new Timeline(container, items, options as TimelineOptions)
 
     if (enableGroups === true) {
       let teams = []
