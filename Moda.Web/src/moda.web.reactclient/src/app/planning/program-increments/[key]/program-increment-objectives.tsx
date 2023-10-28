@@ -1,8 +1,10 @@
+'use client'
+
 import ProgramIncrementObjectivesGrid from '@/src/app/components/common/planning/program-increment-objectives-grid'
 import { ProgramIncrementDetailsDto } from '@/src/services/moda-api'
 import { useGetProgramIncrementObjectives } from '@/src/services/queries/planning-queries'
 import { BarsOutlined, BuildOutlined } from '@ant-design/icons'
-import { Segmented, Space, Typography } from 'antd'
+import { Segmented } from 'antd'
 import { SegmentedLabeledOption } from 'antd/es/segmented'
 import { useMemo, useState } from 'react'
 import { ProgramIncrementObjectivesTimeline } from '../../components'

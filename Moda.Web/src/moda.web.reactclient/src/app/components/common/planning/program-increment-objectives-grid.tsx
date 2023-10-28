@@ -19,10 +19,10 @@ export interface ProgramIncrementObjectivesGridProps {
   hideProgramIncrementColumn?: boolean
   hideTeamColumn?: boolean
   newObjectivesAllowed?: boolean
-  viewSelector: JSX.Element
+  viewSelector?: React.ReactNode
 }
 
-const ProgramIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
+const programIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
   return (
     <Link
       href={`/planning/program-increments/${data.programIncrement?.key}/objectives/${data.key}`}
@@ -32,7 +32,7 @@ const ProgramIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
   )
 }
 
-const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
+const programIncrementLinkCellRenderer = ({ value, data }) => {
   return (
     <Link href={`/planning/program-increments/${data.programIncrement?.key}`}>
       {value}
@@ -40,7 +40,7 @@ const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
   )
 }
 
-const TeamLinkCellRenderer = ({ value, data }) => {
+const teamLinkCellRenderer = ({ value, data }) => {
   const teamLink =
     data.team?.type === 'Team'
       ? `/organizations/teams/${data.team?.key}`
@@ -48,7 +48,7 @@ const TeamLinkCellRenderer = ({ value, data }) => {
   return <Link href={teamLink}>{value}</Link>
 }
 
-const ProgressCellRenderer = ({ value, data }) => {
+const progressCellRenderer = ({ value, data }) => {
   const progressStatus =
     data.status?.name === 'Canceled' ? 'exception' : undefined
   return (
@@ -129,20 +129,20 @@ const ProgramIncrementObjectivesGrid = ({
       {
         field: 'name',
         width: 400,
-        cellRenderer: ProgramIncrementObjectiveLinkCellRenderer,
+        cellRenderer: programIncrementObjectiveLinkCellRenderer,
       },
       {
         field: 'programIncrement.name',
-        cellRenderer: ProgramIncrementLinkCellRenderer,
+        cellRenderer: programIncrementLinkCellRenderer,
         hide: hideProgramIncrement,
       },
-      { field: 'status.name' },
+      { field: 'status.name', width: 125 },
       {
         field: 'team.name',
-        cellRenderer: TeamLinkCellRenderer,
+        cellRenderer: teamLinkCellRenderer,
         hide: hideTeam,
       },
-      { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
+      { field: 'progress', width: 250, cellRenderer: progressCellRenderer },
       {
         field: 'startDate',
         valueGetter: (params) =>
@@ -157,7 +157,7 @@ const ProgramIncrementObjectivesGrid = ({
             ? dayjs(params.data.targetDate).format('M/D/YYYY')
             : null,
       },
-      { field: 'isStretch' },
+      { field: 'isStretch', width: 100 },
     ],
     [
       canManageObjectives,
