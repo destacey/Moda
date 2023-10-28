@@ -261,9 +261,9 @@ const EditProgramIncrementObjectiveForm = ({
           </Form.Item>
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
             <Input.TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
+              autoSize={{ minRows: 2, maxRows: 4 }}
               showCount
-              maxLength={128}
+              maxLength={256}
               disabled={programIncrementData?.objectivesLocked}
             />
           </Form.Item>
