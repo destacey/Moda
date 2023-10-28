@@ -48,14 +48,10 @@ const ProgramIncrementObjectivesTimeline = ({
   const [objectives, setObjectives] = useState<TimelineItem[]>([])
   const { currentThemeName } = useTheme()
   const timelineBackgroundColor =
-    currentThemeName === 'light' ? '#C7EDFF' : '#13283A'
+    currentThemeName === 'light' ? '#f5f5f5' : '#000000'
   const timelineForegroundColor =
-    currentThemeName === 'light' ? '#1272CC' : '#1F83D2'
-  const timelineFontColor = currentThemeName === 'light' ? '#000000' : '#FFFFFF'
-
-  console.log('background color', timelineBackgroundColor)
-  console.log('foreground color', timelineForegroundColor)
-  console.log('font color', timelineFontColor)
+    currentThemeName === 'light' ? '#c7edff' : '#13283a'
+  const timelineFontColor = currentThemeName === 'light' ? '#4d4d4d' : '#FFFFFF'
 
   // TODO: setup the template function to render the content
   // TODO: add the ability to export/save as svg or png
@@ -90,9 +86,6 @@ const ProgramIncrementObjectivesTimeline = ({
         >
           <Typography.Text style={{ padding: '5px' }}>
             <Link
-              style={{
-                color: `${timelineFontColor}`,
-              }}
               href={`/planning/program-increments/${objective.programIncrement.key}/objectives/${objective.key}`}
             >
               {objective.key}
@@ -102,7 +95,7 @@ const ProgramIncrementObjectivesTimeline = ({
         </div>
       )
     },
-    [timelineFontColor, timelineForegroundColor],
+    [timelineForegroundColor],
   )
 
   useEffect(() => {
