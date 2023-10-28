@@ -4,7 +4,7 @@ import { useGetProgramIncrementObjectives } from '@/src/services/queries/plannin
 import { BarsOutlined, BuildOutlined } from '@ant-design/icons'
 import { Segmented, Space, Typography } from 'antd'
 import { SegmentedLabeledOption } from 'antd/es/segmented'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ProgramIncrementObjectivesTimeline } from '../../components'
 
 interface ProgramIncrementObjectivesProps {
@@ -38,24 +38,21 @@ const ProgramIncrementObjectives = ({
     objectivesQueryEnabled,
   )
 
+  const viewSelector = useMemo(
+    () => (
+      <Segmented
+        options={viewSelectorOptions}
+        value={currentView}
+        onChange={setCurrentView}
+      />
+    ),
+    [currentView],
+  )
+
   if (!programIncrement) return null
 
   return (
     <>
-      <Space
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          paddingBottom: '16px',
-        }}
-      >
-        <Segmented
-          options={viewSelectorOptions}
-          value={currentView}
-          onChange={setCurrentView}
-        />
-      </Space>
       {currentView === 'List' && (
         <ProgramIncrementObjectivesGrid
           objectivesQuery={objectivesQuery}
@@ -63,6 +60,7 @@ const ProgramIncrementObjectives = ({
           hideProgramIncrementColumn={true}
           hideTeamColumn={true}
           newObjectivesAllowed={newObjectivesAllowed}
+          viewSelector={viewSelector}
         />
       )}
       {currentView === 'Timeline' && (
@@ -71,6 +69,7 @@ const ProgramIncrementObjectives = ({
           programIncrement={programIncrement}
           enableGroups={true}
           teamNames={teamNames}
+          viewSelector={viewSelector}
         />
       )}
     </>

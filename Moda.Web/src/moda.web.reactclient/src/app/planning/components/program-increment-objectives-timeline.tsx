@@ -18,7 +18,7 @@ import { ModaEmpty } from '../../components/common'
 import { UseQueryResult } from 'react-query'
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import Link from 'next/link'
-import { Typography } from 'antd'
+import { Space, Typography } from 'antd'
 import useTheme from '../../components/contexts/theme'
 
 interface ProgramIncrementObjectivesTimelineProps {
@@ -26,6 +26,7 @@ interface ProgramIncrementObjectivesTimelineProps {
   programIncrement: ProgramIncrementDetailsDto
   enableGroups?: boolean
   teamNames?: string[]
+  viewSelector: JSX.Element
 }
 
 interface TimelineItem extends DataItem {
@@ -44,6 +45,7 @@ const ProgramIncrementObjectivesTimeline = ({
   programIncrement,
   enableGroups = false,
   teamNames,
+  viewSelector,
 }: ProgramIncrementObjectivesTimelineProps) => {
   const [objectives, setObjectives] = useState<TimelineItem[]>([])
   const { currentThemeName } = useTheme()
@@ -198,6 +200,16 @@ const ProgramIncrementObjectivesTimeline = ({
 
     return (
       <>
+        <Space
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            paddingBottom: '16px',
+          }}
+        >
+          {viewSelector}
+        </Space>
         <div id="timeline-vis"></div>
       </>
     )

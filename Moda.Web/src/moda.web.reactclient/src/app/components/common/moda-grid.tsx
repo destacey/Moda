@@ -29,6 +29,7 @@ interface ModaGridProps extends AgGridReactProps {
   includeExportButton?: boolean
   actions?: React.ReactNode | null
   gridControlMenuItems?: ItemType[]
+  toolbarActions?: React.ReactNode | null
   loadData?: () => Promise<void> | void
   isDataLoading?: boolean
 }
@@ -48,6 +49,7 @@ const ModaGrid = ({
   includeExportButton,
   actions,
   gridControlMenuItems,
+  toolbarActions,
   defaultColDef,
   rowData,
   loadData,
@@ -143,6 +145,7 @@ const ModaGrid = ({
                   />
                 </Tooltip>
               )}
+              {toolbarActions && toolbarActions}
             </Space>
           </Col>
         </Row>
