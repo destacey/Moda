@@ -95,7 +95,7 @@ const RisksGrid = ({
     return (
       <>
         {canCreateRisks && (
-          <Button onClick={() => setOpenCreateRiskForm(true)}>
+          <Button type="link" onClick={() => setOpenCreateRiskForm(true)}>
             Create Risk
           </Button>
         )}

@@ -1,3 +1,5 @@
+'use client'
+
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
@@ -17,6 +19,7 @@ export interface ProgramIncrementObjectivesGridProps {
   hideProgramIncrementColumn?: boolean
   hideTeamColumn?: boolean
   newObjectivesAllowed?: boolean
+  viewSelector: JSX.Element
 }
 
 const ProgramIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
@@ -64,6 +67,7 @@ const ProgramIncrementObjectivesGrid = ({
   hideProgramIncrementColumn = false,
   hideTeamColumn = false,
   newObjectivesAllowed = false,
+  viewSelector,
 }: ProgramIncrementObjectivesGridProps) => {
   const [hideProgramIncrement, setHideProgramIncrement] = useState<boolean>(
     hideProgramIncrementColumn,
@@ -175,7 +179,7 @@ const ProgramIncrementObjectivesGrid = ({
     return (
       <>
         {canCreateObjectives && (
-          <Button onClick={createObjectiveButtonClicked}>
+          <Button type="link" onClick={createObjectiveButtonClicked}>
             Create Objective
           </Button>
         )}
@@ -229,6 +233,7 @@ const ProgramIncrementObjectivesGrid = ({
         loadData={refresh}
         actions={showActions && actions()}
         gridControlMenuItems={controlItems}
+        toolbarActions={viewSelector}
       />
       {openCreateObjectiveForm && (
         <CreateProgramIncrementObjectiveForm

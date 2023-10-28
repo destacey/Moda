@@ -1,3 +1,5 @@
+'use client'
+
 import {
   DataItem,
   Timeline,
@@ -16,13 +18,15 @@ import { ModaEmpty } from '../../components/common'
 import { UseQueryResult } from 'react-query'
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import Link from 'next/link'
-import { Typography } from 'antd'
+import { Space, Typography } from 'antd'
+import useTheme from '../../components/contexts/theme'
 
 interface ProgramIncrementObjectivesTimelineProps {
   objectivesQuery: UseQueryResult<ProgramIncrementObjectiveListDto[], unknown>
   programIncrement: ProgramIncrementDetailsDto
   enableGroups?: boolean
   teamNames?: string[]
+  viewSelector?: JSX.Element
 }
 
 interface TimelineItem extends DataItem {
@@ -41,8 +45,15 @@ const ProgramIncrementObjectivesTimeline = ({
   programIncrement,
   enableGroups = false,
   teamNames,
+  viewSelector,
 }: ProgramIncrementObjectivesTimelineProps) => {
   const [objectives, setObjectives] = useState<TimelineItem[]>([])
+  const { currentThemeName } = useTheme()
+  const timelineBackgroundColor =
+    currentThemeName === 'light' ? '#f5f5f5' : '#000000'
+  const timelineForegroundColor =
+    currentThemeName === 'light' ? '#c7edff' : '#13283a'
+  const timelineFontColor = currentThemeName === 'light' ? '#4d4d4d' : '#FFFFFF'
 
   // TODO: setup the template function to render the content
   // TODO: add the ability to export/save as svg or png
@@ -64,7 +75,7 @@ const ProgramIncrementObjectivesTimeline = ({
       groupOrder: 'content',
       xss: { disabled: true },
     }
-  }, [programIncrement])
+  }, [programIncrement.end, programIncrement.start])
 
   const ObjectiveContent = useCallback(
     (objective: ProgramIncrementObjectiveListDto) => {
@@ -72,13 +83,10 @@ const ProgramIncrementObjectivesTimeline = ({
         <div
           style={{
             width: `${objective.progress}%`,
-            backgroundColor: '#C7C7C7',
+            backgroundColor: `${timelineForegroundColor}`,
           }}
         >
-          <Typography.Text
-            delete={objective.status?.name === 'Canceled'}
-            style={{ padding: '5px' }}
-          >
+          <Typography.Text style={{ padding: '5px' }}>
             <Link
               href={`/planning/program-increments/${objective.programIncrement.key}/objectives/${objective.key}`}
             >
@@ -89,7 +97,7 @@ const ProgramIncrementObjectivesTimeline = ({
         </div>
       )
     },
-    [],
+    [timelineForegroundColor],
   )
 
   useEffect(() => {
@@ -108,8 +116,7 @@ const ProgramIncrementObjectivesTimeline = ({
             end: dayjs(obj.targetDate ?? programIncrement.end).toDate(),
             group: obj.team?.name,
             type: 'range',
-            style:
-              'background: #E8E8E8; border-color: #E8E8E8; opacity: 0.99 !important;',
+            style: `background: ${timelineBackgroundColor}; border-color: ${timelineBackgroundColor}; color: ${timelineFontColor};`,
             zIndex: 1,
           }
         }),
@@ -120,6 +127,8 @@ const ProgramIncrementObjectivesTimeline = ({
     programIncrement.end,
     programIncrement.key,
     programIncrement.start,
+    timelineBackgroundColor,
+    timelineFontColor,
   ])
 
   useEffect(() => {
@@ -165,7 +174,11 @@ const ProgramIncrementObjectivesTimeline = ({
       }
 
       const groups = teams.map((team) => {
-        return { id: team, content: team } as DataGroup
+        return {
+          id: team,
+          content: team,
+          style: `color: ${timelineFontColor};`,
+        } as DataGroup
       })
 
       timeline.setGroups(groups)
@@ -177,6 +190,7 @@ const ProgramIncrementObjectivesTimeline = ({
     programIncrement.end,
     programIncrement.start,
     teamNames,
+    timelineFontColor,
   ])
 
   const TimelineChart = () => {
@@ -186,6 +200,18 @@ const ProgramIncrementObjectivesTimeline = ({
 
     return (
       <>
+        {viewSelector && (
+          <Space
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              paddingBottom: '16px',
+            }}
+          >
+            {viewSelector}
+          </Space>
+        )}
         <div id="timeline-vis"></div>
       </>
     )
