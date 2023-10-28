@@ -179,7 +179,7 @@ const ProgramIncrementObjectivesGrid = ({
     return (
       <>
         {canCreateObjectives && (
-          <Button onClick={createObjectiveButtonClicked}>
+          <Button type="link" onClick={createObjectiveButtonClicked}>
             Create Objective
           </Button>
         )}
