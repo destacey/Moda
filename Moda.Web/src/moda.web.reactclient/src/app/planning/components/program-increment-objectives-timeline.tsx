@@ -26,7 +26,7 @@ interface ProgramIncrementObjectivesTimelineProps {
   programIncrement: ProgramIncrementDetailsDto
   enableGroups?: boolean
   teamNames?: string[]
-  viewSelector: JSX.Element
+  viewSelector?: JSX.Element
 }
 
 interface TimelineItem extends DataItem {
@@ -200,16 +200,18 @@ const ProgramIncrementObjectivesTimeline = ({
 
     return (
       <>
-        <Space
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-            paddingBottom: '16px',
-          }}
-        >
-          {viewSelector}
-        </Space>
+        {viewSelector && (
+          <Space
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              paddingBottom: '16px',
+            }}
+          >
+            {viewSelector}
+          </Space>
+        )}
         <div id="timeline-vis"></div>
       </>
     )
