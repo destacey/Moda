@@ -26,13 +26,14 @@ public class HealthCheckTests
         var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
 
         // Act
-        var result = new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.Timestamp, faker.Expiration, faker.Note);
+        var result = new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.Timestamp, faker.Expiration, faker.Note);
 
         // Assert
         result.Should().NotBeNull();
         result.ObjectId.Should().Be(faker.ObjectId);
         result.Context.Should().Be(faker.Context);
         result.Status.Should().Be(faker.Status);
+        result.ReportedById.Should().Be(faker.ReportedById);
         result.Timestamp.Should().Be(faker.Timestamp);
         result.Expiration.Should().Be(faker.Expiration);
         result.Note.Should().Be(faker.Note);
@@ -46,7 +47,7 @@ public class HealthCheckTests
         var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
 
         // Act
-        Action act = () => new HealthCheck(objectId, faker.Context, faker.Status, faker.Timestamp, faker.Expiration, faker.Note);
+        Action act = () => new HealthCheck(objectId, faker.Context, faker.Status, faker.ReportedById, faker.Timestamp, faker.Expiration, faker.Note);
 
         // Assert
         act.Should().Throw<ArgumentException>().WithMessage("Parameter [objectId] is default value for type Guid (Parameter 'objectId')");
@@ -61,7 +62,7 @@ public class HealthCheckTests
         var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
 
         // Act
-        Action act = () => new HealthCheck(faker.ObjectId, faker.Context, faker.Status, timestamp, expiration, faker.Note);
+        Action act = () => new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, timestamp, expiration, faker.Note);
 
         // Assert
         act.Should().Throw<ArgumentException>().WithMessage("Expiration must be greater than timestamp. (Parameter 'expiration')");
@@ -146,7 +147,7 @@ public class HealthCheckTests
         var note = "Updated Note";
 
         // Act
-        var result = sut.Update(status, expiration, note);
+        var result = sut.Update(status, expiration, note, _dateTimeService.Now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -165,7 +166,7 @@ public class HealthCheckTests
         var note = "Updated Note";
 
         // Act
-        var result = sut.Update(status, expiration, note);
+        var result = sut.Update(status, expiration, note, _dateTimeService.Now);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -182,13 +183,32 @@ public class HealthCheckTests
         var note = " ";
 
         // Act
-        var result = sut.Update(status, expiration, note);
+        var result = sut.Update(status, expiration, note, _dateTimeService.Now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
         sut.Status.Should().Be(status);
         sut.Expiration.Should().Be(expiration);
         sut.Note.Should().BeNull();
+    }
+
+    [Fact]
+    public void Update_WhenExpired_FailsWithError()
+    {
+        // Arrange
+        var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var sut = new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.Timestamp.Minus(Duration.FromDays(15)), faker.Timestamp.Minus(Duration.FromDays(10)), faker.Note);
+        var status = HealthStatus.Healthy;
+        var expiration = _dateTimeService.Now.Plus(Duration.FromDays(1));
+        var note = "Updated Note";
+
+        // Act
+        var result = sut.Update(status, expiration, note, _dateTimeService.Now);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("Expired health checks cannot be modified.");
+        sut.Note.Should().NotBe(note);
     }
 
     #endregion Update

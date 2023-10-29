@@ -46,10 +46,11 @@ public class HealthReportTests
         var objectId = Guid.NewGuid();
         var healthChecks = new HealthCheckFaker(_dateTimeService.Now.Minus(Duration.FromDays(30)), objectId)
             .MultipleWithSameObjectId(objectId, 2);
+        var reportedById = Guid.NewGuid();
         var healthReport = new HealthReport(healthChecks);
 
         // Act
-        var result = healthReport.AddHealthCheck(objectId, HealthCheckContext.ProgramIncrementObjective, HealthStatus.Healthy, _dateTimeService.Now, _dateTimeService.Now.Plus(Duration.FromDays(5)), "Test");
+        var result = healthReport.AddHealthCheck(objectId, HealthCheckContext.ProgramIncrementObjective, HealthStatus.Healthy, reportedById, _dateTimeService.Now, _dateTimeService.Now.Plus(Duration.FromDays(5)), "Test");
 
         // Assert
         result.Should().NotBeNull();
@@ -69,10 +70,11 @@ public class HealthReportTests
         var objectId = Guid.NewGuid();
         var healthChecks = new HealthCheckFaker(_dateTimeService.Now.Minus(Duration.FromDays(8)), objectId)
             .MultipleWithSameObjectId(objectId, 2);
+        var reportedById = Guid.NewGuid();
         var healthReport = new HealthReport(healthChecks);
 
         // Act
-        var result = healthReport.AddHealthCheck(objectId, HealthCheckContext.ProgramIncrementObjective, HealthStatus.Healthy, _dateTimeService.Now, _dateTimeService.Now.Plus(Duration.FromDays(5)), "Test");
+        var result = healthReport.AddHealthCheck(objectId, HealthCheckContext.ProgramIncrementObjective, HealthStatus.Healthy, reportedById, _dateTimeService.Now, _dateTimeService.Now.Plus(Duration.FromDays(5)), "Test");
 
         var previous = healthReport.HealthChecks.OrderByDescending(h => h.Timestamp).ToList()[1];
 

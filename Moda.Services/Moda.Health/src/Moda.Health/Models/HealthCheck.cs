@@ -5,6 +5,7 @@ using Moda.Common.Domain.Interfaces;
 using NodaTime;
 using CSharpFunctionalExtensions;
 using Ardalis.GuardClauses;
+using Moda.Common.Domain.Employees;
 
 namespace Moda.Health.Models;
 
@@ -15,13 +16,14 @@ public sealed class HealthCheck : BaseAuditableEntity<int>, IHealthCheck
 
     private HealthCheck() { }
 
-    internal HealthCheck(Guid objectId, HealthCheckContext context, HealthStatus status, Instant timestamp, Instant expiration, string? note)
+    internal HealthCheck(Guid objectId, HealthCheckContext context, HealthStatus status, Guid reportedById, Instant timestamp, Instant expiration, string? note)
     {
         Guard.Against.Default(objectId, nameof(objectId));
 
         ObjectId = objectId;
         Context = context;
         Status = status;
+        ReportedById = reportedById;
         Timestamp = timestamp;
         Expiration = expiration;
         Note = note;
@@ -42,6 +44,16 @@ public sealed class HealthCheck : BaseAuditableEntity<int>, IHealthCheck
     /// The status of the health check.
     /// </summary>
     public HealthStatus Status { get; private set; }
+
+    /// <summary>
+    /// EmployeeId of the employee who reported the health check.
+    /// </summary>
+    public Guid ReportedById { get; private set; }
+
+    /// <summary>
+    /// The employee who reported the health check.
+    /// </summary>
+    public Employee ReportedBy { get; private set; } = default!;
 
     /// <summary>
     /// The timestamp of when the health check was initially created.
@@ -95,8 +107,11 @@ public sealed class HealthCheck : BaseAuditableEntity<int>, IHealthCheck
     /// <param name="expiration"></param>
     /// <param name="note"></param>
     /// <returns>Result</returns>
-    internal Result Update(HealthStatus status, Instant expiration, string? note)
+    internal Result Update(HealthStatus status, Instant expiration, string? note, Instant now)
     {
+        if (IsExpired(now))
+            return Result.Failure("Expired health checks cannot be modified.");
+
         try
         {
             Status = status;

@@ -7,6 +7,7 @@ public class HealthCheckFaker : Faker<HealthCheck>
         RuleFor(x => x.ObjectId, f => objectId ?? f.Random.Guid());
         RuleFor(x => x.Context, f => f.PickRandom<HealthCheckContext>());
         RuleFor(x => x.Status, f => f.PickRandom<HealthStatus>());
+        RuleFor(x => x.ReportedById, f => f.Random.Guid());
         RuleFor(x => x.Timestamp, timestamp);
         RuleFor(x => x.Expiration, timestamp.Plus(Duration.FromDays(5)));
         RuleFor(x => x.Note, f => f.Random.String2(15));

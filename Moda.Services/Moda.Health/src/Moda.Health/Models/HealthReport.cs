@@ -20,13 +20,14 @@ public sealed class HealthReport
     /// <param name="objectId"></param>
     /// <param name="context"></param>
     /// <param name="status"></param>
+    /// <param name="reportedById"></param>
     /// <param name="timestamp"></param>
     /// <param name="expiration"></param>
     /// <param name="note"></param>
     /// <returns></returns>
-    internal HealthCheck AddHealthCheck(Guid objectId, HealthCheckContext context, HealthStatus status, Instant timestamp, Instant expiration, string? note)
+    internal HealthCheck AddHealthCheck(Guid objectId, HealthCheckContext context, HealthStatus status, Guid reportedById, Instant timestamp, Instant expiration, string? note)
     {
-        var healthCheck = new HealthCheck(objectId, context, status, timestamp, expiration, note);
+        var healthCheck = new HealthCheck(objectId, context, status, reportedById, timestamp, expiration, note);
 
         // health checks should not overlap
         // expire latest health check if not expired
