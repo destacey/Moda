@@ -4,9 +4,6 @@ import PageTitle from '@/src/app/components/common/page-title'
 import { Button, Card, Dropdown, MenuProps, Space } from 'antd'
 import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
 import ProgramIncrementDetails from './program-increment-details'
-import ProgramIncrementObjectivesGrid, {
-  ProgramIncrementObjectivesGridProps,
-} from '@/src/app/components/common/planning/program-increment-objectives-grid'
 import TeamsGrid, {
   TeamsGridProps,
 } from '@/src/app/components/common/organizations/teams-grid'
@@ -22,7 +19,6 @@ import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { EditProgramIncrementForm } from '../../components'
 import {
   useGetProgramIncrementByKey,
-  useGetProgramIncrementObjectives,
   useGetProgramIncrementRisks,
   useGetProgramIncrementTeams,
 } from '@/src/services/queries/planning-queries'

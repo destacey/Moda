@@ -60,7 +60,7 @@ const ProgramIncrementObjectives = ({
           objectivesQuery={objectivesQuery}
           programIncrementId={programIncrement?.id}
           hideProgramIncrementColumn={true}
-          hideTeamColumn={true}
+          hideTeamColumn={false}
           newObjectivesAllowed={newObjectivesAllowed}
           viewSelector={viewSelector}
         />
