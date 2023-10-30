@@ -80,9 +80,9 @@ const ProgramIncrementObjectivesTimeline = ({
   const [objectives, setObjectives] = useState<TimelineItem[]>([])
   const { currentThemeName } = useTheme()
   const timelineBackgroundColor =
-    currentThemeName === 'light' ? '#f5f5f5' : '#000000'
+    currentThemeName === 'light' ? '#f5f5f5' : '#303030'
   const timelineForegroundColor =
-    currentThemeName === 'light' ? '#c7edff' : '#13283a'
+    currentThemeName === 'light' ? '#c7edff' : '#17354d'
   const timelineFontColor = currentThemeName === 'light' ? '#4d4d4d' : '#FFFFFF'
 
   // TODO: add the ability to export/save as svg or png
