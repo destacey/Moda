@@ -120,12 +120,12 @@ public class Objective : BaseAuditableEntity<Guid>
     {
         if (Status == status) return;
 
-        if (Status is ObjectiveStatus.Completed or ObjectiveStatus.Canceled
-            && status is not ObjectiveStatus.Completed or ObjectiveStatus.Canceled)
+        if (Status is ObjectiveStatus.Completed or ObjectiveStatus.Canceled or ObjectiveStatus.Missed
+            && status is not ObjectiveStatus.Completed or ObjectiveStatus.Canceled or ObjectiveStatus.Missed)
         {
             ClosedDate = null;
         }
-        else if (status is ObjectiveStatus.Completed or ObjectiveStatus.Canceled)
+        else if (status is ObjectiveStatus.Completed or ObjectiveStatus.Canceled or ObjectiveStatus.Missed)
         {
             ClosedDate = timestamp;
         }

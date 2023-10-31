@@ -49,8 +49,9 @@ const teamLinkCellRenderer = ({ value, data }) => {
 }
 
 const progressCellRenderer = ({ value, data }) => {
-  const progressStatus =
-    data.status?.name === 'Canceled' ? 'exception' : undefined
+  const progressStatus = ['Canceled', 'Missed'].includes(data.status?.name)
+    ? 'exception'
+    : undefined
   return (
     <Progress
       percent={value}

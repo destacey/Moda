@@ -59,7 +59,7 @@ public sealed class ImportProgramIncrementObjectivesRequestValidator : CustomVal
                 .WithMessage("The start date must be before the target date.");
         });
 
-        When(o => (ObjectiveStatus)o.StatusId is ObjectiveStatus.Completed or ObjectiveStatus.Canceled,
+        When(o => (ObjectiveStatus)o.StatusId is ObjectiveStatus.Completed or ObjectiveStatus.Canceled or ObjectiveStatus.Missed,
             () => RuleFor(o => o.ClosedDateUtc)
                 .NotEmpty()
                     .WithMessage("The ClosedDateUtc can not be empty if the status is Completed or Canceled."))

@@ -4,10 +4,11 @@ namespace Moda.Planning.Application.Tests.Sut.ProgramIncrements.Extensions;
 public class ObjectiveStatusExtensionTests
 {
     [Theory]
-    [InlineData(1, 1)]
-    [InlineData(2, 2)]
-    [InlineData(3, 3)]
-    [InlineData(4, 4)]
+    [InlineData(1, 1)] // NotStarted
+    [InlineData(2, 2)] // InProgress
+    [InlineData(3, 3)] // Completed
+    [InlineData(4, 4)] // Canceled
+    [InlineData(5, 5)] // Missed
     public void ToGoalObjectiveStatus(int enumValue, int expectedValue)
     {
         var currentEnum = (Moda.Planning.Domain.Enums.ObjectiveStatus)enumValue;
@@ -21,7 +22,7 @@ public class ObjectiveStatusExtensionTests
 
     [Theory]
     [InlineData(0)]
-    [InlineData(5)]
+    [InlineData(6)]
     public void ToGoalObjectiveStatus_ThrowsArgumentOutOfRangeException(int enumValue)
     {
         var currentEnum = (Moda.Planning.Domain.Enums.ObjectiveStatus)enumValue;
