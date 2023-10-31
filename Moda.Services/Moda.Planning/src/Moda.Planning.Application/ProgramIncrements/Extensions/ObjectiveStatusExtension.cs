@@ -11,6 +11,7 @@ public static class ObjectiveStatusExtension
             ObjectiveStatus.InProgress => Goals.Domain.Enums.ObjectiveStatus.InProgress,
             ObjectiveStatus.Completed => Goals.Domain.Enums.ObjectiveStatus.Completed,
             ObjectiveStatus.Canceled => Goals.Domain.Enums.ObjectiveStatus.Canceled,
+            ObjectiveStatus.Missed => Goals.Domain.Enums.ObjectiveStatus.Missed,
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };
     }
