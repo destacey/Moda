@@ -27,6 +27,7 @@ import { notFound, usePathname } from 'next/navigation'
 import { useAppDispatch } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import ProgramIncrementObjectives from './program-increment-objectives'
+import ProgramIncrementDetailsLoading from './loading'
 
 enum ProgramIncrementTabs {
   Details = 'details',
@@ -205,6 +206,10 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     },
     [objectivesQueryEnabled, risksQueryEnabled, teamsQueryEnabled],
   )
+
+  if (isLoading) {
+    return <ProgramIncrementDetailsLoading />
+  }
 
   if (!isLoading && !isFetching && !programIncrementData) {
     notFound()

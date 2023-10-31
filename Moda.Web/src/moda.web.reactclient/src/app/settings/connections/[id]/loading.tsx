@@ -3,11 +3,11 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import { Skeleton } from 'antd'
 
-export default function Loading() {
+export default function ConnectionDetailsLoading() {
   return (
     <>
-      <PageTitle title="Risk Details" />
-      <Skeleton />
+      <PageTitle title="Connection Details" />
+      <Skeleton active />
     </>
   )
 }

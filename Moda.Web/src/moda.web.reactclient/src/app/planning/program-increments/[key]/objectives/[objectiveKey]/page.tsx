@@ -15,6 +15,7 @@ import { useGetProgramIncrementObjectiveByKey } from '@/src/services/queries/pla
 import { notFound, useRouter, usePathname } from 'next/navigation'
 import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
+import ProgramIncrementObjectiveDetailsLoading from './loading'
 
 const ObjectiveDetailsPage = ({ params }) => {
   useDocumentTitle('PI Objective Details')
@@ -132,13 +133,14 @@ const ObjectiveDetailsPage = ({ params }) => {
     )
   }
 
+  if (isLoading) {
+    return <ProgramIncrementObjectiveDetailsLoading />
+  }
+
   if (!isLoading && !isFetching && !objectiveData) {
     notFound()
   }
 
-  if (isLoading || isFetching) {
-    return <div>Loading...</div>
-  }
   return (
     <>
       <PageTitle
