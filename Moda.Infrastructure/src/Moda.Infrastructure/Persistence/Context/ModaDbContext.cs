@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Moda.Common.Domain.Employees;
 using Moda.Goals.Application.Persistence;
 using Moda.Goals.Domain.Models;
+using Moda.Health.Models;
 using Moda.Links;
 using Moda.Links.Models;
 using Moda.Planning.Application.Persistence;
@@ -36,6 +37,12 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<Objective> Objectives => Set<Objective>();
 
     #endregion IGoals
+
+    #region IHealth
+
+    public DbSet<HealthCheck> HealthChecks => Set<HealthCheck>();
+
+    #endregion IHealth
 
     #region ILinks
 

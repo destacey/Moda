@@ -9,7 +9,7 @@ public sealed class HealthReport
     private HealthReport() { }
     public HealthReport(List<HealthCheck> healthChecks)
     {
-        _healthChecks = healthChecks.OrderByDescending(h => h.Timestamp).ToList();    
+        _healthChecks = healthChecks.OrderByDescending(h => h.ReportedOn).ToList();    
     }
 
     public IReadOnlyCollection<HealthCheck> HealthChecks => _healthChecks.AsReadOnly();
@@ -21,20 +21,20 @@ public sealed class HealthReport
     /// <param name="context"></param>
     /// <param name="status"></param>
     /// <param name="reportedById"></param>
-    /// <param name="timestamp"></param>
+    /// <param name="reportedOn"></param>
     /// <param name="expiration"></param>
     /// <param name="note"></param>
     /// <returns></returns>
-    internal HealthCheck AddHealthCheck(Guid objectId, HealthCheckContext context, HealthStatus status, Guid reportedById, Instant timestamp, Instant expiration, string? note)
+    internal HealthCheck AddHealthCheck(Guid objectId, HealthCheckContext context, HealthStatus status, Guid reportedById, Instant reportedOn, Instant expiration, string? note)
     {
-        var healthCheck = new HealthCheck(objectId, context, status, reportedById, timestamp, expiration, note);
+        var healthCheck = new HealthCheck(objectId, context, status, reportedById, reportedOn, expiration, note);
 
         // health checks should not overlap
         // expire latest health check if not expired
         var latestHealthCheck = _healthChecks.FirstOrDefault();
-        if (latestHealthCheck is not null && timestamp < latestHealthCheck.Expiration)
+        if (latestHealthCheck is not null && reportedOn < latestHealthCheck.Expiration)
         {
-            latestHealthCheck.ChangeExpiration(timestamp);
+            latestHealthCheck.ChangeExpiration(reportedOn);
         }
 
         _healthChecks.Add(healthCheck);

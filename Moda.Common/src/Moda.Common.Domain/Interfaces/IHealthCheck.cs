@@ -4,9 +4,14 @@ using NodaTime;
 namespace Moda.Common.Domain.Interfaces;
 public interface IHealthCheck
 {
-    int Id { get; }
+    Guid Id { get; }
     Guid ObjectId { get; }
     HealthCheckContext Context { get; }
+    HealthStatus Status { get; }
+    Guid ReportedById { get; }
+    Instant ReportedOn { get; }
     Instant Expiration { get; }
     string? Note { get; }
+
+    bool IsExpired(Instant now);
 }

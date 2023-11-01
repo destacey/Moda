@@ -58,7 +58,7 @@ public class HealthReportTests
         result.ObjectId.Should().Be(objectId);
         result.Context.Should().Be(HealthCheckContext.ProgramIncrementObjective);
         result.Status.Should().Be(HealthStatus.Healthy);
-        result.Timestamp.Should().Be(_dateTimeService.Now);
+        result.ReportedOn.Should().Be(_dateTimeService.Now);
         result.Expiration.Should().Be(_dateTimeService.Now.Plus(Duration.FromDays(5)));
         result.Note.Should().Be("Test");
     }
@@ -76,7 +76,7 @@ public class HealthReportTests
         // Act
         var result = healthReport.AddHealthCheck(objectId, HealthCheckContext.ProgramIncrementObjective, HealthStatus.Healthy, reportedById, _dateTimeService.Now, _dateTimeService.Now.Plus(Duration.FromDays(5)), "Test");
 
-        var previous = healthReport.HealthChecks.OrderByDescending(h => h.Timestamp).ToList()[1];
+        var previous = healthReport.HealthChecks.OrderByDescending(h => h.ReportedOn).ToList()[1];
 
         // Assert
         result.Should().NotBeNull();
@@ -85,7 +85,7 @@ public class HealthReportTests
         result.ObjectId.Should().Be(objectId);
         result.Context.Should().Be(HealthCheckContext.ProgramIncrementObjective);
         result.Status.Should().Be(HealthStatus.Healthy);
-        result.Timestamp.Should().Be(_dateTimeService.Now);
+        result.ReportedOn.Should().Be(_dateTimeService.Now);
         result.Expiration.Should().Be(_dateTimeService.Now.Plus(Duration.FromDays(5)));
         result.Note.Should().Be("Test");
     }

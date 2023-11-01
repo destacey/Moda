@@ -9,14 +9,14 @@ using Moda.Common.Domain.Employees;
 
 namespace Moda.Health.Models;
 
-public sealed class HealthCheck : BaseAuditableEntity<int>, IHealthCheck
+public sealed class HealthCheck : BaseAuditableEntity<Guid>, IHealthCheck
 {
     private string? _note;
     private Instant _expiration;
 
     private HealthCheck() { }
 
-    internal HealthCheck(Guid objectId, HealthCheckContext context, HealthStatus status, Guid reportedById, Instant timestamp, Instant expiration, string? note)
+    internal HealthCheck(Guid objectId, HealthCheckContext context, HealthStatus status, Guid reportedById, Instant reportedOn, Instant expiration, string? note)
     {
         Guard.Against.Default(objectId, nameof(objectId));
 
@@ -24,7 +24,7 @@ public sealed class HealthCheck : BaseAuditableEntity<int>, IHealthCheck
         Context = context;
         Status = status;
         ReportedById = reportedById;
-        Timestamp = timestamp;
+        ReportedOn = reportedOn;
         Expiration = expiration;
         Note = note;
     }
@@ -58,7 +58,7 @@ public sealed class HealthCheck : BaseAuditableEntity<int>, IHealthCheck
     /// <summary>
     /// The timestamp of when the health check was initially created.
     /// </summary>
-    public Instant Timestamp { get; private init; }
+    public Instant ReportedOn { get; private init; }
 
     /// <summary>
     /// The expiration of the health check.
@@ -68,7 +68,7 @@ public sealed class HealthCheck : BaseAuditableEntity<int>, IHealthCheck
         get => _expiration;
         private set
         {
-            if (value <= Timestamp)
+            if (value <= ReportedOn)
             {
                 throw new ArgumentException("Expiration must be greater than timestamp.", nameof(Expiration));
             }

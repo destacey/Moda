@@ -3,12 +3,12 @@ public class HealthCheckFaker : Faker<HealthCheck>
 {
     public HealthCheckFaker(Instant timestamp, Guid? objectId = null)
     {
-        RuleFor(x => x.Id, f => f.Random.Int());
+        RuleFor(x => x.Id, f => f.Random.Guid());
         RuleFor(x => x.ObjectId, f => objectId ?? f.Random.Guid());
         RuleFor(x => x.Context, f => f.PickRandom<HealthCheckContext>());
         RuleFor(x => x.Status, f => f.PickRandom<HealthStatus>());
         RuleFor(x => x.ReportedById, f => f.Random.Guid());
-        RuleFor(x => x.Timestamp, timestamp);
+        RuleFor(x => x.ReportedOn, timestamp);
         RuleFor(x => x.Expiration, timestamp.Plus(Duration.FromDays(5)));
         RuleFor(x => x.Note, f => f.Random.String2(15));
     }

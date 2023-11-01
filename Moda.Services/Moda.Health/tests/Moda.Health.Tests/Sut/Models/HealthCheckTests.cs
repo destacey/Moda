@@ -26,7 +26,7 @@ public class HealthCheckTests
         var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
 
         // Act
-        var result = new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.Timestamp, faker.Expiration, faker.Note);
+        var result = new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn, faker.Expiration, faker.Note);
 
         // Assert
         result.Should().NotBeNull();
@@ -34,7 +34,7 @@ public class HealthCheckTests
         result.Context.Should().Be(faker.Context);
         result.Status.Should().Be(faker.Status);
         result.ReportedById.Should().Be(faker.ReportedById);
-        result.Timestamp.Should().Be(faker.Timestamp);
+        result.ReportedOn.Should().Be(faker.ReportedOn);
         result.Expiration.Should().Be(faker.Expiration);
         result.Note.Should().Be(faker.Note);
     }
@@ -47,7 +47,7 @@ public class HealthCheckTests
         var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
 
         // Act
-        Action act = () => new HealthCheck(objectId, faker.Context, faker.Status, faker.ReportedById, faker.Timestamp, faker.Expiration, faker.Note);
+        Action act = () => new HealthCheck(objectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn, faker.Expiration, faker.Note);
 
         // Assert
         act.Should().Throw<ArgumentException>().WithMessage("Parameter [objectId] is default value for type Guid (Parameter 'objectId')");
@@ -77,7 +77,7 @@ public class HealthCheckTests
     {
         // Arrange
         var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
-        var expiration = sut.Timestamp.Plus(Duration.FromDays(1));
+        var expiration = sut.ReportedOn.Plus(Duration.FromDays(1));
 
         // Act
         sut.ChangeExpiration(expiration);
@@ -91,7 +91,7 @@ public class HealthCheckTests
     {
         // Arrange
         var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
-        var expiration = sut.Timestamp.Minus(Duration.FromDays(1));
+        var expiration = sut.ReportedOn.Minus(Duration.FromDays(1));
 
         // Act
         Action act = () => sut.ChangeExpiration(expiration);
@@ -109,7 +109,7 @@ public class HealthCheckTests
     {
         // Arrange
         var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
-        var expiration = sut.Timestamp.Plus(Duration.FromDays(1));
+        var expiration = sut.ReportedOn.Plus(Duration.FromDays(1));
         sut.ChangeExpiration(expiration);
 
         // Act
@@ -143,7 +143,7 @@ public class HealthCheckTests
         // Arrange
         var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
         var status = HealthStatus.Healthy;
-        var expiration = sut.Timestamp.Plus(Duration.FromDays(1));
+        var expiration = sut.ReportedOn.Plus(Duration.FromDays(1));
         var note = "Updated Note";
 
         // Act
@@ -162,7 +162,7 @@ public class HealthCheckTests
         // Arrange
         var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
         var status = HealthStatus.Healthy;
-        var expiration = sut.Timestamp.Minus(Duration.FromDays(1));
+        var expiration = sut.ReportedOn.Minus(Duration.FromDays(1));
         var note = "Updated Note";
 
         // Act
@@ -179,7 +179,7 @@ public class HealthCheckTests
         // Arrange
         var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
         var status = HealthStatus.Healthy;
-        var expiration = sut.Timestamp.Plus(Duration.FromDays(1));
+        var expiration = sut.ReportedOn.Plus(Duration.FromDays(1));
         var note = " ";
 
         // Act
@@ -197,7 +197,7 @@ public class HealthCheckTests
     {
         // Arrange
         var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
-        var sut = new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.Timestamp.Minus(Duration.FromDays(15)), faker.Timestamp.Minus(Duration.FromDays(10)), faker.Note);
+        var sut = new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn.Minus(Duration.FromDays(15)), faker.ReportedOn.Minus(Duration.FromDays(10)), faker.Note);
         var status = HealthStatus.Healthy;
         var expiration = _dateTimeService.Now.Plus(Duration.FromDays(1));
         var note = "Updated Note";
