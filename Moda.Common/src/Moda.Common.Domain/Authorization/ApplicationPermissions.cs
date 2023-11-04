@@ -47,6 +47,8 @@ public static class ApplicationResource
     public const string WorkTypes = nameof(WorkTypes);
 
     public const string Links = nameof(Links);
+
+    public const string HealthChecks = nameof(HealthChecks);
 }
 
 public static class ApplicationPermissions
@@ -92,8 +94,15 @@ public static class ApplicationPermissions
         new("Delete Connections", ApplicationAction.Delete, ApplicationResource.Connections),
 
         new("View Connectors", ApplicationAction.View, ApplicationResource.Connectors),
-    }; 
-    
+    };
+
+    private static readonly ApplicationPermission[] _healthChecks = new ApplicationPermission[]
+    {
+        new("View Health Checks", ApplicationAction.View, ApplicationResource.Links, IsBasic: true),
+        new("Create Health Checks", ApplicationAction.Create, ApplicationResource.Links, IsBasic: true),
+        new("Update Health Checks", ApplicationAction.Update, ApplicationResource.Links, IsBasic: true),
+    };
+
     private static readonly ApplicationPermission[] _links = new ApplicationPermission[]
     {
         new("View Links", ApplicationAction.View, ApplicationResource.Links, IsBasic: true),
@@ -169,6 +178,7 @@ public static class ApplicationPermissions
         .Union(_backgroundJobs)
         .Union(_identity)
         .Union(_appIntegration)
+        .Union(_healthChecks)
         .Union(_links)
         .Union(_organization)
         .Union(_planning)
