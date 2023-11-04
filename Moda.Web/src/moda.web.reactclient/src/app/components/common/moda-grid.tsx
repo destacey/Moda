@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
   Col,
+  Divider,
   Dropdown,
   Input,
   Row,
@@ -16,8 +17,9 @@ import {
 } from 'antd'
 import {
   ControlOutlined,
-  ExportOutlined,
+  DownloadOutlined,
   ReloadOutlined,
+  SearchOutlined,
 } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import useTheme from '../contexts/theme'
@@ -29,6 +31,7 @@ interface ModaGridProps extends AgGridReactProps {
   includeExportButton?: boolean
   actions?: React.ReactNode | null
   gridControlMenuItems?: ItemType[]
+  toolbarActions?: React.ReactNode | null
   loadData?: () => Promise<void> | void
   isDataLoading?: boolean
 }
@@ -48,6 +51,7 @@ const ModaGrid = ({
   includeExportButton,
   actions,
   gridControlMenuItems,
+  toolbarActions,
   defaultColDef,
   rowData,
   loadData,
@@ -106,6 +110,7 @@ const ModaGrid = ({
                   placeholder="Search"
                   allowClear={true}
                   onChange={onGlobalSearchChange}
+                  suffix={<SearchOutlined />}
                 />
               )}
               {showGridControls && (
@@ -133,16 +138,20 @@ const ModaGrid = ({
                   />
                 </Tooltip>
               )}
+              {(showExportButton || toolbarActions) && (
+                <Divider type="vertical" style={{ height: '30px' }} />
+              )}
               {showExportButton && (
                 <Tooltip title="Export to CSV">
                   <Button
                     type="text"
                     shape="circle"
-                    icon={<ExportOutlined />}
+                    icon={<DownloadOutlined />}
                     onClick={onBtnExport}
                   />
                 </Tooltip>
               )}
+              {toolbarActions && toolbarActions}
             </Space>
           </Col>
         </Row>

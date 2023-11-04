@@ -1,3 +1,5 @@
+'use client'
+
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
@@ -17,9 +19,10 @@ export interface ProgramIncrementObjectivesGridProps {
   hideProgramIncrementColumn?: boolean
   hideTeamColumn?: boolean
   newObjectivesAllowed?: boolean
+  viewSelector?: React.ReactNode
 }
 
-const ProgramIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
+const programIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
   return (
     <Link
       href={`/planning/program-increments/${data.programIncrement?.key}/objectives/${data.key}`}
@@ -29,7 +32,7 @@ const ProgramIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
   )
 }
 
-const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
+const programIncrementLinkCellRenderer = ({ value, data }) => {
   return (
     <Link href={`/planning/program-increments/${data.programIncrement?.key}`}>
       {value}
@@ -37,7 +40,7 @@ const ProgramIncrementLinkCellRenderer = ({ value, data }) => {
   )
 }
 
-const TeamLinkCellRenderer = ({ value, data }) => {
+const teamLinkCellRenderer = ({ value, data }) => {
   const teamLink =
     data.team?.type === 'Team'
       ? `/organizations/teams/${data.team?.key}`
@@ -45,9 +48,10 @@ const TeamLinkCellRenderer = ({ value, data }) => {
   return <Link href={teamLink}>{value}</Link>
 }
 
-const ProgressCellRenderer = ({ value, data }) => {
-  const progressStatus =
-    data.status?.name === 'Canceled' ? 'exception' : undefined
+const progressCellRenderer = ({ value, data }) => {
+  const progressStatus = ['Canceled', 'Missed'].includes(data.status?.name)
+    ? 'exception'
+    : undefined
   return (
     <Progress
       percent={value}
@@ -64,6 +68,7 @@ const ProgramIncrementObjectivesGrid = ({
   hideProgramIncrementColumn = false,
   hideTeamColumn = false,
   newObjectivesAllowed = false,
+  viewSelector,
 }: ProgramIncrementObjectivesGridProps) => {
   const [hideProgramIncrement, setHideProgramIncrement] = useState<boolean>(
     hideProgramIncrementColumn,
@@ -125,20 +130,20 @@ const ProgramIncrementObjectivesGrid = ({
       {
         field: 'name',
         width: 400,
-        cellRenderer: ProgramIncrementObjectiveLinkCellRenderer,
+        cellRenderer: programIncrementObjectiveLinkCellRenderer,
       },
       {
         field: 'programIncrement.name',
-        cellRenderer: ProgramIncrementLinkCellRenderer,
+        cellRenderer: programIncrementLinkCellRenderer,
         hide: hideProgramIncrement,
       },
-      { field: 'status.name' },
+      { field: 'status.name', width: 125 },
       {
         field: 'team.name',
-        cellRenderer: TeamLinkCellRenderer,
+        cellRenderer: teamLinkCellRenderer,
         hide: hideTeam,
       },
-      { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
+      { field: 'progress', width: 250, cellRenderer: progressCellRenderer },
       {
         field: 'startDate',
         valueGetter: (params) =>
@@ -153,7 +158,7 @@ const ProgramIncrementObjectivesGrid = ({
             ? dayjs(params.data.targetDate).format('M/D/YYYY')
             : null,
       },
-      { field: 'isStretch' },
+      { field: 'isStretch', width: 100 },
     ],
     [
       canManageObjectives,
@@ -175,7 +180,7 @@ const ProgramIncrementObjectivesGrid = ({
     return (
       <>
         {canCreateObjectives && (
-          <Button onClick={createObjectiveButtonClicked}>
+          <Button type="link" onClick={createObjectiveButtonClicked}>
             Create Objective
           </Button>
         )}
@@ -229,6 +234,7 @@ const ProgramIncrementObjectivesGrid = ({
         loadData={refresh}
         actions={showActions && actions()}
         gridControlMenuItems={controlItems}
+        toolbarActions={viewSelector}
       />
       {openCreateObjectiveForm && (
         <CreateProgramIncrementObjectiveForm

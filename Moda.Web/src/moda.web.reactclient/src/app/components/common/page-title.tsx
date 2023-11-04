@@ -11,11 +11,11 @@ export interface PageTitleProps {
 
 // TODO: align actions to the right/end when not the xs or sm breakpoint
 const PageTitle = ({ title, subtitle, tags, actions }: PageTitleProps) => {
-  const mdSize = actions ? 12 : 24
+  const titleMdSize = actions ? 16 : 24
   return (
     <>
       <Row align={'middle'} style={{ marginBottom: '12px' }}>
-        <Col xs={24} sm={24} md={mdSize}>
+        <Col xs={24} sm={24} md={titleMdSize}>
           <Space>
             <div>
               <Typography.Title
@@ -30,7 +30,7 @@ const PageTitle = ({ title, subtitle, tags, actions }: PageTitleProps) => {
           </Space>
         </Col>
         {actions && (
-          <Col xs={24} sm={24} md={mdSize}>
+          <Col xs={24} sm={24} md={8}>
             <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
               {actions}
             </Space>

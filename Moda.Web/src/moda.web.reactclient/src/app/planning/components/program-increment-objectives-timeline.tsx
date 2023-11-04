@@ -1,3 +1,5 @@
+'use client'
+
 import {
   DataItem,
   Timeline,
@@ -5,24 +7,26 @@ import {
 } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import 'vis-timeline/styles/vis-timeline-graph2d.css'
 import './program-increment-objectives-timeline.css'
-import { renderToString } from 'react-dom/server'
 import {
   ProgramIncrementDetailsDto,
   ProgramIncrementObjectiveListDto,
 } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { createRoot } from 'react-dom/client'
 import { ModaEmpty } from '../../components/common'
 import { UseQueryResult } from 'react-query'
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import Link from 'next/link'
-import { Typography } from 'antd'
+import { Space, Typography } from 'antd'
+import useTheme from '../../components/contexts/theme'
 
 interface ProgramIncrementObjectivesTimelineProps {
   objectivesQuery: UseQueryResult<ProgramIncrementObjectiveListDto[], unknown>
   programIncrement: ProgramIncrementDetailsDto
   enableGroups?: boolean
   teamNames?: string[]
+  viewSelector?: React.ReactNode
 }
 
 interface TimelineItem extends DataItem {
@@ -34,6 +38,36 @@ interface TimelineItem extends DataItem {
   end: Date
   group?: string
   type?: string
+  objective?: ProgramIncrementObjectiveListDto
+}
+
+interface ObjectiveTimelineTemplateProps {
+  objective: ProgramIncrementObjectiveListDto
+  timelineFontColor: string
+  timelineForegroundColor: string
+}
+export const ObjectiveTimelineTemplate = ({
+  objective,
+  timelineFontColor,
+  timelineForegroundColor,
+}: ObjectiveTimelineTemplateProps) => {
+  return (
+    <div
+      style={{
+        width: `${objective.progress}%`,
+        backgroundColor: timelineForegroundColor,
+      }}
+    >
+      <Typography.Text style={{ padding: '5px', color: timelineFontColor }}>
+        <Link
+          href={`/planning/program-increments/${objective.programIncrement.key}/objectives/${objective.key}`}
+        >
+          {objective.key}
+        </Link>
+        <span> - </span> {objective.name}
+      </Typography.Text>
+    </div>
+  )
 }
 
 const ProgramIncrementObjectivesTimeline = ({
@@ -41,13 +75,19 @@ const ProgramIncrementObjectivesTimeline = ({
   programIncrement,
   enableGroups = false,
   teamNames,
+  viewSelector,
 }: ProgramIncrementObjectivesTimelineProps) => {
   const [objectives, setObjectives] = useState<TimelineItem[]>([])
+  const { currentThemeName } = useTheme()
+  const timelineBackgroundColor =
+    currentThemeName === 'light' ? '#f5f5f5' : '#303030'
+  const timelineForegroundColor =
+    currentThemeName === 'light' ? '#c7edff' : '#17354d'
+  const timelineFontColor = currentThemeName === 'light' ? '#4d4d4d' : '#FFFFFF'
 
-  // TODO: setup the template function to render the content
   // TODO: add the ability to export/save as svg or png
   // TODO: update the styles to match the rest of the app.  Especially for dark mode.
-  const options: TimelineOptions = useMemo(() => {
+  const options = useMemo(() => {
     return {
       editable: false,
       orientation: 'top',
@@ -62,35 +102,26 @@ const ProgramIncrementObjectivesTimeline = ({
       min: dayjs(programIncrement.start).subtract(4, 'week').toDate(),
       max: dayjs(programIncrement.end).add(4, 'week').toDate(),
       groupOrder: 'content',
-      xss: { disabled: true },
+      xss: { disabled: false },
+      template: (item: TimelineItem, element: HTMLElement, data: any) => {
+        if (item.type === 'range') {
+          // TODO: this is throwing a lot of warnings in the console.  You are calling ReactDOMClient.createRoot() on a container that has already been passed to createRoot() before. Instead, call root.render() on the existing root instead if you want to update it.
+          createRoot(element).render(
+            <ObjectiveTimelineTemplate
+              objective={item.objective}
+              timelineFontColor={timelineFontColor}
+              timelineForegroundColor={timelineForegroundColor}
+            />,
+          )
+        }
+      },
     }
-  }, [programIncrement])
-
-  const ObjectiveContent = useCallback(
-    (objective: ProgramIncrementObjectiveListDto) => {
-      return (
-        <div
-          style={{
-            width: `${objective.progress}%`,
-            backgroundColor: '#C7C7C7',
-          }}
-        >
-          <Typography.Text
-            delete={objective.status?.name === 'Canceled'}
-            style={{ padding: '5px' }}
-          >
-            <Link
-              href={`/planning/program-increments/${objective.programIncrement.key}/objectives/${objective.key}`}
-            >
-              {objective.key}
-            </Link>
-            <span> - </span> {objective.name}
-          </Typography.Text>
-        </div>
-      )
-    },
-    [],
-  )
+  }, [
+    programIncrement.end,
+    programIncrement.start,
+    timelineFontColor,
+    timelineForegroundColor,
+  ])
 
   useEffect(() => {
     if (!objectivesQuery?.data) return
@@ -103,23 +134,24 @@ const ProgramIncrementObjectivesTimeline = ({
             id: obj.key,
             programIncrementKey: obj.programIncrement.key,
             title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
-            content: renderToString(ObjectiveContent(obj)),
+            content: '',
             start: dayjs(obj.startDate ?? programIncrement.start).toDate(),
             end: dayjs(obj.targetDate ?? programIncrement.end).toDate(),
             group: obj.team?.name,
             type: 'range',
-            style:
-              'background: #E8E8E8; border-color: #E8E8E8; opacity: 0.99 !important;',
+            style: `background: ${timelineBackgroundColor}; border-color: ${timelineBackgroundColor};`,
             zIndex: 1,
+            objective: obj,
           }
         }),
     )
   }, [
-    ObjectiveContent,
     objectivesQuery?.data,
     programIncrement.end,
     programIncrement.key,
     programIncrement.start,
+    timelineBackgroundColor,
+    timelineFontColor,
   ])
 
   useEffect(() => {
@@ -149,7 +181,7 @@ const ProgramIncrementObjectivesTimeline = ({
     ]
 
     var container = document.getElementById('timeline-vis')
-    const timeline = new Timeline(container, items, options)
+    const timeline = new Timeline(container, items, options as TimelineOptions)
 
     if (enableGroups === true) {
       let teams = []
@@ -165,7 +197,11 @@ const ProgramIncrementObjectivesTimeline = ({
       }
 
       const groups = teams.map((team) => {
-        return { id: team, content: team } as DataGroup
+        return {
+          id: team,
+          content: team,
+          style: `color: ${timelineFontColor};`,
+        } as DataGroup
       })
 
       timeline.setGroups(groups)
@@ -177,6 +213,7 @@ const ProgramIncrementObjectivesTimeline = ({
     programIncrement.end,
     programIncrement.start,
     teamNames,
+    timelineFontColor,
   ])
 
   const TimelineChart = () => {
@@ -186,6 +223,18 @@ const ProgramIncrementObjectivesTimeline = ({
 
     return (
       <>
+        {viewSelector && (
+          <Space
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              paddingBottom: '16px',
+            }}
+          >
+            {viewSelector}
+          </Space>
+        )}
         <div id="timeline-vis"></div>
       </>
     )

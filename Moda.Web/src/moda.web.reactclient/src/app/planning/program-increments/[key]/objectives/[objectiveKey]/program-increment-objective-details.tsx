@@ -16,8 +16,9 @@ const ProgramIncrementObjectiveDetails = ({
 }: ProgramIncrementObjectiveDetailsProps) => {
   if (!objective) return null
 
-  const progressStatus =
-    objective.status?.name === 'Canceled' ? 'exception' : undefined
+  const progressStatus = ['Canceled', 'Missed'].includes(objective.status?.name)
+    ? 'exception'
+    : undefined
 
   const teamLink =
     objective.team?.type === 'Team'

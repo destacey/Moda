@@ -2,7 +2,7 @@
 
 import { MsalProvider } from '@azure/msal-react'
 import { createContext, useCallback, useEffect, useState } from 'react'
-import jwt_decode from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 import auth from '@/src/services/auth'
 import { getProfileClient } from '@/src/services/clients'
 import { useLocalStorageState } from '@/src/app/hooks'
@@ -28,7 +28,7 @@ const AuthProvider = ({ children }) => {
   const acquireToken = useCallback(async () => {
     return (await authAcquire())?.token
   }, [])
-  
+
   const refreshUser = async () => {
     setIsLoading(true)
     try {
@@ -38,7 +38,7 @@ const AuthProvider = ({ children }) => {
         const accessToken = await acquireToken()
         const profileClient = await getProfileClient(accessToken)
         const permissions = await profileClient.getPermissions()
-        const decodedClaims = jwt_decode(accessToken ?? '') as {
+        const decodedClaims = jwtDecode(accessToken ?? '') as {
           [key: string]: string
         }
         const claims: Claim[] = [

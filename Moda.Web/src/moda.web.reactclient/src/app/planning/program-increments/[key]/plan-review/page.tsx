@@ -3,7 +3,7 @@
 import { useDocumentTitle } from '@/src/app/hooks'
 import { ProgramIncrementTeamResponse } from '@/src/services/moda-api'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Card, Tag } from 'antd'
+import { Card, Spin, Tag } from 'antd'
 import Link from 'next/link'
 import TeamPlanReview from './team-plan-review'
 import { useAppDispatch } from '@/src/app/hooks'
@@ -14,6 +14,7 @@ import {
   useGetProgramIncrementByKey,
   useGetProgramIncrementTeams,
 } from '@/src/services/queries/planning-queries'
+import ProgramIncrementPlanReviewLoading from './loading'
 
 const ProgramIncrementPlanReviewPage = ({ params }) => {
   useDocumentTitle('PI Plan Review')
@@ -135,6 +136,10 @@ const ProgramIncrementPlanReviewPage = ({ params }) => {
     refreshProgramIncrement,
     tabs,
   ])
+
+  if (isLoading) {
+    return <ProgramIncrementPlanReviewLoading />
+  }
 
   return (
     <>

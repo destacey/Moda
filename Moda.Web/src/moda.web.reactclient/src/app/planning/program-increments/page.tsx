@@ -65,7 +65,10 @@ const ProgramIncrementListPage = () => {
     return (
       <>
         {canCreateProgramIncrement && (
-          <Button onClick={() => setOpenCreateProgramIncrementForm(true)}>
+          <Button
+            type="link"
+            onClick={() => setOpenCreateProgramIncrementForm(true)}
+          >
             Create Program Increment
           </Button>
         )}

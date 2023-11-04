@@ -20,6 +20,7 @@ const getColorForStatus = (status: string) => {
     case 'Completed':
       return 'green'
     case 'Canceled':
+    case 'Missed':
       return 'red'
     default:
       return 'default'
@@ -60,8 +61,11 @@ const ObjectiveListItem = ({
         }`
       : null
     const showProgress = objective.status?.name !== 'Not Started'
-    const progressStatus =
-      objective.status?.name === 'Canceled' ? 'exception' : undefined
+    const progressStatus = ['Canceled', 'Missed'].includes(
+      objective.status?.name,
+    )
+      ? 'exception'
+      : undefined
     return (
       <>
         <Space>
