@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Events;
 using NodaTime;
 
 namespace Moda.Health.Models;
@@ -38,6 +39,8 @@ public sealed class HealthReport
         }
 
         _healthChecks.Add(healthCheck);
+
+        healthCheck.AddDomainEvent(EntityCreatedEvent.WithEntity(healthCheck, reportedOn));
 
         return healthCheck;
     }

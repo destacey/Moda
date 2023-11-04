@@ -47,7 +47,7 @@ internal sealed class UpdateLinkCommandHandler : ICommandHandler<UpdateLinkComma
                 .FirstOrDefaultAsync(l => l.Id == request.LinkId, cancellationToken);
             if (link is null)
             {
-                _logger.LogError("Unable to edit link. Link with id {LinkId} not found.", request.LinkId);
+                _logger.LogError("Unable to update link. Link with id {LinkId} not found.", request.LinkId);
                 return Result.Failure<LinkDto>($"Link with id {request.LinkId} not found.");
             }
 

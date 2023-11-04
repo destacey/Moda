@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Moda.Organization.Domain.Models;
+﻿using Moda.Organization.Domain.Models;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Tests.Sut.Models;

@@ -1,4 +1,5 @@
-﻿using Moda.Health.Tests.Data;
+﻿using Moda.Common.Domain.Events;
+using Moda.Health.Tests.Data;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
@@ -37,6 +38,8 @@ public class HealthCheckTests
         result.ReportedOn.Should().Be(faker.ReportedOn);
         result.Expiration.Should().Be(faker.Expiration);
         result.Note.Should().Be(faker.Note);
+
+        result.DomainEvents.Should().BeEmpty();
     }
 
     [Fact]
@@ -154,23 +157,9 @@ public class HealthCheckTests
         sut.Status.Should().Be(status);
         sut.Expiration.Should().Be(expiration);
         sut.Note.Should().Be(note);
-    }
 
-    [Fact]
-    public void Update_WhenExpirationLessThanTimestamp_ThrowsArgumentException()
-    {
-        // Arrange
-        var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
-        var status = HealthStatus.Healthy;
-        var expiration = sut.ReportedOn.Minus(Duration.FromDays(1));
-        var note = "Updated Note";
-
-        // Act
-        var result = sut.Update(status, expiration, note, _dateTimeService.Now);
-
-        // Assert
-        result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Contain("Expiration must be greater than timestamp. (Parameter 'Expiration')");
+        sut.DomainEvents.Should().NotBeEmpty();
+        sut.DomainEvents.Should().ContainSingle(e => e is EntityUpdatedEvent<HealthCheck>);
     }
 
     [Fact]
@@ -190,6 +179,26 @@ public class HealthCheckTests
         sut.Status.Should().Be(status);
         sut.Expiration.Should().Be(expiration);
         sut.Note.Should().BeNull();
+
+        sut.DomainEvents.Should().NotBeEmpty();
+        sut.DomainEvents.Should().ContainSingle(e => e is EntityUpdatedEvent<HealthCheck>);
+    }
+
+    [Fact]
+    public void Update_WhenExpirationLessThanTimestamp_ThrowsArgumentException()
+    {
+        // Arrange
+        var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var status = HealthStatus.Healthy;
+        var expiration = sut.ReportedOn.Minus(Duration.FromDays(1));
+        var note = "Updated Note";
+
+        // Act
+        var result = sut.Update(status, expiration, note, _dateTimeService.Now);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Contain("Expiration must be greater than timestamp. (Parameter 'Expiration')");
     }
 
     [Fact]

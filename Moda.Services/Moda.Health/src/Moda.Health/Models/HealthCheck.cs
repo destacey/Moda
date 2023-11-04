@@ -6,6 +6,7 @@ using NodaTime;
 using CSharpFunctionalExtensions;
 using Ardalis.GuardClauses;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Events;
 
 namespace Moda.Health.Models;
 
@@ -28,7 +29,6 @@ public sealed class HealthCheck : BaseAuditableEntity<Guid>, IHealthCheck
         Expiration = expiration;
         Note = note;
     }
-
 
     /// <summary>
     /// The objectId associated with the health check.
@@ -117,6 +117,8 @@ public sealed class HealthCheck : BaseAuditableEntity<Guid>, IHealthCheck
             Status = status;
             Expiration = expiration;
             Note = note;
+
+            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, now));
 
             return Result.Success();
         }

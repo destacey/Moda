@@ -1,4 +1,5 @@
-﻿using Moda.Health.Tests.Data;
+﻿using Moda.Common.Domain.Events;
+using Moda.Health.Tests.Data;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
@@ -6,9 +7,7 @@ using NodaTime.Testing;
 namespace Moda.Health.Tests.Sut.Models;
 public class HealthReportTests
 {
-
     private readonly TestingDateTimeService _dateTimeService;
-
 
     public HealthReportTests()
     {
@@ -61,6 +60,9 @@ public class HealthReportTests
         result.ReportedOn.Should().Be(_dateTimeService.Now);
         result.Expiration.Should().Be(_dateTimeService.Now.Plus(Duration.FromDays(5)));
         result.Note.Should().Be("Test");
+
+        result.DomainEvents.Should().NotBeEmpty();
+        result.DomainEvents.Should().ContainSingle(e => e is EntityCreatedEvent<HealthCheck>);
     }
 
     [Fact]
@@ -88,6 +90,9 @@ public class HealthReportTests
         result.ReportedOn.Should().Be(_dateTimeService.Now);
         result.Expiration.Should().Be(_dateTimeService.Now.Plus(Duration.FromDays(5)));
         result.Note.Should().Be("Test");
+
+        result.DomainEvents.Should().NotBeEmpty();
+        result.DomainEvents.Should().ContainSingle(e => e is EntityCreatedEvent<HealthCheck>);
     }
 
     #endregion AddHealthCheck
