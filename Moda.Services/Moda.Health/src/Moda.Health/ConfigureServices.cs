@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Moda.Health;
 public static class ConfigureServices
 {
-    public static IServiceCollection AddLinksApplication(this IServiceCollection services)
+    public static IServiceCollection AddHealthApplication(this IServiceCollection services)
     {
         var assembly = Assembly.GetExecutingAssembly();
 

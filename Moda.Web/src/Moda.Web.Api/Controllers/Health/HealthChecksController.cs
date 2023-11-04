@@ -74,17 +74,7 @@ public class HealthChecksController : ControllerBase
         return result.IsSuccess
             ? Ok(result.Value)
             : BadRequest(result.Error);
-    }
 
-    [HttpGet("contexts")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.HealthChecks)]
-    [OpenApiOperation("Get a list of health check contexts.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<HealthCheckContextDto>>> GetContexts(CancellationToken cancellationToken)
-    {
-        var items = await _sender.Send(new GetHealthCheckContextsQuery(), cancellationToken);
-        return Ok(items.OrderBy(c => c.Order));
     }
 
     [HttpGet("statuses")]

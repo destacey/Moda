@@ -20,7 +20,7 @@ public class HealthCheckConfiguration : IEntityTypeConfiguration<HealthCheck>
         builder.Property(h => h.ObjectId).IsRequired();
 
         builder.Property(h => h.Context).IsRequired()
-            .HasConversion<EnumConverter<HealthCheckContext>>()
+            .HasConversion<EnumConverter<SystemContext>>()
             .HasColumnType("varchar")
             .HasMaxLength(64);
 

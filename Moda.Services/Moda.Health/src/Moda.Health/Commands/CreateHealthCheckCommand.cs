@@ -9,7 +9,7 @@ using Moda.Health.Models;
 using NodaTime;
 
 namespace Moda.Health.Commands;
-public sealed record CreateHealthCheckCommand(Guid ObjectId, HealthCheckContext Context, HealthStatus Status, Instant Expiration, string? Note) : ICommand<Guid>;
+public sealed record CreateHealthCheckCommand(Guid ObjectId, SystemContext Context, HealthStatus Status, Instant Expiration, string? Note) : ICommand<Guid>;
 
 public sealed class CreateHealthCheckCommandValidator : CustomValidator<CreateHealthCheckCommand>
 {
@@ -28,7 +28,8 @@ public sealed class CreateHealthCheckCommandValidator : CustomValidator<CreateHe
 
         RuleFor(h => h.Expiration)
             .NotEmpty()
-            .GreaterThan(dateTimeService.Now);
+            .GreaterThan(dateTimeService.Now)
+            .WithMessage("The Expiration must be in the future.");
 
         RuleFor(h => h.Note)
             .MaximumLength(1024);
@@ -54,13 +55,17 @@ internal sealed class CreateHealthCheckCommandHandler : ICommandHandler<CreateHe
     {
         try
         {
+            Guid? currentUserEmployeeId = _currentUser.GetEmployeeId();
+            if (currentUserEmployeeId is null)
+                return Result.Failure<Guid>("Unable to determine current user's employee Id.");
+
             var objectHealthChecks = await _healthDbContext.HealthChecks
                 .Where(hr => hr.ObjectId == request.ObjectId)
                 .ToListAsync(cancellationToken);
 
             var healthReport = new HealthReport(objectHealthChecks);
 
-            var healthCheck = healthReport.AddHealthCheck(request.ObjectId, request.Context, request.Status, _currentUser.GetUserId(), _dateTimeService.Now, request.Expiration, request.Note);
+            var healthCheck = healthReport.AddHealthCheck(request.ObjectId, request.Context, request.Status, currentUserEmployeeId.Value, _dateTimeService.Now, request.Expiration, request.Note);
 
             await _healthDbContext.HealthChecks.AddAsync(healthCheck, cancellationToken);
 

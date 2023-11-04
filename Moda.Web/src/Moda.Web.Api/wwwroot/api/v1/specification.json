@@ -5561,45 +5561,6 @@
         ]
       }
     },
-    "/api/healthchecks/contexts": {
-      "get": {
-        "tags": [
-          "HealthChecks"
-        ],
-        "summary": "Get a list of health check contexts.",
-        "operationId": "HealthChecks_GetContexts",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/HealthCheckContextDto"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      }
-    },
     "/api/healthchecks/statuses": {
       "get": {
         "tags": [
@@ -8848,27 +8809,6 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
-          }
-        }
-      },
-      "HealthCheckContextDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "order": {
-            "type": "integer",
-            "format": "int32"
           }
         }
       },

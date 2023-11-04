@@ -17,7 +17,7 @@ public sealed class HealthCheck : BaseAuditableEntity<Guid>, IHealthCheck
 
     private HealthCheck() { }
 
-    internal HealthCheck(Guid objectId, HealthCheckContext context, HealthStatus status, Guid reportedById, Instant reportedOn, Instant expiration, string? note)
+    internal HealthCheck(Guid objectId, SystemContext context, HealthStatus status, Guid reportedById, Instant reportedOn, Instant expiration, string? note)
     {
         Guard.Against.Default(objectId, nameof(objectId));
 
@@ -38,7 +38,7 @@ public sealed class HealthCheck : BaseAuditableEntity<Guid>, IHealthCheck
     /// <summary>
     /// The context of the health check based on the ObjectId.
     /// </summary>
-    public HealthCheckContext Context { get; private init; }
+    public SystemContext Context { get; private init; }
 
     /// <summary>
     /// The status of the health check.

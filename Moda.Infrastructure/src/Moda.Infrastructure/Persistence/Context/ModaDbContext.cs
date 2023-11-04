@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Moda.Common.Domain.Employees;
 using Moda.Goals.Application.Persistence;
 using Moda.Goals.Domain.Models;
+using Moda.Health;
 using Moda.Health.Models;
 using Moda.Links;
 using Moda.Links.Models;
@@ -12,7 +13,7 @@ using Moda.Work.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Context;
 
-public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IWorkDbContext
+public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IWorkDbContext
 {
     public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeService dateTimeService, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
         : base(options, currentUser, dateTimeService, serializer, dbSettings, events)

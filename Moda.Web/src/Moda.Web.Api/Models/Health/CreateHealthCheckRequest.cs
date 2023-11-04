@@ -14,7 +14,7 @@ public class CreateHealthCheckRequest
 
     public CreateHealthCheckCommand ToCreateHealthCheckCommand()
     {
-        return new CreateHealthCheckCommand(ObjectId, (HealthCheckContext)ContextId, (HealthStatus)StatusId, Expiration, Note);
+        return new CreateHealthCheckCommand(ObjectId, (SystemContext)ContextId, (HealthStatus)StatusId, Expiration, Note);
     }
 }
 
@@ -27,7 +27,7 @@ public sealed class CreateHealthCheckRequestValidator : CustomValidator<CreateHe
         RuleFor(h => h.ObjectId)
             .NotEmpty();
 
-        RuleFor(h => (HealthCheckContext)h.ContextId)
+        RuleFor(h => (SystemContext)h.ContextId)
             .IsInEnum()
             .WithMessage("A valid health check context must be selected.");
 
@@ -37,7 +37,8 @@ public sealed class CreateHealthCheckRequestValidator : CustomValidator<CreateHe
 
         RuleFor(h => h.Expiration)
             .NotEmpty()
-            .GreaterThan(dateTimeService.Now);
+            .GreaterThan(dateTimeService.Now)
+            .WithMessage("The Expiration must be in the future.");
 
         RuleFor(h => h.Note)
             .MaximumLength(1024);

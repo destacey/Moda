@@ -26,7 +26,8 @@ public sealed class UpdateHealthCheckCommandValidator : CustomValidator<UpdateHe
 
         RuleFor(h => h.Expiration)
             .NotEmpty()
-            .GreaterThan(dateTimeService.Now);
+            .GreaterThan(dateTimeService.Now)
+            .WithMessage("The Expiration must be in the future.");
 
         RuleFor(h => h.Note)
             .MaximumLength(1024);

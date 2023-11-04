@@ -6,7 +6,7 @@ public interface IHealthCheck
 {
     Guid Id { get; }
     Guid ObjectId { get; }
-    HealthCheckContext Context { get; }
+    SystemContext Context { get; }
     HealthStatus Status { get; }
     Guid ReportedById { get; }
     Instant ReportedOn { get; }

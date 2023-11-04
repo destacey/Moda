@@ -98,9 +98,9 @@ public static class ApplicationPermissions
 
     private static readonly ApplicationPermission[] _healthChecks = new ApplicationPermission[]
     {
-        new("View Health Checks", ApplicationAction.View, ApplicationResource.Links, IsBasic: true),
-        new("Create Health Checks", ApplicationAction.Create, ApplicationResource.Links, IsBasic: true),
-        new("Update Health Checks", ApplicationAction.Update, ApplicationResource.Links, IsBasic: true),
+        new("View Health Checks", ApplicationAction.View, ApplicationResource.HealthChecks, IsBasic: true),
+        new("Create Health Checks", ApplicationAction.Create, ApplicationResource.HealthChecks, IsBasic: true),
+        new("Update Health Checks", ApplicationAction.Update, ApplicationResource.HealthChecks, IsBasic: true),
     };
 
     private static readonly ApplicationPermission[] _links = new ApplicationPermission[]

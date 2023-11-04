@@ -26,7 +26,7 @@ public sealed class HealthReport
     /// <param name="expiration"></param>
     /// <param name="note"></param>
     /// <returns></returns>
-    internal HealthCheck AddHealthCheck(Guid objectId, HealthCheckContext context, HealthStatus status, Guid reportedById, Instant reportedOn, Instant expiration, string? note)
+    internal HealthCheck AddHealthCheck(Guid objectId, SystemContext context, HealthStatus status, Guid reportedById, Instant reportedOn, Instant expiration, string? note)
     {
         var healthCheck = new HealthCheck(objectId, context, status, reportedById, reportedOn, expiration, note);
 
