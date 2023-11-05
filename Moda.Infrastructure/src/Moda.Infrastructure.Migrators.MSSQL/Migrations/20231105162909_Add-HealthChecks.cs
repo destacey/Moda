@@ -45,6 +45,29 @@ public partial class AddHealthChecks : Migration
                     principalColumn: "Id");
             });
 
+        migrationBuilder.CreateTable(
+            name: "PlanningHealthChecks",
+            schema: "Planning",
+            columns: table => new
+            {
+                ObjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Status = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
+                ReportedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                Expiration = table.Column<DateTime>(type: "datetime2", nullable: false),
+                Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_PlanningHealthChecks", x => x.ObjectId);
+                table.ForeignKey(
+                    name: "FK_PlanningHealthChecks_ProgramIncrementObjectives_ObjectId",
+                    column: x => x.ObjectId,
+                    principalSchema: "Planning",
+                    principalTable: "ProgramIncrementObjectives",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
+            });
+
         migrationBuilder.CreateIndex(
             name: "IX_HealthChecks_Id",
             schema: "Health",
@@ -64,6 +87,12 @@ public partial class AddHealthChecks : Migration
             schema: "Health",
             table: "HealthChecks",
             column: "ReportedById");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_PlanningHealthChecks_ObjectId",
+            schema: "Planning",
+            table: "PlanningHealthChecks",
+            column: "ObjectId");
     }
 
     /// <inheritdoc />
@@ -72,5 +101,9 @@ public partial class AddHealthChecks : Migration
         migrationBuilder.DropTable(
             name: "HealthChecks",
             schema: "Health");
+
+        migrationBuilder.DropTable(
+            name: "PlanningHealthChecks",
+            schema: "Planning");
     }
 }

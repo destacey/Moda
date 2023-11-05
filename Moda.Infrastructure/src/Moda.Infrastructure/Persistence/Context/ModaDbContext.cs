@@ -65,6 +65,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<ProgramIncrementObjective> ProgramIncrementObjectives => Set<ProgramIncrementObjective>();
     public DbSet<Risk> Risks => Set<Risk>();
     public DbSet<PlanningTeam> PlanningTeams => Set<PlanningTeam>();
+    public DbSet<SimpleHealthCheck> PlanningHealthChecks => Set<SimpleHealthCheck>();
 
     #endregion IPlanning
 

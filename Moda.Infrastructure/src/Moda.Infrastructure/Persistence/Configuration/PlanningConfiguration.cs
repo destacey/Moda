@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Moda.Common.Domain.Enums;
 using Moda.Organization.Domain.Enums;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models;
@@ -149,6 +150,11 @@ public class ProgramIncrementObjectiveConfig : IEntityTypeConfiguration<ProgramI
             .HasForeignKey(p => p.TeamId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasOne(o => o.HealthCheck)
+            .WithOne()
+            .HasForeignKey<SimpleHealthCheck>(h => h.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         // Ignore
     }
 }
@@ -236,5 +242,26 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
             .WithMany()
             .HasForeignKey(p => p.AssigneeId)
             .OnDelete(DeleteBehavior.NoAction);
+    }
+}
+
+public class SimpleHealthCheckConfig : IEntityTypeConfiguration<SimpleHealthCheck>
+{
+    public void Configure(EntityTypeBuilder<SimpleHealthCheck> builder)
+    {
+        builder.ToTable("PlanningHealthChecks", SchemaNames.Planning);
+
+        builder.HasKey(h => h.ObjectId);
+
+        builder.HasIndex(r => r.ObjectId);
+
+        builder.Property(h => h.ObjectId).IsRequired();
+        builder.Property(h => h.Id).IsRequired();
+        builder.Property(h => h.Status).IsRequired()
+            .HasConversion<EnumConverter<HealthStatus>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+        builder.Property(h => h.ReportedOn).IsRequired();
+        builder.Property(h => h.Expiration).IsRequired();
     }
 }

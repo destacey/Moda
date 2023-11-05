@@ -5,4 +5,5 @@ public interface IPlanningDbContext : IModaDbContext
     DbSet<ProgramIncrementObjective> ProgramIncrementObjectives { get; }
     DbSet<Risk> Risks { get; }
     DbSet<PlanningTeam> PlanningTeams { get; }
+    DbSet<SimpleHealthCheck> PlanningHealthChecks { get; }
 }

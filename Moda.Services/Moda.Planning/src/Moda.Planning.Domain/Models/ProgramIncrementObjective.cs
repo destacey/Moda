@@ -49,6 +49,8 @@ public class ProgramIncrementObjective : BaseAuditableEntity<Guid>
     /// <value><c>true</c> if this instance is stretch; otherwise, <c>false</c>.</value>
     public bool IsStretch { get; private set; } = false;
 
+    public SimpleHealthCheck? HealthCheck { get; private set; }
+
     /// <summary>Updates the specified PI objective.</summary>
     /// <param name="status">The status.</param>
     /// <param name="isStretch">if set to <c>true</c> [is stretch].</param>

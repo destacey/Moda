@@ -18,7 +18,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "7.0.12")
+                .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1110,6 +1110,32 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Risks", "Planning");
                 });
 
+            modelBuilder.Entity("Moda.Planning.Domain.Models.SimpleHealthCheck", b =>
+                {
+                    b.Property<Guid>("ObjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Expiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ReportedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("ObjectId");
+
+                    b.HasIndex("ObjectId");
+
+                    b.ToTable("PlanningHealthChecks", "Planning");
+                });
+
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevel", b =>
                 {
                     b.Property<int>("Id")
@@ -1728,6 +1754,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
+            modelBuilder.Entity("Moda.Planning.Domain.Models.SimpleHealthCheck", b =>
+                {
+                    b.HasOne("Moda.Planning.Domain.Models.ProgramIncrementObjective", null)
+                        .WithOne("HealthCheck")
+                        .HasForeignKey("Moda.Planning.Domain.Models.SimpleHealthCheck", "ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevel", b =>
                 {
                     b.HasOne("Moda.Work.Domain.Models.BacklogLevelScheme", null)
@@ -1859,6 +1894,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Objectives");
 
                     b.Navigation("Teams");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrementObjective", b =>
+                {
+                    b.Navigation("HealthCheck");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevelScheme", b =>
