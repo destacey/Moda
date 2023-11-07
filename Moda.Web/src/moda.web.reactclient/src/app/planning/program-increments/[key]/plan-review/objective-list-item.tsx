@@ -1,16 +1,29 @@
 import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
-import { Button, List, Progress, Space, Tag, Typography } from 'antd'
+import {
+  Button,
+  Dropdown,
+  List,
+  MenuProps,
+  Progress,
+  Space,
+  Tag,
+  Typography,
+} from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import EditProgramIncrementObjectiveForm from '../edit-program-increment-objective-form'
-import { EditOutlined } from '@ant-design/icons'
+import { MenuOutlined } from '@ant-design/icons'
 import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
+import { ItemType } from 'antd/es/menu/hooks/useItems'
+import CreateHealthCheckForm from '@/src/app/components/common/health-check/create-health-check-form'
+import { SystemContext } from '@/src/app/components/constants'
 
 export interface ObjectiveListItemProps {
   objective: ProgramIncrementObjectiveListDto
   piKey: number
   canUpdateObjectives: boolean
+  canCreateHealthChecks: boolean
   refreshObjectives: () => void
 }
 
@@ -32,10 +45,14 @@ const ObjectiveListItem = ({
   objective,
   piKey,
   canUpdateObjectives,
+  canCreateHealthChecks,
   refreshObjectives,
 }: ObjectiveListItemProps) => {
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
+  const [openCreateHealthCheckForm, setOpenCreateHealthCheckForm] =
+    useState<boolean>(false)
+
   const title = () => {
     return (
       <Link
@@ -92,8 +109,37 @@ const ObjectiveListItem = ({
     )
   }
 
+  // TODO: make a menu component that will render one item with its icon, or a dropdown when there multiple items
+  const menuItems: MenuProps['items'] = useMemo(() => {
+    const items: ItemType[] = []
+    if (canUpdateObjectives || canCreateHealthChecks) {
+      items.push(
+        {
+          key: 'edit',
+          label: 'Edit',
+          disabled: !canUpdateObjectives,
+          onClick: () => setOpenUpdateObjectiveForm(true),
+        },
+        {
+          key: 'createHealthCheck',
+          label: 'Create Health Check',
+          disabled: !canCreateHealthChecks,
+          onClick: () => setOpenCreateHealthCheckForm(true),
+        },
+      )
+    }
+    return items
+  }, [canUpdateObjectives, canCreateHealthChecks])
+
   const onEditObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
+    if (wasSaved) {
+      refreshObjectives()
+    }
+  }
+
+  const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
+    setOpenCreateHealthCheckForm(false)
     if (wasSaved) {
       refreshObjectives()
     }
@@ -104,12 +150,9 @@ const ObjectiveListItem = ({
       <List.Item key={objective.key}>
         <List.Item.Meta title={title()} description={description()} />
         {canUpdateObjectives && (
-          <Button
-            type="text"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => setOpenUpdateObjectiveForm(true)}
-          />
+          <Dropdown menu={{ items: menuItems }}>
+            <Button type="text" size="small" icon={<MenuOutlined />} />
+          </Dropdown>
         )}
       </List.Item>
       {openUpdateObjectiveForm && (
@@ -119,6 +162,15 @@ const ObjectiveListItem = ({
           programIncrementId={objective?.programIncrement?.id}
           onFormSave={() => onEditObjectiveFormClosed(true)}
           onFormCancel={() => onEditObjectiveFormClosed(false)}
+        />
+      )}
+      {openCreateHealthCheckForm && (
+        <CreateHealthCheckForm
+          showForm={openCreateHealthCheckForm}
+          objectId={objective?.id}
+          context={SystemContext.PlanningProgramIncrementObjective}
+          onFormCreate={() => onCreateHealthCheckFormClosed(true)}
+          onFormCancel={() => onCreateHealthCheckFormClosed(false)}
         />
       )}
     </>

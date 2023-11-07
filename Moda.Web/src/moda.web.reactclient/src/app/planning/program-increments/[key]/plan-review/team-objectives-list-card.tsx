@@ -46,6 +46,9 @@ const TeamObjectivesListCard = ({
   )
   const canCreateObjectives =
     newObjectivesAllowed && programIncrementId && canManageObjectives
+  const canCreateHealthChecks =
+    !!canManageObjectives &&
+    hasClaim('Permission', 'Permissions.HealthChecks.Create')
 
   const refreshObjectives = useCallback(() => {
     objectivesQuery.refetch()
@@ -105,12 +108,18 @@ const TeamObjectivesListCard = ({
             objective={objective}
             piKey={objective.programIncrement.key}
             canUpdateObjectives={canManageObjectives}
+            canCreateHealthChecks={canCreateHealthChecks}
             refreshObjectives={refreshObjectives}
           />
         )}
       />
     )
-  }, [canManageObjectives, objectivesQuery?.data, refreshObjectives])
+  }, [
+    canCreateHealthChecks,
+    canManageObjectives,
+    objectivesQuery?.data,
+    refreshObjectives,
+  ])
 
   const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
     setOpenCreateObjectiveForm(false)

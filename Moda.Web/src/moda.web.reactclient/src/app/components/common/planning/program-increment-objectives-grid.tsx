@@ -4,14 +4,16 @@ import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
-import { Button, Progress, Space, Switch } from 'antd'
+import { Button, Dropdown, MenuProps, Progress, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import useAuth from '../../contexts/auth'
 import CreateProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[key]/create-program-increment-objective-form'
 import EditProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[key]/edit-program-increment-objective-form'
-import { EditOutlined } from '@ant-design/icons'
+import { MenuOutlined } from '@ant-design/icons'
 import { UseQueryResult } from 'react-query'
 import dayjs from 'dayjs'
+import CreateHealthCheckForm from '../health-check/create-health-check-form'
+import { SystemContext } from '../../constants'
 
 export interface ProgramIncrementObjectivesGridProps {
   objectivesQuery: UseQueryResult<ProgramIncrementObjectiveListDto[], unknown>
@@ -78,7 +80,11 @@ const ProgramIncrementObjectivesGrid = ({
     useState<boolean>(false)
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
-  const [editObjectiveId, setEditObjectiveId] = useState<string | null>(null)
+  const [openCreateHealthCheckForm, setOpenCreateHealthCheckForm] =
+    useState<boolean>(false)
+  const [selectedObjectiveId, setSelectedObjectiveId] = useState<string | null>(
+    null,
+  )
 
   const { hasClaim } = useAuth()
   const canManageObjectives = hasClaim(
@@ -87,7 +93,31 @@ const ProgramIncrementObjectivesGrid = ({
   )
   const canCreateObjectives =
     newObjectivesAllowed && programIncrementId && canManageObjectives
+  const canCreateHealthChecks =
+    !!canManageObjectives &&
+    hasClaim('Permission', 'Permissions.HealthChecks.Create')
   const showActions = canCreateObjectives
+
+  const menuItems: MenuProps['items'] = useMemo(() => {
+    const items: ItemType[] = []
+    if (canManageObjectives || canCreateHealthChecks) {
+      items.push(
+        {
+          key: 'edit',
+          label: 'Edit',
+          disabled: !canManageObjectives,
+          onClick: () => setOpenUpdateObjectiveForm(true),
+        },
+        {
+          key: 'createHealthCheck',
+          label: 'Create Health Check',
+          disabled: !canCreateHealthChecks,
+          onClick: () => setOpenCreateHealthCheckForm(true),
+        },
+      )
+    }
+    return items
+  }, [canManageObjectives, canCreateHealthChecks])
 
   const refresh = useCallback(async () => {
     objectivesQuery.refetch()
@@ -98,9 +128,8 @@ const ProgramIncrementObjectivesGrid = ({
     setOpenCreateObjectiveForm(true)
   }, [])
 
-  const editObjectiveButtonClicked = useCallback((id: string) => {
-    setEditObjectiveId(id)
-    setOpenUpdateObjectiveForm(true)
+  const rowMenuClicked = useCallback((id: string) => {
+    setSelectedObjectiveId(id)
   }, [])
 
   const columnDefs = useMemo(
@@ -115,12 +144,14 @@ const ProgramIncrementObjectivesGrid = ({
         cellRenderer: (params) => {
           return (
             canManageObjectives && (
-              <Button
-                type="text"
-                size="small"
-                icon={<EditOutlined />}
-                onClick={() => editObjectiveButtonClicked(params.data.id)}
-              />
+              <Dropdown menu={{ items: menuItems }} trigger={['click']}>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<MenuOutlined />}
+                  onClick={() => rowMenuClicked(params.data.id)}
+                />
+              </Dropdown>
             )
           )
         },
@@ -163,9 +194,10 @@ const ProgramIncrementObjectivesGrid = ({
     ],
     [
       canManageObjectives,
-      editObjectiveButtonClicked,
       hideProgramIncrement,
       hideTeam,
+      menuItems,
+      rowMenuClicked,
     ],
   )
 
@@ -225,6 +257,13 @@ const ProgramIncrementObjectivesGrid = ({
     setOpenUpdateObjectiveForm(false)
   }
 
+  const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
+    setOpenCreateHealthCheckForm(false)
+    if (wasSaved) {
+      refresh()
+    }
+  }
+
   return (
     <>
       {/* TODO:  setup dynamic height */}
@@ -248,10 +287,19 @@ const ProgramIncrementObjectivesGrid = ({
       {openUpdateObjectiveForm && (
         <EditProgramIncrementObjectiveForm
           showForm={openUpdateObjectiveForm}
-          objectiveId={editObjectiveId}
+          objectiveId={selectedObjectiveId}
           programIncrementId={programIncrementId}
           onFormSave={() => onEditObjectiveFormClosed(true)}
           onFormCancel={() => onEditObjectiveFormClosed(false)}
+        />
+      )}
+      {openCreateHealthCheckForm && (
+        <CreateHealthCheckForm
+          showForm={openCreateHealthCheckForm}
+          objectId={selectedObjectiveId}
+          context={SystemContext.PlanningProgramIncrementObjective}
+          onFormCreate={() => onCreateHealthCheckFormClosed(true)}
+          onFormCancel={() => onCreateHealthCheckFormClosed(false)}
         />
       )}
     </>

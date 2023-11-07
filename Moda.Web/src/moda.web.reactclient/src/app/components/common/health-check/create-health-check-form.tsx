@@ -66,7 +66,6 @@ const CreateHealthCheckForm = (props: CreateHealthCheckFormProps) => {
       const request = mapToRequestValues(values)
       request.objectId = props.objectId
       request.contextId = props.context
-      console.log(request)
       await createHealthCheck.mutateAsync(request)
       return true
     } catch (error) {
