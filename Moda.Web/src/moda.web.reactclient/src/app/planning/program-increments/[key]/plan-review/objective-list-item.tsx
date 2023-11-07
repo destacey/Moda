@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import EditProgramIncrementObjectiveForm from '../edit-program-increment-objective-form'
 import { EditOutlined } from '@ant-design/icons'
+import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
 
 export interface ObjectiveListItemProps {
   objective: ProgramIncrementObjectiveListDto
@@ -73,6 +74,7 @@ const ObjectiveListItem = ({
             {objective.status.name}
           </Tag>
           {objective.isStretch && <Tag>Stretch</Tag>}
+          <HealthCheckTag healthCheck={objective?.healthCheck} />
           <Typography.Text>
             {startDate}
             {startDate && targetDate && ' - '}

@@ -7586,6 +7586,7 @@ export interface ProgramIncrementObjectiveListDto {
     key?: number;
     name?: string;
     status?: SimpleNavigationDto;
+    healthCheck?: PlanningHealthCheckDto | undefined;
     programIncrement?: NavigationDto;
     team?: PlanningTeamNavigationDto;
     progress?: number;
@@ -7600,12 +7601,19 @@ export interface SimpleNavigationDto {
     name?: string;
 }
 
+export interface PlanningHealthCheckDto {
+    id?: string;
+    status?: SimpleNavigationDto;
+    expiration?: Date;
+}
+
 export interface ProgramIncrementObjectiveDetailsDto {
     id?: string;
     key?: number;
     name?: string;
     description?: string | undefined;
     status?: SimpleNavigationDto;
+    healthCheck?: PlanningHealthCheckDto | undefined;
     progress?: number;
     programIncrement?: NavigationDto;
     team?: PlanningTeamNavigationDto;

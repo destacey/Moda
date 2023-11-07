@@ -27,6 +27,10 @@ public sealed record ProgramIncrementObjectiveDetailsDto
     /// <value>The status.</value>
     public required SimpleNavigationDto Status { get; set; }
 
+    /// <summary>Gets or sets the health status.</summary>
+    /// <value>The status.</value>
+    public PlanningHealthCheckDto? HealthCheck { get; set; }
+
     public double Progress { get; set; }
 
     public required NavigationDto ProgramIncrement { get; set; }
@@ -53,7 +57,7 @@ public sealed record ProgramIncrementObjectiveDetailsDto
     /// <value><c>true</c> if this instance is stretch; otherwise, <c>false</c>.</value>
     public bool IsStretch { get; set; }
 
-    public static ProgramIncrementObjectiveDetailsDto Create(ProgramIncrementObjective piObjective, ObjectiveDetailsDto objective, NavigationDto piNavigationDto)
+    public static ProgramIncrementObjectiveDetailsDto Create(ProgramIncrementObjective piObjective, ObjectiveDetailsDto objective, NavigationDto piNavigationDto, Instant now)
     {
         return new ProgramIncrementObjectiveDetailsDto()
         {
@@ -63,6 +67,7 @@ public sealed record ProgramIncrementObjectiveDetailsDto
             Description = objective.Description,
             ProgramIncrement = piNavigationDto,
             Status = SimpleNavigationDto.FromEnum(piObjective.Status),
+            HealthCheck = piObjective.HealthCheck is not null ? PlanningHealthCheckDto.Create(piObjective.HealthCheck, now) : null,
             Progress = objective.Progress,
             Team = PlanningTeamNavigationDto.FromPlanningTeam(piObjective.Team),
             Type = SimpleNavigationDto.FromEnum(piObjective.Type),

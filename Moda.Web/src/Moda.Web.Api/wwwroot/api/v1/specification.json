@@ -6735,6 +6735,14 @@
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
+          "healthCheck": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlanningHealthCheckDto"
+              }
+            ]
+          },
           "programIncrement": {
             "$ref": "#/components/schemas/NavigationDto"
           },
@@ -6776,6 +6784,23 @@
           }
         }
       },
+      "PlanningHealthCheckDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "expiration": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "ProgramIncrementObjectiveDetailsDto": {
         "type": "object",
         "additionalProperties": false,
@@ -6797,6 +6822,14 @@
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "healthCheck": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlanningHealthCheckDto"
+              }
+            ]
           },
           "progress": {
             "type": "number",

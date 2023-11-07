@@ -143,6 +143,7 @@ const ProgramIncrementObjectivesGrid = ({
         cellRenderer: teamLinkCellRenderer,
         hide: hideTeam,
       },
+      { field: 'healthCheck.status.name', headerName: 'Health', width: 125 },
       { field: 'progress', width: 250, cellRenderer: progressCellRenderer },
       {
         field: 'startDate',

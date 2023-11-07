@@ -18,6 +18,7 @@ import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import ProgramIncrementObjectiveDetailsLoading from './loading'
 import CreateHealthCheckForm from '@/src/app/components/common/health-check/create-health-check-form'
 import { SystemContext } from '@/src/app/components/constants'
+import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
 
 const ObjectiveDetailsPage = ({ params }) => {
   useDocumentTitle('PI Objective Details')
@@ -172,6 +173,7 @@ const ObjectiveDetailsPage = ({ params }) => {
         title={`${objectiveData?.key} - ${objectiveData?.name}`}
         subtitle="PI Objective Details"
         actions={showActions && actions()}
+        tags={<HealthCheckTag healthCheck={objectiveData?.healthCheck} />}
       />
       <Card
         style={{ width: '100%' }}
