@@ -8145,7 +8145,7 @@ export interface HealthCheckDto {
     id?: string;
     objectId?: string;
     status?: SimpleNavigationDto;
-    reportedBy?: SimpleNavigationDto;
+    reportedBy?: NavigationDto;
     reportedOn?: Date;
     expiration?: Date;
     note?: string | undefined;

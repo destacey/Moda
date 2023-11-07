@@ -17,12 +17,12 @@ export interface ObjectiveListItemProps {
 const getColorForStatus = (status: string) => {
   switch (status) {
     case 'In Progress':
-      return 'blue'
+      return 'processing'
     case 'Completed':
-      return 'green'
+      return 'success'
     case 'Canceled':
     case 'Missed':
-      return 'red'
+      return 'error'
     default:
       return 'default'
   }
@@ -69,7 +69,7 @@ const ObjectiveListItem = ({
       : undefined
     return (
       <>
-        <Space>
+        <Space wrap>
           <Tag color={getColorForStatus(objective.status.name)}>
             {objective.status.name}
           </Tag>

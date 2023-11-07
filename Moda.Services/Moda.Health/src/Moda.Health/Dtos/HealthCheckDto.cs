@@ -24,7 +24,7 @@ public sealed record HealthCheckDto : IMapFrom<HealthCheck>
     /// <summary>
     /// The employee who reported the health check.
     /// </summary>
-    public required SimpleNavigationDto ReportedBy { get; set; }
+    public required NavigationDto ReportedBy { get; set; }
 
     /// <summary>
     /// The timestamp of when the health check was initially created.

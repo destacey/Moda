@@ -37,7 +37,7 @@ const RiskListItem = ({
     ) : null
 
     return (
-      <Space>
+      <Space wrap>
         <Tag>{risk.category}</Tag>
         <Typography.Text>
           {content}

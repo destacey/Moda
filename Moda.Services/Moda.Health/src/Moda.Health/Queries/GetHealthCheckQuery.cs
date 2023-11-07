@@ -18,6 +18,7 @@ internal sealed class GetHealthCheckQueryHandler : IQueryHandler<GetHealthCheckQ
     public async Task<HealthCheckDto?> Handle(GetHealthCheckQuery request, CancellationToken cancellationToken)
     {
         return await _healthDbContext.HealthChecks
+            .AsNoTracking()
             .ProjectToType<HealthCheckDto>()
             .FirstOrDefaultAsync(h => h.Id == request.Id, cancellationToken);
     }

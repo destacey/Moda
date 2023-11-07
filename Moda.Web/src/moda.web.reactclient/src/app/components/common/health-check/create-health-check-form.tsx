@@ -160,7 +160,7 @@ const CreateHealthCheckForm = (props: CreateHealthCheckFormProps) => {
               buttonStyle="solid"
             />
           </Form.Item>
-          <Form.Item label="Note" name="note">
+          <Form.Item label="Note" name="note" help="Markdown enabled">
             <Input.TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount

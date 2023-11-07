@@ -6,11 +6,11 @@ import _ from 'lodash'
 import { OptionModel } from '@/src/app/components/types'
 
 // HEALTH CHECKS
-export const useGetHealthCheckById = (id: string) => {
+export const useGetHealthCheckById = (id: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: [QK.HEALTH_CHECKS, id],
     queryFn: async () => (await getHealthChecksClient()).getById(id),
-    enabled: !!id,
+    enabled: !!id && enabled,
   })
 }
 

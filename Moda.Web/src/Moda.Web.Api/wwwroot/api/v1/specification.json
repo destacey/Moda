@@ -8745,7 +8745,7 @@
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "reportedBy": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
+            "$ref": "#/components/schemas/NavigationDto"
           },
           "reportedOn": {
             "type": "string",
