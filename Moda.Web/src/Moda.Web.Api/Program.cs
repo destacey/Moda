@@ -6,6 +6,7 @@ using Moda.Common.Application.Interfaces;
 using Moda.Goals.Application;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
+using Moda.Health;
 using Moda.Links;
 using Moda.Organization.Application;
 using Moda.Planning.Application;
@@ -59,6 +60,7 @@ try
     builder.Services.AddOrganizationApplication();
     builder.Services.AddPlanningApplication();
     builder.Services.AddGoalsApplication();
+    builder.Services.AddHealthApplication();
     builder.Services.AddLinksApplication();
     builder.Services.AddWorkApplication();
     builder.Services.AddAppIntegrationApplication();

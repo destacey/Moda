@@ -30,12 +30,14 @@ internal sealed class GetProgramIncrementObjectiveQueryHandler : IQueryHandler<G
     private readonly IPlanningDbContext _planningDbContext;
     private readonly ILogger<GetProgramIncrementObjectiveQueryHandler> _logger;
     private readonly ISender _sender;
+    private readonly IDateTimeService _dateTimeService;
 
-    public GetProgramIncrementObjectiveQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetProgramIncrementObjectiveQueryHandler> logger, ISender sender)
+    public GetProgramIncrementObjectiveQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetProgramIncrementObjectiveQueryHandler> logger, ISender sender, IDateTimeService dateTimeService)
     {
         _planningDbContext = planningDbContext;
         _logger = logger;
         _sender = sender;
+        _dateTimeService = dateTimeService;
     }
 
     public async Task<ProgramIncrementObjectiveDetailsDto?> Handle(GetProgramIncrementObjectiveQuery request, CancellationToken cancellationToken)
@@ -44,14 +46,20 @@ internal sealed class GetProgramIncrementObjectiveQueryHandler : IQueryHandler<G
 
         if (request.Id.HasValue && request.ObjectiveId.HasValue)
         {
-            query = query.Include(p => p.Objectives.Where(o => o.Id == request.ObjectiveId.Value))
-                .ThenInclude(o => o.Team)
+            query = query
+                .Include(p => p.Objectives.Where(o => o.Id == request.ObjectiveId.Value))
+                    .ThenInclude(o => o.Team)
+                .Include(p => p.Objectives.Where(o => o.Id == request.ObjectiveId.Value))
+                    .ThenInclude(o => o.HealthCheck)
                 .Where(p => p.Id == request.Id.Value);
         }
         else if (request.Key.HasValue && request.ObjectiveKey.HasValue)
         {
-            query = query.Include(p => p.Objectives.Where(o => o.Key == request.ObjectiveKey.Value))
-                .ThenInclude(o => o.Team)
+            query = query
+                .Include(p => p.Objectives.Where(o => o.Key == request.ObjectiveKey.Value))
+                    .ThenInclude(o => o.Team)
+                .Include(p => p.Objectives.Where(o => o.Key == request.ObjectiveKey.Value))
+                    .ThenInclude(o => o.HealthCheck)
                 .Where(p => p.Key == request.Key.Value);
         }
         else
@@ -74,7 +82,7 @@ internal sealed class GetProgramIncrementObjectiveQueryHandler : IQueryHandler<G
 
         var piNavigation = NavigationDto.Create(programIncrement.Id, programIncrement.Key, programIncrement.Name);
 
-        return ProgramIncrementObjectiveDetailsDto.Create(programIncrement.Objectives.First(), objective, piNavigation);
+        return ProgramIncrementObjectiveDetailsDto.Create(programIncrement.Objectives.First(), objective, piNavigation, _dateTimeService.Now);
     }
 
     private void ThrowAndLogException(GetProgramIncrementObjectiveQuery request, string message)

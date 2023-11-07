@@ -1,5 +1,4 @@
 ﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Extensions;
 using Moda.Goals.Application.Objectives.Dtos;
 using Moda.Planning.Application.Models;
 
@@ -23,6 +22,10 @@ public sealed record ProgramIncrementObjectiveListDto
     /// <value>The status.</value>
     public required SimpleNavigationDto Status { get; set; }
 
+    /// <summary>Gets or sets the health status.</summary>
+    /// <value>The status.</value>
+    public PlanningHealthCheckDto? HealthCheck { get; set; }
+
     public required NavigationDto ProgramIncrement { get; set; }
 
     public required PlanningTeamNavigationDto Team { get; set; }
@@ -45,7 +48,7 @@ public sealed record ProgramIncrementObjectiveListDto
     /// <value><c>true</c> if this instance is stretch; otherwise, <c>false</c>.</value>
     public bool IsStretch { get; set; }
 
-    public static ProgramIncrementObjectiveListDto Create(ProgramIncrementObjective piObjective, ObjectiveListDto objective, NavigationDto piNavigationDto)
+    public static ProgramIncrementObjectiveListDto Create(ProgramIncrementObjective piObjective, ObjectiveListDto objective, NavigationDto piNavigationDto, Instant now)
     {
         return new ProgramIncrementObjectiveListDto()
         {
@@ -54,6 +57,7 @@ public sealed record ProgramIncrementObjectiveListDto
             Name = objective.Name,
             ProgramIncrement = piNavigationDto,
             Status = SimpleNavigationDto.FromEnum(piObjective.Status),
+            HealthCheck = piObjective.HealthCheck is not null ? PlanningHealthCheckDto.Create(piObjective.HealthCheck, now) : null,
             Progress = objective.Progress,
             Team = PlanningTeamNavigationDto.FromPlanningTeam(piObjective.Team),
             Type = SimpleNavigationDto.FromEnum(piObjective.Type),

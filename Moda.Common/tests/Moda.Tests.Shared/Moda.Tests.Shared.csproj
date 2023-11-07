@@ -14,4 +14,10 @@
     <ProjectReference Include="..\..\src\Moda.Common.Application\Moda.Common.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="NodaTime.Testing">
+      <HintPath>..\..\..\..\..\..\Tools\nodatime.testing\3.1.9\lib\netstandard2.0\NodaTime.Testing.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

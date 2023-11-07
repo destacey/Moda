@@ -3,6 +3,7 @@ import {
   AzureDevOpsBoardsConnectionsClient,
   BackgroundJobsClient,
   EmployeesClient,
+  HealthChecksClient,
   LinksClient,
   PermissionsClient,
   ProfileClient,
@@ -21,7 +22,9 @@ const createDefaultAxiosInstance = async (accessToken?: string) =>
   axios.create({
     baseURL: apiUrl,
     headers: {
-      Authorization: `Bearer ${accessToken ?? (await auth.acquireToken())?.token}`,
+      Authorization: `Bearer ${
+        accessToken ?? (await auth.acquireToken())?.token
+      }`,
     },
     //Removing the transformResponse will cause the response to be a string instead of an object
     transformResponse: (data) => data,
@@ -38,6 +41,8 @@ export const getBackgroundJobsClient = async (accessToken?: string) =>
   new BackgroundJobsClient('', await createDefaultAxiosInstance(accessToken))
 export const getEmployeesClient = async (accessToken?: string) =>
   new EmployeesClient('', await createDefaultAxiosInstance(accessToken))
+export const getHealthChecksClient = async (accessToken?: string) =>
+  new HealthChecksClient('', await createDefaultAxiosInstance(accessToken))
 export const getLinksClient = async (accessToken?: string) =>
   new LinksClient('', await createDefaultAxiosInstance(accessToken))
 export const getPermissionsClient = async (accessToken?: string) =>

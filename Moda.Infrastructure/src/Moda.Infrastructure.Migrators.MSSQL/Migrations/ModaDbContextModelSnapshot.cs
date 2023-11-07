@@ -18,7 +18,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "7.0.11")
+                .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -361,6 +361,74 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("PlanId", "IsDeleted"), new[] { "Id", "Key", "Name", "Type", "Status", "OwnerId" });
 
                     b.ToTable("Objectives", "Goals");
+                });
+
+            modelBuilder.Entity("Moda.Health.Models.HealthCheck", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Context")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Expiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<Guid>("ObjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReportedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ReportedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "ObjectId" });
+
+                    b.HasIndex("ObjectId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ObjectId"), new[] { "Id" });
+
+                    b.HasIndex("ReportedById");
+
+                    b.ToTable("HealthChecks", "Health");
                 });
 
             modelBuilder.Entity("Moda.Infrastructure.Auditing.Trail", b =>
@@ -1042,6 +1110,32 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Risks", "Planning");
                 });
 
+            modelBuilder.Entity("Moda.Planning.Domain.Models.SimpleHealthCheck", b =>
+                {
+                    b.Property<Guid>("ObjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Expiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ReportedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("ObjectId");
+
+                    b.HasIndex("ObjectId");
+
+                    b.ToTable("PlanningHealthChecks", "Planning");
+                });
+
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevel", b =>
                 {
                     b.Property<int>("Id")
@@ -1451,7 +1545,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.OwnsOne("Moda.Common.Domain.Employees.Employee.Name#Moda.Common.Models.PersonName", "Name", b1 =>
+                    b.OwnsOne("Moda.Common.Models.PersonName", "Name", b1 =>
                         {
                             b1.Property<Guid>("EmployeeId")
                                 .HasColumnType("uniqueidentifier");
@@ -1497,6 +1591,17 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Moda.Health.Models.HealthCheck", b =>
+                {
+                    b.HasOne("Moda.Common.Domain.Employees.Employee", "ReportedBy")
+                        .WithMany()
+                        .HasForeignKey("ReportedById")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ReportedBy");
+                });
+
             modelBuilder.Entity("Moda.Infrastructure.Identity.ApplicationRoleClaim", b =>
                 {
                     b.HasOne("Moda.Infrastructure.Identity.ApplicationRole", null)
@@ -1530,7 +1635,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.OwnsOne("Moda.Organization.Domain.Models.TeamMembership.DateRange#Moda.Organization.Domain.Models.MembershipDateRange", "DateRange", b1 =>
+                    b.OwnsOne("Moda.Organization.Domain.Models.MembershipDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("TeamMembershipId")
                                 .HasColumnType("uniqueidentifier");
@@ -1563,7 +1668,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrement", b =>
                 {
-                    b.OwnsOne("Moda.Planning.Domain.Models.ProgramIncrement.DateRange#Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
+                    b.OwnsOne("Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("ProgramIncrementId")
                                 .HasColumnType("uniqueidentifier");
@@ -1649,6 +1754,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
+            modelBuilder.Entity("Moda.Planning.Domain.Models.SimpleHealthCheck", b =>
+                {
+                    b.HasOne("Moda.Planning.Domain.Models.ProgramIncrementObjective", null)
+                        .WithOne("HealthCheck")
+                        .HasForeignKey("Moda.Planning.Domain.Models.SimpleHealthCheck", "ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevel", b =>
                 {
                     b.HasOne("Moda.Work.Domain.Models.BacklogLevelScheme", null)
@@ -1669,7 +1783,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
                 {
-                    b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.Configuration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration", "Configuration", b1 =>
+                    b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration", "Configuration", b1 =>
                         {
                             b1.Property<Guid>("AzureDevOpsBoardsConnectionId")
                                 .HasColumnType("uniqueidentifier");
@@ -1691,7 +1805,34 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("AzureDevOpsBoardsConnectionId");
 
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.Configuration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration.Workspaces#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace", "Workspaces", b2 =>
+                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkProcess", "WorkProcesses", b2 =>
+                                {
+                                    b2.Property<Guid>("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<int>("Id")
+                                        .ValueGeneratedOnAdd()
+                                        .HasColumnType("int");
+
+                                    b2.Property<string>("Description")
+                                        .HasColumnType("nvarchar(max)");
+
+                                    b2.Property<Guid>("ExternalId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<string>("Name")
+                                        .IsRequired()
+                                        .HasColumnType("nvarchar(max)");
+
+                                    b2.HasKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "Id");
+
+                                    b2.ToTable("Connections", "AppIntegrations");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
+                                });
+
+                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace", "Workspaces", b2 =>
                                 {
                                     b2.Property<Guid>("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
                                         .HasColumnType("uniqueidentifier");
@@ -1713,6 +1854,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                     b2.Property<bool>("Sync")
                                         .HasColumnType("bit");
 
+                                    b2.Property<Guid?>("WorkProcessId")
+                                        .HasColumnType("uniqueidentifier");
+
                                     b2.HasKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "Id");
 
                                     b2.ToTable("Connections", "AppIntegrations");
@@ -1720,6 +1864,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                     b2.WithOwner()
                                         .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
                                 });
+
+                            b1.Navigation("WorkProcesses");
 
                             b1.Navigation("Workspaces");
                         });
@@ -1748,6 +1894,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Objectives");
 
                     b.Navigation("Teams");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.ProgramIncrementObjective", b =>
+                {
+                    b.Navigation("HealthCheck");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevelScheme", b =>

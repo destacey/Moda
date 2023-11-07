@@ -16,6 +16,9 @@ import { notFound, useRouter, usePathname } from 'next/navigation'
 import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import ProgramIncrementObjectiveDetailsLoading from './loading'
+import CreateHealthCheckForm from '@/src/app/components/common/health-check/create-health-check-form'
+import { SystemContext } from '@/src/app/components/constants'
+import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
 
 const ObjectiveDetailsPage = ({ params }) => {
   useDocumentTitle('PI Objective Details')
@@ -32,6 +35,8 @@ const ObjectiveDetailsPage = ({ params }) => {
     useState<boolean>(false)
   const [openDeleteObjectiveForm, setOpenDeleteObjectiveForm] =
     useState<boolean>(false)
+  const [openCreateHealthCheckForm, setOpenCreateHealthCheckForm] =
+    useState<boolean>(false)
 
   const router = useRouter()
   const { hasClaim } = useAuth()
@@ -39,7 +44,11 @@ const ObjectiveDetailsPage = ({ params }) => {
     'Permission',
     'Permissions.ProgramIncrementObjectives.Manage',
   )
+  const canCreateHealthChecks =
+    !!canManageObjectives &&
+    hasClaim('Permission', 'Permissions.HealthChecks.Create')
   const showActions = canManageObjectives
+
   const pathname = usePathname()
   const dispatch = useAppDispatch()
 
@@ -97,6 +106,13 @@ const ObjectiveDetailsPage = ({ params }) => {
     }
   }
 
+  const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
+    setOpenCreateHealthCheckForm(false)
+    if (wasSaved) {
+      refetchObjective()
+    }
+  }
+
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
     if (canManageObjectives) {
@@ -111,10 +127,20 @@ const ObjectiveDetailsPage = ({ params }) => {
           label: 'Delete',
           onClick: () => setOpenDeleteObjectiveForm(true),
         },
+        {
+          key: 'divider',
+          type: 'divider',
+        },
+        {
+          key: 'createHealthCheck',
+          label: 'Create Health Check',
+          disabled: !canCreateHealthChecks,
+          onClick: () => setOpenCreateHealthCheckForm(true),
+        },
       )
     }
     return items
-  }, [canManageObjectives])
+  }, [canCreateHealthChecks, canManageObjectives])
 
   const actions = () => {
     return (
@@ -147,6 +173,7 @@ const ObjectiveDetailsPage = ({ params }) => {
         title={`${objectiveData?.key} - ${objectiveData?.name}`}
         subtitle="PI Objective Details"
         actions={showActions && actions()}
+        tags={<HealthCheckTag healthCheck={objectiveData?.healthCheck} />}
       />
       <Card
         style={{ width: '100%' }}
@@ -171,6 +198,15 @@ const ObjectiveDetailsPage = ({ params }) => {
           objective={objectiveData}
           onFormSave={() => onDeleteObjectiveFormClosed(true)}
           onFormCancel={() => onDeleteObjectiveFormClosed(false)}
+        />
+      )}
+      {openCreateHealthCheckForm && (
+        <CreateHealthCheckForm
+          showForm={openCreateHealthCheckForm}
+          objectId={objectiveData?.id}
+          context={SystemContext.PlanningProgramIncrementObjective}
+          onFormCreate={() => onCreateHealthCheckFormClosed(true)}
+          onFormCancel={() => onCreateHealthCheckFormClosed(false)}
         />
       )}
     </>

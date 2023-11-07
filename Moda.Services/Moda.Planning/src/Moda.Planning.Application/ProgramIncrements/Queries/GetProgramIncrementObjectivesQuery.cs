@@ -29,12 +29,14 @@ internal sealed class GetProgramIncrementObjectivesQueryHandler : IQueryHandler<
     private readonly IPlanningDbContext _planningDbContext;
     private readonly ILogger<GetProgramIncrementObjectivesQueryHandler> _logger;
     private readonly ISender _sender;
+    private readonly IDateTimeService _dateTimeService;
 
-    public GetProgramIncrementObjectivesQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetProgramIncrementObjectivesQueryHandler> logger, ISender sender)
+    public GetProgramIncrementObjectivesQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetProgramIncrementObjectivesQueryHandler> logger, ISender sender, IDateTimeService dateTimeService)
     {
         _planningDbContext = planningDbContext;
         _logger = logger;
         _sender = sender;
+        _dateTimeService = dateTimeService;
     }
 
     public async Task<IReadOnlyList<ProgramIncrementObjectiveListDto>> Handle(GetProgramIncrementObjectivesQuery request, CancellationToken cancellationToken)
@@ -50,13 +52,19 @@ internal sealed class GetProgramIncrementObjectivesQueryHandler : IQueryHandler<
                 ThrowAndLogException(request, $"Program increment {request.Id} does not have team {request.TeamId}.");
             }
 
-            query = query.Include(p => p.Objectives.Where(o => o.TeamId == request.TeamId.Value))
-                .ThenInclude(o => o.Team);
+            query = query
+                .Include(p => p.Objectives.Where(o => o.TeamId == request.TeamId.Value))
+                    .ThenInclude(o => o.Team)
+                .Include(p => p.Objectives.Where(o => o.TeamId == request.TeamId.Value))
+                    .ThenInclude(o => o.HealthCheck);
         }
         else
         {
-            query = query.Include(p => p.Objectives)
-                .ThenInclude(o => o.Team);
+            query = query
+                .Include(p => p.Objectives)
+                    .ThenInclude(o => o.Team)
+                .Include(p => p.Objectives)
+                    .ThenInclude(o => o.HealthCheck);
         }
 
         if (request.Id.HasValue)
@@ -89,7 +97,7 @@ internal sealed class GetProgramIncrementObjectivesQueryHandler : IQueryHandler<
         List<ProgramIncrementObjectiveListDto> piObjectives = new(objectives.Count);
         foreach (var piObjective in programIncrement.Objectives)
         {
-            piObjectives.Add(ProgramIncrementObjectiveListDto.Create(piObjective, objectives.Single(o => o.Id == piObjective.ObjectiveId), piNavigation));
+            piObjectives.Add(ProgramIncrementObjectiveListDto.Create(piObjective, objectives.Single(o => o.Id == piObjective.ObjectiveId), piNavigation, _dateTimeService.Now));
         }
 
         return piObjectives;

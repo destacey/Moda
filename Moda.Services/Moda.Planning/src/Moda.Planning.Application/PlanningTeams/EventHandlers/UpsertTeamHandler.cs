@@ -1,8 +1,11 @@
 ﻿using Moda.Common.Application.Events;
+using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Events;
 using Moda.Organization.Domain.Models;
 
 namespace Moda.Planning.Application.PlanningTeams.EventHandlers;
+
+// TODO - putting a dependency on the Organization project is not good.  This should be a named event rather a generic event of T.  Need to refactor this.
 internal sealed class UpsertTeamHandler :
     IEventNotificationHandler<EntityCreatedEvent<Team>>,
     IEventNotificationHandler<EntityUpdatedEvent<Team>>,
@@ -101,11 +104,11 @@ internal sealed class UpsertTeamHandler :
             }
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Planning Team {Action}. {PlanningTeamId} - {PlanningTeamName}", action, teamId, teamName);
+            _logger.LogInformation("[{SystemActionType}] Planning Team {Action}. {PlanningTeamId} - {PlanningTeamName}", SystemActionType.ServiceDataReplication, action, teamId, teamName);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Planning Team {Action} action failed to save. {PlanningTeamId} - {PlanningTeamName}", action, baseTeam.Id, baseTeam.Name);
+            _logger.LogCritical(ex, "[{SystemActionType}] Planning Team {Action} action failed to save. {PlanningTeamId} - {PlanningTeamName}", SystemActionType.ServiceDataReplication, action, baseTeam.Id, baseTeam.Name);
         }
     }
 }
