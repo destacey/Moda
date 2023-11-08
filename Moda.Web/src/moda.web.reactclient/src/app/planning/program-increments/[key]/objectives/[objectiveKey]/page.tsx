@@ -13,12 +13,13 @@ import DeleteProgramIncrementObjectiveForm from './delete-program-increment-obje
 import { authorizePage } from '@/src/app/components/hoc'
 import { useGetProgramIncrementObjectiveByKey } from '@/src/services/queries/planning-queries'
 import { notFound, useRouter, usePathname } from 'next/navigation'
-import { useAppDispatch } from '@/src/app/hooks'
+import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import ProgramIncrementObjectiveDetailsLoading from './loading'
 import CreateHealthCheckForm from '@/src/app/components/common/health-check/create-health-check-form'
 import { SystemContext } from '@/src/app/components/constants'
 import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
+import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
 
 const ObjectiveDetailsPage = ({ params }) => {
   useDocumentTitle('PI Objective Details')
@@ -35,8 +36,6 @@ const ObjectiveDetailsPage = ({ params }) => {
     useState<boolean>(false)
   const [openDeleteObjectiveForm, setOpenDeleteObjectiveForm] =
     useState<boolean>(false)
-  const [openCreateHealthCheckForm, setOpenCreateHealthCheckForm] =
-    useState<boolean>(false)
 
   const router = useRouter()
   const { hasClaim } = useAuth()
@@ -51,6 +50,9 @@ const ObjectiveDetailsPage = ({ params }) => {
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
+  const editingObjectiveId = useAppSelector(
+    (state) => state.healthCheck.createContext.objectId,
+  )
 
   const tabs = [
     {
@@ -107,7 +109,6 @@ const ObjectiveDetailsPage = ({ params }) => {
   }
 
   const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
-    setOpenCreateHealthCheckForm(false)
     if (wasSaved) {
       refetchObjective()
     }
@@ -135,12 +136,18 @@ const ObjectiveDetailsPage = ({ params }) => {
           key: 'createHealthCheck',
           label: 'Create Health Check',
           disabled: !canCreateHealthChecks,
-          onClick: () => setOpenCreateHealthCheckForm(true),
+          onClick: () =>
+            dispatch(
+              beginHealthCheckCreate({
+                objectId: objectiveData?.id,
+                contextId: SystemContext.PlanningProgramIncrementObjective,
+              }),
+            ),
         },
       )
     }
     return items
-  }, [canCreateHealthChecks, canManageObjectives])
+  }, [canCreateHealthChecks, canManageObjectives, dispatch, objectiveData?.id])
 
   const actions = () => {
     return (
@@ -200,14 +207,8 @@ const ObjectiveDetailsPage = ({ params }) => {
           onFormCancel={() => onDeleteObjectiveFormClosed(false)}
         />
       )}
-      {openCreateHealthCheckForm && (
-        <CreateHealthCheckForm
-          showForm={openCreateHealthCheckForm}
-          objectId={objectiveData?.id}
-          context={SystemContext.PlanningProgramIncrementObjective}
-          onFormCreate={() => onCreateHealthCheckFormClosed(true)}
-          onFormCancel={() => onCreateHealthCheckFormClosed(false)}
-        />
+      {editingObjectiveId == objectiveData?.id && (
+        <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed} />
       )}
     </>
   )

@@ -14,6 +14,8 @@ import { UseQueryResult } from 'react-query'
 import dayjs from 'dayjs'
 import CreateHealthCheckForm from '../health-check/create-health-check-form'
 import { SystemContext } from '../../constants'
+import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
+import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
 
 export interface ProgramIncrementObjectivesGridProps {
   objectivesQuery: UseQueryResult<ProgramIncrementObjectiveListDto[], unknown>
@@ -80,10 +82,13 @@ const ProgramIncrementObjectivesGrid = ({
     useState<boolean>(false)
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
-  const [openCreateHealthCheckForm, setOpenCreateHealthCheckForm] =
-    useState<boolean>(false)
   const [selectedObjectiveId, setSelectedObjectiveId] = useState<string | null>(
     null,
+  )
+
+  const dispatch = useAppDispatch()
+  const editingObjectiveId = useAppSelector(
+    (state) => state.healthCheck.createContext.objectId,
   )
 
   const { hasClaim } = useAuth()
@@ -112,12 +117,23 @@ const ProgramIncrementObjectivesGrid = ({
           key: 'createHealthCheck',
           label: 'Create Health Check',
           disabled: !canCreateHealthChecks,
-          onClick: () => setOpenCreateHealthCheckForm(true),
+          onClick: () =>
+            dispatch(
+              beginHealthCheckCreate({
+                objectId: selectedObjectiveId,
+                contextId: SystemContext.PlanningProgramIncrementObjective,
+              }),
+            ),
         },
       )
     }
     return items
-  }, [canManageObjectives, canCreateHealthChecks])
+  }, [
+    canManageObjectives,
+    canCreateHealthChecks,
+    dispatch,
+    selectedObjectiveId,
+  ])
 
   const refresh = useCallback(async () => {
     objectivesQuery.refetch()
@@ -258,7 +274,6 @@ const ProgramIncrementObjectivesGrid = ({
   }
 
   const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
-    setOpenCreateHealthCheckForm(false)
     if (wasSaved) {
       refresh()
     }
@@ -293,14 +308,8 @@ const ProgramIncrementObjectivesGrid = ({
           onFormCancel={() => onEditObjectiveFormClosed(false)}
         />
       )}
-      {openCreateHealthCheckForm && (
-        <CreateHealthCheckForm
-          showForm={openCreateHealthCheckForm}
-          objectId={selectedObjectiveId}
-          context={SystemContext.PlanningProgramIncrementObjective}
-          onFormCreate={() => onCreateHealthCheckFormClosed(true)}
-          onFormCancel={() => onCreateHealthCheckFormClosed(false)}
-        />
+      {editingObjectiveId == selectedObjectiveId && (
+        <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed} />
       )}
     </>
   )

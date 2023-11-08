@@ -18,6 +18,11 @@ import HealthCheckTag from '@/src/app/components/common/health-check/health-chec
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import CreateHealthCheckForm from '@/src/app/components/common/health-check/create-health-check-form'
 import { SystemContext } from '@/src/app/components/constants'
+import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
+import {
+  beginHealthCheckCreate,
+  selectHealthCheckIsInEditMode,
+} from '@/src/store/health-check-slice'
 
 export interface ObjectiveListItemProps {
   objective: ProgramIncrementObjectiveListDto
@@ -50,8 +55,11 @@ const ObjectiveListItem = ({
 }: ObjectiveListItemProps) => {
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
-  const [openCreateHealthCheckForm, setOpenCreateHealthCheckForm] =
-    useState<boolean>(false)
+
+  const dispatch = useAppDispatch()
+  const editingObjectiveId = useAppSelector(
+    (state) => state.healthCheck.createContext.objectId,
+  )
 
   const title = () => {
     return (
@@ -124,12 +132,18 @@ const ObjectiveListItem = ({
           key: 'createHealthCheck',
           label: 'Create Health Check',
           disabled: !canCreateHealthChecks,
-          onClick: () => setOpenCreateHealthCheckForm(true),
+          onClick: () =>
+            dispatch(
+              beginHealthCheckCreate({
+                objectId: objective.id,
+                contextId: SystemContext.PlanningProgramIncrementObjective,
+              }),
+            ),
         },
       )
     }
     return items
-  }, [canUpdateObjectives, canCreateHealthChecks])
+  }, [canUpdateObjectives, canCreateHealthChecks, dispatch, objective.id])
 
   const onEditObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
@@ -139,7 +153,6 @@ const ObjectiveListItem = ({
   }
 
   const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
-    setOpenCreateHealthCheckForm(false)
     if (wasSaved) {
       refreshObjectives()
     }
@@ -164,14 +177,8 @@ const ObjectiveListItem = ({
           onFormCancel={() => onEditObjectiveFormClosed(false)}
         />
       )}
-      {openCreateHealthCheckForm && (
-        <CreateHealthCheckForm
-          showForm={openCreateHealthCheckForm}
-          objectId={objective?.id}
-          context={SystemContext.PlanningProgramIncrementObjective}
-          onFormCreate={() => onCreateHealthCheckFormClosed(true)}
-          onFormCancel={() => onCreateHealthCheckFormClosed(false)}
-        />
+      {editingObjectiveId == objective?.id && (
+        <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed}/>
       )}
     </>
   )

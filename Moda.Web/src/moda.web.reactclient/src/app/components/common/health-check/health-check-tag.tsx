@@ -1,34 +1,44 @@
 import { PlanningHealthCheckDto } from '@/src/services/moda-api'
-import { useGetHealthCheckById } from '@/src/services/queries/health-check-queries'
 import { Descriptions, Popover, Space, Spin, Tag } from 'antd'
 import dayjs from 'dayjs'
-import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
+import {
+  getHealthCheck,
+  selectHealthCheckContext,
+} from '@/src/store/health-check-slice'
 
 export interface HealthCheckTagProps {
   healthCheck?: PlanningHealthCheckDto
 }
 
-const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
-  const [enableQuery, setEnableQuery] = useState<boolean>(false)
-  const [hovered, setHovered] = useState(false)
+const color = (status: string) => {
+  switch (status) {
+    case 'Healthy':
+      return 'success'
+    case 'At Risk':
+      return 'warning'
+    case 'Unhealthy':
+      return 'error'
+    default:
+      return 'default'
+  }
+}
 
-  const { data: healthCheckData, isLoading } = useGetHealthCheckById(
-    healthCheck?.id,
-    true,
+const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
+  const dispatch = useAppDispatch()
+  const { item: healthCheckData, isLoading } = useAppSelector(
+    selectHealthCheckContext,
   )
 
   if (!healthCheck) return null
 
   const handleHoverChange = (open: boolean) => {
-    setHovered(open)
-    if (open && !enableQuery) {
-      setEnableQuery(true)
-    }
+    !!open && dispatch(getHealthCheck(healthCheck.id))
   }
 
   const content = () => {
-    if (!hovered) return null
+    if (!healthCheckData) return null
     if (isLoading) return <Spin size="small" />
 
     const maxWidth = healthCheckData.note
@@ -53,7 +63,7 @@ const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
         <Descriptions.Item label="Expires On">
           {dayjs(healthCheckData.expiration).format('M/D/YYYY hh:mm A')}
         </Descriptions.Item>
-        <Descriptions.Item label="Note">
+        <Descriptions.Item>
           <Space direction="vertical">
             <ReactMarkdown>{healthCheckData.note}</ReactMarkdown>
           </Space>
@@ -62,27 +72,11 @@ const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
     )
   }
 
-  const color = () => {
-    switch (healthCheck.status.name) {
-      case 'Healthy':
-        return 'success'
-      case 'At Risk':
-        return 'warning'
-      case 'Unhealthy':
-        return 'error'
-      default:
-        return 'default'
-    }
-  }
-
   return (
-    <Popover
-      content={content}
-      trigger="hover"
-      open={hovered}
-      onOpenChange={handleHoverChange}
-    >
-      <Tag color={color()}>{healthCheck.status.name}</Tag>
+    <Popover content={content} trigger="hover" onOpenChange={handleHoverChange}>
+      <Tag color={color(healthCheck.status.name)}>
+        {healthCheck.status.name}
+      </Tag>
     </Popover>
   )
 }

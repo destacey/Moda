@@ -15,6 +15,9 @@ using Moda.Web.Api.Services;
 using Moda.Work.Application;
 using NodaTime.Serialization.SystemTextJson;
 using Serilog;
+using Microsoft.ApplicationInsights.Extensibility.Implementation;
+
+TelemetryDebugWriter.IsTracingDisabled = true;
 
 StaticLogger.EnsureInitialized();
 Log.Information("Server Booting Up...");
