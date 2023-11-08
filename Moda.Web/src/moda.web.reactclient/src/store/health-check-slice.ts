@@ -33,6 +33,16 @@ const healthCheckSlice = createCrudSlice({
       state.detail.isInEditMode = true
     },
   },
+  additionalThunkReducers: ({createDetail}) => {
+    return {
+      [createDetail.fulfilled.type]: (state, action) => {
+        state.createContext = {
+          objectId: '',
+          contextId: null,
+        }      
+      },
+    }
+  },
   getData: async (arg, { getState, rejectWithValue }) => {
     try {
       return (await (await getHealthChecksClient()).getHealthReport('test'))

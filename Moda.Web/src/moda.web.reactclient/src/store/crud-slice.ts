@@ -1,5 +1,7 @@
 import {
   ActionReducerMapBuilder,
+  AsyncThunkPayloadCreator,
+  Draft,
   EntityId,
   EntityState,
   PayloadAction,
@@ -13,7 +15,13 @@ import {
 import { FieldData } from 'rc-field-form/lib/interface'
 import { NoInfer } from 'react-redux/es/types'
 import { toFormErrors } from '../utils'
-import { AsyncThunkPayloadCreator } from '@reduxjs/toolkit/dist/createAsyncThunk'
+import { TypedActionCreator } from '@reduxjs/toolkit/dist/mapBuilders'
+
+type CrudThunkAction = {
+  pending: TypedActionCreator<string>,
+  fulfilled: TypedActionCreator<string>,
+  rejected: TypedActionCreator<string>,
+}
 
 /**
  * Options for creating a CRUD slice using `createSlice` from Redux Toolkit.
@@ -41,7 +49,13 @@ export interface CreateCrudSliceOptions<
    * The initial state of the slice, if not provided the default initial state will be used.
    */
   initialState: (defaultState: CrudState<TItem, TDetail>) => State
+  /**
+   * Reducers for the slice.
+   */
   reducers: ValidateSliceCaseReducers<State, CR>
+  /**
+   * Extra reducers for the slice.
+   */
   extraReducers?: (builder: ActionReducerMapBuilder<NoInfer<State>>) => void
   /**
    * Async thunk action for getting a list of items.
@@ -69,6 +83,16 @@ export interface CreateCrudSliceOptions<
    * This is optional and only needed if you want to delete an item.
    */
   deleteDetail?: AsyncThunkPayloadCreator<EntityId, TDeleteDetailArgs>
+  additionalThunkReducers?: (params: {
+    getData: CrudThunkAction,
+    getDetail: CrudThunkAction,
+    updateDetail?: CrudThunkAction,
+    createDetail?: CrudThunkAction,
+    deleteDetail?: CrudThunkAction,
+    refreshDetail?: CrudThunkAction,
+  }) => {
+    [actionType: string]: (state: Draft<NoInfer<State>>, action: PayloadAction<any>) => void
+  }
 }
 
 export interface CrudState<TItem, TDetail = TItem> {
@@ -121,7 +145,6 @@ const createCrudSlice = <
   >,
 ) => {
   const itemsAdapter = createEntityAdapter<TItem>(options.createAdapterOptions)
-
   const initialState: State = options.initialState({
     data: itemsAdapter.getInitialState(),
     isLoading: false,
@@ -155,6 +178,10 @@ const createCrudSlice = <
     options.refreshDetail &&
     createAsyncThunk(`${options.name}/refreshDetail`, options.refreshDetail)
 
+  const additionalThunkReducers = (options.additionalThunkReducers && 
+    options.additionalThunkReducers({getData, getDetail, updateDetail, createDetail, deleteDetail, refreshDetail})) ?? {}
+
+
   const slice = createSlice({
     name: options.name,
     initialState,
@@ -165,32 +192,37 @@ const createCrudSlice = <
       ...options.reducers,
     },
     extraReducers: (builder) => {
-      builder.addCase(getData.pending, (state) => {
+      builder.addCase(getData.pending, (state, action) => {
         state.isLoading = true
         state.error = null
+        additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
       })
       builder.addCase(getData.fulfilled, (state, action) => {
         // known issue with immer and generics: https://github.com/immerjs/use-immer/issues/72
         itemsAdapter.setAll(state.data as EntityState<TItem>, action.payload)
         state.isLoading = false
+        additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
       })
       builder.addCase(
         getData.rejected,
         (state, action: PayloadAction<{ error?: any }>) => {
           state.isLoading = false
           state.error = action.payload.error
+          additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
         },
       )
-      builder.addCase(getDetail.pending, (state) => {
+      builder.addCase(getDetail.pending, (state, action) => {
         state.detail.isLoading = true
         state.detail.error = null
         state.detail.notFound = false
+        additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
       })
       builder.addCase(getDetail.fulfilled, (state, action) => {
         ;(state.detail.item as TDetail) = action.payload
         itemsAdapter.upsertOne(state.data as EntityState<TItem>, action.payload)
         state.detail.isLoading = false
         state.detail.notFound = false
+        additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
       })
       builder.addCase(
         getDetail.rejected,
@@ -200,13 +232,16 @@ const createCrudSlice = <
           if (action.payload?.error?.status === 404) {
             state.detail.notFound = true
           }
+          additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
         },
       )
       if (updateDetail) {
-        builder.addCase(updateDetail.pending, (state) => {
+        builder.addCase(updateDetail.pending, (state, action) => {
           state.detail.isSaving = true
           state.detail.error = null
           state.detail.validationErrors = []
+          additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
+
         })
         builder.addCase(updateDetail.fulfilled, (state, action) => {
           ;(state.detail.item as TDetail) = action.payload
@@ -216,6 +251,7 @@ const createCrudSlice = <
           )
           state.detail.isSaving = false
           state.detail.isInEditMode = false
+          additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
         })
         builder.addCase(
           updateDetail.rejected,
@@ -227,19 +263,22 @@ const createCrudSlice = <
             } else {
               state.detail.error = error
             }
+            additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
           },
         )
       }
       if (createDetail) {
-        builder.addCase(createDetail.pending, (state) => {
+        builder.addCase(createDetail.pending, (state, action) => {
           state.detail.isSaving = true
           state.detail.error = null
           state.detail.validationErrors = []
+          additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
         })
         builder.addCase(createDetail.fulfilled, (state, action) => {
           itemsAdapter.addOne(state.data as EntityState<TItem>, action.payload)
           state.detail.isSaving = false
           state.detail.isInEditMode = false
+          additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
         })
         builder.addCase(
           createDetail.rejected,
@@ -251,13 +290,15 @@ const createCrudSlice = <
             } else {
               state.detail.error = error
             }
+            additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
           },
         )
       }
       if (deleteDetail) {
-        builder.addCase(deleteDetail.pending, (state) => {
+        builder.addCase(deleteDetail.pending, (state, action) => {
           state.detail.isSaving = true
           state.detail.error = null
+          additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
         })
         builder.addCase(deleteDetail.fulfilled, (state, action) => {
           itemsAdapter.removeOne(
@@ -266,32 +307,37 @@ const createCrudSlice = <
           )
           state.detail.item = null
           state.detail.isSaving = false
+          additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
         })
         builder.addCase(
           deleteDetail.rejected,
           (state, action: PayloadAction<{ error?: any }>) => {
             state.detail.isSaving = false
             state.detail.error = action.payload?.error
+            additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
           },
         )
         if (refreshDetail) {
-          builder.addCase(refreshDetail.pending, (state) => {
+          builder.addCase(refreshDetail.pending, (state, action) => {
             state.detail.isLoading = true
             state.detail.error = null
+            additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
           })
           builder.addCase(refreshDetail.fulfilled, (state, action) => {
-            ;(state.detail.item as TDetail) = action.payload
+            (state.detail.item as TDetail) = action.payload
             itemsAdapter.upsertOne(
               state.data as EntityState<TItem>,
               action.payload,
             )
             state.detail.isLoading = false
+            additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
           })
           builder.addCase(
             refreshDetail.rejected,
             (state, action: PayloadAction<{ error?: any }>) => {
               state.detail.isLoading = false
               state.detail.error = action.payload?.error
+              additionalThunkReducers[action.type] && additionalThunkReducers[action.type](state, action)
             },
           )
         }
