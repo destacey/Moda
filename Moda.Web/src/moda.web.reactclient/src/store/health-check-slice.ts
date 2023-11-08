@@ -70,7 +70,6 @@ const healthCheckSlice = createCrudSlice({
         ...newHealthCheck,
         ...healthCheckState.createContext,
       }
-      console.log(healthCheck)
       const id = await (await getHealthChecksClient()).create(healthCheck)
       return await (await getHealthChecksClient()).getById(id)
     } catch (error) {

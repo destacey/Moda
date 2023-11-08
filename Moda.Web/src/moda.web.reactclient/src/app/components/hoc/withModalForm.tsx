@@ -9,12 +9,13 @@ export interface ModalFormProps<TFormValues> {
     title: string
     okText?: string
     useFormState: () => FormState
-    onOk: (values: TFormValues) => Action | ThunkAction<void, RootState, unknown, Action<string>> 
+    onOk: (values: TFormValues) => Action | ThunkAction<void, RootState, unknown, Action<string>>
     onCancel: Action
 }
 
 export interface FormProps<TFormValues> {
     form: FormInstance<TFormValues>
+    onClose?: (success: boolean) => void
   }
 
 export interface FormState {
@@ -48,7 +49,9 @@ const withModalForm = <P extends FormProps<TFormValues>, TFormValues>(
         const handleOk = async () => {
             try {
                 const values = await form.validateFields()
-                dispatch(modalFormProps.onOk(values))
+                // dispacth and await the thunk action, it may be an async thunk action or a regular thunk action
+                await dispatch(modalFormProps.onOk(values))
+                props.onClose?.(true)
             } catch (errorInfo) {
                 console.error(errorInfo)
             }
@@ -57,6 +60,7 @@ const withModalForm = <P extends FormProps<TFormValues>, TFormValues>(
         const handleCancel = () => {
             dispatch(modalFormProps.onCancel)
             form.resetFields()
+            props.onClose?.(false)
         }
 
         useEffect(() => {

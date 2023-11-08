@@ -179,7 +179,7 @@ const ObjectiveListItem = ({
         />
       )}
       {healthCheckIsEditMode && editingObjectiveId == objective?.id && (
-        <CreateHealthCheckForm />
+        <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed}/>
       )}
     </>
   )
