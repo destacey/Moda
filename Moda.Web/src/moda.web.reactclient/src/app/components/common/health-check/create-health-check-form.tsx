@@ -8,13 +8,15 @@ import {
 } from '@/src/services/queries/health-check-queries'
 import dayjs from 'dayjs'
 import { SystemContext } from '@/src/app/components/constants'
-import { useAppSelector } from '@/src/app/hooks'
+import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import withModalForm from '../../hoc/withModalForm'
 import {
   createHealthCheck,
   selectHealthCheckEditContext,
   cancelHealthCheckCreate,
+  getHealthCheckStatusOptions
 } from '@/src/store/health-check-slice'
+import { useEffect } from 'react'
 
 export interface CreateHealthCheckFormProps {
   showForm: boolean
@@ -53,8 +55,13 @@ const CreateHealthCheckForm = ({
     'Permission',
     'Permissions.HealthChecks.Create',
   )
+  const dispatch = useAppDispatch()
 
-  const { data: statusOptions } = useGetHealthStatusOptions()
+  const statusOptions = useAppSelector((state) => state.healthCheck.statusOptions)
+
+  useEffect(() => {
+    dispatch(getHealthCheckStatusOptions())
+  },[dispatch]);
 
   return (
     <Form

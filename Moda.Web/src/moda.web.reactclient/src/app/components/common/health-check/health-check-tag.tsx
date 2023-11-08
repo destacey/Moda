@@ -38,7 +38,6 @@ const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
   }
 
   const content = () => {
-    console.log(healthCheckData)
     if (!healthCheckData) return null
     if (isLoading) return <Spin size="small" />
 

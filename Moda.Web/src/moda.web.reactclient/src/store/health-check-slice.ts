@@ -7,14 +7,20 @@ import {
 import { getHealthChecksClient } from '../services/clients'
 import { CreateHealthCheckFormValues } from '../app/components/common/health-check/create-health-check-form'
 import { SystemContext } from '../app/components/constants'
-import { PayloadAction } from '@reduxjs/toolkit'
+import { PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
+import { OptionModel } from '../app/components/types'
 
 interface HealthCheckState extends CrudState<HealthCheckDto> {
   createContext: {
     objectId: string
     contextId: SystemContext | null
   }
+  statusOptions: OptionModel<number>[]
 }
+
+export const getHealthCheckStatusOptions = createAsyncThunk("healthCheck/getHealthCheckStatusOptions", async () => {
+  return await (await getHealthChecksClient()).getStatuses()
+})
 
 const healthCheckSlice = createCrudSlice({
   name: 'healthCheck',
@@ -22,6 +28,7 @@ const healthCheckSlice = createCrudSlice({
     defaultState: CrudState<HealthCheckDto>,
   ): HealthCheckState => ({
     ...defaultState,
+    statusOptions: [],
     createContext: {
       objectId: '',
       contextId: null,
@@ -39,6 +46,14 @@ const healthCheckSlice = createCrudSlice({
       }
       state.detail.isInEditMode = false
     }
+  },
+  extraReducers: (builder) => {
+    builder.addCase(getHealthCheckStatusOptions.fulfilled, (state, action) => {
+      state.statusOptions = action.payload.map((status) => ({
+        value: status.id,
+        label: status.name,
+      }))
+    })
   },
   additionalThunkReducers: ({createDetail}) => {
     return {
