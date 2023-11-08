@@ -57,7 +57,6 @@ const ObjectiveListItem = ({
     useState<boolean>(false)
 
   const dispatch = useAppDispatch()
-  const healthCheckIsEditMode = useAppSelector(selectHealthCheckIsInEditMode)
   const editingObjectiveId = useAppSelector(
     (state) => state.healthCheck.createContext.objectId,
   )
@@ -178,7 +177,7 @@ const ObjectiveListItem = ({
           onFormCancel={() => onEditObjectiveFormClosed(false)}
         />
       )}
-      {healthCheckIsEditMode && editingObjectiveId == objective?.id && (
+      {editingObjectiveId == objective?.id && (
         <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed}/>
       )}
     </>

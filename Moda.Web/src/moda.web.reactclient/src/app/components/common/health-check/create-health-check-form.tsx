@@ -2,11 +2,8 @@
 
 import { CreateHealthCheckRequest } from '@/src/services/moda-api'
 import { DatePicker, Form, FormProps, Input, Modal, Radio, message } from 'antd'
-import { useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
-import { toFormErrors } from '@/src/utils'
 import {
-  useCreateHealthCheckMutation,
   useGetHealthStatusOptions,
 } from '@/src/services/queries/health-check-queries'
 import dayjs from 'dayjs'
@@ -16,7 +13,7 @@ import withModalForm from '../../hoc/withModalForm'
 import {
   createHealthCheck,
   selectHealthCheckEditContext,
-  setEditMode,
+  cancelHealthCheckCreate,
 } from '@/src/store/health-check-slice'
 
 export interface CreateHealthCheckFormProps {
@@ -114,7 +111,7 @@ export const ModalCreateHealthCheckForm = withModalForm(CreateHealthCheckForm, {
   okText: 'Create',
   useFormState: () => useAppSelector(selectHealthCheckEditContext),
   onOk: (values: CreateHealthCheckFormValues) => createHealthCheck(values),
-  onCancel: setEditMode(false),
+  onCancel: cancelHealthCheckCreate(),
 })
 
 export default ModalCreateHealthCheckForm

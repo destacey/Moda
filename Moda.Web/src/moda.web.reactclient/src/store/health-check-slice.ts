@@ -32,6 +32,13 @@ const healthCheckSlice = createCrudSlice({
       state.createContext = action.payload
       state.detail.isInEditMode = true
     },
+    cancelHealthCheckCreate: (state) => {
+      state.createContext = {
+        objectId: '',
+        contextId: null,
+      }
+      state.detail.isInEditMode = false
+    }
   },
   additionalThunkReducers: ({createDetail}) => {
     return {
@@ -94,6 +101,7 @@ export const {
   createDetail: createHealthCheck,
   updateDetail: updateHealthCheck,
   beginHealthCheckCreate,
+  cancelHealthCheckCreate,
   setEditMode,
 } = healthCheckSlice.actions
 
