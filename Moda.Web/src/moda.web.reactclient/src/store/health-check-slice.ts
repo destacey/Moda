@@ -7,11 +7,12 @@ import {
 import { getHealthChecksClient } from '../services/clients'
 import { CreateHealthCheckFormValues } from '../app/components/common/health-check/create-health-check-form'
 import { SystemContext } from '../app/components/constants'
+import { PayloadAction } from '@reduxjs/toolkit'
 
 interface HealthCheckState extends CrudState<HealthCheckDto> {
   createContext: {
     objectId: string
-    context: SystemContext | null
+    contextId: SystemContext | null
   }
 }
 
@@ -23,11 +24,11 @@ const healthCheckSlice = createCrudSlice({
     ...defaultState,
     createContext: {
       objectId: '',
-      context: null,
+      contextId: null,
     },
   }),
   reducers: {
-    beginHealthCheckCreate: (state, action) => {
+    beginHealthCheckCreate: (state, action:PayloadAction<{objectId: string, contextId: SystemContext}>) => {
       state.createContext = action.payload
       state.detail.isInEditMode = true
     },
