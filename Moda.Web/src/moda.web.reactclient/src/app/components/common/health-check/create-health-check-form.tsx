@@ -1,11 +1,8 @@
 'use client'
 
 import { CreateHealthCheckRequest } from '@/src/services/moda-api'
-import { DatePicker, Form, FormProps, Input, Modal, Radio, message } from 'antd'
+import { DatePicker, Form, FormProps, Input, Radio } from 'antd'
 import useAuth from '../../contexts/auth'
-import {
-  useGetHealthStatusOptions,
-} from '@/src/services/queries/health-check-queries'
 import dayjs from 'dayjs'
 import { SystemContext } from '@/src/app/components/constants'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
@@ -14,7 +11,7 @@ import {
   createHealthCheck,
   selectHealthCheckEditContext,
   cancelHealthCheckCreate,
-  getHealthCheckStatusOptions
+  getHealthCheckStatusOptions,
 } from '@/src/store/health-check-slice'
 import { useEffect } from 'react'
 
@@ -57,11 +54,15 @@ const CreateHealthCheckForm = ({
   )
   const dispatch = useAppDispatch()
 
-  const statusOptions = useAppSelector((state) => state.healthCheck.statusOptions)
+  const statusOptions = useAppSelector(
+    (state) => state.healthCheck.statusOptions,
+  )
 
   useEffect(() => {
     dispatch(getHealthCheckStatusOptions())
-  },[dispatch]);
+  }, [dispatch])
+
+  if (!canCreateHealthChecks) return null
 
   return (
     <Form
