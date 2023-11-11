@@ -66,6 +66,47 @@ const progressCellRenderer = ({ value, data }) => {
   )
 }
 
+interface ActionsMenuCellRendererProps {
+  objectiveId: string
+  canManageObjectives: boolean
+  canCreateHealthChecks: boolean
+  onEditObjectiveMenuClicked: (id: string) => void
+  onCreateHealthCheckMenuClicked: (id: string) => void
+}
+
+const actionsMenuCellRenderer = (props: ActionsMenuCellRendererProps) => {
+  if (
+    (!props.canManageObjectives && !props.canCreateHealthChecks) ||
+    !props.objectiveId ||
+    !props.canManageObjectives ||
+    !props.canCreateHealthChecks ||
+    !props.onEditObjectiveMenuClicked ||
+    !props.onCreateHealthCheckMenuClicked
+  ) {
+    return null
+  }
+  const items: ItemType[] = [
+    {
+      key: 'editObjective',
+      label: 'Edit Objective',
+      disabled: !props.canManageObjectives,
+      onClick: () => props.onEditObjectiveMenuClicked(props.objectiveId),
+    },
+    {
+      key: 'createHealthCheck',
+      label: 'Create Health Check',
+      disabled: !props.canCreateHealthChecks,
+      onClick: () => props.onCreateHealthCheckMenuClicked(props.objectiveId),
+    },
+  ]
+
+  return (
+    <Dropdown menu={{ items }} trigger={['click']}>
+      <Button type="text" size="small" icon={<MenuOutlined />} />
+    </Dropdown>
+  )
+}
+
 const ProgramIncrementObjectivesGrid = ({
   objectivesQuery,
   programIncrementId,
@@ -103,37 +144,23 @@ const ProgramIncrementObjectivesGrid = ({
     hasClaim('Permission', 'Permissions.HealthChecks.Create')
   const showActions = canCreateObjectives
 
-  const menuItems: MenuProps['items'] = useMemo(() => {
-    const items: ItemType[] = []
-    if (canManageObjectives || canCreateHealthChecks) {
-      items.push(
-        {
-          key: 'edit',
-          label: 'Edit',
-          disabled: !canManageObjectives,
-          onClick: () => setOpenUpdateObjectiveForm(true),
-        },
-        {
-          key: 'createHealthCheck',
-          label: 'Create Health Check',
-          disabled: !canCreateHealthChecks,
-          onClick: () =>
-            dispatch(
-              beginHealthCheckCreate({
-                objectId: selectedObjectiveId,
-                contextId: SystemContext.PlanningProgramIncrementObjective,
-              }),
-            ),
-        },
+  const onEditObjectiveMenuClicked = useCallback((id: string) => {
+    setSelectedObjectiveId(id)
+    setOpenUpdateObjectiveForm(true)
+  }, [])
+
+  const onCreateHealthCheckMenuClicked = useCallback(
+    (id: string) => {
+      setSelectedObjectiveId(id)
+      dispatch(
+        beginHealthCheckCreate({
+          objectId: id,
+          contextId: SystemContext.PlanningProgramIncrementObjective,
+        }),
       )
-    }
-    return items
-  }, [
-    canManageObjectives,
-    canCreateHealthChecks,
-    dispatch,
-    selectedObjectiveId,
-  ])
+    },
+    [dispatch],
+  )
 
   const refresh = useCallback(async () => {
     objectivesQuery.refetch()
@@ -142,10 +169,6 @@ const ProgramIncrementObjectivesGrid = ({
 
   const createObjectiveButtonClicked = useCallback(() => {
     setOpenCreateObjectiveForm(true)
-  }, [])
-
-  const rowMenuClicked = useCallback((id: string) => {
-    setSelectedObjectiveId(id)
   }, [])
 
   const columnDefs = useMemo(
@@ -158,18 +181,14 @@ const ProgramIncrementObjectivesGrid = ({
         sortable: false,
         hide: !canManageObjectives,
         cellRenderer: (params) => {
-          return (
-            canManageObjectives && (
-              <Dropdown menu={{ items: menuItems }} trigger={['click']}>
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<MenuOutlined />}
-                  onClick={() => rowMenuClicked(params.data.id)}
-                />
-              </Dropdown>
-            )
-          )
+          const objectiveId = params.data.id
+          return actionsMenuCellRenderer({
+            objectiveId,
+            canManageObjectives,
+            canCreateHealthChecks,
+            onEditObjectiveMenuClicked,
+            onCreateHealthCheckMenuClicked,
+          })
         },
       },
       { field: 'id', hide: true },
@@ -209,11 +228,12 @@ const ProgramIncrementObjectivesGrid = ({
       { field: 'isStretch', width: 100 },
     ],
     [
+      canCreateHealthChecks,
       canManageObjectives,
       hideProgramIncrement,
       hideTeam,
-      menuItems,
-      rowMenuClicked,
+      onCreateHealthCheckMenuClicked,
+      onEditObjectiveMenuClicked,
     ],
   )
 
