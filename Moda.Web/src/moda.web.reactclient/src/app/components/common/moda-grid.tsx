@@ -12,6 +12,7 @@ import {
   Input,
   Row,
   Space,
+  Spin,
   Tooltip,
   Typography,
 } from 'antd'
@@ -23,6 +24,7 @@ import {
 } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import useTheme from '../contexts/theme'
+import ModaEmpty from './moda-empty'
 
 interface ModaGridProps extends AgGridReactProps {
   height?: number
@@ -63,11 +65,8 @@ const ModaGrid = ({
   const showGlobalSearch = includeGlobalSearch ?? true
   const showExportButton = includeExportButton ?? true
   const showGridControls = gridControlMenuItems?.length > 0
-  const toolbarMdSize = actions ? 12 : 24
 
   const gridRef = useRef<AgGridReact>(null)
-
-  const rowCount = rowData?.length ?? 0
 
   const onModelUpdated = useCallback(() => {
     setDisplayedRowCount(gridRef.current?.api.getDisplayedRowCount() ?? 0)
@@ -81,77 +80,86 @@ const ModaGrid = ({
     gridRef.current?.api.exportDataAsCsv()
   }, [])
 
+  const rowCount = rowData?.length ?? 0
+
   useEffect(() => {
     if (!gridRef.current?.api) return
 
+    console.log(isDataLoading)
     if (isDataLoading) {
       gridRef.current?.api.showLoadingOverlay()
+    } else if (rowData && rowCount === 0) {
+      gridRef.current?.api.showNoRowsOverlay()
     } else {
       gridRef.current?.api.hideOverlay()
     }
-  }, [isDataLoading])
+  }, [isDataLoading, rowCount, rowData])
 
   return (
     <div style={{ width: width }}>
       <Space direction="vertical" style={{ width: '100%' }}>
         <Row>
           {actions && (
-            <Col xs={24} sm={24} md={toolbarMdSize}>
+            <Col xs={24} sm={24} md={10}>
               {actions}
             </Col>
           )}
-          <Col xs={24} sm={24} md={toolbarMdSize}>
-            <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Typography.Text>
-                {displayedRowCount} of {rowCount}
-              </Typography.Text>
-              {showGlobalSearch && (
-                <Input
-                  placeholder="Search"
-                  allowClear={true}
-                  onChange={onGlobalSearchChange}
-                  suffix={<SearchOutlined />}
-                />
-              )}
-              {showGridControls && (
-                // TODO: this tooltip is triggering "findDOMNode is deprecated in StrictMode" warnings
-                // <Tooltip title="Grid Controls">
-                <Dropdown
-                  menu={{ items: gridControlMenuItems }}
-                  trigger={['click']}
-                >
-                  <Button
-                    type="text"
-                    shape="circle"
-                    icon={<ControlOutlined />}
+          <Col xs={24} sm={24} md={actions ? 14 : 24}>
+            <Space style={{ display: 'flex', justifyContent: 'flex-end' }} wrap>
+              <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Typography.Text>
+                  {displayedRowCount} of {rowCount}
+                </Typography.Text>
+                {showGlobalSearch && (
+                  <Input
+                    placeholder="Search"
+                    allowClear={true}
+                    onChange={onGlobalSearchChange}
+                    suffix={<SearchOutlined />}
                   />
-                </Dropdown>
-                // </Tooltip>
-              )}
-              {loadData && (
-                <Tooltip title="Refresh Grid">
-                  <Button
-                    type="text"
-                    shape="circle"
-                    icon={<ReloadOutlined />}
-                    onClick={() => loadData?.()}
-                  />
-                </Tooltip>
-              )}
-              {(showExportButton || toolbarActions) && (
-                <Divider type="vertical" style={{ height: '30px' }} />
-              )}
-              {showExportButton && (
-                <Tooltip title="Export to CSV">
-                  <Button
-                    type="text"
-                    shape="circle"
-                    icon={<DownloadOutlined />}
-                    onClick={onBtnExport}
-                  />
-                </Tooltip>
-              )}
-              {toolbarActions && toolbarActions}
+                )}
+              </Space>
+              <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                {showGridControls && (
+                  // TODO: this tooltip is triggering "findDOMNode is deprecated in StrictMode" warnings
+                  // <Tooltip title="Grid Controls">
+                  <Dropdown
+                    menu={{ items: gridControlMenuItems }}
+                    trigger={['click']}
+                  >
+                    <Button
+                      type="text"
+                      shape="circle"
+                      icon={<ControlOutlined />}
+                    />
+                  </Dropdown>
+                  // </Tooltip>
+                )}
+                {loadData && (
+                  <Tooltip title="Refresh Grid">
+                    <Button
+                      type="text"
+                      shape="circle"
+                      icon={<ReloadOutlined />}
+                      onClick={() => loadData?.()}
+                    />
+                  </Tooltip>
+                )}
+                {(showExportButton || toolbarActions) && (
+                  <Divider type="vertical" style={{ height: '30px' }} />
+                )}
+                {showExportButton && (
+                  <Tooltip title="Export to CSV">
+                    <Button
+                      type="text"
+                      shape="circle"
+                      icon={<DownloadOutlined />}
+                      onClick={onBtnExport}
+                    />
+                  </Tooltip>
+                )}
+                {toolbarActions && toolbarActions}
+              </Space>
             </Space>
           </Col>
         </Row>
@@ -165,6 +173,10 @@ const ModaGrid = ({
             rowData={rowData}
             onModelUpdated={onModelUpdated}
             multiSortKey="ctrl"
+            loadingOverlayComponent={() => <Spin size="large" />}
+            noRowsOverlayComponent={() => (
+              <ModaEmpty message="No records found." />
+            )}
             {...props}
           ></AgGridReact>
         </div>

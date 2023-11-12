@@ -5479,7 +5479,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HealthReportDto"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HealthCheckDto"
+                  }
                 }
               }
             }
@@ -8758,18 +8761,6 @@
           "note": {
             "type": "string",
             "nullable": true
-          }
-        }
-      },
-      "HealthReportDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "healthChecks": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/HealthCheckDto"
-            }
           }
         }
       },

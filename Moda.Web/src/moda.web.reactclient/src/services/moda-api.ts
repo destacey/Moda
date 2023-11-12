@@ -6547,7 +6547,7 @@ export class HealthChecksClient {
     /**
      * Get the healt report for a specific objectId.
      */
-    getHealthReport(objectId: string, cancelToken?: CancelToken | undefined): Promise<HealthReportDto> {
+    getHealthReport(objectId: string, cancelToken?: CancelToken | undefined): Promise<HealthCheckDto[]> {
         let url_ = this.baseUrl + "/api/healthchecks/health-report/{objectId}";
         if (objectId === undefined || objectId === null)
             throw new Error("The parameter 'objectId' must be defined.");
@@ -6574,7 +6574,7 @@ export class HealthChecksClient {
         });
     }
 
-    protected processGetHealthReport(response: AxiosResponse): Promise<HealthReportDto> {
+    protected processGetHealthReport(response: AxiosResponse): Promise<HealthCheckDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -6589,7 +6589,7 @@ export class HealthChecksClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<HealthReportDto>(result200);
+            return Promise.resolve<HealthCheckDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -6602,7 +6602,7 @@ export class HealthChecksClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<HealthReportDto>(null as any);
+        return Promise.resolve<HealthCheckDto[]>(null as any);
     }
 
     /**
@@ -8149,10 +8149,6 @@ export interface HealthCheckDto {
     reportedOn?: Date;
     expiration?: Date;
     note?: string | undefined;
-}
-
-export interface HealthReportDto {
-    healthChecks?: HealthCheckDto[];
 }
 
 export interface CreateHealthCheckRequest {

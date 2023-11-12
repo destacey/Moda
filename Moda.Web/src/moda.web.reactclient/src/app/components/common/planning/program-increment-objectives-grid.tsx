@@ -4,18 +4,18 @@ import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
-import { Button, Dropdown, MenuProps, Progress, Space, Switch } from 'antd'
+import { Button, MenuProps, Progress, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import useAuth from '../../contexts/auth'
 import CreateProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[key]/create-program-increment-objective-form'
 import EditProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[key]/edit-program-increment-objective-form'
-import { MenuOutlined } from '@ant-design/icons'
 import { UseQueryResult } from 'react-query'
 import dayjs from 'dayjs'
 import CreateHealthCheckForm from '../health-check/create-health-check-form'
 import { SystemContext } from '../../constants'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
+import { ModaGridRowMenuCellRenderer } from '../moda-grid-cell-renderers'
 
 export interface ProgramIncrementObjectivesGridProps {
   objectivesQuery: UseQueryResult<ProgramIncrementObjectiveListDto[], unknown>
@@ -66,6 +66,53 @@ const progressCellRenderer = ({ value, data }) => {
   )
 }
 
+interface RowMenuProps extends MenuProps {
+  objectiveId: string
+  programIncrementKey: string
+  objectiveKey: string
+  canManageObjectives: boolean
+  canCreateHealthChecks: boolean
+  onEditObjectiveMenuClicked: (id: string) => void
+  onCreateHealthCheckMenuClicked: (id: string) => void
+}
+
+const getRowMenuItems = (props: RowMenuProps) => {
+  if (
+    (!props.canManageObjectives && !props.canCreateHealthChecks) ||
+    !props.objectiveId ||
+    !props.canManageObjectives ||
+    !props.canCreateHealthChecks ||
+    !props.onEditObjectiveMenuClicked ||
+    !props.onCreateHealthCheckMenuClicked
+  ) {
+    return null
+  }
+  return [
+    {
+      key: 'editObjective',
+      label: 'Edit Objective',
+      disabled: !props.canManageObjectives,
+      onClick: () => props.onEditObjectiveMenuClicked(props.objectiveId),
+    },
+    {
+      key: 'createHealthCheck',
+      label: 'Create Health Check',
+      disabled: !props.canCreateHealthChecks,
+      onClick: () => props.onCreateHealthCheckMenuClicked(props.objectiveId),
+    },
+    {
+      key: 'healthReport',
+      label: (
+        <Link
+          href={`/planning/program-increments/${props.programIncrementKey}/objectives/${props.objectiveKey}/health-report`}
+        >
+          Health Report
+        </Link>
+      ),
+    },
+  ] as ItemType[]
+}
+
 const ProgramIncrementObjectivesGrid = ({
   objectivesQuery,
   programIncrementId,
@@ -103,37 +150,23 @@ const ProgramIncrementObjectivesGrid = ({
     hasClaim('Permission', 'Permissions.HealthChecks.Create')
   const showActions = canCreateObjectives
 
-  const menuItems: MenuProps['items'] = useMemo(() => {
-    const items: ItemType[] = []
-    if (canManageObjectives || canCreateHealthChecks) {
-      items.push(
-        {
-          key: 'edit',
-          label: 'Edit',
-          disabled: !canManageObjectives,
-          onClick: () => setOpenUpdateObjectiveForm(true),
-        },
-        {
-          key: 'createHealthCheck',
-          label: 'Create Health Check',
-          disabled: !canCreateHealthChecks,
-          onClick: () =>
-            dispatch(
-              beginHealthCheckCreate({
-                objectId: selectedObjectiveId,
-                contextId: SystemContext.PlanningProgramIncrementObjective,
-              }),
-            ),
-        },
+  const onEditObjectiveMenuClicked = useCallback((id: string) => {
+    setSelectedObjectiveId(id)
+    setOpenUpdateObjectiveForm(true)
+  }, [])
+
+  const onCreateHealthCheckMenuClicked = useCallback(
+    (id: string) => {
+      setSelectedObjectiveId(id)
+      dispatch(
+        beginHealthCheckCreate({
+          objectId: id,
+          contextId: SystemContext.PlanningProgramIncrementObjective,
+        }),
       )
-    }
-    return items
-  }, [
-    canManageObjectives,
-    canCreateHealthChecks,
-    dispatch,
-    selectedObjectiveId,
-  ])
+    },
+    [dispatch],
+  )
 
   const refresh = useCallback(async () => {
     objectivesQuery.refetch()
@@ -142,10 +175,6 @@ const ProgramIncrementObjectivesGrid = ({
 
   const createObjectiveButtonClicked = useCallback(() => {
     setOpenCreateObjectiveForm(true)
-  }, [])
-
-  const rowMenuClicked = useCallback((id: string) => {
-    setSelectedObjectiveId(id)
   }, [])
 
   const columnDefs = useMemo(
@@ -158,18 +187,17 @@ const ProgramIncrementObjectivesGrid = ({
         sortable: false,
         hide: !canManageObjectives,
         cellRenderer: (params) => {
-          return (
-            canManageObjectives && (
-              <Dropdown menu={{ items: menuItems }} trigger={['click']}>
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<MenuOutlined />}
-                  onClick={() => rowMenuClicked(params.data.id)}
-                />
-              </Dropdown>
-            )
-          )
+          const menuItems = getRowMenuItems({
+            objectiveId: params.data.id,
+            programIncrementKey: params.data.programIncrement?.key,
+            objectiveKey: params.data.key,
+            canManageObjectives,
+            canCreateHealthChecks,
+            onEditObjectiveMenuClicked,
+            onCreateHealthCheckMenuClicked,
+          })
+
+          return ModaGridRowMenuCellRenderer({ menuItems })
         },
       },
       { field: 'id', hide: true },
@@ -209,11 +237,12 @@ const ProgramIncrementObjectivesGrid = ({
       { field: 'isStretch', width: 100 },
     ],
     [
+      canCreateHealthChecks,
       canManageObjectives,
       hideProgramIncrement,
       hideTeam,
-      menuItems,
-      rowMenuClicked,
+      onCreateHealthCheckMenuClicked,
+      onEditObjectiveMenuClicked,
     ],
   )
 

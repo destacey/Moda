@@ -37,12 +37,10 @@ public class HealthChecksController : ControllerBase
     [OpenApiOperation("Get the healt report for a specific objectId.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<HealthReportDto>> GetHealthReport(Guid objectId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<HealthCheckDto>>> GetHealthReport(Guid objectId, CancellationToken cancellationToken)
     {
-        var healthReport = await _sender.Send(new GetHealthReportQuery(objectId), cancellationToken);
-        return healthReport is not null
-            ? Ok(healthReport)
-            : NotFound();
+        var healthChecks = await _sender.Send(new GetHealthReportQuery(objectId), cancellationToken);
+        return Ok(healthChecks);
     }
 
     [HttpPost]

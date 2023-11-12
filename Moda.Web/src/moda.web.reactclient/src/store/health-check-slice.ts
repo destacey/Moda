@@ -11,6 +11,7 @@ import { PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { OptionModel } from '../app/components/types'
 
 interface HealthCheckState extends CrudState<HealthCheckDto> {
+  objectId?: string
   createContext: {
     objectId: string
     contextId: SystemContext | null
@@ -18,9 +19,12 @@ interface HealthCheckState extends CrudState<HealthCheckDto> {
   statusOptions: OptionModel<number>[]
 }
 
-export const getHealthCheckStatusOptions = createAsyncThunk("healthCheck/getHealthCheckStatusOptions", async () => {
-  return await (await getHealthChecksClient()).getStatuses()
-})
+export const getHealthCheckStatusOptions = createAsyncThunk(
+  'healthCheck/getHealthCheckStatusOptions',
+  async () => {
+    return await (await getHealthChecksClient()).getStatuses()
+  },
+)
 
 const healthCheckSlice = createCrudSlice({
   name: 'healthCheck',
@@ -28,6 +32,7 @@ const healthCheckSlice = createCrudSlice({
     defaultState: CrudState<HealthCheckDto>,
   ): HealthCheckState => ({
     ...defaultState,
+    objectId: null,
     statusOptions: [],
     createContext: {
       objectId: '',
@@ -35,7 +40,10 @@ const healthCheckSlice = createCrudSlice({
     },
   }),
   reducers: {
-    beginHealthCheckCreate: (state, action:PayloadAction<{objectId: string, contextId: SystemContext}>) => {
+    beginHealthCheckCreate: (
+      state,
+      action: PayloadAction<{ objectId: string; contextId: SystemContext }>,
+    ) => {
       state.createContext = action.payload
       state.detail.isInEditMode = true
     },
@@ -45,7 +53,10 @@ const healthCheckSlice = createCrudSlice({
         contextId: null,
       }
       state.detail.isInEditMode = false
-    }
+    },
+    setHealthReportId: (state, action) => {
+      state.objectId = action.payload
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getHealthCheckStatusOptions.fulfilled, (state, action) => {
@@ -55,20 +66,24 @@ const healthCheckSlice = createCrudSlice({
       }))
     })
   },
-  additionalThunkReducers: ({createDetail}) => {
+  additionalThunkReducers: ({ createDetail }) => {
     return {
       [createDetail.fulfilled.type]: (state, action) => {
         state.createContext = {
           objectId: '',
           contextId: null,
-        }      
+        }
       },
     }
   },
   getData: async (arg, { getState, rejectWithValue }) => {
     try {
-      return (await (await getHealthChecksClient()).getHealthReport('test'))
-        .healthChecks
+      const { healthCheck: healthCheckState } = getState() as {
+        healthCheck: HealthCheckState
+      }
+      return await (
+        await getHealthChecksClient()
+      ).getHealthReport(healthCheckState.objectId)
     } catch (error) {
       return rejectWithValue({ error })
     }
@@ -112,15 +127,18 @@ const healthCheckSlice = createCrudSlice({
 })
 
 export const {
+  getData: getHealthReport,
   getDetail: getHealthCheck,
   createDetail: createHealthCheck,
   updateDetail: updateHealthCheck,
   beginHealthCheckCreate,
   cancelHealthCheckCreate,
   setEditMode,
+  setHealthReportId,
 } = healthCheckSlice.actions
 
 export const {
+  selectDataContext: selectHealthReportContext,
   selectDetail: selectHealthCheck,
   selectDetailContext: selectHealthCheckContext,
   selectEditContext: selectHealthCheckEditContext,
