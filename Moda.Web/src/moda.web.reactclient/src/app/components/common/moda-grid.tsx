@@ -12,7 +12,7 @@ import {
   Input,
   Row,
   Space,
-  Spin, // used inside overlayLoadingTemplate
+  Spin,
   Tooltip,
   Typography,
 } from 'antd'
@@ -24,7 +24,7 @@ import {
 } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import useTheme from '../contexts/theme'
-import ModaEmpty from './moda-empty' // used inside overlayNoRowsTemplate
+import ModaEmpty from './moda-empty'
 
 interface ModaGridProps extends AgGridReactProps {
   height?: number

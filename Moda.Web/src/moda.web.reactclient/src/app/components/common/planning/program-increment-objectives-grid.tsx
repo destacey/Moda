@@ -4,18 +4,18 @@ import { ProgramIncrementObjectiveListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
-import { Button, Dropdown, MenuProps, Progress, Space, Switch } from 'antd'
+import { Button, MenuProps, Progress, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import useAuth from '../../contexts/auth'
 import CreateProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[key]/create-program-increment-objective-form'
 import EditProgramIncrementObjectiveForm from '@/src/app/planning/program-increments/[key]/edit-program-increment-objective-form'
-import { MenuOutlined } from '@ant-design/icons'
 import { UseQueryResult } from 'react-query'
 import dayjs from 'dayjs'
 import CreateHealthCheckForm from '../health-check/create-health-check-form'
 import { SystemContext } from '../../constants'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
+import { ModaGridRowMenuCellRenderer } from '../moda-grid-cell-renderers'
 
 export interface ProgramIncrementObjectivesGridProps {
   objectivesQuery: UseQueryResult<ProgramIncrementObjectiveListDto[], unknown>
@@ -66,15 +66,17 @@ const progressCellRenderer = ({ value, data }) => {
   )
 }
 
-interface ActionsMenuCellRendererProps {
+interface RowMenuProps extends MenuProps {
   objectiveId: string
+  programIncrementKey: string
+  objectiveKey: string
   canManageObjectives: boolean
   canCreateHealthChecks: boolean
   onEditObjectiveMenuClicked: (id: string) => void
   onCreateHealthCheckMenuClicked: (id: string) => void
 }
 
-const actionsMenuCellRenderer = (props: ActionsMenuCellRendererProps) => {
+const getRowMenuItems = (props: RowMenuProps) => {
   if (
     (!props.canManageObjectives && !props.canCreateHealthChecks) ||
     !props.objectiveId ||
@@ -85,7 +87,7 @@ const actionsMenuCellRenderer = (props: ActionsMenuCellRendererProps) => {
   ) {
     return null
   }
-  const items: ItemType[] = [
+  return [
     {
       key: 'editObjective',
       label: 'Edit Objective',
@@ -98,13 +100,17 @@ const actionsMenuCellRenderer = (props: ActionsMenuCellRendererProps) => {
       disabled: !props.canCreateHealthChecks,
       onClick: () => props.onCreateHealthCheckMenuClicked(props.objectiveId),
     },
-  ]
-
-  return (
-    <Dropdown menu={{ items }} trigger={['click']}>
-      <Button type="text" size="small" icon={<MenuOutlined />} />
-    </Dropdown>
-  )
+    {
+      key: 'healthReport',
+      label: (
+        <Link
+          href={`/planning/program-increments/${props.programIncrementKey}/objectives/${props.objectiveKey}/health-report`}
+        >
+          Health Report
+        </Link>
+      ),
+    },
+  ] as ItemType[]
 }
 
 const ProgramIncrementObjectivesGrid = ({
@@ -181,14 +187,17 @@ const ProgramIncrementObjectivesGrid = ({
         sortable: false,
         hide: !canManageObjectives,
         cellRenderer: (params) => {
-          const objectiveId = params.data.id
-          return actionsMenuCellRenderer({
-            objectiveId,
+          const menuItems = getRowMenuItems({
+            objectiveId: params.data.id,
+            programIncrementKey: params.data.programIncrement?.key,
+            objectiveKey: params.data.key,
             canManageObjectives,
             canCreateHealthChecks,
             onEditObjectiveMenuClicked,
             onCreateHealthCheckMenuClicked,
           })
+
+          return ModaGridRowMenuCellRenderer({ menuItems })
         },
       },
       { field: 'id', hide: true },
