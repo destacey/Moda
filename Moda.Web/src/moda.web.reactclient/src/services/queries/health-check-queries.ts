@@ -13,6 +13,17 @@ export const useGetHealthCheckById = (id: string, enabled: boolean = true) => {
     enabled: !!id && enabled,
   })
 }
+export const useGetHealthReport = (
+  objectId: string,
+  enabled: boolean = true,
+) => {
+  return useQuery({
+    queryKey: [QK.HEALTH_REPORT, objectId],
+    queryFn: async () =>
+      (await getHealthChecksClient()).getHealthReport(objectId),
+    enabled: !!objectId && enabled,
+  })
+}
 
 export const useCreateHealthCheckMutation = () => {
   return useMutation(

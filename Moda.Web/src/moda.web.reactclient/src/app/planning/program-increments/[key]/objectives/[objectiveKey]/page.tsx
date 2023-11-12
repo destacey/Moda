@@ -20,6 +20,7 @@ import CreateHealthCheckForm from '@/src/app/components/common/health-check/crea
 import { SystemContext } from '@/src/app/components/constants'
 import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
 import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
+import Link from 'next/link'
 
 const ObjectiveDetailsPage = ({ params }) => {
   useDocumentTitle('PI Objective Details')
@@ -144,10 +145,27 @@ const ObjectiveDetailsPage = ({ params }) => {
               }),
             ),
         },
+        {
+          key: 'healthReport',
+          label: (
+            <Link
+              href={`/planning/program-increments/${params.key}/objectives/${params.objectiveKey}/health-report`}
+            >
+              Health Report
+            </Link>
+          ),
+        },
       )
     }
     return items
-  }, [canCreateHealthChecks, canManageObjectives, dispatch, objectiveData?.id])
+  }, [
+    canCreateHealthChecks,
+    canManageObjectives,
+    dispatch,
+    objectiveData?.id,
+    params.key,
+    params.objectiveKey,
+  ])
 
   const actions = () => {
     return (
