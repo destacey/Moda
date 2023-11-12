@@ -104,9 +104,9 @@ const ModaGrid = ({
               {actions}
             </Col>
           )}
-          <Col xs={24} sm={24} md={14}>
+          <Col xs={24} sm={24} md={actions ? 14 : 24}>
             <Space style={{ display: 'flex', justifyContent: 'flex-end' }} wrap>
-              <Space>
+              <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Typography.Text>
                   {displayedRowCount} of {rowCount}
                 </Typography.Text>
@@ -119,7 +119,7 @@ const ModaGrid = ({
                   />
                 )}
               </Space>
-              <Space>
+              <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 {showGridControls && (
                   // TODO: this tooltip is triggering "findDOMNode is deprecated in StrictMode" warnings
                   // <Tooltip title="Grid Controls">
