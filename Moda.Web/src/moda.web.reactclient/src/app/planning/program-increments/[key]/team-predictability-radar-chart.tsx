@@ -93,7 +93,7 @@ const TeamPredictabilityRadarChart = ({
   }
 
   return (
-    <div id="chart">
+    <div id="team-predictability-radar-chart">
       {typeof window !== 'undefined' && (
         <Chart
           options={options}

@@ -1,6 +1,7 @@
+import HealthReportChart from '@/src/app/components/common/health-check/health-report-chart'
 import LinksCard from '@/src/app/components/common/links/links-card'
 import { ProgramIncrementObjectiveDetailsDto } from '@/src/services/moda-api'
-import { Col, Descriptions, Progress, Row, Space, Tooltip } from 'antd'
+import { Card, Col, Descriptions, Progress, Row, Space, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
@@ -70,7 +71,12 @@ const ProgramIncrementObjectiveDetails = ({
           </Descriptions>
         </Col>
       </Row>
-      <LinksCard objectId={objective.id} />
+      <Space align="start" wrap>
+        <Card size="small">
+          <HealthReportChart objectId={objective.id} />
+        </Card>
+        <LinksCard objectId={objective.id} />
+      </Space>
     </>
   )
 }

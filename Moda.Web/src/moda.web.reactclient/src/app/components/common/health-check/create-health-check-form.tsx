@@ -1,7 +1,7 @@
 'use client'
 
 import { CreateHealthCheckRequest } from '@/src/services/moda-api'
-import { DatePicker, Form, FormProps, Input, Radio } from 'antd'
+import { Card, DatePicker, Form, FormProps, Input, Radio } from 'antd'
 import useAuth from '../../contexts/auth'
 import dayjs from 'dayjs'
 import { SystemContext } from '@/src/app/components/constants'
@@ -14,6 +14,7 @@ import {
   getHealthCheckStatusOptions,
 } from '@/src/store/health-check-slice'
 import { useEffect } from 'react'
+import HealthReportChart from './health-report-chart'
 
 export interface CreateHealthCheckFormProps {
   showForm: boolean
@@ -65,52 +66,54 @@ const CreateHealthCheckForm = ({
   if (!canCreateHealthChecks) return null
 
   return (
-    <Form
-      form={form}
-      size="small"
-      layout="vertical"
-      name="create-health-check-form"
-      initialValues={{
-        expiration: dayjs().add(2, 'week').endOf('day'),
-      }}
-    >
-      <Form.Item name="statusId" label="Status" rules={[{ required: true }]}>
-        <Radio.Group
-          options={statusOptions}
-          optionType="button"
-          buttonStyle="solid"
-        />
-      </Form.Item>
-      <Form.Item label="Note" name="note" help="Markdown enabled">
-        <Input.TextArea
-          autoSize={{ minRows: 6, maxRows: 10 }}
-          showCount
-          maxLength={1024}
-        />
-      </Form.Item>
-      <Form.Item
-        label="Expiration"
-        name="expiration"
-        rules={[
-          { required: true },
-          {
-            validator: (_, value) =>
-              value && dayjs() <= value
-                ? Promise.resolve()
-                : Promise.reject(
-                    new Error('The Expiration must be in the future.'),
-                  ),
-          },
-        ]}
+    <>
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="create-health-check-form"
+        initialValues={{
+          expiration: dayjs().add(2, 'week').endOf('day'),
+        }}
       >
-        <DatePicker
-          presets={datePresets}
-          showTime
-          format="YYYY-MM-DD HH:mm"
-          disabledDate={(value) => value && value < dayjs().startOf('day')}
-        />
-      </Form.Item>
-    </Form>
+        <Form.Item name="statusId" label="Status" rules={[{ required: true }]}>
+          <Radio.Group
+            options={statusOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </Form.Item>
+        <Form.Item label="Note" name="note" help="Markdown enabled">
+          <Input.TextArea
+            autoSize={{ minRows: 6, maxRows: 10 }}
+            showCount
+            maxLength={1024}
+          />
+        </Form.Item>
+        <Form.Item
+          label="Expiration"
+          name="expiration"
+          rules={[
+            { required: true },
+            {
+              validator: (_, value) =>
+                value && dayjs() <= value
+                  ? Promise.resolve()
+                  : Promise.reject(
+                      new Error('The Expiration must be in the future.'),
+                    ),
+            },
+          ]}
+        >
+          <DatePicker
+            presets={datePresets}
+            showTime
+            format="YYYY-MM-DD HH:mm"
+            disabledDate={(value) => value && value < dayjs().startOf('day')}
+          />
+        </Form.Item>
+      </Form>
+    </>
   )
 }
 
