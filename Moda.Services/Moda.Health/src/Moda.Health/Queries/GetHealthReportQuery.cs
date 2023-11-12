@@ -4,9 +4,9 @@ using Moda.Common.Application.Interfaces;
 using Moda.Health.Dtos;
 
 namespace Moda.Health.Queries;
-public sealed record GetHealthReportQuery(Guid ObjectId) : IQuery<HealthReportDto?>;
+public sealed record GetHealthReportQuery(Guid ObjectId) : IQuery<IReadOnlyList<HealthCheckDto>>;
 
-internal sealed class GetHealthReportQueryHandler : IQueryHandler<GetHealthReportQuery, HealthReportDto?>
+internal sealed class GetHealthReportQueryHandler : IQueryHandler<GetHealthReportQuery, IReadOnlyList<HealthCheckDto>>
 {
     private readonly IHealthDbContext _healthDbContext;
 
@@ -15,13 +15,14 @@ internal sealed class GetHealthReportQueryHandler : IQueryHandler<GetHealthRepor
         _healthDbContext = healthDbContext;
     }
 
-    public async Task<HealthReportDto?> Handle(GetHealthReportQuery request, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<HealthCheckDto>> Handle(GetHealthReportQuery request, CancellationToken cancellationToken)
     {
         var healthChecks = await _healthDbContext.HealthChecks
-            .Where(hr => hr.ObjectId == request.ObjectId)
+            .AsNoTracking()
+            .Where(h => h.ObjectId == request.ObjectId)
             .ProjectToType<HealthCheckDto>()
             .ToListAsync(cancellationToken);
 
-        return !healthChecks.Any() ? null : new HealthReportDto(healthChecks);
+        return (IReadOnlyList<HealthCheckDto>)(healthChecks?.OrderByDescending(h => h.ReportedOn).ToList() ?? Enumerable.Empty<HealthCheckDto>());
     }
 }

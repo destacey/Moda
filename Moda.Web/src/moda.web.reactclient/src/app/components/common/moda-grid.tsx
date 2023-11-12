@@ -12,6 +12,7 @@ import {
   Input,
   Row,
   Space,
+  Spin, // used inside overlayLoadingTemplate
   Tooltip,
   Typography,
 } from 'antd'
@@ -23,6 +24,7 @@ import {
 } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import useTheme from '../contexts/theme'
+import ModaEmpty from './moda-empty' // used inside overlayNoRowsTemplate
 
 interface ModaGridProps extends AgGridReactProps {
   height?: number
@@ -66,8 +68,6 @@ const ModaGrid = ({
 
   const gridRef = useRef<AgGridReact>(null)
 
-  const rowCount = rowData?.length ?? 0
-
   const onModelUpdated = useCallback(() => {
     setDisplayedRowCount(gridRef.current?.api.getDisplayedRowCount() ?? 0)
   }, [])
@@ -80,15 +80,20 @@ const ModaGrid = ({
     gridRef.current?.api.exportDataAsCsv()
   }, [])
 
+  const rowCount = rowData?.length ?? 0
+
   useEffect(() => {
     if (!gridRef.current?.api) return
 
+    console.log(isDataLoading)
     if (isDataLoading) {
       gridRef.current?.api.showLoadingOverlay()
+    } else if (rowData && rowCount === 0) {
+      gridRef.current?.api.showNoRowsOverlay()
     } else {
       gridRef.current?.api.hideOverlay()
     }
-  }, [isDataLoading])
+  }, [isDataLoading, rowCount, rowData])
 
   return (
     <div style={{ width: width }}>
@@ -168,6 +173,10 @@ const ModaGrid = ({
             rowData={rowData}
             onModelUpdated={onModelUpdated}
             multiSortKey="ctrl"
+            loadingOverlayComponent={() => <Spin size="large" />}
+            noRowsOverlayComponent={() => (
+              <ModaEmpty message="No records found." />
+            )}
             {...props}
           ></AgGridReact>
         </div>
