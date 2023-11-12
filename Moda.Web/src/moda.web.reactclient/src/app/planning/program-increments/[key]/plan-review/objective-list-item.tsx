@@ -140,6 +140,16 @@ const ObjectiveListItem = ({
               }),
             ),
         },
+        {
+          key: 'healthReport',
+          label: (
+            <Link
+              href={`/planning/program-increments/${objective.programIncrement.key}/objectives/${objective.key}/health-report`}
+            >
+              Health Report
+            </Link>
+          ),
+        },
       )
     }
     return items
@@ -178,7 +188,7 @@ const ObjectiveListItem = ({
         />
       )}
       {editingObjectiveId == objective?.id && (
-        <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed}/>
+        <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed} />
       )}
     </>
   )
