@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 import dayjs from 'dayjs'
+import { ApexOptions } from 'apexcharts'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
@@ -27,6 +28,7 @@ const convertStatusToNumber = (status: string) => {
   }
 }
 
+// TODO: add a way to refresh the chart when a new health report is added from a parent component
 const HealthReportChart = (props: HealthReportChartProps) => {
   const [seriesData, setSeriesData] = useState([])
 
@@ -61,7 +63,7 @@ const HealthReportChart = (props: HealthReportChartProps) => {
     return <Spin size="small" />
   }
 
-  const options = {
+  const options: ApexOptions = {
     chart: {
       fontFamily: 'inherit',
       parentHeightOffset: 0,
@@ -93,7 +95,6 @@ const HealthReportChart = (props: HealthReportChartProps) => {
       min: 0,
       max: 2,
       tickAmount: 2,
-      categories: ['Unhealthy', 'At Risk', 'Healthy'],
       labels: {
         style: {
           colors: fontColor,
@@ -141,7 +142,7 @@ const HealthReportChart = (props: HealthReportChartProps) => {
         <Chart
           options={options}
           series={seriesData}
-          type={'line'}
+          type="line"
           height={200}
           width={350}
         />
