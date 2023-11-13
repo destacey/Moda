@@ -18,6 +18,7 @@ internal sealed class GetProgramIncrementPredictabilityQueryHandler : IQueryHand
 
     public async Task<ProgramIncrementPredictabilityDto?> Handle(GetProgramIncrementPredictabilityQuery request, CancellationToken cancellationToken)
     {
+        // TODO: filter by teams only.  Don't include teams or objective data for team of teams.
         var programIncrement = await _planningDbContext.ProgramIncrements
             .Include(p => p.Teams)
                 .ThenInclude(t => t.Team)

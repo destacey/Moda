@@ -110,7 +110,7 @@ const ProgramIncrementDetails = ({
           </Descriptions>
         </Col>
       </Row>
-      <Space align="start" wrap={true}>
+      <Space align="start" wrap>
         {daysCountdownMetric}
         {programIncrementPredictability}
         {teamPredictabilityChart}
