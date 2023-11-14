@@ -17,7 +17,10 @@ import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
 import {
   HealthCheckStatusCellRenderer,
-  ModaGridRowMenuCellRenderer,
+  PlanningTeamLinkCellRenderer,
+  ProgramIncrementLinkCellRenderer,
+  ProgramIncrementObjectiveLinkCellRenderer,
+  RowMenuCellRenderer,
 } from '../moda-grid-cell-renderers'
 
 export interface ProgramIncrementObjectivesGridProps {
@@ -29,33 +32,7 @@ export interface ProgramIncrementObjectivesGridProps {
   viewSelector?: React.ReactNode
 }
 
-const programIncrementObjectiveLinkCellRenderer = ({ value, data }) => {
-  return (
-    <Link
-      href={`/planning/program-increments/${data.programIncrement?.key}/objectives/${data.key}`}
-    >
-      {value}
-    </Link>
-  )
-}
-
-const programIncrementLinkCellRenderer = ({ value, data }) => {
-  return (
-    <Link href={`/planning/program-increments/${data.programIncrement?.key}`}>
-      {value}
-    </Link>
-  )
-}
-
-const teamLinkCellRenderer = ({ value, data }) => {
-  const teamLink =
-    data.team?.type === 'Team'
-      ? `/organizations/teams/${data.team?.key}`
-      : `/organizations/team-of-teams/${data.team?.key}`
-  return <Link href={teamLink}>{value}</Link>
-}
-
-const progressCellRenderer = ({ value, data }) => {
+const ProgressCellRenderer = ({ value, data }) => {
   const progressStatus = ['Canceled', 'Missed'].includes(data.status?.name)
     ? 'exception'
     : undefined
@@ -201,7 +178,7 @@ const ProgramIncrementObjectivesGrid = ({
             onCreateHealthCheckMenuClicked,
           })
 
-          return ModaGridRowMenuCellRenderer({ menuItems })
+          return RowMenuCellRenderer({ menuItems })
         },
       },
       { field: 'id', hide: true },
@@ -209,19 +186,20 @@ const ProgramIncrementObjectivesGrid = ({
       {
         field: 'name',
         width: 400,
-        cellRenderer: programIncrementObjectiveLinkCellRenderer,
+        cellRenderer: ProgramIncrementObjectiveLinkCellRenderer,
       },
       { field: 'isStretch', width: 100 },
       {
-        field: 'programIncrement.name',
-        cellRenderer: programIncrementLinkCellRenderer,
+        field: 'programIncrement',
+        valueFormatter: (params) => params.data.programIncrement.name,
+        cellRenderer: ProgramIncrementLinkCellRenderer,
         hide: hideProgramIncrement,
       },
       { field: 'status.name', headerName: 'Status', width: 125 },
       {
-        field: 'team.name',
-        headerName: 'Team',
-        cellRenderer: teamLinkCellRenderer,
+        field: 'team',
+        valueFormatter: (params) => params.data.team.name,
+        cellRenderer: PlanningTeamLinkCellRenderer,
         hide: hideTeam,
       },
       {
@@ -229,10 +207,9 @@ const ProgramIncrementObjectivesGrid = ({
         headerName: 'Health',
         width: 125,
         valueFormatter: (params) => params.data.healthCheck?.status.name,
-        useValueFormatterForExport: true,
         cellRenderer: HealthCheckStatusCellRenderer,
       },
-      { field: 'progress', width: 250, cellRenderer: progressCellRenderer },
+      { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
       {
         field: 'startDate',
         valueGetter: (params) =>
