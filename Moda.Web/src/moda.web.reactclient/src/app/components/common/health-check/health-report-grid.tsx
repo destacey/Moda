@@ -1,10 +1,11 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import ModaGrid from '../moda-grid'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import { useGetHealthReport } from '@/src/services/queries/health-check-queries'
+import { MarkdownCellRenderer } from '../moda-grid-cell-renderers'
 
 interface HealthReportGridProps {
   objectId: string
@@ -37,8 +38,22 @@ const HealthReportGrid = (props: HealthReportGridProps) => {
   const columnDefs = useMemo(
     () => [
       { field: 'id', hide: true },
-      { field: 'status.name' },
-      { field: 'reportedBy.name', cellRenderer: ReportedByLinkCellRenderer },
+      {
+        field: 'status.name',
+        headerName: 'Health',
+        width: 115,
+      },
+      {
+        field: 'note',
+        width: 400,
+        autoHeight: true,
+        cellRenderer: MarkdownCellRenderer,
+      },
+      {
+        field: 'reportedBy.name',
+        headerName: 'Reported By',
+        cellRenderer: ReportedByLinkCellRenderer,
+      },
       {
         field: 'reportedOn',
         valueGetter: (params) =>
@@ -49,7 +64,6 @@ const HealthReportGrid = (props: HealthReportGridProps) => {
         valueGetter: (params) =>
           dayjs(params.data.expiration).format('M/D/YYYY h:mm A'),
       },
-      { field: 'note', width: 300 },
     ],
     [],
   )

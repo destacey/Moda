@@ -1,0 +1,11 @@
+.grid-react-markdown p {
+    margin-top: 0px;
+    margin-bottom: 12px;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.grid-react-markdown ul {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}

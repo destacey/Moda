@@ -15,7 +15,10 @@ import CreateHealthCheckForm from '../health-check/create-health-check-form'
 import { SystemContext } from '../../constants'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
-import { ModaGridRowMenuCellRenderer } from '../moda-grid-cell-renderers'
+import {
+  HealthCheckStatusCellRenderer,
+  ModaGridRowMenuCellRenderer,
+} from '../moda-grid-cell-renderers'
 
 export interface ProgramIncrementObjectivesGridProps {
   objectivesQuery: UseQueryResult<ProgramIncrementObjectiveListDto[], unknown>
@@ -185,6 +188,7 @@ const ProgramIncrementObjectivesGrid = ({
         width: 50,
         filter: false,
         sortable: false,
+        exportable: false,
         hide: !canManageObjectives,
         cellRenderer: (params) => {
           const menuItems = getRowMenuItems({
@@ -207,18 +211,27 @@ const ProgramIncrementObjectivesGrid = ({
         width: 400,
         cellRenderer: programIncrementObjectiveLinkCellRenderer,
       },
+      { field: 'isStretch', width: 100 },
       {
         field: 'programIncrement.name',
         cellRenderer: programIncrementLinkCellRenderer,
         hide: hideProgramIncrement,
       },
-      { field: 'status.name', width: 125 },
+      { field: 'status.name', headerName: 'Status', width: 125 },
       {
         field: 'team.name',
+        headerName: 'Team',
         cellRenderer: teamLinkCellRenderer,
         hide: hideTeam,
       },
-      { field: 'healthCheck.status.name', headerName: 'Health', width: 125 },
+      {
+        field: 'healthCheck',
+        headerName: 'Health',
+        width: 125,
+        valueFormatter: (params) => params.data.healthCheck?.status.name,
+        useValueFormatterForExport: true,
+        cellRenderer: HealthCheckStatusCellRenderer,
+      },
       { field: 'progress', width: 250, cellRenderer: progressCellRenderer },
       {
         field: 'startDate',
@@ -234,7 +247,6 @@ const ProgramIncrementObjectivesGrid = ({
             ? dayjs(params.data.targetDate).format('M/D/YYYY')
             : null,
       },
-      { field: 'isStretch', width: 100 },
     ],
     [
       canCreateHealthChecks,
