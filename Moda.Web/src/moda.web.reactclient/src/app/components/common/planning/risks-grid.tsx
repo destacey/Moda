@@ -159,6 +159,7 @@ const RisksGrid = ({
       { field: 'summary', width: 300, cellRenderer: RiskLinkCellRenderer },
       {
         field: 'team.name',
+        headerName: 'Team',
         cellRenderer: TeamLinkCellRenderer,
         hide: hideTeam,
       },
@@ -172,7 +173,11 @@ const RisksGrid = ({
             ? dayjs(params.data.followUpDate).format('M/D/YYYY')
             : null,
       },
-      { field: 'assignee.name', cellRenderer: AssigneeLinkCellRenderer },
+      {
+        field: 'assignee.name',
+        headerName: 'Assignee',
+        cellRenderer: AssigneeLinkCellRenderer,
+      },
       {
         field: 'reportedOn',
         valueGetter: (params) =>

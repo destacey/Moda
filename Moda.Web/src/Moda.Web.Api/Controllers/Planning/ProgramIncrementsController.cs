@@ -1,6 +1,7 @@
 ﻿using CsvHelper;
 using Mapster;
 using Moda.Common.Application.Interfaces;
+using Moda.Health.Queries;
 using Moda.Organization.Application.Teams.Queries;
 using Moda.Organization.Application.TeamsOfTeams.Queries;
 using Moda.Planning.Application.ProgramIncrements.Commands;
@@ -8,6 +9,7 @@ using Moda.Planning.Application.ProgramIncrements.Dtos;
 using Moda.Planning.Application.ProgramIncrements.Queries;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
+using Moda.Web.Api.Dtos.Planning;
 using Moda.Web.Api.Models.Planning.ProgramIncrements;
 
 namespace Moda.Web.Api.Controllers.Planning;
@@ -143,7 +145,7 @@ public class ProgramIncrementsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<double?>> GetTeamPredictability(Guid id, Guid teamId, CancellationToken cancellationToken)
-    {        
+    {
         var predictability = await _sender.Send(new GetTeamProgramIncrementPredictabilityQuery(id, teamId), cancellationToken);
 
         return Ok(predictability);
@@ -264,6 +266,45 @@ public class ProgramIncrementsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpGet("{id}/objectives/health-report")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ProgramIncrementObjectives)]
+    [OpenApiOperation("Get a health report for program increment objectives.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveHealthCheckDto>>> GetObjectivesHealthReport(string id, Guid? teamId, CancellationToken cancellationToken)
+    {
+        GetProgramIncrementObjectivesQuery objectivesQuery;
+        if (Guid.TryParse(id, out Guid guidId))
+        {
+            objectivesQuery = new GetProgramIncrementObjectivesQuery(guidId, teamId);
+        }
+        else if (int.TryParse(id, out int intId))
+        {
+            objectivesQuery = new GetProgramIncrementObjectivesQuery(intId, teamId);
+        }
+        else
+        {
+            return NotFound();
+        }
+
+        var objectives = await _sender.Send(objectivesQuery, cancellationToken);
+        if (objectives == null)
+            return Ok(new List<ProgramIncrementObjectiveHealthCheckDto>());
+
+        // get healthchecks
+        var healthCheckIds = objectives.Where(o => o.HealthCheck is not null).Select(o => o.HealthCheck!.Id).ToList();
+        var healthChecks = await _sender.Send(new GetHealthChecksQuery(healthCheckIds), cancellationToken);
+
+        var objectiveHealthChecks = new List<ProgramIncrementObjectiveHealthCheckDto>(objectives.Count);
+        foreach (var objective in objectives)
+        {
+            var healthCheck = healthChecks.FirstOrDefault(h => h.Id == objective.HealthCheck?.Id);
+            objectiveHealthChecks.Add(ProgramIncrementObjectiveHealthCheckDto.Create(objective, healthCheck));
+        }
+
+        return Ok(objectiveHealthChecks);
     }
 
     [HttpPost("{id}/objectives/import")]

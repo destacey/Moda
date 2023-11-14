@@ -7,22 +7,10 @@ import {
   getHealthCheck,
   selectHealthCheckContext,
 } from '@/src/store/health-check-slice'
+import { healthCheckTagColor } from './health-check-utils'
 
 export interface HealthCheckTagProps {
   healthCheck?: PlanningHealthCheckDto
-}
-
-const color = (status: string) => {
-  switch (status) {
-    case 'Healthy':
-      return 'success'
-    case 'At Risk':
-      return 'warning'
-    case 'Unhealthy':
-      return 'error'
-    default:
-      return 'default'
-  }
 }
 
 const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
@@ -74,7 +62,7 @@ const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
 
   return (
     <Popover content={content} trigger="hover" onOpenChange={handleHoverChange}>
-      <Tag color={color(healthCheck.status.name)}>
+      <Tag color={healthCheckTagColor(healthCheck.status.name)}>
         {healthCheck.status.name}
       </Tag>
     </Popover>

@@ -52,9 +52,7 @@ export const useGetProgramIncrementByKey = (key: number) => {
   })
 }
 
-export const useGetProgramIncrementPredictability = (
-  id: string,
-) => {
+export const useGetProgramIncrementPredictability = (id: string) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_PREDICTABILITY, id],
     queryFn: async () =>
@@ -127,6 +125,23 @@ export const useGetProgramIncrementObjectivesByTeamId = (
       (await getProgramIncrementsClient()).getObjectives(id, teamId),
     // staleTime: 20000,
     enabled: !!id && !!teamId && enabled,
+  })
+}
+
+export const useGetProgramIncrementObjectivesHealthReport = (
+  idOrKey: string,
+  teamId?: string,
+  enabled: boolean = true,
+) => {
+  return useQuery({
+    queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVES_HEALTH_REPORT, idOrKey, teamId],
+    queryFn: async () =>
+      (await getProgramIncrementsClient()).getObjectivesHealthReport(
+        idOrKey,
+        teamId,
+      ),
+    // staleTime: 20000,
+    enabled: !!idOrKey && enabled,
   })
 }
 

@@ -2088,6 +2088,70 @@ export class ProgramIncrementsClient {
     }
 
     /**
+     * Get a health report for program increment objectives.
+     * @param teamId (optional) 
+     */
+    getObjectivesHealthReport(id: string, teamId: string | null | undefined, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementObjectiveHealthCheckDto[]> {
+        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/objectives/health-report?";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (teamId !== undefined && teamId !== null)
+            url_ += "teamId=" + encodeURIComponent("" + teamId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetObjectivesHealthReport(_response);
+        });
+    }
+
+    protected processGetObjectivesHealthReport(response: AxiosResponse): Promise<ProgramIncrementObjectiveHealthCheckDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProgramIncrementObjectiveHealthCheckDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProgramIncrementObjectiveHealthCheckDto[]>(null as any);
+    }
+
+    /**
      * Import objectives for a program increment from a csv file.
      * @param contentType (optional) 
      * @param contentDisposition (optional) 
@@ -7644,6 +7708,33 @@ export interface UpdateProgramIncrementObjectiveRequest {
     startDate?: Date | undefined;
     targetDate?: Date | undefined;
     isStretch?: boolean;
+}
+
+export interface ProgramIncrementObjectiveHealthCheckDto {
+    /** Gets or sets the identifier. */
+    id?: string;
+    /** Gets the key. */
+    key?: number;
+    /** The name of the objective. */
+    name?: string;
+    /** Gets or sets the status. */
+    status?: SimpleNavigationDto;
+    /** Gets or sets the type. */
+    type?: SimpleNavigationDto;
+    programIncrement?: NavigationDto;
+    team?: PlanningTeamNavigationDto;
+    /** Gets a value indicating whether this instance is stretch. */
+    isStretch?: boolean;
+    /** The id of the health check. */
+    healthCheckId?: string | undefined;
+    /** The status of the health check. */
+    healthStatus?: SimpleNavigationDto | undefined;
+    /** The timestamp of when the health check was initially created. */
+    reportedOn?: Date | undefined;
+    /** The expiration of the health check. */
+    expiration?: Date | undefined;
+    /** The note for the health check. */
+    note?: string | undefined;
 }
 
 export interface IHeaderDictionary {

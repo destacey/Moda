@@ -93,10 +93,24 @@ const ProgramIncrementDetailsPage = ({ params }) => {
           label: 'Manage Teams',
           onClick: () => setOpenManageTeamsForm(true),
         },
+        {
+          key: 'divider',
+          type: 'divider',
+        },
+        {
+          key: 'healthReport',
+          label: (
+            <Link
+              href={`/planning/program-increments/${params.key}/objectives/health-report`}
+            >
+              Health Report
+            </Link>
+          ),
+        },
       )
     }
     return items
-  }, [canUpdateProgramIncrement])
+  }, [canUpdateProgramIncrement, params.key])
 
   const actions = () => {
     return (
