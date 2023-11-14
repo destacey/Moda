@@ -1710,6 +1710,67 @@
         ]
       }
     },
+    "/api/planning/program-increments/{id}/objectives/health-report": {
+      "get": {
+        "tags": [
+          "ProgramIncrements"
+        ],
+        "summary": "Get a health report for program increment objectives.",
+        "operationId": "ProgramIncrements_GetObjectivesHealthReport",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "teamId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProgramIncrementObjectiveHealthCheckDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/program-increments/{id}/objectives/import": {
       "post": {
         "tags": [
@@ -6961,6 +7022,84 @@
           },
           "isStretch": {
             "type": "boolean"
+          }
+        }
+      },
+      "ProgramIncrementObjectiveHealthCheckDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Gets or sets the identifier.",
+            "format": "guid"
+          },
+          "key": {
+            "type": "integer",
+            "description": "Gets the key.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the objective."
+          },
+          "status": {
+            "description": "Gets or sets the status.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SimpleNavigationDto"
+              }
+            ]
+          },
+          "type": {
+            "description": "Gets or sets the type.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SimpleNavigationDto"
+              }
+            ]
+          },
+          "programIncrement": {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          "team": {
+            "$ref": "#/components/schemas/PlanningTeamNavigationDto"
+          },
+          "isStretch": {
+            "type": "boolean",
+            "description": "Gets a value indicating whether this instance is stretch."
+          },
+          "healthCheckId": {
+            "type": "string",
+            "description": "The id of the health check.",
+            "format": "guid",
+            "nullable": true
+          },
+          "healthStatus": {
+            "description": "The status of the health check.",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SimpleNavigationDto"
+              }
+            ]
+          },
+          "reportedOn": {
+            "type": "string",
+            "description": "The timestamp of when the health check was initially created.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "expiration": {
+            "type": "string",
+            "description": "The expiration of the health check.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "description": "The note for the health check.",
+            "nullable": true
           }
         }
       },
