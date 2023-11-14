@@ -273,9 +273,23 @@ public class ProgramIncrementsController : ControllerBase
     [OpenApiOperation("Get a health report for program increment objectives.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveHealthCheckDto>>> GetObjectivesHealthReport(Guid id, Guid? teamId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ProgramIncrementObjectiveHealthCheckDto>>> GetObjectivesHealthReport(string id, Guid? teamId, CancellationToken cancellationToken)
     {
-        var objectives = await _sender.Send(new GetProgramIncrementObjectivesQuery(id, teamId), cancellationToken);
+        GetProgramIncrementObjectivesQuery objectivesQuery;
+        if (Guid.TryParse(id, out Guid guidId))
+        {
+            objectivesQuery = new GetProgramIncrementObjectivesQuery(guidId, teamId);
+        }
+        else if (int.TryParse(id, out int intId))
+        {
+            objectivesQuery = new GetProgramIncrementObjectivesQuery(intId, teamId);
+        }
+        else
+        {
+            return NotFound();
+        }
+
+        var objectives = await _sender.Send(objectivesQuery, cancellationToken);
         if (objectives == null)
             return Ok(new List<ProgramIncrementObjectiveHealthCheckDto>());
 
