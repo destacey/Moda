@@ -235,7 +235,7 @@ const EditRiskForm = ({
           <Form.Item
             name="description"
             label="Description"
-            help="Markdown enabled"
+            extra="Markdown enabled"
           >
             <Input.TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
@@ -309,7 +309,7 @@ const EditRiskForm = ({
           <Form.Item label="Follow Up" name="followUpDate">
             <DatePicker />
           </Form.Item>
-          <Form.Item name="response" label="Response" help="Markdown enabled">
+          <Form.Item name="response" label="Response" extra="Markdown enabled">
             <Input.TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
