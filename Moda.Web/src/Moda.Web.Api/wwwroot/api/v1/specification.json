@@ -5935,7 +5935,7 @@
         "tags": [
           "AzureDevOpsBoardsConnections"
         ],
-        "summary": "Import Azure DevOps Boards projects as Moda workspaces.",
+        "summary": "Import Azure DevOps projects as Moda workspaces.",
         "operationId": "AzureDevOpsBoardsConnections_ImportWorkspaces",
         "parameters": [
           {
@@ -5950,7 +5950,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": ""
           },
           "400": {
@@ -5959,6 +5959,69 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/app-integrations/azure-devops-boards-connections/{id}/init-workspace-integration": {
+      "post": {
+        "tags": [
+          "AzureDevOpsBoardsConnections"
+        ],
+        "summary": "Initialize Azure DevOps project integration as a Moda workspace.",
+        "operationId": "AzureDevOpsBoardsConnections_InitWorkspaceIntegration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitWorkspaceIntegrationRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -9209,6 +9272,38 @@
           "personalAccessToken": {
             "type": "string",
             "description": "Gets the personal access token."
+          }
+        }
+      },
+      "InitWorkspaceIntegrationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "externalId",
+          "workspaceKey"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Connection Id.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "externalId": {
+            "type": "string",
+            "description": "External identifier for the workspace.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "workspaceKey": {
+            "type": "string",
+            "description": "The key for the workspace.",
+            "maxLength": 20,
+            "minLength": 1,
+            "nullable": false
           }
         }
       },
