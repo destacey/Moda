@@ -1,4 +1,7 @@
-import { TestAzureDevOpsBoardConnectionRequest } from './../moda-api'
+import {
+  InitWorkspaceIntegrationRequest,
+  TestAzureDevOpsBoardConnectionRequest,
+} from './../moda-api'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { QK } from './query-keys'
 import { getAzureDevOpsBoardsConnectionsClient } from '../clients'
@@ -63,10 +66,22 @@ export const useImportAzdoBoardsConnectionWorkspacesMutation = () => {
       (await getAzureDevOpsBoardsConnectionsClient()).importWorkspaces(
         connectionId,
       ),
-    onSuccess: (data, context) => {
-      // queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, false])
-      // queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, true])
-      // queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, context.id])
+    onSuccess: (data, connectionId) => {
+      queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, connectionId])
+    },
+  })
+}
+
+export const useInitAzdoBoardsConnectionWorkspaceMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (initRequest: InitWorkspaceIntegrationRequest) =>
+      (await getAzureDevOpsBoardsConnectionsClient()).initWorkspaceIntegration(
+        initRequest.id,
+        initRequest,
+      ),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, variables.id])
     },
   })
 }
