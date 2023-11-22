@@ -45,7 +45,7 @@ services:
       - 5341:5341
     environment:
       - ACCEPT_EULA=Y
-      - SEQ_FIRSTRUN_ADMINPASSWORDHASH=QBqA9On29LzcZaqOq81gGMi4dk8bQGZ+nmqSeawEFb4WdYdicKjAIWMW11eYZtKnLmYdkNlPSFxc+BiuizTu2p84njCv6jI48fle9iZ4BWin
+      - SEQ_FIRSTRUN_ADMINPASSWORDHASH=QBqA9On29LzcZaqOq81gGMi4dk8bQGZ+nmqSeawEFb4WdYdicKjAIWMW11eYZtKnLmYdkNlPSFxc+BiuizTu2p84njCv6jI48fle9iZ4BWin # Test1234!
     volumes:
       - ./.seq:/data
    
