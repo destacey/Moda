@@ -1,8 +1,7 @@
 {
     "Serilog": {
         "Using": [
-            "Serilog.Sinks.Console",
-            "Serilog.Sinks.File"
+            "Serilog.Sinks.Console"
         ],
         "Enrich": [
             "FromLogContext",
@@ -38,17 +37,7 @@
             "Application": "Moda"
         },
         "WriteTo": [
-            { "Name": "Console" },
-            {
-                "Name": "File",
-                "Args": {
-                    "path": "Logs/logs.json",
-                    "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog",
-                    "rollingInterval": "Day",
-                    "restrictedToMinimumLevel": "Information",
-                    "retainedFileCountLimit": 5
-                }
-            }
+            { "Name": "Console" }
         ]
     }
 }
