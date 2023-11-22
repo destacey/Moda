@@ -44,7 +44,7 @@ SecuritySettings__AzureAd__RootIssuer={your root issuer/sts url for AAD}
 SecuritySettings__AzureAd__TenantId={your tenant ID}
 ```
 
-Additionally, by default Moda logs to the console via Serilog. If you wish to configure any of the other supported sinks (currently Seq, Datadog and Application Insights), provide the appropriate Serilog__Using__1 and Serilog__WriteTo__1 settings as env vars for your moda-api container. An example with DataDog (taken from some TF for the `azurerm_container_app` resource type):
+Additionally, by default Moda logs to the console via Serilog. If you wish to configure any of the other supported sinks (currently Seq, Datadog and Application Insights), provide the appropriate Serilog__Using__x and Serilog__WriteTo__x settings as env vars for your moda-api container. An example with DataDog (taken from some TF for the `azurerm_container_app` resource type):
 
 ```terraform
       env {
@@ -83,7 +83,7 @@ Additionally, by default Moda logs to the console via Serilog. If you wish to co
       }
 ```
 
-> Note, you must use `__1` or greater; `__0` is reserved for the console sink.
+> Note, if you use `__0` for the WriteTo and Using values, you will override the default console logging
 
 ## License
 
