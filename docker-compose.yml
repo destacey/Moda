@@ -16,6 +16,9 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - CorsSettings__WebClient=http://localhost:5002
+      - Serilog__Using__1=Serilog.Sinks.Seq
+      - Serilog__WriteTo__1__Name=Seq
+      - Serilog__WriteTo__1__Args__serverUrl=http://seq:5341
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -34,3 +37,15 @@ services:
       - NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY=${AAD_LOGON_AUTHORITY}
       - NEXT_PUBLIC_API_SCOPE=${API_SCOPE}
       - NEXT_PUBLIC_API_BASE_URL=${API_BASE_URL}
+
+  seq:
+    image: datalust/seq
+    ports:
+      - 8081:80
+      - 5341:5341
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_ADMINPASSWORDHASH=QBqA9On29LzcZaqOq81gGMi4dk8bQGZ+nmqSeawEFb4WdYdicKjAIWMW11eYZtKnLmYdkNlPSFxc+BiuizTu2p84njCv6jI48fle9iZ4BWin
+    volumes:
+      - ./.seq:/data
+   
