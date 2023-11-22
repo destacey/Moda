@@ -83,6 +83,8 @@ Additionally, by default Moda logs to the console via Serilog. If you wish to co
       }
 ```
 
+> Note, you must use `__1` or greater; `__0` is reserved for the console sink.
+
 ## License
 
 See [LICENSE](LICENSE.md)
