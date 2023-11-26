@@ -1,6 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using Moda.Integrations.AzureDevOps.Extensions;
-using Moda.Integrations.AzureDevOps.Models;
+using Moda.Integrations.AzureDevOps.Models.Processes;
 using RestSharp;
 
 namespace Moda.Integrations.AzureDevOps.Clients;
@@ -46,6 +46,15 @@ internal sealed class ProcessClient : IDisposable
         request.AddParameter("$expand", "states,behaviors");
 
         return await _client.ExecuteAsync<GetProcessWorkItemTypesResponse>(request, cancellationToken);
+    }
+
+    internal async Task<RestResponse<GetProcessBehaviorsResponse>> GetBehaviors(Guid processId, CancellationToken cancellationToken)
+    {
+        var request = new RestRequest($"/_apis/work/processes/{processId}/behaviors", Method.Get);
+        request.AddAcceptHeaderWithApiVersion(_apiVersion);
+        request.AddAuthorizationHeaderForPersonalAccessToken(_token);
+
+        return await _client.ExecuteAsync<GetProcessBehaviorsResponse>(request, cancellationToken);
     }
 
     public void Dispose()

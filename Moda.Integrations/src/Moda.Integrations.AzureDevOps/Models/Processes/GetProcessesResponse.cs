@@ -1,4 +1,4 @@
-﻿namespace Moda.Integrations.AzureDevOps.Models;
+﻿namespace Moda.Integrations.AzureDevOps.Models.Processes;
 internal sealed record GetProcessesResponse
 {
     public int Count { get; set; }
@@ -14,17 +14,4 @@ internal sealed record GetProcessesResponse
             WorkspaceIds = p.Projects?.Select(p => p.Id).ToList() ?? new List<Guid>()
         }).ToList();
     }
-}
-
-internal sealed record ProcessDto
-{
-    public Guid TypeId { get; set; }
-    public required string Name { get; set; }
-    public string? Description { get; set; }
-    public List<ProcessProjectDto>? Projects { get; set; }
-}
-
-internal sealed record ProcessProjectDto
-{
-    public Guid Id { get; set; }
 }

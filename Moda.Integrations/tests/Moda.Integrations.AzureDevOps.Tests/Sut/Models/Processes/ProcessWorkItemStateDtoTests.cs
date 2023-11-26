@@ -1,11 +1,10 @@
 ﻿using System.Text.Json;
-using Moda.Integrations.AzureDevOps.Models;
+using Moda.Integrations.AzureDevOps.Models.Processes;
+using Moda.Integrations.AzureDevOps.Tests.Models;
 
-namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models;
-public class ProcessWorkItemStateDtoTests
+namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models.Processes;
+public class ProcessWorkItemStateDtoTests : CommonResponseTest
 {
-    private readonly JsonSerializerOptions _options = new(JsonSerializerDefaults.Web);
-
     [Fact]
     public void JsonSerilizer_Deserialize_Succeeds()
     {
@@ -31,7 +30,7 @@ public class ProcessWorkItemStateDtoTests
            	"color": "f06673",
            	"stateCategory": "Removed",
            	"order": 4,
-           	"url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Initiative/states/28db9425-a6bc-4932-b93d-6a789fb233b3",
+           	"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Initiative/states/28db9425-a6bc-4932-b93d-6a789fb233b3",
            	"customizationType": "custom"
            }
            """;

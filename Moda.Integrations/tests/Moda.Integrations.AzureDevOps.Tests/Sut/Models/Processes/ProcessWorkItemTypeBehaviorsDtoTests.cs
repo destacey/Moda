@@ -1,11 +1,10 @@
 ﻿using System.Text.Json;
-using Moda.Integrations.AzureDevOps.Models;
+using Moda.Integrations.AzureDevOps.Models.Processes;
+using Moda.Integrations.AzureDevOps.Tests.Models;
 
-namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models;
-public class ProcessWorkItemTypeBehaviorsDtoTests
+namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models.Processes;
+public class ProcessWorkItemTypeBehaviorsDtoTests : CommonResponseTest
 {
-    private readonly JsonSerializerOptions _options = new(JsonSerializerDefaults.Web);
-
     [Fact]
     public void JsonSerilizer_Deserialize_Succeeds()
     {
@@ -27,11 +26,11 @@ public class ProcessWorkItemTypeBehaviorsDtoTests
            {
            	"behavior": {
            		"id": "Custom.1bdcd692-19c0-4b8f-9439-356410b60583",
-           		"url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/behaviors/Custom.1bdcd692-19c0-4b8f-9439-356410b60583"
+           		"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/behaviors/Custom.1bdcd692-19c0-4b8f-9439-356410b60583"
            	},
            	"isDefault": true,
            	"isLegacyDefault": false,
-           	"url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/behaviors/Custom.1bdcd692-19c0-4b8f-9439-356410b60583"
+           	"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/behaviors/Custom.1bdcd692-19c0-4b8f-9439-356410b60583"
            }
            """;
     }
