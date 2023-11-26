@@ -5,6 +5,7 @@ import {
   getUsersClient,
 } from '../clients'
 import {
+  AssignUserRolesRequest,
   CreateOrUpdateRoleRequest,
   UpdateRolePermissionsRequest,
 } from '../moda-api'
@@ -37,6 +38,25 @@ export const useGetUserRoles = (
     queryFn: async () =>
       (await getUsersClient()).getRoles(id, includeUnassigned),
     enabled: !!id,
+  })
+}
+
+export const useManageUserRolesMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (params: {
+      assignUserRolesRequest: AssignUserRolesRequest
+    }) =>
+      (await getUsersClient()).manageRoles(
+        params.assignUserRolesRequest.userId,
+        params.assignUserRolesRequest,
+      ),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([
+        QK.USER_ROLES,
+        variables.assignUserRolesRequest.userId,
+      ])
+    },
   })
 }
 
