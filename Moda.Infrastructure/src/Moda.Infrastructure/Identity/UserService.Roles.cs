@@ -4,7 +4,7 @@ namespace Moda.Infrastructure.Identity;
 
 internal partial class UserService
 {
-    public async Task<List<UserRoleDto>> GetRolesAsync(string userId, CancellationToken cancellationToken)
+    public async Task<List<UserRoleDto>> GetRolesAsync(string userId, bool includeUnassigned, CancellationToken cancellationToken)
     {
         var userRoles = new List<UserRoleDto>();
 
@@ -24,7 +24,7 @@ internal partial class UserService
             });
         }
 
-        return userRoles.Where(r => r.Enabled).ToList();
+        return includeUnassigned ? userRoles : userRoles.Where(r => r.Enabled).ToList();
     }
 
     public async Task<string> AssignRolesAsync(AssignUserRolesCommand command, CancellationToken cancellationToken)

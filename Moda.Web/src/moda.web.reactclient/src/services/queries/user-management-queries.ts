@@ -28,10 +28,14 @@ export const useGetUserById = (id: string) => {
   })
 }
 
-export const useGetUserRoles = (id: string) => {
+export const useGetUserRoles = (
+  id: string,
+  includeUnassigned: boolean = false,
+) => {
   return useQuery({
     queryKey: [QK.USER_ROLES, id],
-    queryFn: async () => (await getUsersClient()).getRoles(id),
+    queryFn: async () =>
+      (await getUsersClient()).getRoles(id, includeUnassigned),
     enabled: !!id,
   })
 }

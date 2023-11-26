@@ -43,16 +43,16 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<List<UserRoleDto>> GetRoles(string id, CancellationToken cancellationToken)
+    public async Task<List<UserRoleDto>> GetRoles(string id, CancellationToken cancellationToken, [FromQuery] bool includeUnassigned = false)
     {
-        return await _userService.GetRolesAsync(id, cancellationToken);
+        return await _userService.GetRolesAsync(id, includeUnassigned, cancellationToken);
     }
 
     [HttpPost("{id}/roles")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.UserRoles)]
     [OpenApiOperation("Update a user's assigned roles.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Register))]
-    public async Task<ActionResult<string>> AssignRoles(string id, AssignUserRolesRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<string>> ManageRoles(string id, AssignUserRolesRequest request, CancellationToken cancellationToken)
     {
         return id != request.UserId
             ? BadRequest()
