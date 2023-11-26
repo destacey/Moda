@@ -38,6 +38,16 @@ internal sealed class ProcessClient : IDisposable
         return await _client.ExecuteAsync<GetProcessesResponse>(request, cancellationToken);
     }
 
+    internal async Task<RestResponse<GetProcessWorkItemTypesResponse>> GetWorkItemTypes(Guid processId, CancellationToken cancellationToken)
+    {
+        var request = new RestRequest($"/_apis/work/processes/{processId}/workitemtypes", Method.Get);
+        request.AddAcceptHeaderWithApiVersion(_apiVersion);
+        request.AddAuthorizationHeaderForPersonalAccessToken(_token);
+        request.AddParameter("$expand", "states,behaviors");
+
+        return await _client.ExecuteAsync<GetProcessWorkItemTypesResponse>(request, cancellationToken);
+    }
+
     public void Dispose()
     {
         _client?.Dispose();
