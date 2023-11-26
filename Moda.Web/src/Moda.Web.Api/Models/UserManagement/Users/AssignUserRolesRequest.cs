@@ -2,8 +2,8 @@
 
 public sealed record AssignUserRolesRequest
 {
-    public string UserId { get; set; } = null!;
-    public List<UserRoleDto> UserRoles { get; set; } = null!;
+    public required string UserId { get; set; }
+    public List<UserRoleDto> UserRoles { get; set; } = new();
 
     public AssignUserRolesCommand ToAssignUserRolesRequest()
         => new(UserId, UserRoles);

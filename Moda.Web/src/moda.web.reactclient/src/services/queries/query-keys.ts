@@ -1,5 +1,7 @@
 export enum QK {
   // USER MANAGEMENT
+  USERS = 'USERS',
+  USER_ROLES = 'USER_ROLES',
   ROLES = 'ROLES',
   PERMISSIONS = 'PERMISSIONS',
 

@@ -879,12 +879,17 @@ export class UsersClient {
 
     /**
      * Get a user's roles.
+     * @param includeUnassigned (optional) 
      */
-    getRoles(id: string, cancelToken?: CancelToken | undefined): Promise<UserRoleDto[]> {
-        let url_ = this.baseUrl + "/api/user-management/users/{id}/roles";
+    getRoles(id: string, includeUnassigned: boolean | undefined, cancelToken?: CancelToken | undefined): Promise<UserRoleDto[]> {
+        let url_ = this.baseUrl + "/api/user-management/users/{id}/roles?";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (includeUnassigned === null)
+            throw new Error("The parameter 'includeUnassigned' cannot be null.");
+        else if (includeUnassigned !== undefined)
+            url_ += "includeUnassigned=" + encodeURIComponent("" + includeUnassigned) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -948,7 +953,7 @@ export class UsersClient {
     /**
      * Update a user's assigned roles.
      */
-    assignRoles(id: string, request: AssignUserRolesRequest, cancelToken?: CancelToken | undefined): Promise<string> {
+    manageRoles(id: string, request: AssignUserRolesRequest, cancelToken?: CancelToken | undefined): Promise<string> {
         let url_ = this.baseUrl + "/api/user-management/users/{id}/roles";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -975,11 +980,11 @@ export class UsersClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processAssignRoles(_response);
+            return this.processManageRoles(_response);
         });
     }
 
-    protected processAssignRoles(response: AxiosResponse): Promise<string> {
+    protected processManageRoles(response: AxiosResponse): Promise<string> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
