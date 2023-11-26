@@ -90,9 +90,9 @@ internal sealed class ImportProgramIncrementObjectivesCommandHandler : ICommandH
                 {
                     var deleteResult = await _sender.Send(new DeleteObjectiveCommand(objectiveResult.Value), cancellationToken);
                     if (deleteResult.IsFailure)
-                        _logger.LogError("Unable to delete objective. (Record Id: {importedObjective.ImportId}).  Error: {Error}", deleteResult.Error);
+                        _logger.LogError("Unable to delete objective. (Import Id: {ImportId}).  Error: {Error}", importedObjective.ImportId, deleteResult.Error);
 
-                    _logger.LogError("Unable to create PI objective. (Record Id: {importedObjective.ImportId}).  Error: {Error}", result.Error);
+                    _logger.LogError("Unable to create PI objective. (Import Id: {ImportId}).  Error: {Error}", importedObjective.ImportId, result.Error);
                     return Result.Failure<int>($"Unable to PI create objective. (Record Id: {importedObjective.ImportId}).  Error: {result.Error}");
                 }
 
