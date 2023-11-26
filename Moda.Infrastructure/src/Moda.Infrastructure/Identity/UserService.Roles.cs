@@ -24,7 +24,7 @@ internal partial class UserService
             });
         }
 
-        return userRoles;
+        return userRoles.Where(r => r.Enabled).ToList();
     }
 
     public async Task<string> AssignRolesAsync(AssignUserRolesCommand command, CancellationToken cancellationToken)
