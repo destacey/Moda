@@ -30,6 +30,10 @@ try
     {
         config.ReadFrom.Configuration(context.Configuration);
     });
+    if(builder.Environment.IsDevelopment())
+    {
+        Serilog.Debugging.SelfLog.Enable(Console.Error);
+    }
 
     builder.Services.AddControllers()
         .AddJsonOptions(options => options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb));
