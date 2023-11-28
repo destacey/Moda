@@ -29,6 +29,7 @@ try
     builder.Host.UseSerilog((context, config) =>
     {
         config.ReadFrom.Configuration(context.Configuration);
+        config.Enrich.WithProperty("version", Environment.GetEnvironmentVariable("version") ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "none-supplied");
     });
     if(builder.Environment.IsDevelopment())
     {
