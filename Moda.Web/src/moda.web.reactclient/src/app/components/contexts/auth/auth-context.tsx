@@ -7,14 +7,11 @@ import auth from '@/src/services/auth'
 import { getProfileClient } from '@/src/services/clients'
 import { useLocalStorageState } from '@/src/app/hooks'
 import { AuthContextType, Claim, User } from './types'
+import { Spin } from 'antd'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
-const { msalInstance, acquireToken: authAcquire } = auth
-
-if (msalInstance.getAllAccounts().length > 0) {
-  msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0])
-}
+const { msalWrapper, acquireToken: authAcquire } = auth
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useLocalStorageState<User>('current-user', {
@@ -24,14 +21,16 @@ const AuthProvider = ({ children }) => {
     claims: [],
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [msalInstanceInitialized, setMsalInstanceInitialized] = useState(msalWrapper.isInitialized)
 
   const acquireToken = useCallback(async () => {
     return (await authAcquire())?.token
   }, [])
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     setIsLoading(true)
     try {
+      const msalInstance = await msalWrapper.getInstance()
       const activeAccount =
         msalInstance.getActiveAccount() ?? msalInstance.getAllAccounts()[0]
       if (activeAccount) {
@@ -67,12 +66,12 @@ const AuthProvider = ({ children }) => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [acquireToken, setUser])
 
   const hasClaim = useCallback(
     (claimType: string, claimValue: string): boolean => {
       return (
-        user.claims.some(
+        user?.claims.some(
           (claim) => claim.type === claimType && claim.value === claimValue,
         ) ?? false
       )
@@ -81,16 +80,19 @@ const AuthProvider = ({ children }) => {
   )
 
   useEffect(() => {
-    msalInstance.handleRedirectPromise().then((response) => {
-      if (!response) {
-        const accounts = msalInstance.getAllAccounts()
-        if (accounts.length === 0) {
-          msalInstance.loginRedirect()
+    msalWrapper.getInstance().then(msalInstance => {
+      setMsalInstanceInitialized(msalWrapper.isInitialized)
+      msalInstance.handleRedirectPromise().then(async (response) => {
+        if (!response) {
+          const accounts = msalInstance.getAllAccounts()
+          if (accounts.length === 0 && msalWrapper.interactionStatus() === 'none') {
+            msalInstance.loginRedirect()
+          }
+        } else {
+          msalInstance.setActiveAccount(response.account)
+          await refreshUser()
         }
-      } else {
-        msalInstance.setActiveAccount(response.account)
-        refreshUser()
-      }
+      })
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -101,14 +103,19 @@ const AuthProvider = ({ children }) => {
     hasClaim,
     acquireToken,
     refreshUser,
-    login: () => msalInstance.loginRedirect(),
-    logout: () => msalInstance.logoutRedirect(),
+    login: async () => (await msalWrapper.getInstance()).loginRedirect(),
+    logout: async () => (await msalWrapper.getInstance()).logoutRedirect(),
   }
 
   return (
-    <AuthContext.Provider value={authContext}>
-      <MsalProvider instance={msalInstance}>{children}</MsalProvider>
-    </AuthContext.Provider>
+    <>
+      {msalInstanceInitialized === false && <Spin />}
+      {msalInstanceInitialized === true &&
+        <AuthContext.Provider value={authContext}>
+          <MsalProvider instance={msalWrapper.instance}>{children}</MsalProvider>
+        </AuthContext.Provider>
+      }
+    </>
   )
 }
 
