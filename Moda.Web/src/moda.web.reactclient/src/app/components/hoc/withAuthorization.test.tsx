@@ -1,5 +1,12 @@
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
+
+// Mock the MsalProvider
+jest.mock('@azure/msal-react', () => ({
+  MsalProvider: ({ children }) => children,
+  useMsal: jest.fn(),
+}))
+
 import { AuthContext, AuthContextType } from '../contexts/auth'
 import withAuthorization, { WithAuthorizationProps } from './withAuthorization'
 
@@ -12,8 +19,6 @@ describe('withAuthorization', () => {
     __esModule: true,
     default: () => ({ hasClaim: mockHasClaim }),
   }))
-
-  jest.mock('')
 
   beforeEach(() => {
     jest.clearAllMocks()
