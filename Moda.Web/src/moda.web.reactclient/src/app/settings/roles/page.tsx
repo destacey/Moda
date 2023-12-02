@@ -10,24 +10,17 @@ import useAuth from '../../components/contexts/auth'
 import CreateRoleForm from './create-role-form'
 import { useRouter } from 'next/navigation'
 import { useGetRoles } from '@/src/services/queries/user-management-queries'
-import { RoleListDto } from '@/src/services/moda-api'
 import { useDocumentTitle } from '../../hooks'
 
 const LinkCellRenderer = ({ value, data }) => {
   return <Link href={`roles/${data.id}`}>{value}</Link>
 }
 
-const sortRoles = (data: RoleListDto[]) => {
-  return data?.sort((a, b) => {
-    return a.name.localeCompare(b.name)
-  })
-}
-
 const RoleListPage = () => {
   useDocumentTitle('Roles')
   const [openCreateRoleForm, setOpenCreateRoleForm] = useState(false)
   const router = useRouter()
-  const { data, refetch } = useGetRoles()
+  const { data: roleData, isLoading, refetch } = useGetRoles()
 
   const { hasClaim } = useAuth()
   const canCreateRole = hasClaim('Permission', 'Permissions.Roles.Create')
@@ -62,14 +55,15 @@ const RoleListPage = () => {
 
       <ModaGrid
         columnDefs={columnDefs}
-        rowData={sortRoles(data)}
+        rowData={roleData}
         loadData={refresh}
+        isDataLoading={isLoading}
       />
 
       {openCreateRoleForm && (
         <CreateRoleForm
           showForm={openCreateRoleForm}
-          roles={data}
+          roles={roleData}
           onFormCreate={(id: string) => {
             setOpenCreateRoleForm(false)
             router.push(`/settings/roles/${id}`)

@@ -1,10 +1,64 @@
 import { QueryClient, useMutation, useQuery, useQueryClient } from 'react-query'
-import { getPermissionsClient, getRolesClient } from '../clients'
 import {
+  getPermissionsClient,
+  getRolesClient,
+  getUsersClient,
+} from '../clients'
+import {
+  AssignUserRolesRequest,
   CreateOrUpdateRoleRequest,
   UpdateRolePermissionsRequest,
 } from '../moda-api'
 import { QK } from './query-keys'
+
+// USERS
+
+export const useGetUsers = () => {
+  return useQuery({
+    queryKey: [QK.USERS],
+    queryFn: async () => (await getUsersClient()).getList(),
+    select: (data) => data.sort((a, b) => a.userName.localeCompare(b.userName)),
+  })
+}
+
+export const useGetUserById = (id: string) => {
+  return useQuery({
+    queryKey: [QK.USERS, id],
+    queryFn: async () => (await getUsersClient()).getById(id),
+    enabled: !!id,
+  })
+}
+
+export const useGetUserRoles = (
+  id: string,
+  includeUnassigned: boolean = false,
+) => {
+  return useQuery({
+    queryKey: [QK.USER_ROLES, id],
+    queryFn: async () =>
+      (await getUsersClient()).getRoles(id, includeUnassigned),
+    enabled: !!id,
+  })
+}
+
+export const useManageUserRolesMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (params: {
+      assignUserRolesRequest: AssignUserRolesRequest
+    }) =>
+      (await getUsersClient()).manageRoles(
+        params.assignUserRolesRequest.userId,
+        params.assignUserRolesRequest,
+      ),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([
+        QK.USER_ROLES,
+        variables.assignUserRolesRequest.userId,
+      ])
+    },
+  })
+}
 
 // ROLES
 
@@ -12,6 +66,7 @@ export const useGetRoles = () => {
   return useQuery({
     queryKey: [QK.ROLES],
     queryFn: async () => (await getRolesClient()).getList(),
+    select: (data) => data.sort((a, b) => a.name.localeCompare(b.name)),
   })
 }
 

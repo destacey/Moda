@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-
-namespace Moda.Common.Tests.Sut.Extensions;
+﻿namespace Moda.Common.Tests.Sut.Extensions;
 public class StringExtensionsTests
 {
     [Theory]
@@ -15,7 +13,7 @@ public class StringExtensionsTests
     [InlineData(" ", false)]
     [InlineData("", false)]
     [InlineData(null, false)]
-    public void IsValidEmailAddressFormat(string emailAddress, bool expectedResult)
+    public void IsValidEmailAddressFormat(string? emailAddress, bool expectedResult)
     {
         var result = StringExtensions.IsValidEmailAddressFormat(emailAddress);
 
@@ -32,7 +30,7 @@ public class StringExtensionsTests
     [InlineData(" ", false)]
     [InlineData("", false)]
     [InlineData(null, false)]
-    public void IsValidPhoneNumberFormat(string phoneNumber, bool expectedResult)
+    public void IsValidPhoneNumberFormat(string? phoneNumber, bool expectedResult)
     {
         var result = StringExtensions.IsValidPhoneNumberFormat(phoneNumber);
 
@@ -54,7 +52,7 @@ public class StringExtensionsTests
     [InlineData(" ", false)]
     [InlineData("", false)]
     [InlineData(null, false)]
-    public void IsValidZipCodeFormat(string zipCode, bool expectedResult)
+    public void IsValidZipCodeFormat(string? zipCode, bool expectedResult)
     {
         var result = StringExtensions.IsValidZipCodeFormat(zipCode);
 
@@ -68,7 +66,7 @@ public class StringExtensionsTests
     [InlineData(" ", null)]
     [InlineData("", null)]
     [InlineData(null, null)]
-    public void NullIfWhiteSpacePlusTrim(string value, string expectedResult)
+    public void NullIfWhiteSpacePlusTrim(string? value, string? expectedResult)
     {
         var result = StringExtensions.NullIfWhiteSpacePlusTrim(value);
 

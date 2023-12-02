@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Moda.Organization.Domain.Extensions;
+﻿using Moda.Organization.Domain.Extensions;
 
 namespace Moda.Organization.Domain.Tests.Sut.Extensions;
 public class StringExtensionsTests
@@ -17,7 +16,7 @@ public class StringExtensionsTests
     [InlineData(" ", false)]
     [InlineData("", false)]
     [InlineData(null, false)]
-    public void IsValidOrganizationCodeFormat(string code, bool expectedResult)
+    public void IsValidOrganizationCodeFormat(string? code, bool expectedResult)
     {
         var result = StringExtensions.IsValidTeamCodeFormat(code);
 

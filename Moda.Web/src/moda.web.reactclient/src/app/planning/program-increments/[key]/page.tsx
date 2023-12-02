@@ -84,31 +84,30 @@ const ProgramIncrementDetailsPage = ({ params }) => {
     if (canUpdateProgramIncrement) {
       items.push(
         {
-          key: 'edit',
+          key: 'edit-pi-menu-item',
           label: 'Edit',
           onClick: () => setOpenEditProgramIncrementForm(true),
         },
         {
-          key: 'manage-teams',
+          key: 'manage-teams-menu-item',
           label: 'Manage Teams',
           onClick: () => setOpenManageTeamsForm(true),
         },
         {
-          key: 'divider',
           type: 'divider',
-        },
-        {
-          key: 'healthReport',
-          label: (
-            <Link
-              href={`/planning/program-increments/${params.key}/objectives/health-report`}
-            >
-              Health Report
-            </Link>
-          ),
         },
       )
     }
+    items.push({
+      key: 'healthReport-menu-item',
+      label: (
+        <Link
+          href={`/planning/program-increments/${params.key}/objectives/health-report`}
+        >
+          Health Report
+        </Link>
+      ),
+    })
     return items
   }, [canUpdateProgramIncrement, params.key])
 
@@ -119,16 +118,14 @@ const ProgramIncrementDetailsPage = ({ params }) => {
           <Link href={`/planning/program-increments/${params.key}/plan-review`}>
             Plan Review
           </Link>
-          {canUpdateProgramIncrement && (
-            <Dropdown menu={{ items: actionsMenuItems }}>
-              <Button>
-                <Space>
-                  Actions
-                  <DownOutlined />
-                </Space>
-              </Button>
-            </Dropdown>
-          )}
+          <Dropdown placement="bottomRight" menu={{ items: actionsMenuItems }}>
+            <Button>
+              <Space>
+                Actions
+                <DownOutlined />
+              </Space>
+            </Button>
+          </Dropdown>
         </Space>
       </>
     )

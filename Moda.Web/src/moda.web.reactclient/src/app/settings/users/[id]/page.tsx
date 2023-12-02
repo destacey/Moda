@@ -2,18 +2,55 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { authorizePage } from '@/src/app/components/hoc'
-import { UserDetailsDto } from '@/src/services/moda-api'
-import { useState } from 'react'
+import { useGetUserById } from '@/src/services/queries/user-management-queries'
+import { notFound, usePathname } from 'next/navigation'
+import UserDetailsLoading from './loading'
+import { useAppDispatch } from '@/src/app/hooks'
+import { useEffect, useState } from 'react'
+import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
+import UserDetails from './user-details'
+import { Card } from 'antd'
 
 const UserDetailsPage = ({ params }) => {
-  const [user, setUser] = useState<UserDetailsDto | null>(null)
+  const [activeTab, setActiveTab] = useState('details')
+  const { data: userData, isLoading } = useGetUserById(params.id)
+  const dispatch = useAppDispatch()
+  const pathname = usePathname()
+
+  const tabs = [
+    {
+      key: 'details',
+      tab: 'Details',
+      content: <UserDetails user={userData} canEdit={true} />,
+    },
+  ]
+
+  useEffect(() => {
+    userData &&
+      dispatch(setBreadcrumbTitle({ title: userData.userName, pathname }))
+  }, [userData, dispatch, pathname])
+
+  if (isLoading) {
+    return <UserDetailsLoading />
+  }
+
+  if (!userData) {
+    notFound()
+  }
+
+  const fullName = `${userData?.firstName} ${userData?.lastName}`
 
   return (
     <>
-      <PageTitle
-        title={user?.userName ?? `Test ${params.id}`}
-        subtitle="User Details"
-      />
+      <PageTitle title={fullName} subtitle="User Details" />
+      <Card
+        style={{ width: '100%' }}
+        tabList={tabs}
+        activeTabKey={activeTab}
+        onTabChange={(key) => setActiveTab(key)}
+      >
+        {tabs.find((t) => t.key === activeTab)?.content}
+      </Card>
     </>
   )
 }

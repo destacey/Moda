@@ -638,6 +638,15 @@
               "type": "string"
             },
             "x-position": 1
+          },
+          {
+            "name": "includeUnassigned",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 2
           }
         ],
         "responses": {
@@ -686,7 +695,7 @@
           "Users"
         ],
         "summary": "Update a user's assigned roles.",
-        "operationId": "Users_AssignRoles",
+        "operationId": "Users_ManageRoles",
         "parameters": [
           {
             "name": "id",

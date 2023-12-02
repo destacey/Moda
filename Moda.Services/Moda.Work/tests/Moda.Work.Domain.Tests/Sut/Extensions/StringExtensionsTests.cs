@@ -16,7 +16,7 @@ public class StringExtensionsTests
     [InlineData(" ", false)]
     [InlineData("", false)]
     [InlineData(null, false)]
-    public void IsValidWorkspaceKeyFormat(string key, bool expectedResult)
+    public void IsValidWorkspaceKeyFormat(string? key, bool expectedResult)
     {
         var result = StringExtensions.IsValidWorkspaceKeyFormat(key);
 
