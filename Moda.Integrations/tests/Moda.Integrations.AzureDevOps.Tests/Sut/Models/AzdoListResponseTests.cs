@@ -1,9 +1,10 @@
 ﻿using System.Text.Json;
+using Moda.Integrations.AzureDevOps.Models;
 using Moda.Integrations.AzureDevOps.Models.Processes;
 using Moda.Integrations.AzureDevOps.Tests.Models;
 
-namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models.Processes;
-public class GetProcessBehaviorsResponseTests : CommonResponseTest
+namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models;
+public class AzdoListResponseTests : CommonResponseTest
 {
     [Fact]
     public void JsonSerilizer_Deserialize_Succeeds()
@@ -12,19 +13,19 @@ public class GetProcessBehaviorsResponseTests : CommonResponseTest
         var json = GetJson();
 
         // Act
-        var actualResponse = JsonSerializer.Deserialize<GetProcessBehaviorsResponse>(json, _options);
+        var actualResponse = JsonSerializer.Deserialize<AzdoListResponse<BehaviorDto>>(json, _options);
 
         // Assert
         Assert.NotNull(actualResponse);
-        actualResponse.Count.Should().Be(7);
-        actualResponse.Value.Count.Should().Be(7);
+        actualResponse.Count.Should().Be(4);
+        actualResponse.Items.Count.Should().Be(4);
     }
 
     private static string GetJson()
     {
         return """
             {
-                "count": 7,
+                "count": 4,
                 "value": [
                     {
                         "name": "Epics",
@@ -77,42 +78,6 @@ public class GetProcessBehaviorsResponseTests : CommonResponseTest
                             "url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/behaviors/System.PortfolioBacklogBehavior"
                         },
                         "url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/behaviors/Microsoft.VSTS.Agile.FeatureBacklogBehavior"
-                    },
-                    {
-                        "name": "Ordered",
-                        "referenceName": "System.OrderedBehavior",
-                        "color": null,
-                        "rank": 0,
-                        "description": "Enables work items to be ordered relative to other work items",
-                        "customization": "system",
-                        "inherits": null,
-                        "url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/behaviors/System.OrderedBehavior"
-                    },
-                    {
-                        "name": "Tasks",
-                        "referenceName": "System.TaskBacklogBehavior",
-                        "color": "A4880A",
-                        "rank": 10,
-                        "description": "Task level backlog and board",
-                        "customization": "system",
-                        "inherits": {
-                            "behaviorRefName": "System.OrderedBehavior",
-                            "url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/behaviors/System.OrderedBehavior"
-                        },
-                        "url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/behaviors/System.TaskBacklogBehavior"
-                    },
-                    {
-                        "name": "Portfolio",
-                        "referenceName": "System.PortfolioBacklogBehavior",
-                        "color": null,
-                        "rank": 0,
-                        "description": "Portfolio level backlog and board",
-                        "customization": "system",
-                        "inherits": {
-                            "behaviorRefName": "System.OrderedBehavior",
-                            "url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/behaviors/System.OrderedBehavior"
-                        },
-                        "url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/behaviors/System.PortfolioBacklogBehavior"
                     }
                 ]
             }

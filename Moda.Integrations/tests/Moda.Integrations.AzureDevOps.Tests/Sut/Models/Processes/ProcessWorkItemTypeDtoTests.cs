@@ -12,7 +12,7 @@ public class ProcessWorkItemTypeDtoTests : CommonResponseTest
         var json = GetJson();
 
         // Act
-        var actualResponse = JsonSerializer.Deserialize<ProcessWorkItemTypeDto>(json, _options);
+        var actualResponse = JsonSerializer.Deserialize<WorkItemTypeDto>(json, _options);
 
         // Assert
         Assert.NotNull(actualResponse);
