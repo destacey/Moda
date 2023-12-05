@@ -1,4 +1,6 @@
-﻿using Moda.Planning.Application.Models;
+﻿using Moda.Organization.Domain.Enums;
+using Moda.Planning.Application.Models;
+using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.ProgramIncrements.Queries;
 public sealed record GetProgramIncrementPredictabilityQuery(Guid Id) : IQuery<ProgramIncrementPredictabilityDto?>;
@@ -20,9 +22,9 @@ internal sealed class GetProgramIncrementPredictabilityQueryHandler : IQueryHand
     {
         // TODO: filter by teams only.  Don't include teams or objective data for team of teams.
         var programIncrement = await _planningDbContext.ProgramIncrements
-            .Include(p => p.Teams)
+            .Include(p => p.Teams.Where(t => t.Team.Type == TeamType.Team))
                 .ThenInclude(t => t.Team)
-            .Include(p => p.Objectives)
+            .Include(p => p.Objectives.Where(o => o.Type == ProgramIncrementObjectiveType.Team))
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
 
