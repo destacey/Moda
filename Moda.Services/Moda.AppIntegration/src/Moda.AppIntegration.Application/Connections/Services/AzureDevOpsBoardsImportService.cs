@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Moda.AppIntegration.Application.Connections.Commands;

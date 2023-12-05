@@ -1,15 +1,10 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 
 namespace Moda.Integrations.AzureDevOps.Models;
-public record AzdoWorkProcess : IExternalWorkProcess
+public sealed record AzdoBacklogLevel : IExternalBacklogLevel
 {
-    public Guid Id { get; set; }
-
+    public required string Id { get; set; }
     public required string Name { get; set; }
-
     public string? Description { get; set; }
-
-    public List<Guid> WorkspaceIds { get; set; } = new();
-
-    public bool IsEnabled { get; set; }
+    public int Rank { get; set; }
 }

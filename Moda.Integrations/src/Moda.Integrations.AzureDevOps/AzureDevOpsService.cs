@@ -39,7 +39,7 @@ public class AzureDevOpsService : IAzureDevOpsService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error testing Azure DevOps connection.");
+            _logger.LogError(ex, "Exception thrown testing Azure DevOps connection.");
             return Result.Failure(ex.InnerException?.Message ?? ex.Message);
         }
     }

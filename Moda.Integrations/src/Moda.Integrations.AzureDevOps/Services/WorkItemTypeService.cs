@@ -34,7 +34,7 @@ internal sealed class WorkItemTypeService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting work item types for project {ProjectId} from Azure DevOps", projectId);
+            _logger.LogError(ex, "Exception thrown getting work item types for project {ProjectId} from Azure DevOps", projectId);
             return Result.Failure<List<WorkItemType>>(ex.ToString());
         }
     }

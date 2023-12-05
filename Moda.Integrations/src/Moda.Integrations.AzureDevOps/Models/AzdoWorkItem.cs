@@ -2,7 +2,7 @@
 using Moda.Common.Application.Interfaces.Work;
 
 namespace Moda.Integrations.AzureDevOps.Models;
-public class AzdoWorkItem : IExternalWorkItem
+public record AzdoWorkItem : IExternalWorkItem
 {
     public AzdoWorkItem(WorkItem workItem)
     {

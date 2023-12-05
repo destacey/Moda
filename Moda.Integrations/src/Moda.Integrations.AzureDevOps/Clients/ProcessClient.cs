@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using Moda.Integrations.AzureDevOps.Extensions;
+using Moda.Integrations.AzureDevOps.Models;
 using Moda.Integrations.AzureDevOps.Models.Processes;
 using RestSharp;
 
@@ -28,33 +29,45 @@ internal sealed class ProcessClient : IDisposable
         _client = new RestClient(options);
     }
 
-    internal async Task<RestResponse<GetProcessesResponse>> GetProcesses(CancellationToken cancellationToken)
+    internal async Task<RestResponse<AzdoListResponse<ProcessDto>>> GetProcesses(CancellationToken cancellationToken)
     {
         var request = new RestRequest("/_apis/work/processes", Method.Get);
-        request.AddAcceptHeaderWithApiVersion(_apiVersion);
-        request.AddAuthorizationHeaderForPersonalAccessToken(_token);
+        SetupRequest(request);
         request.AddParameter("$expand", "projects");
 
-        return await _client.ExecuteAsync<GetProcessesResponse>(request, cancellationToken);
+        return await _client.ExecuteAsync<AzdoListResponse<ProcessDto>>(request, cancellationToken);
     }
 
-    internal async Task<RestResponse<GetProcessWorkItemTypesResponse>> GetWorkItemTypes(Guid processId, CancellationToken cancellationToken)
+    internal async Task<RestResponse<ProcessDto>> GetProcess(Guid processId, CancellationToken cancellationToken)
+    {
+        var request = new RestRequest($"/_apis/work/processes/{processId}", Method.Get);
+        SetupRequest(request);
+        request.AddParameter("$expand", "projects");
+
+        return await _client.ExecuteAsync<ProcessDto>(request, cancellationToken);
+    }
+
+    internal async Task<RestResponse<AzdoListResponse<WorkItemTypeDto>>> GetWorkItemTypes(Guid processId, CancellationToken cancellationToken)
     {
         var request = new RestRequest($"/_apis/work/processes/{processId}/workitemtypes", Method.Get);
-        request.AddAcceptHeaderWithApiVersion(_apiVersion);
-        request.AddAuthorizationHeaderForPersonalAccessToken(_token);
+        SetupRequest(request);
         request.AddParameter("$expand", "states,behaviors");
 
-        return await _client.ExecuteAsync<GetProcessWorkItemTypesResponse>(request, cancellationToken);
+        return await _client.ExecuteAsync<AzdoListResponse<WorkItemTypeDto>>(request, cancellationToken);
     }
 
-    internal async Task<RestResponse<GetProcessBehaviorsResponse>> GetBehaviors(Guid processId, CancellationToken cancellationToken)
+    internal async Task<RestResponse<AzdoListResponse<BehaviorDto>>> GetBehaviors(Guid processId, CancellationToken cancellationToken)
     {
         var request = new RestRequest($"/_apis/work/processes/{processId}/behaviors", Method.Get);
+        SetupRequest(request);
+
+        return await _client.ExecuteAsync<AzdoListResponse<BehaviorDto>>(request, cancellationToken);
+    }
+
+    private void SetupRequest(RestRequest request)
+    {
         request.AddAcceptHeaderWithApiVersion(_apiVersion);
         request.AddAuthorizationHeaderForPersonalAccessToken(_token);
-
-        return await _client.ExecuteAsync<GetProcessBehaviorsResponse>(request, cancellationToken);
     }
 
     public void Dispose()
