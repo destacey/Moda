@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Work.Domain.Enums;
+namespace Moda.Common.Domain.Enums;
 public enum BacklogCategory
 {
     [Display(Name = "Portfolio", Description = "Portfolio backlogs provide a way to group related items into a hierarchical structure.  This is the only backlog category that allows multiple backlog levels.", Order = 1)]

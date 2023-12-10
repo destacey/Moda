@@ -1,4 +1,5 @@
-﻿using Moda.Work.Application.BacklogCategories.Dtos;
+﻿using Moda.Common.Domain.Enums;
+using Moda.Work.Application.BacklogCategories.Dtos;
 
 namespace Moda.Work.Application.BacklogCategories.Queries;
 
