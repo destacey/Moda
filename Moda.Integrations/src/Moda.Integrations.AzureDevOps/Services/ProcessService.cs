@@ -41,21 +41,21 @@ internal sealed class ProcessService
         }
     }
 
-    public async Task<Result<AzdoWorkProcessDetails>> GetProcess(Guid processId, CancellationToken cancellationToken)
+    public async Task<Result<AzdoWorkProcessConfiguration>> GetProcess(Guid processId, CancellationToken cancellationToken)
     {
         try
         {
             var processResult = await GetProcessById(processId, cancellationToken);
             if (processResult.IsFailure)
-                return Result.Failure<AzdoWorkProcessDetails>(processResult.Error);
+                return Result.Failure<AzdoWorkProcessConfiguration>(processResult.Error);
 
             var behaviorsResult = await GetProcessBehaviors(processId, cancellationToken);
             if (behaviorsResult.IsFailure)
-                return Result.Failure<AzdoWorkProcessDetails>(behaviorsResult.Error);
+                return Result.Failure<AzdoWorkProcessConfiguration>(behaviorsResult.Error);
 
             var workTypesResult = await GetProcessWorkItemTypes(processId, cancellationToken);
             if (workTypesResult.IsFailure)
-                return Result.Failure<AzdoWorkProcessDetails>(workTypesResult.Error);
+                return Result.Failure<AzdoWorkProcessConfiguration>(workTypesResult.Error);
 
 
             return Result.Success(processResult.Value.ToAzdoWorkProcessDetails(behaviorsResult.Value, workTypesResult.Value));
@@ -63,7 +63,7 @@ internal sealed class ProcessService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception thrown getting process {ProcessId} from Azure DevOps.", processId);
-            return Result.Failure<AzdoWorkProcessDetails>(ex.ToString());
+            return Result.Failure<AzdoWorkProcessConfiguration>(ex.ToString());
         }
     }
 
@@ -103,17 +103,17 @@ internal sealed class ProcessService
         return Result.Success(response.Data?.Items ?? new List<BehaviorDto>());
     }
 
-    private async Task<Result<List<WorkItemTypeDto>>> GetProcessWorkItemTypes(Guid processId, CancellationToken cancellationToken)
+    private async Task<Result<List<ProcessWorkItemTypeDto>>> GetProcessWorkItemTypes(Guid processId, CancellationToken cancellationToken)
     {
         var response = await _processClient.GetWorkItemTypes(processId, cancellationToken);
         if (!response.IsSuccessful)
         {
             _logger.LogError("Error getting work item types for process {ProcessId} from Azure DevOps: {ErrorMessage}.", processId, response.ErrorMessage);
-            return Result.Failure<List<WorkItemTypeDto>>(response.ErrorMessage);
+            return Result.Failure<List<ProcessWorkItemTypeDto>>(response.ErrorMessage);
         }
 
         _logger.LogDebug("{WorkItemTypeCount} work item types found for process {ProcessId}.", response.Data?.Count ?? 0, processId);
 
-        return Result.Success(response.Data?.Items ?? new List<WorkItemTypeDto>());
+        return Result.Success(response.Data?.Items ?? new List<ProcessWorkItemTypeDto>());
     }
 }

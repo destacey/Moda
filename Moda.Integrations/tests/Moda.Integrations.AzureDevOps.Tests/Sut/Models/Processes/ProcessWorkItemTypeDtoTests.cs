@@ -3,7 +3,7 @@ using Moda.Integrations.AzureDevOps.Models.Processes;
 using Moda.Integrations.AzureDevOps.Tests.Models;
 
 namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models.Processes;
-public class ProcessWorkItemTypeDtoTests : CommonResponseTest
+public class ProcessWorkItemTypeDtoTests : CommonResponseOptions
 {
     [Fact]
     public void JsonSerilizer_Deserialize_Succeeds()
@@ -12,7 +12,7 @@ public class ProcessWorkItemTypeDtoTests : CommonResponseTest
         var json = GetJson();
 
         // Act
-        var actualResponse = JsonSerializer.Deserialize<WorkItemTypeDto>(json, _options);
+        var actualResponse = JsonSerializer.Deserialize<ProcessWorkItemTypeDto>(json, _options);
 
         // Assert
         Assert.NotNull(actualResponse);
@@ -20,8 +20,29 @@ public class ProcessWorkItemTypeDtoTests : CommonResponseTest
         actualResponse.Name.Should().Be("Epic");
         actualResponse.Description.Should().Be("Epics help teams effectively manage and groom their product backlog");
         actualResponse.IsDisabled.Should().BeFalse();
+        actualResponse.Inherits.Should().Be("Microsoft.VSTS.WorkItemTypes.Epic");
         actualResponse.States.Should().HaveCount(6);
         actualResponse.Behaviors.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void JsonSerilizer_DeserializeWithoutBehavior_Succeeds()
+    {
+        // Arrange
+        var json = GetJsonWithoutBehavior();
+
+        // Act
+        var actualResponse = JsonSerializer.Deserialize<ProcessWorkItemTypeDto>(json, _options);
+
+        // Assert
+        Assert.NotNull(actualResponse);
+        actualResponse.ReferenceName.Should().Be("Microsoft.VSTS.WorkItemTypes.Bug");
+        actualResponse.Name.Should().Be("Bug");
+        actualResponse.Description.Should().Be("Describes a divergence between required and actual behavior, and tracks the work done to correct the defect and verify the correction.");
+        actualResponse.IsDisabled.Should().BeFalse();
+        actualResponse.Inherits.Should().BeNull();
+        actualResponse.States.Should().HaveCount(4);
+        actualResponse.Behaviors.Should().HaveCount(0);
     }
 
     private static string GetJson()
@@ -107,5 +128,56 @@ public class ProcessWorkItemTypeDtoTests : CommonResponseTest
            	]
            }
            """;
+    }
+
+    private static string GetJsonWithoutBehavior()
+    {
+        return """
+            {
+                "referenceName": "Microsoft.VSTS.WorkItemTypes.Bug",
+                "name": "Bug",
+                "description": "Describes a divergence between required and actual behavior, and tracks the work done to correct the defect and verify the correction.",
+                "customization": "system",
+                "color": "CC293D",
+                "icon": "icon_insect",
+                "isDisabled": false,
+                "inherits": null,
+                "states": [
+                    {
+                        "id": "7b7e3e8c-e500-40b6-ad56-d59b8d64d757",
+                        "name": "New",
+                        "color": "b2b2b2",
+                        "stateCategory": "Proposed",
+                        "order": 1,
+                        "customizationType": "system"
+                    },
+                    {
+                        "id": "277237cd-0bc0-4ffb-bdc6-d358b154ba9e",
+                        "name": "Active",
+                        "color": "007acc",
+                        "stateCategory": "InProgress",
+                        "order": 2,
+                        "customizationType": "system"
+                    },
+                    {
+                        "id": "f36cfea7-889a-448e-b5d1-fbc9b134ec82",
+                        "name": "Resolved",
+                        "color": "ff9d00",
+                        "stateCategory": "Resolved",
+                        "order": 3,
+                        "customizationType": "system"
+                    },
+                    {
+                        "id": "9f479b88-4542-4f9d-8048-5d9c953b5082",
+                        "name": "Closed",
+                        "color": "339933",
+                        "stateCategory": "Completed",
+                        "order": 4,
+                        "customizationType": "system"
+                    }
+                ],
+                "behaviors": []
+            }
+            """;
     }
 }

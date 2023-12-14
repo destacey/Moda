@@ -1,4 +1,7 @@
-﻿namespace Moda.Integrations.AzureDevOps.Models.Processes;
+﻿using Ardalis.GuardClauses;
+using Moda.Common.Domain.Enums;
+
+namespace Moda.Integrations.AzureDevOps.Models.Processes;
 
 internal sealed record BehaviorDto
 {
@@ -7,20 +10,11 @@ internal sealed record BehaviorDto
     public string? Description { get; set; }
     public int Rank { get; set; }
     public required string Customization { get; set; }
+    public Dictionary<string, object>? Inherits { get; set; }
 }
 
 internal static class BehaviorDtoExtensions
 {
-    public static AzdoBacklogLevel ToAzdoBacklogLevel(this BehaviorDto behavior)
-    {
-        return new AzdoBacklogLevel
-        {
-            Id = behavior.ReferenceName,
-            Name = behavior.Name,
-            Description = behavior.Description,
-            Rank = behavior.Rank,
-        };
-    }
 
     /// <summary>
     /// Returns a list of backlog levels that are requirement level or higher.
@@ -29,8 +23,39 @@ internal static class BehaviorDtoExtensions
     /// <returns></returns>
     public static List<AzdoBacklogLevel> ToAzdoBacklogLevels(this List<BehaviorDto> behaviors)
     {
-        return behaviors
-            .Where(b => b.Rank > 0 && b.ReferenceName != "System.TaskBacklogBehavior")
-            .Select(b => b.ToAzdoBacklogLevel()).ToList();
+        var backlogLevels = new List<AzdoBacklogLevel>();
+        foreach (var behavior in behaviors.Where(b => b.Rank > 0))
+        {
+            Guard.Against.Null(behavior.Inherits, nameof(behavior.Inherits));
+            Guard.Against.NullOrEmpty(behavior.Inherits["behaviorRefName"]?.ToString(), "behaviorRefName");
+
+            BacklogCategory? category = MapBehaviorToBacklogCategory(behavior.ReferenceName) 
+                ?? MapBehaviorToBacklogCategory(behavior.Inherits["behaviorRefName"].ToString()!);
+            Guard.Against.Null(category, nameof(category));
+
+            backlogLevels.Add(new AzdoBacklogLevel
+            {
+                Id = behavior.ReferenceName,
+                Name = behavior.Name,
+                Description = behavior.Description,
+                Rank = behavior.Rank,
+                BacklogCategory = category.Value
+            });
+        }
+
+        return backlogLevels;
+
+        static BacklogCategory? MapBehaviorToBacklogCategory(string behavior)
+        {
+            Guard.Against.Null(behavior, nameof(behavior));
+
+            return behavior switch
+            {
+                "System.PortfolioBacklogBehavior" => BacklogCategory.Portfolio,
+                "System.RequirementBacklogBehavior" => BacklogCategory.Requirement,
+                "System.TaskBacklogBehavior" => BacklogCategory.Task,
+                _ => null
+            };
+        }
     }
 }

@@ -14,4 +14,5 @@ public class ProcessServiceData : BaseConfiguration
     public string GetProcessName { get; init; } = string.Empty;
     public int GetProcessProjectsCount { get; init; }
     public Guid GetProcessProjectName { get; init; }
+    public int GetProcessBacklogLevelsCount { get; init; }
 }

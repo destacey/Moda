@@ -23,16 +23,16 @@ internal static class ProcessDtoExtensions
         };
     }
 
-    public static AzdoWorkProcessDetails ToAzdoWorkProcessDetails(this ProcessDto process, List<BehaviorDto> behaviors, List<WorkItemTypeDto> workTypes)
+    public static AzdoWorkProcessConfiguration ToAzdoWorkProcessDetails(this ProcessDto process, List<BehaviorDto> behaviors, List<ProcessWorkItemTypeDto> workTypes)
     {
-        return new AzdoWorkProcessDetails
+        return new AzdoWorkProcessConfiguration
         {
             Id = process.TypeId,
             Name = process.Name,
             Description = process.Description,
             IsEnabled = process.IsEnabled,
             WorkspaceIds = process.Projects?.Select(p => p.Id).ToList() ?? new List<Guid>(),
-            Behaviors = behaviors.ToAzdoBacklogLevels(),
+            BacklogLevels = behaviors.ToAzdoBacklogLevels(),
             WorkTypes = workTypes.ToAzdoWorkTypes(),
         };
     }

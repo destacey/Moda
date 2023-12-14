@@ -4,4 +4,6 @@ public interface IExternalWorkType
     string Id { get; }
     string Name { get; }
     string? Description { get; }
+    string BacklogLevelId { get; }
+    bool IsDisabled { get; }
 }

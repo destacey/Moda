@@ -47,13 +47,13 @@ internal sealed class ProcessClient : IDisposable
         return await _client.ExecuteAsync<ProcessDto>(request, cancellationToken);
     }
 
-    internal async Task<RestResponse<AzdoListResponse<WorkItemTypeDto>>> GetWorkItemTypes(Guid processId, CancellationToken cancellationToken)
+    internal async Task<RestResponse<AzdoListResponse<ProcessWorkItemTypeDto>>> GetWorkItemTypes(Guid processId, CancellationToken cancellationToken)
     {
         var request = new RestRequest($"/_apis/work/processes/{processId}/workitemtypes", Method.Get);
         SetupRequest(request);
         request.AddParameter("$expand", "states,behaviors");
 
-        return await _client.ExecuteAsync<AzdoListResponse<WorkItemTypeDto>>(request, cancellationToken);
+        return await _client.ExecuteAsync<AzdoListResponse<ProcessWorkItemTypeDto>>(request, cancellationToken);
     }
 
     internal async Task<RestResponse<AzdoListResponse<BehaviorDto>>> GetBehaviors(Guid processId, CancellationToken cancellationToken)

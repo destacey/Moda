@@ -3,7 +3,7 @@ using Moda.Integrations.AzureDevOps.Models.Processes;
 using Moda.Integrations.AzureDevOps.Tests.Models;
 
 namespace Moda.Integrations.AzureDevOps.Tests.Sut.Models.Processes;
-public class ProcessWorkItemTypeBehaviorsDtoTests : CommonResponseTest
+public class ProcessWorkItemTypeBehaviorsDtoTests : CommonResponseOptions
 {
     [Fact]
     public void JsonSerilizer_Deserialize_Succeeds()

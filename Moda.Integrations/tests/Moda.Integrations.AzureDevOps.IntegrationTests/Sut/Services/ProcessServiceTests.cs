@@ -5,7 +5,6 @@ using Moq;
 
 namespace Moda.Integrations.AzureDevOps.IntegrationTests.Sut.Services;
 
-
 [Collection("OptionsCollection")]
 public class ProcessServiceTests
 {
@@ -61,7 +60,7 @@ public class ProcessServiceTests
         // Arrange
         var processId = _processServiceData.GetProcessId;
         var expectedLogMessage = $"Process {processId} found.";
-        var expectedBehaviorCount = 4;
+        var expectedBacklogLevelsCount = _processServiceData.GetProcessBacklogLevelsCount;
 
         var service = new ProcessService(
             _azdoOrganizationOptions.OrganizationUrl,
@@ -86,9 +85,9 @@ public class ProcessServiceTests
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!),
             Times.Once);
 
-        result.Value.Behaviors.Should().NotBeNull();
-        result.Value.Behaviors.Should().NotBeEmpty();
-        result.Value.Behaviors.Count().Should().Be(expectedBehaviorCount);
+        result.Value.BacklogLevels.Should().NotBeNull();
+        result.Value.BacklogLevels.Should().NotBeEmpty();
+        result.Value.BacklogLevels.Count().Should().Be(expectedBacklogLevelsCount);
     }
 
     [Fact]
@@ -130,7 +129,7 @@ public class ProcessServiceTests
         // Arrange
         var organizationUrl = "https://www.test12345678.com";
         var processId = _processServiceData.GetProcessId;
-        var expectedErrorMessage = "A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond. (www.test12345678.com:443)";
+        var expectedErrorMessage = "Connection Error - A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond. (www.test12345678.com:443)";
         var expectedLogMessage = $"Error getting process {processId} from Azure DevOps: Connection Error - A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond. (www.test12345678.com:443).";
 
         var service = new ProcessService(
