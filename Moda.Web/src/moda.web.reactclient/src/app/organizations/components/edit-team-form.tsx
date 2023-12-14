@@ -2,10 +2,7 @@
 
 import { Form, Input } from 'antd'
 import { useCallback, useEffect } from 'react'
-import {
-  TeamDetailsDto,
-  TeamOfTeamsDetailsDto,
-} from '@/src/services/moda-api'
+import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
 import { EditTeamFormValues } from '../types'
 import withModalForm, { FormProps } from '../../components/hoc/withModalForm'
 import { setEditMode, updateTeam, selectEditTeamContext } from '../team-slice'
@@ -15,8 +12,7 @@ interface EditTeamFormProps extends FormProps<EditTeamFormValues> {
   team: TeamDetailsDto | TeamOfTeamsDetailsDto
 }
 
-const EditTeamForm = ({form, team}: EditTeamFormProps) => {
-
+const EditTeamForm = ({ form, team }: EditTeamFormProps) => {
   const mapTeamToFormValues = useCallback(
     (team: EditTeamFormValues) => {
       form.setFieldsValue({
@@ -24,7 +20,7 @@ const EditTeamForm = ({form, team}: EditTeamFormProps) => {
         name: team.name,
         code: team.code,
         description: team.description,
-        type: team.type
+        type: team.type,
       })
     },
     [form],
@@ -36,12 +32,7 @@ const EditTeamForm = ({form, team}: EditTeamFormProps) => {
 
   return (
     <>
-      <Form
-        form={form}
-        size="small"
-        layout="vertical"
-        name="update-team-form"
-      >
+      <Form form={form} size="small" layout="vertical" name="update-team-form">
         <Form.Item name="id" hidden={true}>
           <Input />
         </Form.Item>
@@ -99,7 +90,7 @@ const ModalEditTeamForm = withModalForm(EditTeamForm, {
   okText: 'Save',
   useFormState: () => useAppSelector(selectEditTeamContext),
   onOk: (values: EditTeamFormValues) => updateTeam(values),
-  onCancel: setEditMode(false)
+  onCancel: setEditMode(false),
 })
 
 export default ModalEditTeamForm

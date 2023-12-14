@@ -6,14 +6,9 @@ import { createTeam, setEditMode, selectEditTeamContext } from '../team-slice'
 import withModalForm, { FormProps } from '../../components/hoc/withModalForm'
 import { useAppSelector } from '../../hooks'
 
-const CreateTeamForm = ({form}: FormProps<CreateTeamFormValues>) => {
+const CreateTeamForm = ({ form }: FormProps<CreateTeamFormValues>) => {
   return (
-    <Form
-      form={form}
-      size="small"
-      layout="vertical"
-      name="create-team-form"
-    >
+    <Form form={form} size="small" layout="vertical" name="create-team-form">
       <Form.Item label="Team Type" name="type" rules={[{ required: true }]}>
         <Radio.Group>
           <Radio value="Team">Team</Radio>
@@ -50,11 +45,7 @@ const CreateTeamForm = ({form}: FormProps<CreateTeamFormValues>) => {
           }
         />
       </Form.Item>
-      <Form.Item
-        name="description"
-        label="Description"
-        help="Markdown enabled"
-      >
+      <Form.Item name="description" label="Description" help="Markdown enabled">
         <Input.TextArea
           autoSize={{ minRows: 6, maxRows: 10 }}
           showCount
@@ -65,12 +56,12 @@ const CreateTeamForm = ({form}: FormProps<CreateTeamFormValues>) => {
   )
 }
 
-export const ModalCreateTeamForm = withModalForm(CreateTeamForm, { 
-  title: "Create Team", 
-  okText: "Create", 
+export const ModalCreateTeamForm = withModalForm(CreateTeamForm, {
+  title: 'Create Team',
+  okText: 'Create',
   useFormState: () => useAppSelector(selectEditTeamContext),
   onOk: (values: CreateTeamFormValues) => createTeam(values),
-  onCancel: setEditMode(false)
+  onCancel: setEditMode(false),
 })
 
 export default ModalCreateTeamForm
