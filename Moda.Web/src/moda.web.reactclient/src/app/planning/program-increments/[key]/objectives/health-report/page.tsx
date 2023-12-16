@@ -83,7 +83,7 @@ const ObjectiveHealthReportPage = ({ params }) => {
       { field: 'isStretch', width: 100 },
       {
         field: 'programIncrement',
-        valueFormatter: (params) => params.data.programIncrement.name,
+        valueFormatter: (params) => params.value.name,
         useValueFormatterForExport: true,
         cellRenderer: ProgramIncrementLinkCellRenderer,
         hide: true,
@@ -91,7 +91,7 @@ const ObjectiveHealthReportPage = ({ params }) => {
       { field: 'status.name', headerName: 'Status', width: 125 },
       {
         field: 'team',
-        valueFormatter: (params) => params.data.team.name,
+        valueFormatter: (params) => params.value.name,
         cellRenderer: PlanningTeamLinkCellRenderer,
         hide: false,
       },
