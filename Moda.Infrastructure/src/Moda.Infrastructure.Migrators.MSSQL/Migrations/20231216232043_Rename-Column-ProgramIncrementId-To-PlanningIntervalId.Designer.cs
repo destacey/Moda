@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Moda.Infrastructure.Persistence.Context;
 
@@ -11,9 +12,11 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    partial class ModaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231216232043_Rename-Column-ProgramIncrementId-To-PlanningIntervalId")]
+    partial class RenameColumnProgramIncrementIdToPlanningIntervalId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -840,7 +843,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("PlanningIntervals", "Planning");
+                    b.ToTable("ProgramIncrements", "Planning");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalObjective", b =>
@@ -924,7 +927,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("PlanningIntervalId", "IsDeleted"), new[] { "Id", "Key", "ObjectiveId", "Type", "IsStretch" });
 
-                    b.ToTable("PlanningIntervalObjectives", "Planning");
+                    b.ToTable("ProgramIncrementObjectives", "Planning");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningIntervalTeam", b =>
@@ -943,7 +946,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("PlanningIntervalTeams", "Planning");
+                    b.ToTable("ProgramIncrementTeams", "Planning");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.PlanningTeam", b =>
@@ -1685,7 +1688,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                             b1.HasIndex("Start", "End");
 
-                            b1.ToTable("PlanningIntervals", "Planning");
+                            b1.ToTable("ProgramIncrements", "Planning");
 
                             b1.WithOwner()
                                 .HasForeignKey("PlanningIntervalId");
