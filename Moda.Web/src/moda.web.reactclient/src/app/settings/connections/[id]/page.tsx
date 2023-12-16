@@ -1,8 +1,8 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { useEffect, useState } from 'react'
 import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
+import { useEffect, useState } from 'react'
 import { Button, Card, Space, message } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
@@ -31,9 +31,9 @@ const ConnectionDetailsPage = ({ params }) => {
   const [isImportingWorkspaces, setIsImportingWorkspaces] = useState(false)
   const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
-  const [openInitWorkspaceForm, setOpenInitWorkspaceForm] =
-    useState<boolean>(false)
-  const [initWorkspaceId, setInitWorkspaceId] = useState<string>(null)
+  // const [openInitWorkspaceForm, setOpenInitWorkspaceForm] =
+  //   useState<boolean>(false)
+  // const [initWorkspaceId, setInitWorkspaceId] = useState<string>(null)
   const [messageApi, contextHolder] = message.useMessage()
   const dispatch = useAppDispatch()
   const pathname = usePathname()
@@ -57,8 +57,8 @@ const ConnectionDetailsPage = ({ params }) => {
     useImportAzdoBoardsConnectionWorkspacesMutation()
 
   const initWorkspace = (workspaceId: string) => {
-    setInitWorkspaceId(workspaceId)
-    setOpenInitWorkspaceForm(true)
+    // setInitWorkspaceId(workspaceId)
+    // setOpenInitWorkspaceForm(true)
   }
 
   const tabs = [
@@ -76,6 +76,7 @@ const ConnectionDetailsPage = ({ params }) => {
           workProcesses={connectionData?.configuration?.workProcesses}
           organizationUrl={connectionData?.configuration?.organizationUrl}
           initWorkspace={initWorkspace}
+          //initWorkspace={() => null}
         />
       ),
     },
@@ -107,11 +108,11 @@ const ConnectionDetailsPage = ({ params }) => {
     }
   }
 
-  const onInitWorkspaceFormClosed = (wasSaved: boolean) => {
-    setOpenInitWorkspaceForm(false)
-    setInitWorkspaceId(null)
-    refetch()
-  }
+  // const onInitWorkspaceFormClosed = (wasSaved: boolean) => {
+  //   setOpenInitWorkspaceForm(false)
+  //   setInitWorkspaceId(null)
+  //   refetch()
+  // }
 
   const importWorkspaces = async () => {
     try {
@@ -190,7 +191,7 @@ const ConnectionDetailsPage = ({ params }) => {
           onFormCancel={() => onEditConnectionFormClosed(false)}
         />
       )}
-      {openInitWorkspaceForm && (
+      {/* {openInitWorkspaceForm && (
         <InitWorkspaceIntegrationForm
           showForm={openInitWorkspaceForm}
           connectionId={connectionData.id}
@@ -198,7 +199,7 @@ const ConnectionDetailsPage = ({ params }) => {
           onFormCreate={() => onInitWorkspaceFormClosed(false)}
           onFormCancel={() => onInitWorkspaceFormClosed(false)}
         />
-      )}
+      )} */}
     </>
   )
 }

@@ -34,12 +34,12 @@ const AzdoBoardsWorkspaces = (props: AzdoBoardsWorkspacesProps) => {
     return workProcess?.name
   }
 
-  const allowIntegrationSetup = (workProcessId?: string) => {
-    if (!workProcessId) return false
+  // const allowIntegrationSetup = (workProcessId?: string) => {
+  //   if (!workProcessId) return false
 
-    // and the workprocess isn't already integrated
-    return !!getWorkProcessName(workProcessId)
-  }
+  //   // and the workprocess isn't already integrated
+  //   return !!getWorkProcessName(workProcessId)
+  // }
 
   return (
     <>
@@ -81,16 +81,16 @@ const AzdoBoardsWorkspaces = (props: AzdoBoardsWorkspacesProps) => {
                       </Link>
                     </>
                   }
-                  extra={
-                    allowIntegrationSetup(item.workProcessId) && (
-                      <Button
-                        type="text"
-                        title="Setup Workspace Integration"
-                        icon={<AppstoreAddOutlined />}
-                        onClick={() => props.initWorkspace(item.externalId)}
-                      />
-                    )
-                  }
+                  // extra={
+                  //   allowIntegrationSetup(item.workProcessId) && (
+                  //     <Button
+                  //       type="text"
+                  //       title="Setup Workspace Integration"
+                  //       icon={<AppstoreAddOutlined />}
+                  //       onClick={() => props.initWorkspace(item.externalId)}
+                  //     />
+                  //   )
+                  // }
                 >
                   <Descriptions column={1} size="small">
                     <Descriptions.Item>{item.description}</Descriptions.Item>
