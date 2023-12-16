@@ -42,7 +42,7 @@ internal sealed class IterationService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting iterations for project {ProjectId} from Azure DevOps", projectId);
+            _logger.LogError(ex, "Exception thrown getting iterations for project {ProjectId} from Azure DevOps", projectId);
             return Result.Failure<List<WorkItemClassificationNode>>(ex.ToString());
         }
     }

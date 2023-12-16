@@ -2,22 +2,44 @@ import {
   AzureDevOpsBoardsWorkProcessDto,
   AzureDevOpsBoardsWorkspaceDto,
 } from '@/src/services/moda-api'
-import { ExportOutlined } from '@ant-design/icons'
-import { Alert, Card, Descriptions, List, Space, Typography } from 'antd'
+import { AppstoreAddOutlined, ExportOutlined } from '@ant-design/icons'
+import {
+  Alert,
+  Button,
+  Card,
+  Descriptions,
+  List,
+  Space,
+  Typography,
+} from 'antd'
 import Link from 'next/link'
 
 interface AzdoBoardsWorkspacesProps {
   workspaces: AzureDevOpsBoardsWorkspaceDto[]
   workProcesses: AzureDevOpsBoardsWorkProcessDto[]
   organizationUrl: string
+  initWorkspace: (workspaceId: string) => void
 }
 
-const AzdoBoardsWorkspaces = ({
-  workspaces,
-  workProcesses,
-  organizationUrl,
-}: AzdoBoardsWorkspacesProps) => {
-  if (!workspaces) return null
+const AzdoBoardsWorkspaces = (props: AzdoBoardsWorkspacesProps) => {
+  if (!props.workspaces) return null
+
+  const getWorkProcessName = (workProcessId?: string) => {
+    if (!workProcessId) return null
+
+    const workProcess = props.workProcesses.find(
+      (x) => x.externalId === workProcessId,
+    )
+
+    return workProcess?.name
+  }
+
+  // const allowIntegrationSetup = (workProcessId?: string) => {
+  //   if (!workProcessId) return false
+
+  //   // and the workprocess isn't already integrated
+  //   return !!getWorkProcessName(workProcessId)
+  // }
 
   return (
     <>
@@ -25,7 +47,7 @@ const AzdoBoardsWorkspaces = ({
         <Typography.Text>
           The workspaces below represent projects within Azure DevOps.
         </Typography.Text>
-        {workspaces.length === 0 ? (
+        {props.workspaces.length === 0 ? (
           <Alert
             message="No workspaces were found for this connection."
             type="error"
@@ -41,7 +63,9 @@ const AzdoBoardsWorkspaces = ({
               xl: 4,
               xxl: 6,
             }}
-            dataSource={workspaces}
+            dataSource={props.workspaces.sort((a, b) =>
+              a.name.localeCompare(b.name),
+            )}
             renderItem={(item) => (
               <List.Item>
                 <Card
@@ -49,7 +73,7 @@ const AzdoBoardsWorkspaces = ({
                     <>
                       {item.name}{' '}
                       <Link
-                        href={`${organizationUrl}/${item.name}`}
+                        href={`${props.organizationUrl}/${item.name}`}
                         target="_blank"
                         title="Open in Azure DevOps"
                       >
@@ -57,13 +81,21 @@ const AzdoBoardsWorkspaces = ({
                       </Link>
                     </>
                   }
+                  // extra={
+                  //   allowIntegrationSetup(item.workProcessId) && (
+                  //     <Button
+                  //       type="text"
+                  //       title="Setup Workspace Integration"
+                  //       icon={<AppstoreAddOutlined />}
+                  //       onClick={() => props.initWorkspace(item.externalId)}
+                  //     />
+                  //   )
+                  // }
                 >
                   <Descriptions column={1} size="small">
                     <Descriptions.Item>{item.description}</Descriptions.Item>
                     <Descriptions.Item label="Work Process">
-                      {workProcesses.find(
-                        (x) => x.externalId === item.workProcessId,
-                      )?.name ?? 'Not Found'}
+                      {getWorkProcessName(item.workProcessId) ?? 'Not Found'}
                     </Descriptions.Item>
                   </Descriptions>
                 </Card>

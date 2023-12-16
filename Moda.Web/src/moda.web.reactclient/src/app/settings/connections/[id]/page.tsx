@@ -1,9 +1,9 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { useEffect, useState } from 'react'
 import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
-import { Button, Card, Divider, Space, Tabs, message } from 'antd'
+import { useEffect, useState } from 'react'
+import { Button, Card, Space, message } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
@@ -18,6 +18,7 @@ import { ExportOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
+import InitWorkspaceIntegrationForm from '../components/init-workspace-integration-form'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -30,6 +31,9 @@ const ConnectionDetailsPage = ({ params }) => {
   const [isImportingWorkspaces, setIsImportingWorkspaces] = useState(false)
   const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
+  // const [openInitWorkspaceForm, setOpenInitWorkspaceForm] =
+  //   useState<boolean>(false)
+  // const [initWorkspaceId, setInitWorkspaceId] = useState<string>(null)
   const [messageApi, contextHolder] = message.useMessage()
   const dispatch = useAppDispatch()
   const pathname = usePathname()
@@ -52,6 +56,11 @@ const ConnectionDetailsPage = ({ params }) => {
   const importWorkspacesMutation =
     useImportAzdoBoardsConnectionWorkspacesMutation()
 
+  const initWorkspace = (workspaceId: string) => {
+    // setInitWorkspaceId(workspaceId)
+    // setOpenInitWorkspaceForm(true)
+  }
+
   const tabs = [
     {
       key: ConnectionTabs.Details,
@@ -66,6 +75,8 @@ const ConnectionDetailsPage = ({ params }) => {
           workspaces={connectionData?.configuration?.workspaces}
           workProcesses={connectionData?.configuration?.workProcesses}
           organizationUrl={connectionData?.configuration?.organizationUrl}
+          initWorkspace={initWorkspace}
+          //initWorkspace={() => null}
         />
       ),
     },
@@ -97,13 +108,21 @@ const ConnectionDetailsPage = ({ params }) => {
     }
   }
 
+  // const onInitWorkspaceFormClosed = (wasSaved: boolean) => {
+  //   setOpenInitWorkspaceForm(false)
+  //   setInitWorkspaceId(null)
+  //   refetch()
+  // }
+
   const importWorkspaces = async () => {
     try {
       await importWorkspacesMutation.mutateAsync(params.id)
       messageApi.success('Successfully imported workspaces.')
     } catch (error) {
       console.error(error)
-      messageApi.error('Failed to import workspaces.')
+      messageApi.error(
+        `Failed to initialize workspace. Error: ${error.supportMessage}`,
+      )
     }
     setIsImportingWorkspaces(false)
   }
@@ -172,6 +191,15 @@ const ConnectionDetailsPage = ({ params }) => {
           onFormCancel={() => onEditConnectionFormClosed(false)}
         />
       )}
+      {/* {openInitWorkspaceForm && (
+        <InitWorkspaceIntegrationForm
+          showForm={openInitWorkspaceForm}
+          connectionId={connectionData.id}
+          externalId={initWorkspaceId}
+          onFormCreate={() => onInitWorkspaceFormClosed(false)}
+          onFormCancel={() => onInitWorkspaceFormClosed(false)}
+        />
+      )} */}
     </>
   )
 }

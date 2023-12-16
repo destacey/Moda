@@ -165,7 +165,6 @@ const ProgramIncrementObjectivesGrid = ({
         width: 50,
         filter: false,
         sortable: false,
-        exportable: false,
         hide: !canManageObjectives,
         cellRenderer: (params) => {
           const menuItems = getRowMenuItems({

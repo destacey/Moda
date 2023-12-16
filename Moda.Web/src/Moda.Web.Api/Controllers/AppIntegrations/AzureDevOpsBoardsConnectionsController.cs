@@ -116,15 +116,49 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
 
     [HttpPost("{id}/import-workspaces")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
-    [OpenApiOperation("Import Azure DevOps Boards projects as Moda workspaces.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [OpenApiOperation("Import Azure DevOps projects as Moda workspaces.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> ImportWorkspaces(Guid id, CancellationToken cancellationToken, [FromServices] IAzureDevOpsBoardsImportService azureDevOpsBoardsImportService)
+    public async Task<ActionResult> ImportWorkspaces(Guid id, [FromServices] IAzureDevOpsBoardsImportService azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {
         var result = await azureDevOpsBoardsImportService.ImportWorkspaces(id, cancellationToken);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "AzureDevOpsBoardsConnectionsController.ImportWorkspaces"
+            };
+            return BadRequest(error);
+        }
 
-        return result.IsSuccess
-            ? Ok()
-            : BadRequest(result.Error);
+        return NoContent();
+    }
+
+    [HttpPost("{id}/init-workspace-integration")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
+    [OpenApiOperation("Initialize Azure DevOps project integration as a Moda workspace.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> InitWorkspaceIntegration(Guid id, InitWorkspaceIntegrationRequest request, [FromServices] IAzureDevOpsBoardsImportService azureDevOpsBoardsImportService, CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest();
+
+        var result = await azureDevOpsBoardsImportService.InitWorkspaceIntegration(request.Id, request.ExternalId, request.WorkspaceKey, cancellationToken);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "AzureDevOpsBoardsConnectionsController.InitWorkspaceIntegration"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
     }
 }

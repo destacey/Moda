@@ -37,7 +37,7 @@ internal sealed class ProjectService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting projects from Azure DevOps");
+            _logger.LogError(ex, "Exception thrown getting projects from Azure DevOps");
             return Result.Failure<List<TeamProjectReference>>(ex.ToString());
         }
     }
@@ -57,7 +57,7 @@ internal sealed class ProjectService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting project {ProjectId} from Azure DevOps", projectId);
+            _logger.LogError(ex, "Exception thrown getting project {ProjectId} from Azure DevOps", projectId);
             return Result.Failure<TeamProject>(ex.ToString());
         }
     }

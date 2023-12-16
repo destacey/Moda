@@ -2,7 +2,7 @@
 using Moda.Common.Application.Interfaces.ExternalWork;
 
 namespace Moda.Integrations.AzureDevOps.Models;
-public class AzdoWorkspace : IExternalWorkspace
+public record AzdoWorkspace : IExternalWorkspace
 {
     public AzdoWorkspace(TeamProject teamProject)
     {

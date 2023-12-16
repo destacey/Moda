@@ -193,7 +193,7 @@ const EditProgramIncrementForm = ({
           <Form.Item
             name="description"
             label="Description"
-            help="Markdown enabled"
+            extra="Markdown enabled"
           >
             <Input.TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}

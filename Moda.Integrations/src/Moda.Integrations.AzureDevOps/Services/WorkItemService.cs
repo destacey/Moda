@@ -35,7 +35,7 @@ internal sealed class WorkItemService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting work item for project {ProjectId} from Azure DevOps", projectId);
+            _logger.LogError(ex, "Exception thrown getting work item for project {ProjectId} from Azure DevOps", projectId);
             return Result.Failure<WorkItem>(ex.ToString());
         }
     }
@@ -95,7 +95,7 @@ internal sealed class WorkItemService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting work items for project {ProjectId} from Azure DevOps", projectId);
+            _logger.LogError(ex, "Exception thrown getting work items for project {ProjectId} from Azure DevOps", projectId);
             return Result.Failure<List<WorkItem>>(ex.ToString());
         }
     }
@@ -119,7 +119,7 @@ internal sealed class WorkItemService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting work items for project {ProjectId} from Azure DevOps", projectId);
+            _logger.LogError(ex, "Exception thrown getting work items for project {ProjectId} from Azure DevOps", projectId);
             return Result.Failure<List<WorkItem>>(ex.ToString());
         }
     }

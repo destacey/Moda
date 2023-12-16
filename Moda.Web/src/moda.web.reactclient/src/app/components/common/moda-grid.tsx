@@ -85,7 +85,6 @@ const ModaGrid = ({
   useEffect(() => {
     if (!gridRef.current?.api) return
 
-    console.log(isDataLoading)
     if (isDataLoading) {
       gridRef.current?.api.showLoadingOverlay()
     } else if (rowData && rowCount === 0) {

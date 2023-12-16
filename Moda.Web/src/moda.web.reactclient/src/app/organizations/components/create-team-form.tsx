@@ -45,7 +45,11 @@ const CreateTeamForm = ({ form }: FormProps<CreateTeamFormValues>) => {
           }
         />
       </Form.Item>
-      <Form.Item name="description" label="Description" help="Markdown enabled">
+      <Form.Item
+        name="description"
+        label="Description"
+        extra="Markdown enabled"
+      >
         <Input.TextArea
           autoSize={{ minRows: 6, maxRows: 10 }}
           showCount

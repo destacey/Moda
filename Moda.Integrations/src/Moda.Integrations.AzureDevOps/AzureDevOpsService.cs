@@ -39,7 +39,7 @@ public class AzureDevOpsService : IAzureDevOpsService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error testing Azure DevOps connection.");
+            _logger.LogError(ex, "Exception thrown testing Azure DevOps connection.");
             return Result.Failure(ex.InnerException?.Message ?? ex.Message);
         }
     }
@@ -146,21 +146,21 @@ public class AzureDevOpsService : IAzureDevOpsService
         return Result.Success(workItems);
     }
 
-    public async Task<Result<List<IExternalWorkType>>> GetWorkItemTypes(string organizationUrl, string token, Guid projectId, CancellationToken cancellationToken)
-    {
-        var connection = CreateVssConnection(organizationUrl, token);
-        var workItemTypeService = GetService<WorkItemTypeService>(connection);
+    //public async Task<Result<List<IExternalWorkType>>> GetWorkItemTypes(string organizationUrl, string token, Guid projectId, CancellationToken cancellationToken)
+    //{
+    //    var connection = CreateVssConnection(organizationUrl, token);
+    //    var workItemTypeService = GetService<WorkItemTypeService>(connection);
 
-        var result = await workItemTypeService.GetWorkItemTypes(projectId, cancellationToken);
-        if (result.IsFailure)
-            return Result.Failure<List<IExternalWorkType>>(result.Error);
+    //    var result = await workItemTypeService.GetWorkItemTypes(projectId, cancellationToken);
+    //    if (result.IsFailure)
+    //        return Result.Failure<List<IExternalWorkType>>(result.Error);
 
-        var workItems = result.Value
-            .Select(w => new AzdoWorkType(w))
-            .ToList<IExternalWorkType>();
+    //    var workItems = result.Value
+    //        .Select(w => new AzdoWorkType(w))
+    //        .ToList<IExternalWorkType>();
 
-        return Result.Success(workItems);
-    }
+    //    return Result.Success(workItems);
+    //}
 
     // TODO should these be cached?  any impact on GC if cached?  // should the client be created and cached here rather than in the service constructor?
     private TService GetService<TService>(VssConnection? connection)

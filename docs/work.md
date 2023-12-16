@@ -17,7 +17,7 @@ The work domain provides the capabilities to manage your teams work items.
 - [Work State Category](#work-state-category)
 
 ## Workspace
-A workspace is a container for work items. A workspace lives within a single [organization](./organization.md).
+A workspace is a container for work items.
 
 A workspace is either owned by Moda or managed by an external application and synchronized with Moda.
 

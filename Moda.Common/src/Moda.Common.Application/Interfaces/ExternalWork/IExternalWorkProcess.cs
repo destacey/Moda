@@ -5,4 +5,5 @@ public interface IExternalWorkProcess
     string Name { get; }
     string? Description { get; }
     List<Guid> WorkspaceIds { get; }
+    bool IsEnabled { get; }
 }
