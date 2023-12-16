@@ -207,6 +207,7 @@ const ProgramIncrementDetailsPage = ({ params }) => {
         tabKey == ProgramIncrementTabs.Objectives &&
         !objectivesQueryEnabled
       ) {
+        setTeamsQueryEnabled(true)
         setObjectivesQueryEnabled(true)
       } else if (
         tabKey == ProgramIncrementTabs.RiskManagement &&
