@@ -12,6 +12,6 @@ public enum ObjectiveType
     [Display(Name = "Company", Order = 3)]
     Company = 3,
 
-    [Display(Name = "Program Increment", Order = 4)]
-    ProgramIncrement = 4
+    [Display(Name = "Planning Interval", Order = 4)]
+    PlanningInterval = 4
 }

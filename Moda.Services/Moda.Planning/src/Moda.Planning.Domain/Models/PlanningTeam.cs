@@ -12,7 +12,7 @@ namespace Moda.Planning.Domain.Models;
 /// <seealso cref="Moda.Common.Domain.Interfaces.ISoftDelete" />
 public class PlanningTeam : BaseEntity<Guid>, ISoftDelete
 {
-    protected readonly List<ProgramIncrementTeam> _programIncrementTeams = new();
+    protected readonly List<PlanningIntervalTeam> _planningIntervalTeams = new();
 
     private PlanningTeam() { }
 
@@ -37,7 +37,7 @@ public class PlanningTeam : BaseEntity<Guid>, ISoftDelete
     public Instant? Deleted { get; set; }
     public Guid? DeletedBy { get; set; }
     public bool IsDeleted { get; set; }
-    public IReadOnlyCollection<ProgramIncrementTeam> ProgramIncrementTeams => _programIncrementTeams.AsReadOnly();
+    public IReadOnlyCollection<PlanningIntervalTeam> PlanningIntervalTeams => _planningIntervalTeams.AsReadOnly();
 
 
     /// <summary>Updates the specified team from an Organization BaseTeam.</summary>

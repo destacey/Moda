@@ -57,11 +57,11 @@ public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
     }
 }
 
-public class ProgramIncrementConfig : IEntityTypeConfiguration<ProgramIncrement>
+public class PlanningIntervalConfig : IEntityTypeConfiguration<PlanningInterval>
 {
-    public void Configure(EntityTypeBuilder<ProgramIncrement> builder)
+    public void Configure(EntityTypeBuilder<PlanningInterval> builder)
     {
-        builder.ToTable("ProgramIncrements", SchemaNames.Planning);
+        builder.ToTable("PlanningIntervals", SchemaNames.Planning);
 
         builder.HasKey(p => p.Id);
         builder.HasAlternateKey(p => p.Key);
@@ -97,31 +97,31 @@ public class ProgramIncrementConfig : IEntityTypeConfiguration<ProgramIncrement>
     }
 }
 
-public class ProgramIncrementObjectiveConfig : IEntityTypeConfiguration<ProgramIncrementObjective>
+public class PlanningIntervalObjectiveConfig : IEntityTypeConfiguration<PlanningIntervalObjective>
 {
-    public void Configure(EntityTypeBuilder<ProgramIncrementObjective> builder)
+    public void Configure(EntityTypeBuilder<PlanningIntervalObjective> builder)
     {
-        builder.ToTable("ProgramIncrementObjectives", SchemaNames.Planning);
+        builder.ToTable("PlanningIntervalObjectives", SchemaNames.Planning);
 
         builder.HasKey(o => o.Id);
         builder.HasAlternateKey(o => o.Key);
 
         builder.HasIndex(o => new { o.Id, o.IsDeleted })
-            .IncludeProperties(o => new { o.Key, o.ProgramIncrementId, o.ObjectiveId, o.Type, o.IsStretch });
+            .IncludeProperties(o => new { o.Key, o.PlanningIntervalId, o.ObjectiveId, o.Type, o.IsStretch });
         builder.HasIndex(o => new { o.Key, o.IsDeleted })
-            .IncludeProperties(o => new { o.Id, o.ProgramIncrementId, o.ObjectiveId, o.Type, o.IsStretch });
-        builder.HasIndex(o => new { o.ProgramIncrementId, o.IsDeleted })
+            .IncludeProperties(o => new { o.Id, o.PlanningIntervalId, o.ObjectiveId, o.Type, o.IsStretch });
+        builder.HasIndex(o => new { o.PlanningIntervalId, o.IsDeleted })
             .IncludeProperties(o => new { o.Id, o.Key, o.ObjectiveId, o.Type, o.IsStretch });
         builder.HasIndex(o => new { o.ObjectiveId, o.IsDeleted })
-            .IncludeProperties(o => new { o.Id, o.Key, o.ProgramIncrementId, o.Type, o.IsStretch });
+            .IncludeProperties(o => new { o.Id, o.Key, o.PlanningIntervalId, o.Type, o.IsStretch });
         builder.HasIndex(o => o.IsDeleted)
-            .IncludeProperties(o => new { o.Id, o.Key, o.ProgramIncrementId, o.ObjectiveId, o.Type, o.IsStretch });
+            .IncludeProperties(o => new { o.Id, o.Key, o.PlanningIntervalId, o.ObjectiveId, o.Type, o.IsStretch });
 
         builder.Property(o => o.Key).ValueGeneratedOnAdd();
 
         builder.Property(o => o.ObjectiveId).IsRequired();
         builder.Property(o => o.Type).IsRequired()
-            .HasConversion<EnumConverter<ProgramIncrementObjectiveType>>()
+            .HasConversion<EnumConverter<PlanningIntervalObjectiveType>>()
             .HasMaxLength(64)
             .HasColumnType("varchar");
         builder.Property(o => o.Status).IsRequired()
@@ -140,9 +140,9 @@ public class ProgramIncrementObjectiveConfig : IEntityTypeConfiguration<ProgramI
         builder.Property(o => o.IsDeleted);
 
         // Relationships
-        builder.HasOne<ProgramIncrement>()
+        builder.HasOne<PlanningInterval>()
             .WithMany(p => p.Objectives)
-            .HasForeignKey(o => o.ProgramIncrementId)
+            .HasForeignKey(o => o.PlanningIntervalId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(o => o.Team)
@@ -159,27 +159,27 @@ public class ProgramIncrementObjectiveConfig : IEntityTypeConfiguration<ProgramI
     }
 }
 
-public class ProgramIncrementTeamConfig : IEntityTypeConfiguration<ProgramIncrementTeam>
+public class PlanningIntervalTeamConfig : IEntityTypeConfiguration<PlanningIntervalTeam>
 {
-    public void Configure(EntityTypeBuilder<ProgramIncrementTeam> builder)
+    public void Configure(EntityTypeBuilder<PlanningIntervalTeam> builder)
     {
-        builder.ToTable("ProgramIncrementTeams", SchemaNames.Planning);
+        builder.ToTable("PlanningIntervalTeams", SchemaNames.Planning);
 
-        builder.HasKey(p => new { p.ProgramIncrementId, p.TeamId });
+        builder.HasKey(p => new { p.PlanningIntervalId, p.TeamId });
 
-        builder.HasIndex(p => p.ProgramIncrementId)
+        builder.HasIndex(p => p.PlanningIntervalId)
             .IncludeProperties(p => p.TeamId);
 
-        builder.Property(p => p.ProgramIncrementId).IsRequired();
+        builder.Property(p => p.PlanningIntervalId).IsRequired();
         builder.Property(p => p.TeamId).IsRequired();
 
-        builder.HasOne<ProgramIncrement>()
+        builder.HasOne<PlanningInterval>()
             .WithMany(p => p.Teams)
-            .HasForeignKey(p => p.ProgramIncrementId)
+            .HasForeignKey(p => p.PlanningIntervalId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(p => p.Team)
-            .WithMany(p => p.ProgramIncrementTeams)
+            .WithMany(p => p.PlanningIntervalTeams)
             .HasForeignKey(p => p.TeamId)
             .OnDelete(DeleteBehavior.Cascade);
     }

@@ -1083,7 +1083,7 @@ export class UsersClient {
     }
 }
 
-export class ProgramIncrementsClient {
+export class PlanningIntervalsClient {
     private instance: AxiosInstance;
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -1097,10 +1097,10 @@ export class ProgramIncrementsClient {
     }
 
     /**
-     * Get a list of program increments.
+     * Get a list of planning intervals.
      */
-    getList( cancelToken?: CancelToken | undefined): Promise<ProgramIncrementListDto[]> {
-        let url_ = this.baseUrl + "/api/planning/program-increments";
+    getList( cancelToken?: CancelToken | undefined): Promise<PlanningIntervalListDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -1123,7 +1123,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processGetList(response: AxiosResponse): Promise<ProgramIncrementListDto[]> {
+    protected processGetList(response: AxiosResponse): Promise<PlanningIntervalListDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1138,7 +1138,7 @@ export class ProgramIncrementsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProgramIncrementListDto[]>(result200);
+            return Promise.resolve<PlanningIntervalListDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -1151,14 +1151,14 @@ export class ProgramIncrementsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ProgramIncrementListDto[]>(null as any);
+        return Promise.resolve<PlanningIntervalListDto[]>(null as any);
     }
 
     /**
-     * Create a program increment.
+     * Create a planning interval.
      */
-    create(request: CreateProgramIncrementRequest, cancelToken?: CancelToken | undefined): Promise<string> {
-        let url_ = this.baseUrl + "/api/planning/program-increments";
+    create(request: CreatePlanningIntervalRequest, cancelToken?: CancelToken | undefined): Promise<string> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -1220,10 +1220,10 @@ export class ProgramIncrementsClient {
     }
 
     /**
-     * Get program increment details.
+     * Get planning interval details.
      */
-    getById(id: string, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementDetailsDto> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}";
+    getById(id: string, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1249,7 +1249,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processGetById(response: AxiosResponse): Promise<ProgramIncrementDetailsDto> {
+    protected processGetById(response: AxiosResponse): Promise<PlanningIntervalDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1264,7 +1264,7 @@ export class ProgramIncrementsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProgramIncrementDetailsDto>(result200);
+            return Promise.resolve<PlanningIntervalDetailsDto>(result200);
 
         } else if (status === 404) {
             const _responseText = response.data;
@@ -1284,10 +1284,10 @@ export class ProgramIncrementsClient {
     }
 
     /**
-     * Update a program increment.
+     * Update a planning interval.
      */
-    update(id: string, request: UpdateProgramIncrementRequest, cancelToken?: CancelToken | undefined): Promise<void> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}";
+    update(id: string, request: UpdatePlanningIntervalRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1352,10 +1352,10 @@ export class ProgramIncrementsClient {
     }
 
     /**
-     * Get program increment details using the key.
+     * Get planning interval details using the key.
      */
-    getByKey(id: number, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementDetailsDto> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/key/{id}";
+    getByKey(id: number, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/key/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1381,7 +1381,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processGetByKey(response: AxiosResponse): Promise<ProgramIncrementDetailsDto> {
+    protected processGetByKey(response: AxiosResponse): Promise<PlanningIntervalDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1396,7 +1396,7 @@ export class ProgramIncrementsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProgramIncrementDetailsDto>(result200);
+            return Promise.resolve<PlanningIntervalDetailsDto>(result200);
 
         } else if (status === 404) {
             const _responseText = response.data;
@@ -1418,8 +1418,8 @@ export class ProgramIncrementsClient {
     /**
      * Get the PI predictability for all teams.
      */
-    getPredictability(id: string, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementPredictabilityDto> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/predictability";
+    getPredictability(id: string, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalPredictabilityDto> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/predictability";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1445,7 +1445,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processGetPredictability(response: AxiosResponse): Promise<ProgramIncrementPredictabilityDto> {
+    protected processGetPredictability(response: AxiosResponse): Promise<PlanningIntervalPredictabilityDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1460,7 +1460,7 @@ export class ProgramIncrementsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProgramIncrementPredictabilityDto>(result200);
+            return Promise.resolve<PlanningIntervalPredictabilityDto>(result200);
 
         } else if (status === 404) {
             const _responseText = response.data;
@@ -1480,14 +1480,14 @@ export class ProgramIncrementsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ProgramIncrementPredictabilityDto>(null as any);
+        return Promise.resolve<PlanningIntervalPredictabilityDto>(null as any);
     }
 
     /**
-     * Get a list of program increment teams.
+     * Get a list of planning interval teams.
      */
-    getTeams(id: string, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementTeamResponse[]> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/teams";
+    getTeams(id: string, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalTeamResponse[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/teams";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1513,7 +1513,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processGetTeams(response: AxiosResponse): Promise<ProgramIncrementTeamResponse[]> {
+    protected processGetTeams(response: AxiosResponse): Promise<PlanningIntervalTeamResponse[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1528,7 +1528,7 @@ export class ProgramIncrementsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProgramIncrementTeamResponse[]>(result200);
+            return Promise.resolve<PlanningIntervalTeamResponse[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -1541,14 +1541,14 @@ export class ProgramIncrementsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ProgramIncrementTeamResponse[]>(null as any);
+        return Promise.resolve<PlanningIntervalTeamResponse[]>(null as any);
     }
 
     /**
-     * Manager program increment teams.
+     * Manager planning interval teams.
      */
-    manageTeams(id: string, request: ManageProgramIncrementTeamsRequest, cancelToken?: CancelToken | undefined): Promise<void> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/teams";
+    manageTeams(id: string, request: ManagePlanningIntervalTeamsRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/teams";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1609,7 +1609,7 @@ export class ProgramIncrementsClient {
      * Get the PI predictability for a team.
      */
     getTeamPredictability(id: string, teamId: string, cancelToken?: CancelToken | undefined): Promise<number | null> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/teams/{teamId}/predictability";
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/teams/{teamId}/predictability";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1670,11 +1670,11 @@ export class ProgramIncrementsClient {
     }
 
     /**
-     * Get a list of program increment teams.
+     * Get a list of planning interval teams.
      * @param teamId (optional) 
      */
-    getObjectives(id: string, teamId: string | null | undefined, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementObjectiveListDto[]> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/objectives?";
+    getObjectives(id: string, teamId: string | null | undefined, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalObjectiveListDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/objectives?";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1702,7 +1702,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processGetObjectives(response: AxiosResponse): Promise<ProgramIncrementObjectiveListDto[]> {
+    protected processGetObjectives(response: AxiosResponse): Promise<PlanningIntervalObjectiveListDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1717,7 +1717,7 @@ export class ProgramIncrementsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProgramIncrementObjectiveListDto[]>(result200);
+            return Promise.resolve<PlanningIntervalObjectiveListDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -1730,14 +1730,14 @@ export class ProgramIncrementsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ProgramIncrementObjectiveListDto[]>(null as any);
+        return Promise.resolve<PlanningIntervalObjectiveListDto[]>(null as any);
     }
 
     /**
-     * Create a program increment objective.
+     * Create a planning interval objective.
      */
-    createObjective(id: string, request: CreateProgramIncrementObjectiveRequest, cancelToken?: CancelToken | undefined): Promise<number> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/objectives";
+    createObjective(id: string, request: CreatePlanningIntervalObjectiveRequest, cancelToken?: CancelToken | undefined): Promise<number> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/objectives";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1813,10 +1813,10 @@ export class ProgramIncrementsClient {
     }
 
     /**
-     * Get a program increment objective.
+     * Get a planning interval objective.
      */
-    getObjectiveById(id: string, objectiveId: string, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementObjectiveDetailsDto> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/objectives/{objectiveId}";
+    getObjectiveById(id: string, objectiveId: string, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalObjectiveDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/objectives/{objectiveId}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1845,7 +1845,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processGetObjectiveById(response: AxiosResponse): Promise<ProgramIncrementObjectiveDetailsDto> {
+    protected processGetObjectiveById(response: AxiosResponse): Promise<PlanningIntervalObjectiveDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1860,7 +1860,7 @@ export class ProgramIncrementsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProgramIncrementObjectiveDetailsDto>(result200);
+            return Promise.resolve<PlanningIntervalObjectiveDetailsDto>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -1880,14 +1880,14 @@ export class ProgramIncrementsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ProgramIncrementObjectiveDetailsDto>(null as any);
+        return Promise.resolve<PlanningIntervalObjectiveDetailsDto>(null as any);
     }
 
     /**
-     * Update a program increment objective.
+     * Update a planning interval objective.
      */
-    updateObjective(id: string, objectiveId: string, request: UpdateProgramIncrementObjectiveRequest, cancelToken?: CancelToken | undefined): Promise<void> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/objectives/{objectiveId}";
+    updateObjective(id: string, objectiveId: string, request: UpdatePlanningIntervalObjectiveRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/objectives/{objectiveId}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -1962,10 +1962,10 @@ export class ProgramIncrementsClient {
     }
 
     /**
-     * Delete a program increment objective.
+     * Delete a planning interval objective.
      */
     deleteObjective(id: string, objectiveId: string, cancelToken?: CancelToken | undefined): Promise<void> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/objectives/{objectiveId}";
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/objectives/{objectiveId}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -2022,10 +2022,10 @@ export class ProgramIncrementsClient {
     }
 
     /**
-     * Get a program increment objective using the PI and Objective keys.
+     * Get a planning interval objective using the PI and Objective keys.
      */
-    getObjectiveByKey(id: number, objectiveId: number, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementObjectiveDetailsDto> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/key/{id}/objectives/{objectiveId}";
+    getObjectiveByKey(id: number, objectiveId: number, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalObjectiveDetailsDto> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/key/{id}/objectives/{objectiveId}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -2054,7 +2054,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processGetObjectiveByKey(response: AxiosResponse): Promise<ProgramIncrementObjectiveDetailsDto> {
+    protected processGetObjectiveByKey(response: AxiosResponse): Promise<PlanningIntervalObjectiveDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2069,7 +2069,7 @@ export class ProgramIncrementsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProgramIncrementObjectiveDetailsDto>(result200);
+            return Promise.resolve<PlanningIntervalObjectiveDetailsDto>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -2089,15 +2089,15 @@ export class ProgramIncrementsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ProgramIncrementObjectiveDetailsDto>(null as any);
+        return Promise.resolve<PlanningIntervalObjectiveDetailsDto>(null as any);
     }
 
     /**
-     * Get a health report for program increment objectives.
+     * Get a health report for planning interval objectives.
      * @param teamId (optional) 
      */
-    getObjectivesHealthReport(id: string, teamId: string | null | undefined, cancelToken?: CancelToken | undefined): Promise<ProgramIncrementObjectiveHealthCheckDto[]> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/objectives/health-report?";
+    getObjectivesHealthReport(id: string, teamId: string | null | undefined, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalObjectiveHealthCheckDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/objectives/health-report?";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -2125,7 +2125,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processGetObjectivesHealthReport(response: AxiosResponse): Promise<ProgramIncrementObjectiveHealthCheckDto[]> {
+    protected processGetObjectivesHealthReport(response: AxiosResponse): Promise<PlanningIntervalObjectiveHealthCheckDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2140,7 +2140,7 @@ export class ProgramIncrementsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProgramIncrementObjectiveHealthCheckDto[]>(result200);
+            return Promise.resolve<PlanningIntervalObjectiveHealthCheckDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -2153,11 +2153,11 @@ export class ProgramIncrementsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ProgramIncrementObjectiveHealthCheckDto[]>(null as any);
+        return Promise.resolve<PlanningIntervalObjectiveHealthCheckDto[]>(null as any);
     }
 
     /**
-     * Import objectives for a program increment from a csv file.
+     * Import objectives for a planning interval from a csv file.
      * @param contentType (optional) 
      * @param contentDisposition (optional) 
      * @param headers (optional) 
@@ -2166,7 +2166,7 @@ export class ProgramIncrementsClient {
      * @param fileName (optional) 
      */
     importObjectives(id: string, contentType: string | null | undefined, contentDisposition: string | null | undefined, headers: IHeaderDictionary | null | undefined, length: number | undefined, name: string | null | undefined, fileName: string | null | undefined, cancelToken?: CancelToken | undefined): Promise<void> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/objectives/import";
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/objectives/import";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -2246,8 +2246,8 @@ export class ProgramIncrementsClient {
     /**
      * Get a list of all PI objective statuses.
      */
-    getObjectiveStatuses( cancelToken?: CancelToken | undefined): Promise<ProgramIncrementObjectiveStatusDto[]> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/objective-statuses";
+    getObjectiveStatuses( cancelToken?: CancelToken | undefined): Promise<PlanningIntervalObjectiveStatusDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/objective-statuses";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -2270,7 +2270,7 @@ export class ProgramIncrementsClient {
         });
     }
 
-    protected processGetObjectiveStatuses(response: AxiosResponse): Promise<ProgramIncrementObjectiveStatusDto[]> {
+    protected processGetObjectiveStatuses(response: AxiosResponse): Promise<PlanningIntervalObjectiveStatusDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2285,7 +2285,7 @@ export class ProgramIncrementsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<ProgramIncrementObjectiveStatusDto[]>(result200);
+            return Promise.resolve<PlanningIntervalObjectiveStatusDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -2298,16 +2298,16 @@ export class ProgramIncrementsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ProgramIncrementObjectiveStatusDto[]>(null as any);
+        return Promise.resolve<PlanningIntervalObjectiveStatusDto[]>(null as any);
     }
 
     /**
-     * Get program increment risks.
+     * Get planning interval risks.
      * @param teamId (optional) 
      * @param includeClosed (optional) 
      */
     getRisks(id: string, teamId: string | null | undefined, includeClosed: boolean | undefined, cancelToken?: CancelToken | undefined): Promise<RiskListDto[]> {
-        let url_ = this.baseUrl + "/api/planning/program-increments/{id}/risks?";
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/risks?";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -7632,7 +7632,7 @@ export interface ToggleUserStatusRequest {
     activateUser?: boolean;
 }
 
-export interface ProgramIncrementListDto {
+export interface PlanningIntervalListDto {
     id?: string;
     key?: number;
     name?: string;
@@ -7641,7 +7641,7 @@ export interface ProgramIncrementListDto {
     state?: string;
 }
 
-export interface ProgramIncrementDetailsDto {
+export interface PlanningIntervalDetailsDto {
     id?: string;
     key?: number;
     name?: string;
@@ -7653,12 +7653,12 @@ export interface ProgramIncrementDetailsDto {
     predictability?: number | undefined;
 }
 
-export interface ProgramIncrementPredictabilityDto {
+export interface PlanningIntervalPredictabilityDto {
     predictability?: number;
-    teamPredictabilities?: ProgramIncrementTeamPredictabilityDto[];
+    teamPredictabilities?: PlanningIntervalTeamPredictabilityDto[];
 }
 
-export interface ProgramIncrementTeamPredictabilityDto {
+export interface PlanningIntervalTeamPredictabilityDto {
     team?: PlanningTeamNavigationDto;
     predictability?: number;
 }
@@ -7667,7 +7667,7 @@ export interface PlanningTeamNavigationDto extends NavigationDto {
     type?: string;
 }
 
-export interface CreateProgramIncrementRequest {
+export interface CreatePlanningIntervalRequest {
     /** Gets the team name. */
     name: string;
     /** Gets the team description. */
@@ -7678,7 +7678,7 @@ export interface CreateProgramIncrementRequest {
     end: Date;
 }
 
-export interface UpdateProgramIncrementRequest {
+export interface UpdatePlanningIntervalRequest {
     /** Gets or sets the identifier. */
     id?: string;
     /** Gets the team name. */
@@ -7693,7 +7693,7 @@ export interface UpdateProgramIncrementRequest {
     objectivesLocked?: boolean;
 }
 
-export interface ProgramIncrementTeamResponse {
+export interface PlanningIntervalTeamResponse {
     /** Gets or sets the identifier. */
     id?: string;
     /** Gets the key. */
@@ -7713,18 +7713,18 @@ export interface TeamNavigationDto extends NavigationDto {
     type?: string;
 }
 
-export interface ManageProgramIncrementTeamsRequest {
+export interface ManagePlanningIntervalTeamsRequest {
     id?: string;
     teamIds?: string[];
 }
 
-export interface ProgramIncrementObjectiveListDto {
+export interface PlanningIntervalObjectiveListDto {
     id?: string;
     key?: number;
     name?: string;
     status?: SimpleNavigationDto;
     healthCheck?: PlanningHealthCheckDto | undefined;
-    programIncrement?: NavigationDto;
+    planningInterval?: NavigationDto;
     team?: PlanningTeamNavigationDto;
     progress?: number;
     type?: SimpleNavigationDto;
@@ -7744,7 +7744,7 @@ export interface PlanningHealthCheckDto {
     expiration?: Date;
 }
 
-export interface ProgramIncrementObjectiveDetailsDto {
+export interface PlanningIntervalObjectiveDetailsDto {
     id?: string;
     key?: number;
     name?: string;
@@ -7752,7 +7752,7 @@ export interface ProgramIncrementObjectiveDetailsDto {
     status?: SimpleNavigationDto;
     healthCheck?: PlanningHealthCheckDto | undefined;
     progress?: number;
-    programIncrement?: NavigationDto;
+    planningInterval?: NavigationDto;
     team?: PlanningTeamNavigationDto;
     type?: SimpleNavigationDto;
     startDate?: Date | undefined;
@@ -7761,8 +7761,8 @@ export interface ProgramIncrementObjectiveDetailsDto {
     isStretch?: boolean;
 }
 
-export interface CreateProgramIncrementObjectiveRequest {
-    programIncrementId?: string;
+export interface CreatePlanningIntervalObjectiveRequest {
+    planningIntervalId?: string;
     teamId: string;
     name: string;
     description?: string | undefined;
@@ -7771,8 +7771,8 @@ export interface CreateProgramIncrementObjectiveRequest {
     isStretch?: boolean;
 }
 
-export interface UpdateProgramIncrementObjectiveRequest {
-    programIncrementId?: string;
+export interface UpdatePlanningIntervalObjectiveRequest {
+    planningIntervalId?: string;
     objectiveId?: string;
     name: string;
     description?: string | undefined;
@@ -7783,7 +7783,7 @@ export interface UpdateProgramIncrementObjectiveRequest {
     isStretch?: boolean;
 }
 
-export interface ProgramIncrementObjectiveHealthCheckDto {
+export interface PlanningIntervalObjectiveHealthCheckDto {
     /** Gets or sets the identifier. */
     id?: string;
     /** Gets the key. */
@@ -7794,7 +7794,7 @@ export interface ProgramIncrementObjectiveHealthCheckDto {
     status?: SimpleNavigationDto;
     /** Gets or sets the type. */
     type?: SimpleNavigationDto;
-    programIncrement?: NavigationDto;
+    planningInterval?: NavigationDto;
     team?: PlanningTeamNavigationDto;
     /** Gets a value indicating whether this instance is stretch. */
     isStretch?: boolean;
@@ -7904,7 +7904,7 @@ export interface IHeaderDictionary {
     XXSSProtection?: any[];
 }
 
-export interface ProgramIncrementObjectiveStatusDto {
+export interface PlanningIntervalObjectiveStatusDto {
     id?: number;
     name?: string;
     description?: string | undefined;

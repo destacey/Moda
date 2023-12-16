@@ -46,7 +46,7 @@ internal sealed class GetRiskQueryHandler : IQueryHandler<GetRiskQuery, RiskDeta
         else
         {
             var requestName = request.GetType().Name;
-            var exception = new InternalServerException("No program increment id or local id provided.");
+            var exception = new InternalServerException("No planning interval id or local id provided.");
 
             _logger.LogError(exception, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
             throw exception;

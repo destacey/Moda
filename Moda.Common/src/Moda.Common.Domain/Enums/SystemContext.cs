@@ -9,6 +9,6 @@ public enum SystemContext
     // 1000 - 1999: Common
 
     // 2000 - 2999: Planning
-    [Display(Name = "Planning.ProgramIncrement.Objective", Description = "Program Increment Objective", Order = 1)]
-    PlanningProgramIncrementObjective = 2010,
+    [Display(Name = "Planning.PlanningInterval.Objective", Description = "Planning Interval Objective", Order = 1)]
+    PlanningPlanningIntervalObjective = 2010,
 }

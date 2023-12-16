@@ -34,8 +34,8 @@ public static class ApplicationResource
     public const string Employees = nameof(Employees);
     public const string Teams = nameof(Teams);
 
-    public const string ProgramIncrements = nameof(ProgramIncrements);
-    public const string ProgramIncrementObjectives = nameof(ProgramIncrementObjectives);
+    public const string PlanningIntervals = nameof(PlanningIntervals);
+    public const string PlanningIntervalObjectives = nameof(PlanningIntervalObjectives);
     public const string Risks = nameof(Risks);
 
     public const string BacklogCategories = nameof(BacklogCategories);
@@ -126,14 +126,14 @@ public static class ApplicationPermissions
 
     private static readonly ApplicationPermission[] _planning = new ApplicationPermission[]
     {
-        new("View Program Increments", ApplicationAction.View, ApplicationResource.ProgramIncrements, IsBasic: true),
-        new("Create Program Increments", ApplicationAction.Create, ApplicationResource.ProgramIncrements),
-        new("Update Program Increments", ApplicationAction.Update, ApplicationResource.ProgramIncrements),
-        new("Delete Program Increments", ApplicationAction.Delete, ApplicationResource.ProgramIncrements),
+        new("View Planning Intervals", ApplicationAction.View, ApplicationResource.PlanningIntervals, IsBasic: true),
+        new("Create Planning Intervals", ApplicationAction.Create, ApplicationResource.PlanningIntervals),
+        new("Update Planning Intervals", ApplicationAction.Update, ApplicationResource.PlanningIntervals),
+        new("Delete Planning Intervals", ApplicationAction.Delete, ApplicationResource.PlanningIntervals),
 
-        new("View Program Increment Objectives", ApplicationAction.View, ApplicationResource.ProgramIncrementObjectives, IsBasic: true),
-        new("Create, update, and delete Program Increment Objectives", ApplicationAction.Manage, ApplicationResource.ProgramIncrementObjectives, IsBasic: true),
-        new("Import Program Increment Objectives", ApplicationAction.Import, ApplicationResource.ProgramIncrementObjectives),
+        new("View Planning Interval Objectives", ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives, IsBasic: true),
+        new("Create, update, and delete Planning Interval Objectives", ApplicationAction.Manage, ApplicationResource.PlanningIntervalObjectives, IsBasic: true),
+        new("Import Planning Interval Objectives", ApplicationAction.Import, ApplicationResource.PlanningIntervalObjectives),
 
         new("View Risks", ApplicationAction.View, ApplicationResource.Risks, IsBasic: true),
         new("Create Risks", ApplicationAction.Create, ApplicationResource.Risks, IsBasic: true),

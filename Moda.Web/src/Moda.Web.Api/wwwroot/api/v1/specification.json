@@ -820,13 +820,13 @@
         ]
       }
     },
-    "/api/planning/program-increments": {
+    "/api/planning/planning-intervals": {
       "get": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Get a list of program increments.",
-        "operationId": "ProgramIncrements_GetList",
+        "summary": "Get a list of planning intervals.",
+        "operationId": "PlanningIntervals_GetList",
         "responses": {
           "200": {
             "description": "",
@@ -835,7 +835,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ProgramIncrementListDto"
+                    "$ref": "#/components/schemas/PlanningIntervalListDto"
                   }
                 }
               }
@@ -860,16 +860,16 @@
       },
       "post": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Create a program increment.",
-        "operationId": "ProgramIncrements_Create",
+        "summary": "Create a planning interval.",
+        "operationId": "PlanningIntervals_Create",
         "requestBody": {
           "x-name": "request",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateProgramIncrementRequest"
+                "$ref": "#/components/schemas/CreatePlanningIntervalRequest"
               }
             }
           },
@@ -916,13 +916,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/{id}": {
+    "/api/planning/planning-intervals/{id}": {
       "get": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Get program increment details.",
-        "operationId": "ProgramIncrements_GetById",
+        "summary": "Get planning interval details.",
+        "operationId": "PlanningIntervals_GetById",
         "parameters": [
           {
             "name": "id",
@@ -941,7 +941,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProgramIncrementDetailsDto"
+                  "$ref": "#/components/schemas/PlanningIntervalDetailsDto"
                 }
               }
             }
@@ -975,10 +975,10 @@
       },
       "put": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Update a program increment.",
-        "operationId": "ProgramIncrements_Update",
+        "summary": "Update a planning interval.",
+        "operationId": "PlanningIntervals_Update",
         "parameters": [
           {
             "name": "id",
@@ -996,7 +996,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateProgramIncrementRequest"
+                "$ref": "#/components/schemas/UpdatePlanningIntervalRequest"
               }
             }
           },
@@ -1035,13 +1035,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/key/{id}": {
+    "/api/planning/planning-intervals/key/{id}": {
       "get": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Get program increment details using the key.",
-        "operationId": "ProgramIncrements_GetByKey",
+        "summary": "Get planning interval details using the key.",
+        "operationId": "PlanningIntervals_GetByKey",
         "parameters": [
           {
             "name": "id",
@@ -1060,7 +1060,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProgramIncrementDetailsDto"
+                  "$ref": "#/components/schemas/PlanningIntervalDetailsDto"
                 }
               }
             }
@@ -1093,13 +1093,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/{id}/predictability": {
+    "/api/planning/planning-intervals/{id}/predictability": {
       "get": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
         "summary": "Get the PI predictability for all teams.",
-        "operationId": "ProgramIncrements_GetPredictability",
+        "operationId": "PlanningIntervals_GetPredictability",
         "parameters": [
           {
             "name": "id",
@@ -1118,7 +1118,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProgramIncrementPredictabilityDto"
+                  "$ref": "#/components/schemas/PlanningIntervalPredictabilityDto"
                 }
               }
             }
@@ -1151,13 +1151,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/{id}/teams": {
+    "/api/planning/planning-intervals/{id}/teams": {
       "get": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Get a list of program increment teams.",
-        "operationId": "ProgramIncrements_GetTeams",
+        "summary": "Get a list of planning interval teams.",
+        "operationId": "PlanningIntervals_GetTeams",
         "parameters": [
           {
             "name": "id",
@@ -1178,7 +1178,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ProgramIncrementTeamResponse"
+                    "$ref": "#/components/schemas/PlanningIntervalTeamResponse"
                   }
                 }
               }
@@ -1203,10 +1203,10 @@
       },
       "post": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Manager program increment teams.",
-        "operationId": "ProgramIncrements_ManageTeams",
+        "summary": "Manager planning interval teams.",
+        "operationId": "PlanningIntervals_ManageTeams",
         "parameters": [
           {
             "name": "id",
@@ -1224,7 +1224,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ManageProgramIncrementTeamsRequest"
+                "$ref": "#/components/schemas/ManagePlanningIntervalTeamsRequest"
               }
             }
           },
@@ -1253,13 +1253,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/{id}/teams/{teamId}/predictability": {
+    "/api/planning/planning-intervals/{id}/teams/{teamId}/predictability": {
       "get": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
         "summary": "Get the PI predictability for a team.",
-        "operationId": "ProgramIncrements_GetTeamPredictability",
+        "operationId": "PlanningIntervals_GetTeamPredictability",
         "parameters": [
           {
             "name": "id",
@@ -1313,13 +1313,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/{id}/objectives": {
+    "/api/planning/planning-intervals/{id}/objectives": {
       "get": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Get a list of program increment teams.",
-        "operationId": "ProgramIncrements_GetObjectives",
+        "summary": "Get a list of planning interval teams.",
+        "operationId": "PlanningIntervals_GetObjectives",
         "parameters": [
           {
             "name": "id",
@@ -1350,7 +1350,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ProgramIncrementObjectiveListDto"
+                    "$ref": "#/components/schemas/PlanningIntervalObjectiveListDto"
                   }
                 }
               }
@@ -1375,10 +1375,10 @@
       },
       "post": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Create a program increment objective.",
-        "operationId": "ProgramIncrements_CreateObjective",
+        "summary": "Create a planning interval objective.",
+        "operationId": "PlanningIntervals_CreateObjective",
         "parameters": [
           {
             "name": "id",
@@ -1396,7 +1396,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateProgramIncrementObjectiveRequest"
+                "$ref": "#/components/schemas/CreatePlanningIntervalObjectiveRequest"
               }
             }
           },
@@ -1453,13 +1453,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/{id}/objectives/{objectiveId}": {
+    "/api/planning/planning-intervals/{id}/objectives/{objectiveId}": {
       "get": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Get a program increment objective.",
-        "operationId": "ProgramIncrements_GetObjectiveById",
+        "summary": "Get a planning interval objective.",
+        "operationId": "PlanningIntervals_GetObjectiveById",
         "parameters": [
           {
             "name": "id",
@@ -1488,7 +1488,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProgramIncrementObjectiveDetailsDto"
+                  "$ref": "#/components/schemas/PlanningIntervalObjectiveDetailsDto"
                 }
               }
             }
@@ -1522,10 +1522,10 @@
       },
       "put": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Update a program increment objective.",
-        "operationId": "ProgramIncrements_UpdateObjective",
+        "summary": "Update a planning interval objective.",
+        "operationId": "PlanningIntervals_UpdateObjective",
         "parameters": [
           {
             "name": "id",
@@ -1553,7 +1553,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateProgramIncrementObjectiveRequest"
+                "$ref": "#/components/schemas/UpdatePlanningIntervalObjectiveRequest"
               }
             }
           },
@@ -1603,10 +1603,10 @@
       },
       "delete": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Delete a program increment objective.",
-        "operationId": "ProgramIncrements_DeleteObjective",
+        "summary": "Delete a planning interval objective.",
+        "operationId": "PlanningIntervals_DeleteObjective",
         "parameters": [
           {
             "name": "id",
@@ -1651,13 +1651,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/key/{id}/objectives/{objectiveId}": {
+    "/api/planning/planning-intervals/key/{id}/objectives/{objectiveId}": {
       "get": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Get a program increment objective using the PI and Objective keys.",
-        "operationId": "ProgramIncrements_GetObjectiveByKey",
+        "summary": "Get a planning interval objective using the PI and Objective keys.",
+        "operationId": "PlanningIntervals_GetObjectiveByKey",
         "parameters": [
           {
             "name": "id",
@@ -1686,7 +1686,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProgramIncrementObjectiveDetailsDto"
+                  "$ref": "#/components/schemas/PlanningIntervalObjectiveDetailsDto"
                 }
               }
             }
@@ -1719,13 +1719,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/{id}/objectives/health-report": {
+    "/api/planning/planning-intervals/{id}/objectives/health-report": {
       "get": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Get a health report for program increment objectives.",
-        "operationId": "ProgramIncrements_GetObjectivesHealthReport",
+        "summary": "Get a health report for planning interval objectives.",
+        "operationId": "PlanningIntervals_GetObjectivesHealthReport",
         "parameters": [
           {
             "name": "id",
@@ -1755,7 +1755,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ProgramIncrementObjectiveHealthCheckDto"
+                    "$ref": "#/components/schemas/PlanningIntervalObjectiveHealthCheckDto"
                   }
                 }
               }
@@ -1779,13 +1779,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/{id}/objectives/import": {
+    "/api/planning/planning-intervals/{id}/objectives/import": {
       "post": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Import objectives for a program increment from a csv file.",
-        "operationId": "ProgramIncrements_ImportObjectives",
+        "summary": "Import objectives for a planning interval from a csv file.",
+        "operationId": "PlanningIntervals_ImportObjectives",
         "parameters": [
           {
             "name": "id",
@@ -1868,13 +1868,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/objective-statuses": {
+    "/api/planning/planning-intervals/objective-statuses": {
       "get": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
         "summary": "Get a list of all PI objective statuses.",
-        "operationId": "ProgramIncrements_GetObjectiveStatuses",
+        "operationId": "PlanningIntervals_GetObjectiveStatuses",
         "responses": {
           "200": {
             "description": "",
@@ -1883,7 +1883,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ProgramIncrementObjectiveStatusDto"
+                    "$ref": "#/components/schemas/PlanningIntervalObjectiveStatusDto"
                   }
                 }
               }
@@ -1907,13 +1907,13 @@
         ]
       }
     },
-    "/api/planning/program-increments/{id}/risks": {
+    "/api/planning/planning-intervals/{id}/risks": {
       "get": {
         "tags": [
-          "ProgramIncrements"
+          "PlanningIntervals"
         ],
-        "summary": "Get program increment risks.",
-        "operationId": "ProgramIncrements_GetRisks",
+        "summary": "Get planning interval risks.",
+        "operationId": "PlanningIntervals_GetRisks",
         "parameters": [
           {
             "name": "id",
@@ -6583,7 +6583,7 @@
           }
         }
       },
-      "ProgramIncrementListDto": {
+      "PlanningIntervalListDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -6611,7 +6611,7 @@
           }
         }
       },
-      "ProgramIncrementDetailsDto": {
+      "PlanningIntervalDetailsDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -6651,7 +6651,7 @@
           }
         }
       },
-      "ProgramIncrementPredictabilityDto": {
+      "PlanningIntervalPredictabilityDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -6662,12 +6662,12 @@
           "teamPredictabilities": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ProgramIncrementTeamPredictabilityDto"
+              "$ref": "#/components/schemas/PlanningIntervalTeamPredictabilityDto"
             }
           }
         }
       },
-      "ProgramIncrementTeamPredictabilityDto": {
+      "PlanningIntervalTeamPredictabilityDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -6696,7 +6696,7 @@
           }
         ]
       },
-      "CreateProgramIncrementRequest": {
+      "CreatePlanningIntervalRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -6733,7 +6733,7 @@
           }
         }
       },
-      "UpdateProgramIncrementRequest": {
+      "UpdatePlanningIntervalRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -6779,7 +6779,7 @@
           }
         }
       },
-      "ProgramIncrementTeamResponse": {
+      "PlanningIntervalTeamResponse": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -6835,7 +6835,7 @@
           }
         ]
       },
-      "ManageProgramIncrementTeamsRequest": {
+      "ManagePlanningIntervalTeamsRequest": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -6852,7 +6852,7 @@
           }
         }
       },
-      "ProgramIncrementObjectiveListDto": {
+      "PlanningIntervalObjectiveListDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -6878,7 +6878,7 @@
               }
             ]
           },
-          "programIncrement": {
+          "planningInterval": {
             "$ref": "#/components/schemas/NavigationDto"
           },
           "team": {
@@ -6936,7 +6936,7 @@
           }
         }
       },
-      "ProgramIncrementObjectiveDetailsDto": {
+      "PlanningIntervalObjectiveDetailsDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -6970,7 +6970,7 @@
             "type": "number",
             "format": "double"
           },
-          "programIncrement": {
+          "planningInterval": {
             "$ref": "#/components/schemas/NavigationDto"
           },
           "team": {
@@ -6999,7 +6999,7 @@
           }
         }
       },
-      "CreateProgramIncrementObjectiveRequest": {
+      "CreatePlanningIntervalObjectiveRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -7007,7 +7007,7 @@
           "name"
         ],
         "properties": {
-          "programIncrementId": {
+          "planningIntervalId": {
             "type": "string",
             "format": "guid"
           },
@@ -7044,14 +7044,14 @@
           }
         }
       },
-      "UpdateProgramIncrementObjectiveRequest": {
+      "UpdatePlanningIntervalObjectiveRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "name"
         ],
         "properties": {
-          "programIncrementId": {
+          "planningIntervalId": {
             "type": "string",
             "format": "guid"
           },
@@ -7096,7 +7096,7 @@
           }
         }
       },
-      "ProgramIncrementObjectiveHealthCheckDto": {
+      "PlanningIntervalObjectiveHealthCheckDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -7130,7 +7130,7 @@
               }
             ]
           },
-          "programIncrement": {
+          "planningInterval": {
             "$ref": "#/components/schemas/NavigationDto"
           },
           "team": {
@@ -7546,7 +7546,7 @@
           }
         }
       },
-      "ProgramIncrementObjectiveStatusDto": {
+      "PlanningIntervalObjectiveStatusDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
