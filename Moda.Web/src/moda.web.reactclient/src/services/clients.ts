@@ -7,7 +7,7 @@ import {
   LinksClient,
   PermissionsClient,
   ProfileClient,
-  ProgramIncrementsClient,
+  PlanningIntervalsClient,
   RisksClient,
   RolesClient,
   TeamsClient,
@@ -49,8 +49,8 @@ export const getPermissionsClient = async (accessToken?: string) =>
   new PermissionsClient('', await createDefaultAxiosInstance(accessToken))
 export const getProfileClient = async (accessToken?: string) =>
   new ProfileClient('', await createDefaultAxiosInstance(accessToken))
-export const getProgramIncrementsClient = async (accessToken?: string) =>
-  new ProgramIncrementsClient('', await createDefaultAxiosInstance(accessToken))
+export const getPlanningIntervalsClient = async (accessToken?: string) =>
+  new PlanningIntervalsClient('', await createDefaultAxiosInstance(accessToken))
 export const getRisksClient = async (accessToken?: string) =>
   new RisksClient('', await createDefaultAxiosInstance(accessToken))
 export const getRolesClient = async (accessToken?: string) =>

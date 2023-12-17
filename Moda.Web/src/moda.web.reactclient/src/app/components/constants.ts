@@ -1,3 +1,3 @@
 export enum SystemContext {
-  PlanningProgramIncrementObjective = 2010,
+  PlanningPlanningIntervalObjective = 2010,
 }

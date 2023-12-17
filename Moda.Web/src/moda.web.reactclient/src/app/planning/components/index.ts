@@ -1,3 +1,3 @@
-export { default as CreateProgramIncrementForm } from './create-program-increment-form'
-export { default as EditProgramIncrementForm } from './edit-program-increment-form'
-export { default as ProgramIncrementObjectivesTimeline } from './program-increment-objectives-timeline'
+export { default as CreatePlanningIntervalForm } from './create-planning-interval-form'
+export { default as EditPlanningIntervalForm } from './edit-planning-interval-form'
+export { default as PlanningIntervalObjectivesTimeline } from './planning-interval-objectives-timeline'

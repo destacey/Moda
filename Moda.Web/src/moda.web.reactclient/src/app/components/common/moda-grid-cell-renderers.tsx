@@ -8,9 +8,9 @@ import {
   NavigationDto,
   PlanningHealthCheckDto,
   PlanningTeamNavigationDto,
-  ProgramIncrementListDto,
-  ProgramIncrementObjectiveDetailsDto,
-  ProgramIncrementObjectiveListDto,
+  PlanningIntervalListDto,
+  PlanningIntervalObjectiveDetailsDto,
+  PlanningIntervalObjectiveListDto,
 } from '@/src/services/moda-api'
 import Link from 'next/link'
 
@@ -47,31 +47,31 @@ export const PlanningTeamLinkCellRenderer = ({
   return <Link href={teamLink}>{value.name}</Link>
 }
 
-export interface ProgramIncrementObjectiveLinkCellRendererProps {
-  data: ProgramIncrementObjectiveListDto
+export interface PlanningIntervalObjectiveLinkCellRendererProps {
+  data: PlanningIntervalObjectiveListDto
 }
-export const ProgramIncrementObjectiveLinkCellRenderer = ({
+export const PlanningIntervalObjectiveLinkCellRenderer = ({
   data,
-}: ProgramIncrementObjectiveLinkCellRendererProps) => {
+}: PlanningIntervalObjectiveLinkCellRendererProps) => {
   if (!data) return null
   return (
     <Link
-      href={`/planning/program-increments/${data.programIncrement?.key}/objectives/${data.key}`}
+      href={`/planning/planning-intervals/${data.planningInterval?.key}/objectives/${data.key}`}
     >
       {data.name}
     </Link>
   )
 }
 
-export interface ProgramIncrementLinkCellRendererProps {
+export interface PlanningIntervalLinkCellRendererProps {
   value: NavigationDto
 }
-export const ProgramIncrementLinkCellRenderer = ({
+export const PlanningIntervalLinkCellRenderer = ({
   value,
-}: ProgramIncrementLinkCellRendererProps) => {
+}: PlanningIntervalLinkCellRendererProps) => {
   if (!value) return null
   return (
-    <Link href={`/planning/program-increments/${value.key}`}>{value.name}</Link>
+    <Link href={`/planning/planning-intervals/${value.key}`}>{value.name}</Link>
   )
 }
 
