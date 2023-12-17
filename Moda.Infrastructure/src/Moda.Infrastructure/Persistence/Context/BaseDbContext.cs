@@ -103,6 +103,8 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
 
         ChangeTracker.DetectChanges();
 
+        var correlationId = Guid.NewGuid();
+
         var trailEntries = new List<AuditTrail>();
         foreach (var entry in ChangeTracker.Entries<IAuditable>()
             .Where(e => e.State is EntityState.Added or EntityState.Deleted or EntityState.Modified || e.HasChangedOwnedEntities())
@@ -110,8 +112,10 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         {
             var trailEntry = new AuditTrail(entry, _serializer, _dateTimeService)
             {
+                SchemaName = entry.Metadata.GetSchema(),
                 TableName = entry.Entity.GetType().Name,
-                UserId = userId
+                UserId = userId,
+                CorrelationId = correlationId
             };
             trailEntries.Add(trailEntry);
             foreach (var property in entry.Properties)

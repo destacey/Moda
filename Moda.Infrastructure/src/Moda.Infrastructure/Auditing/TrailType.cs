@@ -1,5 +1,6 @@
 namespace Moda.Infrastructure.Auditing;
 
+// Max length of 32
 public enum TrailType : byte
 {
     None = 0,

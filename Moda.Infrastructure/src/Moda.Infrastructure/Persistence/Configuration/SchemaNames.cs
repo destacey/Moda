@@ -1,5 +1,6 @@
 ﻿namespace Moda.Infrastructure.Persistence.Configuration;
 
+// These values are also used in the audit trails
 internal static class SchemaNames
 {
     public static string AppIntegration = "AppIntegrations";
