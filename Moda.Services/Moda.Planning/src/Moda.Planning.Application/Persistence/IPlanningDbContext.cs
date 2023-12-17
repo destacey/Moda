@@ -1,8 +1,8 @@
 ﻿namespace Moda.Planning.Application.Persistence;
 public interface IPlanningDbContext : IModaDbContext
 {
-    DbSet<ProgramIncrement> ProgramIncrements { get; }
-    DbSet<ProgramIncrementObjective> ProgramIncrementObjectives { get; }
+    DbSet<PlanningInterval> PlanningIntervals { get; }
+    DbSet<PlanningIntervalObjective> PlanningIntervalObjectives { get; }
     DbSet<Risk> Risks { get; }
     DbSet<PlanningTeam> PlanningTeams { get; }
     DbSet<SimpleHealthCheck> PlanningHealthChecks { get; }

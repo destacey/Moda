@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import { getProgramIncrementsClient, getRisksClient } from '../clients'
+import { getPlanningIntervalsClient, getRisksClient } from '../clients'
 import { QK } from './query-keys'
 import {
-  CreateProgramIncrementObjectiveRequest,
-  CreateProgramIncrementRequest,
+  CreatePlanningIntervalObjectiveRequest,
+  CreatePlanningIntervalRequest,
   CreateRiskRequest,
-  UpdateProgramIncrementObjectiveRequest,
-  UpdateProgramIncrementRequest,
+  UpdatePlanningIntervalObjectiveRequest,
+  UpdatePlanningIntervalRequest,
   UpdateRiskRequest,
 } from '../moda-api'
 import _ from 'lodash'
@@ -16,10 +16,10 @@ import dayjs from 'dayjs'
 // PROGRAM INCREMENTS
 
 const stateOrder = ['Active', 'Future', 'Completed']
-export const useGetProgramIncrements = () => {
+export const useGetPlanningIntervals = () => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENTS],
-    queryFn: async () => (await getProgramIncrementsClient()).getList(),
+    queryFn: async () => (await getPlanningIntervalsClient()).getList(),
     select: (data) =>
       data?.sort((a, b) => {
         const aStateIndex = stateOrder.indexOf(a.state)
@@ -34,51 +34,51 @@ export const useGetProgramIncrements = () => {
   })
 }
 
-export const useGetProgramIncrementById = (id: string) => {
+export const useGetPlanningIntervalById = (id: string) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENTS, id],
-    queryFn: async () => (await getProgramIncrementsClient()).getById(id),
+    queryFn: async () => (await getPlanningIntervalsClient()).getById(id),
     // staleTime: 60000,
     enabled: !!id,
   })
 }
 
-export const useGetProgramIncrementByKey = (key: number) => {
+export const useGetPlanningIntervalByKey = (key: number) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENTS, key],
-    queryFn: async () => (await getProgramIncrementsClient()).getByKey(key),
+    queryFn: async () => (await getPlanningIntervalsClient()).getByKey(key),
     // staleTime: 60000,
     enabled: !!key,
   })
 }
 
-export const useGetProgramIncrementPredictability = (id: string) => {
+export const useGetPlanningIntervalPredictability = (id: string) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_PREDICTABILITY, id],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getPredictability(id),
+      (await getPlanningIntervalsClient()).getPredictability(id),
     enabled: !!id,
   })
 }
 
-export const useCreateProgramIncrementMutation = () => {
+export const useCreatePlanningIntervalMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (programIncrement: CreateProgramIncrementRequest) =>
-      (await getProgramIncrementsClient()).create(programIncrement),
+    mutationFn: async (planningInterval: CreatePlanningIntervalRequest) =>
+      (await getPlanningIntervalsClient()).create(planningInterval),
     onSuccess: (data) => {
       queryClient.invalidateQueries(QK.PROGRAM_INCREMENTS)
     },
   })
 }
 
-export const useUpdateProgramIncrementMutation = () => {
+export const useUpdatePlanningIntervalMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (programIncrement: UpdateProgramIncrementRequest) =>
-      (await getProgramIncrementsClient()).update(
-        programIncrement.id,
-        programIncrement,
+    mutationFn: async (planningInterval: UpdatePlanningIntervalRequest) =>
+      (await getPlanningIntervalsClient()).update(
+        planningInterval.id,
+        planningInterval,
       ),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries([QK.PROGRAM_INCREMENTS])
@@ -88,33 +88,33 @@ export const useUpdateProgramIncrementMutation = () => {
 }
 
 // PROGRAM INCREMENT - TEAMS
-export const useGetProgramIncrementTeams = (
+export const useGetPlanningIntervalTeams = (
   id: string,
   enabled: boolean = true,
 ) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_TEAMS, id],
-    queryFn: async () => (await getProgramIncrementsClient()).getTeams(id),
+    queryFn: async () => (await getPlanningIntervalsClient()).getTeams(id),
     // staleTime: 60000,
     enabled: !!id && enabled,
   })
 }
 
 // PROGRAM INCREMENT - OBJECTIVES
-export const useGetProgramIncrementObjectives = (
+export const useGetPlanningIntervalObjectives = (
   id: string,
   enabled: boolean = true,
 ) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVES, id],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getObjectives(id, null),
+      (await getPlanningIntervalsClient()).getObjectives(id, null),
     // staleTime: 10000,
     enabled: !!id && enabled,
   })
 }
 
-export const useGetProgramIncrementObjectivesByTeamId = (
+export const useGetPlanningIntervalObjectivesByTeamId = (
   id: string,
   teamId: string,
   enabled: boolean = true,
@@ -122,13 +122,13 @@ export const useGetProgramIncrementObjectivesByTeamId = (
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVES, id, teamId],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getObjectives(id, teamId),
+      (await getPlanningIntervalsClient()).getObjectives(id, teamId),
     // staleTime: 20000,
     enabled: !!id && !!teamId && enabled,
   })
 }
 
-export const useGetProgramIncrementObjectivesHealthReport = (
+export const useGetPlanningIntervalObjectivesHealthReport = (
   idOrKey: string,
   teamId?: string,
   enabled: boolean = true,
@@ -136,7 +136,7 @@ export const useGetProgramIncrementObjectivesHealthReport = (
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVES_HEALTH_REPORT, idOrKey, teamId],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getObjectivesHealthReport(
+      (await getPlanningIntervalsClient()).getObjectivesHealthReport(
         idOrKey,
         teamId,
       ),
@@ -145,14 +145,14 @@ export const useGetProgramIncrementObjectivesHealthReport = (
   })
 }
 
-export const useGetProgramIncrementObjectiveById = (
+export const useGetPlanningIntervalObjectiveById = (
   id: string,
   objectiveId: string,
 ) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVES, id, objectiveId],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getObjectiveById(id, objectiveId),
+      (await getPlanningIntervalsClient()).getObjectiveById(id, objectiveId),
     onError: (error) => {
       console.log(error)
     },
@@ -161,36 +161,36 @@ export const useGetProgramIncrementObjectiveById = (
   })
 }
 
-export const useGetProgramIncrementObjectiveByKey = (
+export const useGetPlanningIntervalObjectiveByKey = (
   key: number,
   objectiveKey: number,
 ) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVES, key, objectiveKey],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getObjectiveByKey(key, objectiveKey),
+      (await getPlanningIntervalsClient()).getObjectiveByKey(key, objectiveKey),
     // staleTime: 10000,
     enabled: !!key && !!objectiveKey,
   })
 }
 
-export const useGetProgramIncrementObjectiveStatuses = (
+export const useGetPlanningIntervalObjectiveStatuses = (
   enabled: boolean = true,
 ) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVE_STATUSES],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getObjectiveStatuses(),
+      (await getPlanningIntervalsClient()).getObjectiveStatuses(),
     // staleTime: 300000,
     enabled: enabled,
   })
 }
 
-export const useGetProgramIncrementObjectiveStatusOptions = () => {
+export const useGetPlanningIntervalObjectiveStatusOptions = () => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_OBJECTIVE_STATUS_OPTIONS],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getObjectiveStatuses(),
+      (await getPlanningIntervalsClient()).getObjectiveStatuses(),
     select: (data) => {
       const statuses = _.sortBy(data, ['order'])
       const options: OptionModel<number>[] = statuses.map((s) => ({
@@ -203,33 +203,33 @@ export const useGetProgramIncrementObjectiveStatusOptions = () => {
   })
 }
 
-export const useGetTeamProgramIncrementPredictability = (
+export const useGetTeamPlanningIntervalPredictability = (
   id: string,
   teamId: string,
 ) => {
   return useQuery({
     queryKey: [QK.PROGRAM_INCREMENT_TEAM_PREDICTABILITY, id, teamId],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getTeamPredictability(id, teamId),
+      (await getPlanningIntervalsClient()).getTeamPredictability(id, teamId),
     //staleTime: 30000,
     enabled: !!id && !!teamId,
   })
 }
 
-export interface CreateProgramIncrementObjectiveMutationRequest {
-  objective: CreateProgramIncrementObjectiveRequest
-  programIncrementKey: number
+export interface CreatePlanningIntervalObjectiveMutationRequest {
+  objective: CreatePlanningIntervalObjectiveRequest
+  planningIntervalKey: number
 }
 
-export const useCreateProgramIncrementObjectiveMutation = () => {
+export const useCreatePlanningIntervalObjectiveMutation = () => {
   const queryClient = useQueryClient()
   return useMutation(
     async ({
       objective,
-      programIncrementKey,
-    }: CreateProgramIncrementObjectiveMutationRequest) =>
-      (await getProgramIncrementsClient()).createObjective(
-        objective.programIncrementId,
+      planningIntervalKey,
+    }: CreatePlanningIntervalObjectiveMutationRequest) =>
+      (await getPlanningIntervalsClient()).createObjective(
+        objective.planningIntervalId,
         objective,
       ),
     {
@@ -237,35 +237,35 @@ export const useCreateProgramIncrementObjectiveMutation = () => {
         queryClient.invalidateQueries([QK.PROGRAM_INCREMENT_OBJECTIVES])
         queryClient.invalidateQueries([
           QK.PROGRAM_INCREMENT_TEAM_PREDICTABILITY,
-          variables.objective.programIncrementId,
+          variables.objective.planningIntervalId,
         ])
         queryClient.invalidateQueries([
           QK.PROGRAM_INCREMENTS,
-          variables.objective.programIncrementId,
+          variables.objective.planningIntervalId,
         ])
         queryClient.invalidateQueries([
           QK.PROGRAM_INCREMENTS,
-          variables.programIncrementKey,
+          variables.planningIntervalKey,
         ])
       },
     },
   )
 }
 
-export interface UpdateProgramIncrementObjectiveMutationRequest {
-  objective: UpdateProgramIncrementObjectiveRequest
-  programIncrementKey: number
+export interface UpdatePlanningIntervalObjectiveMutationRequest {
+  objective: UpdatePlanningIntervalObjectiveRequest
+  planningIntervalKey: number
 }
 
-export const useUpdateProgramIncrementObjectiveMutation = () => {
+export const useUpdatePlanningIntervalObjectiveMutation = () => {
   const queryClient = useQueryClient()
   return useMutation(
     async ({
       objective,
-      programIncrementKey,
-    }: UpdateProgramIncrementObjectiveMutationRequest) =>
-      (await getProgramIncrementsClient()).updateObjective(
-        objective.programIncrementId,
+      planningIntervalKey,
+    }: UpdatePlanningIntervalObjectiveMutationRequest) =>
+      (await getPlanningIntervalsClient()).updateObjective(
+        objective.planningIntervalId,
         objective.objectiveId,
         objective,
       ),
@@ -274,28 +274,28 @@ export const useUpdateProgramIncrementObjectiveMutation = () => {
         queryClient.invalidateQueries([QK.PROGRAM_INCREMENT_OBJECTIVES])
         queryClient.invalidateQueries([
           QK.PROGRAM_INCREMENT_OBJECTIVES,
-          variables.objective.programIncrementId,
+          variables.objective.planningIntervalId,
         ])
         queryClient.invalidateQueries([
           QK.PROGRAM_INCREMENT_OBJECTIVES,
-          variables.programIncrementKey,
+          variables.planningIntervalKey,
         ])
         queryClient.invalidateQueries([
           QK.PROGRAM_INCREMENT_OBJECTIVES,
-          variables.objective.programIncrementId,
+          variables.objective.planningIntervalId,
           variables.objective.objectiveId,
         ])
         queryClient.invalidateQueries([
           QK.PROGRAM_INCREMENT_TEAM_PREDICTABILITY,
-          variables.objective.programIncrementId,
+          variables.objective.planningIntervalId,
         ])
         queryClient.invalidateQueries([
           QK.PROGRAM_INCREMENTS,
-          variables.objective.programIncrementId,
+          variables.objective.planningIntervalId,
         ])
         queryClient.invalidateQueries([
           QK.PROGRAM_INCREMENTS,
-          variables.programIncrementKey,
+          variables.planningIntervalKey,
         ])
       },
     },
@@ -303,7 +303,7 @@ export const useUpdateProgramIncrementObjectiveMutation = () => {
 }
 
 // PROGRAM INCREMENT - RISKS
-export const useGetProgramIncrementRisks = (
+export const useGetPlanningIntervalRisks = (
   id: string,
   includeClosed: boolean = false,
   enabled: boolean = true,
@@ -315,13 +315,13 @@ export const useGetProgramIncrementRisks = (
       { includeClosed: includeClosed },
     ],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getRisks(id, null, includeClosed),
+      (await getPlanningIntervalsClient()).getRisks(id, null, includeClosed),
     // staleTime: 10000,
     enabled: !!id && enabled,
   })
 }
 
-export const useGetProgramIncrementRisksByTeamId = (
+export const useGetPlanningIntervalRisksByTeamId = (
   id: string,
   teamId: string,
   includeClosed: boolean = false,
@@ -335,7 +335,7 @@ export const useGetProgramIncrementRisksByTeamId = (
       { includeClosed: includeClosed },
     ],
     queryFn: async () =>
-      (await getProgramIncrementsClient()).getRisks(id, teamId, includeClosed),
+      (await getPlanningIntervalsClient()).getRisks(id, teamId, includeClosed),
     // staleTime: 20000,
     enabled: !!id && !!teamId && enabled,
   })

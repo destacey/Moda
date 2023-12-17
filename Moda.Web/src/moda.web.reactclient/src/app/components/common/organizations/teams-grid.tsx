@@ -2,17 +2,15 @@ import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import ModaGrid from '../moda-grid'
 import { UseQueryResult } from 'react-query'
-import { ProgramIncrementTeamResponse } from '@/src/services/moda-api'
+import { PlanningIntervalTeamResponse } from '@/src/services/moda-api'
 
 export interface TeamsGridProps {
-  teamsQuery: UseQueryResult<ProgramIncrementTeamResponse[], unknown>
+  teamsQuery: UseQueryResult<PlanningIntervalTeamResponse[], unknown>
 }
 
 const TeamLinkCellRenderer = ({ value, data }) => {
   const teamRoute = data.type === 'Team' ? 'teams' : 'team-of-teams'
-  return (
-    <Link href={`/organizations/${teamRoute}/${data.key}`}>{value}</Link>
-  )
+  return <Link href={`/organizations/${teamRoute}/${data.key}`}>{value}</Link>
 }
 
 const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {

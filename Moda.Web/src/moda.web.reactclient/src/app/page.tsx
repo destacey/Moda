@@ -1,7 +1,7 @@
 'use client'
 
 import { Col, Row, Space } from 'antd'
-import ActiveProgramIncrements from './components/common/planning/active-program-increments'
+import ActivePlanningIntervals from './components/common/planning/active-planning-intervals'
 import MyAssignedRisks from './components/common/planning/my-assigned-risks'
 import { useDocumentTitle } from './hooks/use-document-title'
 
@@ -11,7 +11,7 @@ const HomePage = () => {
   // TODO: have these load after the page is loaded
   return (
     <>
-      <ActiveProgramIncrements />
+      <ActivePlanningIntervals />
       <Row>
         <Col>
           <MyAssignedRisks />

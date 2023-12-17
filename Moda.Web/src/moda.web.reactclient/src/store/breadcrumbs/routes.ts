@@ -1,4 +1,4 @@
-import { BreadcrumbItem } from "./types"
+import { BreadcrumbItem } from './types'
 
 const routes = {
   organizations: {
@@ -19,8 +19,8 @@ const routes = {
     title: 'Planning',
     href: null,
   },
-  'program-increments': {
-    title: 'Program Increments',
+  'planning-intervals': {
+    title: 'Planning Intervals',
   },
   risks: {
     title: 'Teams',
@@ -49,8 +49,10 @@ const routes = {
   },
 }
 
-export const generateRoute = 
-(pathname: string, lastItemTitleOverride?: string): BreadcrumbItem[] => {
+export const generateRoute = (
+  pathname: string,
+  lastItemTitleOverride?: string,
+): BreadcrumbItem[] => {
   const pathSegments = pathname.split('/').filter((item) => item !== '')
   return pathSegments.map((item, index) => {
     // Set the title of the last path segment to the title passed in from the page

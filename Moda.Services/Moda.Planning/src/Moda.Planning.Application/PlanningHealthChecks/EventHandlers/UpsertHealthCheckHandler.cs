@@ -43,7 +43,7 @@ internal sealed class UpsertHealthCheckHandler :
     /// <returns></returns>
     private async Task UpsertPlanningHealthCheck(HealthCheck healthCheck, CancellationToken cancellationToken)
     {
-        if (healthCheck.Context is not SystemContext.PlanningProgramIncrementObjective)
+        if (healthCheck.Context is not SystemContext.PlanningPlanningIntervalObjective)
             return;
 
         try
@@ -79,7 +79,7 @@ internal sealed class UpsertHealthCheckHandler :
 
     private async Task DeletePlanningHealthCheck(HealthCheck healthCheck, CancellationToken cancellationToken)
     {
-        if (healthCheck.Context is not SystemContext.PlanningProgramIncrementObjective)
+        if (healthCheck.Context is not SystemContext.PlanningPlanningIntervalObjective)
             return;
 
         try

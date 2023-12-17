@@ -32,11 +32,11 @@ const menu: (Item | MenuItem)[] = [
   ]),
   menuItem('Planning', 'plan', null, <ScheduleOutlined />, [
     menuItem(
-      'Program Increments',
-      'plan.program-increments',
-      '/planning/program-increments',
+      'Planning Intervals',
+      'plan.planning-intervals',
+      '/planning/planning-intervals',
     ),
-    // menuItem('Iterations', 'plan.iterations'),
+    // menuItem('Increments', 'plan.increments'),
     // menuItem('Sprints', 'plan.sprints'),
   ]),
   // menuItem('Products', 'pdc', null, <DesktopOutlined />, [
