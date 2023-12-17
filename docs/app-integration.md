@@ -46,7 +46,7 @@ The Azure DevOps Boards connector enables Moda to connect and retrieve data for 
 | Work Item | Work Item |
 | Work Item Type | Work Type |
 | Area | establishes the link between a Work Item and a Team |
-| Iteration | establishes the link between a Work Item and a Sprint, Iteration, or Program Increment |
+| Iteration | establishes the link between a Work Item and a Sprint, Increment, or Planning Interval |
 
 #### Configuration
 
