@@ -107,7 +107,7 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
         }
     }
 
-    /// <summary>States the on.</summary>
+    /// <summary>Iteration state on given date.</summary>
     /// <param name="date">The date.</param>
     /// <returns></returns>
     public IterationState StateOn(LocalDate date)
