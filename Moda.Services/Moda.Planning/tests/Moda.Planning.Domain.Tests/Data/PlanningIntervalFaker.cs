@@ -1,11 +1,13 @@
-﻿using Moda.Common.Models;
+﻿using System.Reflection;
+using Moda.Common.Models;
 using Moda.Planning.Domain.Models;
+using Moda.Tests.Shared.Data;
 using NodaTime.Extensions;
 
 namespace Moda.Planning.Domain.Tests.Data;
 public class PlanningIntervalFaker : Faker<PlanningInterval>
 {
-    public PlanningIntervalFaker()
+    public PlanningIntervalFaker() : base("en", IncludePrivateFieldBinder.Create())
     {
         PlanningIntervalId = Guid.NewGuid();
         RuleFor(x => x.Id, PlanningIntervalId);
