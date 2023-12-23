@@ -93,14 +93,12 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
     /// <summary>Updates the specified name.</summary>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
-    /// <param name="dateRange">The date range.</param>
     /// <param name="objectivesLocked">if set to <c>true</c> [objectives locked].</param>
     /// <returns></returns>
-    public Result Update(string name, string? description, LocalDateRange dateRange, bool objectivesLocked)
+    public Result Update(string name, string? description, bool objectivesLocked)
     {
         Name = name;
         Description = description;
-        DateRange = dateRange;
         ObjectivesLocked = objectivesLocked;
 
         return Result.Success();

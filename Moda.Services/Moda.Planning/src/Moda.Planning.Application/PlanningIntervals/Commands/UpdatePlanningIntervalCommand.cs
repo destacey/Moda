@@ -1,5 +1,5 @@
 ﻿namespace Moda.Planning.Application.PlanningIntervals.Commands;
-public sealed record UpdatePlanningIntervalCommand(Guid Id, string Name, string? Description, LocalDateRange DateRange, bool ObjectivesLocked) : ICommand<int>;
+public sealed record UpdatePlanningIntervalCommand(Guid Id, string Name, string? Description, bool ObjectivesLocked) : ICommand<int>;
 
 public sealed class UpdatePlanningIntervalCommandValidator : CustomValidator<UpdatePlanningIntervalCommand>
 {
@@ -19,9 +19,6 @@ public sealed class UpdatePlanningIntervalCommandValidator : CustomValidator<Upd
 
         RuleFor(e => e.Description)
             .MaximumLength(1024);
-
-        RuleFor(e => e.DateRange)
-            .NotNull();
     }
 
     public async Task<bool> BeUniquePlanningIntervalName(Guid id, string name, CancellationToken cancellationToken)
@@ -55,7 +52,6 @@ internal sealed class UpdatePlanningIntervalCommandHandler : ICommandHandler<Upd
             var updateResult = planningInterval.Update(
                 request.Name,
                 request.Description,
-                request.DateRange,
                 request.ObjectivesLocked
                 );
 

@@ -16,21 +16,13 @@ public sealed record UpdatePlanningIntervalRequest
     /// <value>The team description.</value>
     public string? Description { get; set; }
 
-    /// <summary>Gets or sets the start.</summary>
-    /// <value>The start.</value>
-    public LocalDate Start { get; set; }
-
-    /// <summary>Gets or sets the end.</summary>
-    /// <value>The end.</value>
-    public LocalDate End { get; set; }
-
     /// <summary>Gets or sets the objectives locked.</summary>
     /// <value><c>true</c> if [objectives locked]; otherwise, <c>false</c>.</value>
     public bool ObjectivesLocked { get; set; }
 
     public UpdatePlanningIntervalCommand ToUpdatePlanningIntervalCommand()
     {
-        return new UpdatePlanningIntervalCommand(Id, Name, Description, new LocalDateRange(Start, End), ObjectivesLocked);
+        return new UpdatePlanningIntervalCommand(Id, Name, Description, ObjectivesLocked);
     }
 }
 
@@ -46,13 +38,5 @@ public sealed class UpdatePlanningIntervalRequestValidator : CustomValidator<Upd
 
         RuleFor(t => t.Description)
             .MaximumLength(1024);
-
-        RuleFor(t => t.Start)
-            .NotNull();
-
-        RuleFor(t => t.End)
-            .NotNull()
-            .Must((membership, end) => membership.Start <= end)
-                .WithMessage("End date must be greater than or equal to start date");
     }
 }

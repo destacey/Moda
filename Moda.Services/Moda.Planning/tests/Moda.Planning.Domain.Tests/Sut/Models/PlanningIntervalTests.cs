@@ -36,8 +36,7 @@ public class PlanningIntervalTests
     {
         // Arrange
         var sut = _planningIntervalFaker.UsePrivateConstructor().Generate();
-        LocalDateRange dateRange = new(_dateTimeService.Today.PlusDays(10), _dateTimeService.Today.PlusDays(70));
-        sut.Update(sut.Name, sut.Description, dateRange, false);
+        sut.Update(sut.Name, sut.Description, false);
 
         // Act
         var result = sut.CalculatePredictability(_dateTimeService.Today);

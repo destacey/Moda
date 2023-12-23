@@ -7685,10 +7685,6 @@ export interface UpdatePlanningIntervalRequest {
     name: string;
     /** Gets the team description. */
     description?: string | undefined;
-    /** Gets or sets the start. */
-    start: Date;
-    /** Gets or sets the end. */
-    end: Date;
     /** Gets or sets the objectives locked. */
     objectivesLocked?: boolean;
 }

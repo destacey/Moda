@@ -1,6 +1,6 @@
 'use client'
 
-import { DatePicker, Form, Input, Modal, Switch, message } from 'antd'
+import { Form, Input, Modal, Switch, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../components/contexts/auth'
 import {
@@ -8,7 +8,6 @@ import {
   UpdatePlanningIntervalRequest,
 } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
-import dayjs from 'dayjs'
 import {
   useGetPlanningIntervalById,
   useUpdatePlanningIntervalMutation,
@@ -25,8 +24,6 @@ interface EditPlanningIntervalFormValues {
   id: string
   name: string
   description?: string
-  start: Date
-  end: Date
   objectivesLocked: boolean
 }
 
@@ -35,8 +32,6 @@ const mapToRequestValues = (values: EditPlanningIntervalFormValues) => {
     id: values.id,
     name: values.name,
     description: values.description,
-    start: (values.start as any)?.format('YYYY-MM-DD'),
-    end: (values.end as any)?.format('YYYY-MM-DD'),
     objectivesLocked: values.objectivesLocked,
   } as UpdatePlanningIntervalRequest
 }
@@ -68,8 +63,6 @@ const EditPlanningIntervalForm = ({
         id: planningInterval.id,
         name: planningInterval.name,
         description: planningInterval.description,
-        start: dayjs(planningInterval.start),
-        end: dayjs(planningInterval.end),
         objectivesLocked: planningInterval.objectivesLocked,
       })
     },
@@ -200,12 +193,6 @@ const EditPlanningIntervalForm = ({
               showCount
               maxLength={1024}
             />
-          </Form.Item>
-          <Form.Item label="Start" name="start" rules={[{ required: true }]}>
-            <DatePicker />
-          </Form.Item>
-          <Form.Item label="End" name="end" rules={[{ required: true }]}>
-            <DatePicker />
           </Form.Item>
           <Form.Item
             label="Objectives Locked?"
