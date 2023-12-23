@@ -20,9 +20,19 @@ public sealed record CreatePlanningIntervalRequest
     /// <value>The end.</value>
     public LocalDate End { get; set; }
 
+    /// <summary>
+    /// Gets or sets the length of iterations in weeks.
+    /// </summary>
+    public int IterationWeeks { get; set; }
+
+    /// <summary>
+    /// Gets or sets the iteration prefix.
+    /// </summary>
+    public string? IterationPrefix { get; set; }
+
     public CreatePlanningIntervalCommand ToCreatePlanningIntervalCommand()
     {
-        return new CreatePlanningIntervalCommand(Name, Description, new LocalDateRange(Start, End));
+        return new CreatePlanningIntervalCommand(Name, Description, new LocalDateRange(Start, End), IterationWeeks, IterationPrefix);
     }
 }
 
@@ -46,5 +56,8 @@ public sealed class CreatePlanningIntervalRequestValidator : CustomValidator<Cre
             .NotNull()
             .Must((membership, end) => membership.Start <= end)
                 .WithMessage("End date must be greater than or equal to start date");
+
+        RuleFor(t => t.IterationWeeks)
+            .GreaterThan(0);
     }
 }

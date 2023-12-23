@@ -1,5 +1,7 @@
-﻿namespace Moda.Planning.Application.PlanningIntervals.Commands;
-public sealed record CreatePlanningIntervalCommand(string Name, string? Description, LocalDateRange DateRange) : ICommand<int>;
+﻿using Moda.Planning.Domain.Enums;
+
+namespace Moda.Planning.Application.PlanningIntervals.Commands;
+public sealed record CreatePlanningIntervalCommand(string Name, string? Description, LocalDateRange DateRange, int IterationWeeks, string? IterationPrefix) : ICommand<int>;
 
 public sealed class CreatePlanningIntervalCommandValidator : CustomValidator<CreatePlanningIntervalCommand>
 {
@@ -10,16 +12,19 @@ public sealed class CreatePlanningIntervalCommandValidator : CustomValidator<Cre
 
         RuleLevelCascadeMode = CascadeMode.Stop;
 
-        RuleFor(e => e.Name)
+        RuleFor(c => c.Name)
             .NotEmpty()
             .MaximumLength(128)
             .MustAsync(BeUniquePlanningIntervalName).WithMessage("The Planning Interval name already exists.");
 
-        RuleFor(e => e.Description)
+        RuleFor(c => c.Description)
             .MaximumLength(1024);
 
-        RuleFor(e => e.DateRange)
+        RuleFor(c => c.DateRange)
             .NotNull();
+
+        RuleFor(c => c.IterationWeeks)
+            .GreaterThan(0);
     }
 
     public async Task<bool> BeUniquePlanningIntervalName(string name, CancellationToken cancellationToken)
@@ -50,6 +55,33 @@ internal sealed class CreatePlanningIntervalCommandHandler : ICommandHandler<Cre
                 request.Description,
                 request.DateRange
                 );
+
+            // create iterations for the planning interval
+            var iterationStart = request.DateRange.Start;
+            var iterationCount = 1;
+            var isLastIteration = false;
+            while (true)
+            {
+                var iterationName = $"{request.IterationPrefix}{iterationCount}";
+                var iterationEnd = iterationStart.PlusWeeks(request.IterationWeeks).PlusDays(-1);
+                var iterationType = IterationType.Development;
+                if (iterationEnd >= request.DateRange.End)
+                {
+                    iterationEnd = request.DateRange.End;
+                    iterationType = IterationType.InnovationAndPlanning;
+                    isLastIteration = true;
+                }
+
+                var iterationDates = new LocalDateRange(iterationStart, iterationEnd);
+
+                planningInterval.AddIteration(iterationName, iterationType, iterationDates);
+
+                if (isLastIteration)
+                    break;
+
+                iterationStart = iterationEnd.PlusDays(1);
+                iterationCount++;
+            }
 
             await _planningDbContext.PlanningIntervals.AddAsync(planningInterval, cancellationToken);
 

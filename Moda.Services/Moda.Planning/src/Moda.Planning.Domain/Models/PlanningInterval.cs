@@ -157,25 +157,25 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
 
     #region Iterations
 
-    //public Result AddIteration(string name, IterationType type, LocalDateRange dateRange)
-    //{
-    //    if (Iterations.Any(x => x.Name == name))
-    //        return Result.Failure("Iteration name already exists.");
+    public Result AddIteration(string name, IterationType type, LocalDateRange dateRange)
+    {
+        if (Iterations.Any(x => x.Name == name))
+            return Result.Failure("Iteration name already exists.");
 
-    //    if (Iterations.Any(x => x.DateRange.Overlaps(dateRange)))
-    //        return Result.Failure("Iteration date range overlaps with existing iteration date range.");
+        if (Iterations.Any(x => x.DateRange.Overlaps(dateRange)))
+            return Result.Failure("Iteration date range overlaps with existing iteration date range.");
 
-    //    if (dateRange.Start < DateRange.Start)
-    //        return Result.Failure("Iteration date range cannot start before the Planning Interval date range.");
+        if (dateRange.Start < DateRange.Start)
+            return Result.Failure("Iteration date range cannot start before the Planning Interval date range.");
 
-    //    if (dateRange.End > DateRange.End)
-    //        return Result.Failure("Iteration date range cannot end after the Planning Interval date range.");
+        if (dateRange.End > DateRange.End)
+            return Result.Failure("Iteration date range cannot end after the Planning Interval date range.");
 
-    //    var iteration = new PlanningIntervalIteration(Id, name, type, dateRange);
-    //    _iterations.Add(iteration);
+        var iteration = new PlanningIntervalIteration(Id, name, type, dateRange);
+        _iterations.Add(iteration);
 
-    //    return Result.Success();
-    //}
+        return Result.Success();
+    }
 
     public Result UpdateIteration(Guid iterationId, string name, IterationType type)
     {

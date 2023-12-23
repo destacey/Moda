@@ -7676,6 +7676,10 @@ export interface CreatePlanningIntervalRequest {
     start: Date;
     /** Gets or sets the end. */
     end: Date;
+    /** Gets or sets the length of iterations in weeks. */
+    iterationWeeks?: number;
+    /** Gets or sets the iteration prefix. */
+    iterationPrefix?: string | undefined;
 }
 
 export interface UpdatePlanningIntervalRequest {

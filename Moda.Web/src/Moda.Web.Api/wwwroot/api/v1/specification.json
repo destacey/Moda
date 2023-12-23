@@ -6730,6 +6730,18 @@
             "description": "Gets or sets the end.",
             "format": "date",
             "nullable": false
+          },
+          "iterationWeeks": {
+            "type": "integer",
+            "description": "Gets or sets the length of iterations in weeks.",
+            "format": "int32",
+            "minimum": 0.0,
+            "exclusiveMinimum": true
+          },
+          "iterationPrefix": {
+            "type": "string",
+            "description": "Gets or sets the iteration prefix.",
+            "nullable": true
           }
         }
       },
