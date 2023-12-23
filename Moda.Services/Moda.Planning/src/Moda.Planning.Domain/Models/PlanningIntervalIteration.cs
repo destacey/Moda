@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using Moda.Planning.Domain.Enums;
+using Moda.Planning.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public sealed class Iteration : BaseAuditableEntity<Guid>
+public sealed class PlanningIntervalIteration : BaseAuditableEntity<Guid>, ILocalSchedule
 {
     private string _name = default!;
     private LocalDateRange _dateRange = default!;
 
-    private Iteration() { }
+    private PlanningIntervalIteration() { }
 
-    internal Iteration(Guid planningIntervalId, string name, IterationType type, LocalDateRange dateRange)
+    internal PlanningIntervalIteration(Guid planningIntervalId, string name, IterationType type, LocalDateRange dateRange)
     {
         PlanningIntervalId = planningIntervalId;
         Name = name;
@@ -60,5 +57,25 @@ public sealed class Iteration : BaseAuditableEntity<Guid>
         if (DateRange.IsPastOn(date)) { return IterationState.Completed; }
         if (DateRange.IsActiveOn(date)) { return IterationState.Active; }
         return IterationState.Future;
+    }
+
+    internal Result Update(string name, IterationType type)
+    {
+        Name = name;
+        Type = type;
+
+        return Result.Success();
+    }
+
+    internal Result ChangeDates(LocalDateRange dateRange)
+    {
+        DateRange = dateRange;
+
+        return Result.Success();
+    }
+
+    internal static PlanningIntervalIteration Create(Guid planningIntervalId, string name, IterationType type, LocalDateRange dateRange)
+    {
+        return new PlanningIntervalIteration(planningIntervalId, name, type, dateRange);
     }
 }

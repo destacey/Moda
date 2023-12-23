@@ -18,7 +18,7 @@ public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
 
         builder.HasIndex(t => new { t.Id, t.IsDeleted })
             .IncludeProperties(t => new { t.Key, t.Name, t.Code, t.Type, t.IsActive });
-        builder.HasIndex(t =>  new { t.Key, t.IsDeleted })
+        builder.HasIndex(t => new { t.Key, t.IsDeleted })
             .IncludeProperties(t => new { t.Id, t.Name, t.Code, t.Type, t.IsActive });
         builder.HasIndex(t => t.Code)
             .IsUnique()
@@ -36,10 +36,12 @@ public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
             .HasConversion(
                 t => t.Value,
                 t => new TeamCode(t))
+            .HasColumnType("varchar")
             .HasMaxLength(10);
         builder.Property(t => t.Type).IsRequired()
             .HasConversion<EnumConverter<TeamType>>()
-            .HasMaxLength(64);
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
         builder.Property(t => t.IsActive);
 
         // Audit
@@ -97,6 +99,58 @@ public class PlanningIntervalConfig : IEntityTypeConfiguration<PlanningInterval>
     }
 }
 
+public class PlanningIntervalIterationConfig : IEntityTypeConfiguration<PlanningIntervalIteration>
+{
+    public void Configure(EntityTypeBuilder<PlanningIntervalIteration> builder)
+    {
+        builder.ToTable("PlanningIntervalIterations", SchemaNames.Planning);
+
+        builder.HasKey(i => i.Id);
+        builder.HasAlternateKey(i => i.Key);
+
+        builder.HasIndex(i => new { i.Id, i.IsDeleted })
+            .IncludeProperties(i => new { i.Key, i.PlanningIntervalId, i.Name, i.Type });
+        builder.HasIndex(i => new { i.Key, i.IsDeleted })
+            .IncludeProperties(i => new { i.Id, i.PlanningIntervalId, i.Name, i.Type });
+        builder.HasIndex(i => new { i.PlanningIntervalId, i.IsDeleted })
+            .IncludeProperties(i => new { i.Id, i.Key, i.Name, i.Type });
+        builder.HasIndex(i => i.IsDeleted)
+            .IncludeProperties(i => new { i.Id, i.Key, i.PlanningIntervalId, i.Name, i.Type });
+
+        builder.Property(i => i.Key).ValueGeneratedOnAdd();
+
+        builder.Property(i => i.Name).HasMaxLength(128).IsRequired();
+        builder.Property(i => i.Type).IsRequired()
+            .HasConversion<EnumConverter<IterationType>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        // Value Objects
+        builder.OwnsOne(p => p.DateRange, options =>
+        {
+            options.HasIndex(i => new { i.Start, i.End });
+
+            options.Property(d => d.Start).HasColumnName("Start").IsRequired();
+            options.Property(d => d.End).HasColumnName("End").IsRequired();
+        });
+
+        // Audit
+        builder.Property(i => i.Created);
+        builder.Property(i => i.CreatedBy);
+        builder.Property(i => i.LastModified);
+        builder.Property(i => i.LastModifiedBy);
+        builder.Property(i => i.Deleted);
+        builder.Property(i => i.DeletedBy);
+        builder.Property(i => i.IsDeleted);
+
+        // Relationships
+        builder.HasOne<PlanningInterval>()
+            .WithMany(p => p.Iterations)
+            .HasForeignKey(i => i.PlanningIntervalId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
 public class PlanningIntervalObjectiveConfig : IEntityTypeConfiguration<PlanningIntervalObjective>
 {
     public void Configure(EntityTypeBuilder<PlanningIntervalObjective> builder)
@@ -122,11 +176,11 @@ public class PlanningIntervalObjectiveConfig : IEntityTypeConfiguration<Planning
         builder.Property(o => o.ObjectiveId).IsRequired();
         builder.Property(o => o.Type).IsRequired()
             .HasConversion<EnumConverter<PlanningIntervalObjectiveType>>()
-            .HasMaxLength(64)
+            .HasMaxLength(32)
             .HasColumnType("varchar");
         builder.Property(o => o.Status).IsRequired()
             .HasConversion<EnumConverter<ObjectiveStatus>>()
-            .HasMaxLength(64)
+            .HasMaxLength(32)
             .HasColumnType("varchar");
         builder.Property(o => o.IsStretch).IsRequired();
 
@@ -205,19 +259,23 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
 
         builder.Property(r => r.Status).IsRequired()
             .HasConversion<EnumConverter<RiskStatus>>()
-            .HasMaxLength(64);
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
 
         builder.Property(r => r.Category).IsRequired()
             .HasConversion<EnumConverter<RiskCategory>>()
-            .HasMaxLength(64);
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
 
         builder.Property(r => r.Impact).IsRequired()
             .HasConversion<EnumConverter<RiskGrade>>()
-            .HasMaxLength(64);
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
 
         builder.Property(r => r.Likelihood).IsRequired()
             .HasConversion<EnumConverter<RiskGrade>>()
-            .HasMaxLength(64);
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
 
         builder.Property(r => r.FollowUpDate);
         builder.Property(r => r.Response).HasMaxLength(1024);

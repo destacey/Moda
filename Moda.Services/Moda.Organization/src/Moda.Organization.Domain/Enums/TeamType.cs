@@ -2,6 +2,7 @@
 
 namespace Moda.Organization.Domain.Enums;
 
+// max length of 32 characters
 public enum TeamType
 {
     [Display(Name = "Team", Description = "A team is a collection of team members that work together to execute against a prioritized set of goals.", Order = 1)]

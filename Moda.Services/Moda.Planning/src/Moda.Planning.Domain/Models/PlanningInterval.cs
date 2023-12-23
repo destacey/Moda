@@ -2,21 +2,23 @@
 using CSharpFunctionalExtensions;
 using Moda.Organization.Domain.Enums;
 using Moda.Planning.Domain.Enums;
+using Moda.Planning.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public class PlanningInterval : BaseAuditableEntity<Guid>
+public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
 {
     private string _name = default!;
     private string? _description;
     private LocalDateRange _dateRange = default!;
 
-    protected readonly List<PlanningIntervalTeam> _teams = new();
-    protected readonly List<PlanningIntervalObjective> _objectives = new();
+    private readonly List<PlanningIntervalTeam> _teams = new();
+    private readonly List<PlanningIntervalIteration> _iterations = new();
+    private readonly List<PlanningIntervalObjective> _objectives = new();
 
-    protected PlanningInterval() { }
+    private PlanningInterval() { }
 
-    protected PlanningInterval(string name, string? description, LocalDateRange dateRange)
+    private PlanningInterval(string name, string? description, LocalDateRange dateRange)
     {
         Name = name;
         Description = description;
@@ -35,7 +37,7 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
     public string Name
     {
         get => _name;
-        protected set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
     }
 
     /// <summary>
@@ -44,7 +46,7 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
     public string? Description
     {
         get => _description;
-        protected set => _description = value.NullIfWhiteSpacePlusTrim();
+        private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>Gets or sets the date range.</summary>
@@ -52,7 +54,7 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
     public LocalDateRange DateRange
     {
         get => _dateRange;
-        protected set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
+        private set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
     }
 
     public bool ObjectivesLocked { get; private set; } = false;
@@ -60,6 +62,10 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
     /// <summary>Gets the teams.</summary>
     /// <value>The PI teams.</value>
     public IReadOnlyCollection<PlanningIntervalTeam> Teams => _teams.AsReadOnly();
+
+    /// <summary>Gets the iterations.</summary>
+    /// <value>The PI iterations.</value>
+    public IReadOnlyCollection<PlanningIntervalIteration> Iterations => _iterations.AsReadOnly();
 
     /// <summary>Gets the objectives.</summary>
     /// <value>The PI objectives.</value>
@@ -92,19 +98,12 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
     /// <returns></returns>
     public Result Update(string name, string? description, LocalDateRange dateRange, bool objectivesLocked)
     {
-        try
-        {
-            Name = name;
-            Description = description;
-            DateRange = dateRange;
-            ObjectivesLocked = objectivesLocked;
+        Name = name;
+        Description = description;
+        DateRange = dateRange;
+        ObjectivesLocked = objectivesLocked;
 
-            return Result.Success();
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure(ex.ToString());
-        }
+        return Result.Success();
     }
 
     /// <summary>Iteration state on given date.</summary>
@@ -133,27 +132,90 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
     /// <returns></returns>
     public Result ManageTeams(IEnumerable<Guid> teamIds)
     {
-        try
+        var removedTeams = _teams.Where(x => !teamIds.Contains(x.TeamId)).ToList();
+        foreach (var removedTeam in removedTeams)
         {
-            var removedTeams = _teams.Where(x => !teamIds.Contains(x.TeamId)).ToList();
-            foreach (var removedTeam in removedTeams)
-            {
-                _teams.Remove(removedTeam);
-            }
-
-            var addedTeams = teamIds.Where(x => !_teams.Any(y => y.TeamId == x)).ToList();
-            foreach (var addedTeam in addedTeams)
-            {
-                _teams.Add(new PlanningIntervalTeam(Id, addedTeam));
-            }
-
-            return Result.Success();
+            _teams.Remove(removedTeam);
         }
-        catch (Exception ex)
+
+        var addedTeams = teamIds.Where(x => !_teams.Any(y => y.TeamId == x)).ToList();
+        foreach (var addedTeam in addedTeams)
         {
-            return Result.Failure(ex.ToString());
+            _teams.Add(new PlanningIntervalTeam(Id, addedTeam));
         }
+
+        return Result.Success();
     }
+
+    public Result ManageDates(PlanningIntervalCalendar calendar)
+    {
+        if (Id != calendar.Id)
+            return Result.Failure("Planning Interval Id does not match Id in the Calendar.");
+
+        DateRange = calendar.DateRange;
+
+        return Result.Success();
+    }
+
+    #region Iterations
+
+    //public Result AddIteration(string name, IterationType type, LocalDateRange dateRange)
+    //{
+    //    if (Iterations.Any(x => x.Name == name))
+    //        return Result.Failure("Iteration name already exists.");
+
+    //    if (Iterations.Any(x => x.DateRange.Overlaps(dateRange)))
+    //        return Result.Failure("Iteration date range overlaps with existing iteration date range.");
+
+    //    if (dateRange.Start < DateRange.Start)
+    //        return Result.Failure("Iteration date range cannot start before the Planning Interval date range.");
+
+    //    if (dateRange.End > DateRange.End)
+    //        return Result.Failure("Iteration date range cannot end after the Planning Interval date range.");
+
+    //    var iteration = new PlanningIntervalIteration(Id, name, type, dateRange);
+    //    _iterations.Add(iteration);
+
+    //    return Result.Success();
+    //}
+
+    public Result UpdateIteration(Guid iterationId, string name, IterationType type)
+    {
+        var existingIteration = _iterations.FirstOrDefault(x => x.Id == iterationId);
+        if (existingIteration == null)
+            return Result.Failure($"Iteration {iterationId} not found.");
+
+        if (existingIteration.Name != name && _iterations.Any(x => x.Name == name))
+            return Result.Failure("Iteration name already exists.");
+
+        //if (existingIteration.DateRange != dateRange && _iterations.Any(x => x.DateRange.Overlaps(dateRange)))
+        //    return Result.Failure("Iteration date range overlaps with existing iteration date range.");
+
+        //if (dateRange.Start < DateRange.Start)
+        //    return Result.Failure("Iteration date range cannot start before the Planning Interval date range.");
+
+        //if (dateRange.End > DateRange.End)
+        //    return Result.Failure("Iteration date range cannot end after the Planning Interval date range.");
+
+        var updateResult = existingIteration.Update(name, type);
+        return updateResult.IsSuccess ? Result.Success() : Result.Failure(updateResult.Error);
+    }
+
+    public Result DeleteIteration(Guid iterationId)
+    {
+        var existingIteration = _iterations.FirstOrDefault(x => x.Id == iterationId);
+        if (existingIteration == null)
+            return Result.Failure($"Iteration {iterationId} not found.");
+
+        _iterations.Remove(existingIteration);
+
+        return Result.Success();
+    }
+
+
+    #endregion Iterations
+
+    #region Objectives
 
     /// <summary>Creates a PI objective.</summary>
     /// <param name="team">The team.</param>
@@ -226,6 +288,8 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
             return Result.Failure(ex.ToString());
         }
     }
+
+    #endregion Objectives
 
     /// <summary>Creates the specified name.</summary>
     /// <param name="name">The name.</param>
