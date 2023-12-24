@@ -1416,6 +1416,74 @@ export class PlanningIntervalsClient {
     }
 
     /**
+     * Get the PI calendar.
+     */
+    getCalendar(idOrKey: string, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalCalendarDto> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/calendar";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetCalendar(_response);
+        });
+    }
+
+    protected processGetCalendar(response: AxiosResponse): Promise<PlanningIntervalCalendarDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PlanningIntervalCalendarDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PlanningIntervalCalendarDto>(null as any);
+    }
+
+    /**
      * Get the PI predictability for all teams.
      */
     getPredictability(id: string, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalPredictabilityDto> {
@@ -2096,11 +2164,11 @@ export class PlanningIntervalsClient {
      * Get a health report for planning interval objectives.
      * @param teamId (optional) 
      */
-    getObjectivesHealthReport(id: string, teamId: string | null | undefined, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalObjectiveHealthCheckDto[]> {
-        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/objectives/health-report?";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    getObjectivesHealthReport(idOrKey: string, teamId: string | null | undefined, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalObjectiveHealthCheckDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/objectives/health-report?";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
         if (teamId !== undefined && teamId !== null)
             url_ += "teamId=" + encodeURIComponent("" + teamId) + "&";
         url_ = url_.replace(/[?&]$/, "");
@@ -7651,6 +7719,28 @@ export interface PlanningIntervalDetailsDto {
     state?: string;
     objectivesLocked?: boolean;
     predictability?: number | undefined;
+}
+
+export interface PlanningIntervalCalendarDto {
+    id?: string;
+    name?: string;
+    dateRange?: LocalDateRange;
+    iterationSchedules?: ILocalSchedule[];
+}
+
+export interface ValueObject {
+}
+
+export interface LocalDateRange extends ValueObject {
+    start?: Date;
+    end?: Date;
+    days?: number;
+}
+
+export interface ILocalSchedule {
+    id?: string;
+    name?: string;
+    dateRange?: LocalDateRange;
 }
 
 export interface PlanningIntervalPredictabilityDto {

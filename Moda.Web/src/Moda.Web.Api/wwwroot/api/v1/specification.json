@@ -1093,6 +1093,63 @@
         ]
       }
     },
+    "/api/planning/planning-intervals/{idOrKey}/calendar": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get the PI calendar.",
+        "operationId": "PlanningIntervals_GetCalendar",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningIntervalCalendarDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/planning-intervals/{id}/predictability": {
       "get": {
         "tags": [
@@ -1719,7 +1776,7 @@
         ]
       }
     },
-    "/api/planning/planning-intervals/{id}/objectives/health-report": {
+    "/api/planning/planning-intervals/{idOrKey}/objectives/health-report": {
       "get": {
         "tags": [
           "PlanningIntervals"
@@ -1728,7 +1785,7 @@
         "operationId": "PlanningIntervals_GetObjectivesHealthReport",
         "parameters": [
           {
-            "name": "id",
+            "name": "idOrKey",
             "in": "path",
             "required": true,
             "schema": {
@@ -6648,6 +6705,75 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          }
+        }
+      },
+      "PlanningIntervalCalendarDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "dateRange": {
+            "$ref": "#/components/schemas/LocalDateRange"
+          },
+          "iterationSchedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ILocalSchedule"
+            }
+          }
+        }
+      },
+      "LocalDateRange": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "start": {
+                "type": "string",
+                "format": "date"
+              },
+              "end": {
+                "type": "string",
+                "format": "date"
+              },
+              "days": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        ]
+      },
+      "ValueObject": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false
+      },
+      "ILocalSchedule": {
+        "type": "object",
+        "x-abstract": true,
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "dateRange": {
+            "$ref": "#/components/schemas/LocalDateRange"
           }
         }
       },

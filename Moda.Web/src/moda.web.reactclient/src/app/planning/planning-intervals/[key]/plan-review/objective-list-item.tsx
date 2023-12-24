@@ -153,7 +153,14 @@ const ObjectiveListItem = ({
       )
     }
     return items
-  }, [canUpdateObjectives, canCreateHealthChecks, dispatch, objective.id])
+  }, [
+    canUpdateObjectives,
+    canCreateHealthChecks,
+    objective.planningInterval.key,
+    objective.key,
+    objective.id,
+    dispatch,
+  ])
 
   const onEditObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)

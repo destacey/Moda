@@ -65,7 +65,7 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
 
     /// <summary>Gets the iterations.</summary>
     /// <value>The PI iterations.</value>
-    public IReadOnlyCollection<PlanningIntervalIteration> Iterations => _iterations.AsReadOnly();
+    public IReadOnlyCollection<PlanningIntervalIteration> Iterations => _iterations.OrderBy(i => i.DateRange.Start).ToList().AsReadOnly();
 
     /// <summary>Gets the objectives.</summary>
     /// <value>The PI objectives.</value>
@@ -90,18 +90,24 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
         return completedCount >= nonstretchCount ? 100.0d : Math.Round(100 * ((double)completedCount / nonstretchCount), 2);
     }
 
-    /// <summary>Updates the specified name.</summary>
-    /// <param name="name">The name.</param>
-    /// <param name="description">The description.</param>
-    /// <param name="objectivesLocked">if set to <c>true</c> [objectives locked].</param>
-    /// <returns></returns>
-    public Result Update(string name, string? description, bool objectivesLocked)
+    /// <summary>
+    /// Determines whether this planning interval can create objectives.
+    /// </summary>
+    /// <returns>
+    ///   <c>true</c> if this planning interval can create objectives; otherwise, <c>false</c>.
+    /// </returns>
+    public bool CanCreateObjectives()
     {
-        Name = name;
-        Description = description;
-        ObjectivesLocked = objectivesLocked;
+        return !ObjectivesLocked;
+    }
 
-        return Result.Success();
+    /// <summary>
+    /// Gets a calendar with PI and iteration dates.
+    /// </summary>
+    /// <returns></returns>
+    public PlanningIntervalCalendar GetCalendar()
+    {
+        return new PlanningIntervalCalendar(this, Iterations);
     }
 
     /// <summary>Iteration state on given date.</summary>
@@ -114,15 +120,18 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
         return IterationState.Future;
     }
 
-    /// <summary>
-    /// Determines whether this planning interval can create objectives.
-    /// </summary>
-    /// <returns>
-    ///   <c>true</c> if this planning interval can create objectives; otherwise, <c>false</c>.
-    /// </returns>
-    public bool CanCreateObjectives()
+    /// <summary>Updates the specified name.</summary>
+    /// <param name="name">The name.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="objectivesLocked">if set to <c>true</c> [objectives locked].</param>
+    /// <returns></returns>
+    public Result Update(string name, string? description, bool objectivesLocked)
     {
-        return !ObjectivesLocked;
+        Name = name;
+        Description = description;
+        ObjectivesLocked = objectivesLocked;
+
+        return Result.Success();
     }
 
     /// <summary>Manages the planning interval teams.</summary>

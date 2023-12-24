@@ -8,8 +8,6 @@ import {
   NavigationDto,
   PlanningHealthCheckDto,
   PlanningTeamNavigationDto,
-  PlanningIntervalListDto,
-  PlanningIntervalObjectiveDetailsDto,
   PlanningIntervalObjectiveListDto,
 } from '@/src/services/moda-api'
 import Link from 'next/link'

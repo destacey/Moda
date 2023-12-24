@@ -5,12 +5,12 @@ public sealed record PlanningIntervalCalendar
 {
     private readonly List<ILocalSchedule> _iterationSchedules = new();
 
-    internal PlanningIntervalCalendar(ILocalSchedule planningInterval, List<ILocalSchedule> iterations)
+    internal PlanningIntervalCalendar(ILocalSchedule planningInterval, IEnumerable<ILocalSchedule> iterations)
     {
         Id = planningInterval.Id;
         Name = planningInterval.Name;
         DateRange = planningInterval.DateRange;
-        _iterationSchedules = iterations;        
+        _iterationSchedules = iterations.ToList();
     }
 
     public Guid Id { get; init; }

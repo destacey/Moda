@@ -1,4 +1,5 @@
-﻿using CsvHelper;
+﻿using CSharpFunctionalExtensions;
+using CsvHelper;
 using Mapster;
 using Moda.Common.Application.Interfaces;
 using Moda.Health.Queries;
@@ -68,6 +69,35 @@ public class PlanningIntervalsController : ControllerBase
 
         return planningInterval is not null
             ? Ok(planningInterval)
+            : NotFound();
+    }
+
+    [HttpGet("{idOrKey}/calendar")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
+    [OpenApiOperation("Get the PI calendar.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<PlanningIntervalCalendarDto>> GetCalendar(string idOrKey, CancellationToken cancellationToken)
+    {
+        GetPlanningIntervalCalendarQuery query;
+        if (Guid.TryParse(idOrKey, out Guid guidId))
+        {
+            query = new GetPlanningIntervalCalendarQuery(guidId);
+        }
+        else if (int.TryParse(idOrKey, out int intId))
+        {
+            query = new GetPlanningIntervalCalendarQuery(intId);
+        }
+        else
+        {
+            return UnknownIdOrKeyTypeError("PlanningIntervalsController.GetCalendar");
+        }
+
+        var calendar = await _sender.Send(query, cancellationToken);
+
+        return calendar is not null
+            ? Ok(calendar)
             : NotFound();
     }
 
@@ -268,25 +298,25 @@ public class PlanningIntervalsController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("{id}/objectives/health-report")]
+    [HttpGet("{idOrKey}/objectives/health-report")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
     [OpenApiOperation("Get a health report for planning interval objectives.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<PlanningIntervalObjectiveHealthCheckDto>>> GetObjectivesHealthReport(string id, Guid? teamId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<PlanningIntervalObjectiveHealthCheckDto>>> GetObjectivesHealthReport(string idOrKey, Guid? teamId, CancellationToken cancellationToken)
     {
         GetPlanningIntervalObjectivesQuery objectivesQuery;
-        if (Guid.TryParse(id, out Guid guidId))
+        if (Guid.TryParse(idOrKey, out Guid guidId))
         {
             objectivesQuery = new GetPlanningIntervalObjectivesQuery(guidId, teamId);
         }
-        else if (int.TryParse(id, out int intId))
+        else if (int.TryParse(idOrKey, out int intId))
         {
             objectivesQuery = new GetPlanningIntervalObjectivesQuery(intId, teamId);
         }
         else
         {
-            return NotFound();
+            return UnknownIdOrKeyTypeError("PlanningIntervalsController.GetObjectivesHealthReport");
         }
 
         var objectives = await _sender.Send(objectivesQuery, cancellationToken);
@@ -428,4 +458,15 @@ public class PlanningIntervalsController : ControllerBase
     }
 
     #endregion Risks
+
+    private ActionResult UnknownIdOrKeyTypeError(string source)
+    {
+        var error = new ErrorResult
+        {
+            StatusCode = 400,
+            SupportMessage = "Unknown id or key type.",
+            Source = source
+        };
+        return BadRequest(error);
+    }
 }
