@@ -198,6 +198,22 @@ public class PlanningIntervalsController : ControllerBase
             : BadRequest(result.Error);
     }
 
+    #region Iterations
+
+    [HttpGet("{id}/iterations")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
+    [OpenApiOperation("Get a list of planning interval iterations.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<PlanningIntervalIterationListDto>>> GetIterations(Guid id, CancellationToken cancellationToken)
+    {
+        var iterations = await _sender.Send(new GetPlanningIntervalIterationsQuery(id), cancellationToken);
+
+        return Ok(iterations);
+    }
+
+    #endregion Iterations
+
     #region Objectives
 
     [HttpGet("{id}/objectives")]

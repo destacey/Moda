@@ -109,10 +109,10 @@ const PlanningIntervalDetails = ({
   return (
     <>
       <Row>
-        <Col xs={24} sm={24} md={16}>
+        <Col xs={24} sm={24} md={11} lg={13} xl={16}>
           <Descriptions
             size="small"
-            column={{ xs: 1, sm: 1, md: 2, lg: 3, xl: 3, xxl: 4 }}
+            column={{ xs: 1, sm: 1, md: 1, lg: 3, xl: 4, xxl: 5 }}
             items={detailsItems}
           />
           {planningInterval.description && (
@@ -125,7 +125,7 @@ const PlanningIntervalDetails = ({
             </Descriptions>
           )}
         </Col>
-        <Col xs={24} sm={24} md={8}>
+        <Col xs={24} sm={24} md={13} lg={11} xl={8}>
           <PlanningIntervalIterationsList id={planningInterval.id} />
         </Col>
       </Row>

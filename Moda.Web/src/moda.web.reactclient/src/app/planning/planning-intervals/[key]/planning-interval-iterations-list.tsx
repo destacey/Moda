@@ -1,8 +1,7 @@
 'use client'
 
-import { useGetPlanningIntervalCalendar } from '@/src/services/queries/planning-queries'
+import { useGetPlanningIntervalIterations } from '@/src/services/queries/planning-queries'
 import { Card, Flex, List, Space } from 'antd'
-import Typography from 'antd/es/typography/Typography'
 import dayjs from 'dayjs'
 
 interface PlanningIntervalIterationsListProps {
@@ -12,22 +11,25 @@ interface PlanningIntervalIterationsListProps {
 const PlanningIntervalIterationsList = ({
   id,
 }: PlanningIntervalIterationsListProps) => {
-  const { data: calendar } = useGetPlanningIntervalCalendar(id)
+  const { data: iterations } = useGetPlanningIntervalIterations(id)
 
-  if (!calendar) return null
+  if (!iterations) return null
   return (
     <>
       <Card size="small" title="Iterations">
         <List
           size="small"
           itemLayout="horizontal"
-          dataSource={calendar.iterationSchedules}
+          dataSource={iterations}
           renderItem={(iteration) => (
             <List.Item>
-              <List.Item.Meta title={iteration.name} />
+              <List.Item.Meta
+                title={iteration.name}
+                description={iteration.type.name}
+              />
               <Flex wrap="wrap">
-                {dayjs(iteration.dateRange.start).format('M/D/YYYY')} -{' '}
-                {dayjs(iteration.dateRange.end).format('M/D/YYYY')}
+                {dayjs(iteration.start).format('M/D/YYYY')} -{' '}
+                {dayjs(iteration.end).format('M/D/YYYY')}
               </Flex>
             </List.Item>
           )}

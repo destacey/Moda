@@ -13,7 +13,7 @@ import _ from 'lodash'
 import { OptionModel } from '@/src/app/components/types'
 import dayjs from 'dayjs'
 
-// PROGRAM INCREMENTS
+// PLANNING INTERVALS
 
 const stateOrder = ['Active', 'Future', 'Completed']
 export const useGetPlanningIntervals = () => {
@@ -95,7 +95,16 @@ export const useUpdatePlanningIntervalMutation = () => {
   })
 }
 
-// PROGRAM INCREMENT - TEAMS
+// PLANNING INTERVAL - ITERATIONS
+export const useGetPlanningIntervalIterations = (id: string) => {
+  return useQuery({
+    queryKey: [QK.PLANNING_INTERVAL_ITERATIONS, id],
+    queryFn: async () => (await getPlanningIntervalsClient()).getIterations(id),
+    enabled: !!id,
+  })
+}
+
+// PLANNING INTERVAL - TEAMS
 export const useGetPlanningIntervalTeams = (
   id: string,
   enabled: boolean = true,
@@ -108,7 +117,7 @@ export const useGetPlanningIntervalTeams = (
   })
 }
 
-// PROGRAM INCREMENT - OBJECTIVES
+// PLANNING INTERVAL - OBJECTIVES
 export const useGetPlanningIntervalObjectives = (
   id: string,
   enabled: boolean = true,
@@ -310,7 +319,7 @@ export const useUpdatePlanningIntervalObjectiveMutation = () => {
   )
 }
 
-// PROGRAM INCREMENT - RISKS
+// PLANNING INTERVAL - RISKS
 export const useGetPlanningIntervalRisks = (
   id: string,
   includeClosed: boolean = false,

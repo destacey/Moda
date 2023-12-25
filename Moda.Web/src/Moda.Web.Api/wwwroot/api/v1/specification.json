@@ -1370,6 +1370,57 @@
         ]
       }
     },
+    "/api/planning/planning-intervals/{id}/iterations": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get a list of planning interval iterations.",
+        "operationId": "PlanningIntervals_GetIterations",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlanningIntervalIterationListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/planning-intervals/{id}/objectives": {
       "get": {
         "tags": [
@@ -6976,6 +7027,47 @@
           }
         }
       },
+      "PlanningIntervalIterationListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date"
+          },
+          "end": {
+            "type": "string",
+            "format": "date"
+          },
+          "type": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          }
+        }
+      },
+      "SimpleNavigationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "PlanningIntervalObjectiveListDto": {
         "type": "object",
         "additionalProperties": false,
@@ -7027,19 +7119,6 @@
           },
           "isStretch": {
             "type": "boolean"
-          }
-        }
-      },
-      "SimpleNavigationDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
           }
         }
       },
