@@ -1,8 +1,8 @@
 'use client'
 
+import ModaDateRange from '@/src/app/components/common/moda-date-range'
 import { useGetPlanningIntervalIterations } from '@/src/services/queries/planning-queries'
-import { Card, Flex, List, Space } from 'antd'
-import dayjs from 'dayjs'
+import { Card, List } from 'antd'
 
 interface PlanningIntervalIterationsListProps {
   id: string
@@ -27,10 +27,7 @@ const PlanningIntervalIterationsList = ({
                 title={iteration.name}
                 description={iteration.type.name}
               />
-              <Flex wrap="wrap">
-                {dayjs(iteration.start).format('M/D/YYYY')} -{' '}
-                {dayjs(iteration.end).format('M/D/YYYY')}
-              </Flex>
+              <ModaDateRange dateRange={iteration} />
             </List.Item>
           )}
         />

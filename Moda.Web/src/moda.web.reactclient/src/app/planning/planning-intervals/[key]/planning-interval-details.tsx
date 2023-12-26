@@ -28,12 +28,12 @@ const PlanningIntervalDetails = ({
     {
       key: 'start',
       label: 'Start',
-      children: dayjs(planningInterval.start).format('M/D/YYYY'),
+      children: dayjs(planningInterval.start).format('MMM D, YYYY'),
     },
     {
       key: 'end',
       label: 'End',
-      children: dayjs(planningInterval.end).format('M/D/YYYY'),
+      children: dayjs(planningInterval.end).format('MMM D, YYYY'),
     },
     {
       key: 'state',
