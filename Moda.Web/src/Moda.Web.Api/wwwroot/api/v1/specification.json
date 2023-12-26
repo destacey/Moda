@@ -6887,7 +6887,8 @@
         "properties": {
           "predictability": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "nullable": true
           },
           "teamPredictabilities": {
             "type": "array",
@@ -6906,7 +6907,8 @@
           },
           "predictability": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "nullable": true
           }
         }
       },

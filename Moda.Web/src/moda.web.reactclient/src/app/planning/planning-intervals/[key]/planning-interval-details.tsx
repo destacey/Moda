@@ -94,7 +94,8 @@ const PlanningIntervalDetails = ({
     if (
       !planningInterval ||
       planningInterval.state === 'Future' ||
-      !piPredictabilityData
+      !piPredictabilityData ||
+      piPredictabilityData.predictability === null
     )
       return null
     return (

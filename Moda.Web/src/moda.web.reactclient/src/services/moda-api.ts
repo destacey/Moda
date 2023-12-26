@@ -7866,13 +7866,13 @@ export interface ILocalSchedule {
 }
 
 export interface PlanningIntervalPredictabilityDto {
-    predictability?: number;
+    predictability?: number | undefined;
     teamPredictabilities?: PlanningIntervalTeamPredictabilityDto[];
 }
 
 export interface PlanningIntervalTeamPredictabilityDto {
     team?: PlanningTeamNavigationDto;
-    predictability?: number;
+    predictability?: number | undefined;
 }
 
 export interface PlanningTeamNavigationDto extends NavigationDto {

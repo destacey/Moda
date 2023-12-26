@@ -134,6 +134,21 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
         return Result.Success();
     }
 
+    /// <summary>
+    /// Manages the PI dates and iterations.
+    /// </summary>
+    /// <param name="dateRange"></param>
+    /// <returns></returns>
+    public Result ManageDates(LocalDateRange dateRange)
+    {
+        //if (Id != calendar.Id)
+        //    return Result.Failure("Planning Interval Id does not match Id in the Calendar.");
+
+        DateRange = dateRange;
+
+        return Result.Success();
+    }
+
     /// <summary>Manages the planning interval teams.</summary>
     /// <param name="teamIds">The team ids.</param>
     /// <returns></returns>
@@ -150,16 +165,6 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
         {
             _teams.Add(new PlanningIntervalTeam(Id, addedTeam));
         }
-
-        return Result.Success();
-    }
-
-    public Result ManageDates(LocalDateRange dateRange)
-    {
-        //if (Id != calendar.Id)
-        //    return Result.Failure("Planning Interval Id does not match Id in the Calendar.");
-
-        DateRange = dateRange;
 
         return Result.Success();
     }
