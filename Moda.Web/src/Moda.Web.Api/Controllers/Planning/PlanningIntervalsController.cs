@@ -181,9 +181,26 @@ public class PlanningIntervalsController : ControllerBase
         return Ok(predictability);
     }
 
+    [HttpPost("{id}/dates")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.PlanningIntervals)]
+    [OpenApiOperation("Manage planning interval dates and iterations.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> ManageDates(Guid id, [FromBody] ManagePlanningIntervalDatesRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToManagePlanningIntervalDatesCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.Error);
+    }
+
     [HttpPost("{id}/teams")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.PlanningIntervals)]
-    [OpenApiOperation("Manager planning interval teams.", "")]
+    [OpenApiOperation("Manage planning interval teams.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> ManageTeams(Guid id, [FromBody] ManagePlanningIntervalTeamsRequest request, CancellationToken cancellationToken)

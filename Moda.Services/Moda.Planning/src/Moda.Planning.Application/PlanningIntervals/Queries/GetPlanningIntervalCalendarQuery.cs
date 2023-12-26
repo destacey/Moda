@@ -51,6 +51,7 @@ internal sealed class GetPlanningIntervalCalendarQueryHandler : IQueryHandler<Ge
         }
 
         var planningInterval = await query
+            .AsNoTracking()
             .FirstOrDefaultAsync(cancellationToken);
 
         return planningInterval is null 

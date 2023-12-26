@@ -13,7 +13,7 @@ const PlanningIntervalIterationsList = ({
 }: PlanningIntervalIterationsListProps) => {
   const { data: iterations } = useGetPlanningIntervalIterations(id)
 
-  if (!iterations) return null
+  if (!iterations || iterations.length == 0) return null
   return (
     <>
       <Card size="small" title="Iterations">

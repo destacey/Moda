@@ -154,12 +154,12 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
         return Result.Success();
     }
 
-    public Result ManageDates(PlanningIntervalCalendar calendar)
+    public Result ManageDates(LocalDateRange dateRange)
     {
-        if (Id != calendar.Id)
-            return Result.Failure("Planning Interval Id does not match Id in the Calendar.");
+        //if (Id != calendar.Id)
+        //    return Result.Failure("Planning Interval Id does not match Id in the Calendar.");
 
-        DateRange = calendar.DateRange;
+        DateRange = dateRange;
 
         return Result.Success();
     }

@@ -5,6 +5,7 @@ import {
   CreatePlanningIntervalObjectiveRequest,
   CreatePlanningIntervalRequest,
   CreateRiskRequest,
+  ManagePlanningIntervalDatesRequest,
   UpdatePlanningIntervalObjectiveRequest,
   UpdatePlanningIntervalRequest,
   UpdateRiskRequest,
@@ -91,6 +92,30 @@ export const useUpdatePlanningIntervalMutation = () => {
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries([QK.PLANNING_INTERVALS])
       queryClient.invalidateQueries([QK.PLANNING_INTERVALS, variables.id])
+    },
+  })
+}
+
+export const useManagePlanningIntervalDatesMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (
+      planningIntervalDates: ManagePlanningIntervalDatesRequest,
+    ) =>
+      (await getPlanningIntervalsClient()).manageDates(
+        planningIntervalDates.id,
+        planningIntervalDates,
+      ),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([QK.PLANNING_INTERVALS])
+      queryClient.invalidateQueries([
+        QK.PLANNING_INTERVAL_ITERATIONS,
+        variables.id,
+      ])
+      queryClient.invalidateQueries([
+        QK.PLANNING_INTERVAL_CALENDAR,
+        variables.id,
+      ])
     },
   })
 }

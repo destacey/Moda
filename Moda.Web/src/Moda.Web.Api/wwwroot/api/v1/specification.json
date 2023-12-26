@@ -1262,7 +1262,7 @@
         "tags": [
           "PlanningIntervals"
         ],
-        "summary": "Manager planning interval teams.",
+        "summary": "Manage planning interval teams.",
         "operationId": "PlanningIntervals_ManageTeams",
         "parameters": [
           {
@@ -1351,6 +1351,59 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/planning-intervals/{id}/dates": {
+      "post": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Manage planning interval dates and iterations.",
+        "operationId": "PlanningIntervals_ManageDates",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagePlanningIntervalDatesRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
           },
           "400": {
             "description": "",
@@ -7009,6 +7062,35 @@
             }
           }
         ]
+      },
+      "ManagePlanningIntervalDatesRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "start",
+          "end"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "start": {
+            "type": "string",
+            "description": "Gets or sets the start.",
+            "format": "date",
+            "nullable": false
+          },
+          "end": {
+            "type": "string",
+            "description": "Gets or sets the end.",
+            "format": "date",
+            "nullable": false
+          }
+        }
       },
       "ManagePlanningIntervalTeamsRequest": {
         "type": "object",
