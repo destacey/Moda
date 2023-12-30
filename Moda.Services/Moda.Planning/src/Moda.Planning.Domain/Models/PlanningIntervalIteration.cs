@@ -67,6 +67,15 @@ public sealed class PlanningIntervalIteration : BaseAuditableEntity<Guid>, ILoca
         return Result.Success();
     }
 
+    internal Result Update(string name, IterationType type, LocalDateRange dateRange)
+    {
+        Name = name;
+        Type = type;
+        DateRange = dateRange;
+
+        return Result.Success();
+    }
+
     internal Result ChangeDates(LocalDateRange dateRange)
     {
         DateRange = dateRange;

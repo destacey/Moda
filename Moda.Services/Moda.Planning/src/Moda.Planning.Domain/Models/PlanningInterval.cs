@@ -139,12 +139,54 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
     /// </summary>
     /// <param name="dateRange"></param>
     /// <returns></returns>
-    public Result ManageDates(LocalDateRange dateRange)
+    public Result ManageDates(LocalDateRange dateRange, List<UpsertPlanningIntervalIteration> iterations)
     {
-        //if (Id != calendar.Id)
-        //    return Result.Failure("Planning Interval Id does not match Id in the Calendar.");
-
         DateRange = dateRange;
+
+        //TODO: we are currently allowing gaps in the date ranges, but we should not allow that
+
+        // verify no duplicate names
+        var iterationNames = iterations.Select(i => i.Name).ToList();
+        if (iterationNames.Distinct().Count() != iterationNames.Count)
+            return Result.Failure("Iteration names must be unique within the PI.");
+
+        // verify iteration dates are within the PI date range and don't overlap
+        foreach (var iteration in iterations)
+        {
+            if (iteration.DateRange.Start < DateRange.Start)
+                return Result.Failure("Iteration date ranges cannot start before the Planning Interval date range.");
+            if (iteration.DateRange.End > DateRange.End)
+                return Result.Failure("Iteration date ranges cannot end after the Planning Interval date range.");
+
+            if (Iterations.Where(i => i.Id != iteration.Id).Any(x => x.DateRange.Overlaps(iteration.DateRange)))
+                return Result.Failure("Iteration date ranges cannot overlap.");
+        }
+
+        // remove any iterations that are not in the list
+        var initialIterationIds = _iterations.Select(i => i.Id).ToList();
+        var removedIterations = _iterations.Where(i => !iterations.Any(x => x.Id == i.Id)).ToList();
+        foreach (var removedIteration in removedIterations)
+        {
+            var deleteResult = DeleteIteration(removedIteration.Id);
+            if (deleteResult.IsFailure)
+                return Result.Failure(deleteResult.Error);
+        }
+
+        // update existing iterations
+        foreach (var iteration in iterations.Where(x => !x.IsNew))
+        {
+            var updateResult = UpdateIteration(iteration.Id!.Value, iteration.Name, iteration.Type, iteration.DateRange);
+            if (updateResult.IsFailure)
+                return Result.Failure(updateResult.Error);
+        }
+
+        // add new iterations
+        foreach (var iteration in iterations.Where(x => x.IsNew))
+        {
+            var addResult = AddIteration(iteration.Name, iteration.Type, iteration.DateRange);
+            if (addResult.IsFailure)
+                return Result.Failure(addResult.Error);
+        }
 
         return Result.Success();
     }
@@ -191,29 +233,20 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
         return Result.Success();
     }
 
-    public Result UpdateIteration(Guid iterationId, string name, IterationType type)
+    private Result UpdateIteration(Guid iterationId, string name, IterationType type, LocalDateRange dateRange)
     {
         var existingIteration = _iterations.FirstOrDefault(x => x.Id == iterationId);
         if (existingIteration == null)
             return Result.Failure($"Iteration {iterationId} not found.");
 
-        if (existingIteration.Name != name && _iterations.Any(x => x.Name == name))
-            return Result.Failure("Iteration name already exists.");
+        //if (existingIteration.Name != name && _iterations.Any(x => x.Name == name))
+        //    return Result.Failure("Iteration name already exists.");
 
-        //if (existingIteration.DateRange != dateRange && _iterations.Any(x => x.DateRange.Overlaps(dateRange)))
-        //    return Result.Failure("Iteration date range overlaps with existing iteration date range.");
-
-        //if (dateRange.Start < DateRange.Start)
-        //    return Result.Failure("Iteration date range cannot start before the Planning Interval date range.");
-
-        //if (dateRange.End > DateRange.End)
-        //    return Result.Failure("Iteration date range cannot end after the Planning Interval date range.");
-
-        var updateResult = existingIteration.Update(name, type);
+        var updateResult = existingIteration.Update(name, type, dateRange);
         return updateResult.IsSuccess ? Result.Success() : Result.Failure(updateResult.Error);
     }
 
-    public Result DeleteIteration(Guid iterationId)
+    private Result DeleteIteration(Guid iterationId)
     {
         var existingIteration = _iterations.FirstOrDefault(x => x.Id == iterationId);
         if (existingIteration == null)

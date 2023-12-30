@@ -129,6 +129,23 @@ export const useGetPlanningIntervalIterations = (id: string) => {
   })
 }
 
+export const useGetPlanningIntervalIterationTypeOptions = () => {
+  return useQuery({
+    queryKey: [QK.PLANNING_INTERVAL_ITERATION_TYPE_OPTIONS],
+    queryFn: async () =>
+      (await getPlanningIntervalsClient()).getIterationTypes(),
+    select: (data) => {
+      const statuses = _.sortBy(data, ['order'])
+      const options: OptionModel<number>[] = statuses.map((s) => ({
+        value: s.id,
+        label: s.name,
+      }))
+      return options
+    },
+    // staleTime: 300000,
+  })
+}
+
 // PLANNING INTERVAL - TEAMS
 export const useGetPlanningIntervalTeams = (
   id: string,

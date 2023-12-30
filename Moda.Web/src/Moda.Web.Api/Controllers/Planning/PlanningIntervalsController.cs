@@ -126,7 +126,7 @@ public class PlanningIntervalsController : ControllerBase
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
-            : BadRequest(result.Error);
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.Create"));
     }
 
     [HttpPut("{id}")]
@@ -144,7 +144,7 @@ public class PlanningIntervalsController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(result.Error);
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.Update"));
     }
 
     [HttpGet("{id}/teams")]
@@ -195,7 +195,7 @@ public class PlanningIntervalsController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(result.Error);
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.ManageDates"));
     }
 
     [HttpPost("{id}/teams")]
@@ -212,7 +212,7 @@ public class PlanningIntervalsController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(result.Error);
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.ManageTeams"));
     }
 
     #region Iterations
@@ -227,6 +227,17 @@ public class PlanningIntervalsController : ControllerBase
         var iterations = await _sender.Send(new GetPlanningIntervalIterationsQuery(id), cancellationToken);
 
         return Ok(iterations);
+    }
+
+    [HttpGet("iteration-types")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
+    [OpenApiOperation("Get a list of iteration types.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<PlanningIntervalIterationTypeDto>>> GetIterationTypes(CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetPlanningIntervalIterationTypesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
     }
 
     #endregion Iterations
@@ -288,7 +299,6 @@ public class PlanningIntervalsController : ControllerBase
             return BadRequest();
 
         var result = await _sender.Send(request.ToCreatePlanningIntervalObjectiveCommand(), cancellationToken);
-
         if (result.IsFailure)
         {
             var error = new ErrorResult

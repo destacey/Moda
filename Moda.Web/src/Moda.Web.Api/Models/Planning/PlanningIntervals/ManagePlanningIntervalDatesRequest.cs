@@ -14,9 +14,15 @@ public sealed record ManagePlanningIntervalDatesRequest
     /// <value>The end.</value>
     public LocalDate End { get; set; }
 
+    /// <summary>
+    /// The iterations for the Planning Interval.
+    /// </summary>
+    public List<PlanningIntervalIterationUpsertRequest> Iterations { get; set; } = new();
+
     public ManagePlanningIntervalDatesCommand ToManagePlanningIntervalDatesCommand()
     {
-        return new ManagePlanningIntervalDatesCommand(Id, new LocalDateRange(Start, End));
+        var iterations = Iterations.Select(i => i.ToPlanningIntervalIterationUpsertDto());
+        return new ManagePlanningIntervalDatesCommand(Id, new LocalDateRange(Start, End), iterations);
     }
 }
 

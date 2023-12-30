@@ -1,17 +1,39 @@
 ﻿using Ardalis.GuardClauses;
+using Moda.Planning.Application.PlanningIntervals.Dtos;
 
 namespace Moda.Planning.Application.PlanningIntervals.Commands;
 public sealed record ManagePlanningIntervalDatesCommand : ICommand
 {
-    public ManagePlanningIntervalDatesCommand(Guid id, LocalDateRange dateRange)
+    public ManagePlanningIntervalDatesCommand(Guid id, LocalDateRange dateRange, IEnumerable<PlanningIntervalIterationUpsertDto> iterations)
     {
         Id = id;
         DateRange = Guard.Against.Null(dateRange);
+        Iterations = iterations?.ToList() ?? new List<PlanningIntervalIterationUpsertDto>();
     }
 
     public Guid Id { get; }
     public LocalDateRange DateRange { get; }
+    public List<PlanningIntervalIterationUpsertDto> Iterations { get; } = new();
 }
+
+public sealed class ManagePlanningIntervalDatesCommandValidator : CustomValidator<ManagePlanningIntervalDatesCommand>
+{
+    public ManagePlanningIntervalDatesCommandValidator()
+    {
+        RuleLevelCascadeMode = CascadeMode.Stop;
+
+        RuleFor(c => c.Id)
+            .NotEmpty();
+
+        RuleFor(c => c.DateRange)
+            .NotNull();
+
+        RuleFor(c => c.Iterations)
+            .NotNull()
+            .ForEach(x => x.SetValidator(new PlanningIntervalIterationUpsertDtoValidator()));
+    }
+}
+
 
 internal sealed class ManagePlanningIntervalDatesCommandHandler : ICommandHandler<ManagePlanningIntervalDatesCommand>
 {
@@ -38,7 +60,10 @@ internal sealed class ManagePlanningIntervalDatesCommandHandler : ICommandHandle
                 return Result.Failure($"Planning Interval with Id {request.Id} not found.");
             }
 
-            var result = planningInterval.ManageDates(request.DateRange);
+            var iterations = request.Iterations
+                .Select(i => UpsertPlanningIntervalIteration.Create(i.IterationId, i.Name, i.Type, i.DateRange)).ToList();
+
+            var result = planningInterval.ManageDates(request.DateRange, iterations);
             if (result.IsFailure)
                 return Result.Failure(result.Error);
 

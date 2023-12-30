@@ -1860,6 +1860,64 @@ export class PlanningIntervalsClient {
     }
 
     /**
+     * Get a list of iteration types.
+     */
+    getIterationTypes( cancelToken?: CancelToken | undefined): Promise<PlanningIntervalIterationTypeDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/iteration-types";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetIterationTypes(_response);
+        });
+    }
+
+    protected processGetIterationTypes(response: AxiosResponse): Promise<PlanningIntervalIterationTypeDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PlanningIntervalIterationTypeDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PlanningIntervalIterationTypeDto[]>(null as any);
+    }
+
+    /**
      * Get a list of planning interval teams.
      * @param teamId (optional) 
      */
@@ -7931,6 +7989,20 @@ export interface ManagePlanningIntervalDatesRequest {
     start: Date;
     /** Gets or sets the end. */
     end: Date;
+    /** The iterations for the Planning Interval. */
+    iterations?: PlanningIntervalIterationUpsertRequest[];
+}
+
+export interface PlanningIntervalIterationUpsertRequest {
+    iterationId?: string | undefined;
+    /** The name of the iteration. */
+    name: string;
+    /** The type of iteration. */
+    typeId?: number;
+    /** Gets or sets the start. */
+    start: Date;
+    /** Gets or sets the end. */
+    end: Date;
 }
 
 export interface ManagePlanningIntervalTeamsRequest {
@@ -7950,6 +8022,13 @@ export interface PlanningIntervalIterationListDto {
 export interface SimpleNavigationDto {
     id?: number;
     name?: string;
+}
+
+export interface PlanningIntervalIterationTypeDto {
+    id?: number;
+    name?: string;
+    description?: string | undefined;
+    order?: number;
 }
 
 export interface PlanningIntervalObjectiveListDto {
