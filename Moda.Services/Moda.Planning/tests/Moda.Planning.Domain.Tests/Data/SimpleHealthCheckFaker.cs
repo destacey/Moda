@@ -1,8 +1,9 @@
 ﻿using Moda.Common.Domain.Enums;
 using Moda.Planning.Domain.Models;
+using Moda.Tests.Shared.Data;
 
 namespace Moda.Planning.Domain.Tests.Data;
-public class SimpleHealthCheckFaker : Faker<SimpleHealthCheck>
+public class SimpleHealthCheckFaker : PrivateConstructorFaker<SimpleHealthCheck>
 {
     public SimpleHealthCheckFaker(Instant timestamp, Guid? objectId = null)
     {
@@ -21,13 +22,13 @@ public static class SimpleHealthCheckFakerExtensions
 
         var healthChecks = new List<SimpleHealthCheck>()
         {
-            faker.UsePrivateConstructor().Generate()
+            faker.Generate()
         };
 
         for (int i = 1; i < count; i++)
         {
             var previous = healthChecks.Last();
-            var healthCheckFaker = new SimpleHealthCheckFaker(previous.Expiration, objectId).UsePrivateConstructor().Generate();
+            var healthCheckFaker = new SimpleHealthCheckFaker(previous.Expiration, objectId).Generate();
             healthChecks.Add(healthCheckFaker);
         }
 

@@ -23,11 +23,11 @@ public sealed record PlanningIntervalDetailsDto
 
     /// <summary>Gets or sets the start.</summary>
     /// <value>The start.</value>
-    public LocalDate Start { get; set; }
+    public required LocalDate Start { get; set; }
 
     /// <summary>Gets or sets the end.</summary>
     /// <value>The end.</value>
-    public LocalDate End { get; set; }
+    public required LocalDate End { get; set; }
 
     /// <summary>Gets or sets the state.</summary>
     /// <value>The state.</value>

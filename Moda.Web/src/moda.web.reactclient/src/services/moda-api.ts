@@ -1416,6 +1416,74 @@ export class PlanningIntervalsClient {
     }
 
     /**
+     * Get the PI calendar.
+     */
+    getCalendar(idOrKey: string, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalCalendarDto> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/calendar";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetCalendar(_response);
+        });
+    }
+
+    protected processGetCalendar(response: AxiosResponse): Promise<PlanningIntervalCalendarDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PlanningIntervalCalendarDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PlanningIntervalCalendarDto>(null as any);
+    }
+
+    /**
      * Get the PI predictability for all teams.
      */
     getPredictability(id: string, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalPredictabilityDto> {
@@ -1545,7 +1613,7 @@ export class PlanningIntervalsClient {
     }
 
     /**
-     * Manager planning interval teams.
+     * Manage planning interval teams.
      */
     manageTeams(id: string, request: ManagePlanningIntervalTeamsRequest, cancelToken?: CancelToken | undefined): Promise<void> {
         let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/teams";
@@ -1667,6 +1735,186 @@ export class PlanningIntervalsClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<number | null>(null as any);
+    }
+
+    /**
+     * Manage planning interval dates and iterations.
+     */
+    manageDates(id: string, request: ManagePlanningIntervalDatesRequest, cancelToken?: CancelToken | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/dates";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processManageDates(_response);
+        });
+    }
+
+    protected processManageDates(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get a list of planning interval iterations.
+     */
+    getIterations(id: string, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalIterationListDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/iterations";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetIterations(_response);
+        });
+    }
+
+    protected processGetIterations(response: AxiosResponse): Promise<PlanningIntervalIterationListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PlanningIntervalIterationListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PlanningIntervalIterationListDto[]>(null as any);
+    }
+
+    /**
+     * Get a list of iteration types.
+     */
+    getIterationTypes( cancelToken?: CancelToken | undefined): Promise<PlanningIntervalIterationTypeDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/iteration-types";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetIterationTypes(_response);
+        });
+    }
+
+    protected processGetIterationTypes(response: AxiosResponse): Promise<PlanningIntervalIterationTypeDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PlanningIntervalIterationTypeDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PlanningIntervalIterationTypeDto[]>(null as any);
     }
 
     /**
@@ -2096,11 +2344,11 @@ export class PlanningIntervalsClient {
      * Get a health report for planning interval objectives.
      * @param teamId (optional) 
      */
-    getObjectivesHealthReport(id: string, teamId: string | null | undefined, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalObjectiveHealthCheckDto[]> {
-        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/objectives/health-report?";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    getObjectivesHealthReport(idOrKey: string, teamId: string | null | undefined, cancelToken?: CancelToken | undefined): Promise<PlanningIntervalObjectiveHealthCheckDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/objectives/health-report?";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
         if (teamId !== undefined && teamId !== null)
             url_ += "teamId=" + encodeURIComponent("" + teamId) + "&";
         url_ = url_.replace(/[?&]$/, "");
@@ -7653,14 +7901,36 @@ export interface PlanningIntervalDetailsDto {
     predictability?: number | undefined;
 }
 
+export interface PlanningIntervalCalendarDto {
+    id?: string;
+    name?: string;
+    dateRange?: LocalDateRange;
+    iterationSchedules?: ILocalSchedule[];
+}
+
+export interface ValueObject {
+}
+
+export interface LocalDateRange extends ValueObject {
+    start?: Date;
+    end?: Date;
+    days?: number;
+}
+
+export interface ILocalSchedule {
+    id?: string;
+    name?: string;
+    dateRange?: LocalDateRange;
+}
+
 export interface PlanningIntervalPredictabilityDto {
-    predictability?: number;
+    predictability?: number | undefined;
     teamPredictabilities?: PlanningIntervalTeamPredictabilityDto[];
 }
 
 export interface PlanningIntervalTeamPredictabilityDto {
     team?: PlanningTeamNavigationDto;
-    predictability?: number;
+    predictability?: number | undefined;
 }
 
 export interface PlanningTeamNavigationDto extends NavigationDto {
@@ -7676,6 +7946,10 @@ export interface CreatePlanningIntervalRequest {
     start: Date;
     /** Gets or sets the end. */
     end: Date;
+    /** Gets or sets the length of iterations in weeks. */
+    iterationWeeks?: number;
+    /** Gets or sets the iteration prefix. */
+    iterationPrefix?: string | undefined;
 }
 
 export interface UpdatePlanningIntervalRequest {
@@ -7685,10 +7959,6 @@ export interface UpdatePlanningIntervalRequest {
     name: string;
     /** Gets the team description. */
     description?: string | undefined;
-    /** Gets or sets the start. */
-    start: Date;
-    /** Gets or sets the end. */
-    end: Date;
     /** Gets or sets the objectives locked. */
     objectivesLocked?: boolean;
 }
@@ -7713,9 +7983,52 @@ export interface TeamNavigationDto extends NavigationDto {
     type?: string;
 }
 
+export interface ManagePlanningIntervalDatesRequest {
+    id: string;
+    /** Gets or sets the start. */
+    start: Date;
+    /** Gets or sets the end. */
+    end: Date;
+    /** The iterations for the Planning Interval. */
+    iterations?: PlanningIntervalIterationUpsertRequest[];
+}
+
+export interface PlanningIntervalIterationUpsertRequest {
+    iterationId?: string | undefined;
+    /** The name of the iteration. */
+    name: string;
+    /** The type of iteration. */
+    typeId?: number;
+    /** Gets or sets the start. */
+    start: Date;
+    /** Gets or sets the end. */
+    end: Date;
+}
+
 export interface ManagePlanningIntervalTeamsRequest {
     id?: string;
     teamIds?: string[];
+}
+
+export interface PlanningIntervalIterationListDto {
+    id?: string;
+    key?: number;
+    name?: string;
+    start?: Date;
+    end?: Date;
+    type?: SimpleNavigationDto;
+}
+
+export interface SimpleNavigationDto {
+    id?: number;
+    name?: string;
+}
+
+export interface PlanningIntervalIterationTypeDto {
+    id?: number;
+    name?: string;
+    description?: string | undefined;
+    order?: number;
 }
 
 export interface PlanningIntervalObjectiveListDto {
@@ -7731,11 +8044,6 @@ export interface PlanningIntervalObjectiveListDto {
     startDate?: Date | undefined;
     targetDate?: Date | undefined;
     isStretch?: boolean;
-}
-
-export interface SimpleNavigationDto {
-    id?: number;
-    name?: string;
 }
 
 export interface PlanningHealthCheckDto {

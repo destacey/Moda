@@ -28,30 +28,32 @@ internal sealed class GetPlanningIntervalPredictabilityQueryHandler : IQueryHand
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
 
-        if (planningInterval is null || !planningInterval.Teams.Any() || !planningInterval.Objectives.Any())
+        if (planningInterval is null)
             return null;
+        else if (!planningInterval.Teams.Any())
+            return new PlanningIntervalPredictabilityDto(null, new List<PlanningIntervalTeamPredictabilityDto>());
 
         var currentDate = _dateTimeService.Now.InUtc().Date;
 
         var teamPredictabilities = planningInterval.Teams
-            .Select(t => new PlanningIntervalTeamPredictabilityDto(t.Team, planningInterval.CalculatePredictability(currentDate, t.TeamId) ?? 0))
+            .Select(t => new PlanningIntervalTeamPredictabilityDto(t.Team, planningInterval.CalculatePredictability(currentDate, t.TeamId)))
             .OrderBy(t => t.Team.Name)
             .ToList();
 
-        return new PlanningIntervalPredictabilityDto(planningInterval.CalculatePredictability(currentDate) ?? 0, teamPredictabilities);
+        return new PlanningIntervalPredictabilityDto(planningInterval.CalculatePredictability(currentDate), teamPredictabilities);
     }
 }
 
-public sealed record PlanningIntervalPredictabilityDto(double Predictability, List<PlanningIntervalTeamPredictabilityDto> TeamPredictabilities);
+public sealed record PlanningIntervalPredictabilityDto(double? Predictability, List<PlanningIntervalTeamPredictabilityDto> TeamPredictabilities);
 
 public sealed record PlanningIntervalTeamPredictabilityDto
 {
-    public PlanningIntervalTeamPredictabilityDto(PlanningTeam team, double predictability)
+    public PlanningIntervalTeamPredictabilityDto(PlanningTeam team, double? predictability)
     {
         Team = PlanningTeamNavigationDto.FromPlanningTeam(team);
         Predictability = predictability;
     }
 
     public PlanningTeamNavigationDto Team { get; set; }
-    public double Predictability { get; set; }
+    public double? Predictability { get; set; }
 }

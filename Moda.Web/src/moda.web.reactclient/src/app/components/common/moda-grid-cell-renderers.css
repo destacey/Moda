@@ -1,8 +1,15 @@
 .grid-react-markdown p {
-    margin-top: 0px;
+    margin-top: 12px;
     margin-bottom: 12px;
     word-break: break-word;
     white-space: normal;
+}
+.grid-react-markdown > p:first-child {
+    margin-top: 0;
+  }
+
+.grid-react-markdown > p:last-child {
+    margin-bottom: 0;
 }
 
 .grid-react-markdown ul {

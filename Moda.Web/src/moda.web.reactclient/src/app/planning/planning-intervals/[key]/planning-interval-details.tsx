@@ -2,15 +2,16 @@
 
 import LinksCard from '@/src/app/components/common/links/links-card'
 import { PlanningIntervalDetailsDto } from '@/src/services/moda-api'
-import { Card, Col, Descriptions, Row, Space, Statistic } from 'antd'
+import { Card, Col, Descriptions, Divider, Row, Space, Statistic } from 'antd'
 import dayjs from 'dayjs'
 import { daysRemaining } from '@/src/utils'
-import ReactMarkdown from 'react-markdown'
 import TeamPredictabilityRadarChart from './team-predictability-radar-chart'
 import { useGetPlanningIntervalPredictability } from '@/src/services/queries/planning-queries'
 import { useMemo } from 'react'
 
-const { Item } = Descriptions
+import type { DescriptionsProps } from 'antd'
+import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
+import PlanningIntervalIterationsList from './planning-interval-iterations-list'
 
 interface PlanningIntervalDetailsProps {
   planningInterval: PlanningIntervalDetailsDto
@@ -22,6 +23,29 @@ const PlanningIntervalDetails = ({
   const { data: piPredictabilityData } = useGetPlanningIntervalPredictability(
     planningInterval?.id,
   )
+
+  const detailsItems: DescriptionsProps['items'] = [
+    {
+      key: 'start',
+      label: 'Start',
+      children: dayjs(planningInterval.start).format('MMM D, YYYY'),
+    },
+    {
+      key: 'end',
+      label: 'End',
+      children: dayjs(planningInterval.end).format('MMM D, YYYY'),
+    },
+    {
+      key: 'state',
+      label: 'State',
+      children: planningInterval.state,
+    },
+    {
+      key: 'objectivesLocked',
+      label: 'Objectives Locked?',
+      children: planningInterval.objectivesLocked ? 'Yes' : 'No',
+    },
+  ]
 
   const daysCountdownMetric = useMemo(() => {
     if (!planningInterval) return null
@@ -70,7 +94,8 @@ const PlanningIntervalDetails = ({
     if (
       !planningInterval ||
       planningInterval.state === 'Future' ||
-      !piPredictabilityData
+      !piPredictabilityData ||
+      piPredictabilityData.predictability === null
     )
       return null
     return (
@@ -85,30 +110,27 @@ const PlanningIntervalDetails = ({
   return (
     <>
       <Row>
-        <Col xs={24} md={12}>
-          <Descriptions>
-            <Item label="Start">
-              {dayjs(planningInterval.start).format('M/D/YYYY')}
-            </Item>
-            <Item label="End">
-              {dayjs(planningInterval.end).format('M/D/YYYY')}
-            </Item>
-            <Item label="State">{planningInterval.state}</Item>
-            <Item label="Objectives Locked?">
-              {planningInterval.objectivesLocked ? 'Yes' : 'No'}
-            </Item>
-          </Descriptions>
+        <Col xs={24} sm={24} md={11} lg={13} xl={16}>
+          <Descriptions
+            size="small"
+            column={{ xs: 1, sm: 1, md: 1, lg: 3, xl: 4, xxl: 5 }}
+            items={detailsItems}
+          />
+          {planningInterval.description && (
+            <Descriptions layout="vertical" size="small">
+              <Descriptions.Item label="Description">
+                <ModaMarkdownDescription
+                  content={planningInterval.description}
+                />
+              </Descriptions.Item>
+            </Descriptions>
+          )}
         </Col>
-        <Col xs={24} md={12}>
-          <Descriptions layout="vertical">
-            <Item label="Description">
-              <Space direction="vertical">
-                <ReactMarkdown>{planningInterval.description}</ReactMarkdown>
-              </Space>
-            </Item>
-          </Descriptions>
+        <Col xs={24} sm={24} md={13} lg={11} xl={8}>
+          <PlanningIntervalIterationsList id={planningInterval.id} />
         </Col>
       </Row>
+      <Divider />
       <Space align="start" wrap>
         {daysCountdownMetric}
         {planningIntervalPredictability}

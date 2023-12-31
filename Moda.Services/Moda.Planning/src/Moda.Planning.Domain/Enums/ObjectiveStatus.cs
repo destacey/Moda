@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Planning.Domain.Enums;
+
+// max length of 32 characters
 public enum ObjectiveStatus
 {
     [Display(Name = "Not Started", Description = "The objective has not been started.", Order = 1)]

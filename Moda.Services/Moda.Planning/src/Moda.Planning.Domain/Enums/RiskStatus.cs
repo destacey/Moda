@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Planning.Domain.Enums;
+
+// max length of 32 characters
 public enum RiskStatus
 {
     [Display(Name = "Open", Description = "The risk is open.", Order = 1)]

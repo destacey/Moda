@@ -37,11 +37,13 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
             .HasConversion(
                 o => o.Value,
                 o => new TeamCode(o))
+            .HasColumnType("varchar")
             .HasMaxLength(10);
         builder.Property(o => o.Description).HasMaxLength(1024);
-        builder.Property(o => o.Type).IsRequired()
+        builder.Property(t => t.Type).IsRequired()
             .HasConversion<EnumConverter<TeamType>>()
-            .HasMaxLength(64);
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
         builder.Property(o => o.IsActive);
 
         // Audit

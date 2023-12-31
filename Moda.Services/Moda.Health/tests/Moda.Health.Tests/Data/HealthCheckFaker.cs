@@ -1,5 +1,7 @@
-﻿namespace Moda.Health.Tests.Data;
-public class HealthCheckFaker : Faker<HealthCheck>
+﻿using Moda.Tests.Shared.Data;
+
+namespace Moda.Health.Tests.Data;
+public class HealthCheckFaker : PrivateConstructorFaker<HealthCheck>
 {
     public HealthCheckFaker(Instant timestamp, Guid? objectId = null)
     {
@@ -21,13 +23,13 @@ public static class HealthCheckFakerExtensions
 
         var healthChecks = new List<HealthCheck>()
         {
-            faker.UsePrivateConstructor().Generate()
+            faker.Generate()
         };
 
         for (int i = 1; i < count; i++)
         {
             var previous = healthChecks.Last();
-            var healthCheckFaker = new HealthCheckFaker(previous.Expiration, objectId).UsePrivateConstructor().Generate();
+            var healthCheckFaker = new HealthCheckFaker(previous.Expiration, objectId).Generate();
             healthChecks.Add(healthCheckFaker);
         }
 

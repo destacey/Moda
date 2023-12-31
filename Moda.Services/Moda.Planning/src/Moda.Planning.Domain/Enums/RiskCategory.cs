@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Planning.Domain.Enums;
+
+// max length of 32 characters
 public enum RiskCategory
 {
     [Display(Name = "Resolved", Description = "The risk is determined to not be a threat at this time. No further action is required.", Order = 1)]

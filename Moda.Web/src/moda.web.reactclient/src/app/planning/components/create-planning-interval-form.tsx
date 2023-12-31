@@ -1,6 +1,14 @@
 'use client'
 
-import { DatePicker, Form, Input, Modal, message } from 'antd'
+import {
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Typography,
+  message,
+} from 'antd'
 import { useEffect, useState } from 'react'
 import useAuth from '../../components/contexts/auth'
 import { CreatePlanningIntervalRequest } from '@/src/services/moda-api'
@@ -18,6 +26,8 @@ interface CreatePlanningIntervalFormValues {
   description?: string
   start: Date
   end: Date
+  iterationWeeks: number
+  iterationPrefix?: string
 }
 
 const mapToRequestValues = (values: CreatePlanningIntervalFormValues) => {
@@ -26,6 +36,8 @@ const mapToRequestValues = (values: CreatePlanningIntervalFormValues) => {
     description: values.description,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
+    iterationWeeks: values.iterationWeeks,
+    iterationPrefix: values.iterationPrefix,
   } as CreatePlanningIntervalRequest
 }
 
@@ -157,6 +169,30 @@ const CreatePlanningIntervalForm = ({
           <Form.Item label="End" name="end" rules={[{ required: true }]}>
             <DatePicker />
           </Form.Item>
+          <Form.Item
+            label="Iteration Weeks"
+            name="iterationWeeks"
+            rules={[{ required: true }]}
+          >
+            <InputNumber min={1} max={10} />
+          </Form.Item>
+          <Form.Item
+            label="Iteration Prefix"
+            name="iterationPrefix"
+            extra="Iteration Name Template: Iteration Prefix + Iteration Number"
+          >
+            <Input />
+          </Form.Item>
+          <>
+            {formValues &&
+              formValues.iterationPrefix &&
+              formValues.iterationPrefix != null && (
+                <Typography.Text type="secondary">
+                  Iteration name format: {formValues.iterationPrefix}1,{' '}
+                  {formValues.iterationPrefix}2, ...
+                </Typography.Text>
+              )}
+          </>
         </Form>
       </Modal>
     </>

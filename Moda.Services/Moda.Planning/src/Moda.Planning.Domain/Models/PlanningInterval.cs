@@ -2,22 +2,25 @@
 using CSharpFunctionalExtensions;
 using Moda.Organization.Domain.Enums;
 using Moda.Planning.Domain.Enums;
+using Moda.Planning.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public class PlanningInterval : BaseAuditableEntity<Guid>
+public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
 {
     private string _name = default!;
     private string? _description;
     private LocalDateRange _dateRange = default!;
 
-    protected readonly List<PlanningIntervalTeam> _teams = new();
-    protected readonly List<PlanningIntervalObjective> _objectives = new();
+    private readonly List<PlanningIntervalTeam> _teams = new();
+    private readonly List<PlanningIntervalIteration> _iterations = new();
+    private readonly List<PlanningIntervalObjective> _objectives = new();
 
-    protected PlanningInterval() { }
+    private PlanningInterval() { }
 
-    protected PlanningInterval(string name, string? description, LocalDateRange dateRange)
+    private PlanningInterval(string name, string? description, LocalDateRange dateRange)
     {
+        // TODO generate a new Guid, rather than depend on the DB.  This can be used when creating new Iterations.
         Name = name;
         Description = description;
         DateRange = dateRange;
@@ -35,7 +38,7 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
     public string Name
     {
         get => _name;
-        protected set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
     }
 
     /// <summary>
@@ -44,7 +47,7 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
     public string? Description
     {
         get => _description;
-        protected set => _description = value.NullIfWhiteSpacePlusTrim();
+        private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>Gets or sets the date range.</summary>
@@ -52,7 +55,7 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
     public LocalDateRange DateRange
     {
         get => _dateRange;
-        protected set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
+        private set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
     }
 
     public bool ObjectivesLocked { get; private set; } = false;
@@ -60,6 +63,10 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
     /// <summary>Gets the teams.</summary>
     /// <value>The PI teams.</value>
     public IReadOnlyCollection<PlanningIntervalTeam> Teams => _teams.AsReadOnly();
+
+    /// <summary>Gets the iterations.</summary>
+    /// <value>The PI iterations.</value>
+    public IReadOnlyCollection<PlanningIntervalIteration> Iterations => _iterations.OrderBy(i => i.DateRange.Start).ToList().AsReadOnly();
 
     /// <summary>Gets the objectives.</summary>
     /// <value>The PI objectives.</value>
@@ -84,39 +91,6 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
         return completedCount >= nonstretchCount ? 100.0d : Math.Round(100 * ((double)completedCount / nonstretchCount), 2);
     }
 
-    /// <summary>Updates the specified name.</summary>
-    /// <param name="name">The name.</param>
-    /// <param name="description">The description.</param>
-    /// <param name="dateRange">The date range.</param>
-    /// <param name="objectivesLocked">if set to <c>true</c> [objectives locked].</param>
-    /// <returns></returns>
-    public Result Update(string name, string? description, LocalDateRange dateRange, bool objectivesLocked)
-    {
-        try
-        {
-            Name = name;
-            Description = description;
-            DateRange = dateRange;
-            ObjectivesLocked = objectivesLocked;
-
-            return Result.Success();
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure(ex.ToString());
-        }
-    }
-
-    /// <summary>States the on.</summary>
-    /// <param name="date">The date.</param>
-    /// <returns></returns>
-    public IterationState StateOn(LocalDate date)
-    {
-        if (DateRange.IsPastOn(date)) { return IterationState.Completed; }
-        if (DateRange.IsActiveOn(date)) { return IterationState.Active; }
-        return IterationState.Future;
-    }
-
     /// <summary>
     /// Determines whether this planning interval can create objectives.
     /// </summary>
@@ -128,32 +102,203 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
         return !ObjectivesLocked;
     }
 
+    /// <summary>
+    /// Gets a calendar with PI and iteration dates.
+    /// </summary>
+    /// <returns></returns>
+    public PlanningIntervalCalendar GetCalendar()
+    {
+        return new PlanningIntervalCalendar(this, Iterations);
+    }
+
+    /// <summary>Iteration state on given date.</summary>
+    /// <param name="date">The date.</param>
+    /// <returns></returns>
+    public IterationState StateOn(LocalDate date)
+    {
+        if (DateRange.IsPastOn(date)) { return IterationState.Completed; }
+        if (DateRange.IsActiveOn(date)) { return IterationState.Active; }
+        return IterationState.Future;
+    }
+
+    /// <summary>Updates the specified name.</summary>
+    /// <param name="name">The name.</param>
+    /// <param name="description">The description.</param>
+    /// <param name="objectivesLocked">if set to <c>true</c> [objectives locked].</param>
+    /// <returns></returns>
+    public Result Update(string name, string? description, bool objectivesLocked)
+    {
+        Name = name;
+        Description = description;
+        ObjectivesLocked = objectivesLocked;
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Manages the PI dates and iterations.
+    /// </summary>
+    /// <param name="dateRange"></param>
+    /// <returns></returns>
+    public Result ManageDates(LocalDateRange dateRange, List<UpsertPlanningIntervalIteration> iterations)
+    {
+        DateRange = dateRange;
+
+        //TODO: we are currently allowing gaps in the date ranges, but we should not allow that
+
+        // verify no duplicate names
+        var iterationNames = iterations.Select(i => i.Name).ToList();
+        if (iterationNames.Distinct().Count() != iterationNames.Count)
+            return Result.Failure("Iteration names must be unique within the PI.");
+
+        // verify iteration dates are within the PI date range and don't overlap
+        foreach (var iteration in iterations)
+        {
+            if (iteration.DateRange.Start < DateRange.Start)
+                return Result.Failure("Iteration date ranges cannot start before the Planning Interval date range.");
+            if (iteration.DateRange.End > DateRange.End)
+                return Result.Failure("Iteration date ranges cannot end after the Planning Interval date range.");
+
+            if (Iterations.Where(i => i.Id != iteration.Id).Any(x => x.DateRange.Overlaps(iteration.DateRange)))
+                return Result.Failure("Iteration date ranges cannot overlap.");
+        }
+
+        // remove any iterations that are not in the list
+        var initialIterationIds = _iterations.Select(i => i.Id).ToList();
+        var removedIterations = _iterations.Where(i => !iterations.Any(x => x.Id == i.Id)).ToList();
+        foreach (var removedIteration in removedIterations)
+        {
+            var deleteResult = DeleteIteration(removedIteration.Id);
+            if (deleteResult.IsFailure)
+                return Result.Failure(deleteResult.Error);
+        }
+
+        // update existing iterations
+        foreach (var iteration in iterations.Where(x => !x.IsNew))
+        {
+            var updateResult = UpdateIteration(iteration.Id!.Value, iteration.Name, iteration.Type, iteration.DateRange);
+            if (updateResult.IsFailure)
+                return Result.Failure(updateResult.Error);
+        }
+
+        // add new iterations
+        foreach (var iteration in iterations.Where(x => x.IsNew))
+        {
+            var addResult = AddIteration(iteration.Name, iteration.Type, iteration.DateRange);
+            if (addResult.IsFailure)
+                return Result.Failure(addResult.Error);
+        }
+
+        return Result.Success();
+    }
+
     /// <summary>Manages the planning interval teams.</summary>
     /// <param name="teamIds">The team ids.</param>
     /// <returns></returns>
     public Result ManageTeams(IEnumerable<Guid> teamIds)
     {
-        try
+        var removedTeams = _teams.Where(x => !teamIds.Contains(x.TeamId)).ToList();
+        foreach (var removedTeam in removedTeams)
         {
-            var removedTeams = _teams.Where(x => !teamIds.Contains(x.TeamId)).ToList();
-            foreach (var removedTeam in removedTeams)
-            {
-                _teams.Remove(removedTeam);
-            }
-
-            var addedTeams = teamIds.Where(x => !_teams.Any(y => y.TeamId == x)).ToList();
-            foreach (var addedTeam in addedTeams)
-            {
-                _teams.Add(new PlanningIntervalTeam(Id, addedTeam));
-            }
-
-            return Result.Success();
+            _teams.Remove(removedTeam);
         }
-        catch (Exception ex)
+
+        var addedTeams = teamIds.Where(x => !_teams.Any(y => y.TeamId == x)).ToList();
+        foreach (var addedTeam in addedTeams)
         {
-            return Result.Failure(ex.ToString());
+            _teams.Add(new PlanningIntervalTeam(Id, addedTeam));
         }
+
+        return Result.Success();
     }
+
+    #region Iterations
+
+    /// <summary>
+    /// Auto-generates iterations if none exist.
+    /// </summary>
+    /// <param name="iterationWeeks">Specifies the default length of each iteration.  The length of final iteration will also depend on the planning interval end date.</param>
+    /// <param name="iterationPrefix">By default each iteration is named based on its sequence.  Providing a prefix can reduce confusion with iterations in other planning intervals.</param>
+    /// <returns></returns>
+    public Result InitializeIterations(int iterationWeeks, string? iterationPrefix)
+    {
+        if (Iterations.Any())
+            return Result.Failure("Unable to generate new iterations for a Planning Interval that has iterations.");
+
+        var iterationStart = DateRange.Start;
+        var iterationCount = 1;
+        var isLastIteration = false;
+        while (true)
+        {
+            var iterationName = $"{iterationPrefix}{iterationCount}";
+            var iterationEnd = iterationStart.PlusDays(iterationWeeks * 7 - 1);
+            var iterationType = IterationType.Development;
+            if (iterationEnd >= DateRange.End)
+            {
+                iterationEnd = DateRange.End;
+                iterationType = IterationType.InnovationAndPlanning;
+                isLastIteration = true;
+            }
+
+            var addIterationResult = AddIteration(iterationName, iterationType, new LocalDateRange(iterationStart, iterationEnd));
+            if (addIterationResult.IsFailure)
+                return Result.Failure(addIterationResult.Error);
+
+            if (isLastIteration)
+                break;
+
+            iterationStart = iterationEnd.PlusDays(1);
+            iterationCount++;
+        }
+
+        return Result.Success();
+    }
+
+    public Result AddIteration(string name, IterationType type, LocalDateRange dateRange)
+    {
+        if (Iterations.Any(x => x.Name == name))
+            return Result.Failure("Iteration name already exists.");
+
+        if (Iterations.Any(x => x.DateRange.Overlaps(dateRange)))
+            return Result.Failure("Iteration date range overlaps with existing iteration date range.");
+
+        if (dateRange.Start < DateRange.Start)
+            return Result.Failure("Iteration date range cannot start before the Planning Interval date range.");
+
+        if (dateRange.End > DateRange.End)
+            return Result.Failure("Iteration date range cannot end after the Planning Interval date range.");
+
+        var iteration = new PlanningIntervalIteration(Id, name, type, dateRange);
+        _iterations.Add(iteration);
+
+        return Result.Success();
+    }
+
+    private Result UpdateIteration(Guid iterationId, string name, IterationType type, LocalDateRange dateRange)
+    {
+        var existingIteration = _iterations.FirstOrDefault(x => x.Id == iterationId);
+        if (existingIteration == null)
+            return Result.Failure($"Iteration {iterationId} not found.");
+
+        var updateResult = existingIteration.Update(name, type, dateRange);
+        return updateResult.IsSuccess ? Result.Success() : Result.Failure(updateResult.Error);
+    }
+
+    private Result DeleteIteration(Guid iterationId)
+    {
+        var existingIteration = _iterations.FirstOrDefault(x => x.Id == iterationId);
+        if (existingIteration == null)
+            return Result.Failure($"Iteration {iterationId} not found.");
+
+        _iterations.Remove(existingIteration);
+
+        return Result.Success();
+    }
+
+
+    #endregion Iterations
+
+    #region Objectives
 
     /// <summary>Creates a PI objective.</summary>
     /// <param name="team">The team.</param>
@@ -227,13 +372,20 @@ public class PlanningInterval : BaseAuditableEntity<Guid>
         }
     }
 
+    #endregion Objectives
+
     /// <summary>Creates the specified name.</summary>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
     /// <param name="dateRange">The date range.</param>
     /// <returns></returns>
-    public static PlanningInterval Create(string name, string? description, LocalDateRange dateRange)
+    public static Result<PlanningInterval> Create(string name, string? description, LocalDateRange dateRange, int iterationWeeks, string? iterationPrefix)
     {
-        return new PlanningInterval(name, description, dateRange);
+        var planningInterval = new PlanningInterval(name, description, dateRange);
+        var result = planningInterval.InitializeIterations(iterationWeeks, iterationPrefix);
+
+        return result.IsFailure 
+            ? Result.Failure<PlanningInterval>(result.Error) 
+            : planningInterval;
     }
 }

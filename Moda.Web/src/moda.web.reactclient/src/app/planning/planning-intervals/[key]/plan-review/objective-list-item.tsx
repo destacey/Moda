@@ -19,10 +19,7 @@ import { ItemType } from 'antd/es/menu/hooks/useItems'
 import CreateHealthCheckForm from '@/src/app/components/common/health-check/create-health-check-form'
 import { SystemContext } from '@/src/app/components/constants'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
-import {
-  beginHealthCheckCreate,
-  selectHealthCheckIsInEditMode,
-} from '@/src/store/health-check-slice'
+import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
 
 export interface ObjectiveListItemProps {
   objective: PlanningIntervalObjectiveListDto
@@ -153,7 +150,14 @@ const ObjectiveListItem = ({
       )
     }
     return items
-  }, [canUpdateObjectives, canCreateHealthChecks, dispatch, objective.id])
+  }, [
+    canUpdateObjectives,
+    canCreateHealthChecks,
+    objective.planningInterval.key,
+    objective.key,
+    objective.id,
+    dispatch,
+  ])
 
   const onEditObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)

@@ -1,9 +1,10 @@
 ﻿using Moda.Organization.Domain.Enums;
 using Moda.Organization.Domain.Models;
 using Moda.Planning.Domain.Models;
+using Moda.Tests.Shared.Data;
 
 namespace Moda.Planning.Domain.Tests.Data;
-public class PlanningTeamFaker : Faker<PlanningTeam>
+public class PlanningTeamFaker : PrivateConstructorFaker<PlanningTeam>
 {
     public PlanningTeamFaker(TeamType type)
     {

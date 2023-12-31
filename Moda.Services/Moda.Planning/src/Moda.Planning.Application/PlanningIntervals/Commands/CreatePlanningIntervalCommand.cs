@@ -1,5 +1,7 @@
-﻿namespace Moda.Planning.Application.PlanningIntervals.Commands;
-public sealed record CreatePlanningIntervalCommand(string Name, string? Description, LocalDateRange DateRange) : ICommand<int>;
+﻿using Moda.Planning.Domain.Enums;
+
+namespace Moda.Planning.Application.PlanningIntervals.Commands;
+public sealed record CreatePlanningIntervalCommand(string Name, string? Description, LocalDateRange DateRange, int IterationWeeks, string? IterationPrefix) : ICommand<int>;
 
 public sealed class CreatePlanningIntervalCommandValidator : CustomValidator<CreatePlanningIntervalCommand>
 {
@@ -10,16 +12,19 @@ public sealed class CreatePlanningIntervalCommandValidator : CustomValidator<Cre
 
         RuleLevelCascadeMode = CascadeMode.Stop;
 
-        RuleFor(e => e.Name)
+        RuleFor(c => c.Name)
             .NotEmpty()
             .MaximumLength(128)
             .MustAsync(BeUniquePlanningIntervalName).WithMessage("The Planning Interval name already exists.");
 
-        RuleFor(e => e.Description)
+        RuleFor(c => c.Description)
             .MaximumLength(1024);
 
-        RuleFor(e => e.DateRange)
+        RuleFor(c => c.DateRange)
             .NotNull();
+
+        RuleFor(c => c.IterationWeeks)
+            .GreaterThan(0);
     }
 
     public async Task<bool> BeUniquePlanningIntervalName(string name, CancellationToken cancellationToken)
@@ -45,17 +50,22 @@ internal sealed class CreatePlanningIntervalCommandHandler : ICommandHandler<Cre
     {
         try
         {
-            var planningInterval = PlanningInterval.Create(
+            var result = PlanningInterval.Create(
                 request.Name,
                 request.Description,
-                request.DateRange
+                request.DateRange,
+                request.IterationWeeks,
+                request.IterationPrefix
                 );
+            if (result.IsFailure)
+                return Result.Failure<int>(result.Error);
+            
 
-            await _planningDbContext.PlanningIntervals.AddAsync(planningInterval, cancellationToken);
+            await _planningDbContext.PlanningIntervals.AddAsync(result.Value, cancellationToken);
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(planningInterval.Key);
+            return Result.Success(result.Value.Key);
         }
         catch (Exception ex)
         {

@@ -28,6 +28,7 @@ import { useAppDispatch } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import PlanningIntervalObjectives from './planning-interval-objectives'
 import PlanningIntervalDetailsLoading from './loading'
+import ManagePlanningIntervalDatesForm from './manage-planning-interval-dates-form'
 
 enum PlanningIntervalTabs {
   Details = 'details',
@@ -46,6 +47,10 @@ const PlanningIntervalDetailsPage = ({ params }) => {
   const [objectivesQueryEnabled, setObjectivesQueryEnabled] =
     useState<boolean>(false)
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
+  const [
+    openManagePlanningIntervalDatesForm,
+    setOpenManagePlanningIntervalDatesForm,
+  ] = useState<boolean>(false)
   const [openManageTeamsForm, setOpenManageTeamsForm] = useState<boolean>(false)
 
   const pathname = usePathname()
@@ -87,6 +92,11 @@ const PlanningIntervalDetailsPage = ({ params }) => {
           key: 'edit-pi-menu-item',
           label: 'Edit',
           onClick: () => setOpenEditPlanningIntervalForm(true),
+        },
+        {
+          key: 'manage-dates-menu-item',
+          label: 'Manage Dates',
+          onClick: () => setOpenManagePlanningIntervalDatesForm(true),
         },
         {
           key: 'manage-teams-menu-item',
@@ -187,6 +197,16 @@ const PlanningIntervalDetailsPage = ({ params }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const onManagePlanningIntervalDatesFormClosed = useCallback(
+    (wasSaved: boolean) => {
+      setOpenManagePlanningIntervalDatesForm(false)
+      if (wasSaved) {
+        refetchPlanningInterval()
+      }
+    },
+    [refetchPlanningInterval],
+  )
+
   const onManageTeamsFormClosed = useCallback((wasSaved: boolean) => {
     setOpenManageTeamsForm(false)
     if (wasSaved) {
@@ -248,6 +268,14 @@ const PlanningIntervalDetailsPage = ({ params }) => {
           id={planningIntervalData?.id}
           onFormUpdate={() => onEditFormClosed(true)}
           onFormCancel={() => onEditFormClosed(false)}
+        />
+      )}
+      {openManagePlanningIntervalDatesForm && (
+        <ManagePlanningIntervalDatesForm
+          showForm={openManagePlanningIntervalDatesForm}
+          id={planningIntervalData?.id}
+          onFormSave={() => onManagePlanningIntervalDatesFormClosed(true)}
+          onFormCancel={() => onManagePlanningIntervalDatesFormClosed(false)}
         />
       )}
       {openManageTeamsForm && (
