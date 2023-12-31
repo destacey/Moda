@@ -12,4 +12,8 @@
     <ProjectReference Include="..\..\..\Moda.Organization\src\Moda.Organization.Domain\Moda.Organization.Domain.csproj" />
   </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="Moda.Planning.Domain.Tests" />
+    </ItemGroup>
+
 </Project>

@@ -25,7 +25,7 @@ public class SimpleSimpleHealthCheckTests
     public void Constructor_WhenValid_ReturnsSimpleHealthCheck()
     {
         // Arrange
-        var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var faker = _healthCheckFaker.Generate();
 
         // Act
         var result = new SimpleHealthCheck(faker.ObjectId, faker.Id, faker.Status, faker.ReportedOn, faker.Expiration);
@@ -45,7 +45,7 @@ public class SimpleSimpleHealthCheckTests
     {
         // Arrange
         var objectId = Guid.Empty;
-        var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var faker = _healthCheckFaker.Generate();
 
         // Act
         Action act = () => new SimpleHealthCheck(objectId, faker.Id, faker.Status, faker.ReportedOn, faker.Expiration);
@@ -62,7 +62,7 @@ public class SimpleSimpleHealthCheckTests
     public void IsExpired_WhenExpirationGreaterThanNow_ReturnsFalse()
     {
         // Arrange
-        var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var faker = _healthCheckFaker.Generate();
 
         // Act
         var sut = new SimpleHealthCheck(faker.ObjectId, faker.Id, faker.Status, faker.ReportedOn, _dateTimeService.Now.Plus(Duration.FromDays(2)));
@@ -76,7 +76,7 @@ public class SimpleSimpleHealthCheckTests
     public void IsExpired_WhenExpirationLessThanNow_ReturnsTrue()
     {
         // Arrange
-        var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var sut = _healthCheckFaker.Generate();
         _dateTimeService.Advance(Duration.FromDays(60));
 
         // Act
@@ -94,7 +94,7 @@ public class SimpleSimpleHealthCheckTests
     public void Update_WhenUpdatingValid_UpdatesSimpleHealthCheck()
     {
         // Arrange
-        var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var sut = _healthCheckFaker.Generate();
         var id = sut.Id;
         var status = sut.Status;
         var reportedOn = sut.ReportedOn;
@@ -117,7 +117,7 @@ public class SimpleSimpleHealthCheckTests
     public void Update_WhenReplacingValid_UpdatesSimpleHealthCheck()
     {
         // Arrange
-        var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var sut = _healthCheckFaker.Generate();
         var id = Guid.NewGuid();
         var status = HealthStatus.AtRisk;
         var reportedOn = sut.ReportedOn.Plus(Duration.FromDays(2));

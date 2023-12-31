@@ -14,6 +14,7 @@ public sealed class PlanningIntervalIteration : BaseAuditableEntity<Guid>, ILoca
 
     internal PlanningIntervalIteration(Guid planningIntervalId, string name, IterationType type, LocalDateRange dateRange)
     {
+        // TODO guard against default planningIntervalId, but PI would need to generate a new Guid, rather than depend on the DB for this to work.
         PlanningIntervalId = planningIntervalId;
         Name = name;
         Type = type;
@@ -59,25 +60,10 @@ public sealed class PlanningIntervalIteration : BaseAuditableEntity<Guid>, ILoca
         return IterationState.Future;
     }
 
-    internal Result Update(string name, IterationType type)
-    {
-        Name = name;
-        Type = type;
-
-        return Result.Success();
-    }
-
     internal Result Update(string name, IterationType type, LocalDateRange dateRange)
     {
         Name = name;
         Type = type;
-        DateRange = dateRange;
-
-        return Result.Success();
-    }
-
-    internal Result ChangeDates(LocalDateRange dateRange)
-    {
         DateRange = dateRange;
 
         return Result.Success();

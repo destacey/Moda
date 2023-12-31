@@ -24,7 +24,7 @@ public class HealthCheckTests
     public void Constructor_WhenValid_ReturnsHealthCheck()
     {
         // Arrange
-        var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var faker = _healthCheckFaker.Generate();
 
         // Act
         var result = new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn, faker.Expiration, faker.Note);
@@ -47,7 +47,7 @@ public class HealthCheckTests
     {
         // Arrange
         var objectId = Guid.Empty;
-        var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var faker = _healthCheckFaker.Generate();
 
         // Act
         Action act = () => new HealthCheck(objectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn, faker.Expiration, faker.Note);
@@ -62,7 +62,7 @@ public class HealthCheckTests
         // Arrange
         var timestamp = Instant.FromDateTimeUtc(DateTime.UtcNow);
         var expiration = timestamp.Minus(Duration.FromDays(1));
-        var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var faker = _healthCheckFaker.Generate();
 
         // Act
         Action act = () => new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, timestamp, expiration, faker.Note);
@@ -79,7 +79,7 @@ public class HealthCheckTests
     public void ChangeExpiration_WhenValid_UpdatesExpiration()
     {
         // Arrange
-        var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var sut = _healthCheckFaker.Generate();
         var expiration = sut.ReportedOn.Plus(Duration.FromDays(1));
 
         // Act
@@ -93,7 +93,7 @@ public class HealthCheckTests
     public void ChangeExpiration_WhenExpirationLessThanTimestamp_ThrowsArgumentException()
     {
         // Arrange
-        var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var sut = _healthCheckFaker.Generate();
         var expiration = sut.ReportedOn.Minus(Duration.FromDays(1));
 
         // Act
@@ -105,13 +105,13 @@ public class HealthCheckTests
 
     #endregion ChangeExpiration
 
-    #region IsExpired
+        #region IsExpired
 
     [Fact]
     public void IsExpired_WhenExpirationGreaterThanNow_ReturnsFalse()
     {
         // Arrange
-        var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var sut = _healthCheckFaker.Generate();
         var expiration = sut.ReportedOn.Plus(Duration.FromDays(1));
         sut.ChangeExpiration(expiration);
 
@@ -126,7 +126,7 @@ public class HealthCheckTests
     public void IsExpired_WhenExpirationLessThanNow_ReturnsTrue()
     {
         // Arrange
-        var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var sut = _healthCheckFaker.Generate();
         _dateTimeService.Advance(Duration.FromDays(60));
 
         // Act
@@ -144,7 +144,7 @@ public class HealthCheckTests
     public void Update_WhenValid_UpdatesHealthCheck()
     {
         // Arrange
-        var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var sut = _healthCheckFaker.Generate();
         var status = HealthStatus.Healthy;
         var expiration = sut.ReportedOn.Plus(Duration.FromDays(1));
         var note = "Updated Note";
@@ -166,7 +166,7 @@ public class HealthCheckTests
     public void Update_WhenNoteIsWhiteSpace_UpdatesHealthCheck()
     {
         // Arrange
-        var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var sut = _healthCheckFaker.Generate();
         var status = HealthStatus.Healthy;
         var expiration = sut.ReportedOn.Plus(Duration.FromDays(1));
         var note = " ";
@@ -188,7 +188,7 @@ public class HealthCheckTests
     public void Update_WhenExpirationLessThanTimestamp_ThrowsArgumentException()
     {
         // Arrange
-        var sut = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var sut = _healthCheckFaker.Generate();
         var status = HealthStatus.Healthy;
         var expiration = sut.ReportedOn.Minus(Duration.FromDays(1));
         var note = "Updated Note";
@@ -205,7 +205,7 @@ public class HealthCheckTests
     public void Update_WhenExpired_FailsWithError()
     {
         // Arrange
-        var faker = _healthCheckFaker.UsePrivateConstructor().Generate();
+        var faker = _healthCheckFaker.Generate();
         var sut = new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn.Minus(Duration.FromDays(15)), faker.ReportedOn.Minus(Duration.FromDays(10)), faker.Note);
         var status = HealthStatus.Healthy;
         var expiration = _dateTimeService.Now.Plus(Duration.FromDays(1));

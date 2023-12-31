@@ -20,6 +20,7 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
 
     private PlanningInterval(string name, string? description, LocalDateRange dateRange)
     {
+        // TODO generate a new Guid, rather than depend on the DB.  This can be used when creating new Iterations.
         Name = name;
         Description = description;
         DateRange = dateRange;
@@ -278,9 +279,6 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
         var existingIteration = _iterations.FirstOrDefault(x => x.Id == iterationId);
         if (existingIteration == null)
             return Result.Failure($"Iteration {iterationId} not found.");
-
-        //if (existingIteration.Name != name && _iterations.Any(x => x.Name == name))
-        //    return Result.Failure("Iteration name already exists.");
 
         var updateResult = existingIteration.Update(name, type, dateRange);
         return updateResult.IsSuccess ? Result.Success() : Result.Failure(updateResult.Error);
