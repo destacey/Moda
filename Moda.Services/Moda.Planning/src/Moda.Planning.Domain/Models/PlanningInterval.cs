@@ -213,6 +213,46 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
 
     #region Iterations
 
+    /// <summary>
+    /// Auto-generates iterations if none exist.
+    /// </summary>
+    /// <param name="iterationWeeks">Specifies the default length of each iteration.  The length of final iteration will also depend on the planning interval end date.</param>
+    /// <param name="iterationPrefix">By default each iteration is named based on its sequence.  Providing a prefix can reduce confusion with iterations in other planning intervals.</param>
+    /// <returns></returns>
+    public Result InitializeIterations(int iterationWeeks, string? iterationPrefix)
+    {
+        if (Iterations.Any())
+            return Result.Failure("Unable to generate new iterations for a Planning Interval that has iterations.");
+
+        var iterationStart = DateRange.Start;
+        var iterationCount = 1;
+        var isLastIteration = false;
+        while (true)
+        {
+            var iterationName = $"{iterationPrefix}{iterationCount}";
+            var iterationEnd = iterationStart.PlusDays(iterationWeeks * 7 - 1);
+            var iterationType = IterationType.Development;
+            if (iterationEnd >= DateRange.End)
+            {
+                iterationEnd = DateRange.End;
+                iterationType = IterationType.InnovationAndPlanning;
+                isLastIteration = true;
+            }
+
+            var addIterationResult = AddIteration(iterationName, iterationType, new LocalDateRange(iterationStart, iterationEnd));
+            if (addIterationResult.IsFailure)
+                return Result.Failure(addIterationResult.Error);
+
+            if (isLastIteration)
+                break;
+
+            iterationStart = iterationEnd.PlusDays(1);
+            iterationCount++;
+        }
+
+        return Result.Success();
+    }
+
     public Result AddIteration(string name, IterationType type, LocalDateRange dateRange)
     {
         if (Iterations.Any(x => x.Name == name))
@@ -341,8 +381,13 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
     /// <param name="description">The description.</param>
     /// <param name="dateRange">The date range.</param>
     /// <returns></returns>
-    public static PlanningInterval Create(string name, string? description, LocalDateRange dateRange)
+    public static Result<PlanningInterval> Create(string name, string? description, LocalDateRange dateRange, int iterationWeeks, string? iterationPrefix)
     {
-        return new PlanningInterval(name, description, dateRange);
+        var planningInterval = new PlanningInterval(name, description, dateRange);
+        var result = planningInterval.InitializeIterations(iterationWeeks, iterationPrefix);
+
+        return result.IsFailure 
+            ? Result.Failure<PlanningInterval>(result.Error) 
+            : planningInterval;
     }
 }

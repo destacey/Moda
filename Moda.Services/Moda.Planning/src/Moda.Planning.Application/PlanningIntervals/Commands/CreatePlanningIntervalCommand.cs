@@ -50,44 +50,22 @@ internal sealed class CreatePlanningIntervalCommandHandler : ICommandHandler<Cre
     {
         try
         {
-            var planningInterval = PlanningInterval.Create(
+            var result = PlanningInterval.Create(
                 request.Name,
                 request.Description,
-                request.DateRange
+                request.DateRange,
+                request.IterationWeeks,
+                request.IterationPrefix
                 );
+            if (result.IsFailure)
+                return Result.Failure<int>(result.Error);
+            
 
-            // create iterations for the planning interval
-            var iterationStart = request.DateRange.Start;
-            var iterationCount = 1;
-            var isLastIteration = false;
-            while (true)
-            {
-                var iterationName = $"{request.IterationPrefix}{iterationCount}";
-                var iterationEnd = iterationStart.PlusWeeks(request.IterationWeeks).PlusDays(-1);
-                var iterationType = IterationType.Development;
-                if (iterationEnd >= request.DateRange.End)
-                {
-                    iterationEnd = request.DateRange.End;
-                    iterationType = IterationType.InnovationAndPlanning;
-                    isLastIteration = true;
-                }
-
-                var iterationDates = new LocalDateRange(iterationStart, iterationEnd);
-
-                planningInterval.AddIteration(iterationName, iterationType, iterationDates);
-
-                if (isLastIteration)
-                    break;
-
-                iterationStart = iterationEnd.PlusDays(1);
-                iterationCount++;
-            }
-
-            await _planningDbContext.PlanningIntervals.AddAsync(planningInterval, cancellationToken);
+            await _planningDbContext.PlanningIntervals.AddAsync(result.Value, cancellationToken);
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(planningInterval.Key);
+            return Result.Success(result.Value.Key);
         }
         catch (Exception ex)
         {
