@@ -175,10 +175,8 @@ const ManagePlanningIntervalDatesForm = ({
   ])
 
   useEffect(() => {
-    console.log('test')
     if (!planningIntervalData || !iterationsData || !iterationTypesOptions)
       return
-    console.log('test2')
     if (canUpdatePlanningInterval) {
       setIsOpen(showForm)
       if (showForm) {
