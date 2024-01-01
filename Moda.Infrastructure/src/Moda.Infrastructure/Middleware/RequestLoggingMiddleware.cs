@@ -7,10 +7,12 @@ namespace Moda.Infrastructure.Middleware;
 
 public class RequestLoggingMiddleware : IMiddleware
 {
+    private readonly ICurrentUser _currentUser;
     private readonly IDateTimeService _dateTimeService;
 
-    public RequestLoggingMiddleware(IDateTimeService dateTimeService)
+    public RequestLoggingMiddleware(ICurrentUser currentUser, IDateTimeService dateTimeService)
     {
+        _currentUser = currentUser;
         _dateTimeService = dateTimeService;
     }
 
@@ -38,10 +40,18 @@ public class RequestLoggingMiddleware : IMiddleware
             }
         }
 
+        string email = _currentUser.GetUserEmail() is string userEmail ? userEmail : "Anonymous";
+        var userId = _currentUser.GetUserId();
+
+        if (userId != Guid.Empty)
+            LogContext.PushProperty("UserId", userId);
+
+        LogContext.PushProperty("UserEmail", email);
+
         LogContext.PushProperty("RequestBody", requestBody);
         Log.ForContext("RequestHeaders", httpContext.Request.Headers.ToDictionary(h => h.Key, h => h.Value.ToString()), destructureObjects: true)
            .ForContext("RequestBody", requestBody)
-           .Information("HTTP {RequestMethod} Request sent to {RequestPath}", httpContext.Request.Method, httpContext.Request.Path);
+           .Information("HTTP {RequestMethod} Request sent to {RequestPath}", httpContext.Request.Method, httpContext.Request.Path, string.IsNullOrEmpty(email) ? "Anonymous" : email);
         await next(httpContext);
     }
 }
