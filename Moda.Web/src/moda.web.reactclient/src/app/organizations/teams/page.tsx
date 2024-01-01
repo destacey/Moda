@@ -109,7 +109,7 @@ const TeamListPage = () => {
         }}
         isDataLoading={isLoading}
       />
-      ({isInEditMode && <ModalCreateTeamForm />})
+      {isInEditMode && <ModalCreateTeamForm />}
     </>
   )
 }
