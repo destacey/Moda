@@ -11,6 +11,7 @@ import { BarsOutlined, BuildOutlined } from '@ant-design/icons'
 import { SegmentedLabeledOption } from 'antd/es/segmented'
 import { PlanningIntervalObjectivesTimeline } from '../../../components'
 import {
+  useGetPlanningIntervalCalendar,
   useGetPlanningIntervalObjectivesByTeamId,
   useGetPlanningIntervalRisksByTeamId,
   useGetTeamPlanningIntervalPredictability,
@@ -39,6 +40,8 @@ const TeamPlanReview = ({
   refreshPlanningInterval,
 }: TeamPlanReviewProps) => {
   const [currentView, setCurrentView] = useState<string | number>('List')
+
+  const calendarQuery = useGetPlanningIntervalCalendar(planningInterval?.id)
 
   const objectivesQuery = useGetPlanningIntervalObjectivesByTeamId(
     planningInterval?.id,
@@ -101,7 +104,7 @@ const TeamPlanReview = ({
       {currentView === 'Timeline' && (
         <PlanningIntervalObjectivesTimeline
           objectivesQuery={objectivesQuery}
-          planningInterval={planningInterval}
+          planningIntervalCalendarQuery={calendarQuery}
         />
       )}
     </>

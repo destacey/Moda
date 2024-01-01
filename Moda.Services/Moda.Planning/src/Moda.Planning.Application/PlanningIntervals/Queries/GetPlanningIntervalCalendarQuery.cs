@@ -1,4 +1,4 @@
-﻿using Moda.Planning.Domain.Interfaces;
+﻿using Moda.Planning.Application.PlanningIntervals.Dtos;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;
 public sealed record GetPlanningIntervalCalendarQuery : IQuery<PlanningIntervalCalendarDto?>
@@ -63,23 +63,34 @@ internal sealed class GetPlanningIntervalCalendarQueryHandler : IQueryHandler<Ge
 public sealed record PlanningIntervalCalendarDto
 {
     /// <summary>
-    /// Planning Interval Id.
+    /// The Planning Interval Id.
     /// </summary>
     public Guid Id { get; set; }
 
     /// <summary>
-    /// Planning Interval Name.
+    /// The Planning Interval Key.
+    /// </summary>
+    public int Key { get; set; }
+
+    /// <summary>
+    /// The Planning Interval Name.
     /// </summary>
     public required string Name { get; set; }
 
     /// <summary>
-    /// Planning Interval start and end dates.
-    public required LocalDateRange DateRange { get; set; }
+    /// The Planning Interval Start Date.
+    /// </summary>
+    public required LocalDate Start { get; set; }
 
     /// <summary>
-    /// List of iteration schedules for the planning interval.
+    /// The Planning Interval End Date.
     /// </summary>
-    public required List<ILocalSchedule> IterationSchedules { get; set; }
+    public required LocalDate End { get; set; }
+
+    /// <summary>
+    /// The Planning Interval Iteration Schedules.
+    /// </summary>
+    public required List<LocalScheduleDto> IterationSchedules { get; set; }
 
     public static PlanningIntervalCalendarDto Create(PlanningIntervalCalendar calendar)
     {
@@ -87,8 +98,9 @@ public sealed record PlanningIntervalCalendarDto
         {
             Id = calendar.Id,
             Name = calendar.Name,
-            DateRange = calendar.DateRange,
-            IterationSchedules = calendar.IterationSchedules.ToList()
+            Start = calendar.DateRange.Start,
+            End = calendar.DateRange.End,
+            IterationSchedules = calendar.IterationSchedules.Select(i => LocalScheduleDto.Create(i)).ToList()
         };
     }
 }

@@ -8,12 +8,14 @@ public sealed record PlanningIntervalCalendar
     internal PlanningIntervalCalendar(ILocalSchedule planningInterval, IEnumerable<ILocalSchedule> iterations)
     {
         Id = planningInterval.Id;
+        Key = planningInterval.Key;
         Name = planningInterval.Name;
         DateRange = planningInterval.DateRange;
         _iterationSchedules = iterations.ToList();
     }
 
     public Guid Id { get; init; }
+    public int Key { get; init; }
     public string Name { get; init; }
     public LocalDateRange DateRange { get; private set; }
     public IReadOnlyList<ILocalSchedule> IterationSchedules 

@@ -166,7 +166,9 @@ const PlanningIntervalDetailsPage = ({ params }) => {
           newObjectivesAllowed={
             !planningIntervalData?.objectivesLocked ?? false
           }
-          teamNames={teamsQuery?.data?.map((t) => t.name)}
+          teamNames={teamsQuery?.data
+            ?.filter((t) => t.type == 'Team')
+            .map((t) => t.name)}
         />
       ),
     },
