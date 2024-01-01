@@ -8,7 +8,7 @@ import {
 import 'vis-timeline/styles/vis-timeline-graph2d.css'
 import './planning-interval-objectives-timeline.css'
 import {
-  PlanningIntervalDetailsDto,
+  PlanningIntervalCalendarDto,
   PlanningIntervalObjectiveListDto,
 } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
@@ -23,7 +23,10 @@ import useTheme from '../../components/contexts/theme'
 
 interface PlanningIntervalObjectivesTimelineProps {
   objectivesQuery: UseQueryResult<PlanningIntervalObjectiveListDto[], unknown>
-  planningInterval: PlanningIntervalDetailsDto
+  planningIntervalCalendarQuery: UseQueryResult<
+    PlanningIntervalCalendarDto,
+    unknown
+  >
   enableGroups?: boolean
   teamNames?: string[]
   viewSelector?: React.ReactNode
@@ -72,11 +75,14 @@ export const ObjectiveTimelineTemplate = ({
 
 const PlanningIntervalObjectivesTimeline = ({
   objectivesQuery,
-  planningInterval,
+  planningIntervalCalendarQuery,
   enableGroups = false,
   teamNames,
   viewSelector,
 }: PlanningIntervalObjectivesTimelineProps) => {
+  const [piStart, setPiStart] = useState<Date>(undefined)
+  const [piEnd, setPiEnd] = useState<Date>(undefined)
+  const [iterations, setIterations] = useState<TimelineItem[]>([])
   const [objectives, setObjectives] = useState<TimelineItem[]>([])
   const { currentThemeName } = useTheme()
   const timelineBackgroundColor =
@@ -97,10 +103,10 @@ const PlanningIntervalObjectivesTimeline = ({
       showCurrentTime: true,
       verticalScroll: true,
       zoomKey: 'ctrlKey',
-      start: dayjs(planningInterval.start).subtract(1, 'week').toDate(),
-      end: dayjs(planningInterval.end).add(1, 'week').toDate(),
-      min: dayjs(planningInterval.start).subtract(4, 'week').toDate(),
-      max: dayjs(planningInterval.end).add(4, 'week').toDate(),
+      start: dayjs(piStart).subtract(1, 'week').toDate(),
+      end: dayjs(piEnd).add(1, 'week').toDate(),
+      min: dayjs(piStart).subtract(4, 'week').toDate(),
+      max: dayjs(piEnd).add(4, 'week').toDate(),
       groupOrder: 'content',
       xss: { disabled: false },
       template: (item: TimelineItem, element: HTMLElement, data: any) => {
@@ -113,43 +119,62 @@ const PlanningIntervalObjectivesTimeline = ({
               timelineForegroundColor={timelineForegroundColor}
             />,
           )
+        } else if (item.type === 'background') {
+          // TODO: styling could use some work
+          createRoot(element).render(
+            <Typography.Text>{item.title}</Typography.Text>,
+          )
         }
       },
     }
-  }, [
-    planningInterval.end,
-    planningInterval.start,
-    timelineFontColor,
-    timelineForegroundColor,
-  ])
+  }, [piStart, piEnd, timelineFontColor, timelineForegroundColor])
 
   useEffect(() => {
-    if (!objectivesQuery?.data) return
+    if (!objectivesQuery?.data || !planningIntervalCalendarQuery?.data) return
+
+    setPiStart(planningIntervalCalendarQuery.data.start)
+    setPiEnd(planningIntervalCalendarQuery.data.end)
+
+    setIterations(
+      planningIntervalCalendarQuery.data.iterationSchedules.map((i, index) => {
+        return {
+          id: i.key,
+          planningIntervalKey: planningIntervalCalendarQuery.data.key,
+          title: i.name,
+          content: i.name,
+          start: dayjs(i.start).toDate(),
+          end: dayjs(i.end).toDate(),
+          type: 'background',
+        } as TimelineItem
+      }),
+    )
 
     setObjectives(
       objectivesQuery?.data
         .filter((obj) => obj.status?.name !== 'Canceled')
-        .map((obj, index) => {
+        .map((obj) => {
           return {
             id: obj.key,
             planningIntervalKey: obj.planningInterval.key,
             title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
             content: '',
-            start: dayjs(obj.startDate ?? planningInterval.start).toDate(),
-            end: dayjs(obj.targetDate ?? planningInterval.end).toDate(),
+            start: dayjs(
+              obj.startDate ?? planningIntervalCalendarQuery.data.start,
+            ).toDate(),
+            end: dayjs(
+              obj.targetDate ?? planningIntervalCalendarQuery.data.end,
+            ).toDate(),
             group: obj.team?.name,
             type: 'range',
             style: `background: ${timelineBackgroundColor}; border-color: ${timelineBackgroundColor};`,
             zIndex: 1,
             objective: obj,
-          }
+          } as TimelineItem
         }),
     )
   }, [
     objectivesQuery?.data,
-    planningInterval.end,
-    planningInterval.key,
-    planningInterval.start,
+    planningIntervalCalendarQuery.data,
     timelineBackgroundColor,
     timelineFontColor,
   ])
@@ -158,27 +183,7 @@ const PlanningIntervalObjectivesTimeline = ({
     if (!objectives || objectives.length === 0) return
 
     // TODO: add the ability for content to overflow if the text is too long
-    const items: TimelineItem[] = [
-      {
-        id: -1,
-        planningIntervalKey: -1,
-        title: 'PI Start',
-        content: '',
-        start: dayjs(planningInterval.start).toDate(),
-        end: dayjs(planningInterval.start).add(1, 'day').toDate(),
-        type: 'background',
-      },
-      {
-        id: -2,
-        planningIntervalKey: -2,
-        title: 'PI End',
-        content: '',
-        start: dayjs(planningInterval.end).toDate(),
-        end: dayjs(planningInterval.end).add(1, 'day').toDate(),
-        type: 'background',
-      },
-      ...objectives,
-    ]
+    const items: TimelineItem[] = [...iterations, ...objectives]
 
     var container = document.getElementById('timeline-vis')
     const timeline = new Timeline(container, items, options as TimelineOptions)
@@ -196,7 +201,7 @@ const PlanningIntervalObjectivesTimeline = ({
         teams = teamNames
       }
 
-      const groups = teams.map((team) => {
+      const groups = teams.map((team, index) => {
         return {
           id: team,
           content: team,
@@ -210,10 +215,11 @@ const PlanningIntervalObjectivesTimeline = ({
     enableGroups,
     objectives,
     options,
-    planningInterval.end,
-    planningInterval.start,
+    piStart,
+    piEnd,
     teamNames,
     timelineFontColor,
+    iterations,
   ])
 
   const TimelineChart = () => {

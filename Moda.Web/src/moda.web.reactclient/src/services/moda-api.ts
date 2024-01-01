@@ -7903,24 +7903,19 @@ export interface PlanningIntervalDetailsDto {
 
 export interface PlanningIntervalCalendarDto {
     id?: string;
+    key?: number;
     name?: string;
-    dateRange?: LocalDateRange;
-    iterationSchedules?: ILocalSchedule[];
-}
-
-export interface ValueObject {
-}
-
-export interface LocalDateRange extends ValueObject {
     start?: Date;
     end?: Date;
-    days?: number;
+    iterationSchedules?: LocalScheduleDto[];
 }
 
-export interface ILocalSchedule {
+export interface LocalScheduleDto {
     id?: string;
+    key?: number;
     name?: string;
-    dateRange?: LocalDateRange;
+    start?: Date;
+    end?: Date;
 }
 
 export interface PlanningIntervalPredictabilityDto {

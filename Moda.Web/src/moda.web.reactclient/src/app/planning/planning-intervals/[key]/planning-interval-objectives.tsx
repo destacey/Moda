@@ -2,7 +2,10 @@
 
 import PlanningIntervalObjectivesGrid from '@/src/app/components/common/planning/planning-interval-objectives-grid'
 import { PlanningIntervalDetailsDto } from '@/src/services/moda-api'
-import { useGetPlanningIntervalObjectives } from '@/src/services/queries/planning-queries'
+import {
+  useGetPlanningIntervalCalendar,
+  useGetPlanningIntervalObjectives,
+} from '@/src/services/queries/planning-queries'
 import { BarsOutlined, BuildOutlined } from '@ant-design/icons'
 import { Segmented } from 'antd'
 import { SegmentedLabeledOption } from 'antd/es/segmented'
@@ -34,6 +37,8 @@ const PlanningIntervalObjectives = ({
   teamNames,
 }: PlanningIntervalObjectivesProps) => {
   const [currentView, setCurrentView] = useState<string | number>('List')
+
+  const calendarQuery = useGetPlanningIntervalCalendar(planningInterval?.id)
 
   const objectivesQuery = useGetPlanningIntervalObjectives(
     planningInterval?.id,
@@ -68,7 +73,7 @@ const PlanningIntervalObjectives = ({
       {currentView === 'Timeline' && (
         <PlanningIntervalObjectivesTimeline
           objectivesQuery={objectivesQuery}
-          planningInterval={planningInterval}
+          planningIntervalCalendarQuery={calendarQuery}
           enableGroups={true}
           teamNames={teamNames}
           viewSelector={viewSelector}
