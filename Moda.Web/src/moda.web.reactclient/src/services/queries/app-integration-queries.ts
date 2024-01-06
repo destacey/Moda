@@ -59,13 +59,13 @@ export const useUpdateAzdoBoardsConnectionMutation = () => {
   })
 }
 
-export const useImportAzdoBoardsConnectionWorkspacesMutation = () => {
+export const useImportAzdoBoardsConnectionOrganizationMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (connectionId: string) =>
-      (await getAzureDevOpsBoardsConnectionsClient()).importWorkspaces(
-        connectionId,
-      ),
+      (
+        await getAzureDevOpsBoardsConnectionsClient()
+      ).importOrganizationConfiguration(connectionId),
     onSuccess: (data, connectionId) => {
       queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, connectionId])
     },

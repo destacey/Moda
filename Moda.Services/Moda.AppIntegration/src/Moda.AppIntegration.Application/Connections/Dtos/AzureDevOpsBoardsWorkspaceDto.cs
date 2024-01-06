@@ -6,7 +6,7 @@ public sealed record AzureDevOpsBoardsWorkspaceDto : IMapFrom<AzureDevOpsBoardsW
     public Guid ExternalId { get; set; }
     public required string Name { get; set; }
     public string? Description { get; set; }
-    public Guid? WorkProcessId { get; set; }
+    public Guid WorkProcessId { get; set; }
     public bool Sync { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)

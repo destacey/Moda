@@ -23,7 +23,7 @@ public sealed class AzureDevOpsBoardsImportService : IAzureDevOpsBoardsImportSer
         _dateTimeService = dateTimeService;
     }
 
-    public async Task<Result> ImportWorkspaces(Guid connectionId, CancellationToken cancellationToken)
+    public async Task<Result> ImportOrganizationConfiguration(Guid connectionId, CancellationToken cancellationToken)
     {
         try
         {
@@ -104,7 +104,7 @@ public sealed class AzureDevOpsBoardsImportService : IAzureDevOpsBoardsImportSer
             }
 
             // re-import the connection to make sure everything is up-to-date
-            var importWorkspacesResult = await ImportWorkspaces(connectionId, cancellationToken);
+            var importWorkspacesResult = await ImportOrganizationConfiguration(connectionId, cancellationToken);
             if (importWorkspacesResult.IsFailure)
                 return importWorkspacesResult;
 
