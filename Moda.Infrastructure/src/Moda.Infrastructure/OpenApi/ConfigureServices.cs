@@ -62,7 +62,7 @@ internal static class ConfigureServices
                 document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor());
                 document.OperationProcessors.Add(new SwaggerGlobalAuthProcessor());
 
-                document.TypeMappers.Add(new PrimitiveTypeMapper(typeof(TimeSpan), schema =>
+                document.SchemaSettings.TypeMappers.Add(new PrimitiveTypeMapper(typeof(TimeSpan), schema =>
                 {
                     schema.Type = NJsonSchema.JsonObjectType.String;
                     schema.IsNullableRaw = true;
@@ -73,7 +73,11 @@ internal static class ConfigureServices
                 document.OperationProcessors.Add(new SwaggerHeaderAttributeProcessor());
 
                 var fluentValidationSchemaProcessor = serviceProvider.CreateScope().ServiceProvider.GetService<FluentValidationSchemaProcessor>();
-                document.SchemaProcessors.Add(fluentValidationSchemaProcessor);
+                if (fluentValidationSchemaProcessor is null)
+                {
+                    throw new InvalidOperationException("FluentValidationSchemaProcessor is not registered");
+                }
+                document.SchemaSettings.SchemaProcessors.Add(fluentValidationSchemaProcessor);
             });
 
             // Add the FluentValidationSchemaProcessor as a scoped service
@@ -94,7 +98,7 @@ internal static class ConfigureServices
         if (config.GetValue<bool>("SwaggerSettings:Enable"))
         {
             app.UseOpenApi();
-            app.UseSwaggerUi3(options =>
+            app.UseSwaggerUi(options =>
             {
                 options.DefaultModelsExpandDepth = -1;
                 options.DocExpansion = "none";

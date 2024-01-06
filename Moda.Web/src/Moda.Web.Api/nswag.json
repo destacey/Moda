@@ -1,5 +1,5 @@
 {
-  "runtime": "Net70",
+  "runtime": "Net80",
   "defaultVariables": null,
   "documentGenerator": {
     "aspNetCoreToOpenApi": {
@@ -55,7 +55,7 @@
         "outputType": "OpenApi3",
         "newLineBehavior": "Auto",
         "assemblyPaths": [
-            "bin/Debug/net7.0/Moda.Web.Api.dll"
+            "bin/Debug/net8.0/Moda.Web.Api.dll"
         ],
         "assemblyConfig": null,
         "referencePaths": [],
