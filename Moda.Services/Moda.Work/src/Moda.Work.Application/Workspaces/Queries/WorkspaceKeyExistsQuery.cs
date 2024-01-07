@@ -1,7 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 namespace Moda.Work.Application.Workspaces.Queries;
-public sealed record WorkspaceKeyExistsQuery(WorkspaceKey WorkspaceKey): IQuery<bool>;
+public sealed record WorkspaceKeyExistsQuery : IQuery<bool>
+{
+    public WorkspaceKeyExistsQuery(string workspaceKey)
+    {
+        WorkspaceKey = new WorkspaceKey(workspaceKey);        
+    }
+
+    public WorkspaceKey WorkspaceKey { get; set; }
+}
 
 internal sealed class WorkspaceKeyExistsQueryHandler : IQueryHandler<WorkspaceKeyExistsQuery, bool>
 {

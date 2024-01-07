@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
-using Moda.Organization.Domain.Enums;
+using Moda.Common.Domain.Enums.Organization;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models;
 
@@ -33,9 +33,6 @@ public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
 
         builder.Property(t => t.Name).IsRequired().HasMaxLength(128);
         builder.Property(t => t.Code).IsRequired()
-            .HasConversion(
-                t => t.Value,
-                t => new TeamCode(t))
             .HasColumnType("varchar")
             .HasMaxLength(10);
         builder.Property(t => t.Type).IsRequired()

@@ -1,4 +1,5 @@
-﻿using Moda.Planning.Domain.Enums;
+﻿using Moda.Common.Domain.Enums.Organization;
+using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models;
 using Moda.Tests.Shared.Data;
 
@@ -22,8 +23,8 @@ public class PlanningIntervalObjectiveFaker : PrivateConstructorFaker<PlanningIn
     {
         return team.Type switch
         {
-            Organization.Domain.Enums.TeamType.Team => PlanningIntervalObjectiveType.Team,
-            Organization.Domain.Enums.TeamType.TeamOfTeams => PlanningIntervalObjectiveType.TeamOfTeams,
+            TeamType.Team => PlanningIntervalObjectiveType.Team,
+            TeamType.TeamOfTeams => PlanningIntervalObjectiveType.TeamOfTeams,
             _ => throw new ArgumentOutOfRangeException(nameof(team.Type), team.Type, null)
         };
     }

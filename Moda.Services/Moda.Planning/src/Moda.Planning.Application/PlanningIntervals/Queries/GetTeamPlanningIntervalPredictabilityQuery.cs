@@ -1,4 +1,4 @@
-﻿using Moda.Organization.Domain.Enums;
+﻿using Moda.Common.Domain.Enums.Organization;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;

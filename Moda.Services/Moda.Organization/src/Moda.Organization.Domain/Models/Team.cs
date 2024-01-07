@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Events;
 using Moda.Organization.Domain.Enums;
 using NodaTime;

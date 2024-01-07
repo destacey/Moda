@@ -1,4 +1,5 @@
-﻿using Moda.Planning.Application.PlanningIntervals.Extensions;
+﻿using Moda.Common.Domain.Enums.Goals;
+using Moda.Planning.Application.PlanningIntervals.Extensions;
 
 namespace Moda.Planning.Application.Tests.Sut.PlanningIntervals.Extensions;
 public class ObjectiveStatusExtensionTests
@@ -17,7 +18,7 @@ public class ObjectiveStatusExtensionTests
         var result = currentEnum.ToGoalObjectiveStatus();
 
         // Assert
-        result.Should().Be((Moda.Goals.Domain.Enums.ObjectiveStatus)expectedValue);
+        result.Should().Be((ObjectiveStatus)expectedValue);
     }
 
     [Theory]

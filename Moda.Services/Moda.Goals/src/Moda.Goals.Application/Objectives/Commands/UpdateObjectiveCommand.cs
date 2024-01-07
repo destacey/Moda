@@ -1,5 +1,5 @@
-﻿using Moda.Goals.Application.Persistence;
-using Moda.Goals.Domain.Enums;
+﻿using Moda.Common.Domain.Enums.Goals;
+using Moda.Goals.Application.Persistence;
 
 namespace Moda.Goals.Application.Objectives.Commands;
 public sealed record UpdateObjectiveCommand(Guid Id, string Name, string? Description, ObjectiveStatus Status, double Progress, Guid? OwnerId, LocalDate? StartDate, LocalDate? TargetDate) : ICommand<Guid>;

@@ -11,13 +11,12 @@ public class TeamCode : ValueObject
     {
         value = Guard.Against.NullOrWhiteSpace(value, nameof(TeamCode)).Trim().ToUpper();
 
-        if (ValidateOrganizationCodeFormat(value))
-        {
-            Value = value;
-        }
+        ValidateOrganizationCodeFormat(value);
+
+        Value = value;
     }
 
-    public string Value { get; } = null!;
+    public string Value { get; }
 
     protected override IEnumerable<IComparable> GetEqualityComponents()
     {
