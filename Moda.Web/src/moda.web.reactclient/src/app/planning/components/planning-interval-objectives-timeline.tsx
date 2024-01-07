@@ -122,7 +122,9 @@ const PlanningIntervalObjectivesTimeline = ({
         } else if (item.type === 'background') {
           // TODO: styling could use some work
           createRoot(element).render(
-            <Typography.Text>{item.title}</Typography.Text>,
+            <div>
+              <Typography.Text>{item.title}</Typography.Text>
+            </div>,
           )
         }
       },
@@ -143,7 +145,8 @@ const PlanningIntervalObjectivesTimeline = ({
           title: i.name,
           content: i.name,
           start: dayjs(i.start).toDate(),
-          end: dayjs(i.end).toDate(),
+          end: dayjs(i.end).add(1, 'day').subtract(1, 'second').toDate(),
+          className: 'iteration-background',
           type: 'background',
         } as TimelineItem
       }),
