@@ -119,7 +119,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [OpenApiOperation("Import Azure DevOps processes and projects.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> ImportOrganizationConfiguration(Guid id, [FromServices] IAzureDevOpsBoardsImportService azureDevOpsBoardsImportService, CancellationToken cancellationToken)
+    public async Task<ActionResult> ImportOrganizationConfiguration(Guid id, [FromServices] IAzureDevOpsBoardsImportManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {
         var result = await azureDevOpsBoardsImportService.ImportOrganizationConfiguration(id, cancellationToken);
         if (result.IsFailure)
@@ -142,7 +142,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> InitWorkspaceIntegration(Guid id, InitWorkspaceIntegrationRequest request, [FromServices] IAzureDevOpsBoardsImportService azureDevOpsBoardsImportService, CancellationToken cancellationToken)
+    public async Task<ActionResult> InitWorkspaceIntegration(Guid id, InitWorkspaceIntegrationRequest request, [FromServices] IAzureDevOpsBoardsImportManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {
         if (id != request.Id)
             return BadRequest();

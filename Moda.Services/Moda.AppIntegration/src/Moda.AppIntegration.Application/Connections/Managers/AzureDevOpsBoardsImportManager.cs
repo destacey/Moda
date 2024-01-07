@@ -7,15 +7,15 @@ using Moda.AppIntegration.Application.Interfaces;
 using Moda.Work.Application.Workspaces.Queries;
 using Moda.Work.Domain.Models;
 
-namespace Moda.AppIntegration.Application.Connections.Services;
-public sealed class AzureDevOpsBoardsImportService : IAzureDevOpsBoardsImportService
+namespace Moda.AppIntegration.Application.Connections.Managers;
+public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportManager
 {
-    private readonly ILogger<AzureDevOpsBoardsImportService> _logger;
+    private readonly ILogger<AzureDevOpsBoardsImportManager> _logger;
     private readonly IAzureDevOpsService _azureDevOpsService;
     private readonly ISender _sender;
     private readonly IDateTimeService _dateTimeService;
 
-    public AzureDevOpsBoardsImportService(ILogger<AzureDevOpsBoardsImportService> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IDateTimeService dateTimeService)
+    public AzureDevOpsBoardsImportManager(ILogger<AzureDevOpsBoardsImportManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IDateTimeService dateTimeService)
     {
         _logger = logger;
         _azureDevOpsService = azureDevOpsService;
@@ -31,7 +31,7 @@ public sealed class AzureDevOpsBoardsImportService : IAzureDevOpsBoardsImportSer
             if (connection is null)
             {
                 _logger.LogError("Unable to find Azure DevOps connection with id {ConnectionId}.", connectionId);
-                return Result.Failure($"Unable to find Azure DevOps connection with id {connectionId}.");                
+                return Result.Failure($"Unable to find Azure DevOps connection with id {connectionId}.");
             }
 
             if (connection.IsValidConfiguration is false)
