@@ -8,6 +8,7 @@ import {
   Button,
   Card,
   Descriptions,
+  Flex,
   List,
   Space,
   Tabs,
@@ -42,65 +43,81 @@ const AzdoBoardsOrganization = (props: AzdoBoardsOrganizationProps) => {
   //   return !!getWorkProcessName(workProcessId)
   // }
 
-  const processDetails = (process: AzureDevOpsBoardsWorkProcessDto) => (
+  const workspaceSection = (
+    processWorkspaces: AzureDevOpsBoardsWorkspaceDto[],
+  ) => (
     <>
-      <Space direction="vertical">
-        <Typography.Title level={5}>{process.name}</Typography.Title>
-        <Typography.Text>{process.description}</Typography.Text>
-        <Typography.Title level={5}>Workspaces</Typography.Title>
-        <List
-          grid={{
-            gutter: 16,
-            xs: 1,
-            sm: 1,
-            md: 1,
-            lg: 2,
-            xl: 3,
-            xxl: 4,
-          }}
-          locale={{ emptyText: 'No workspaces found.' }}
-          dataSource={props.workspaces
-            .filter((x) => x.workProcessId === process.externalId)
-            .sort((a, b) => a.name.localeCompare(b.name))}
-          renderItem={(item) => (
-            <List.Item>
-              <Card
-                title={
-                  <>
-                    {item.name}{' '}
-                    <Link
-                      href={`${props.organizationUrl}/${item.name}`}
-                      target="_blank"
-                      title="Open in Azure DevOps"
-                    >
-                      <ExportOutlined style={{ width: '12px' }} />
-                    </Link>
-                  </>
-                }
-                // extra={
-                //   allowIntegrationSetup(item.workProcessId) && (
-                //     <Button
-                //       type="text"
-                //       title="Setup Workspace Integration"
-                //       icon={<AppstoreAddOutlined />}
-                //       onClick={() => props.initWorkspace(item.externalId)}
-                //     />
-                //   )
-                // }
-              >
-                <Descriptions column={1} size="small">
-                  <Descriptions.Item>{item.description}</Descriptions.Item>
-                  <Descriptions.Item label="Work Process">
-                    {getWorkProcessName(item.workProcessId) ?? 'Not Found'}
-                  </Descriptions.Item>
-                </Descriptions>
-              </Card>
-            </List.Item>
-          )}
-        />
-      </Space>
+      <Typography.Title level={5}>Workspaces</Typography.Title>
+      <List
+        grid={{
+          gutter: 16,
+          xs: 1,
+          sm: 1,
+          md: 1,
+          lg: 2,
+          xl: 3,
+          xxl: 4,
+        }}
+        locale={{ emptyText: 'No workspaces found.' }}
+        dataSource={processWorkspaces.sort((a, b) =>
+          a.name.localeCompare(b.name),
+        )}
+        renderItem={(item) => (
+          <List.Item>
+            <Card
+              title={
+                <>
+                  {item.name}{' '}
+                  <Link
+                    href={`${props.organizationUrl}/${item.name}`}
+                    target="_blank"
+                    title="Open in Azure DevOps"
+                  >
+                    <ExportOutlined style={{ width: '12px' }} />
+                  </Link>
+                </>
+              }
+              // extra={
+              //   allowIntegrationSetup(item.workProcessId) && (
+              //     <Button
+              //       type="text"
+              //       title="Setup Workspace Integration"
+              //       icon={<AppstoreAddOutlined />}
+              //       onClick={() => props.initWorkspace(item.externalId)}
+              //     />
+              //   )
+              // }
+            >
+              <Descriptions column={1} size="small">
+                <Descriptions.Item>{item.description}</Descriptions.Item>
+                <Descriptions.Item label="Work Process">
+                  {getWorkProcessName(item.workProcessId) ?? 'Not Found'}
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+          </List.Item>
+        )}
+      />
     </>
   )
+
+  const processSection = (process: AzureDevOpsBoardsWorkProcessDto) => {
+    const processWorkspaces = props.workspaces.filter(
+      (x) => x.workProcessId === process.externalId,
+    )
+
+    return (
+      <>
+        <Flex vertical>
+          <Typography.Title level={5} style={{ marginTop: '0px' }}>
+            {process.name}
+          </Typography.Title>
+          <Typography.Text>{process.description}</Typography.Text>
+          {workspaceSection(processWorkspaces)}
+        </Flex>
+      </>
+    )
+  }
 
   return (
     <>
@@ -125,7 +142,7 @@ const AzdoBoardsOrganization = (props: AzdoBoardsOrganizationProps) => {
                   return {
                     label: p.name,
                     key: p.externalId,
-                    children: processDetails(p),
+                    children: processSection(p),
                   }
                 })}
             />
