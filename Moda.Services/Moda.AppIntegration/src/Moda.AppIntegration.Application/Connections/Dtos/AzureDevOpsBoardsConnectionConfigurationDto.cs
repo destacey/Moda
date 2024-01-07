@@ -30,9 +30,4 @@ public sealed record AzureDevOpsBoardsConnectionConfigurationDto : IMapFrom<Azur
         if (!string.IsNullOrWhiteSpace(PersonalAccessToken) && PersonalAccessToken.Length > 4)
             PersonalAccessToken = string.Concat(PersonalAccessToken.AsSpan(0, 4), new string('*', PersonalAccessToken.Length - 4));
     }
-
-    public void ConfigureMapping(TypeAdapterConfig config)
-    {
-        config.NewConfig<AzureDevOpsBoardsConnectionConfiguration, AzureDevOpsBoardsConnectionDetailsDto>();
-    }
 }

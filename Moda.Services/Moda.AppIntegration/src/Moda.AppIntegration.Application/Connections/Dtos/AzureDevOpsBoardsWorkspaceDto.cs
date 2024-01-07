@@ -8,9 +8,4 @@ public sealed record AzureDevOpsBoardsWorkspaceDto : IMapFrom<AzureDevOpsBoardsW
     public string? Description { get; set; }
     public Guid WorkProcessId { get; set; }
     public bool Sync { get; set; }
-
-    public void ConfigureMapping(TypeAdapterConfig config)
-    {
-        config.NewConfig<AzureDevOpsBoardsWorkspace, AzureDevOpsBoardsWorkspaceDto>();
-    }
 }
