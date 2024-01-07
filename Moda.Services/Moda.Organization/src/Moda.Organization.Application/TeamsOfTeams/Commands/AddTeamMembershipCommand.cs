@@ -33,13 +33,13 @@ public sealed class AddTeamMembershipCommandValidator : CustomValidator<AddTeamM
 internal sealed class AddTeamMembershipCommandHandler : ICommandHandler<AddTeamMembershipCommand>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<AddTeamMembershipCommandHandler> _logger;
 
-    public AddTeamMembershipCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeService dateTimeService, ILogger<AddTeamMembershipCommandHandler> logger)
+    public AddTeamMembershipCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeManager, ILogger<AddTeamMembershipCommandHandler> logger)
     {
         _organizationDbContext = organizationDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -52,7 +52,7 @@ internal sealed class AddTeamMembershipCommandHandler : ICommandHandler<AddTeamM
             var parentTeam = await _organizationDbContext.TeamOfTeams
                 .SingleAsync(t => t.Id == request.ParentTeamId);
 
-            var result = team.AddTeamMembership(parentTeam, request.DateRange, _dateTimeService.Now);
+            var result = team.AddTeamMembership(parentTeam, request.DateRange, _dateTimeManager.Now);
             if (result.IsFailure)
                 return result;
 
@@ -72,7 +72,7 @@ internal sealed class AddTeamMembershipCommandHandler : ICommandHandler<AddTeamM
 
     private async Task<TeamOfTeams> GetTeamWithAllChildMemberships(Guid teamId, CancellationToken cancellationToken)
     {
-        var today = _dateTimeService.Now.InUtc().Date;
+        var today = _dateTimeManager.Now.InUtc().Date;
         var team = await _organizationDbContext.TeamOfTeams
             .Include(t => t.ParentMemberships)
             .Include(t => t.ChildMemberships.Where(m => m.DateRange != null && (today <= m.DateRange.Start || (!m.DateRange.End.HasValue && m.DateRange.Start <= today) || (m.DateRange.Start <= today && today <= m.DateRange.End))))

@@ -5,14 +5,14 @@ using NodaTime;
 namespace Moda.Infrastructure.Persistence.Initialization;
 public class WorkSeeder : ICustomSeeder
 {
-    public async Task Initialize(ModaDbContext dbContext, IDateTimeService dateTimeService, CancellationToken cancellationToken)
+    public async Task Initialize(ModaDbContext dbContext, IDateTimeProvider dateTimeManager, CancellationToken cancellationToken)
     {
-        await SeedBacklogLevelScheme(dbContext, dateTimeService, cancellationToken);
+        await SeedBacklogLevelScheme(dbContext, dateTimeManager, cancellationToken);
     }
 
-    public async Task SeedBacklogLevelScheme(ModaDbContext dbContext, IDateTimeService dateTimeService, CancellationToken cancellationToken)
+    public async Task SeedBacklogLevelScheme(ModaDbContext dbContext, IDateTimeProvider dateTimeManager, CancellationToken cancellationToken)
     {
-        Instant timestamp = dateTimeService.Now;
+        Instant timestamp = dateTimeManager.Now;
 
         if (await dbContext.BacklogLevelSchemes.AnyAsync(cancellationToken))
         {

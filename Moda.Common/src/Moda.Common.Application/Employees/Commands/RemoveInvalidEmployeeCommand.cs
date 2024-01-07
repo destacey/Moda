@@ -7,13 +7,13 @@ public sealed record RemoveInvalidEmployeeCommand(Guid Id) : ICommand<int>;
 internal sealed class RemoveInvalidEmployeeCommandHandler : ICommandHandler<RemoveInvalidEmployeeCommand, int>
 {
     private readonly IModaDbContext _modaDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<RemoveInvalidEmployeeCommandHandler> _logger;
 
-    public RemoveInvalidEmployeeCommandHandler(IModaDbContext modaDbContext, IDateTimeService dateTimeService, ILogger<RemoveInvalidEmployeeCommandHandler> logger)
+    public RemoveInvalidEmployeeCommandHandler(IModaDbContext modaDbContext, IDateTimeProvider dateTimeManager, ILogger<RemoveInvalidEmployeeCommandHandler> logger)
     {
         _modaDbContext = modaDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -39,7 +39,7 @@ internal sealed class RemoveInvalidEmployeeCommandHandler : ICommandHandler<Remo
                 employee.OfficeLocation,
                 null,
                 false,  // this command should not change IsActive
-                _dateTimeService.Now
+                _dateTimeManager.Now
                 );
 
             if (updateResult.IsFailure)
@@ -55,7 +55,7 @@ internal sealed class RemoveInvalidEmployeeCommandHandler : ICommandHandler<Remo
 
             foreach (var report in employee.DirectReports)
             {
-                report.UpdateManagerId(null, _dateTimeService.Now);
+                report.UpdateManagerId(null, _dateTimeManager.Now);
             }
 
             await _modaDbContext.SaveChangesAsync(cancellationToken);

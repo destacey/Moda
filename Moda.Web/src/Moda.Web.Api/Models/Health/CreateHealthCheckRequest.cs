@@ -20,7 +20,7 @@ public class CreateHealthCheckRequest
 
 public sealed class CreateHealthCheckRequestValidator : CustomValidator<CreateHealthCheckRequest>
 {
-    public CreateHealthCheckRequestValidator(IDateTimeService dateTimeService)
+    public CreateHealthCheckRequestValidator(IDateTimeProvider dateTimeManager)
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -37,7 +37,7 @@ public sealed class CreateHealthCheckRequestValidator : CustomValidator<CreateHe
 
         RuleFor(h => h.Expiration)
             .NotEmpty()
-            .GreaterThan(dateTimeService.Now)
+            .GreaterThan(dateTimeManager.Now)
             .WithMessage("The Expiration must be in the future.");
 
         RuleFor(h => h.Note)

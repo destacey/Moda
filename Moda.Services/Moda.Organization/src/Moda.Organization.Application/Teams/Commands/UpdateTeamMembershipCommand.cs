@@ -22,13 +22,13 @@ public sealed class UpdateTeamMembershipCommandValidator : CustomValidator<Updat
 internal sealed class UpdateTeamMembershipCommandHandler : ICommandHandler<UpdateTeamMembershipCommand>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<UpdateTeamMembershipCommandHandler> _logger;
 
-    public UpdateTeamMembershipCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeService dateTimeService, ILogger<UpdateTeamMembershipCommandHandler> logger)
+    public UpdateTeamMembershipCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeManager, ILogger<UpdateTeamMembershipCommandHandler> logger)
     {
         _organizationDbContext = organizationDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -41,7 +41,7 @@ internal sealed class UpdateTeamMembershipCommandHandler : ICommandHandler<Updat
                     .ThenInclude(m => m.Target)
                 .SingleAsync(t => t.Id == request.TeamId);
 
-            var result = team.UpdateTeamMembership(request.TeamMembershipId, request.DateRange, _dateTimeService.Now);
+            var result = team.UpdateTeamMembership(request.TeamMembershipId, request.DateRange, _dateTimeManager.Now);
             if (result.IsFailure)
                 return result;
 

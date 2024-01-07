@@ -21,18 +21,18 @@ internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamMemb
 {
     private readonly IOrganizationDbContext _organizationDbContext;
     private readonly ILogger<GetTeamMembershipsQueryHandler> _logger;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
 
-    public GetTeamMembershipsQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamMembershipsQueryHandler> logger, IDateTimeService dateTimeService)
+    public GetTeamMembershipsQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamMembershipsQueryHandler> logger, IDateTimeProvider dateTimeManager)
     {
         _organizationDbContext = organizationDbContext;
         _logger = logger;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
     }
 
     public async Task<IReadOnlyList<TeamMembershipsDto>> Handle(GetTeamMembershipsQuery request, CancellationToken cancellationToken)
     {
-        var today = _dateTimeService.Now.InUtc().Date;
+        var today = _dateTimeManager.Now.InUtc().Date;
         var query = _organizationDbContext.TeamOfTeams
             .Include(t => t.ParentMemberships)
                 .ThenInclude(m => m.Target)
@@ -63,11 +63,11 @@ internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamMemb
         List<TeamMembershipsDto> memberships = new List<TeamMembershipsDto>();
         if (team.ParentMemberships.Any())
         {
-            memberships.AddRange(team.ParentMemberships.Select(m => TeamMembershipsDto.Create(m, _dateTimeService)).ToList());
+            memberships.AddRange(team.ParentMemberships.Select(m => TeamMembershipsDto.Create(m, _dateTimeManager)).ToList());
         }
         if (team.ChildMemberships.Any())
         {
-            memberships.AddRange(team.ChildMemberships.Select(m => TeamMembershipsDto.Create(m, _dateTimeService)).ToList());
+            memberships.AddRange(team.ChildMemberships.Select(m => TeamMembershipsDto.Create(m, _dateTimeManager)).ToList());
         }
 
         return memberships;

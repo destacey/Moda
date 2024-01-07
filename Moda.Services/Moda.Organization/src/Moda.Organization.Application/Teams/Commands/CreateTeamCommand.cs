@@ -53,13 +53,13 @@ public sealed class CreateTeamCommandValidator : CustomValidator<CreateTeamComma
 internal sealed class CreateTeamCommandHandler : ICommandHandler<CreateTeamCommand, int>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<CreateTeamCommandHandler> _logger;
 
-    public CreateTeamCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeService dateTimeService, ILogger<CreateTeamCommandHandler> logger)
+    public CreateTeamCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeManager, ILogger<CreateTeamCommandHandler> logger)
     {
         _organizationDbContext = organizationDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -67,7 +67,7 @@ internal sealed class CreateTeamCommandHandler : ICommandHandler<CreateTeamComma
     {
         try
         {
-            var team = Team.Create(request.Name, request.Code, request.Description, _dateTimeService.Now);
+            var team = Team.Create(request.Name, request.Code, request.Description, _dateTimeManager.Now);
             await _organizationDbContext.Teams.AddAsync((Team)team, cancellationToken);
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);

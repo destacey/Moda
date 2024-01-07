@@ -21,13 +21,13 @@ internal sealed class GetPlanningIntervalQueryHandler : IQueryHandler<GetPlannin
 {
     private readonly IPlanningDbContext _planningDbContext;
     private readonly ILogger<GetPlanningIntervalQueryHandler> _logger;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
 
-    public GetPlanningIntervalQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalQueryHandler> logger, IDateTimeService dateTimeService)
+    public GetPlanningIntervalQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalQueryHandler> logger, IDateTimeProvider dateTimeManager)
     {
         _planningDbContext = planningDbContext;
         _logger = logger;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
     }
 
     public async Task<PlanningIntervalDetailsDto?> Handle(GetPlanningIntervalQuery request, CancellationToken cancellationToken)
@@ -54,7 +54,7 @@ internal sealed class GetPlanningIntervalQueryHandler : IQueryHandler<GetPlannin
         }
 
         return await query
-            .Select(p => PlanningIntervalDetailsDto.Create(p, _dateTimeService))
+            .Select(p => PlanningIntervalDetailsDto.Create(p, _dateTimeManager))
             .FirstOrDefaultAsync(cancellationToken);
     }
 }

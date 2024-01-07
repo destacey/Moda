@@ -8,13 +8,13 @@ internal sealed class GetTeamPlanningIntervalPredictabilityQueryHandler : IQuery
 {
     private readonly IPlanningDbContext _planningDbContext;
     private readonly ILogger<GetTeamPlanningIntervalPredictabilityQueryHandler> _logger;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
 
-    public GetTeamPlanningIntervalPredictabilityQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetTeamPlanningIntervalPredictabilityQueryHandler> logger, IDateTimeService dateTimeService)
+    public GetTeamPlanningIntervalPredictabilityQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetTeamPlanningIntervalPredictabilityQueryHandler> logger, IDateTimeProvider dateTimeManager)
     {
         _planningDbContext = planningDbContext;
         _logger = logger;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
     }
 
     public async Task<double?> Handle(GetTeamPlanningIntervalPredictabilityQuery request, CancellationToken cancellationToken)
@@ -28,7 +28,7 @@ internal sealed class GetTeamPlanningIntervalPredictabilityQueryHandler : IQuery
         if (planningInterval is null || !planningInterval.Teams.Any())
             return null;
 
-        return planningInterval.CalculatePredictability(_dateTimeService.Now.InUtc().Date, request.TeamId);
+        return planningInterval.CalculatePredictability(_dateTimeManager.Now.InUtc().Date, request.TeamId);
     }
 }
 

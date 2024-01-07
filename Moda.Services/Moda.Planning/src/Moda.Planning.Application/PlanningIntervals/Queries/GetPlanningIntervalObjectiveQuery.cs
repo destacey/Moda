@@ -30,14 +30,14 @@ internal sealed class GetPlanningIntervalObjectiveQueryHandler : IQueryHandler<G
     private readonly IPlanningDbContext _planningDbContext;
     private readonly ILogger<GetPlanningIntervalObjectiveQueryHandler> _logger;
     private readonly ISender _sender;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
 
-    public GetPlanningIntervalObjectiveQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalObjectiveQueryHandler> logger, ISender sender, IDateTimeService dateTimeService)
+    public GetPlanningIntervalObjectiveQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalObjectiveQueryHandler> logger, ISender sender, IDateTimeProvider dateTimeManager)
     {
         _planningDbContext = planningDbContext;
         _logger = logger;
         _sender = sender;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
     }
 
     public async Task<PlanningIntervalObjectiveDetailsDto?> Handle(GetPlanningIntervalObjectiveQuery request, CancellationToken cancellationToken)
@@ -82,7 +82,7 @@ internal sealed class GetPlanningIntervalObjectiveQueryHandler : IQueryHandler<G
 
         var piNavigation = NavigationDto.Create(planningInterval.Id, planningInterval.Key, planningInterval.Name);
 
-        return PlanningIntervalObjectiveDetailsDto.Create(planningInterval.Objectives.First(), objective, piNavigation, _dateTimeService.Now);
+        return PlanningIntervalObjectiveDetailsDto.Create(planningInterval.Objectives.First(), objective, piNavigation, _dateTimeManager.Now);
     }
 
     private void ThrowAndLogException(GetPlanningIntervalObjectiveQuery request, string message)

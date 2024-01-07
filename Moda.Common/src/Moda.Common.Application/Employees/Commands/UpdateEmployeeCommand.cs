@@ -100,13 +100,13 @@ public sealed class UpdateEmployeeCommandValidator : CustomValidator<UpdateEmplo
 internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmployeeCommand, int>
 {
     private readonly IModaDbContext _modaDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<UpdateEmployeeCommandHandler> _logger;
 
-    public UpdateEmployeeCommandHandler(IModaDbContext modaDbContext, IDateTimeService dateTimeService, ILogger<UpdateEmployeeCommandHandler> logger)
+    public UpdateEmployeeCommandHandler(IModaDbContext modaDbContext, IDateTimeProvider dateTimeManager, ILogger<UpdateEmployeeCommandHandler> logger)
     {
         _modaDbContext = modaDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -138,7 +138,7 @@ internal sealed class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmplo
                 request.OfficeLocation,
                 request.ManagerId,
                 employee.IsActive,  // this command should not change IsActive
-                _dateTimeService.Now
+                _dateTimeManager.Now
                 );
 
             if (updateResult.IsFailure)

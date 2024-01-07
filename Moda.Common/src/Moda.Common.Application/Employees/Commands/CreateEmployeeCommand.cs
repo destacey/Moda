@@ -93,13 +93,13 @@ public sealed class CreateEmployeeCommandValidator : CustomValidator<CreateEmplo
 internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmployeeCommand, int>
 {
     private readonly IModaDbContext _modaDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<CreateEmployeeCommandHandler> _logger;
 
-    public CreateEmployeeCommandHandler(IModaDbContext modaDbContext, IDateTimeService dateTimeService, ILogger<CreateEmployeeCommandHandler> logger)
+    public CreateEmployeeCommandHandler(IModaDbContext modaDbContext, IDateTimeProvider dateTimeManager, ILogger<CreateEmployeeCommandHandler> logger)
     {
         _modaDbContext = modaDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -124,7 +124,7 @@ internal sealed class CreateEmployeeCommandHandler : ICommandHandler<CreateEmplo
                 request.Department,
                 request.OfficeLocation,
                 managerId,
-                _dateTimeService.Now
+                _dateTimeManager.Now
                 );
 
             await _modaDbContext.Employees.AddAsync(employee, cancellationToken);

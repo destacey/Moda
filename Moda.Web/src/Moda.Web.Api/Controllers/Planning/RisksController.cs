@@ -13,13 +13,13 @@ public class RisksController : ControllerBase
 {
     private readonly ISender _sender;
     private readonly ICsvService _csvService;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
 
-    public RisksController(ISender sender, ICsvService csvService, IDateTimeService dateTimeService)
+    public RisksController(ISender sender, ICsvService csvService, IDateTimeProvider dateTimeManager)
     {
         _sender = sender;
         _csvService = csvService;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
     }
 
     [HttpGet]
@@ -141,7 +141,7 @@ public class RisksController : ControllerBase
             var importedRisks = _csvService.ReadCsv<ImportRiskRequest>(file.OpenReadStream());
 
             List<ImportRiskDto> risks = new();
-            var validator = new ImportRiskRequestValidator(_dateTimeService);
+            var validator = new ImportRiskRequestValidator(_dateTimeManager);
             foreach (var risk in importedRisks)
             {
                 var validationResults = await validator.ValidateAsync(risk, cancellationToken);

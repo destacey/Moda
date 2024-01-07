@@ -45,13 +45,13 @@ public sealed class UpdateRiskCommandValidator : CustomValidator<UpdateRiskComma
 internal sealed class UpdateRiskCommandHandler : ICommandHandler<UpdateRiskCommand, int>
 {
     private readonly IPlanningDbContext _planningDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<UpdateRiskCommandHandler> _logger;
 
-    public UpdateRiskCommandHandler(IPlanningDbContext planningDbContext, IDateTimeService dateTimeService, ILogger<UpdateRiskCommandHandler> logger)
+    public UpdateRiskCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeManager, ILogger<UpdateRiskCommandHandler> logger)
     {
         _planningDbContext = planningDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -74,7 +74,7 @@ internal sealed class UpdateRiskCommandHandler : ICommandHandler<UpdateRiskComma
                 request.AssigneeId,
                 request.FollowUpDate,
                 request.Response,
-                _dateTimeService.Now
+                _dateTimeManager.Now
                 );
 
             if (updateResult.IsFailure)

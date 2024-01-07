@@ -13,14 +13,14 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
     private readonly ILogger<AzureDevOpsBoardsImportManager> _logger;
     private readonly IAzureDevOpsService _azureDevOpsService;
     private readonly ISender _sender;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
 
-    public AzureDevOpsBoardsImportManager(ILogger<AzureDevOpsBoardsImportManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IDateTimeService dateTimeService)
+    public AzureDevOpsBoardsImportManager(ILogger<AzureDevOpsBoardsImportManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IDateTimeProvider dateTimeManager)
     {
         _logger = logger;
         _azureDevOpsService = azureDevOpsService;
         _sender = sender;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
     }
 
     public async Task<Result> ImportOrganizationConfiguration(Guid connectionId, CancellationToken cancellationToken)

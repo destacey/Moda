@@ -14,7 +14,7 @@ public sealed record UpdateHealthCheckCommand(Guid Id, HealthStatus Status, Inst
 
 public sealed class UpdateHealthCheckCommandValidator : CustomValidator<UpdateHealthCheckCommand>
 {
-    public UpdateHealthCheckCommandValidator(IDateTimeService dateTimeService)
+    public UpdateHealthCheckCommandValidator(IDateTimeProvider dateTimeManager)
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -26,7 +26,7 @@ public sealed class UpdateHealthCheckCommandValidator : CustomValidator<UpdateHe
 
         RuleFor(h => h.Expiration)
             .NotEmpty()
-            .GreaterThan(dateTimeService.Now)
+            .GreaterThan(dateTimeManager.Now)
             .WithMessage("The Expiration must be in the future.");
 
         RuleFor(h => h.Note)
@@ -37,13 +37,13 @@ public sealed class UpdateHealthCheckCommandValidator : CustomValidator<UpdateHe
 internal sealed class UpdateHealthCheckCommandHandler : ICommandHandler<UpdateHealthCheckCommand, HealthCheckDto>
 {
     private readonly IHealthDbContext _healthDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<UpdateHealthCheckCommandHandler> _logger;
 
-    public UpdateHealthCheckCommandHandler(IHealthDbContext healthDbContext, IDateTimeService dateTimeService, ILogger<UpdateHealthCheckCommandHandler> logger)
+    public UpdateHealthCheckCommandHandler(IHealthDbContext healthDbContext, IDateTimeProvider dateTimeManager, ILogger<UpdateHealthCheckCommandHandler> logger)
     {
         _healthDbContext = healthDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -59,7 +59,7 @@ internal sealed class UpdateHealthCheckCommandHandler : ICommandHandler<UpdateHe
                 return Result.Failure<HealthCheckDto>($"Health check with id {request.Id} not found.");
             }
 
-            var updateResult = healthCheck.Update(request.Status, request.Expiration, request.Note, _dateTimeService.Now);
+            var updateResult = healthCheck.Update(request.Status, request.Expiration, request.Note, _dateTimeManager.Now);
             if (updateResult.IsFailure)
             {
                 // Reset the entity

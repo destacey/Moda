@@ -33,13 +33,13 @@ public sealed class UpdateWorkStateCommandValidator : CustomValidator<UpdateWork
 internal sealed class UpdateWorkStateCommandHandler : ICommandHandler<UpdateWorkStateCommand, int>
 {
     private readonly IWorkDbContext _workDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<UpdateWorkStateCommandHandler> _logger;
 
-    public UpdateWorkStateCommandHandler(IWorkDbContext workDbContext, IDateTimeService dateTimeService, ILogger<UpdateWorkStateCommandHandler> logger)
+    public UpdateWorkStateCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeManager, ILogger<UpdateWorkStateCommandHandler> logger)
     {
         _workDbContext = workDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -52,7 +52,7 @@ internal sealed class UpdateWorkStateCommandHandler : ICommandHandler<UpdateWork
             if (workState is null)
                 return Result.Failure<int>("Work State not found.");
 
-            var updateResult = workState.Update(request.Description, _dateTimeService.Now);
+            var updateResult = workState.Update(request.Description, _dateTimeManager.Now);
 
             if (updateResult.IsFailure)
             {

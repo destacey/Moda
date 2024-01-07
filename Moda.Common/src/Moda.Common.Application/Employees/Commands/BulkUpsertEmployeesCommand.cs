@@ -36,13 +36,13 @@ public sealed class BulkUpsertEmployeesCommandValidator : CustomValidator<BulkUp
 internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUpsertEmployeesCommand>
 {
     private readonly IModaDbContext _modaDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<BulkUpsertEmployeesCommandHandler> _logger;
 
-    public BulkUpsertEmployeesCommandHandler(IModaDbContext modaDbContext, IDateTimeService dateTimeService, ILogger<BulkUpsertEmployeesCommandHandler> logger)
+    public BulkUpsertEmployeesCommandHandler(IModaDbContext modaDbContext, IDateTimeProvider dateTimeManager, ILogger<BulkUpsertEmployeesCommandHandler> logger)
     {
         _modaDbContext = modaDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -72,7 +72,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                         externalEmployee.OfficeLocation,
                         managerId,
                         externalEmployee.IsActive,
-                        _dateTimeService.Now
+                        _dateTimeManager.Now
                         );
 
                     if (updateResult.IsFailure)
@@ -98,7 +98,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                         externalEmployee.Department,
                         externalEmployee.OfficeLocation,
                         managerId,
-                        _dateTimeService.Now
+                        _dateTimeManager.Now
                         );
 
                     await _modaDbContext.Employees.AddAsync(newEmployee);
@@ -150,7 +150,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                 {
                     var managerId = GetManagerId(item.Value);
                     var employee = updatedEmployees.First(e => e.EmployeeNumber == item.Key);
-                    employee.UpdateManagerId(managerId, _dateTimeService.Now);
+                    employee.UpdateManagerId(managerId, _dateTimeManager.Now);
                 }
 
                 await _modaDbContext.SaveChangesAsync(cancellationToken);

@@ -51,13 +51,13 @@ public sealed class CreateWorkTypeCommandValidator : CustomValidator<CreateWorkT
 internal sealed class CreateWorkTypeCommandHandler : ICommandHandler<CreateWorkTypeCommand, int>
 {
     private readonly IWorkDbContext _workDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<CreateWorkTypeCommandHandler> _logger;
 
-    public CreateWorkTypeCommandHandler(IWorkDbContext workDbContext, IDateTimeService dateTimeService, ILogger<CreateWorkTypeCommandHandler> logger)
+    public CreateWorkTypeCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeManager, ILogger<CreateWorkTypeCommandHandler> logger)
     {
         _workDbContext = workDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -65,7 +65,7 @@ internal sealed class CreateWorkTypeCommandHandler : ICommandHandler<CreateWorkT
     {
         try
         {
-            Instant timestamp = _dateTimeService.Now;
+            Instant timestamp = _dateTimeManager.Now;
 
             var workType = WorkType.Create(request.Name, request.Description, timestamp);
 

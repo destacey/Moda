@@ -53,13 +53,13 @@ public sealed class CreateTeamOfTeamsCommandValidator : CustomValidator<CreateTe
 internal sealed class CreateTeamOfTeamsCommandHandler : ICommandHandler<CreateTeamOfTeamsCommand, int>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<CreateTeamOfTeamsCommandHandler> _logger;
 
-    public CreateTeamOfTeamsCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeService dateTimeService, ILogger<CreateTeamOfTeamsCommandHandler> logger)
+    public CreateTeamOfTeamsCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeManager, ILogger<CreateTeamOfTeamsCommandHandler> logger)
     {
         _organizationDbContext = organizationDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -67,7 +67,7 @@ internal sealed class CreateTeamOfTeamsCommandHandler : ICommandHandler<CreateTe
     {
         try
         {
-            var team = TeamOfTeams.Create(request.Name, request.Code, request.Description, _dateTimeService.Now);
+            var team = TeamOfTeams.Create(request.Name, request.Code, request.Description, _dateTimeManager.Now);
             await _organizationDbContext.TeamOfTeams.AddAsync(team, cancellationToken);
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);

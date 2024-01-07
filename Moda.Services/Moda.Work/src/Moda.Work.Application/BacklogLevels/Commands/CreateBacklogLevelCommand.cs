@@ -61,13 +61,13 @@ public sealed class CreateBacklogLevelCommandValidator : CustomValidator<CreateB
 internal sealed class CreateBacklogLevelCommandHandler : ICommandHandler<CreateBacklogLevelCommand, int>
 {
     private readonly IWorkDbContext _workDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeManager;
     private readonly ILogger<CreateBacklogLevelCommandHandler> _logger;
 
-    public CreateBacklogLevelCommandHandler(IWorkDbContext workDbContext, IDateTimeService dateTimeService, ILogger<CreateBacklogLevelCommandHandler> logger)
+    public CreateBacklogLevelCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeManager, ILogger<CreateBacklogLevelCommandHandler> logger)
     {
         _workDbContext = workDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeManager = dateTimeManager;
         _logger = logger;
     }
 
@@ -82,7 +82,7 @@ internal sealed class CreateBacklogLevelCommandHandler : ICommandHandler<CreateB
             if (scheme is null)
                 return Result.Failure<int>("The system backlog level scheme does not exist.");
 
-            Instant timestamp = _dateTimeService.Now;
+            Instant timestamp = _dateTimeManager.Now;
 
             var backlogLevel = BacklogLevel.Create(request.Name, request.Description, BacklogCategory.Portfolio, Ownership.Owned, request.Rank, timestamp);
 

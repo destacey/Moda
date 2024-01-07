@@ -9,12 +9,12 @@ using NodaTime.Testing;
 namespace Moda.Planning.Domain.Tests.Sut.Models;
 public class PlanningIntervalIterationTests
 {
-    private readonly TestingDateTimeService _dateTimeService;
+    private readonly TestingDateTimeProvider _dateTimeManager;
     private readonly PlanningIntervalIterationFaker _faker = new();
 
     public PlanningIntervalIterationTests()
     {
-        _dateTimeService = new(new FakeClock(DateTime.UtcNow.ToInstant()));
+        _dateTimeManager = new(new FakeClock(DateTime.UtcNow.ToInstant()));
     }
 
     #region Constructor
@@ -177,7 +177,7 @@ public class PlanningIntervalIterationTests
     public void StateOn_ShouldReturnCompleted_WhenDateIsPast()
     {
         // Arrange
-        var today = _dateTimeService.Today;
+        var today = _dateTimeManager.Today;
         var iterationDateRange = new LocalDateRange(today.Plus(Period.FromWeeks(-4)), today.Plus(Period.FromWeeks(-2)));
         var sut = _faker.WithData(dateRange: iterationDateRange).Generate();
 
@@ -192,7 +192,7 @@ public class PlanningIntervalIterationTests
     public void StateOn_ShouldReturnActive_WhenDateIsWithinRange()
     {
         // Arrange
-        var today = _dateTimeService.Today;
+        var today = _dateTimeManager.Today;
         var iterationDateRange = new LocalDateRange(today.Plus(Period.FromWeeks(-1)), today.Plus(Period.FromWeeks(1)));
         var sut = _faker.WithData(dateRange: iterationDateRange).Generate();
 
@@ -207,7 +207,7 @@ public class PlanningIntervalIterationTests
     public void StateOn_ShouldReturnFuture_WhenDateIsFuture()
     {
         // Arrange
-        var today = _dateTimeService.Today;
+        var today = _dateTimeManager.Today;
         var iterationDateRange = new LocalDateRange(today.Plus(Period.FromWeeks(1)), today.Plus(Period.FromWeeks(3)));
         var sut = _faker.WithData(dateRange: iterationDateRange).Generate();
 
