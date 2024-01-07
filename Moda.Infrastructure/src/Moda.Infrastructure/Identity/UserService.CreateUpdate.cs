@@ -37,7 +37,7 @@ internal partial class UserService
         if (!existingUsers)
         {
             await _userManager.AddToRoleAsync(user, "Admin");
-            await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeManager.Now, true));
+            await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now, true));
         }
         else
         {
@@ -45,7 +45,7 @@ internal partial class UserService
             if (roles is null || !roles.Any())
             {
                 await _userManager.AddToRoleAsync(user, "Basic");
-                await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeManager.Now, true));
+                await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now, true));
             }
         }
 
@@ -89,7 +89,7 @@ internal partial class UserService
             user.ObjectId = principal.GetObjectId();
             result = await _userManager.UpdateAsync(user);
 
-            await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeManager.Now));
+            await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
         }
         else
         {
@@ -109,7 +109,7 @@ internal partial class UserService
             };
             result = await _userManager.CreateAsync(user);
 
-            await _events.PublishAsync(new ApplicationUserCreatedEvent(user.Id, _dateTimeManager.Now));
+            await _events.PublishAsync(new ApplicationUserCreatedEvent(user.Id, _dateTimeProvider.Now));
         }
 
         if (!result.Succeeded)
@@ -142,7 +142,7 @@ internal partial class UserService
 
         await _signInManager.RefreshSignInAsync(user);
 
-        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeManager.Now));
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
 
         if (!result.Succeeded)
         {
@@ -168,7 +168,7 @@ internal partial class UserService
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeManager.Now));
+                    await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
                 }
                 else
                 {

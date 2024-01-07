@@ -30,13 +30,13 @@ public sealed class UpdatePlanningIntervalCommandValidator : CustomValidator<Upd
 internal sealed class UpdatePlanningIntervalCommandHandler : ICommandHandler<UpdatePlanningIntervalCommand, int>
 {
     private readonly IPlanningDbContext _planningDbContext;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<UpdatePlanningIntervalCommandHandler> _logger;
 
-    public UpdatePlanningIntervalCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeManager, ILogger<UpdatePlanningIntervalCommandHandler> logger)
+    public UpdatePlanningIntervalCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdatePlanningIntervalCommandHandler> logger)
     {
         _planningDbContext = planningDbContext;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
 

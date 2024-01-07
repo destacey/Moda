@@ -33,13 +33,13 @@ public sealed class AddTeamMembershipCommandValidator : CustomValidator<AddTeamM
 internal sealed class AddTeamMembershipCommandHandler : ICommandHandler<AddTeamMembershipCommand>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<AddTeamMembershipCommandHandler> _logger;
 
-    public AddTeamMembershipCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeManager, ILogger<AddTeamMembershipCommandHandler> logger)
+    public AddTeamMembershipCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeProvider, ILogger<AddTeamMembershipCommandHandler> logger)
     {
         _organizationDbContext = organizationDbContext;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
 
@@ -54,7 +54,7 @@ internal sealed class AddTeamMembershipCommandHandler : ICommandHandler<AddTeamM
             var parentTeam = await _organizationDbContext.TeamOfTeams
                 .SingleAsync(t => t.Id == request.ParentTeamId);
 
-            var result = team.AddTeamMembership(parentTeam, request.DateRange, _dateTimeManager.Now);
+            var result = team.AddTeamMembership(parentTeam, request.DateRange, _dateTimeProvider.Now);
             if (result.IsFailure)
                 return result;
 

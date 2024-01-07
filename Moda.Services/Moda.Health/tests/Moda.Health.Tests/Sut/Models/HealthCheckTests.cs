@@ -7,15 +7,15 @@ using NodaTime.Testing;
 namespace Moda.Health.Tests.Sut.Models;
 public class HealthCheckTests
 {
-    private readonly TestingDateTimeProvider _dateTimeManager;
+    private readonly TestingDateTimeProvider _dateTimeProvider;
 
     private readonly HealthCheckFaker _healthCheckFaker;
 
     public HealthCheckTests()
     {
         // TODO: Replace with a FakeClock that can be injected into the constructor.
-        _dateTimeManager = new(new FakeClock(DateTime.UtcNow.ToInstant()));
-        _healthCheckFaker = new(_dateTimeManager.Now);
+        _dateTimeProvider = new(new FakeClock(DateTime.UtcNow.ToInstant()));
+        _healthCheckFaker = new(_dateTimeProvider.Now);
     }
 
     #region Constructor
@@ -116,7 +116,7 @@ public class HealthCheckTests
         sut.ChangeExpiration(expiration);
 
         // Act
-        var result = sut.IsExpired(_dateTimeManager.Now);
+        var result = sut.IsExpired(_dateTimeProvider.Now);
 
         // Assert
         result.Should().BeFalse();
@@ -127,10 +127,10 @@ public class HealthCheckTests
     {
         // Arrange
         var sut = _healthCheckFaker.Generate();
-        _dateTimeManager.Advance(Duration.FromDays(60));
+        _dateTimeProvider.Advance(Duration.FromDays(60));
 
         // Act
-        var result = sut.IsExpired(_dateTimeManager.Now);
+        var result = sut.IsExpired(_dateTimeProvider.Now);
 
         // Assert
         result.Should().BeTrue();
@@ -150,7 +150,7 @@ public class HealthCheckTests
         var note = "Updated Note";
 
         // Act
-        var result = sut.Update(status, expiration, note, _dateTimeManager.Now);
+        var result = sut.Update(status, expiration, note, _dateTimeProvider.Now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -172,7 +172,7 @@ public class HealthCheckTests
         var note = " ";
 
         // Act
-        var result = sut.Update(status, expiration, note, _dateTimeManager.Now);
+        var result = sut.Update(status, expiration, note, _dateTimeProvider.Now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -194,7 +194,7 @@ public class HealthCheckTests
         var note = "Updated Note";
 
         // Act
-        var result = sut.Update(status, expiration, note, _dateTimeManager.Now);
+        var result = sut.Update(status, expiration, note, _dateTimeProvider.Now);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -208,11 +208,11 @@ public class HealthCheckTests
         var faker = _healthCheckFaker.Generate();
         var sut = new HealthCheck(faker.ObjectId, faker.Context, faker.Status, faker.ReportedById, faker.ReportedOn.Minus(Duration.FromDays(15)), faker.ReportedOn.Minus(Duration.FromDays(10)), faker.Note);
         var status = HealthStatus.Healthy;
-        var expiration = _dateTimeManager.Now.Plus(Duration.FromDays(1));
+        var expiration = _dateTimeProvider.Now.Plus(Duration.FromDays(1));
         var note = "Updated Note";
 
         // Act
-        var result = sut.Update(status, expiration, note, _dateTimeManager.Now);
+        var result = sut.Update(status, expiration, note, _dateTimeProvider.Now);
 
         // Assert
         result.IsFailure.Should().BeTrue();

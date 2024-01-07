@@ -8,17 +8,17 @@ namespace Moda.Infrastructure.Middleware;
 public class RequestLoggingMiddleware : IMiddleware
 {
     private readonly ICurrentUser _currentUser;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public RequestLoggingMiddleware(ICurrentUser currentUser, IDateTimeProvider dateTimeManager)
+    public RequestLoggingMiddleware(ICurrentUser currentUser, IDateTimeProvider dateTimeProvider)
     {
         _currentUser = currentUser;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task InvokeAsync(HttpContext httpContext, RequestDelegate next)
     {
-        LogContext.PushProperty("RequestTimeUTC", _dateTimeManager.Now);
+        LogContext.PushProperty("RequestTimeUTC", _dateTimeProvider.Now);
         string requestBody = string.Empty;
         if (httpContext.Request.Path.ToString().Contains("tokens"))
         {

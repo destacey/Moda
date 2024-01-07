@@ -19,7 +19,7 @@ public sealed record ImportRiskDto(
 
 public sealed class ImportRiskDtoValidator : CustomValidator<ImportRiskDto>
 {
-    public ImportRiskDtoValidator(IDateTimeProvider dateTimeManager)
+    public ImportRiskDtoValidator(IDateTimeProvider dateTimeProvider)
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -38,7 +38,7 @@ public sealed class ImportRiskDtoValidator : CustomValidator<ImportRiskDto>
 
         RuleFor(r => r.ReportedOn)
             .NotEmpty()
-            .Must(date => date < dateTimeManager.Now)
+            .Must(date => date < dateTimeProvider.Now)
             .WithMessage("The ReportedOnUtc date must be less than the current UTC date and time.");
 
         RuleFor(r => r.ReportedById)
@@ -67,7 +67,7 @@ public sealed class ImportRiskDtoValidator : CustomValidator<ImportRiskDto>
             () => RuleFor(r => r.ClosedDate)
                 .NotEmpty()
                     .WithMessage("The ClosedDateUtc can not be empty if the status is Closed.")
-                .Must(date => date < dateTimeManager.Now)
+                .Must(date => date < dateTimeProvider.Now)
                     .WithMessage("The ClosedDateUtc date must be less than the current UTC date and time.")
                 .Must((model, date) => date > model.ReportedOn)
                     .WithMessage("The ClosedDateUtc date must be greater than the ReportedOnUtc date and time."))

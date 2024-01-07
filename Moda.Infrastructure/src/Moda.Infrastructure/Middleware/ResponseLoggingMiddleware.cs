@@ -7,12 +7,12 @@ namespace Moda.Infrastructure.Middleware;
 public class ResponseLoggingMiddleware : IMiddleware
 {
     private readonly ICurrentUser _currentUser;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public ResponseLoggingMiddleware(ICurrentUser currentUser, IDateTimeProvider dateTimeManager)
+    public ResponseLoggingMiddleware(ICurrentUser currentUser, IDateTimeProvider dateTimeProvider)
     {
         _currentUser = currentUser;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task InvokeAsync(HttpContext httpContext, RequestDelegate next)
@@ -41,7 +41,7 @@ public class ResponseLoggingMiddleware : IMiddleware
 
         LogContext.PushProperty("UserEmail", email);
         LogContext.PushProperty("StatusCode", httpContext.Response.StatusCode);
-        LogContext.PushProperty("ResponseTimeUTC", _dateTimeManager.Now);
+        LogContext.PushProperty("ResponseTimeUTC", _dateTimeProvider.Now);
         Log.ForContext("ResponseHeaders", httpContext.Response.Headers.ToDictionary(h => h.Key, h => h.Value.ToString()), destructureObjects: true)
             .ForContext("ResponseBody", responseBody)
             .Information("HTTP {RequestMethod} Request to {RequestPath} by {RequesterEmail} has Status Code {StatusCode}.", httpContext.Request.Method, httpContext.Request.Path, string.IsNullOrEmpty(email) ? "Anonymous" : email, httpContext.Response.StatusCode);

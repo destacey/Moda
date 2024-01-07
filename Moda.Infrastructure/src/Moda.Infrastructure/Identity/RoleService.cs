@@ -12,7 +12,7 @@ internal class RoleService : IRoleService
     private readonly ModaDbContext _db;
     private readonly ICurrentUser _currentUser;
     private readonly IEventPublisher _events;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public RoleService(
         RoleManager<ApplicationRole> roleManager,
@@ -20,14 +20,14 @@ internal class RoleService : IRoleService
         ModaDbContext db,
         ICurrentUser currentUser,
         IEventPublisher events,
-        IDateTimeProvider dateTimeManager)
+        IDateTimeProvider dateTimeProvider)
     {
         _roleManager = roleManager;
         _userManager = userManager;
         _db = db;
         _currentUser = currentUser;
         _events = events;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<List<RoleListDto>> GetListAsync(CancellationToken cancellationToken)
@@ -73,7 +73,7 @@ internal class RoleService : IRoleService
                 throw new InternalServerException("Register role failed");
             }
 
-            await _events.PublishAsync(new ApplicationRoleCreatedEvent(role.Id, role.Name!, _dateTimeManager.Now));
+            await _events.PublishAsync(new ApplicationRoleCreatedEvent(role.Id, role.Name!, _dateTimeProvider.Now));
 
             return role.Id;
         }
@@ -99,7 +99,7 @@ internal class RoleService : IRoleService
                 throw new InternalServerException("Update role failed");
             }
 
-            await _events.PublishAsync(new ApplicationRoleUpdatedEvent(role.Id, role.Name!, _dateTimeManager.Now));
+            await _events.PublishAsync(new ApplicationRoleUpdatedEvent(role.Id, role.Name!, _dateTimeProvider.Now));
 
             return role.Id;
         }
@@ -148,7 +148,7 @@ internal class RoleService : IRoleService
             }
         }
 
-        await _events.PublishAsync(new ApplicationRoleUpdatedEvent(role.Id, role.Name!, _dateTimeManager.Now, true));
+        await _events.PublishAsync(new ApplicationRoleUpdatedEvent(role.Id, role.Name!, _dateTimeProvider.Now, true));
 
         return "Permissions Updated.";
     }
@@ -171,7 +171,7 @@ internal class RoleService : IRoleService
 
         await _roleManager.DeleteAsync(role);
 
-        await _events.PublishAsync(new ApplicationRoleDeletedEvent(role.Id, role.Name!, _dateTimeManager.Now));
+        await _events.PublishAsync(new ApplicationRoleDeletedEvent(role.Id, role.Name!, _dateTimeProvider.Now));
 
         return string.Format("Role {0} Deleted.", role.Name);
     }

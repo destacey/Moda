@@ -63,13 +63,13 @@ public sealed class UpdateBacklogLevelCommandValidator : CustomValidator<UpdateB
 internal sealed class UpdateBacklogLevelCommandHandler : ICommandHandler<UpdateBacklogLevelCommand, int>
 {
     private readonly IWorkDbContext _workDbContext;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<UpdateBacklogLevelCommandHandler> _logger;
 
-    public UpdateBacklogLevelCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeManager, ILogger<UpdateBacklogLevelCommandHandler> logger)
+    public UpdateBacklogLevelCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateBacklogLevelCommandHandler> logger)
     {
         _workDbContext = workDbContext;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
 
@@ -88,7 +88,7 @@ internal sealed class UpdateBacklogLevelCommandHandler : ICommandHandler<UpdateB
             if (backlogLevel is null)
                 return Result.Failure<int>("Backlog Level not found.");
 
-            var updateResult = backlogLevel.Update(request.Name, request.Description, request.Rank, _dateTimeManager.Now);
+            var updateResult = backlogLevel.Update(request.Name, request.Description, request.Rank, _dateTimeProvider.Now);
 
             if (updateResult.IsFailure)
             {

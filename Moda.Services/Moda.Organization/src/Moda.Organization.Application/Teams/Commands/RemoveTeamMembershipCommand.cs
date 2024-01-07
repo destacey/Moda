@@ -19,13 +19,13 @@ public sealed class RemoveTeamMembershipCommandValidator : CustomValidator<Remov
 internal sealed class RemoveTeamMembershipCommandHandler : ICommandHandler<RemoveTeamMembershipCommand>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<RemoveTeamMembershipCommandHandler> _logger;
 
-    public RemoveTeamMembershipCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeManager, ILogger<RemoveTeamMembershipCommandHandler> logger)
+    public RemoveTeamMembershipCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeProvider, ILogger<RemoveTeamMembershipCommandHandler> logger)
     {
         _organizationDbContext = organizationDbContext;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
 

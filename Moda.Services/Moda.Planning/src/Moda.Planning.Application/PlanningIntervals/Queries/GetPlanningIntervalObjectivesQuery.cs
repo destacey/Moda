@@ -29,14 +29,14 @@ internal sealed class GetPlanningIntervalObjectivesQueryHandler : IQueryHandler<
     private readonly IPlanningDbContext _planningDbContext;
     private readonly ILogger<GetPlanningIntervalObjectivesQueryHandler> _logger;
     private readonly ISender _sender;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public GetPlanningIntervalObjectivesQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalObjectivesQueryHandler> logger, ISender sender, IDateTimeProvider dateTimeManager)
+    public GetPlanningIntervalObjectivesQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalObjectivesQueryHandler> logger, ISender sender, IDateTimeProvider dateTimeProvider)
     {
         _planningDbContext = planningDbContext;
         _logger = logger;
         _sender = sender;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<IReadOnlyList<PlanningIntervalObjectiveListDto>> Handle(GetPlanningIntervalObjectivesQuery request, CancellationToken cancellationToken)
@@ -97,7 +97,7 @@ internal sealed class GetPlanningIntervalObjectivesQueryHandler : IQueryHandler<
         List<PlanningIntervalObjectiveListDto> piObjectives = new(objectives.Count);
         foreach (var piObjective in planningInterval.Objectives)
         {
-            piObjectives.Add(PlanningIntervalObjectiveListDto.Create(piObjective, objectives.Single(o => o.Id == piObjective.ObjectiveId), piNavigation, _dateTimeManager.Now));
+            piObjectives.Add(PlanningIntervalObjectiveListDto.Create(piObjective, objectives.Single(o => o.Id == piObjective.ObjectiveId), piNavigation, _dateTimeProvider.Now));
         }
 
         return piObjectives;

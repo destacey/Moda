@@ -13,7 +13,7 @@ public sealed record CreateHealthCheckCommand(Guid ObjectId, SystemContext Conte
 
 public sealed class CreateHealthCheckCommandValidator : CustomValidator<CreateHealthCheckCommand>
 {
-    public CreateHealthCheckCommandValidator(IDateTimeProvider dateTimeManager)
+    public CreateHealthCheckCommandValidator(IDateTimeProvider dateTimeProvider)
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -28,7 +28,7 @@ public sealed class CreateHealthCheckCommandValidator : CustomValidator<CreateHe
 
         RuleFor(h => h.Expiration)
             .NotEmpty()
-            .GreaterThan(dateTimeManager.Now)
+            .GreaterThan(dateTimeProvider.Now)
             .WithMessage("The Expiration must be in the future.");
 
         RuleFor(h => h.Note)
@@ -39,14 +39,14 @@ public sealed class CreateHealthCheckCommandValidator : CustomValidator<CreateHe
 internal sealed class CreateHealthCheckCommandHandler : ICommandHandler<CreateHealthCheckCommand, Guid>
 {
     private readonly IHealthDbContext _healthDbContext;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ICurrentUser _currentUser;
     private readonly ILogger<CreateHealthCheckCommandHandler> _logger;
 
-    public CreateHealthCheckCommandHandler(IHealthDbContext healthDbContext, IDateTimeProvider dateTimeManager, ICurrentUser currentUser, ILogger<CreateHealthCheckCommandHandler> logger)
+    public CreateHealthCheckCommandHandler(IHealthDbContext healthDbContext, IDateTimeProvider dateTimeProvider, ICurrentUser currentUser, ILogger<CreateHealthCheckCommandHandler> logger)
     {
         _healthDbContext = healthDbContext;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
         _currentUser = currentUser;
         _logger = logger;
     }
@@ -65,7 +65,7 @@ internal sealed class CreateHealthCheckCommandHandler : ICommandHandler<CreateHe
 
             var healthReport = new HealthReport(objectHealthChecks);
 
-            var healthCheck = healthReport.AddHealthCheck(request.ObjectId, request.Context, request.Status, currentUserEmployeeId.Value, _dateTimeManager.Now, request.Expiration, request.Note);
+            var healthCheck = healthReport.AddHealthCheck(request.ObjectId, request.Context, request.Status, currentUserEmployeeId.Value, _dateTimeProvider.Now, request.Expiration, request.Note);
 
             await _healthDbContext.HealthChecks.AddAsync(healthCheck, cancellationToken);
 

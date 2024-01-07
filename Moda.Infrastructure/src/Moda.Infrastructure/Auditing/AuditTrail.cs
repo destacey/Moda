@@ -5,13 +5,13 @@ namespace Moda.Infrastructure.Auditing;
 public class AuditTrail
 {
     private readonly ISerializerService _serializer;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public AuditTrail(EntityEntry entry, ISerializerService serializer, IDateTimeProvider dateTimeManager)
+    public AuditTrail(EntityEntry entry, ISerializerService serializer, IDateTimeProvider dateTimeProvider)
     {
         Entry = entry;
         _serializer = serializer;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public EntityEntry Entry { get; }
@@ -34,7 +34,7 @@ public class AuditTrail
             Type = TrailType.ToString(),
             SchemaName = SchemaName,
             TableName = TableName,
-            DateTime = _dateTimeManager.Now,
+            DateTime = _dateTimeProvider.Now,
             PrimaryKey = _serializer.Serialize(KeyValues),
             OldValues = OldValues.Count == 0 ? null : _serializer.Serialize(OldValues),
             NewValues = NewValues.Count == 0 ? null : _serializer.Serialize(NewValues),

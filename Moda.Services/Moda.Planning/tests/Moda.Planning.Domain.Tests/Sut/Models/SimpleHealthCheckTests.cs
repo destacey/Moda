@@ -8,15 +8,15 @@ using NodaTime.Testing;
 namespace Moda.Planning.Domain.Tests.Sut.Models;
 public class SimpleSimpleHealthCheckTests
 {
-    private readonly TestingDateTimeProvider _dateTimeManager;
+    private readonly TestingDateTimeProvider _dateTimeProvider;
 
     private readonly SimpleHealthCheckFaker _healthCheckFaker;
 
     public SimpleSimpleHealthCheckTests()
     {
         // TODO: Replace with a FakeClock that can be injected into the constructor.
-        _dateTimeManager = new(new FakeClock(DateTime.UtcNow.ToInstant()));
-        _healthCheckFaker = new(_dateTimeManager.Now);
+        _dateTimeProvider = new(new FakeClock(DateTime.UtcNow.ToInstant()));
+        _healthCheckFaker = new(_dateTimeProvider.Now);
     }
 
     #region Constructor
@@ -65,8 +65,8 @@ public class SimpleSimpleHealthCheckTests
         var faker = _healthCheckFaker.Generate();
 
         // Act
-        var sut = new SimpleHealthCheck(faker.ObjectId, faker.Id, faker.Status, faker.ReportedOn, _dateTimeManager.Now.Plus(Duration.FromDays(2)));
-        var result = sut.IsExpired(_dateTimeManager.Now);
+        var sut = new SimpleHealthCheck(faker.ObjectId, faker.Id, faker.Status, faker.ReportedOn, _dateTimeProvider.Now.Plus(Duration.FromDays(2)));
+        var result = sut.IsExpired(_dateTimeProvider.Now);
 
         // Assert
         result.Should().BeFalse();
@@ -77,10 +77,10 @@ public class SimpleSimpleHealthCheckTests
     {
         // Arrange
         var sut = _healthCheckFaker.Generate();
-        _dateTimeManager.Advance(Duration.FromDays(60));
+        _dateTimeProvider.Advance(Duration.FromDays(60));
 
         // Act
-        var result = sut.IsExpired(_dateTimeManager.Now);
+        var result = sut.IsExpired(_dateTimeProvider.Now);
 
         // Assert
         result.Should().BeTrue();

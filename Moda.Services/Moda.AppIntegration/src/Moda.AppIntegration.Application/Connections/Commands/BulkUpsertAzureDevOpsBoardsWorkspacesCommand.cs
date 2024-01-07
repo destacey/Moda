@@ -9,13 +9,13 @@ public sealed record BulkUpsertAzureDevOpsBoardsWorkspacesCommand(Guid Connectio
 internal sealed class BulkUpsertAzureDevOpsBoardsWorkspacesCommandHandler : ICommandHandler<BulkUpsertAzureDevOpsBoardsWorkspacesCommand>
 {
     private readonly IAppIntegrationDbContext _appIntegrationDbContext;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<BulkUpsertAzureDevOpsBoardsWorkspacesCommandHandler> _logger;
 
-    public BulkUpsertAzureDevOpsBoardsWorkspacesCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeManager, ILogger<BulkUpsertAzureDevOpsBoardsWorkspacesCommandHandler> logger)
+    public BulkUpsertAzureDevOpsBoardsWorkspacesCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<BulkUpsertAzureDevOpsBoardsWorkspacesCommandHandler> logger)
     {
         _appIntegrationDbContext = appIntegrationDbContext;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
 
@@ -28,7 +28,7 @@ internal sealed class BulkUpsertAzureDevOpsBoardsWorkspacesCommandHandler : ICom
             return Result.Failure($"Unable to find Azure DevOps Boards connection with id {request.ConnectionId}.");
         }
 
-        var importWorkProcessesResult = connection.ImportProcesses(request.WorkProcesses, _dateTimeManager.Now);
+        var importWorkProcessesResult = connection.ImportProcesses(request.WorkProcesses, _dateTimeProvider.Now);
         if (importWorkProcessesResult.IsFailure)
         {
             string requestName = request.GetType().Name;
@@ -37,7 +37,7 @@ internal sealed class BulkUpsertAzureDevOpsBoardsWorkspacesCommandHandler : ICom
             return Result.Failure($"Errors occurred while processing {requestName}.");
         }
 
-        var importWorkspacesResult = connection.ImportWorkspaces(request.Workspaces, _dateTimeManager.Now);
+        var importWorkspacesResult = connection.ImportWorkspaces(request.Workspaces, _dateTimeProvider.Now);
         if (importWorkspacesResult.IsFailure)
         {
             string requestName = request.GetType().Name;

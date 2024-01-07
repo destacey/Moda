@@ -13,7 +13,7 @@ public sealed record ImportRisksCommand : ICommand
 
 public sealed class ImportRisksCommandValidator : CustomValidator<ImportRisksCommand>
 {
-    public ImportRisksCommandValidator(IDateTimeProvider dateTimeManager)
+    public ImportRisksCommandValidator(IDateTimeProvider dateTimeProvider)
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -23,20 +23,20 @@ public sealed class ImportRisksCommandValidator : CustomValidator<ImportRisksCom
 
         RuleForEach(e => e.Risks)
             .NotNull()
-            .SetValidator(new ImportRiskDtoValidator(dateTimeManager));
+            .SetValidator(new ImportRiskDtoValidator(dateTimeProvider));
     }
 }
 
 internal sealed class ImportRisksCommandHandler : ICommandHandler<ImportRisksCommand>
 {
     private readonly IPlanningDbContext _planningDbContext;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<ImportRisksCommandHandler> _logger;
 
-    public ImportRisksCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeManager, ILogger<ImportRisksCommandHandler> logger)
+    public ImportRisksCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider, ILogger<ImportRisksCommandHandler> logger)
     {
         _planningDbContext = planningDbContext;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
 

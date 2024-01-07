@@ -41,14 +41,14 @@ public sealed class CreateRiskCommandValidator : CustomValidator<CreateRiskComma
 internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskCommand, int>
 {
     private readonly IPlanningDbContext _planningDbContext;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<CreateRiskCommandHandler> _logger;
     private readonly ICurrentUser _currentUser;
 
-    public CreateRiskCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeManager, ILogger<CreateRiskCommandHandler> logger, ICurrentUser currentUser)
+    public CreateRiskCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateRiskCommandHandler> logger, ICurrentUser currentUser)
     {
         _planningDbContext = planningDbContext;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
         _currentUser = currentUser;
     }
@@ -65,7 +65,7 @@ internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskComma
                 request.Summary,
                 request.Description,
                 request.TeamId,
-                _dateTimeManager.Now,
+                _dateTimeProvider.Now,
                 currentUserEmployeeId.Value,
                 request.Category,
                 request.Impact,

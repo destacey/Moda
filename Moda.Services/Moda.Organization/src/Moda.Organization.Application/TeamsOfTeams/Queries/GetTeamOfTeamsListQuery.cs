@@ -16,17 +16,17 @@ public sealed record GetTeamOfTeamsListQuery : IQuery<IReadOnlyList<TeamOfTeamsL
 internal sealed class GetTeamOfTeamsListQueryHandler : IQueryHandler<GetTeamOfTeamsListQuery, IReadOnlyList<TeamOfTeamsListDto>>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public GetTeamOfTeamsListQueryHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeManager)
+    public GetTeamOfTeamsListQueryHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeProvider)
     {
         _organizationDbContext = organizationDbContext;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<IReadOnlyList<TeamOfTeamsListDto>> Handle(GetTeamOfTeamsListQuery request, CancellationToken cancellationToken)
     {
-        var today = _dateTimeManager.Now.InUtc().Date;
+        var today = _dateTimeProvider.Now.InUtc().Date;
         var query = _organizationDbContext.TeamOfTeams
             .Include(t => t.ParentMemberships.Where(m => m.DateRange.Start <= today && (!m.DateRange.End.HasValue || today <= m.DateRange.End)))
             .AsQueryable();

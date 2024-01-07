@@ -15,8 +15,8 @@ namespace Moda.Infrastructure.Persistence.Context;
 
 public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IWorkDbContext
 {
-    public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeManager, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
-        : base(options, currentUser, dateTimeManager, serializer, dbSettings, events)
+    public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
+        : base(options, currentUser, dateTimeProvider, serializer, dbSettings, events)
     {
     }
 

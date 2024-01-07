@@ -33,13 +33,13 @@ public sealed class UpdateWorkTypeCommandValidator : CustomValidator<UpdateWorkT
 internal sealed class UpdateWorkTypeCommandHandler : ICommandHandler<UpdateWorkTypeCommand, int>
 {
     private readonly IWorkDbContext _workDbContext;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<UpdateWorkTypeCommandHandler> _logger;
 
-    public UpdateWorkTypeCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeManager, ILogger<UpdateWorkTypeCommandHandler> logger)
+    public UpdateWorkTypeCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateWorkTypeCommandHandler> logger)
     {
         _workDbContext = workDbContext;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
 
@@ -52,7 +52,7 @@ internal sealed class UpdateWorkTypeCommandHandler : ICommandHandler<UpdateWorkT
             if (workType is null)
                 return Result.Failure<int>("Work Type not found.");
 
-            var updateResult = workType.Update(request.Description, _dateTimeManager.Now);
+            var updateResult = workType.Update(request.Description, _dateTimeProvider.Now);
 
             if (updateResult.IsFailure)
             {

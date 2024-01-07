@@ -9,13 +9,13 @@ internal sealed class GetPlanningIntervalPredictabilityQueryHandler : IQueryHand
 {
     private readonly IPlanningDbContext _planningDbContext;
     private readonly ILogger<GetPlanningIntervalPredictabilityQueryHandler> _logger;
-    private readonly IDateTimeProvider _dateTimeManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public GetPlanningIntervalPredictabilityQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalPredictabilityQueryHandler> logger, IDateTimeProvider dateTimeManager)
+    public GetPlanningIntervalPredictabilityQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalPredictabilityQueryHandler> logger, IDateTimeProvider dateTimeProvider)
     {
         _planningDbContext = planningDbContext;
         _logger = logger;
-        _dateTimeManager = dateTimeManager;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<PlanningIntervalPredictabilityDto?> Handle(GetPlanningIntervalPredictabilityQuery request, CancellationToken cancellationToken)
@@ -33,7 +33,7 @@ internal sealed class GetPlanningIntervalPredictabilityQueryHandler : IQueryHand
         else if (!planningInterval.Teams.Any())
             return new PlanningIntervalPredictabilityDto(null, new List<PlanningIntervalTeamPredictabilityDto>());
 
-        var currentDate = _dateTimeManager.Now.InUtc().Date;
+        var currentDate = _dateTimeProvider.Now.InUtc().Date;
 
         var teamPredictabilities = planningInterval.Teams
             .Select(t => new PlanningIntervalTeamPredictabilityDto(t.Team, planningInterval.CalculatePredictability(currentDate, t.TeamId)))
