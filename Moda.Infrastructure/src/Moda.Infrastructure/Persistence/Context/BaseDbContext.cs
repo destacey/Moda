@@ -11,16 +11,16 @@ namespace Moda.Infrastructure.Persistence.Context;
 public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, ApplicationRoleClaim, IdentityUserToken<string>>
 {
     protected readonly ICurrentUser _currentUser;
-    protected readonly IDateTimeService _dateTimeService;
+    protected readonly IDateTimeProvider _dateTimeProvider;
     private readonly ISerializerService _serializer;
     private readonly DatabaseSettings _dbSettings;
     private readonly IEventPublisher _events;
 
-    protected BaseDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeService dateTimeService, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
+    protected BaseDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
         : base(options)
     {
         _currentUser = currentUser;
-        _dateTimeService = dateTimeService;
+        _dateTimeProvider = dateTimeProvider;
         _serializer = serializer;
         _dbSettings = dbSettings.Value;
         _events = events;
@@ -78,7 +78,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
     {
         foreach (var entry in ChangeTracker.Entries<IAuditable>().ToList())
         {
-            var timestamp = _dateTimeService.Now;
+            var timestamp = _dateTimeProvider.Now;
 
             if (entry.State == EntityState.Added)
             {
@@ -110,7 +110,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
             .Where(e => e.State is EntityState.Added or EntityState.Deleted or EntityState.Modified || e.HasChangedOwnedEntities())
             .ToList())
         {
-            var trailEntry = new AuditTrail(entry, _serializer, _dateTimeService)
+            var trailEntry = new AuditTrail(entry, _serializer, _dateTimeProvider)
             {
                 SchemaName = entry.Metadata.GetSchema(),
                 TableName = entry.Entity.GetType().Name,

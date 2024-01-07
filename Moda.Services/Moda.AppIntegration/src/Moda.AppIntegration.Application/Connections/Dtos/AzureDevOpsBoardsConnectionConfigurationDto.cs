@@ -15,20 +15,19 @@ public sealed record AzureDevOpsBoardsConnectionConfigurationDto : IMapFrom<Azur
     /// <value>The organization URL.</value>
     public required string OrganizationUrl { get; set; }
 
-    /// <summary>Gets or sets the workspaces.</summary>
-    /// <value>The workspaces.</value>
-    public required List<AzureDevOpsBoardsWorkspaceDto> Workspaces { get; set; }
-
+    /// <summary>
+    /// Gets or sets the work processes.
+    /// </summary>
     public required List<AzureDevOpsBoardsWorkProcessDto> WorkProcesses { get; set; }
+
+    /// <summary>
+    /// Gets or sets the workspaces.
+    /// </summary>
+    public required List<AzureDevOpsBoardsWorkspaceDto> Workspaces { get; set; }
 
     public void MaskPersonalAccessToken()
     {
         if (!string.IsNullOrWhiteSpace(PersonalAccessToken) && PersonalAccessToken.Length > 4)
             PersonalAccessToken = string.Concat(PersonalAccessToken.AsSpan(0, 4), new string('*', PersonalAccessToken.Length - 4));
-    }
-
-    public void ConfigureMapping(TypeAdapterConfig config)
-    {
-        config.NewConfig<AzureDevOpsBoardsConnectionConfiguration, AzureDevOpsBoardsConnectionDetailsDto>();
     }
 }

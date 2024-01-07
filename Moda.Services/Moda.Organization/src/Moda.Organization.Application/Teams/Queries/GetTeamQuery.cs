@@ -21,18 +21,18 @@ internal sealed class GetTeamQueryHandler : IQueryHandler<GetTeamQuery, TeamDeta
 {
     private readonly IOrganizationDbContext _organizationDbContext;
     private readonly ILogger<GetTeamQueryHandler> _logger;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public GetTeamQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamQueryHandler> logger, IDateTimeService dateTimeService)
+    public GetTeamQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamQueryHandler> logger, IDateTimeProvider dateTimeProvider)
     {
         _organizationDbContext = organizationDbContext;
         _logger = logger;
-        _dateTimeService = dateTimeService;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<TeamDetailsDto?> Handle(GetTeamQuery request, CancellationToken cancellationToken)
     {
-        var today = _dateTimeService.Now.InUtc().Date;
+        var today = _dateTimeProvider.Now.InUtc().Date;
         var query = _organizationDbContext.Teams
             .Include(t => t.ParentMemberships.Where(m => m.DateRange.Start <= today && (!m.DateRange.End.HasValue || today <= m.DateRange.End)))
             .AsQueryable();

@@ -61,13 +61,13 @@ public sealed class UpdateTeamOfTeamsCommandValidator : CustomValidator<UpdateTe
 internal sealed class UpdateTeamOfTeamsCommandHandler : ICommandHandler<UpdateTeamOfTeamsCommand, int>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<UpdateTeamOfTeamsCommandHandler> _logger;
 
-    public UpdateTeamOfTeamsCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeService dateTimeService, ILogger<UpdateTeamOfTeamsCommandHandler> logger)
+    public UpdateTeamOfTeamsCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateTeamOfTeamsCommandHandler> logger)
     {
         _organizationDbContext = organizationDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
 
@@ -84,7 +84,7 @@ internal sealed class UpdateTeamOfTeamsCommandHandler : ICommandHandler<UpdateTe
                 request.Name,
                 request.Code,
                 request.Description, 
-                _dateTimeService.Now
+                _dateTimeProvider.Now
                 );
 
             if (updateResult.IsFailure)

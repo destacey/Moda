@@ -74,14 +74,14 @@ public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
 internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommandHandler<UpdateAzureDevOpsBoardsConnectionCommand, Guid>
 {
     private readonly IAppIntegrationDbContext _appIntegrationDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<UpdateAzureDevOpsBoardsConnectionCommandHandler> _logger;
     private readonly IAzureDevOpsService _azureDevOpsService;
 
-    public UpdateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeService dateTimeService, ILogger<UpdateAzureDevOpsBoardsConnectionCommandHandler> logger, IAzureDevOpsService azureDevOpsService)
+    public UpdateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateAzureDevOpsBoardsConnectionCommandHandler> logger, IAzureDevOpsService azureDevOpsService)
     {
         _appIntegrationDbContext = appIntegrationDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
         _azureDevOpsService = azureDevOpsService;
     }
@@ -104,7 +104,7 @@ internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommand
             var testConfig = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, pat);
             var testConnectionResult = await _azureDevOpsService.TestConnection(testConfig.OrganizationUrl, testConfig.PersonalAccessToken);
 
-            var updateResult = connection.Update(request.Name, request.Description, request.Organization, pat, testConnectionResult.IsSuccess, _dateTimeService.Now);
+            var updateResult = connection.Update(request.Name, request.Description, request.Organization, pat, testConnectionResult.IsSuccess, _dateTimeProvider.Now);
             if (updateResult.IsFailure)
             {
                 // Reset the entity

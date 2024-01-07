@@ -3,11 +3,11 @@ using NodaTime;
 using NodaTime.Testing;
 
 namespace Moda.Tests.Shared;
-public class TestingDateTimeService : IDateTimeService
+public class TestingDateTimeProvider : IDateTimeProvider
 {
     private readonly FakeClock _clock;
 
-    public TestingDateTimeService(IClock clock)
+    public TestingDateTimeProvider(IClock clock)
     {
         _clock = (FakeClock)clock;
     }

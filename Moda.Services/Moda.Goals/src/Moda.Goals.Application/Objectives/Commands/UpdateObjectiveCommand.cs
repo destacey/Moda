@@ -44,13 +44,13 @@ public sealed class UpdateObjectiveCommandValidator : CustomValidator<UpdateObje
 internal sealed class UpdateObjectiveCommandHandler : ICommandHandler<UpdateObjectiveCommand, Guid>
 {
     private readonly IGoalsDbContext _goalsDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<UpdateObjectiveCommandHandler> _logger;
 
-    public UpdateObjectiveCommandHandler(IGoalsDbContext goalsDbContext, IDateTimeService dateTimeService, ILogger<UpdateObjectiveCommandHandler> logger)
+    public UpdateObjectiveCommandHandler(IGoalsDbContext goalsDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateObjectiveCommandHandler> logger)
     {
         _goalsDbContext = goalsDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
 
@@ -71,7 +71,7 @@ internal sealed class UpdateObjectiveCommandHandler : ICommandHandler<UpdateObje
                 request.OwnerId,
                 request.StartDate,
                 request.TargetDate,
-                _dateTimeService.Now
+                _dateTimeProvider.Now
                 );
 
             if (updateResult.IsFailure)

@@ -40,7 +40,7 @@ public sealed record PlanningIntervalDetailsDto
     public double? Predictability { get; set; }
 
     // TODO: do this with Mapster
-    public static PlanningIntervalDetailsDto Create(PlanningInterval planningInterval, IDateTimeService dateTimeService)
+    public static PlanningIntervalDetailsDto Create(PlanningInterval planningInterval, IDateTimeProvider dateTimeProvider)
     {
         return new PlanningIntervalDetailsDto()
         {
@@ -50,9 +50,9 @@ public sealed record PlanningIntervalDetailsDto
             Description = planningInterval.Description,
             Start = planningInterval.DateRange.Start,
             End = planningInterval.DateRange.End,
-            State = planningInterval.StateOn(dateTimeService.Now.InUtc().Date).GetDisplayName(),
+            State = planningInterval.StateOn(dateTimeProvider.Now.InUtc().Date).GetDisplayName(),
             ObjectivesLocked = planningInterval.ObjectivesLocked,
-            Predictability = planningInterval.CalculatePredictability(dateTimeService.Now.InUtc().Date)
+            Predictability = planningInterval.CalculatePredictability(dateTimeProvider.Now.InUtc().Date)
         };
     }
 }

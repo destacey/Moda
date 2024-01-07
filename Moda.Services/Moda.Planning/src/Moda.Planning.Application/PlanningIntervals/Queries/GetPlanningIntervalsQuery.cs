@@ -6,18 +6,18 @@ public sealed record GetPlanningIntervalsQuery() : IQuery<IReadOnlyList<Planning
 internal sealed class GetPlanningIntervalsQueryHandler : IQueryHandler<GetPlanningIntervalsQuery, IReadOnlyList<PlanningIntervalListDto>>
 {
     private readonly IPlanningDbContext _planningDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public GetPlanningIntervalsQueryHandler(IPlanningDbContext planningDbContext, IDateTimeService dateTimeService)
+    public GetPlanningIntervalsQueryHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider)
     {
         _planningDbContext = planningDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<IReadOnlyList<PlanningIntervalListDto>> Handle(GetPlanningIntervalsQuery request, CancellationToken cancellationToken)
     {
         return await _planningDbContext.PlanningIntervals
-            .Select(p => PlanningIntervalListDto.Create(p, _dateTimeService))
+            .Select(p => PlanningIntervalListDto.Create(p, _dateTimeProvider))
             .ToListAsync(cancellationToken);
     }
 }

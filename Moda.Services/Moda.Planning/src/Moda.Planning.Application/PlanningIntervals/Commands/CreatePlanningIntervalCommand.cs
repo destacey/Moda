@@ -36,13 +36,13 @@ public sealed class CreatePlanningIntervalCommandValidator : CustomValidator<Cre
 internal sealed class CreatePlanningIntervalCommandHandler : ICommandHandler<CreatePlanningIntervalCommand, int>
 {
     private readonly IPlanningDbContext _planningDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<CreatePlanningIntervalCommandHandler> _logger;
 
-    public CreatePlanningIntervalCommandHandler(IPlanningDbContext planningDbContext, IDateTimeService dateTimeService, ILogger<CreatePlanningIntervalCommandHandler> logger)
+    public CreatePlanningIntervalCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreatePlanningIntervalCommandHandler> logger)
     {
         _planningDbContext = planningDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
 

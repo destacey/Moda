@@ -11,7 +11,7 @@ public record TeamMembershipsDto
     public required string State { get; set; }
 
     // TODO: do this with Mapster
-    public static TeamMembershipsDto Create(TeamMembership membership, IDateTimeService dateTimeService)
+    public static TeamMembershipsDto Create(TeamMembership membership, IDateTimeProvider dateTimeProvider)
     {
         return new TeamMembershipsDto()
         {
@@ -20,7 +20,7 @@ public record TeamMembershipsDto
             Parent = TeamNavigationDto.FromBaseTeam(membership.Target),
             Start = membership.DateRange.Start,
             End = membership.DateRange.End,
-            State = membership.StateOn(dateTimeService.Now.InUtc().Date).GetDisplayName()
+            State = membership.StateOn(dateTimeProvider.Now.InUtc().Date).GetDisplayName()
         };
     }
 }

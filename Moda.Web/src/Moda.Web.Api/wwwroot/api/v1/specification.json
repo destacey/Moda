@@ -6139,13 +6139,13 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/import-workspaces": {
+    "/api/app-integrations/azure-devops-boards-connections/{id}/import-organization-configuration": {
       "post": {
         "tags": [
           "AzureDevOpsBoardsConnections"
         ],
-        "summary": "Import Azure DevOps projects as Moda workspaces.",
-        "operationId": "AzureDevOpsBoardsConnections_ImportWorkspaces",
+        "summary": "Import Azure DevOps processes and projects.",
+        "operationId": "AzureDevOpsBoardsConnections_ImportOrganizationConfiguration",
         "parameters": [
           {
             "name": "id",
@@ -9512,17 +9512,34 @@
           "organizationUrl": {
             "type": "string"
           },
-          "workspaces": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AzureDevOpsBoardsWorkspaceDto"
-            }
-          },
           "workProcesses": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AzureDevOpsBoardsWorkProcessDto"
             }
+          },
+          "workspaces": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AzureDevOpsBoardsWorkspaceDto"
+            }
+          }
+        }
+      },
+      "AzureDevOpsBoardsWorkProcessDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "externalId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -9543,28 +9560,10 @@
           },
           "workProcessId": {
             "type": "string",
-            "format": "guid",
-            "nullable": true
+            "format": "guid"
           },
           "sync": {
             "type": "boolean"
-          }
-        }
-      },
-      "AzureDevOpsBoardsWorkProcessDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "externalId": {
-            "type": "string",
-            "format": "guid"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
           }
         }
       },
