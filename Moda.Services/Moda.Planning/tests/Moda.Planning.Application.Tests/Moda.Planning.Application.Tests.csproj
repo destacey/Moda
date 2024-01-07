@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Moda.Goals\src\Moda.Goals.Domain\Moda.Goals.Domain.csproj" />
+        <ProjectReference Include="..\..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
         <ProjectReference Include="..\..\src\Moda.Planning.Application\Moda.Planning.Application.csproj" />
         <ProjectReference Include="..\..\src\Moda.Planning.Domain\Moda.Planning.Domain.csproj" />
     </ItemGroup>

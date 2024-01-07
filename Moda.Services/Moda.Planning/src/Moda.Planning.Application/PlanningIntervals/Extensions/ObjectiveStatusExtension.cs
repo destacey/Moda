@@ -3,15 +3,15 @@
 namespace Moda.Planning.Application.PlanningIntervals.Extensions;
 public static class ObjectiveStatusExtension
 {
-    public static Goals.Domain.Enums.ObjectiveStatus ToGoalObjectiveStatus(this ObjectiveStatus status)
+    public static Common.Domain.Enums.Goals.ObjectiveStatus ToGoalObjectiveStatus(this ObjectiveStatus status)
     {
         return status switch
         {
-            ObjectiveStatus.NotStarted => Goals.Domain.Enums.ObjectiveStatus.NotStarted,
-            ObjectiveStatus.InProgress => Goals.Domain.Enums.ObjectiveStatus.InProgress,
-            ObjectiveStatus.Completed => Goals.Domain.Enums.ObjectiveStatus.Completed,
-            ObjectiveStatus.Canceled => Goals.Domain.Enums.ObjectiveStatus.Canceled,
-            ObjectiveStatus.Missed => Goals.Domain.Enums.ObjectiveStatus.Missed,
+            ObjectiveStatus.NotStarted => Common.Domain.Enums.Goals.ObjectiveStatus.NotStarted,
+            ObjectiveStatus.InProgress => Common.Domain.Enums.Goals.ObjectiveStatus.InProgress,
+            ObjectiveStatus.Completed => Common.Domain.Enums.Goals.ObjectiveStatus.Completed,
+            ObjectiveStatus.Canceled => Common.Domain.Enums.Goals.ObjectiveStatus.Canceled,
+            ObjectiveStatus.Missed => Common.Domain.Enums.Goals.ObjectiveStatus.Missed,
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };
     }

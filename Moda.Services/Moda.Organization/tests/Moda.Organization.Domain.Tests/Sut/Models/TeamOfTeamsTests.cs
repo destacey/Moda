@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
+using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Events;
-using Moda.Organization.Domain.Enums;
 using Moda.Organization.Domain.Models;
 using Moda.Tests.Shared.Extensions;
 using NodaTime;

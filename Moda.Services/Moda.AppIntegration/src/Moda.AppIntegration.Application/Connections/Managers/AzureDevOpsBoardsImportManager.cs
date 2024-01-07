@@ -5,7 +5,6 @@ using Moda.AppIntegration.Application.Connections.Commands;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.Work.Application.Workspaces.Queries;
-using Moda.Work.Domain.Models;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
 public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportManager
@@ -95,7 +94,7 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
                 return Result.Failure($"Unable to initialize a workspace {workspaceExternalId} from Azure DevOps for connection {connectionId} because it is already integrated.");
             }
 
-            var isDuplicateKey = await _sender.Send(new WorkspaceKeyExistsQuery(new WorkspaceKey(workspaceKey)), cancellationToken);
+            var isDuplicateKey = await _sender.Send(new WorkspaceKeyExistsQuery(workspaceKey), cancellationToken);
             if (isDuplicateKey)
             {
                 // TODO: should this be a validation exception
