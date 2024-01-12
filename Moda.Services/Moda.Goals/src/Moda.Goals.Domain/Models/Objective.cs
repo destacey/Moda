@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums.Goals;
 using Moda.Goals.Domain.Enums;
 
 namespace Moda.Goals.Domain.Models;

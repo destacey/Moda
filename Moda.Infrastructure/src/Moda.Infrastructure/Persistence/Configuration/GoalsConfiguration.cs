@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Moda.Common.Domain.Enums.Goals;
 using Moda.Goals.Domain.Enums;
 using Moda.Goals.Domain.Models;
 

@@ -5,25 +5,24 @@ using Moda.AppIntegration.Application.Connections.Commands;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.Work.Application.Workspaces.Queries;
-using Moda.Work.Domain.Models;
 
-namespace Moda.AppIntegration.Application.Connections.Services;
-public sealed class AzureDevOpsBoardsImportService : IAzureDevOpsBoardsImportService
+namespace Moda.AppIntegration.Application.Connections.Managers;
+public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportManager
 {
-    private readonly ILogger<AzureDevOpsBoardsImportService> _logger;
+    private readonly ILogger<AzureDevOpsBoardsImportManager> _logger;
     private readonly IAzureDevOpsService _azureDevOpsService;
     private readonly ISender _sender;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public AzureDevOpsBoardsImportService(ILogger<AzureDevOpsBoardsImportService> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IDateTimeService dateTimeService)
+    public AzureDevOpsBoardsImportManager(ILogger<AzureDevOpsBoardsImportManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IDateTimeProvider dateTimeProvider)
     {
         _logger = logger;
         _azureDevOpsService = azureDevOpsService;
         _sender = sender;
-        _dateTimeService = dateTimeService;
+        _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<Result> ImportWorkspaces(Guid connectionId, CancellationToken cancellationToken)
+    public async Task<Result> ImportOrganizationConfiguration(Guid connectionId, CancellationToken cancellationToken)
     {
         try
         {
@@ -31,7 +30,7 @@ public sealed class AzureDevOpsBoardsImportService : IAzureDevOpsBoardsImportSer
             if (connection is null)
             {
                 _logger.LogError("Unable to find Azure DevOps connection with id {ConnectionId}.", connectionId);
-                return Result.Failure($"Unable to find Azure DevOps connection with id {connectionId}.");                
+                return Result.Failure($"Unable to find Azure DevOps connection with id {connectionId}.");
             }
 
             if (connection.IsValidConfiguration is false)
@@ -95,7 +94,7 @@ public sealed class AzureDevOpsBoardsImportService : IAzureDevOpsBoardsImportSer
                 return Result.Failure($"Unable to initialize a workspace {workspaceExternalId} from Azure DevOps for connection {connectionId} because it is already integrated.");
             }
 
-            var isDuplicateKey = await _sender.Send(new WorkspaceKeyExistsQuery(new WorkspaceKey(workspaceKey)), cancellationToken);
+            var isDuplicateKey = await _sender.Send(new WorkspaceKeyExistsQuery(workspaceKey), cancellationToken);
             if (isDuplicateKey)
             {
                 // TODO: should this be a validation exception
@@ -104,7 +103,7 @@ public sealed class AzureDevOpsBoardsImportService : IAzureDevOpsBoardsImportSer
             }
 
             // re-import the connection to make sure everything is up-to-date
-            var importWorkspacesResult = await ImportWorkspaces(connectionId, cancellationToken);
+            var importWorkspacesResult = await ImportOrganizationConfiguration(connectionId, cancellationToken);
             if (importWorkspacesResult.IsFailure)
                 return importWorkspacesResult;
 

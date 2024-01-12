@@ -34,7 +34,7 @@ public class ImportRiskRequest
 
 public sealed class ImportRiskRequestValidator : CustomValidator<ImportRiskRequest>
 {
-    public ImportRiskRequestValidator(IDateTimeService dateTimeService)
+    public ImportRiskRequestValidator(IDateTimeProvider dateTimeProvider)
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -53,7 +53,7 @@ public sealed class ImportRiskRequestValidator : CustomValidator<ImportRiskReque
 
         RuleFor(r => r.ReportedOnUtc)
             .NotEmpty()
-            .Must(date => date < dateTimeService.Now.ToDateTimeUtc())
+            .Must(date => date < dateTimeProvider.Now.ToDateTimeUtc())
             .WithMessage("The ReportedOnUtc date must be less than the current UTC date and time.");
 
         RuleFor(r => r.ReportedById)
@@ -82,7 +82,7 @@ public sealed class ImportRiskRequestValidator : CustomValidator<ImportRiskReque
             () => RuleFor(r => r.ClosedDateUtc)
                 .NotEmpty()
                     .WithMessage("The ClosedDateUtc can not be empty if the status is Closed.")
-                .Must(date => date < dateTimeService.Now.ToDateTimeUtc())
+                .Must(date => date < dateTimeProvider.Now.ToDateTimeUtc())
                     .WithMessage("The ClosedDateUtc date must be less than the current UTC date and time.")
                 .Must((model, date) => date > model.ReportedOnUtc)
                     .WithMessage("The ClosedDateUtc date must be greater than the ReportedOnUtc date and time."))

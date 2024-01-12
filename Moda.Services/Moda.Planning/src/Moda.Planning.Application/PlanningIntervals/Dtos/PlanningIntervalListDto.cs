@@ -30,7 +30,7 @@ public sealed record PlanningIntervalListDto
     public required string State { get; set; }
 
     // TODO: do this with Mapster
-    public static PlanningIntervalListDto Create(PlanningInterval planningInterval, IDateTimeService dateTimeService)
+    public static PlanningIntervalListDto Create(PlanningInterval planningInterval, IDateTimeProvider dateTimeProvider)
     {
         return new PlanningIntervalListDto()
         {
@@ -39,7 +39,7 @@ public sealed record PlanningIntervalListDto
             Name = planningInterval.Name,
             Start = planningInterval.DateRange.Start,
             End = planningInterval.DateRange.End,
-            State = planningInterval.StateOn(dateTimeService.Now.InUtc().Date).GetDisplayName()
+            State = planningInterval.StateOn(dateTimeProvider.Now.InUtc().Date).GetDisplayName()
         };
     }
 }

@@ -69,14 +69,14 @@ public sealed class CreateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
 internal sealed class CreateAzureDevOpsBoardsConnectionCommandHandler : ICommandHandler<CreateAzureDevOpsBoardsConnectionCommand, Guid>
 {
     private readonly IAppIntegrationDbContext _appIntegrationDbContext;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<CreateAzureDevOpsBoardsConnectionCommandHandler> _logger;
     private readonly IAzureDevOpsService _azureDevOpsService;
 
-    public CreateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeService dateTimeService, ILogger<CreateAzureDevOpsBoardsConnectionCommandHandler> logger, IAzureDevOpsService azureDevOpsService)
+    public CreateAzureDevOpsBoardsConnectionCommandHandler(IAppIntegrationDbContext appIntegrationDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateAzureDevOpsBoardsConnectionCommandHandler> logger, IAzureDevOpsService azureDevOpsService)
     {
         _appIntegrationDbContext = appIntegrationDbContext;
-        _dateTimeService = dateTimeService;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
         _azureDevOpsService = azureDevOpsService;
     }
@@ -85,7 +85,7 @@ internal sealed class CreateAzureDevOpsBoardsConnectionCommandHandler : ICommand
     {
         try
         {
-            Instant timestamp = _dateTimeService.Now;
+            Instant timestamp = _dateTimeProvider.Now;
             var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, request.PersonalAccessToken);
 
             var testConnectionResult = await _azureDevOpsService.TestConnection(config.OrganizationUrl, config.PersonalAccessToken);

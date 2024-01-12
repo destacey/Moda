@@ -21,18 +21,18 @@ internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamMemb
 {
     private readonly IOrganizationDbContext _organizationDbContext;
     private readonly ILogger<GetTeamMembershipsQueryHandler> _logger;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public GetTeamMembershipsQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamMembershipsQueryHandler> logger, IDateTimeService dateTimeService)
+    public GetTeamMembershipsQueryHandler(IOrganizationDbContext organizationDbContext, ILogger<GetTeamMembershipsQueryHandler> logger, IDateTimeProvider dateTimeProvider)
     {
         _organizationDbContext = organizationDbContext;
         _logger = logger;
-        _dateTimeService = dateTimeService;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<IReadOnlyList<TeamMembershipsDto>> Handle(GetTeamMembershipsQuery request, CancellationToken cancellationToken)
     {
-        var today = _dateTimeService.Now.InUtc().Date;
+        var today = _dateTimeProvider.Now.InUtc().Date;
         var query = _organizationDbContext.Teams
             .Include(t => t.ParentMemberships)
                 .ThenInclude(m => m.Target)
@@ -58,6 +58,6 @@ internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamMemb
         var team = await query
             .SingleAsync(cancellationToken);
 
-        return team.ParentMemberships.Select(m => TeamMembershipsDto.Create(m, _dateTimeService)).ToList();
+        return team.ParentMemberships.Select(m => TeamMembershipsDto.Create(m, _dateTimeProvider)).ToList();
     }
 }

@@ -1,4 +1,5 @@
-﻿using Moda.Goals.Application.Persistence;
+﻿using Moda.Common.Domain.Enums.Goals;
+using Moda.Goals.Application.Persistence;
 using Moda.Goals.Domain.Enums;
 using Moda.Goals.Domain.Models;
 

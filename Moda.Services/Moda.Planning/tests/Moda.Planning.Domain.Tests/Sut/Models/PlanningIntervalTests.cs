@@ -1,5 +1,5 @@
-﻿using Moda.Common.Models;
-using Moda.Organization.Domain.Enums;
+﻿using Moda.Common.Domain.Enums.Organization;
+using Moda.Common.Models;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Tests.Data;
@@ -10,12 +10,12 @@ using NodaTime.Testing;
 namespace Moda.Planning.Domain.Tests.Sut.Models;
 public class PlanningIntervalTests
 {
-    private readonly TestingDateTimeService _dateTimeService;
+    private readonly TestingDateTimeProvider _dateTimeProvider;
     private readonly PlanningIntervalFaker _planningIntervalFaker = new();
 
     public PlanningIntervalTests()
     {
-        _dateTimeService = new(new FakeClock(DateTime.UtcNow.ToInstant()));
+        _dateTimeProvider = new(new FakeClock(DateTime.UtcNow.ToInstant()));
     }
 
     #region StateOn
@@ -24,7 +24,7 @@ public class PlanningIntervalTests
     public void StateOn_ShouldReturnCompleted_WhenDateIsPast()
     {
         // Arrange
-        var today = _dateTimeService.Today;
+        var today = _dateTimeProvider.Today;
         var planningIntervalDateRange = new LocalDateRange(today.Plus(Period.FromWeeks(-14)), today.Plus(Period.FromWeeks(-2)));
         var sut = _planningIntervalFaker.WithData(dateRange: planningIntervalDateRange).Generate();
 
@@ -39,7 +39,7 @@ public class PlanningIntervalTests
     public void StateOn_ShouldReturnActive_WhenDateIsWithinRange()
     {
         // Arrange
-        var today = _dateTimeService.Today;
+        var today = _dateTimeProvider.Today;
         var planningIntervalDateRange = new LocalDateRange(today.Plus(Period.FromWeeks(-1)), today.Plus(Period.FromWeeks(11)));
         var sut = _planningIntervalFaker.WithData(dateRange: planningIntervalDateRange).Generate();
 
@@ -54,7 +54,7 @@ public class PlanningIntervalTests
     public void StateOn_ShouldReturnFuture_WhenDateIsFuture()
     {
         // Arrange
-        var today = _dateTimeService.Today;
+        var today = _dateTimeProvider.Today;
         var planningIntervalDateRange = new LocalDateRange(today.Plus(Period.FromWeeks(1)), today.Plus(Period.FromWeeks(13)));
         var sut = _planningIntervalFaker.WithData(dateRange: planningIntervalDateRange).Generate();
 
@@ -76,7 +76,7 @@ public class PlanningIntervalTests
         var sut = _planningIntervalFaker.Generate();
 
         // Act
-        var result = sut.CalculatePredictability(_dateTimeService.Today);
+        var result = sut.CalculatePredictability(_dateTimeProvider.Today);
 
         // Assert
         result.Should().BeNull();
@@ -90,7 +90,7 @@ public class PlanningIntervalTests
         sut.Update(sut.Name, sut.Description, false);
 
         // Act
-        var result = sut.CalculatePredictability(_dateTimeService.Today);
+        var result = sut.CalculatePredictability(_dateTimeProvider.Today);
 
         // Assert
         result.Should().BeNull();
@@ -104,7 +104,7 @@ public class PlanningIntervalTests
         var sut = _planningIntervalFaker.WithObjectives(team, 2).Generate();
 
         // Act
-        var result = sut.CalculatePredictability(_dateTimeService.Today);
+        var result = sut.CalculatePredictability(_dateTimeProvider.Today);
 
         // Assert
         result.Should().Be(0);
@@ -124,7 +124,7 @@ public class PlanningIntervalTests
         }
 
         // Act
-        var result = sut.CalculatePredictability(_dateTimeService.Today);
+        var result = sut.CalculatePredictability(_dateTimeProvider.Today);
 
         // Assert
         result.Should().Be(50);
@@ -146,7 +146,7 @@ public class PlanningIntervalTests
         }
 
         // Act
-        var result = sut.CalculatePredictability(_dateTimeService.Today);
+        var result = sut.CalculatePredictability(_dateTimeProvider.Today);
 
         // Assert
         result.Should().Be(100);
@@ -168,7 +168,7 @@ public class PlanningIntervalTests
         }
 
         // Act
-        var result = sut.CalculatePredictability(_dateTimeService.Today);
+        var result = sut.CalculatePredictability(_dateTimeProvider.Today);
 
         // Assert
         result.Should().Be(100);
@@ -191,7 +191,7 @@ public class PlanningIntervalTests
         }
 
         // Act
-        var result = sut.CalculatePredictability(_dateTimeService.Today);
+        var result = sut.CalculatePredictability(_dateTimeProvider.Today);
 
         // Assert
         result.Should().Be(100);
@@ -215,7 +215,7 @@ public class PlanningIntervalTests
         }
 
         // Act
-        var result = sut.CalculatePredictability(_dateTimeService.Today);
+        var result = sut.CalculatePredictability(_dateTimeProvider.Today);
 
         // Assert
         // 3/4 of the non-stretch objectives are complete and 0/2 of the stretch objectives are complete, so 75% predictability
@@ -240,7 +240,7 @@ public class PlanningIntervalTests
         }
 
         // Act
-        var result = sut.CalculatePredictability(_dateTimeService.Today);
+        var result = sut.CalculatePredictability(_dateTimeProvider.Today);
 
         // Assert
         // 3/4 of the non-stretch objectives are complete and 0/2 of the stretch objectives are complete, so 75% predictability

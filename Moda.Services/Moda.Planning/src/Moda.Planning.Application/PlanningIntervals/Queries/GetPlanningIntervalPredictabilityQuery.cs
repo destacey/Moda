@@ -1,4 +1,4 @@
-﻿using Moda.Organization.Domain.Enums;
+﻿using Moda.Common.Domain.Enums.Organization;
 using Moda.Planning.Application.Models;
 using Moda.Planning.Domain.Enums;
 
@@ -9,13 +9,13 @@ internal sealed class GetPlanningIntervalPredictabilityQueryHandler : IQueryHand
 {
     private readonly IPlanningDbContext _planningDbContext;
     private readonly ILogger<GetPlanningIntervalPredictabilityQueryHandler> _logger;
-    private readonly IDateTimeService _dateTimeService;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public GetPlanningIntervalPredictabilityQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalPredictabilityQueryHandler> logger, IDateTimeService dateTimeService)
+    public GetPlanningIntervalPredictabilityQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalPredictabilityQueryHandler> logger, IDateTimeProvider dateTimeProvider)
     {
         _planningDbContext = planningDbContext;
         _logger = logger;
-        _dateTimeService = dateTimeService;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<PlanningIntervalPredictabilityDto?> Handle(GetPlanningIntervalPredictabilityQuery request, CancellationToken cancellationToken)
@@ -33,7 +33,7 @@ internal sealed class GetPlanningIntervalPredictabilityQueryHandler : IQueryHand
         else if (!planningInterval.Teams.Any())
             return new PlanningIntervalPredictabilityDto(null, new List<PlanningIntervalTeamPredictabilityDto>());
 
-        var currentDate = _dateTimeService.Now.InUtc().Date;
+        var currentDate = _dateTimeProvider.Now.InUtc().Date;
 
         var teamPredictabilities = planningInterval.Teams
             .Select(t => new PlanningIntervalTeamPredictabilityDto(t.Team, planningInterval.CalculatePredictability(currentDate, t.TeamId)))

@@ -7382,10 +7382,10 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Import Azure DevOps projects as Moda workspaces.
+     * Import Azure DevOps processes and projects.
      */
-    importWorkspaces(id: string, cancelToken?: CancelToken | undefined): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/import-workspaces";
+    importOrganizationConfiguration(id: string, cancelToken?: CancelToken | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/import-organization-configuration";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -7406,11 +7406,11 @@ export class AzureDevOpsBoardsConnectionsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processImportWorkspaces(_response);
+            return this.processImportOrganizationConfiguration(_response);
         });
     }
 
-    protected processImportWorkspaces(response: AxiosResponse): Promise<void> {
+    protected processImportOrganizationConfiguration(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -8663,22 +8663,22 @@ export interface AzureDevOpsBoardsConnectionConfigurationDto {
     organization?: string;
     personalAccessToken?: string;
     organizationUrl?: string;
-    workspaces?: AzureDevOpsBoardsWorkspaceDto[];
     workProcesses?: AzureDevOpsBoardsWorkProcessDto[];
-}
-
-export interface AzureDevOpsBoardsWorkspaceDto {
-    externalId?: string;
-    name?: string;
-    description?: string | undefined;
-    workProcessId?: string | undefined;
-    sync?: boolean;
+    workspaces?: AzureDevOpsBoardsWorkspaceDto[];
 }
 
 export interface AzureDevOpsBoardsWorkProcessDto {
     externalId?: string;
     name?: string;
     description?: string | undefined;
+}
+
+export interface AzureDevOpsBoardsWorkspaceDto {
+    externalId?: string;
+    name?: string;
+    description?: string | undefined;
+    workProcessId?: string;
+    sync?: boolean;
 }
 
 export interface CreateAzureDevOpsBoardConnectionRequest {

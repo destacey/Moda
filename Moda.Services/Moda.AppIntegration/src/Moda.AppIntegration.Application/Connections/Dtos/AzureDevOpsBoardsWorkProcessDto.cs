@@ -6,9 +6,4 @@ public sealed record AzureDevOpsBoardsWorkProcessDto : IMapFrom<AzureDevOpsBoard
     public Guid ExternalId { get; set; }
     public required string Name { get; set; }
     public string? Description { get; set; }
-
-    public void ConfigureMapping(TypeAdapterConfig config)
-    {
-        config.NewConfig<AzureDevOpsBoardsWorkProcess, AzureDevOpsBoardsWorkProcessDto>();
-    }
 }

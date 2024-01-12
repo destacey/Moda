@@ -1,11 +1,12 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums.Organization;
+using Moda.Common.Domain.Interfaces.Organization;
 using Moda.Common.Extensions;
-using Moda.Organization.Domain.Enums;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
-public abstract class BaseTeam : BaseAuditableEntity<Guid>
+public abstract class BaseTeam : BaseAuditableEntity<Guid>, ISimpleTeam
 {
     private string _name = null!;
     private TeamCode _code = null!;
@@ -33,6 +34,8 @@ public abstract class BaseTeam : BaseAuditableEntity<Guid>
         get => _code;
         protected set => _code = Guard.Against.Null(value, nameof(Code));
     }
+
+    string ISimpleTeam.Code => Code.Value;
 
     /// <summary>
     /// The description of the team.

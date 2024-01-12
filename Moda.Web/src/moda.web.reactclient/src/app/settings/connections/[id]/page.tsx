@@ -9,11 +9,11 @@ import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
 import {
   useGetAzdoBoardsConnectionById,
-  useImportAzdoBoardsConnectionWorkspacesMutation,
+  useImportAzdoBoardsConnectionOrganizationMutation,
 } from '@/src/services/queries/app-integration-queries'
 import { notFound, usePathname } from 'next/navigation'
 import EditConnectionForm from '../components/edit-connection-form'
-import AzdoBoardsWorkspaces from './azdo-boards-workspaces'
+import AzdoBoardsOrganization from './azdo-boards-organization'
 import { ExportOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { useAppDispatch } from '@/src/app/hooks'
@@ -22,13 +22,13 @@ import InitWorkspaceIntegrationForm from '../components/init-workspace-integrati
 
 enum ConnectionTabs {
   Details = 'details',
-  WorkspaceConfiguration = 'workspace-configuration',
+  OrganizationConfiguration = 'organization-configuration',
 }
 
 const ConnectionDetailsPage = ({ params }) => {
   useDocumentTitle('Connection Details')
   const [activeTab, setActiveTab] = useState(ConnectionTabs.Details)
-  const [isImportingWorkspaces, setIsImportingWorkspaces] = useState(false)
+  const [isImportingOrganization, setIsImportingOrganization] = useState(false)
   const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
   // const [openInitWorkspaceForm, setOpenInitWorkspaceForm] =
@@ -53,8 +53,8 @@ const ConnectionDetailsPage = ({ params }) => {
   } = useGetAzdoBoardsConnectionById(params.id)
   const azdoOrgUrl = connectionData?.configuration?.organizationUrl
 
-  const importWorkspacesMutation =
-    useImportAzdoBoardsConnectionWorkspacesMutation()
+  const importOrganizationConfigurationMutation =
+    useImportAzdoBoardsConnectionOrganizationMutation()
 
   const initWorkspace = (workspaceId: string) => {
     // setInitWorkspaceId(workspaceId)
@@ -68,12 +68,12 @@ const ConnectionDetailsPage = ({ params }) => {
       content: <AzdoBoardsConnectionDetails connection={connectionData} />,
     },
     {
-      key: ConnectionTabs.WorkspaceConfiguration,
-      tab: 'Workspace Configuration',
+      key: ConnectionTabs.OrganizationConfiguration,
+      tab: 'Organization Configuration',
       content: (
-        <AzdoBoardsWorkspaces
-          workspaces={connectionData?.configuration?.workspaces}
+        <AzdoBoardsOrganization
           workProcesses={connectionData?.configuration?.workProcesses}
+          workspaces={connectionData?.configuration?.workspaces}
           organizationUrl={connectionData?.configuration?.organizationUrl}
           initWorkspace={initWorkspace}
           //initWorkspace={() => null}
@@ -114,17 +114,19 @@ const ConnectionDetailsPage = ({ params }) => {
   //   refetch()
   // }
 
-  const importWorkspaces = async () => {
+  const importOrganizationConfiguration = async () => {
     try {
-      await importWorkspacesMutation.mutateAsync(params.id)
-      messageApi.success('Successfully imported workspaces.')
+      await importOrganizationConfigurationMutation.mutateAsync(params.id)
+      messageApi.success(
+        'Successfully imported organization processes and projects.',
+      )
     } catch (error) {
       console.error(error)
       messageApi.error(
-        `Failed to initialize workspace. Error: ${error.supportMessage}`,
+        `Failed to initialize organization. Error: ${error.supportMessage}`,
       )
     }
-    setIsImportingWorkspaces(false)
+    setIsImportingOrganization(false)
   }
 
   const actions = () => {
@@ -137,13 +139,13 @@ const ConnectionDetailsPage = ({ params }) => {
             </Button>
             <Button
               disabled={!connectionData?.isValidConfiguration ?? true}
-              loading={isImportingWorkspaces}
+              loading={isImportingOrganization}
               onClick={() => {
-                setIsImportingWorkspaces(true)
-                importWorkspaces()
+                setIsImportingOrganization(true)
+                importOrganizationConfiguration()
               }}
             >
-              Import Workspaces
+              Import Organization
             </Button>
           </Space>
         )}
