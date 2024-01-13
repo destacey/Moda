@@ -4,6 +4,7 @@ namespace Moda.Common.Domain.Authorization;
 
 public static class ApplicationAction
 {
+    // Common
     public const string View = nameof(View);
     public const string Search = nameof(Search);
     public const string Create = nameof(Create);
@@ -15,6 +16,9 @@ public static class ApplicationAction
     public const string Generate = nameof(Generate);
     public const string Clean = nameof(Clean);
     public const string Run = nameof(Run);
+
+    // Specific
+    public const string ManageTeamMemberships = nameof(ManageTeamMemberships);
 }
 
 public static class ApplicationResource
@@ -121,6 +125,7 @@ public static class ApplicationPermissions
         new("View Teams and Teams of Teams", ApplicationAction.View, ApplicationResource.Teams, IsBasic: true),
         new("Create Teams", ApplicationAction.Create, ApplicationResource.Teams),
         new("Update Teams", ApplicationAction.Update, ApplicationResource.Teams),
+        new("Manage Team Memberships.  This includes adding, updating, and removing team memberships.", ApplicationAction.ManageTeamMemberships, ApplicationResource.Teams),
         new("Delete Teams", ApplicationAction.Delete, ApplicationResource.Teams),
     };
 

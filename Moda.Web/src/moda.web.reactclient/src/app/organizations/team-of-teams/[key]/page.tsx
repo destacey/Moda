@@ -20,6 +20,7 @@ import { notFound, usePathname } from 'next/navigation'
 import { retrieveTeam, setEditMode, selectTeamContext } from '../../team-slice'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
+import { CreateTeamMembershipForm } from '../../components'
 
 enum TeamOfTeamsTabs {
   Details = 'details',
@@ -29,8 +30,10 @@ enum TeamOfTeamsTabs {
 
 const TeamOfTeamsDetailsPage = ({ params }) => {
   useDocumentTitle('Team of Teams Details')
-  const [activeTab, setActiveTab] = useState(TeamOfTeamsTabs.Details)
   const { key } = params
+  const [activeTab, setActiveTab] = useState(TeamOfTeamsTabs.Details)
+  const [openCreateTeamMembershipForm, setOpenCreateTeamMembershipForm] =
+    useState<boolean>(false)
   const [teamMembershipsQueryEnabled, setTeamMembershipsQueryEnabled] =
     useState<boolean>(false)
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
@@ -38,7 +41,11 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
-  const showActions = canUpdateTeam
+  const canManageTeamMemberships = hasClaim(
+    'Permission',
+    'Permissions.Teams.ManageTeamMemberships',
+  )
+  const showActions = canUpdateTeam || canManageTeamMemberships
 
   const {
     item: team,
@@ -69,6 +76,11 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       <>
         {canUpdateTeam && (
           <Button onClick={() => dispatch(setEditMode(true))}>Edit Team</Button>
+        )}
+        {canManageTeamMemberships && (
+          <Button onClick={() => setOpenCreateTeamMembershipForm(true)}>
+            Add Team Membership
+          </Button>
         )}
       </>
     )
@@ -130,6 +142,13 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     [risksQueryEnabled, teamMembershipsQueryEnabled],
   )
 
+  const onCreateTeamMembershipFormClosed = (wasSaved: boolean) => {
+    setOpenCreateTeamMembershipForm(false)
+    if (wasSaved) {
+      dispatch(retrieveTeam({ key, type: 'Team of Teams' }))
+    }
+  }
+
   if (teamNotFound) {
     return notFound()
   }
@@ -150,6 +169,15 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
       {isInEditMode && team && canUpdateTeam && <EditTeamForm team={team} />}
+      {openCreateTeamMembershipForm && (
+        <CreateTeamMembershipForm
+          showForm={openCreateTeamMembershipForm}
+          teamId={team?.id}
+          teamType={'Team of Teams'}
+          onFormCreate={() => onCreateTeamMembershipFormClosed(true)}
+          onFormCancel={() => onCreateTeamMembershipFormClosed(false)}
+        />
+      )}
     </>
   )
 }

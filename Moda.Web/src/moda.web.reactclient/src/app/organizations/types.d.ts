@@ -11,7 +11,7 @@ export interface TeamListItem {
 }
 
 export interface CreateTeamFormValues {
-  type: TeamType
+  type: TeamTypeName
   name: string
   code: string
   description: string
@@ -22,7 +22,7 @@ export interface EditTeamFormValues {
   name: string
   code: string
   description: string
-  type?: TeamType
+  type?: TeamTypeName
 }
 
-export type TeamType = 'Team' | 'Team of Teams'
+export type TeamTypeName = 'Team' | 'Team of Teams'
