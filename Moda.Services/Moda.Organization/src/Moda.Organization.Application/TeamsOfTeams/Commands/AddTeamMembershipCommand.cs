@@ -29,6 +29,7 @@ internal sealed class AddTeamMembershipCommandHandler(IOrganizationDbContext org
         try
         {
             var team = await _organizationDbContext.TeamOfTeams
+                .Include(t => t.ParentMemberships)
                 .SingleAsync(t => t.Id == request.TeamId, cancellationToken);
             if (team is null)
                 return Result.Failure($"Team with id {request.TeamId} not found");
@@ -36,7 +37,7 @@ internal sealed class AddTeamMembershipCommandHandler(IOrganizationDbContext org
             await LoadAllChildMemberships(team, cancellationToken);
 
             var parentTeam = await _organizationDbContext.TeamOfTeams
-                .SingleAsync(t => t.Id == request.ParentTeamId);
+                .SingleAsync(t => t.Id == request.ParentTeamId, cancellationToken: cancellationToken);
 
             var result = team.AddTeamMembership(parentTeam, request.DateRange, _dateTimeProvider.Now);
             if (result.IsFailure)
