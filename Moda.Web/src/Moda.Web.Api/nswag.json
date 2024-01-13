@@ -1,11 +1,11 @@
 {
-  "runtime": "Net70",
+  "runtime": "Net80",
   "defaultVariables": null,
   "documentGenerator": {
     "aspNetCoreToOpenApi": {
-        "project": null,
+        "project": "Moda.Web.Api.csproj",
         "msBuildProjectExtensionsPath": null,
-        "configuration": null,
+        "configuration": "$(Configuration)",
         "runtime": null,
         "targetFramework": null,
         "noBuild": true,
@@ -54,9 +54,7 @@
         "output": "wwwroot/api/v1/specification.json",
         "outputType": "OpenApi3",
         "newLineBehavior": "Auto",
-        "assemblyPaths": [
-            "bin/Debug/net7.0/Moda.Web.Api.dll"
-        ],
+        "assemblyPaths": [],
         "assemblyConfig": null,
         "referencePaths": [],
         "useNuGetCache": false

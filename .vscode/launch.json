@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Moda.Web/src/Moda.Web.Api/bin/Debug/net7.0/Moda.Web.Api.dll",
+            "program": "${workspaceFolder}/Moda.Web/src/Moda.Web.Api/bin/Debug/net8.0/Moda.Web.Api.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Moda.Web/src/Moda.Web.Api",
             "stopAtEntry": false,

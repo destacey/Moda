@@ -1,50 +1,49 @@
 # Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
 
-version: '3.4'
+version: "3.4"
 
 services:
-  modawebapi:
-    container_name: moda.web.api
-    image: modawebapi
-    build:
-      context: .
-      dockerfile: Moda.Web/src/Moda.Web.Api/Dockerfile
-    ports:
-      - 5000:80
-      - 5001:443
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-      - CorsSettings__WebClient=http://localhost:5002
-      - Serilog__Using__1=Serilog.Sinks.Seq
-      - Serilog__WriteTo__1__Name=Seq
-      - Serilog__WriteTo__1__Args__serverUrl=http://seq:5341
-    volumes:
-      - ~/.vsdbg:/remote_debugger:rw
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-  modawebclient:
-    container_name: moda.web.client
-    image: modawebclient
-    build:
-      context: .
-      dockerfile: Moda.Web/src/moda.web.reactclient/Dockerfile
-    ports:
-      - 5002:3000
-    environment:
-      - NEXT_PUBLIC_AZURE_AD_CLIENT_ID=${AAD_CLIENT_ID}
-      - NEXT_PUBLIC_AZURE_AD_TENANT_ID=${AAD_TENANT_ID}
-      - NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY=${AAD_LOGON_AUTHORITY}
-      - NEXT_PUBLIC_API_SCOPE=${API_SCOPE}
-      - NEXT_PUBLIC_API_BASE_URL=${API_BASE_URL}
+    modawebapi:
+        container_name: moda.web.api
+        image: modawebapi
+        build:
+            context: .
+            dockerfile: Moda.Web/src/Moda.Web.Api/Dockerfile
+        ports:
+            - 5000:80
+            - 5001:443
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - ASPNETCORE_URLS=https://+:443;http://+:80
+            - CorsSettings__WebClient=http://localhost:5002
+            - Serilog__Using__1=Serilog.Sinks.Seq
+            - Serilog__WriteTo__1__Name=Seq
+            - Serilog__WriteTo__1__Args__serverUrl=http://seq:5341
+        volumes:
+            - ~/.vsdbg:/remote_debugger:rw
+            - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+            - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    modawebclient:
+        container_name: moda.web.client
+        image: modawebclient
+        build:
+            context: .
+            dockerfile: Moda.Web/src/moda.web.reactclient/Dockerfile
+        ports:
+            - 5002:3000
+        environment:
+            - NEXT_PUBLIC_AZURE_AD_CLIENT_ID=${AAD_CLIENT_ID}
+            - NEXT_PUBLIC_AZURE_AD_TENANT_ID=${AAD_TENANT_ID}
+            - NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY=${AAD_LOGON_AUTHORITY}
+            - NEXT_PUBLIC_API_SCOPE=${API_SCOPE}
+            - NEXT_PUBLIC_API_BASE_URL=${API_BASE_URL}
 
-  seq:
-    image: datalust/seq
-    ports:
-      - 8081:80
-      - 5341:5341
-    environment:
-      - ACCEPT_EULA=Y
-    volumes:
-      - ./.seq:/data
-   
+    seq:
+        image: datalust/seq
+        ports:
+            - 8081:80
+            - 5341:5341
+        environment:
+            - ACCEPT_EULA=Y
+        volumes:
+            - ./.seq:/data
