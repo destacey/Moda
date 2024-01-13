@@ -3,10 +3,10 @@ import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
 import { TeamMembershipsDto } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
+import { UseQueryResult } from 'react-query'
 
 export interface TeamMembershipsGridProps {
-  getTeamMemberships: (id: string) => Promise<TeamMembershipsDto[]>
-  getTeamMembershipsObjectId: string
+  teamMembershipsQuery: UseQueryResult<TeamMembershipsDto[], unknown>
 }
 
 const ChildLinkCellRenderer = ({ value, data }) => {
@@ -24,15 +24,12 @@ const ParentLinkCellRenderer = ({ value, data }) => {
 }
 
 const TeamMembershipsGrid = ({
-  getTeamMemberships,
-  getTeamMembershipsObjectId,
+  teamMembershipsQuery,
 }: TeamMembershipsGridProps) => {
-  const [teamMemberships, setTeamMemberships] = useState<TeamMembershipsDto[]>()
-
-  const loadTeamMemberships = useCallback(async () => {
-    const teamMemberships = await getTeamMemberships(getTeamMembershipsObjectId)
-    setTeamMemberships(teamMemberships)
-  }, [getTeamMemberships, getTeamMembershipsObjectId])
+  const refresh = useCallback(async () => {
+    teamMembershipsQuery.refetch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const columnDefs = useMemo(
     () => [
@@ -57,8 +54,8 @@ const TeamMembershipsGrid = ({
       <ModaGrid
         height={550}
         columnDefs={columnDefs}
-        rowData={teamMemberships}
-        loadData={loadTeamMemberships}
+        rowData={teamMembershipsQuery.data}
+        loadData={refresh}
       />
     </>
   )

@@ -8,6 +8,30 @@ import {
 import _ from 'lodash'
 import { OptionModel } from '@/src/app/components/types'
 
+// TEAM MEMBERSHIPS
+
+export const useGetTeamMemberships = (teamId: string, enabled: boolean) => {
+  return useQuery({
+    queryKey: [QK.TEAM_MEMBERSHIPS, teamId],
+    queryFn: async () => (await getTeamsClient()).getTeamMemberships(teamId),
+    staleTime: 10000,
+    enabled: !!teamId && enabled,
+  })
+}
+
+export const useGetTeamOfTeamsMemberships = (
+  teamId: string,
+  enabled: boolean,
+) => {
+  return useQuery({
+    queryKey: [QK.TEAM_MEMBERSHIPS, teamId],
+    queryFn: async () =>
+      (await getTeamsOfTeamsClient()).getTeamMemberships(teamId),
+    staleTime: 10000,
+    enabled: !!teamId && enabled,
+  })
+}
+
 // TEAMS - RISKS
 export const useGetTeamRisks = (
   id: string,

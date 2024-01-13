@@ -4,7 +4,6 @@ import PageTitle from '@/src/app/components/common/page-title'
 import { Button, Card } from 'antd'
 import { createElement, useCallback, useEffect, useState } from 'react'
 import TeamDetails from './team-details'
-import { getTeamsClient } from '@/src/services/clients'
 import RisksGrid, {
   RisksGridProps,
 } from '@/src/app/components/common/planning/risks-grid'
@@ -12,7 +11,10 @@ import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import { EditTeamForm } from '../../components'
 import useAuth from '@/src/app/components/contexts/auth'
-import { useGetTeamRisks } from '@/src/services/queries/organization-queries'
+import {
+  useGetTeamMemberships,
+  useGetTeamRisks,
+} from '@/src/services/queries/organization-queries'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import {
@@ -33,6 +35,8 @@ const TeamDetailsPage = ({ params }) => {
   useDocumentTitle('Team Details')
   const [activeTab, setActiveTab] = useState(TeamTabs.Details)
   const { key } = params
+  const [teamMembershipsQueryEnabled, setTeamMembershipsQueryEnabled] =
+    useState<boolean>(false)
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
 
@@ -49,6 +53,11 @@ const TeamDetailsPage = ({ params }) => {
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
+  const teamMembershipsQuery = useGetTeamMemberships(
+    team?.id,
+    teamMembershipsQueryEnabled,
+  )
+
   const risksQuery = useGetTeamRisks(
     team?.id,
     includeClosedRisks,
@@ -57,11 +66,6 @@ const TeamDetailsPage = ({ params }) => {
 
   const onIncludeClosedRisksChanged = useCallback((includeClosed: boolean) => {
     setIncludeClosedRisks(includeClosed)
-  }, [])
-
-  const getTeamMemberships = useCallback(async (teamId: string) => {
-    const teamsClient = await getTeamsClient()
-    return await teamsClient.getTeamMemberships(teamId)
   }, [])
 
   const actions = () => {
@@ -96,8 +100,7 @@ const TeamDetailsPage = ({ params }) => {
       key: TeamTabs.TeamMemberships,
       tab: 'Team Memberships',
       content: createElement(TeamMembershipsGrid, {
-        getTeamMemberships: getTeamMemberships,
-        getTeamMembershipsObjectId: team?.id,
+        teamMembershipsQuery: teamMembershipsQuery,
       }),
     },
   ]
@@ -122,9 +125,14 @@ const TeamDetailsPage = ({ params }) => {
       // enables the query for the tab on first render if it hasn't been enabled yet
       if (tabKey == TeamTabs.RiskManagement && !risksQueryEnabled) {
         setRisksQueryEnabled(true)
+      } else if (
+        tabKey == TeamTabs.TeamMemberships &&
+        !teamMembershipsQueryEnabled
+      ) {
+        setTeamMembershipsQueryEnabled(true)
       }
     },
-    [risksQueryEnabled],
+    [risksQueryEnabled, teamMembershipsQueryEnabled],
   )
 
   if (teamNotFound) {
