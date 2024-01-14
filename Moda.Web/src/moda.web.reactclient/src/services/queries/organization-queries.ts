@@ -133,6 +133,45 @@ export const useUpdateTeamMembershipMutation = () => {
   })
 }
 
+export interface DeleteTeamMembershipMutationRequest {
+  teamMembershipId: string
+  teamId: string
+  parentTeamId: string
+  teamType: TeamTypeName
+}
+export const useDeleteTeamMembershipMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      teamMembershipId,
+      teamId,
+      parentTeamId,
+      teamType,
+    }: DeleteTeamMembershipMutationRequest) => {
+      if (teamType === 'Team') {
+        return (await getTeamsClient()).removeTeamMembership(
+          teamId,
+          teamMembershipId,
+        )
+      } else if (teamType === 'Team of Teams') {
+        return (await getTeamsOfTeamsClient()).removeTeamMembership(
+          teamId,
+          teamMembershipId,
+        )
+      } else {
+        throw new Error(`Invalid team type: ${teamType}`)
+      }
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([QK.TEAM_MEMBERSHIPS, variables.teamId])
+      queryClient.invalidateQueries([
+        QK.TEAM_MEMBERSHIPS,
+        variables.parentTeamId,
+      ])
+    },
+  })
+}
+
 // TEAMS - RISKS
 export const useGetTeamRisks = (
   id: string,

@@ -14,6 +14,7 @@ import { MenuProps } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import EditTeamMembershipForm from './edit-team-membership-form'
 import { TeamTypeName } from '../types'
+import DeleteTeamMembershipForm from './delete-team-membership-form'
 
 export interface TeamMembershipsGridProps {
   teamId: string
@@ -25,6 +26,7 @@ interface RowMenuProps extends MenuProps {
   membership: TeamMembershipDto
   canManageTeamMemberships: boolean
   onEditTeamMembershipMenuClicked: (membership: TeamMembershipDto) => void
+  onDeleteTeamMembershipMenuClicked: (membership: TeamMembershipDto) => void
 }
 
 const getRowMenuItems = (props: RowMenuProps) => {
@@ -37,6 +39,12 @@ const getRowMenuItems = (props: RowMenuProps) => {
       disabled: !props.canManageTeamMemberships,
       onClick: () => props.onEditTeamMembershipMenuClicked(props.membership),
     },
+    {
+      key: 'delete-team-membership',
+      label: 'Delete Team Membership',
+      disabled: !props.canManageTeamMemberships,
+      onClick: () => props.onDeleteTeamMembershipMenuClicked(props.membership),
+    },
   ] as ItemType[]
 }
 
@@ -46,6 +54,8 @@ const TeamMembershipsGrid = ({
   teamType,
 }: TeamMembershipsGridProps) => {
   const [openEditTeamMembershipForm, setOpenEditTeamMembershipForm] =
+    useState<boolean>(false)
+  const [openDeleteTeamMembershipForm, setOpenDeleteTeamMembershipForm] =
     useState<boolean>(false)
   const [selectedTeamMembership, setSelectedTeamMembership] =
     useState<TeamMembershipDto | null>(null)
@@ -70,6 +80,14 @@ const TeamMembershipsGrid = ({
     [],
   )
 
+  const onDeleteTeamMembershipMenuClicked = useCallback(
+    (membership: TeamMembershipDto) => {
+      setSelectedTeamMembership(membership)
+      setOpenDeleteTeamMembershipForm(true)
+    },
+    [],
+  )
+
   const columnDefs = useMemo(
     () => [
       {
@@ -89,6 +107,7 @@ const TeamMembershipsGrid = ({
             membership: params.data,
             canManageTeamMemberships,
             onEditTeamMembershipMenuClicked,
+            onDeleteTeamMembershipMenuClicked,
           })
 
           return RowMenuCellRenderer({ menuItems })
@@ -115,11 +134,25 @@ const TeamMembershipsGrid = ({
           params.data.end ? dayjs(params.data.end).format('M/D/YYYY') : null,
       },
     ],
-    [canManageTeamMemberships, onEditTeamMembershipMenuClicked, showRowActions],
+    [
+      canManageTeamMemberships,
+      onDeleteTeamMembershipMenuClicked,
+      onEditTeamMembershipMenuClicked,
+      showRowActions,
+      teamId,
+    ],
   )
 
   const onEditTeamMembershipFormClosed = (wasCreated: boolean) => {
     setOpenEditTeamMembershipForm(false)
+    setSelectedTeamMembership(null)
+    if (wasCreated) {
+      refresh()
+    }
+  }
+
+  const onDeleteTeamMembershipFormClosed = (wasCreated: boolean) => {
+    setOpenDeleteTeamMembershipForm(false)
     setSelectedTeamMembership(null)
     if (wasCreated) {
       refresh()
@@ -141,6 +174,15 @@ const TeamMembershipsGrid = ({
           teamType={teamType}
           onFormSave={() => onEditTeamMembershipFormClosed(true)}
           onFormCancel={() => onEditTeamMembershipFormClosed(false)}
+        />
+      )}
+      {openDeleteTeamMembershipForm && (
+        <DeleteTeamMembershipForm
+          showForm={openDeleteTeamMembershipForm}
+          membership={selectedTeamMembership}
+          teamType={teamType}
+          onFormSave={() => onDeleteTeamMembershipFormClosed(true)}
+          onFormCancel={() => onDeleteTeamMembershipFormClosed(false)}
         />
       )}
     </>
