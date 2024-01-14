@@ -73,7 +73,7 @@ const ModaGrid = ({
   }, [])
 
   const onGlobalSearchChange = useCallback((e) => {
-    gridRef.current?.api.setQuickFilter(e.target.value)
+    gridRef.current?.api.setGridOption('quickFilterText', e.target.value)
   }, [])
 
   const onBtnExport = useCallback(() => {

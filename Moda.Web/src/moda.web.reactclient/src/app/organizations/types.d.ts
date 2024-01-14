@@ -1,11 +1,8 @@
+import { TeamNavigationDto } from './../../services/moda-api'
 import { TeamNavigationDto } from '@/src/services/moda-api'
 
-export interface TeamListItem {
-  id?: string
-  key?: number
-  name?: string
+export interface TeamListItem extends TeamNavigationDto {
   code?: string
-  type?: string
   isActive?: boolean
   teamOfTeams?: TeamNavigationDto | undefined
 }

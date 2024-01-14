@@ -13,7 +13,8 @@ import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import {
   MarkdownCellRenderer,
-  PlanningTeamLinkCellRenderer,
+
+    TeamLinkCellRenderer,
   PlanningIntervalLinkCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,
 } from '@/src/app/components/common/moda-grid-cell-renderers'
@@ -92,7 +93,7 @@ const ObjectiveHealthReportPage = ({ params }) => {
       {
         field: 'team',
         valueFormatter: (params) => params.value.name,
-        cellRenderer: PlanningTeamLinkCellRenderer,
+        cellRenderer: TeamLinkCellRenderer,
         hide: false,
       },
       { field: 'healthCheckId', hide: true },

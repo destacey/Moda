@@ -17,12 +17,11 @@ import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
 import {
   HealthCheckStatusCellRenderer,
-  PlanningTeamLinkCellRenderer,
+  TeamLinkCellRenderer,
   PlanningIntervalLinkCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,
   RowMenuCellRenderer,
 } from '../moda-grid-cell-renderers'
-import { set } from 'lodash'
 
 export interface PlanningIntervalObjectivesGridProps {
   objectivesQuery: UseQueryResult<PlanningIntervalObjectiveListDto[], unknown>
@@ -198,14 +197,15 @@ const PlanningIntervalObjectivesGrid = ({
       {
         field: 'team',
         valueFormatter: (params) => params.value.name,
-        cellRenderer: PlanningTeamLinkCellRenderer,
+        cellRenderer: TeamLinkCellRenderer,
         hide: hideTeam,
       },
       {
         field: 'healthCheck',
         headerName: 'Health',
         width: 125,
-        valueFormatter: (params) => params.value?.status.name,
+        // TODO: sorting and filtering not working
+        valueFormatter: (params) => params.value?.status?.name,
         cellRenderer: HealthCheckStatusCellRenderer,
       },
       { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },

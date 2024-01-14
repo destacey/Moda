@@ -32,24 +32,20 @@ export const MarkdownCellRenderer = ({ value }) => {
   )
 }
 
-export interface TeamLinkCellRendererProps {
-  value: TeamNavigationDto
+export interface TeamRecordTeamLinkCellRendererProps {
+  data: TeamNavigationDto | PlanningTeamNavigationDto
 }
-export const TeamLinkCellRenderer = ({ value }: TeamLinkCellRendererProps) => {
-  if (!value) return null
-  const teamLink =
-    value.type === 'Team'
-      ? `/organizations/teams/${value.key}`
-      : `/organizations/team-of-teams/${value.key}`
-  return <Link href={teamLink}>{value.name}</Link>
+// use this when the record itself is the team rather than a navigation object
+export const TeamRecordTeamLinkCellRenderer = ({
+  data,
+}: TeamRecordTeamLinkCellRendererProps) => {
+  return TeamLinkCellRenderer({ value: data })
 }
 
-export interface PlanningTeamLinkCellRendererProps {
-  value: PlanningTeamNavigationDto
+export interface TeamLinkCellRendererProps {
+  value: TeamNavigationDto | PlanningTeamNavigationDto
 }
-export const PlanningTeamLinkCellRenderer = ({
-  value,
-}: PlanningTeamLinkCellRendererProps) => {
+export const TeamLinkCellRenderer = ({ value }: TeamLinkCellRendererProps) => {
   if (!value) return null
   const teamLink =
     value.type === 'Team'

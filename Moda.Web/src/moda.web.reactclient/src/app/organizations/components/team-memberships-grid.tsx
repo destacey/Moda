@@ -16,6 +16,7 @@ import EditTeamMembershipForm from './edit-team-membership-form'
 import { TeamTypeName } from '../types'
 
 export interface TeamMembershipsGridProps {
+  teamId: string
   teamMembershipsQuery: UseQueryResult<TeamMembershipDto[], unknown>
   teamType: TeamTypeName
 }
@@ -40,6 +41,7 @@ const getRowMenuItems = (props: RowMenuProps) => {
 }
 
 const TeamMembershipsGrid = ({
+  teamId,
   teamMembershipsQuery,
   teamType,
 }: TeamMembershipsGridProps) => {
@@ -79,7 +81,11 @@ const TeamMembershipsGrid = ({
         hide: !showRowActions,
         suppressMenu: true,
         cellRenderer: (params) => {
+          // only allow editing memberships for current team
+          if (teamId != params.data.child.id) return null
+
           const menuItems = getRowMenuItems({
+            id: params.data.id,
             membership: params.data,
             canManageTeamMemberships,
             onEditTeamMembershipMenuClicked,

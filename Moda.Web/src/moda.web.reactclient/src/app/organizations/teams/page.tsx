@@ -1,11 +1,10 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import ModaGrid from '../../components/common/moda-grid'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { Button, Space, Switch } from 'antd'
-import Link from 'next/link'
 import { useDocumentTitle } from '../../hooks/use-document-title'
 import useAuth from '../../components/contexts/auth'
 import { useAppSelector, useAppDispatch } from '../../hooks'
@@ -17,18 +16,10 @@ import {
   selectTeamIsInEditMode,
 } from '../team-slice'
 import { ModalCreateTeamForm } from '../components/create-team-form'
+import { TeamLinkCellRenderer } from '../../components/common/moda-grid-cell-renderers'
 
-const TeamLinkCellRenderer = ({ value, data }) => {
-  const teamRoute = data.type === 'Team' ? 'teams' : 'team-of-teams'
-  return <Link href={`/organizations/${teamRoute}/${data.key}`}>{value}</Link>
-}
-
-const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {
-  return (
-    <Link href={`/organizations/team-of-teams/${data.teamOfTeams?.key}`}>
-      {value}
-    </Link>
-  )
+const LocalTeamLinkCellRenderer = ({ value, data }) => {
+  return TeamLinkCellRenderer({ value: data })
 }
 
 const TeamListPage = () => {
@@ -37,27 +28,26 @@ const TeamListPage = () => {
   const isInEditMode = useAppSelector(selectTeamIsInEditMode)
   const includeDisabled = useAppSelector((state) => state.team.includeInactive)
 
+  const [columnDefs, setColumnDefs] = useState([
+    { field: 'key', width: 90 },
+    { field: 'name', cellRenderer: LocalTeamLinkCellRenderer },
+    { field: 'code', width: 125 },
+    { field: 'type' },
+    {
+      field: 'teamOfTeams',
+      headerName: 'Team of Teams',
+      // TODO: sorting and filtering not working
+      valueFormatter: (params) => params.value?.name,
+      cellRenderer: TeamLinkCellRenderer,
+    },
+    { field: 'isActive' }, // TODO: convert to yes/no
+  ])
+
   const dispatch = useAppDispatch()
 
   const { hasClaim } = useAuth()
   const canCreateTeam = hasClaim('Permission', 'Permissions.Teams.Create')
   const showActions = canCreateTeam
-
-  const columnDefs = useMemo(
-    () => [
-      { field: 'key', width: 90 },
-      { field: 'name', cellRenderer: TeamLinkCellRenderer },
-      { field: 'code', width: 125 },
-      { field: 'type' },
-      {
-        field: 'teamOfTeams.name',
-        headerName: 'Team of Teams',
-        cellRenderer: TeamOfTeamsLinkCellRenderer,
-      },
-      { field: 'isActive' }, // TODO: convert to yes/no
-    ],
-    [],
-  )
 
   const actions = () => {
     if (!showActions) return null
