@@ -4078,7 +4078,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/TeamMembershipsDto"
+                    "$ref": "#/components/schemas/TeamMembershipDto"
                   }
                 }
               }
@@ -4836,7 +4836,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/TeamMembershipsDto"
+                    "$ref": "#/components/schemas/TeamMembershipDto"
                   }
                 }
               }
@@ -8654,7 +8654,7 @@
           }
         }
       },
-      "TeamMembershipsDto": {
+      "TeamMembershipDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {

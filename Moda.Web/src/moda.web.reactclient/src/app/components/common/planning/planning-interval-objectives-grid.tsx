@@ -17,7 +17,7 @@ import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
 import {
   HealthCheckStatusCellRenderer,
-  PlanningTeamLinkCellRenderer,
+  TeamLinkCellRenderer,
   PlanningIntervalLinkCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,
   RowMenuCellRenderer,
@@ -60,8 +60,6 @@ const getRowMenuItems = (props: RowMenuProps) => {
   if (
     (!props.canManageObjectives && !props.canCreateHealthChecks) ||
     !props.objectiveId ||
-    !props.canManageObjectives ||
-    !props.canCreateHealthChecks ||
     !props.onEditObjectiveMenuClicked ||
     !props.onCreateHealthCheckMenuClicked
   ) {
@@ -166,6 +164,7 @@ const PlanningIntervalObjectivesGrid = ({
         filter: false,
         sortable: false,
         hide: !canManageObjectives,
+        suppressMenu: true,
         cellRenderer: (params) => {
           const menuItems = getRowMenuItems({
             objectiveId: params.data.id,
@@ -198,14 +197,15 @@ const PlanningIntervalObjectivesGrid = ({
       {
         field: 'team',
         valueFormatter: (params) => params.value.name,
-        cellRenderer: PlanningTeamLinkCellRenderer,
+        cellRenderer: TeamLinkCellRenderer,
         hide: hideTeam,
       },
       {
         field: 'healthCheck',
         headerName: 'Health',
         width: 125,
-        valueFormatter: (params) => params.value?.status.name,
+        // TODO: sorting and filtering not working
+        valueFormatter: (params) => params.value?.status?.name,
         cellRenderer: HealthCheckStatusCellRenderer,
       },
       { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
@@ -288,6 +288,7 @@ const PlanningIntervalObjectivesGrid = ({
 
   const onEditObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
+    setSelectedObjectiveId(null)
   }
 
   const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {

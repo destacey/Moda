@@ -4,15 +4,20 @@ import PageTitle from '@/src/app/components/common/page-title'
 import { Button, Card } from 'antd'
 import { createElement, useCallback, useEffect, useState } from 'react'
 import TeamDetails from './team-details'
-import { getTeamsClient } from '@/src/services/clients'
 import RisksGrid, {
   RisksGridProps,
 } from '@/src/app/components/common/planning/risks-grid'
-import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-memberships-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import { EditTeamForm } from '../../components'
+import {
+  CreateTeamMembershipForm,
+  EditTeamForm,
+  TeamMembershipsGrid,
+} from '../../components'
 import useAuth from '@/src/app/components/contexts/auth'
-import { useGetTeamRisks } from '@/src/services/queries/organization-queries'
+import {
+  useGetTeamMemberships,
+  useGetTeamRisks,
+} from '@/src/services/queries/organization-queries'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import {
@@ -31,14 +36,22 @@ enum TeamTabs {
 
 const TeamDetailsPage = ({ params }) => {
   useDocumentTitle('Team Details')
-  const [activeTab, setActiveTab] = useState(TeamTabs.Details)
   const { key } = params
+  const [activeTab, setActiveTab] = useState(TeamTabs.Details)
+  const [openCreateTeamMembershipForm, setOpenCreateTeamMembershipForm] =
+    useState<boolean>(false)
+  const [teamMembershipsQueryEnabled, setTeamMembershipsQueryEnabled] =
+    useState<boolean>(false)
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
-  const showActions = canUpdateTeam
+  const canManageTeamMemberships = hasClaim(
+    'Permission',
+    'Permissions.Teams.ManageTeamMemberships',
+  )
+  const showActions = canUpdateTeam || canManageTeamMemberships
 
   const {
     item: team,
@@ -48,6 +61,11 @@ const TeamDetailsPage = ({ params }) => {
   } = useAppSelector(selectEditTeamContext)
   const dispatch = useAppDispatch()
   const pathname = usePathname()
+
+  const teamMembershipsQuery = useGetTeamMemberships(
+    team?.id,
+    teamMembershipsQueryEnabled,
+  )
 
   const risksQuery = useGetTeamRisks(
     team?.id,
@@ -59,16 +77,16 @@ const TeamDetailsPage = ({ params }) => {
     setIncludeClosedRisks(includeClosed)
   }, [])
 
-  const getTeamMemberships = useCallback(async (teamId: string) => {
-    const teamsClient = await getTeamsClient()
-    return await teamsClient.getTeamMemberships(teamId)
-  }, [])
-
   const actions = () => {
     return (
       <>
         {canUpdateTeam && (
           <Button onClick={() => dispatch(setEditMode(true))}>Edit Team</Button>
+        )}
+        {canManageTeamMemberships && (
+          <Button onClick={() => setOpenCreateTeamMembershipForm(true)}>
+            Add Team Membership
+          </Button>
         )}
       </>
     )
@@ -96,8 +114,9 @@ const TeamDetailsPage = ({ params }) => {
       key: TeamTabs.TeamMemberships,
       tab: 'Team Memberships',
       content: createElement(TeamMembershipsGrid, {
-        getTeamMemberships: getTeamMemberships,
-        getTeamMembershipsObjectId: team?.id,
+        teamId: team?.id,
+        teamMembershipsQuery: teamMembershipsQuery,
+        teamType: 'Team',
       }),
     },
   ]
@@ -122,10 +141,22 @@ const TeamDetailsPage = ({ params }) => {
       // enables the query for the tab on first render if it hasn't been enabled yet
       if (tabKey == TeamTabs.RiskManagement && !risksQueryEnabled) {
         setRisksQueryEnabled(true)
+      } else if (
+        tabKey == TeamTabs.TeamMemberships &&
+        !teamMembershipsQueryEnabled
+      ) {
+        setTeamMembershipsQueryEnabled(true)
       }
     },
-    [risksQueryEnabled],
+    [risksQueryEnabled, teamMembershipsQueryEnabled],
   )
+
+  const onCreateTeamMembershipFormClosed = (wasSaved: boolean) => {
+    setOpenCreateTeamMembershipForm(false)
+    if (wasSaved) {
+      dispatch(retrieveTeam({ key, type: 'Team' }))
+    }
+  }
 
   if (teamNotFound) {
     return notFound()
@@ -147,6 +178,15 @@ const TeamDetailsPage = ({ params }) => {
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
       {isInEditMode && team && canUpdateTeam && <EditTeamForm team={team} />}
+      {openCreateTeamMembershipForm && (
+        <CreateTeamMembershipForm
+          showForm={openCreateTeamMembershipForm}
+          teamId={team?.id}
+          teamType={'Team'}
+          onFormCreate={() => onCreateTeamMembershipFormClosed(true)}
+          onFormCancel={() => onCreateTeamMembershipFormClosed(false)}
+        />
+      )}
     </>
   )
 }

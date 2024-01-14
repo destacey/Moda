@@ -1,7 +1,7 @@
 ﻿using Moda.Organization.Application.Models;
 
 namespace Moda.Organization.Application.Teams.Queries;
-public sealed record GetTeamMembershipsQuery : IQuery<IReadOnlyList<TeamMembershipsDto>>
+public sealed record GetTeamMembershipsQuery : IQuery<IReadOnlyList<TeamMembershipDto>>
 {
     public GetTeamMembershipsQuery(Guid teamId)
     {
@@ -17,7 +17,7 @@ public sealed record GetTeamMembershipsQuery : IQuery<IReadOnlyList<TeamMembersh
     public int? TeamKey { get; }
 }
 
-internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamMembershipsQuery, IReadOnlyList<TeamMembershipsDto>>
+internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamMembershipsQuery, IReadOnlyList<TeamMembershipDto>>
 {
     private readonly IOrganizationDbContext _organizationDbContext;
     private readonly ILogger<GetTeamMembershipsQueryHandler> _logger;
@@ -30,7 +30,7 @@ internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamMemb
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<IReadOnlyList<TeamMembershipsDto>> Handle(GetTeamMembershipsQuery request, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<TeamMembershipDto>> Handle(GetTeamMembershipsQuery request, CancellationToken cancellationToken)
     {
         var today = _dateTimeProvider.Now.InUtc().Date;
         var query = _organizationDbContext.Teams
@@ -58,6 +58,6 @@ internal sealed class GetTeamMembershipsQueryHandler : IQueryHandler<GetTeamMemb
         var team = await query
             .SingleAsync(cancellationToken);
 
-        return team.ParentMemberships.Select(m => TeamMembershipsDto.Create(m, _dateTimeProvider)).ToList();
+        return team.ParentMemberships.Select(m => TeamMembershipDto.Create(m, _dateTimeProvider)).ToList();
     }
 }

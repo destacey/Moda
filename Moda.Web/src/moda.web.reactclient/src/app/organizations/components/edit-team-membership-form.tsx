@@ -1,0 +1,197 @@
+'use client'
+
+import { DatePicker, Descriptions, Form, Modal, message } from 'antd'
+import { useCallback, useEffect, useState } from 'react'
+import useAuth from '../../components/contexts/auth'
+import {
+  TeamMembershipDto,
+  UpdateTeamMembershipRequest,
+} from '@/src/services/moda-api'
+import { toFormErrors } from '@/src/utils'
+import {
+  UpdateTeamMembershipMutationRequest,
+  useUpdateTeamMembershipMutation,
+} from '@/src/services/queries/organization-queries'
+import { TeamTypeName } from '../types'
+import dayjs from 'dayjs'
+
+export interface UpdateTeamMembershipFormProps {
+  showForm: boolean
+  membership: TeamMembershipDto
+  teamType: TeamTypeName
+  onFormSave: () => void
+  onFormCancel: () => void
+}
+
+interface UpdateTeamMembershipFormValues {
+  start: Date
+  end: Date | null
+}
+
+const mapToRequestValues = (
+  values: UpdateTeamMembershipFormValues,
+  originalMembership: TeamMembershipDto,
+  teamType: TeamTypeName,
+) => {
+  const membership = {
+    teamMembershipId: originalMembership.id,
+    teamId: originalMembership.child.id,
+    start: (values.start as any)?.format('YYYY-MM-DD'),
+    end: (values.end as any)?.format('YYYY-MM-DD'),
+  } as UpdateTeamMembershipRequest
+  return {
+    membership,
+    parentTeamId: originalMembership.parent.id,
+    teamType,
+  } as UpdateTeamMembershipMutationRequest
+}
+
+const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isValid, setIsValid] = useState(false)
+  const [form] = Form.useForm<UpdateTeamMembershipFormValues>()
+  const formValues = Form.useWatch([], form)
+  const [messageApi, contextHolder] = message.useMessage()
+
+  const updateTeamMembership = useUpdateTeamMembershipMutation()
+
+  const { hasClaim } = useAuth()
+  const canManageTeamMemberships = hasClaim(
+    'Permission',
+    'Permissions.Teams.ManageTeamMemberships',
+  )
+
+  const mapToFormValues = useCallback(
+    (membership: TeamMembershipDto) => {
+      if (!membership) {
+        throw new Error('Membership is required.')
+      }
+      form.setFieldsValue({
+        start: membership.start ? dayjs(membership.start) : null,
+        end: membership.end ? dayjs(membership.end) : null,
+      })
+    },
+    [form],
+  )
+
+  const update = async (
+    values: UpdateTeamMembershipFormValues,
+  ): Promise<boolean> => {
+    try {
+      const request = mapToRequestValues(
+        values,
+        props.membership,
+        props.teamType,
+      )
+      await updateTeamMembership.mutateAsync(request)
+      return true
+    } catch (error) {
+      if (error.status === 422 && error.errors) {
+        const formErrors = toFormErrors(error.errors)
+        form.setFields(formErrors)
+        messageApi.error('Correct the validation error(s) to continue.')
+      } else {
+        messageApi.error(
+          error.supportMessage ??
+            'An unexpected error occurred while updating the team membership.',
+        )
+        console.error(error)
+      }
+      return false
+    }
+  }
+
+  const handleOk = async () => {
+    setIsSaving(true)
+    try {
+      const values = await form.validateFields()
+      if (await update(values)) {
+        setIsOpen(false)
+        form.resetFields()
+        props.onFormSave()
+        // TODO: this message is not displaying
+        messageApi.success('Successfully updated team membership.')
+      }
+    } catch (errorInfo) {
+      console.log('handleOk error', errorInfo)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleCancel = useCallback(() => {
+    setIsOpen(false)
+    props.onFormCancel()
+    form.resetFields()
+  }, [form, props])
+
+  useEffect(() => {
+    if (!props.membership) return
+    if (canManageTeamMemberships) {
+      setIsOpen(props.showForm)
+      if (props.showForm) {
+        mapToFormValues(props.membership)
+      }
+    } else {
+      handleCancel()
+      messageApi.error('You do not have permission to manage team memberships.')
+    }
+  }, [
+    canManageTeamMemberships,
+    handleCancel,
+    mapToFormValues,
+    messageApi,
+    props.membership,
+    props.showForm,
+  ])
+
+  useEffect(() => {
+    form.validateFields({ validateOnly: true }).then(
+      () => setIsValid(true && form.isFieldsTouched()),
+      () => setIsValid(false),
+    )
+  }, [form, formValues])
+
+  return (
+    <>
+      {contextHolder}
+      <Modal
+        title="Edit Team Membership"
+        open={isOpen}
+        onOk={handleOk}
+        okButtonProps={{ disabled: !isValid }}
+        okText="Save"
+        confirmLoading={isSaving}
+        onCancel={handleCancel}
+        maskClosable={false}
+        keyboard={false} // disable esc key to close modal
+        destroyOnClose={true}
+      >
+        <Form
+          form={form}
+          size="small"
+          layout="vertical"
+          name="edit-team-membership-form"
+        >
+          <Descriptions size="small" column={1}>
+            <Descriptions.Item label="Team">
+              {props.membership?.child.name}
+            </Descriptions.Item>
+            <Descriptions.Item label="Parent Team">
+              {props.membership?.parent.name}
+            </Descriptions.Item>
+          </Descriptions>
+          <Form.Item label="Start" name="start" rules={[{ required: true }]}>
+            <DatePicker />
+          </Form.Item>
+          <Form.Item label="End" name="end">
+            <DatePicker />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
+  )
+}
+
+export default EditTeamMembershipForm

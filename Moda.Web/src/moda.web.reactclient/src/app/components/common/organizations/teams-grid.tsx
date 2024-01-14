@@ -1,24 +1,14 @@
-import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import ModaGrid from '../moda-grid'
 import { UseQueryResult } from 'react-query'
 import { PlanningIntervalTeamResponse } from '@/src/services/moda-api'
+import {
+  TeamLinkCellRenderer,
+  TeamRecordTeamLinkCellRenderer,
+} from '../moda-grid-cell-renderers'
 
 export interface TeamsGridProps {
   teamsQuery: UseQueryResult<PlanningIntervalTeamResponse[], unknown>
-}
-
-const TeamLinkCellRenderer = ({ value, data }) => {
-  const teamRoute = data.type === 'Team' ? 'teams' : 'team-of-teams'
-  return <Link href={`/organizations/${teamRoute}/${data.key}`}>{value}</Link>
-}
-
-const TeamOfTeamsLinkCellRenderer = ({ value, data }) => {
-  return (
-    <Link href={`/organizations/team-of-teams/${data.teamOfTeams?.key}`}>
-      {value}
-    </Link>
-  )
 }
 
 const TeamsGrid = ({ teamsQuery }: TeamsGridProps) => {
@@ -30,13 +20,17 @@ const TeamsGrid = ({ teamsQuery }: TeamsGridProps) => {
   const columnDefs = useMemo(
     () => [
       { field: 'key', width: 90 },
-      { field: 'name', cellRenderer: TeamLinkCellRenderer },
+      {
+        field: 'name',
+        cellRenderer: TeamRecordTeamLinkCellRenderer,
+      },
       { field: 'code', width: 125 },
       { field: 'type' },
       {
-        field: 'teamOfTeams.name',
+        field: 'teamOfTeams',
         headerName: 'Team of Teams',
-        cellRenderer: TeamOfTeamsLinkCellRenderer,
+        valueFormatter: (params) => params?.value?.name,
+        cellRenderer: TeamLinkCellRenderer,
       },
       { field: 'isActive' }, // TODO: convert to yes/no
     ],

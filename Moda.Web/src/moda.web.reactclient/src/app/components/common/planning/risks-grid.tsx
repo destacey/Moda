@@ -10,6 +10,7 @@ import CreateRiskForm from './create-risk-form'
 import { EditOutlined } from '@ant-design/icons'
 import EditRiskForm from './edit-risk-form'
 import { UseQueryResult } from 'react-query'
+import { TeamLinkCellRenderer } from '../moda-grid-cell-renderers'
 
 export interface RisksGridProps {
   risksQuery: UseQueryResult<RiskListDto[], unknown>
@@ -21,13 +22,6 @@ export interface RisksGridProps {
 
 const RiskLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/planning/risks/${data.key}`}>{value}</Link>
-}
-
-const TeamLinkCellRenderer = ({ value, data }) => {
-  const teamRoute = data.team?.type === 'Team' ? 'teams' : 'team-of-teams'
-  return (
-    <Link href={`/organizations/${teamRoute}/${data.team?.key}`}>{value}</Link>
-  )
 }
 
 const AssigneeLinkCellRenderer = ({ value, data }) => {
@@ -158,8 +152,8 @@ const RisksGrid = ({
       { field: 'key', width: 90 },
       { field: 'summary', width: 300, cellRenderer: RiskLinkCellRenderer },
       {
-        field: 'team.name',
-        headerName: 'Team',
+        field: 'team',
+        valueFormatter: (params) => params.value.name,
         cellRenderer: TeamLinkCellRenderer,
         hide: hideTeam,
       },

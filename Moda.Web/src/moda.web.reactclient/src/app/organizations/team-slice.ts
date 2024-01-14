@@ -3,7 +3,7 @@ import {
   CreateTeamFormValues,
   EditTeamFormValues,
   TeamListItem,
-  TeamType,
+  TeamTypeName,
 } from './types'
 import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
@@ -45,7 +45,7 @@ const teamSlice = createCrudSlice({
     }
   },
   getDetail: async (
-    teamRequest: { key: number; type: TeamType },
+    teamRequest: { key: number; type: TeamTypeName },
     { rejectWithValue },
   ) => {
     try {

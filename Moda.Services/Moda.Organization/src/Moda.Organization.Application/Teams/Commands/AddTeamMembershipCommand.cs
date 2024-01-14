@@ -1,17 +1,5 @@
 ﻿namespace Moda.Organization.Application.Teams.Commands;
-public sealed record AddTeamMembershipCommand : ICommand
-{
-    public AddTeamMembershipCommand(Guid teamId, Guid parentTeamId, MembershipDateRange dateRange)
-    {
-        TeamId = teamId;
-        ParentTeamId = parentTeamId;
-        DateRange = dateRange;
-    }
-
-    public Guid TeamId { get; }
-    public Guid ParentTeamId { get; }
-    public MembershipDateRange DateRange { get; }
-}
+public sealed record AddTeamMembershipCommand(Guid TeamId, Guid ParentTeamId, MembershipDateRange DateRange) : ICommand;
 
 public sealed class AddTeamMembershipCommandValidator : CustomValidator<AddTeamMembershipCommand>
 {
@@ -30,18 +18,11 @@ public sealed class AddTeamMembershipCommandValidator : CustomValidator<AddTeamM
     }
 }
 
-internal sealed class AddTeamMembershipCommandHandler : ICommandHandler<AddTeamMembershipCommand>
+internal sealed class AddTeamMembershipCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeProvider, ILogger<AddTeamMembershipCommandHandler> logger) : ICommandHandler<AddTeamMembershipCommand>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<AddTeamMembershipCommandHandler> _logger;
-
-    public AddTeamMembershipCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeProvider, ILogger<AddTeamMembershipCommandHandler> logger)
-    {
-        _organizationDbContext = organizationDbContext;
-        _dateTimeProvider = dateTimeProvider;
-        _logger = logger;
-    }
+    private readonly IOrganizationDbContext _organizationDbContext = organizationDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly ILogger<AddTeamMembershipCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(AddTeamMembershipCommand request, CancellationToken cancellationToken)
     {
@@ -49,10 +30,10 @@ internal sealed class AddTeamMembershipCommandHandler : ICommandHandler<AddTeamM
         {
             var team = await _organizationDbContext.Teams
                 .Include(t => t.ParentMemberships)
-                .SingleAsync(t => t.Id == request.TeamId);
+                .SingleAsync(t => t.Id == request.TeamId, cancellationToken: cancellationToken);
 
             var parentTeam = await _organizationDbContext.TeamOfTeams
-                .SingleAsync(t => t.Id == request.ParentTeamId);
+                .SingleAsync(t => t.Id == request.ParentTeamId, cancellationToken: cancellationToken);
 
             var result = team.AddTeamMembership(parentTeam, request.DateRange, _dateTimeProvider.Now);
             if (result.IsFailure)

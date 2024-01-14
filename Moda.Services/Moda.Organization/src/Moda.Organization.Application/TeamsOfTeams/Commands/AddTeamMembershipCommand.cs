@@ -1,17 +1,5 @@
 ﻿namespace Moda.Organization.Application.TeamsOfTeams.Commands;
-public sealed record AddTeamMembershipCommand : ICommand
-{
-    public AddTeamMembershipCommand(Guid teamId, Guid parentTeamId, MembershipDateRange dateRange)
-    {
-        TeamId = teamId;
-        ParentTeamId = parentTeamId;
-        DateRange = dateRange;
-    }
-
-    public Guid TeamId { get; }
-    public Guid ParentTeamId { get; }
-    public MembershipDateRange DateRange { get; }
-}
+public sealed record AddTeamMembershipCommand(Guid TeamId, Guid ParentTeamId, MembershipDateRange DateRange) : ICommand;
 
 public sealed class AddTeamMembershipCommandValidator : CustomValidator<AddTeamMembershipCommand>
 {
@@ -30,27 +18,26 @@ public sealed class AddTeamMembershipCommandValidator : CustomValidator<AddTeamM
     }
 }
 
-internal sealed class AddTeamMembershipCommandHandler : ICommandHandler<AddTeamMembershipCommand>
+internal sealed class AddTeamMembershipCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeProvider, ILogger<AddTeamMembershipCommandHandler> logger) : ICommandHandler<AddTeamMembershipCommand>
 {
-    private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<AddTeamMembershipCommandHandler> _logger;
-
-    public AddTeamMembershipCommandHandler(IOrganizationDbContext organizationDbContext, IDateTimeProvider dateTimeProvider, ILogger<AddTeamMembershipCommandHandler> logger)
-    {
-        _organizationDbContext = organizationDbContext;
-        _dateTimeProvider = dateTimeProvider;
-        _logger = logger;
-    }
+    private readonly IOrganizationDbContext _organizationDbContext = organizationDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly ILogger<AddTeamMembershipCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(AddTeamMembershipCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var team = await GetTeamWithAllChildMemberships(request.TeamId, cancellationToken);
+            var team = await _organizationDbContext.TeamOfTeams
+                .Include(t => t.ParentMemberships)
+                .SingleAsync(t => t.Id == request.TeamId, cancellationToken);
+            if (team is null)
+                return Result.Failure($"Team with id {request.TeamId} not found");
+
+            await LoadAllChildMemberships(team, cancellationToken);
 
             var parentTeam = await _organizationDbContext.TeamOfTeams
-                .SingleAsync(t => t.Id == request.ParentTeamId);
+                .SingleAsync(t => t.Id == request.ParentTeamId, cancellationToken: cancellationToken);
 
             var result = team.AddTeamMembership(parentTeam, request.DateRange, _dateTimeProvider.Now);
             if (result.IsFailure)
@@ -70,26 +57,27 @@ internal sealed class AddTeamMembershipCommandHandler : ICommandHandler<AddTeamM
         }
     }
 
-    private async Task<TeamOfTeams> GetTeamWithAllChildMemberships(Guid teamId, CancellationToken cancellationToken)
+    private async Task LoadAllChildMemberships(TeamOfTeams parent, CancellationToken cancellationToken)
     {
-        var today = _dateTimeProvider.Now.InUtc().Date;
-        var team = await _organizationDbContext.TeamOfTeams
-            .Include(t => t.ParentMemberships)
-            .Include(t => t.ChildMemberships.Where(m => m.DateRange != null && (today <= m.DateRange.Start || (!m.DateRange.End.HasValue && m.DateRange.Start <= today) || (m.DateRange.Start <= today && today <= m.DateRange.End))))
-                .ThenInclude(m => m.Source)
-            .SingleAsync(t => t.Id == teamId, cancellationToken);
+        ArgumentNullException.ThrowIfNull(parent);
 
-        if (team.ChildMemberships.Any())
+        // TODO move to a graph db capability
+        await _organizationDbContext.Entry(parent)
+            .Collection(e => e.ChildMemberships)
+            .LoadAsync(cancellationToken);
+
+        if (parent.ChildMemberships.Count != 0)
         {
-            foreach (var childTeam in team.ChildMemberships.Where(m => m.IsActiveOn(today) || m.IsFutureOn(today)).Select(m => m.Source))
+            foreach (TeamMembership child in parent.ChildMemberships)
             {
-                if (childTeam is TeamOfTeams childTeamOfTeams)
+                await _organizationDbContext.Entry(child)
+                    .Reference(e => e.Source)
+                    .LoadAsync(cancellationToken);
+                if (child.Source is TeamOfTeams childTeamOfTeams)
                 {
-                    await GetTeamWithAllChildMemberships(childTeamOfTeams.Id, cancellationToken);
+                    await LoadAllChildMemberships(childTeamOfTeams, cancellationToken);
                 }
             }
         }
-
-        return team;
     }
 }

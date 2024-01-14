@@ -1,17 +1,14 @@
+import { TeamNavigationDto } from './../../services/moda-api'
 import { TeamNavigationDto } from '@/src/services/moda-api'
 
-export interface TeamListItem {
-  id?: string
-  key?: number
-  name?: string
+export interface TeamListItem extends TeamNavigationDto {
   code?: string
-  type?: string
   isActive?: boolean
   teamOfTeams?: TeamNavigationDto | undefined
 }
 
 export interface CreateTeamFormValues {
-  type: TeamType
+  type: TeamTypeName
   name: string
   code: string
   description: string
@@ -22,7 +19,7 @@ export interface EditTeamFormValues {
   name: string
   code: string
   description: string
-  type?: TeamType
+  type?: TeamTypeName
 }
 
-export type TeamType = 'Team' | 'Team of Teams'
+export type TeamTypeName = 'Team' | 'Team of Teams'

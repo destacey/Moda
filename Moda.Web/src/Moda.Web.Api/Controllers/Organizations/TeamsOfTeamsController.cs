@@ -98,7 +98,7 @@ public class TeamsOfTeamsController : ControllerBase
     [OpenApiOperation("Get parent team memberships.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<TeamMembershipsDto>>> GetTeamMemberships(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<TeamMembershipDto>>> GetTeamMemberships(Guid id, CancellationToken cancellationToken)
     {
         var memberships = await _sender.Send(new GetTeamMembershipsQuery(id), cancellationToken);
 

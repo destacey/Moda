@@ -9,6 +9,7 @@ import {
   PlanningHealthCheckDto,
   PlanningTeamNavigationDto,
   PlanningIntervalObjectiveListDto,
+  TeamNavigationDto,
 } from '@/src/services/moda-api'
 import Link from 'next/link'
 
@@ -31,12 +32,20 @@ export const MarkdownCellRenderer = ({ value }) => {
   )
 }
 
-export interface PlanningTeamLinkCellRendererProps {
-  value: PlanningTeamNavigationDto
+export interface TeamRecordTeamLinkCellRendererProps {
+  data: TeamNavigationDto | PlanningTeamNavigationDto
 }
-export const PlanningTeamLinkCellRenderer = ({
-  value,
-}: PlanningTeamLinkCellRendererProps) => {
+// use this when the record itself is the team rather than a navigation object
+export const TeamRecordTeamLinkCellRenderer = ({
+  data,
+}: TeamRecordTeamLinkCellRendererProps) => {
+  return TeamLinkCellRenderer({ value: data })
+}
+
+export interface TeamLinkCellRendererProps {
+  value: TeamNavigationDto | PlanningTeamNavigationDto
+}
+export const TeamLinkCellRenderer = ({ value }: TeamLinkCellRendererProps) => {
   if (!value) return null
   const teamLink =
     value.type === 'Team'
