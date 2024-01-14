@@ -114,6 +114,7 @@ const TeamDetailsPage = ({ params }) => {
       key: TeamTabs.TeamMemberships,
       tab: 'Team Memberships',
       content: createElement(TeamMembershipsGrid, {
+        teamId: team?.id,
         teamMembershipsQuery: teamMembershipsQuery,
         teamType: 'Team',
       }),
