@@ -5054,7 +5054,7 @@ export class TeamsClient {
     /**
      * Get parent team memberships.
      */
-    getTeamMemberships(id: string, cancelToken?: CancelToken): Promise<TeamMembershipsDto[]> {
+    getTeamMemberships(id: string, cancelToken?: CancelToken): Promise<TeamMembershipDto[]> {
         let url_ = this.baseUrl + "/api/organization/teams/{id}/team-memberships";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -5081,7 +5081,7 @@ export class TeamsClient {
         });
     }
 
-    protected processGetTeamMemberships(response: AxiosResponse): Promise<TeamMembershipsDto[]> {
+    protected processGetTeamMemberships(response: AxiosResponse): Promise<TeamMembershipDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -5096,7 +5096,7 @@ export class TeamsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<TeamMembershipsDto[]>(result200);
+            return Promise.resolve<TeamMembershipDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -5109,7 +5109,7 @@ export class TeamsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<TeamMembershipsDto[]>(null as any);
+        return Promise.resolve<TeamMembershipDto[]>(null as any);
     }
 
     /**
@@ -5885,7 +5885,7 @@ export class TeamsOfTeamsClient {
     /**
      * Get parent team memberships.
      */
-    getTeamMemberships(id: string, cancelToken?: CancelToken): Promise<TeamMembershipsDto[]> {
+    getTeamMemberships(id: string, cancelToken?: CancelToken): Promise<TeamMembershipDto[]> {
         let url_ = this.baseUrl + "/api/organization/teams-of-teams/{id}/team-memberships";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -5912,7 +5912,7 @@ export class TeamsOfTeamsClient {
         });
     }
 
-    protected processGetTeamMemberships(response: AxiosResponse): Promise<TeamMembershipsDto[]> {
+    protected processGetTeamMemberships(response: AxiosResponse): Promise<TeamMembershipDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -5927,7 +5927,7 @@ export class TeamsOfTeamsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<TeamMembershipsDto[]>(result200);
+            return Promise.resolve<TeamMembershipDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -5940,7 +5940,7 @@ export class TeamsOfTeamsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<TeamMembershipsDto[]>(null as any);
+        return Promise.resolve<TeamMembershipDto[]>(null as any);
     }
 
     /**
@@ -8490,7 +8490,7 @@ export interface UpdateTeamRequest {
     description?: string | undefined;
 }
 
-export interface TeamMembershipsDto {
+export interface TeamMembershipDto {
     id?: string;
     child?: TeamNavigationDto;
     parent?: TeamNavigationDto;

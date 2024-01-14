@@ -7,7 +7,10 @@ import {
 } from '../clients'
 import _ from 'lodash'
 import { OptionModel } from '@/src/app/components/types'
-import { AddTeamMembershipRequest } from '../moda-api'
+import {
+  AddTeamMembershipRequest,
+  UpdateTeamMembershipRequest,
+} from '../moda-api'
 import { TeamTypeName } from '@/src/app/organizations/types'
 
 // TEAM OF TEAMS
@@ -83,6 +86,48 @@ export const useCreateTeamMembershipMutation = () => {
       queryClient.invalidateQueries([
         QK.TEAM_MEMBERSHIPS,
         variables.membership.parentTeamId,
+      ])
+    },
+  })
+}
+
+export interface UpdateTeamMembershipMutationRequest {
+  membership: UpdateTeamMembershipRequest
+  parentTeamId: string
+  teamType: TeamTypeName
+}
+export const useUpdateTeamMembershipMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      membership,
+      parentTeamId,
+      teamType,
+    }: UpdateTeamMembershipMutationRequest) => {
+      if (teamType === 'Team') {
+        return (await getTeamsClient()).updateTeamMembership(
+          membership.teamId,
+          membership.teamMembershipId,
+          membership,
+        )
+      } else if (teamType === 'Team of Teams') {
+        return (await getTeamsOfTeamsClient()).updateTeamMembership(
+          membership.teamId,
+          membership.teamMembershipId,
+          membership,
+        )
+      } else {
+        throw new Error(`Invalid team type: ${teamType}`)
+      }
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([
+        QK.TEAM_MEMBERSHIPS,
+        variables.membership.teamId,
+      ])
+      queryClient.invalidateQueries([
+        QK.TEAM_MEMBERSHIPS,
+        variables.parentTeamId,
       ])
     },
   })

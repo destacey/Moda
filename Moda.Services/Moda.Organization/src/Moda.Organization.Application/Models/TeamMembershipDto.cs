@@ -1,7 +1,7 @@
 ﻿using NodaTime;
 
 namespace Moda.Organization.Application.Models;
-public record TeamMembershipsDto
+public record TeamMembershipDto
 {
     public Guid Id { get; set; }
     public required TeamNavigationDto Child { get; set; }
@@ -11,9 +11,9 @@ public record TeamMembershipsDto
     public required string State { get; set; }
 
     // TODO: do this with Mapster
-    public static TeamMembershipsDto Create(TeamMembership membership, IDateTimeProvider dateTimeProvider)
+    public static TeamMembershipDto Create(TeamMembership membership, IDateTimeProvider dateTimeProvider)
     {
-        return new TeamMembershipsDto()
+        return new TeamMembershipDto()
         {
             Id = membership.Id,
             Child = TeamNavigationDto.FromBaseTeam(membership.Source),

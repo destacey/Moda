@@ -7,9 +7,8 @@ import TeamOfTeamsDetails from './team-of-teams-details'
 import RisksGrid, {
   RisksGridProps,
 } from '@/src/app/components/common/planning/risks-grid'
-import TeamMembershipsGrid from '@/src/app/components/common/organizations/team-memberships-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import { EditTeamForm } from '../../components'
+import { EditTeamForm, TeamMembershipsGrid } from '../../components'
 import useAuth from '@/src/app/components/contexts/auth'
 import {
   useGetTeamOfTeamsMemberships,
@@ -108,6 +107,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
       tab: 'Team Memberships',
       content: createElement(TeamMembershipsGrid, {
         teamMembershipsQuery: teamMembershipsQuery,
+        teamType: 'Team of Teams',
       }),
     },
   ]

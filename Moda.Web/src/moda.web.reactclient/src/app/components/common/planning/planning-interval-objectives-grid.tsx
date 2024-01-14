@@ -22,6 +22,7 @@ import {
   PlanningIntervalObjectiveLinkCellRenderer,
   RowMenuCellRenderer,
 } from '../moda-grid-cell-renderers'
+import { set } from 'lodash'
 
 export interface PlanningIntervalObjectivesGridProps {
   objectivesQuery: UseQueryResult<PlanningIntervalObjectiveListDto[], unknown>
@@ -60,8 +61,6 @@ const getRowMenuItems = (props: RowMenuProps) => {
   if (
     (!props.canManageObjectives && !props.canCreateHealthChecks) ||
     !props.objectiveId ||
-    !props.canManageObjectives ||
-    !props.canCreateHealthChecks ||
     !props.onEditObjectiveMenuClicked ||
     !props.onCreateHealthCheckMenuClicked
   ) {
@@ -166,6 +165,7 @@ const PlanningIntervalObjectivesGrid = ({
         filter: false,
         sortable: false,
         hide: !canManageObjectives,
+        suppressMenu: true,
         cellRenderer: (params) => {
           const menuItems = getRowMenuItems({
             objectiveId: params.data.id,
@@ -288,6 +288,7 @@ const PlanningIntervalObjectivesGrid = ({
 
   const onEditObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
+    setSelectedObjectiveId(null)
   }
 
   const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {

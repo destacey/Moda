@@ -1,55 +1,60 @@
 'use client'
 
-import { DatePicker, Form, Modal, Select, message } from 'antd'
+import { DatePicker, Descriptions, Form, Modal, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../components/contexts/auth'
-import { AddTeamMembershipRequest } from '@/src/services/moda-api'
+import {
+  TeamMembershipDto,
+  UpdateTeamMembershipRequest,
+} from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import {
-  CreateTeamMembershipMutationRequest,
-  useCreateTeamMembershipMutation,
-  useGetTeamOfTeamsOptions,
+  UpdateTeamMembershipMutationRequest,
+  useUpdateTeamMembershipMutation,
 } from '@/src/services/queries/organization-queries'
 import { TeamTypeName } from '../types'
+import dayjs from 'dayjs'
 
-export interface CreateTeamMembershipFormProps {
+export interface UpdateTeamMembershipFormProps {
   showForm: boolean
-  teamId: string
+  membership: TeamMembershipDto
   teamType: TeamTypeName
-  onFormCreate: () => void
+  onFormSave: () => void
   onFormCancel: () => void
 }
 
-interface CreateTeamMembershipFormValues {
-  parentTeamId: string
+interface UpdateTeamMembershipFormValues {
   start: Date
   end: Date | null
 }
 
 const mapToRequestValues = (
-  values: CreateTeamMembershipFormValues,
+  values: UpdateTeamMembershipFormValues,
+  originalMembership: TeamMembershipDto,
   teamType: TeamTypeName,
 ) => {
   const membership = {
-    parentTeamId: values.parentTeamId,
+    teamMembershipId: originalMembership.id,
+    teamId: originalMembership.child.id,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
-  } as AddTeamMembershipRequest
-  return { membership, teamType } as CreateTeamMembershipMutationRequest
+  } as UpdateTeamMembershipRequest
+  return {
+    membership,
+    parentTeamId: originalMembership.parent.id,
+    teamType,
+  } as UpdateTeamMembershipMutationRequest
 }
 
-const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
+const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateTeamMembershipFormValues>()
+  const [form] = Form.useForm<UpdateTeamMembershipFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
-  // TODO: only get teams that are not in the hierarchy
-  const { data: teamOptions } = useGetTeamOfTeamsOptions(true)
-
-  const createTeamMembership = useCreateTeamMembershipMutation()
+  const updateTeamMembership = useUpdateTeamMembershipMutation()
 
   const { hasClaim } = useAuth()
   const canManageTeamMemberships = hasClaim(
@@ -57,13 +62,29 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
     'Permissions.Teams.ManageTeamMemberships',
   )
 
-  const create = async (
-    values: CreateTeamMembershipFormValues,
+  const mapToFormValues = useCallback(
+    (membership: TeamMembershipDto) => {
+      if (!membership) {
+        throw new Error('Membership is required.')
+      }
+      form.setFieldsValue({
+        start: membership.start ? dayjs(membership.start) : null,
+        end: membership.end ? dayjs(membership.end) : null,
+      })
+    },
+    [form],
+  )
+
+  const update = async (
+    values: UpdateTeamMembershipFormValues,
   ): Promise<boolean> => {
     try {
-      const request = mapToRequestValues(values, props.teamType)
-      request.membership.teamId = props.teamId
-      await createTeamMembership.mutateAsync(request)
+      const request = mapToRequestValues(
+        values,
+        props.membership,
+        props.teamType,
+      )
+      await updateTeamMembership.mutateAsync(request)
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -73,7 +94,7 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
       } else {
         messageApi.error(
           error.supportMessage ??
-            'An unexpected error occurred while creating the team membership.',
+            'An unexpected error occurred while updating the team membership.',
         )
         console.error(error)
       }
@@ -85,12 +106,12 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values)) {
+      if (await update(values)) {
         setIsOpen(false)
         form.resetFields()
-        props.onFormCreate()
+        props.onFormSave()
         // TODO: this message is not displaying
-        messageApi.success('Successfully created team membership.')
+        messageApi.success('Successfully updated team membership.')
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
@@ -106,20 +127,23 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
   }, [form, props])
 
   useEffect(() => {
-    if (!teamOptions) return
-
+    if (!props.membership) return
     if (canManageTeamMemberships) {
       setIsOpen(props.showForm)
+      if (props.showForm) {
+        mapToFormValues(props.membership)
+      }
     } else {
       handleCancel()
-      messageApi.error('You do not have permission to manage Team Memberships.')
+      messageApi.error('You do not have permission to manage team memberships.')
     }
   }, [
     canManageTeamMemberships,
     handleCancel,
+    mapToFormValues,
     messageApi,
+    props.membership,
     props.showForm,
-    teamOptions,
   ])
 
   useEffect(() => {
@@ -133,11 +157,11 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
     <>
       {contextHolder}
       <Modal
-        title="Create Team Membership"
+        title="Edit Team Membership"
         open={isOpen}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
-        okText="Create"
+        okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
@@ -148,30 +172,16 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
           form={form}
           size="small"
           layout="vertical"
-          name="create-team-membership-form"
+          name="edit-team-membership-form"
         >
-          <Form.Item
-            name="parentTeamId"
-            label="Parent Team"
-            rules={[{ required: true }]}
-          >
-            <Select
-              showSearch
-              placeholder="Select a parent team"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
-              filterSort={(optionA, optionB) =>
-                (optionA?.label ?? '')
-                  .toLowerCase()
-                  .localeCompare((optionB?.label ?? '').toLowerCase())
-              }
-              options={teamOptions?.filter((t) => t.value !== props.teamId)}
-            />
-          </Form.Item>
+          <Descriptions size="small" column={1}>
+            <Descriptions.Item label="Team">
+              {props.membership?.child.name}
+            </Descriptions.Item>
+            <Descriptions.Item label="Parent Team">
+              {props.membership?.parent.name}
+            </Descriptions.Item>
+          </Descriptions>
           <Form.Item label="Start" name="start" rules={[{ required: true }]}>
             <DatePicker />
           </Form.Item>
@@ -184,4 +194,4 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
   )
 }
 
-export default CreateTeamMembershipForm
+export default EditTeamMembershipForm
