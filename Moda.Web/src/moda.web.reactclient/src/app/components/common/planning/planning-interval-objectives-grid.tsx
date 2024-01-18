@@ -16,12 +16,13 @@ import { SystemContext } from '../../constants'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
 import {
-  HealthCheckStatusCellRenderer,
+  NestedHealthCheckStatusCellRenderer,
   TeamLinkCellRenderer,
   PlanningIntervalLinkCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,
   RowMenuCellRenderer,
 } from '../moda-grid-cell-renderers'
+import { ColDef } from 'ag-grid-community'
 
 export interface PlanningIntervalObjectivesGridProps {
   objectivesQuery: UseQueryResult<PlanningIntervalObjectiveListDto[], unknown>
@@ -155,11 +156,10 @@ const PlanningIntervalObjectivesGrid = ({
     setOpenCreateObjectiveForm(true)
   }, [])
 
-  const columnDefs = useMemo(
+  const columnDefs = useMemo<ColDef<PlanningIntervalObjectiveListDto>[]>(
     () => [
       {
-        field: 'actions',
-        headerName: '',
+        headerName: 'Actions',
         width: 50,
         filter: false,
         sortable: false,
@@ -201,12 +201,10 @@ const PlanningIntervalObjectivesGrid = ({
         hide: hideTeam,
       },
       {
-        field: 'healthCheck',
+        field: 'healthCheck.status.name',
         headerName: 'Health',
         width: 125,
-        // TODO: sorting and filtering not working
-        valueFormatter: (params) => params.value?.status?.name,
-        cellRenderer: HealthCheckStatusCellRenderer,
+        cellRenderer: NestedHealthCheckStatusCellRenderer,
       },
       { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
       {

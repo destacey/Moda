@@ -5,7 +5,12 @@ import ModaGrid from '../moda-grid'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import { useGetHealthReport } from '@/src/services/queries/health-check-queries'
-import { MarkdownCellRenderer } from '../moda-grid-cell-renderers'
+import {
+  HealthCheckStatusCellRenderer,
+  MarkdownCellRenderer,
+} from '../moda-grid-cell-renderers'
+import { HealthCheckDto } from '@/src/services/moda-api'
+import { ColDef } from 'ag-grid-community'
 
 interface HealthReportGridProps {
   objectId: string
@@ -35,13 +40,14 @@ const HealthReportGrid = (props: HealthReportGridProps) => {
     refetch,
   } = useGetHealthReport(props?.objectId)
 
-  const columnDefs = useMemo(
+  const columnDefs = useMemo<ColDef<HealthCheckDto>[]>(
     () => [
       { field: 'id', hide: true },
       {
         field: 'status.name',
         headerName: 'Health',
         width: 115,
+        cellRenderer: HealthCheckStatusCellRenderer,
       },
       {
         field: 'note',
@@ -60,7 +66,7 @@ const HealthReportGrid = (props: HealthReportGridProps) => {
           dayjs(params.data.reportedOn).format('M/D/YYYY h:mm A'),
       },
       {
-        field: 'Expiration',
+        field: 'expiration',
         valueGetter: (params) =>
           dayjs(params.data.expiration).format('M/D/YYYY h:mm A'),
       },

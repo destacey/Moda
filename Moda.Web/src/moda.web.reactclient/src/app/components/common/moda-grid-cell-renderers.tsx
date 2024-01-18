@@ -6,21 +6,38 @@ import './moda-grid-cell-renderers.css'
 import HealthCheckTag from './health-check/health-check-tag'
 import {
   NavigationDto,
-  PlanningHealthCheckDto,
   PlanningTeamNavigationDto,
   PlanningIntervalObjectiveListDto,
   TeamNavigationDto,
+  SimpleNavigationDto,
 } from '@/src/services/moda-api'
 import Link from 'next/link'
 
+export interface HealthCheckStatusColumn {
+  id?: string
+  status?: SimpleNavigationDto
+  expiration?: Date
+}
+
+export interface NestedHealthCheckStatusCellRendererProps {
+  data: {
+    healthCheck: HealthCheckStatusColumn | null
+  } | null
+}
+export const NestedHealthCheckStatusCellRenderer = ({
+  data,
+}: NestedHealthCheckStatusCellRendererProps) => {
+  return HealthCheckStatusCellRenderer({ data: data?.healthCheck })
+}
+
 export interface HealthCheckStatusCellRendererProps {
-  value: PlanningHealthCheckDto
+  data: HealthCheckStatusColumn | null
 }
 export const HealthCheckStatusCellRenderer = ({
-  value,
+  data,
 }: HealthCheckStatusCellRendererProps) => {
-  if (!value) return null
-  return <HealthCheckTag healthCheck={value} />
+  if (!data) return null
+  return <HealthCheckTag healthCheck={data} />
 }
 
 export const MarkdownCellRenderer = ({ value }) => {
