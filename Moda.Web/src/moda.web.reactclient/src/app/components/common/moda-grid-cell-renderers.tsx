@@ -49,26 +49,45 @@ export const MarkdownCellRenderer = ({ value }) => {
   )
 }
 
-export interface TeamRecordTeamLinkCellRendererProps {
-  data: TeamNavigationDto | PlanningTeamNavigationDto
-}
-// use this when the record itself is the team rather than a navigation object
-export const TeamRecordTeamLinkCellRenderer = ({
-  data,
-}: TeamRecordTeamLinkCellRendererProps) => {
-  return TeamLinkCellRenderer({ value: data })
+export interface TeamNameLinkColumn extends NavigationDto {
+  type?: string
 }
 
-export interface TeamLinkCellRendererProps {
-  value: TeamNavigationDto | PlanningTeamNavigationDto
+export interface NestedTeamNameLinkCellRendererProps {
+  data: {
+    team: TeamNameLinkColumn | null
+  } | null
 }
-export const TeamLinkCellRenderer = ({ value }: TeamLinkCellRendererProps) => {
-  if (!value) return null
+export const NestedTeamNameLinkCellRenderer = ({
+  data,
+}: NestedTeamNameLinkCellRendererProps) => {
+  return TeamNameLinkCellRenderer({ data: data?.team })
+}
+
+// TODO: how can we merge these two nested renderers?
+export interface NestedTeamOfTeamsNameLinkCellRendererProps {
+  data: {
+    teamOfTeams: TeamNameLinkColumn | null
+  } | null
+}
+export const NestedTeamOfTeamsNameLinkCellRenderer = ({
+  data,
+}: NestedTeamOfTeamsNameLinkCellRendererProps) => {
+  return TeamNameLinkCellRenderer({ data: data?.teamOfTeams })
+}
+
+export interface TeamNameLinkCellRendererProps {
+  data: TeamNameLinkColumn
+}
+export const TeamNameLinkCellRenderer = ({
+  data,
+}: TeamNameLinkCellRendererProps) => {
+  if (!data) return null
   const teamLink =
-    value.type === 'Team'
-      ? `/organizations/teams/${value.key}`
-      : `/organizations/team-of-teams/${value.key}`
-  return <Link href={teamLink}>{value.name}</Link>
+    data.type === 'Team'
+      ? `/organizations/teams/${data.key}`
+      : `/organizations/team-of-teams/${data.key}`
+  return <Link href={teamLink}>{data.name}</Link>
 }
 
 export interface PlanningIntervalObjectiveLinkCellRendererProps {

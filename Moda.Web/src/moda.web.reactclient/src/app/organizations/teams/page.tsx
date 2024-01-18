@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ModaGrid from '../../components/common/moda-grid'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { Button, Space, Switch } from 'antd'
@@ -16,11 +16,12 @@ import {
   selectTeamIsInEditMode,
 } from '../team-slice'
 import { ModalCreateTeamForm } from '../components/create-team-form'
-import { TeamLinkCellRenderer } from '../../components/common/moda-grid-cell-renderers'
-
-const LocalTeamLinkCellRenderer = ({ value, data }) => {
-  return TeamLinkCellRenderer({ value: data })
-}
+import {
+  NestedTeamOfTeamsNameLinkCellRenderer,
+  TeamNameLinkCellRenderer,
+} from '../../components/common/moda-grid-cell-renderers'
+import { TeamListItem } from '../types'
+import { ColDef } from 'ag-grid-community'
 
 const TeamListPage = () => {
   useDocumentTitle('Teams')
@@ -28,20 +29,21 @@ const TeamListPage = () => {
   const isInEditMode = useAppSelector(selectTeamIsInEditMode)
   const includeDisabled = useAppSelector((state) => state.team.includeInactive)
 
-  const [columnDefs, setColumnDefs] = useState([
-    { field: 'key', width: 90 },
-    { field: 'name', cellRenderer: LocalTeamLinkCellRenderer },
-    { field: 'code', width: 125 },
-    { field: 'type' },
-    {
-      field: 'teamOfTeams',
-      headerName: 'Team of Teams',
-      // TODO: sorting and filtering not working
-      valueFormatter: (params) => params.value?.name,
-      cellRenderer: TeamLinkCellRenderer,
-    },
-    { field: 'isActive' }, // TODO: convert to yes/no
-  ])
+  const columnDefs = useMemo<ColDef<TeamListItem>[]>(
+    () => [
+      { field: 'key', width: 90 },
+      { field: 'name', cellRenderer: TeamNameLinkCellRenderer },
+      { field: 'code', width: 125 },
+      { field: 'type' },
+      {
+        field: 'teamOfTeams.name',
+        headerName: 'Team of Teams',
+        cellRenderer: NestedTeamOfTeamsNameLinkCellRenderer,
+      },
+      { field: 'isActive' }, // TODO: convert to yes/no
+    ],
+    [],
+  )
 
   const dispatch = useAppDispatch()
 

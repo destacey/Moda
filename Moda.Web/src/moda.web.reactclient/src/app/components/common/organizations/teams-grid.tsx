@@ -3,9 +3,10 @@ import ModaGrid from '../moda-grid'
 import { UseQueryResult } from 'react-query'
 import { PlanningIntervalTeamResponse } from '@/src/services/moda-api'
 import {
-  TeamLinkCellRenderer,
-  TeamRecordTeamLinkCellRenderer,
+  NestedTeamOfTeamsNameLinkCellRenderer,
+  TeamNameLinkCellRenderer,
 } from '../moda-grid-cell-renderers'
+import { ColDef } from 'ag-grid-community'
 
 export interface TeamsGridProps {
   teamsQuery: UseQueryResult<PlanningIntervalTeamResponse[], unknown>
@@ -17,20 +18,19 @@ const TeamsGrid = ({ teamsQuery }: TeamsGridProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const columnDefs = useMemo(
+  const columnDefs = useMemo<ColDef<PlanningIntervalTeamResponse>[]>(
     () => [
       { field: 'key', width: 90 },
       {
         field: 'name',
-        cellRenderer: TeamRecordTeamLinkCellRenderer,
+        cellRenderer: TeamNameLinkCellRenderer,
       },
       { field: 'code', width: 125 },
       { field: 'type' },
       {
-        field: 'teamOfTeams',
+        field: 'teamOfTeams.name',
         headerName: 'Team of Teams',
-        valueFormatter: (params) => params?.value?.name,
-        cellRenderer: TeamLinkCellRenderer,
+        cellRenderer: NestedTeamOfTeamsNameLinkCellRenderer,
       },
       { field: 'isActive' }, // TODO: convert to yes/no
     ],

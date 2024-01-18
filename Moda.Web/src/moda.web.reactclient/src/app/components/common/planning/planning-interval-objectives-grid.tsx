@@ -17,10 +17,11 @@ import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
 import {
   NestedHealthCheckStatusCellRenderer,
-  TeamLinkCellRenderer,
+  TeamNameLinkCellRenderer,
   PlanningIntervalLinkCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,
   RowMenuCellRenderer,
+  NestedTeamNameLinkCellRenderer,
 } from '../moda-grid-cell-renderers'
 import { ColDef } from 'ag-grid-community'
 
@@ -195,9 +196,8 @@ const PlanningIntervalObjectivesGrid = ({
       },
       { field: 'status.name', headerName: 'Status', width: 125 },
       {
-        field: 'team',
-        valueFormatter: (params) => params.value.name,
-        cellRenderer: TeamLinkCellRenderer,
+        field: 'team.name',
+        cellRenderer: NestedTeamNameLinkCellRenderer,
         hide: hideTeam,
       },
       {

@@ -13,11 +13,11 @@ import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import {
   MarkdownCellRenderer,
-  TeamLinkCellRenderer,
   PlanningIntervalLinkCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,
   HealthCheckStatusCellRenderer,
   HealthCheckStatusColumn,
+  NestedTeamNameLinkCellRenderer,
 } from '@/src/app/components/common/moda-grid-cell-renderers'
 import dayjs from 'dayjs'
 import { ModaGrid } from '@/src/app/components/common'
@@ -29,7 +29,6 @@ const LocalHealthCheckCellRenderer = ({ data }) => {
     status: data.healthStatus,
     expiration: data.expiration,
   }
-  console.log('LocalHealthCheckCellRenderer', healthCheck)
   return HealthCheckStatusCellRenderer({ data: healthCheck })
 }
 
@@ -107,9 +106,8 @@ const ObjectiveHealthReportPage = ({ params }) => {
         width: 125,
       },
       {
-        field: 'team',
-        valueFormatter: (params) => params.value.name,
-        cellRenderer: TeamLinkCellRenderer,
+        field: 'team.name',
+        cellRenderer: NestedTeamNameLinkCellRenderer,
         hide: false,
       },
       { field: 'healthCheckId', hide: true },

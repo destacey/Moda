@@ -6,8 +6,10 @@ import { TeamMembershipDto } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
 import { UseQueryResult } from 'react-query'
 import {
+  NestedTeamNameLinkCellRenderer,
+  NestedTeamOfTeamsNameLinkCellRenderer,
   RowMenuCellRenderer,
-  TeamLinkCellRenderer,
+  TeamNameLinkCellRenderer,
 } from '../../components/common/moda-grid-cell-renderers'
 import useAuth from '../../components/contexts/auth'
 import { MenuProps } from 'antd'
@@ -15,11 +17,20 @@ import { ItemType } from 'antd/es/menu/hooks/useItems'
 import EditTeamMembershipForm from './edit-team-membership-form'
 import { TeamTypeName } from '../types'
 import DeleteTeamMembershipForm from './delete-team-membership-form'
+import { ColDef } from 'ag-grid-community'
 
 export interface TeamMembershipsGridProps {
   teamId: string
   teamMembershipsQuery: UseQueryResult<TeamMembershipDto[], unknown>
   teamType: TeamTypeName
+}
+
+const LocalChildTeamNameLinkCellRenderer = ({ data }) => {
+  return TeamNameLinkCellRenderer({ data: data.child })
+}
+
+const LocalParentTeamNameLinkCellRenderer = ({ data }) => {
+  return TeamNameLinkCellRenderer({ data: data.parent })
 }
 
 interface RowMenuProps extends MenuProps {
@@ -88,11 +99,9 @@ const TeamMembershipsGrid = ({
     [],
   )
 
-  const columnDefs = useMemo(
+  const columnDefs = useMemo<ColDef<TeamMembershipDto>[]>(
     () => [
       {
-        field: 'actions',
-        headerName: '',
         width: 50,
         filter: false,
         sortable: false,
@@ -114,14 +123,14 @@ const TeamMembershipsGrid = ({
         },
       },
       {
-        field: 'child',
-        valueFormatter: (params) => params.value.name,
-        cellRenderer: TeamLinkCellRenderer,
+        field: 'child.name',
+        headerName: 'Child Team',
+        cellRenderer: LocalChildTeamNameLinkCellRenderer,
       },
       {
-        field: 'parent',
-        valueFormatter: (params) => params.value.name,
-        cellRenderer: TeamLinkCellRenderer,
+        field: 'parent.name',
+        headerName: 'Parent Team',
+        cellRenderer: LocalParentTeamNameLinkCellRenderer,
       },
       { field: 'state' },
       {
