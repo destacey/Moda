@@ -10,7 +10,11 @@ import CreateRiskForm from './create-risk-form'
 import { EditOutlined } from '@ant-design/icons'
 import EditRiskForm from './edit-risk-form'
 import { UseQueryResult } from 'react-query'
-import { TeamLinkCellRenderer } from '../moda-grid-cell-renderers'
+import {
+  NestedTeamNameLinkCellRenderer,
+  TeamNameLinkCellRenderer,
+} from '../moda-grid-cell-renderers'
+import { ColDef } from 'ag-grid-community'
 
 export interface RisksGridProps {
   risksQuery: UseQueryResult<RiskListDto[], unknown>
@@ -126,11 +130,9 @@ const RisksGrid = ({
   ]
 
   // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
-  const columnDefs = useMemo(
+  const columnDefs = useMemo<ColDef<RiskListDto>[]>(
     () => [
       {
-        field: 'actions',
-        headerName: '',
         width: 50,
         filter: false,
         sortable: false,
@@ -152,16 +154,16 @@ const RisksGrid = ({
       { field: 'key', width: 90 },
       { field: 'summary', width: 300, cellRenderer: RiskLinkCellRenderer },
       {
-        field: 'team',
-        valueFormatter: (params) => params.value.name,
-        cellRenderer: TeamLinkCellRenderer,
+        field: 'team.name',
+        headerName: 'Team',
+        cellRenderer: NestedTeamNameLinkCellRenderer,
         hide: hideTeam,
       },
       { field: 'status', width: 125, hide: includeClosed === false },
       { field: 'category', width: 125 },
       { field: 'exposure', width: 125 },
       {
-        field: 'followUp',
+        field: 'followUpDate',
         valueGetter: (params) =>
           params.data.followUpDate
             ? dayjs(params.data.followUpDate).format('M/D/YYYY')

@@ -13,13 +13,24 @@ import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import {
   MarkdownCellRenderer,
-
-    TeamLinkCellRenderer,
   PlanningIntervalLinkCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,
+  HealthCheckStatusCellRenderer,
+  HealthCheckStatusColumn,
+  NestedTeamNameLinkCellRenderer,
 } from '@/src/app/components/common/moda-grid-cell-renderers'
 import dayjs from 'dayjs'
 import { ModaGrid } from '@/src/app/components/common'
+
+const LocalHealthCheckCellRenderer = ({ data }) => {
+  if (!data.healthCheckId) return null
+  const healthCheck: HealthCheckStatusColumn = {
+    id: data.healthCheckId,
+    status: data.healthStatus,
+    expiration: data.expiration,
+  }
+  return HealthCheckStatusCellRenderer({ data: healthCheck })
+}
 
 const ObjectiveHealthReportPage = ({ params }) => {
   useDocumentTitle('PI Objectives Health Report')
@@ -83,17 +94,14 @@ const ObjectiveHealthReportPage = ({ params }) => {
       },
       { field: 'isStretch', width: 100 },
       {
-        field: 'planningInterval',
-        valueFormatter: (params) => params.value.name,
-        useValueFormatterForExport: true,
-        cellRenderer: PlanningIntervalLinkCellRenderer,
-        hide: true,
+        field: 'status.name',
+        headerName: 'Status',
+        width: 125,
       },
-      { field: 'status.name', headerName: 'Status', width: 125 },
       {
-        field: 'team',
-        valueFormatter: (params) => params.value.name,
-        cellRenderer: TeamLinkCellRenderer,
+        field: 'team.name',
+        headerName: 'Team',
+        cellRenderer: NestedTeamNameLinkCellRenderer,
         hide: false,
       },
       { field: 'healthCheckId', hide: true },
@@ -101,6 +109,7 @@ const ObjectiveHealthReportPage = ({ params }) => {
         field: 'healthStatus.name',
         headerName: 'Health',
         width: 115,
+        cellRenderer: LocalHealthCheckCellRenderer,
       },
       {
         field: 'note',

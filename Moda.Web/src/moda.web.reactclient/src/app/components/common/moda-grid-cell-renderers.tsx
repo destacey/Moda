@@ -6,21 +6,38 @@ import './moda-grid-cell-renderers.css'
 import HealthCheckTag from './health-check/health-check-tag'
 import {
   NavigationDto,
-  PlanningHealthCheckDto,
   PlanningTeamNavigationDto,
   PlanningIntervalObjectiveListDto,
   TeamNavigationDto,
+  SimpleNavigationDto,
 } from '@/src/services/moda-api'
 import Link from 'next/link'
 
+export interface HealthCheckStatusColumn {
+  id?: string
+  status?: SimpleNavigationDto
+  expiration?: Date
+}
+
+export interface NestedHealthCheckStatusCellRendererProps {
+  data: {
+    healthCheck: HealthCheckStatusColumn | null
+  } | null
+}
+export const NestedHealthCheckStatusCellRenderer = ({
+  data,
+}: NestedHealthCheckStatusCellRendererProps) => {
+  return HealthCheckStatusCellRenderer({ data: data?.healthCheck })
+}
+
 export interface HealthCheckStatusCellRendererProps {
-  value: PlanningHealthCheckDto
+  data: HealthCheckStatusColumn | null
 }
 export const HealthCheckStatusCellRenderer = ({
-  value,
+  data,
 }: HealthCheckStatusCellRendererProps) => {
-  if (!value) return null
-  return <HealthCheckTag healthCheck={value} />
+  if (!data) return null
+  return <HealthCheckTag healthCheck={data} />
 }
 
 export const MarkdownCellRenderer = ({ value }) => {
@@ -32,26 +49,45 @@ export const MarkdownCellRenderer = ({ value }) => {
   )
 }
 
-export interface TeamRecordTeamLinkCellRendererProps {
-  data: TeamNavigationDto | PlanningTeamNavigationDto
-}
-// use this when the record itself is the team rather than a navigation object
-export const TeamRecordTeamLinkCellRenderer = ({
-  data,
-}: TeamRecordTeamLinkCellRendererProps) => {
-  return TeamLinkCellRenderer({ value: data })
+export interface TeamNameLinkColumn extends NavigationDto {
+  type?: string
 }
 
-export interface TeamLinkCellRendererProps {
-  value: TeamNavigationDto | PlanningTeamNavigationDto
+export interface NestedTeamNameLinkCellRendererProps {
+  data: {
+    team: TeamNameLinkColumn | null
+  } | null
 }
-export const TeamLinkCellRenderer = ({ value }: TeamLinkCellRendererProps) => {
-  if (!value) return null
+export const NestedTeamNameLinkCellRenderer = ({
+  data,
+}: NestedTeamNameLinkCellRendererProps) => {
+  return TeamNameLinkCellRenderer({ data: data?.team })
+}
+
+// TODO: how can we merge these two nested renderers?
+export interface NestedTeamOfTeamsNameLinkCellRendererProps {
+  data: {
+    teamOfTeams: TeamNameLinkColumn | null
+  } | null
+}
+export const NestedTeamOfTeamsNameLinkCellRenderer = ({
+  data,
+}: NestedTeamOfTeamsNameLinkCellRendererProps) => {
+  return TeamNameLinkCellRenderer({ data: data?.teamOfTeams })
+}
+
+export interface TeamNameLinkCellRendererProps {
+  data: TeamNameLinkColumn
+}
+export const TeamNameLinkCellRenderer = ({
+  data,
+}: TeamNameLinkCellRendererProps) => {
+  if (!data) return null
   const teamLink =
-    value.type === 'Team'
-      ? `/organizations/teams/${value.key}`
-      : `/organizations/team-of-teams/${value.key}`
-  return <Link href={teamLink}>{value.name}</Link>
+    data.type === 'Team'
+      ? `/organizations/teams/${data.key}`
+      : `/organizations/team-of-teams/${data.key}`
+  return <Link href={teamLink}>{data.name}</Link>
 }
 
 export interface PlanningIntervalObjectiveLinkCellRendererProps {
@@ -70,15 +106,26 @@ export const PlanningIntervalObjectiveLinkCellRenderer = ({
   )
 }
 
+export interface NestedPlanningIntervalLinkCellRendererProps {
+  data: {
+    planningInterval: NavigationDto | null
+  } | null
+}
+export const NestedPlanningIntervalLinkCellRenderer = ({
+  data,
+}: NestedPlanningIntervalLinkCellRendererProps) => {
+  return PlanningIntervalLinkCellRenderer({ data: data?.planningInterval })
+}
+
 export interface PlanningIntervalLinkCellRendererProps {
-  value: NavigationDto
+  data: NavigationDto
 }
 export const PlanningIntervalLinkCellRenderer = ({
-  value,
+  data,
 }: PlanningIntervalLinkCellRendererProps) => {
-  if (!value) return null
+  if (!data) return null
   return (
-    <Link href={`/planning/planning-intervals/${value.key}`}>{value.name}</Link>
+    <Link href={`/planning/planning-intervals/${data.key}`}>{data.name}</Link>
   )
 }
 
