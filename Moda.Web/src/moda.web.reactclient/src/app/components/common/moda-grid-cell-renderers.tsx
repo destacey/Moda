@@ -106,15 +106,26 @@ export const PlanningIntervalObjectiveLinkCellRenderer = ({
   )
 }
 
+export interface NestedPlanningIntervalLinkCellRendererProps {
+  data: {
+    planningInterval: NavigationDto | null
+  } | null
+}
+export const NestedPlanningIntervalLinkCellRenderer = ({
+  data,
+}: NestedPlanningIntervalLinkCellRendererProps) => {
+  return PlanningIntervalLinkCellRenderer({ data: data?.planningInterval })
+}
+
 export interface PlanningIntervalLinkCellRendererProps {
-  value: NavigationDto
+  data: NavigationDto
 }
 export const PlanningIntervalLinkCellRenderer = ({
-  value,
+  data,
 }: PlanningIntervalLinkCellRendererProps) => {
-  if (!value) return null
+  if (!data) return null
   return (
-    <Link href={`/planning/planning-intervals/${value.key}`}>{value.name}</Link>
+    <Link href={`/planning/planning-intervals/${data.key}`}>{data.name}</Link>
   )
 }
 

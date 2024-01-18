@@ -155,6 +155,7 @@ const RisksGrid = ({
       { field: 'summary', width: 300, cellRenderer: RiskLinkCellRenderer },
       {
         field: 'team.name',
+        headerName: 'Team',
         cellRenderer: NestedTeamNameLinkCellRenderer,
         hide: hideTeam,
       },

@@ -94,19 +94,13 @@ const ObjectiveHealthReportPage = ({ params }) => {
       },
       { field: 'isStretch', width: 100 },
       {
-        field: 'planningInterval',
-        valueFormatter: (params) => params.value.name,
-        useValueFormatterForExport: true,
-        cellRenderer: PlanningIntervalLinkCellRenderer,
-        hide: true,
-      },
-      {
         field: 'status.name',
         headerName: 'Status',
         width: 125,
       },
       {
         field: 'team.name',
+        headerName: 'Team',
         cellRenderer: NestedTeamNameLinkCellRenderer,
         hide: false,
       },
