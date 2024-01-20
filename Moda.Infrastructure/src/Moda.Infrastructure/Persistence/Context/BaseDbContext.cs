@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
+using Moda.Infrastructure.Common.Services;
 using Moda.Infrastructure.Persistence.Extensions;
 
 namespace Moda.Infrastructure.Persistence.Context;
@@ -15,8 +16,9 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
     private readonly ISerializerService _serializer;
     private readonly DatabaseSettings _dbSettings;
     private readonly IEventPublisher _events;
+    private readonly IRequestCorrelationIdProvider _requestCorrelationIdProvider;
 
-    protected BaseDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
+    protected BaseDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events, IRequestCorrelationIdProvider requestCorrelationIdProvider)
         : base(options)
     {
         _currentUser = currentUser;
@@ -24,6 +26,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         _serializer = serializer;
         _dbSettings = dbSettings.Value;
         _events = events;
+        _requestCorrelationIdProvider = requestCorrelationIdProvider;
 
         // this is need so that the owned entities are soft deleted correctly
         ChangeTracker.CascadeDeleteTiming = CascadeTiming.OnSaveChanges;
@@ -63,7 +66,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
-        var auditEntries = HandleAuditingBeforeSaveChanges(_currentUser.GetUserId());
+        var auditEntries = HandleAuditingBeforeSaveChanges(_currentUser.GetUserId(), _requestCorrelationIdProvider.CorrelationId);
 
         int result = await base.SaveChangesAsync(cancellationToken);
 
@@ -74,7 +77,7 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         return result;
     }
 
-    private List<AuditTrail> HandleAuditingBeforeSaveChanges(Guid userId)
+    private List<AuditTrail> HandleAuditingBeforeSaveChanges(Guid userId, string correlationId)
     {
         foreach (var entry in ChangeTracker.Entries<IAuditable>().ToList())
         {
@@ -102,8 +105,6 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         }
 
         ChangeTracker.DetectChanges();
-
-        var correlationId = Guid.NewGuid();
 
         var trailEntries = new List<AuditTrail>();
         foreach (var entry in ChangeTracker.Entries<IAuditable>()

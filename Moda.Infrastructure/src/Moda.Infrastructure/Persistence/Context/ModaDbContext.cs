@@ -5,6 +5,7 @@ using Moda.Goals.Application.Persistence;
 using Moda.Goals.Domain.Models;
 using Moda.Health;
 using Moda.Health.Models;
+using Moda.Infrastructure.Common.Services;
 using Moda.Links;
 using Moda.Links.Models;
 using Moda.Planning.Application.Persistence;
@@ -15,8 +16,8 @@ namespace Moda.Infrastructure.Persistence.Context;
 
 public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IWorkDbContext
 {
-    public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events)
-        : base(options, currentUser, dateTimeProvider, serializer, dbSettings, events)
+    public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events, IRequestCorrelationIdProvider requestCorrelationIdProvider)
+        : base(options, currentUser, dateTimeProvider, serializer, dbSettings, events, requestCorrelationIdProvider)
     {
     }
 
