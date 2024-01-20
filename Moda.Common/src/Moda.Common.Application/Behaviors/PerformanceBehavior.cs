@@ -1,22 +1,20 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
 using MediatR;
+using Serilog.Context;
 
 namespace Moda.Common.Application.Behaviors;
 
-public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull, IRequest<TResponse>
+public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : class, IRequest<TResponse>
 {
     private readonly Stopwatch _timer;
-    private readonly ILogger<TRequest> _logger;
-    private readonly ICurrentUser _currentUser;
+    private readonly ILogger<PerformanceBehavior<TRequest, TResponse>> _logger;
 
-    public PerformanceBehavior(
-        ILogger<TRequest> logger,
-        ICurrentUser currentUser)
+    public PerformanceBehavior(ILogger<PerformanceBehavior<TRequest, TResponse>> logger)
     {
         _timer = new Stopwatch();
 
         _logger = logger;
-        _currentUser = currentUser;
     }
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
@@ -29,14 +27,14 @@ public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
 
         var elapsedMilliseconds = _timer.ElapsedMilliseconds;
 
-        if (elapsedMilliseconds > 500)
+        if (elapsedMilliseconds > 700)
         {
             var requestName = typeof(TRequest).Name;
-            var userId = _currentUser.GetUserId().ToString();
-            var userName = _currentUser.GetUserEmail();
 
-            _logger.LogWarning("Moda Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@UserName} {@Request}",
-                requestName, elapsedMilliseconds, userId, userName, request);
+            using (LogContext.PushProperty("ApplicationRequestModel", JsonSerializer.Serialize(request)))
+            {
+                _logger.LogWarning("Long running request: {ApplicationRequestName} completed in {ApplicationElapsed} ms", requestName, elapsedMilliseconds);
+            }
         }
 
         return response;

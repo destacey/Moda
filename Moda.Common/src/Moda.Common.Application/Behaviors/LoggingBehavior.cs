@@ -1,27 +1,29 @@
-﻿using MediatR.Pipeline;
+﻿using MediatR;
 
 namespace Moda.Common.Application.Behaviors;
 
-public class LoggingBehavior<TRequest> : IRequestPreProcessor<TRequest> where TRequest : notnull
+public sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : class
 {
-    private readonly ILogger _logger;
-    private readonly ICurrentUser _currentUser;
+    private readonly ILogger<LoggingBehavior<TRequest, TResponse>> _logger;
 
-    public LoggingBehavior(ILogger<TRequest> logger, ICurrentUser currentUser)
+    public LoggingBehavior(ILogger<LoggingBehavior<TRequest, TResponse>> logger)
     {
         _logger = logger;
-        _currentUser = currentUser;
     }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    public async Task Process(TRequest request, CancellationToken cancellationToken)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         var requestName = typeof(TRequest).Name;
-        var userId = _currentUser.GetUserId().ToString();
-        var userName = _currentUser.GetUserEmail();
 
-        _logger.LogInformation("Moda Request: {Name} {@UserId} {@UserName} {@Request}",
-            requestName, userId, userName, request);
+        _logger.LogInformation("Processing request: {ApplicationRequestName}", requestName);
+
+        TResponse response = await next();
+
+        // THIS IS NOT CURRENTLY IN USE - only ICommand returns a Result in the reponse; IQuery does not
+        // TODO: Update TResponse to "where TResponse : Result"
+        // than add logging here for success/failure
+        // than add this to the configure services
+
+        return response;
     }
 }

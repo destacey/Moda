@@ -13,7 +13,7 @@ public class RequestLoggingMiddleware(ICurrentUser currentUser, IDateTimeProvide
     public async Task InvokeAsync(HttpContext httpContext, RequestDelegate next)
     {
         using (LogContext.PushProperty("CorrelationId", httpContext.TraceIdentifier))
-        using (LogContext.PushProperty("RequestTimeUtc", _dateTimeProvider.Now))
+        using (LogContext.PushProperty("RequestTimestampUtc", _dateTimeProvider.Now))
         using (LogContext.PushProperty("UserEmail", _currentUser.GetUserEmail() is string userEmail ? userEmail : "Anonymous"))
         using (LogContext.PushProperty("UserId", _currentUser.GetUserId()))
         {
