@@ -23,6 +23,6 @@ public class AuditTrailConfig : IEntityTypeConfiguration<Trail>
         builder.Property(x => x.NewValues);
         builder.Property(x => x.AffectedColumns);
         builder.Property(x => x.PrimaryKey).HasMaxLength(450);  // needs a max because of index
-        builder.Property(x => x.CorrelationId);
+        builder.Property(x => x.CorrelationId).HasMaxLength(128);
     }
 }

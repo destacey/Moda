@@ -25,7 +25,7 @@ public class AuditTrail
     public TrailType TrailType { get; set; }
     public List<string> ChangedColumns { get; } = new();
     public bool HasTemporaryProperties => TemporaryProperties.Count > 0;
-    public Guid? CorrelationId { get; set; }
+    public string? CorrelationId { get; set; }
 
     public Trail ToAuditTrail() =>
         new()

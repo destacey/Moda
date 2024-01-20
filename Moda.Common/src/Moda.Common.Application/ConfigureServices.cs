@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Mapster;
 using Mapster.Utils;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Moda.Common.Application;
@@ -12,10 +11,14 @@ public static class ConfigureServices
         var assembly = Assembly.GetExecutingAssembly();
 
         services.AddValidatorsFromAssembly(assembly);
-        services.AddMediatR(options => options.RegisterServicesFromAssembly(assembly));
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
+        services.AddMediatR(config =>
+        {
+            config.RegisterServicesFromAssembly(assembly);
+
+            //config.AddOpenBehavior(typeof(UnhandledExceptionBehavior<,>));  // TODO: currently relying on ExceptionMiddleware, do we need more granular control?
+            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            config.AddOpenBehavior(typeof(PerformanceBehavior<,>));
+        });
 
         TypeAdapterConfig.GlobalSettings.Scan(assembly);
         TypeAdapterConfig.GlobalSettings.ScanInheritedTypes(assembly);

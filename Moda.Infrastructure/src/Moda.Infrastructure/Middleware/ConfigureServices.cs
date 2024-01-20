@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace Moda.Infrastructure.Middleware;
 
@@ -17,7 +18,6 @@ internal static class ConfigureServices
         if (GetMiddlewareSettings(config).EnableHttpsLogging)
         {
             services.AddScoped<RequestLoggingMiddleware>();
-            services.AddScoped<ResponseLoggingMiddleware>();
         }
 
         return services;
@@ -28,7 +28,7 @@ internal static class ConfigureServices
         if (GetMiddlewareSettings(config).EnableHttpsLogging)
         {
             app.UseMiddleware<RequestLoggingMiddleware>();
-            app.UseMiddleware<ResponseLoggingMiddleware>();
+            app.UseSerilogRequestLogging();
         }
 
         return app;
