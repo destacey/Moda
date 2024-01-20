@@ -55,7 +55,6 @@ const HealthReportChart = (props: HealthReportChartProps) => {
         x: dayjs(report.reportedOn),
         y: convertStatusToNumber(report.status?.name),
       }))
-    console.log(chartData)
     setSeriesData([{ name: 'Health Report', data: chartData }])
   }, [healthReport])
 
