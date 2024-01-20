@@ -15,7 +15,7 @@ public static class ConfigureServices
         {
             config.RegisterServicesFromAssembly(assembly);
 
-            config.AddOpenBehavior(typeof(UnhandledExceptionBehavior<,>));
+            //config.AddOpenBehavior(typeof(UnhandledExceptionBehavior<,>));  // TODO: currently relying on ExceptionMiddleware, do we need more granular control?
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
             config.AddOpenBehavior(typeof(PerformanceBehavior<,>));
         });

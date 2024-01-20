@@ -1,6 +1,4 @@
-using System.Text;
 using Microsoft.AspNetCore.Http;
-using Serilog;
 using Serilog.Context;
 
 namespace Moda.Infrastructure.Middleware;

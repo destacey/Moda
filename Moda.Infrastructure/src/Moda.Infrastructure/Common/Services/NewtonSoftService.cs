@@ -4,6 +4,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Moda.Infrastructure.Common.Services;
 
+// TODO: Switch to System.Text.Json
 public class NewtonsoftService : ISerializerService
 {
     public T Deserialize<T>(string text)

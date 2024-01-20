@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text.Json;
 using MediatR;
 using Serilog.Context;
 
@@ -9,12 +8,14 @@ public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
 {
     private readonly Stopwatch _timer;
     private readonly ILogger<PerformanceBehavior<TRequest, TResponse>> _logger;
+    private readonly ISerializerService _jsonSerializer;
 
-    public PerformanceBehavior(ILogger<PerformanceBehavior<TRequest, TResponse>> logger)
+    public PerformanceBehavior(ILogger<PerformanceBehavior<TRequest, TResponse>> logger, ISerializerService jsonSerializer)
     {
         _timer = new Stopwatch();
 
         _logger = logger;
+        _jsonSerializer = jsonSerializer;
     }
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
@@ -31,7 +32,7 @@ public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
         {
             var requestName = typeof(TRequest).Name;
 
-            using (LogContext.PushProperty("ApplicationRequestModel", JsonSerializer.Serialize(request)))
+            using (LogContext.PushProperty("ApplicationRequestModel", _jsonSerializer.Serialize(request)))
             {
                 _logger.LogWarning("Long running request: {ApplicationRequestName} completed in {ApplicationElapsed} ms", requestName, elapsedMilliseconds);
             }
