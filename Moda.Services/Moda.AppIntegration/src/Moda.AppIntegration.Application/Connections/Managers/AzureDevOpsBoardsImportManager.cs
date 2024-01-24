@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moda.AppIntegration.Application.Connections.Commands;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
+using Moda.Work.Application.WorkProcesses.Queries;
 using Moda.Work.Application.Workspaces.Queries;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
@@ -76,11 +77,53 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
 
     }
 
+    public async Task<Result> InitWorkProcessIntegration(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var connectionCheckResult = await GetValidConnectionDetailsForWorkProcess(connectionId, workProcessExternalId, cancellationToken);
+            if (connectionCheckResult.IsFailure)
+                return connectionCheckResult;
+
+            // TODO: should the lookup be on the external id and connector? azdo|externalId
+            // TODO: crossing service boundaries :(
+            // verify the externalId isn't already integrated
+            var exists = await _sender.Send(new ExternalWorkProcessExistsQuery(workProcessExternalId), cancellationToken);
+            if (exists)
+            {
+                _logger.LogError("Unable to initialize a work process {WorkProcessExternalId} from Azure DevOps for connection {ConnectionId} because it is already integrated.", workProcessExternalId, connectionId);
+                return Result.Failure($"Unable to initialize a work process {workProcessExternalId} from Azure DevOps for connection {connectionId} because it is already integrated.");
+            }
+
+            // re-import the connection to make sure everything is up-to-date
+            var importWorkspacesResult = await ImportOrganizationConfiguration(connectionId, cancellationToken);
+            if (importWorkspacesResult.IsFailure)
+                return importWorkspacesResult;
+
+            // getting the connection again to make sure we have the latest data after the import
+            var connectionResult = await GetValidConnectionDetailsForWorkProcess(connectionId, workProcessExternalId, cancellationToken);
+            if (connectionResult.IsFailure)
+                return connectionResult;
+
+            // get the process, types, and states
+
+
+
+            return Result.Failure("Work Process integration initialization still in progress.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while trying to initialize a work process {WorkProcessExternalId} from Azure DevOps for connection {ConnectionId}.", workProcessExternalId, connectionId);
+            return Result.Failure($"An error occurred while trying to initialize a work process {workProcessExternalId} from Azure DevOps for connection {connectionId}.");
+        }
+
+    }
+
     public async Task<Result> InitWorkspaceIntegration(Guid connectionId, Guid workspaceExternalId, string workspaceKey, CancellationToken cancellationToken)
     {
         try
         {
-            var connectionCheckResult = await GetValidConnectionAndWorkspace(connectionId, workspaceExternalId, cancellationToken);
+            var connectionCheckResult = await GetValidConnectionDetailsForWorkspace(connectionId, workspaceExternalId, cancellationToken);
             if (connectionCheckResult.IsFailure)
                 return connectionCheckResult;
 
@@ -108,25 +151,55 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
                 return importWorkspacesResult;
 
             // getting the connection again to make sure we have the latest data after the import
-            var connectionResult = await GetValidConnectionAndWorkspace(connectionId, workspaceExternalId, cancellationToken);
+            var connectionResult = await GetValidConnectionDetailsForWorkspace(connectionId, workspaceExternalId, cancellationToken);
             if (connectionResult.IsFailure)
                 return connectionResult;
 
-            // get the process, types, and states
+            // get the workspace
 
 
 
-            return Result.Failure("Integration initialization still in progress.");
+            return Result.Failure("Workspace integration initialization still in progress.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while trying to initialize a project {WorkspaceExternalId} from Azure DevOps for connection {ConnectionId}.", workspaceExternalId, connectionId);
-            return Result.Failure($"An error occurred while trying to initialize a project {workspaceExternalId} from Azure DevOps for connection {connectionId}.");
+            _logger.LogError(ex, "An error occurred while trying to initialize a workspace {WorkspaceExternalId} from Azure DevOps for connection {ConnectionId}.", workspaceExternalId, connectionId);
+            return Result.Failure($"An error occurred while trying to initialize a workspace {workspaceExternalId} from Azure DevOps for connection {connectionId}.");
         }
 
     }
 
-    private async Task<Result<AzureDevOpsBoardsConnectionDetailsDto>> GetValidConnectionAndWorkspace(Guid connectionId, Guid workspaceExternalId, CancellationToken cancellationToken)
+    private async Task<Result<AzureDevOpsBoardsConnectionDetailsDto>> GetValidConnectionDetailsForWorkProcess(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken)
+    {
+        var result = await GetValidConnectionDetails(connectionId, cancellationToken);
+        if (result.IsFailure)
+            return result;
+
+        if (result.Value.Configuration.WorkProcesses.All(w => w.ExternalId != workProcessExternalId))
+        {
+            _logger.LogError("The work proces {WorkProcessExternalId} is not linked to connection {ConnectionId}.", workProcessExternalId, connectionId);
+            return Result.Failure<AzureDevOpsBoardsConnectionDetailsDto>($"The work proces {workProcessExternalId} is not linked to connection {connectionId}.");
+        }
+
+        return Result.Success(result.Value);
+    }
+
+    private async Task<Result<AzureDevOpsBoardsConnectionDetailsDto>> GetValidConnectionDetailsForWorkspace(Guid connectionId, Guid workspaceExternalId, CancellationToken cancellationToken)
+    {
+        var result = await GetValidConnectionDetails(connectionId, cancellationToken);
+        if (result.IsFailure)
+            return result;
+
+        if (result.Value.Configuration.Workspaces.All(w => w.ExternalId != workspaceExternalId))
+        {
+            _logger.LogError("The workspace {WorkspaceExternalId} is not linked to connection {ConnectionId}.", workspaceExternalId, connectionId);
+            return Result.Failure<AzureDevOpsBoardsConnectionDetailsDto>($"The workspace {workspaceExternalId} is not linked to connection {connectionId}.");
+        }
+
+        return Result.Success(result.Value);
+    }
+
+    private async Task<Result<AzureDevOpsBoardsConnectionDetailsDto>> GetValidConnectionDetails(Guid connectionId, CancellationToken cancellationToken)
     {
         var connection = await _sender.Send(new GetAzureDevOpsBoardsConnectionQuery(connectionId), cancellationToken);
         if (connection is null)
@@ -138,11 +211,6 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
         {
             _logger.LogError("The configuration for Azure DevOps connection {ConnectionId} is not valid.", connectionId);
             return Result.Failure<AzureDevOpsBoardsConnectionDetailsDto>($"The configuration for connection {connectionId} is not valid.");
-        }
-        else if (connection.Configuration.Workspaces.All(w => w.ExternalId != workspaceExternalId))
-        {
-            _logger.LogError("The workspace {WorkspaceExternalId} is not linked to connection {ConnectionId}.", workspaceExternalId, connectionId);
-            return Result.Failure<AzureDevOpsBoardsConnectionDetailsDto>($"The workspace {workspaceExternalId} is not linked to connection {connectionId}.");
         }
 
         return Result.Success(connection);
