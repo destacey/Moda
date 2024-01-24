@@ -18,7 +18,7 @@ import { ExportOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
-import InitWorkspaceIntegrationForm from '../components/init-workspace-integration-form'
+import { AzdoBoardsConnectionContext } from './azdo-boards-connection-context'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -31,9 +31,6 @@ const ConnectionDetailsPage = ({ params }) => {
   const [isImportingOrganization, setIsImportingOrganization] = useState(false)
   const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
-  // const [openInitWorkspaceForm, setOpenInitWorkspaceForm] =
-  //   useState<boolean>(false)
-  // const [initWorkspaceId, setInitWorkspaceId] = useState<string>(null)
   const [messageApi, contextHolder] = message.useMessage()
   const dispatch = useAppDispatch()
   const pathname = usePathname()
@@ -56,11 +53,6 @@ const ConnectionDetailsPage = ({ params }) => {
   const importOrganizationConfigurationMutation =
     useImportAzdoBoardsConnectionOrganizationMutation()
 
-  const initWorkspace = (workspaceId: string) => {
-    // setInitWorkspaceId(workspaceId)
-    // setOpenInitWorkspaceForm(true)
-  }
-
   const tabs = [
     {
       key: ConnectionTabs.Details,
@@ -74,9 +66,6 @@ const ConnectionDetailsPage = ({ params }) => {
         <AzdoBoardsOrganization
           workProcesses={connectionData?.configuration?.workProcesses}
           workspaces={connectionData?.configuration?.workspaces}
-          organizationUrl={connectionData?.configuration?.organizationUrl}
-          initWorkspace={initWorkspace}
-          //initWorkspace={() => null}
         />
       ),
     },
@@ -107,12 +96,6 @@ const ConnectionDetailsPage = ({ params }) => {
       refetch()
     }
   }
-
-  // const onInitWorkspaceFormClosed = (wasSaved: boolean) => {
-  //   setOpenInitWorkspaceForm(false)
-  //   setInitWorkspaceId(null)
-  //   refetch()
-  // }
 
   const importOrganizationConfiguration = async () => {
     try {
@@ -178,13 +161,20 @@ const ConnectionDetailsPage = ({ params }) => {
         subtitle="Connection Details"
         actions={showActions && actions()}
       />
-      <Card
-        tabList={tabs}
-        activeTabKey={activeTab}
-        onTabChange={(key: ConnectionTabs) => setActiveTab(key)}
+      <AzdoBoardsConnectionContext.Provider
+        value={{
+          connectionId: params.id,
+          organizationUrl: azdoOrgUrl,
+        }}
       >
-        {tabs.find((t) => t.key === activeTab)?.content}
-      </Card>
+        <Card
+          tabList={tabs}
+          activeTabKey={activeTab}
+          onTabChange={(key: ConnectionTabs) => setActiveTab(key)}
+        >
+          {tabs.find((t) => t.key === activeTab)?.content}
+        </Card>
+      </AzdoBoardsConnectionContext.Provider>
       {openEditConnectionForm && (
         <EditConnectionForm
           showForm={openEditConnectionForm}
@@ -193,15 +183,6 @@ const ConnectionDetailsPage = ({ params }) => {
           onFormCancel={() => onEditConnectionFormClosed(false)}
         />
       )}
-      {/* {openInitWorkspaceForm && (
-        <InitWorkspaceIntegrationForm
-          showForm={openInitWorkspaceForm}
-          connectionId={connectionData.id}
-          externalId={initWorkspaceId}
-          onFormCreate={() => onInitWorkspaceFormClosed(false)}
-          onFormCancel={() => onInitWorkspaceFormClosed(false)}
-        />
-      )} */}
     </>
   )
 }

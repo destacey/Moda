@@ -6189,6 +6189,69 @@
         ]
       }
     },
+    "/api/app-integrations/azure-devops-boards-connections/{id}/init-work-process-integration": {
+      "post": {
+        "tags": [
+          "AzureDevOpsBoardsConnections"
+        ],
+        "summary": "Initialize Azure DevOps project integration as a Moda workspace.",
+        "operationId": "AzureDevOpsBoardsConnections_InitWorkProcesssIntegration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitWorkProcessIntegrationRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/app-integrations/azure-devops-boards-connections/{id}/init-workspace-integration": {
       "post": {
         "tags": [
@@ -9298,6 +9361,30 @@
           "personalAccessToken": {
             "type": "string",
             "description": "Gets the personal access token."
+          }
+        }
+      },
+      "InitWorkProcessIntegrationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "externalId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Connection Id.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "externalId": {
+            "type": "string",
+            "description": "External identifier for the work process.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
           }
         }
       },
