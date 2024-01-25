@@ -5,23 +5,23 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-/// <summary>Represents the state within a workflow.</summary>
+/// <summary>Represents the status within a workflow.</summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
-public sealed class WorkState : BaseAuditableEntity<int>, IActivatable
+public sealed class WorkStatus : BaseAuditableEntity<int>, IActivatable
 {
     private string _name = null!;
     private string? _description;
 
-    private WorkState() { }
+    private WorkStatus() { }
 
-    private WorkState(string name, string? description)
+    private WorkStatus(string name, string? description)
     {
         Name = name;
         Description = description;
     }
 
-    /// <summary>The name of the work state.  The name cannot be changed.</summary>
+    /// <summary>The name of the work status.  The name cannot be changed.</summary>
     /// <value>The name.</value>
     public string Name
     {
@@ -29,7 +29,7 @@ public sealed class WorkState : BaseAuditableEntity<int>, IActivatable
         init => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
     }
 
-    /// <summary>The description of the work state.</summary>
+    /// <summary>The description of the work status.</summary>
     /// <value>The description.</value>
     public string? Description
     {
@@ -37,11 +37,11 @@ public sealed class WorkState : BaseAuditableEntity<int>, IActivatable
         private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
-    /// <summary>Indicates whether the work state is active or not.</summary>
+    /// <summary>Indicates whether the work status is active or not.</summary>
     /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; private set; } = true;
 
-    /// <summary>Updates the specified work state.</summary>
+    /// <summary>Updates the specified work status.</summary>
     /// <param name="description">The description.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
@@ -62,7 +62,7 @@ public sealed class WorkState : BaseAuditableEntity<int>, IActivatable
     }
 
     /// <summary>
-    /// The process for activating a work state.
+    /// The process for activating a work status.
     /// </summary>
     /// <param name="timestamp"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
@@ -78,7 +78,7 @@ public sealed class WorkState : BaseAuditableEntity<int>, IActivatable
     }
 
     /// <summary>
-    /// The process for deactivating a work state.
+    /// The process for deactivating a work status.
     /// </summary>
     /// <param name="timestamp"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
@@ -93,16 +93,16 @@ public sealed class WorkState : BaseAuditableEntity<int>, IActivatable
         return Result.Success();
     }
 
-    /// <summary>Creates the work state.</summary>
+    /// <summary>Creates the work status.</summary>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public static WorkState Create(string name, string? description, Instant timestamp)
+    public static WorkStatus Create(string name, string? description, Instant timestamp)
     {
-        WorkState workState = new(name, description);
+        WorkStatus status = new(name, description);
 
-        workState.AddDomainEvent(EntityCreatedEvent.WithEntity(workState, timestamp));
-        return workState;
+        status.AddDomainEvent(EntityCreatedEvent.WithEntity(status, timestamp));
+        return status;
     }
 }

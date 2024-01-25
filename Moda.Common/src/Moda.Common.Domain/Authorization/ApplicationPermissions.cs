@@ -46,8 +46,8 @@ public static class ApplicationResource
     public const string BacklogLevels = nameof(BacklogLevels);
     public const string Workspaces = nameof(Workspaces);
     public const string WorkItems = nameof(WorkItems);
-    public const string WorkStateCategories = nameof(WorkStateCategories);
-    public const string WorkStates = nameof(WorkStates);
+    public const string WorkStatusCategories = nameof(WorkStatusCategories);
+    public const string WorkStatuses = nameof(WorkStatuses);
     public const string WorkTypes = nameof(WorkTypes);
 
     public const string Links = nameof(Links);
@@ -166,12 +166,12 @@ public static class ApplicationPermissions
         new("Update WorkItems", ApplicationAction.Update, ApplicationResource.WorkItems),
         new("Delete WorkItems", ApplicationAction.Delete, ApplicationResource.WorkItems),
 
-        new("View WorkStateCategories", ApplicationAction.View, ApplicationResource.WorkStateCategories, IsBasic: true),
+        new("View WorkStatusCategories", ApplicationAction.View, ApplicationResource.WorkStatusCategories, IsBasic: true),
 
-        new("View WorkStates", ApplicationAction.View, ApplicationResource.WorkStates, IsBasic: true),
-        new("Create WorkStates", ApplicationAction.Create, ApplicationResource.WorkStates),
-        new("Update WorkStates", ApplicationAction.Update, ApplicationResource.WorkStates),
-        new("Delete WorkStates", ApplicationAction.Delete, ApplicationResource.WorkStates),
+        new("View WorkStatuses", ApplicationAction.View, ApplicationResource.WorkStatuses, IsBasic: true),
+        new("Create WorkStatuses", ApplicationAction.Create, ApplicationResource.WorkStatuses),
+        new("Update WorkStatuses", ApplicationAction.Update, ApplicationResource.WorkStatuses),
+        new("Delete WorkStatuses", ApplicationAction.Delete, ApplicationResource.WorkStatuses),
 
         new("View WorkTypes", ApplicationAction.View, ApplicationResource.WorkTypes, IsBasic: true),
         new("Create WorkTypes", ApplicationAction.Create, ApplicationResource.WorkTypes),

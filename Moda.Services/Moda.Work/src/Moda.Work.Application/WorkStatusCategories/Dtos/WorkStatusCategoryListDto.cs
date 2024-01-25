@@ -1,6 +1,6 @@
-﻿namespace Moda.Work.Application.WorkStateCategories.Dtos;
+﻿namespace Moda.Work.Application.WorkStatusCategories.Dtos;
 
-public sealed record WorkStateCategoryListDto
+public sealed record WorkStatusCategoryListDto
 {
     public int Id { get; set; }
     public required string Name { get; set; }

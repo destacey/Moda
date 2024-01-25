@@ -2,7 +2,7 @@
 
 namespace Moda.Work.Domain.Enums;
 
-public enum WorkStateCategory
+public enum WorkStatusCategory
 {
     [Display(Name = "Proposed", Description = "The work has been proposed but not yet started.", Order = 1)]
     Proposed = 0,

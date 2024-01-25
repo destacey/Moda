@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
-using Moda.Work.Domain.Enums;
 using Moda.Work.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
@@ -145,11 +144,11 @@ public class WorkspaceConfig : IEntityTypeConfiguration<Workspace>
     }
 }
 
-public class WorkStateConfig : IEntityTypeConfiguration<WorkState>
+public class WorkStatusConfig : IEntityTypeConfiguration<WorkStatus>
 {
-    public void Configure(EntityTypeBuilder<WorkState> builder)
+    public void Configure(EntityTypeBuilder<WorkStatus> builder)
     {
-        builder.ToTable("WorkStates", SchemaNames.Work);
+        builder.ToTable("WorkStatuses", SchemaNames.Work);
 
         builder.HasKey(w => w.Id);
 

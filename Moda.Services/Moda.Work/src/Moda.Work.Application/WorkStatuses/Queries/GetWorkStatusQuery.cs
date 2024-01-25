@@ -3,17 +3,17 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Exceptions;
-using Moda.Work.Application.WorkStates.Dtos;
+using Moda.Work.Application.WorkStatuses.Dtos;
 
-namespace Moda.Work.Application.WorkStates.Queries;
-public sealed record GetWorkStateQuery : IQuery<WorkStateDto?>
+namespace Moda.Work.Application.WorkStatuses.Queries;
+public sealed record GetWorkStatusQuery : IQuery<WorkStatusDto?>
 {
-    public GetWorkStateQuery(int id)
+    public GetWorkStatusQuery(int id)
     {
         Id = id;
     }
 
-    public GetWorkStateQuery(string name)
+    public GetWorkStatusQuery(string name)
     {
         Name = Guard.Against.NullOrWhiteSpace(name).Trim();
     }
@@ -22,20 +22,20 @@ public sealed record GetWorkStateQuery : IQuery<WorkStateDto?>
     public string? Name { get; }
 }
 
-internal sealed class GetWorkStateQueryHandler : IQueryHandler<GetWorkStateQuery, WorkStateDto?>
+internal sealed class GetWorkStatusQueryHandler : IQueryHandler<GetWorkStatusQuery, WorkStatusDto?>
 {
     private readonly IWorkDbContext _workDbContext;
-    private readonly ILogger<GetWorkStateQueryHandler> _logger;
+    private readonly ILogger<GetWorkStatusQueryHandler> _logger;
 
-    public GetWorkStateQueryHandler(IWorkDbContext workDbContext, ILogger<GetWorkStateQueryHandler> logger)
+    public GetWorkStatusQueryHandler(IWorkDbContext workDbContext, ILogger<GetWorkStatusQueryHandler> logger)
     {
         _workDbContext = workDbContext;
         _logger = logger;
     }
 
-    public async Task<WorkStateDto?> Handle(GetWorkStateQuery request, CancellationToken cancellationToken)
+    public async Task<WorkStatusDto?> Handle(GetWorkStatusQuery request, CancellationToken cancellationToken)
     {
-        var query = _workDbContext.WorkStates.AsQueryable();
+        var query = _workDbContext.WorkStatuses.AsQueryable();
 
         if (request.Id.HasValue)
         {
@@ -55,7 +55,7 @@ internal sealed class GetWorkStateQueryHandler : IQueryHandler<GetWorkStateQuery
         }
 
         return await query
-            .ProjectToType<WorkStateDto>()
+            .ProjectToType<WorkStatusDto>()
             .FirstOrDefaultAsync(cancellationToken);
     }
 }

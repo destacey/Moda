@@ -18,6 +18,6 @@ global using Moda.Infrastructure.Auth.Permissions;
 global using Moda.Infrastructure.Middleware;
 global using Moda.Web.Api.Models.Identity.Roles;
 global using Moda.Web.Api.Models.Identity.Users;
-global using Moda.Work.Application.WorkStates.Commands;
+global using Moda.Work.Application.WorkStatuses.Commands;
 global using NodaTime;
 global using NSwag.Annotations;

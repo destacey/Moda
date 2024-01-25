@@ -74,7 +74,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<BacklogLevelScheme> BacklogLevelSchemes => Set<BacklogLevelScheme>();
     public DbSet<WorkProcess> WorkProcesses => Set<WorkProcess>();
     public DbSet<Workspace> Workspaces => Set<Workspace>();
-    public DbSet<WorkState> WorkStates => Set<WorkState>();
+    public DbSet<WorkStatus> WorkStatuses => Set<WorkStatus>();
     public DbSet<WorkType> WorkTypes => Set<WorkType>();
 
     #endregion IWork
