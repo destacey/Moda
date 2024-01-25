@@ -19,7 +19,7 @@ internal static class ProcessDtoExtensions
             Name = process.Name,
             Description = process.Description,
             IsEnabled = process.IsEnabled,
-            WorkspaceIds = process.Projects?.Select(p => p.Id).ToList() ?? new List<Guid>(),
+            WorkspaceIds = process.Projects?.Select(p => p.Id).ToList() ?? [],
         };
     }
 
@@ -31,7 +31,7 @@ internal static class ProcessDtoExtensions
             Name = process.Name,
             Description = process.Description,
             IsEnabled = process.IsEnabled,
-            WorkspaceIds = process.Projects?.Select(p => p.Id).ToList() ?? new List<Guid>(),
+            WorkspaceIds = process.Projects?.Select(p => p.Id).ToList() ?? [],
             BacklogLevels = behaviors.ToAzdoBacklogLevels(),
             WorkTypes = workTypes.ToAzdoWorkTypes(),
         };

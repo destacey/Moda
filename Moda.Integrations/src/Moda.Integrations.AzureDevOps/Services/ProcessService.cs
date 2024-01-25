@@ -100,7 +100,7 @@ internal sealed class ProcessService
 
         _logger.LogDebug("{BehaviorCount} behaviors found for process {ProcessId}.", response.Data?.Count ?? 0, processId);
 
-        return Result.Success(response.Data?.Items ?? new List<BehaviorDto>());
+        return Result.Success(response.Data?.Items ?? []);
     }
 
     private async Task<Result<List<ProcessWorkItemTypeDto>>> GetProcessWorkItemTypes(Guid processId, CancellationToken cancellationToken)
@@ -114,6 +114,6 @@ internal sealed class ProcessService
 
         _logger.LogDebug("{WorkItemTypeCount} work item types found for process {ProcessId}.", response.Data?.Count ?? 0, processId);
 
-        return Result.Success(response.Data?.Items ?? new List<ProcessWorkItemTypeDto>());
+        return Result.Success(response.Data?.Items ?? []);
     }
 }

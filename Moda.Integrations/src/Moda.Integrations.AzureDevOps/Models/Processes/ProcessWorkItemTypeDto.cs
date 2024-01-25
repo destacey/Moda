@@ -7,8 +7,8 @@ internal sealed record ProcessWorkItemTypeDto
     public string? Description { get; set; }
     public string? Inherits { get; set; }
     public bool IsDisabled { get; set; }
-    public List<ProcessWorkItemStateDto> States { get; set; } = new();
-    public List<ProcessWorkItemTypeBehaviorsDto> Behaviors { get; set; } = new();
+    public List<ProcessWorkItemStateDto> States { get; set; } = [];
+    public List<ProcessWorkItemTypeBehaviorsDto> Behaviors { get; set; } = [];
 }
 
 internal static class ProcessWorkItemTypeDtoExtensions
