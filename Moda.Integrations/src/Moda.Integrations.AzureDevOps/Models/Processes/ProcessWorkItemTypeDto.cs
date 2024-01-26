@@ -1,4 +1,5 @@
-﻿namespace Moda.Integrations.AzureDevOps.Models.Processes;
+﻿
+namespace Moda.Integrations.AzureDevOps.Models.Processes;
 
 internal sealed record ProcessWorkItemTypeDto
 {
@@ -13,6 +14,16 @@ internal sealed record ProcessWorkItemTypeDto
 
 internal static class ProcessWorkItemTypeDtoExtensions
 {
+    // TODO make this configurable
+    static readonly string[] _ignoredWorkItemTypes =
+        [
+            "Microsoft.VSTS.WorkItemTypes.Task",
+            "Microsoft.VSTS.WorkItemTypes.Issue",
+            "Microsoft.VSTS.WorkItemTypes.TestCase",
+            "Microsoft.VSTS.WorkItemTypes.TestPlan",
+            "Microsoft.VSTS.WorkItemTypes.TestSuite"
+        ];
+
     public static AzdoWorkType ToAzdoWorkType(this ProcessWorkItemTypeDto workItemType)
     {
         // TODO make this configurable
@@ -30,22 +41,24 @@ internal static class ProcessWorkItemTypeDtoExtensions
 
     public static List<AzdoWorkType> ToAzdoWorkTypes(this List<ProcessWorkItemTypeDto> workItemTypes)
     {
-        // TODO make this configurable
-        var ignoredWorkItemTypes = new List<string>
-        {
-            "Microsoft.VSTS.WorkItemTypes.Task",
-            "Microsoft.VSTS.WorkItemTypes.Issue",
-            "Microsoft.VSTS.WorkItemTypes.TestCase",
-            "Microsoft.VSTS.WorkItemTypes.TestPlan",
-            "Microsoft.VSTS.WorkItemTypes.TestSuite"
-        };
-
         // test work types typically have no behaviors
         return workItemTypes
             .Where(w => !w.IsDisabled 
-                && !ignoredWorkItemTypes.Contains(w.ReferenceName)
-                && (w.Inherits is null || !ignoredWorkItemTypes.Contains(w.Inherits)))
+                && !_ignoredWorkItemTypes.Contains(w.ReferenceName)
+                && (w.Inherits is null || !_ignoredWorkItemTypes.Contains(w.Inherits)))
             .Select(w => w.ToAzdoWorkType())
+            .ToList();
+    }
+
+    public static List<AzdoWorkStatus> ToAzdoWorkStatuses(this List<ProcessWorkItemTypeDto> workItemTypes)
+    {
+        return workItemTypes
+            .Where(w => !w.IsDisabled
+                && !_ignoredWorkItemTypes.Contains(w.ReferenceName)
+                && (w.Inherits is null || !_ignoredWorkItemTypes.Contains(w.Inherits)))
+            .SelectMany(w => w.States)
+            .DistinctBy(s => s.Name)
+            .Select(s => s.ToAzdoWorkStatus())
             .ToList();
     }
 }

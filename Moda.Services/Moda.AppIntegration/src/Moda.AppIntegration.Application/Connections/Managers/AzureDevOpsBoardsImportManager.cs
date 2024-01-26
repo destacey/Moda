@@ -106,6 +106,7 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
                 return connectionResult;
 
             // get the process, types, and states
+            var processResult = await _azureDevOpsService.GetWorkProcess(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workProcessExternalId, cancellationToken);
 
 
 

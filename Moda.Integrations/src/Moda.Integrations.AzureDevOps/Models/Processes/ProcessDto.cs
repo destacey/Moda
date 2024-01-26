@@ -34,6 +34,7 @@ internal static class ProcessDtoExtensions
             WorkspaceIds = process.Projects?.Select(p => p.Id).ToList() ?? [],
             BacklogLevels = behaviors.ToAzdoBacklogLevels(),
             WorkTypes = workTypes.ToAzdoWorkTypes(),
+            WorkStatuses = workTypes.ToAzdoWorkStatuses(),
         };
     }
 

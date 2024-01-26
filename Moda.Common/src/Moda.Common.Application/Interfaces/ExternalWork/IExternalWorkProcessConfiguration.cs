@@ -6,5 +6,7 @@ public interface IExternalWorkProcessConfiguration
     string? Description { get; }
     bool IsEnabled { get; }
     List<Guid> WorkspaceIds { get; }
-    IEnumerable<IExternalBacklogLevel> BacklogLevels { get; }
+    IReadOnlyList<IExternalBacklogLevel> BacklogLevels { get; }
+    IReadOnlyList<IExternalWorkType> WorkTypes { get; }
+    IReadOnlyList<IExternalWorkStatus> WorkStatuses { get; }
 }
