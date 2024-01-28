@@ -10,7 +10,7 @@ public class WorkSeeder : ICustomSeeder
         await SeedBacklogLevelScheme(dbContext, dateTimeProvider, cancellationToken);
     }
 
-    public async Task SeedBacklogLevelScheme(ModaDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
+    public static async Task SeedBacklogLevelScheme(ModaDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
     {
         Instant timestamp = dateTimeProvider.Now;
 

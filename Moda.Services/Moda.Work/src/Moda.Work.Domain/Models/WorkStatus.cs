@@ -26,7 +26,7 @@ public sealed class WorkStatus : BaseAuditableEntity<int>, IActivatable
     public string Name
     {
         get => _name;
-        init => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+        private init => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
     }
 
     /// <summary>The description of the work status.</summary>

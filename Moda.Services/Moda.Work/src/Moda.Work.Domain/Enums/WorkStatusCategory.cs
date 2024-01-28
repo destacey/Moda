@@ -2,6 +2,7 @@
 
 namespace Moda.Work.Domain.Enums;
 
+// Max length of 32 characters
 public enum WorkStatusCategory
 {
     [Display(Name = "Proposed", Description = "The work has been proposed but not yet started.", Order = 1)]

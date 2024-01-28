@@ -9,7 +9,7 @@ namespace Moda.Work.Domain.Models;
 /// </summary>
 public class BacklogLevelScheme : BaseAuditableEntity<Guid>
 {
-    private readonly List<BacklogLevel> _backlogLevels = new();
+    private readonly List<BacklogLevel> _backlogLevels = [];
 
     private BacklogLevelScheme() { }
 
@@ -136,8 +136,8 @@ public class BacklogLevelScheme : BaseAuditableEntity<Guid>
     private static List<BacklogLevel> GetSystemDefaultBacklogLevels(Instant timestamp)
     {
         // backlog levels cannot be removed or have their name changed in this list without changes to the current ReInitialize process
-        List<BacklogLevel> backlogLevels = new()
-        {
+        List<BacklogLevel> backlogLevels =
+        [
             BacklogLevel.Create("Stories", "Stories backlog level.", BacklogCategory.Requirement, Ownership.System, 1, timestamp),
 
             BacklogLevel.Create("Tasks", "Tasks backlog level.", BacklogCategory.Task, Ownership.System, 1, timestamp),
@@ -146,7 +146,7 @@ public class BacklogLevelScheme : BaseAuditableEntity<Guid>
 
             BacklogLevel.Create("Features", "Features backlog level.", BacklogCategory.Portfolio, Ownership.System, 1, timestamp),
             BacklogLevel.Create("Epics", "Epics backlog level.", BacklogCategory.Portfolio, Ownership.System, 2, timestamp)
-        };
+        ];
 
         return backlogLevels;
     }

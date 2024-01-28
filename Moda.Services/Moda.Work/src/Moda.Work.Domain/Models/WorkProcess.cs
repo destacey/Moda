@@ -17,8 +17,8 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     private string _name = null!;
     private string? _description;
 
-    //private readonly List<WorkProcessScheme> _schemes = new();
-    private readonly List<Workspace> _workspaces = new();
+    private readonly List<WorkProcessScheme> _schemes = [];
+    private readonly List<Workspace> _workspaces = [];
 
     private WorkProcess() { }
 
@@ -63,11 +63,12 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     /// Indicates whether the work process is owned by Moda or a third party system.  This value should not change.
     /// </summary>
     /// <value>The ownership.</value>
-    public Ownership Ownership { get; private init; }
+    public Ownership Ownership { get; }
 
-    /// <summary>Gets the external identifier. The value is required when Ownership is managed; otherwise it's null.</summary>
-    /// <value>The external identifier.</value>
-    public Guid? ExternalId { get; private init; }
+    /// <summary>
+    /// Gets the external identifier. The value is required when Ownership is managed; otherwise it's null.  For Azure DevOps, this is the process id.
+    /// </summary>
+    public Guid? ExternalId { get; }
 
     /// <summary>
     /// Indicates whether the work process is active or not.  Only active work processes can be assigned
@@ -76,7 +77,7 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; private set; } = false;
 
-    //public IReadOnlyCollection<WorkProcessScheme> Schemes => _schemes.AsReadOnly();
+    public IReadOnlyCollection<WorkProcessScheme> Schemes => _schemes.AsReadOnly();
 
     public IReadOnlyCollection<Workspace> Workspaces => _workspaces.AsReadOnly();
 

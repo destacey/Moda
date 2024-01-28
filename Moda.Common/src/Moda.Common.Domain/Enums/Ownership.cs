@@ -2,6 +2,7 @@
 
 namespace Moda.Common.Domain.Enums;
 
+// Max length of 32 characters
 public enum Ownership
 {
     [Display(Description = "The object is owned by Moda.")]
