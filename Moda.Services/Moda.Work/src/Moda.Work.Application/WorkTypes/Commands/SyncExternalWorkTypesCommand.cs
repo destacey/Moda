@@ -3,7 +3,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Work.Application.Validators;
+using Moda.Work.Application.WorkTypes.Validators;
 
 namespace Moda.Work.Application.WorkTypes.Commands;
 public sealed record SyncExternalWorkTypesCommand(IList<IExternalWorkType> WorkTypes) : ICommand;
@@ -42,11 +42,11 @@ public sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbCon
             _workDbContext.WorkTypes.AddRange(workTypesToCreate);
             await _workDbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("{@Request}: created {WorkTypeCount} work types.", nameof(SyncExternalWorkTypesCommand), workTypesToCreate.Count);
+            _logger.LogInformation("{AppRequestName}: created {WorkTypeCount} work types.", nameof(SyncExternalWorkTypesCommand), workTypesToCreate.Count);
         }
         else
         {
-            _logger.LogInformation("{@Request}: no new work types found.", nameof(SyncExternalWorkTypesCommand));
+            _logger.LogInformation("{@AppRequestName}: no new work types found.", nameof(SyncExternalWorkTypesCommand));
         }
 
         // Work types are global and cannot be deleted or updated at this time

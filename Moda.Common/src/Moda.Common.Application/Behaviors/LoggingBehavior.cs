@@ -15,7 +15,7 @@ public sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRe
     {
         var requestName = typeof(TRequest).Name;
 
-        _logger.LogInformation("Processing request: {ApplicationRequestName}", requestName);
+        _logger.LogInformation("Processing request: {AppRequestName}", requestName);
 
         TResponse response = await next();
 

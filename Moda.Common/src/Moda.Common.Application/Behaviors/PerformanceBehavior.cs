@@ -34,7 +34,7 @@ public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
 
             using (LogContext.PushProperty("ApplicationRequestModel", _jsonSerializer.Serialize(request)))
             {
-                _logger.LogWarning("Long running request: {ApplicationRequestName} completed in {ApplicationElapsed} ms", requestName, elapsedMilliseconds);
+                _logger.LogWarning("Long running request: {AppRequestName} completed in {ApplicationElapsed} ms", requestName, elapsedMilliseconds);
             }
         }
 

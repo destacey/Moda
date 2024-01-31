@@ -6,6 +6,7 @@ using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.Work.Application.WorkProcesses.Queries;
 using Moda.Work.Application.Workspaces.Queries;
+using Moda.Work.Application.WorkStatuses.Commands;
 using Moda.Work.Application.WorkTypes.Commands;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
@@ -120,6 +121,12 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
             }
 
             // create statuses
+            if (processResult.Value.WorkStatuses.Any())
+            {
+                var syncWorkStatusesResult = await _sender.Send(new SyncExternalWorkStatusesCommand(processResult.Value.WorkStatuses), cancellationToken);
+                if (syncWorkStatusesResult.IsFailure)
+                    return syncWorkStatusesResult;
+            }
 
             // create workflow
             // TODO
