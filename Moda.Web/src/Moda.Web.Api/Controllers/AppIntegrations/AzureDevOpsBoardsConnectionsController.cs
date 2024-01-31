@@ -122,7 +122,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> ImportOrganizationConfiguration(Guid id, [FromServices] IAzureDevOpsBoardsImportManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {
-        var result = await azureDevOpsBoardsImportService.ImportOrganizationConfiguration(id, cancellationToken);
+        var result = await azureDevOpsBoardsImportService.SyncOrganizationConfiguration(id, cancellationToken);
         if (result.IsFailure)
         {
             var error = new ErrorResult

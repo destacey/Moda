@@ -55,7 +55,10 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
         )}
         renderItem={(item) => (
           <List.Item>
-            <AzdoBoardsWorkspaceCard workspace={item} enableInit={true} />
+            <AzdoBoardsWorkspaceCard
+              workspace={item}
+              enableInit={workProcessExists}
+            />
           </List.Item>
         )}
       />

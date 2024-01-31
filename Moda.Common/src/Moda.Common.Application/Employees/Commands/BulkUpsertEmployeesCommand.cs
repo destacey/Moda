@@ -49,9 +49,9 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
     public async Task<Result> Handle(BulkUpsertEmployeesCommand request, CancellationToken cancellationToken)
     {
         string requestName = request.GetType().Name;
-        Dictionary<string, string> errors = new();
-        Dictionary<string, string> missingManagers = new();
-        List<Employee> employees = await _modaDbContext.Employees.ToListAsync(cancellationToken) ?? new();
+        Dictionary<string, string> errors = [];
+        Dictionary<string, string> missingManagers = [];
+        List<Employee> employees = await _modaDbContext.Employees.ToListAsync(cancellationToken) ?? [];
         var blacklist = await _modaDbContext.ExternalEmployeeBlacklistItems.Select(b => b.ObjectId).ToListAsync(cancellationToken);
 
         foreach (var externalEmployee in request.Employees.Where(e => !blacklist.Contains(e.EmployeeNumber)))
@@ -101,7 +101,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
                         _dateTimeProvider.Now
                         );
 
-                    await _modaDbContext.Employees.AddAsync(newEmployee);
+                    await _modaDbContext.Employees.AddAsync(newEmployee, cancellationToken);
                 }
 
                 // check only when no errors on update or create
@@ -143,7 +143,7 @@ internal sealed class BulkUpsertEmployeesCommandHandler : ICommandHandler<BulkUp
 
         async Task SetMissingManagers()
         {
-            if (missingManagers.Any())
+            if (missingManagers.Count != 0)
             {
                 List<Employee> updatedEmployees = await _modaDbContext.Employees.ToListAsync(cancellationToken);
                 foreach (var item in missingManagers)

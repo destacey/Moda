@@ -6,16 +6,10 @@ using Moda.Integrations.AzureDevOps.Models;
 using Moda.Integrations.AzureDevOps.Models.Processes;
 
 namespace Moda.Integrations.AzureDevOps.Services;
-internal sealed class ProcessService
+internal sealed class ProcessService(string organizationUrl, string token, string apiVersion, ILogger<ProcessService> logger)
 {
-    private readonly ProcessClient _processClient;
-    private readonly ILogger<ProcessService> _logger;
-
-    public ProcessService(string organizationUrl, string token, string apiVersion, ILogger<ProcessService> logger)
-    {
-        _processClient = new ProcessClient(organizationUrl, token, apiVersion);
-        _logger = logger;
-    }
+    private readonly ProcessClient _processClient = new ProcessClient(organizationUrl, token, apiVersion);
+    private readonly ILogger<ProcessService> _logger = logger;
 
     public async Task<Result<List<AzdoWorkProcess>>> GetProcesses(CancellationToken cancellationToken)
     {
@@ -30,7 +24,7 @@ internal sealed class ProcessService
 
             _logger.LogDebug("{ProcessCount} processes found.", response.Data?.Count ?? 0);
 
-            var processes = response.Data?.Items.ToAzdoWorkProcesses() ?? new List<AzdoWorkProcess>();
+            var processes = response.Data?.Items.ToAzdoWorkProcesses() ?? [];
 
             return Result.Success(processes);
         }
@@ -57,7 +51,7 @@ internal sealed class ProcessService
             if (workTypesResult.IsFailure)
                 return Result.Failure<AzdoWorkProcessConfiguration>(workTypesResult.Error);
 
-
+            // TODO: Get the work flow configuration for the work types
             return Result.Success(processResult.Value.ToAzdoWorkProcessDetails(behaviorsResult.Value, workTypesResult.Value));
         }
         catch (Exception ex)

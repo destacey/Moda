@@ -6,6 +6,7 @@ using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.Work.Application.WorkProcesses.Queries;
 using Moda.Work.Application.Workspaces.Queries;
+using Moda.Work.Application.WorkTypes.Commands;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
 public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportManager
@@ -23,7 +24,7 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<Result> ImportOrganizationConfiguration(Guid connectionId, CancellationToken cancellationToken)
+    public async Task<Result> SyncOrganizationConfiguration(Guid connectionId, CancellationToken cancellationToken)
     {
         try
         {
@@ -45,7 +46,7 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
             if (workProcessesResult.IsFailure)
                 return workProcessesResult;
 
-            List<AzureDevOpsBoardsWorkProcess> processes = new();
+            List<AzureDevOpsBoardsWorkProcess> processes = [];
             foreach (var externalProcess in workProcessesResult.Value)
             {
                 var process = AzureDevOpsBoardsWorkProcess.Create(externalProcess.Id, externalProcess.Name, externalProcess.Description);
@@ -57,7 +58,7 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
             if (workspacesResult.IsFailure)
                 return workspacesResult;
 
-            List<AzureDevOpsBoardsWorkspace> workspaces = new();
+            List<AzureDevOpsBoardsWorkspace> workspaces = [];
             foreach (var externalWorkspace in workspacesResult.Value)
             {
                 var workProcessId = workProcessesResult.Value.FirstOrDefault(p => p.WorkspaceIds.Contains(externalWorkspace.Id))?.Id;
@@ -96,7 +97,7 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
             }
 
             // re-import the connection to make sure everything is up-to-date
-            var importWorkspacesResult = await ImportOrganizationConfiguration(connectionId, cancellationToken);
+            var importWorkspacesResult = await SyncOrganizationConfiguration(connectionId, cancellationToken);
             if (importWorkspacesResult.IsFailure)
                 return importWorkspacesResult;
 
@@ -105,8 +106,25 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
             if (connectionResult.IsFailure)
                 return connectionResult;
 
-            // get the process, types, and states
+            // get the process, types, states, and workflow
             var processResult = await _azureDevOpsService.GetWorkProcess(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workProcessExternalId, cancellationToken);
+            if ( processResult.IsFailure)
+                return processResult;
+
+            // create types
+            if (processResult.Value.WorkTypes.Any())
+            {
+                var syncWorkTypesResult = await _sender.Send(new SyncExternalWorkTypesCommand(processResult.Value.WorkTypes), cancellationToken);
+                if (syncWorkTypesResult.IsFailure)
+                    return syncWorkTypesResult;
+            }
+
+            // create statuses
+
+            // create workflow
+            // TODO
+
+            // create process
 
 
 
@@ -147,7 +165,7 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
             }
 
             // re-import the connection to make sure everything is up-to-date
-            var importWorkspacesResult = await ImportOrganizationConfiguration(connectionId, cancellationToken);
+            var importWorkspacesResult = await SyncOrganizationConfiguration(connectionId, cancellationToken);
             if (importWorkspacesResult.IsFailure)
                 return importWorkspacesResult;
 

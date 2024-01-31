@@ -14,7 +14,7 @@ public class BehaviorDtoExtensionsTests : CommonResponseOptions
         var behaviors = JsonSerializer.Deserialize<List<BehaviorDto>>(json, _options);
 
         // Act
-        var backlogLevels = behaviors!.ToAzdoBacklogLevels();
+        var backlogLevels = behaviors!.ToIExternalBacklogLevels();
 
         // Assert
         Assert.NotNull(backlogLevels);

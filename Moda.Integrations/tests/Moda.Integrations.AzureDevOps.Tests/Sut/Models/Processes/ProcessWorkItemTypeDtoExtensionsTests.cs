@@ -51,7 +51,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
         var workItemTypes = JsonSerializer.Deserialize<List<ProcessWorkItemTypeDto>>(json, _options);
 
         // Act
-        var workTypes = workItemTypes!.ToAzdoWorkTypes();
+        var workTypes = workItemTypes!.ToIExternalWorkTypes();
 
         // Assert
         Assert.NotNull(workTypes);
