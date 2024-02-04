@@ -42,7 +42,6 @@ public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<AzureDevOp
     /// </summary>
     public bool IsSyncEnabled { get; set; }
 
-
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<AzureDevOpsBoardsConnection, AzureDevOpsBoardsConnectionDetailsDto>()

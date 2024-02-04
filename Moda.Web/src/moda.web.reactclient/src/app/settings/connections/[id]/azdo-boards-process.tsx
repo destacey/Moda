@@ -27,11 +27,14 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
 
   const azdoBoardsConnection = useContext(AzdoBoardsConnectionContext)
 
-  const workProcessExists = false // TODO: check if work process exists
+  const integrationExists = !!props.workProcess.integrationState
 
   const onInitWorkProcessIntegrationFormClosed = (wasSaved: boolean) => {
     setOpenInitWorkProcessIntegrationForm(false)
-    //refetch()
+    if (wasSaved) {
+      // TODO: make this a better experience
+      azdoBoardsConnection.reloadConnectionData
+    }
   }
 
   const workspaceSection = (
@@ -55,10 +58,7 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
         )}
         renderItem={(item) => (
           <List.Item>
-            <AzdoBoardsWorkspaceCard
-              workspace={item}
-              enableInit={workProcessExists}
-            />
+            <AzdoBoardsWorkspaceCard workspace={item} enableInit={false} />
           </List.Item>
         )}
       />
@@ -82,9 +82,8 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
                 <ExportOutlined style={{ width: '12px' }} />
               </Link>
             </Flex>
-            <Text>{props.workProcess.description}</Text>
           </Flex>
-          {!workProcessExists && (
+          {!integrationExists && (
             <Button
               title="Setup Work Process Integration"
               onClick={() => setOpenInitWorkProcessIntegrationForm(true)}
@@ -93,6 +92,7 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
             </Button>
           )}
         </Flex>
+        <Text>{props.workProcess.description}</Text>
         {workspaceSection(props.workspaces)}
       </Flex>
       {openInitWorkProcessIntegrationForm && (

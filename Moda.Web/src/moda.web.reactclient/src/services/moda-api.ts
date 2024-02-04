@@ -8705,6 +8705,12 @@ export interface AzureDevOpsBoardsWorkProcessDto {
     externalId?: string;
     name?: string;
     description?: string | undefined;
+    integrationState?: IntegrationStateDto | undefined;
+}
+
+export interface IntegrationStateDto {
+    internalId?: string;
+    isActive?: boolean;
 }
 
 export interface AzureDevOpsBoardsWorkspaceDto {
@@ -8713,6 +8719,7 @@ export interface AzureDevOpsBoardsWorkspaceDto {
     name?: string;
     description?: string | undefined;
     workProcessId?: string;
+    integrationState?: IntegrationStateDto | undefined;
 }
 
 export interface CreateAzureDevOpsBoardConnectionRequest {

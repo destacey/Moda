@@ -165,6 +165,7 @@ const ConnectionDetailsPage = ({ params }) => {
         value={{
           connectionId: params.id,
           organizationUrl: azdoOrgUrl,
+          reloadConnectionData: refetch,
         }}
       >
         <Card

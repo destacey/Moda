@@ -27,9 +27,6 @@ const InitWorkProcessIntegrationForm = (
 ) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  //const [isValid, setIsValid] = useState(false)
-  // const [form] = Form.useForm<InitWorkProcessIntegrationFormValues>()
-  // const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
   const { hasClaim } = useAuth()
@@ -43,10 +40,6 @@ const InitWorkProcessIntegrationForm = (
 
   const init = async (): Promise<boolean> => {
     try {
-      // const request = mapToRequestValues(values)
-      // request.id = props.connectionId
-      // request.externalId = props.externalId
-
       const request = {
         id: props.connectionId,
         externalId: props.externalId,
@@ -56,11 +49,6 @@ const InitWorkProcessIntegrationForm = (
       messageApi.success('Successfully initialized work process.')
       return true
     } catch (error) {
-      // if (error.status === 422 && error.errors) {
-      //   const formErrors = toFormErrors(error.errors)
-      //   form.setFields(formErrors)
-      //   messageApi.error('Correct the validation error(s) to continue.')
-      // } else {
       messageApi.error(
         `Failed to initialize work process. Error: ${error.supportMessage}`,
       )
@@ -73,10 +61,8 @@ const InitWorkProcessIntegrationForm = (
   const handleOk = async () => {
     setIsSaving(true)
     try {
-      //const values = await form.validateFields()
       if (await init()) {
         setIsOpen(false)
-        //form.resetFields()
         props.onFormSave()
         messageApi.success('Successfully initialized work process.')
       }
@@ -90,7 +76,6 @@ const InitWorkProcessIntegrationForm = (
   const handleCancel = () => {
     setIsOpen(false)
     props.onFormCancel()
-    //form.resetFields()
   }
 
   useEffect(() => {
@@ -104,13 +89,6 @@ const InitWorkProcessIntegrationForm = (
     }
   }, [canUpdateConnection, messageApi, props])
 
-  // useEffect(() => {
-  //   form.validateFields({ validateOnly: true }).then(
-  //     () => setIsValid(true && form.isFieldsTouched()),
-  //     () => setIsValid(false),
-  //   )
-  // }, [form, formValues])
-
   return (
     <>
       {contextHolder}
@@ -118,7 +96,6 @@ const InitWorkProcessIntegrationForm = (
         title="Initialize Work Process"
         open={isOpen}
         onOk={handleOk}
-        //okButtonProps={{ disabled: !isValid }}
         okText="Init"
         confirmLoading={isSaving}
         onCancel={handleCancel}
@@ -127,16 +104,10 @@ const InitWorkProcessIntegrationForm = (
         destroyOnClose={true}
       >
         <Text>
-          You will be redirected to the initialized work process page upon
-          success.
+          Initializing the work process will create the necessary work item
+          types, work statuses, workflows, and work process.
         </Text>
-        {/* <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="init-work-process-form"
-        >
-        </Form> */}
+        {}
       </Modal>
     </>
   )

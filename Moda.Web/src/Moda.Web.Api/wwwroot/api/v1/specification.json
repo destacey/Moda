@@ -9248,6 +9248,27 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "integrationState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IntegrationStateDto"
+              }
+            ]
+          }
+        }
+      },
+      "IntegrationStateDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "internalId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "isActive": {
+            "type": "boolean"
           }
         }
       },
@@ -9274,6 +9295,14 @@
           "workProcessId": {
             "type": "string",
             "format": "guid"
+          },
+          "integrationState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IntegrationStateDto"
+              }
+            ]
           }
         }
       },
