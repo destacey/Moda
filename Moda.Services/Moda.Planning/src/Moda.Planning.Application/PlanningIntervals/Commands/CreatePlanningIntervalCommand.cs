@@ -18,7 +18,7 @@ public sealed class CreatePlanningIntervalCommandValidator : CustomValidator<Cre
             .MustAsync(BeUniquePlanningIntervalName).WithMessage("The Planning Interval name already exists.");
 
         RuleFor(c => c.Description)
-            .MaximumLength(1024);
+            .MaximumLength(2048);
 
         RuleFor(c => c.DateRange)
             .NotNull();
@@ -59,7 +59,7 @@ internal sealed class CreatePlanningIntervalCommandHandler : ICommandHandler<Cre
                 );
             if (result.IsFailure)
                 return Result.Failure<int>(result.Error);
-            
+
 
             await _planningDbContext.PlanningIntervals.AddAsync(result.Value, cancellationToken);
 

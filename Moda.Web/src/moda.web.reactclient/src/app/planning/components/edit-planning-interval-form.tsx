@@ -191,7 +191,7 @@ const EditPlanningIntervalForm = ({
             <Input.TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
-              maxLength={1024}
+              maxLength={2048}
             />
           </Form.Item>
           <Form.Item
