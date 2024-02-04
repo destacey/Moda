@@ -21,9 +21,10 @@ public sealed class SyncExternalWorkTypesCommandValidator : CustomValidator<Sync
     }
 }
 
-
 public sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<SyncExternalWorkTypesCommandHandler> logger) : ICommandHandler<SyncExternalWorkTypesCommand>
 {
+    private const string AppRequestName = nameof(SyncExternalWorkTypesCommand);
+
     private readonly IWorkDbContext _workDbContext = workDbContext;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<SyncExternalWorkTypesCommandHandler> _logger = logger;
@@ -42,11 +43,11 @@ public sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbCon
             _workDbContext.WorkTypes.AddRange(workTypesToCreate);
             await _workDbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("{AppRequestName}: created {WorkTypeCount} work types.", nameof(SyncExternalWorkTypesCommand), workTypesToCreate.Count);
+            _logger.LogInformation("{AppRequestName}: created {WorkTypeCount} work types.", AppRequestName, workTypesToCreate.Count);
         }
         else
         {
-            _logger.LogInformation("{@AppRequestName}: no new work types found.", nameof(SyncExternalWorkTypesCommand));
+            _logger.LogInformation("{AppRequestName}: no new work types found.", AppRequestName);
         }
 
         // Work types are global and cannot be deleted or updated at this time

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Moda.Infrastructure.Persistence.Context;
 
@@ -11,9 +12,11 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    partial class ModaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240203224920_Update-integration-related-schemas")]
+    partial class Updateintegrationrelatedschemas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1349,12 +1352,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Key")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
-
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
@@ -1372,16 +1369,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnType("varchar");
 
                     b.HasKey("Id");
-
-                    b.HasAlternateKey("Key");
-
-                    b.HasIndex("Id", "IsDeleted");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "IsDeleted"), new[] { "Key", "Name", "ExternalId", "Ownership", "IsActive" });
-
-                    b.HasIndex("Key", "IsDeleted");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "IsDeleted"), new[] { "Id", "Name", "ExternalId", "Ownership", "IsActive" });
 
                     b.ToTable("WorkProcesses", "Work");
                 });

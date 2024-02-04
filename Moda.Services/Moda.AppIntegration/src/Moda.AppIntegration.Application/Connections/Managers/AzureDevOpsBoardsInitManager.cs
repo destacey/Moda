@@ -4,26 +4,19 @@ using Microsoft.Extensions.Logging;
 using Moda.AppIntegration.Application.Connections.Commands;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
+using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.WorkProcesses.Queries;
 using Moda.Work.Application.Workspaces.Queries;
 using Moda.Work.Application.WorkStatuses.Commands;
 using Moda.Work.Application.WorkTypes.Commands;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
-public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportManager
+public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IDateTimeProvider dateTimeProvider) : IAzureDevOpsBoardsInitManager
 {
-    private readonly ILogger<AzureDevOpsBoardsImportManager> _logger;
-    private readonly IAzureDevOpsService _azureDevOpsService;
-    private readonly ISender _sender;
-    private readonly IDateTimeProvider _dateTimeProvider;
-
-    public AzureDevOpsBoardsImportManager(ILogger<AzureDevOpsBoardsImportManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IDateTimeProvider dateTimeProvider)
-    {
-        _logger = logger;
-        _azureDevOpsService = azureDevOpsService;
-        _sender = sender;
-        _dateTimeProvider = dateTimeProvider;
-    }
+    private readonly ILogger<AzureDevOpsBoardsInitManager> _logger = logger;
+    private readonly IAzureDevOpsService _azureDevOpsService = azureDevOpsService;
+    private readonly ISender _sender = sender;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<Result> SyncOrganizationConfiguration(Guid connectionId, CancellationToken cancellationToken)
     {
@@ -67,7 +60,7 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
                 workspaces.Add(workspace);
             }
 
-            var bulkUpsertResult = await _sender.Send(new BulkUpsertAzureDevOpsBoardsWorkspacesCommand(connectionId, processes, workspaces), cancellationToken);
+            var bulkUpsertResult = await _sender.Send(new SyncAzureDevOpsBoardsConnectionConfigurationCommand(connectionId, processes, workspaces), cancellationToken);
 
             return Result.Success();
         }
@@ -79,13 +72,13 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
 
     }
 
-    public async Task<Result> InitWorkProcessIntegration(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> InitWorkProcessIntegration(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken)
     {
         try
         {
             var connectionCheckResult = await GetValidConnectionDetailsForWorkProcess(connectionId, workProcessExternalId, cancellationToken);
             if (connectionCheckResult.IsFailure)
-                return connectionCheckResult;
+                return connectionCheckResult.ConvertFailure<Guid>();
 
             // TODO: should the lookup be on the external id and connector? azdo|externalId
             // TODO: crossing service boundaries :(
@@ -94,30 +87,30 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
             if (exists)
             {
                 _logger.LogError("Unable to initialize a work process {WorkProcessExternalId} from Azure DevOps for connection {ConnectionId} because it is already integrated.", workProcessExternalId, connectionId);
-                return Result.Failure($"Unable to initialize a work process {workProcessExternalId} from Azure DevOps for connection {connectionId} because it is already integrated.");
+                return Result.Failure<Guid>($"Unable to initialize a work process {workProcessExternalId} from Azure DevOps for connection {connectionId} because it is already integrated.");
             }
 
             // re-import the connection to make sure everything is up-to-date
             var importWorkspacesResult = await SyncOrganizationConfiguration(connectionId, cancellationToken);
             if (importWorkspacesResult.IsFailure)
-                return importWorkspacesResult;
+                return importWorkspacesResult.ConvertFailure<Guid>();
 
             // getting the connection again to make sure we have the latest data after the import
             var connectionResult = await GetValidConnectionDetailsForWorkProcess(connectionId, workProcessExternalId, cancellationToken);
             if (connectionResult.IsFailure)
-                return connectionResult;
+                return connectionResult.ConvertFailure<Guid>();
 
             // get the process, types, states, and workflow
             var processResult = await _azureDevOpsService.GetWorkProcess(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workProcessExternalId, cancellationToken);
-            if ( processResult.IsFailure)
-                return processResult;
+            if (processResult.IsFailure)
+                return processResult.ConvertFailure<Guid>();
 
             // create types
             if (processResult.Value.WorkTypes.Any())
             {
                 var syncWorkTypesResult = await _sender.Send(new SyncExternalWorkTypesCommand(processResult.Value.WorkTypes), cancellationToken);
                 if (syncWorkTypesResult.IsFailure)
-                    return syncWorkTypesResult;
+                    return syncWorkTypesResult.ConvertFailure<Guid>();
             }
 
             // create statuses
@@ -125,24 +118,29 @@ public sealed class AzureDevOpsBoardsImportManager : IAzureDevOpsBoardsImportMan
             {
                 var syncWorkStatusesResult = await _sender.Send(new SyncExternalWorkStatusesCommand(processResult.Value.WorkStatuses), cancellationToken);
                 if (syncWorkStatusesResult.IsFailure)
-                    return syncWorkStatusesResult;
+                    return syncWorkStatusesResult.ConvertFailure<Guid>();
             }
 
             // create workflow
             // TODO
 
             // create process
+            var createProcessResult = await _sender.Send(new CreateExternalWorkProcessCommand(processResult.Value), cancellationToken);
+            if (createProcessResult.IsFailure)
+                return createProcessResult.ConvertFailure<Guid>();
 
+            // update the integration state
+            var updateIntegrationStateResult = await _sender.Send(new UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommand(connectionId, workProcessExternalId, createProcessResult.Value), cancellationToken);
 
-
-            return Result.Failure("Work Process integration initialization still in progress.");
+            return updateIntegrationStateResult.IsSuccess
+                ? Result.Success(createProcessResult.Value.InternalId)
+                : createProcessResult.ConvertFailure<Guid>();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while trying to initialize a work process {WorkProcessExternalId} from Azure DevOps for connection {ConnectionId}.", workProcessExternalId, connectionId);
-            return Result.Failure($"An error occurred while trying to initialize a work process {workProcessExternalId} from Azure DevOps for connection {connectionId}.");
+            return Result.Failure<Guid>($"An error occurred while trying to initialize a work process {workProcessExternalId} from Azure DevOps for connection {connectionId}.");
         }
-
     }
 
     public async Task<Result> InitWorkspaceIntegration(Guid connectionId, Guid workspaceExternalId, string workspaceKey, CancellationToken cancellationToken)

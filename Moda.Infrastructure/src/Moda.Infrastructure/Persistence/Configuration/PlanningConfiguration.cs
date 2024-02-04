@@ -74,7 +74,7 @@ public class PlanningIntervalConfig : IEntityTypeConfiguration<PlanningInterval>
         builder.Property(p => p.Key).ValueGeneratedOnAdd();
 
         builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
-        builder.Property(p => p.Description).HasMaxLength(1024);
+        builder.Property(p => p.Description).HasMaxLength(2048);
 
         // Value Objects
         builder.OwnsOne(p => p.DateRange, options =>

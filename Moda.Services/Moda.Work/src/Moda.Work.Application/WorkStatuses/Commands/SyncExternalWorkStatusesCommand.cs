@@ -42,7 +42,7 @@ public sealed class SyncExternalWorkStatusesCommandHandler(IWorkDbContext workDb
             _workDbContext.WorkStatuses.AddRange(workStatusesToCreate);
             await _workDbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("{@AppRequestName}: created {WorkStatusCount} work statuses.", nameof(SyncExternalWorkStatusesCommand), workStatusesToCreate.Count);
+            _logger.LogInformation("{AppRequestName}: created {WorkStatusCount} work statuses.", nameof(SyncExternalWorkStatusesCommand), workStatusesToCreate.Count);
         }
         else
         {

@@ -111,6 +111,8 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
             // TODO is there logic that would prevent activation?
             IsActive = true;
             AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
+
+            TryAddIntegrationStateChangedEvent(timestamp);
         }
 
         return Result.Success();
@@ -132,9 +134,22 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
 
             IsActive = false;
             AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
+
+            TryAddIntegrationStateChangedEvent(timestamp);
         }
 
         return Result.Success();
+    }
+
+    private void TryAddIntegrationStateChangedEvent(Instant timestamp)
+    {
+        if (Ownership is Ownership.Managed && ExternalId.HasValue)
+        {
+            AddDomainEvent(new IntegrationStateChangedEvent<Guid>(
+                SystemContext.WorkWorkProcess,
+                IntegrationState<Guid>.Create(Id, IsActive),
+                timestamp));
+        }
     }
 
     /// <summary>Creates an owned Work Process.</summary>

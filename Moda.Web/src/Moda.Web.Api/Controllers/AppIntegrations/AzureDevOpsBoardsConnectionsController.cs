@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using Moda.AppIntegration.Application.Interfaces;
+﻿using Moda.AppIntegration.Application.Interfaces;
 using Moda.AppIntegration.Domain.Models;
 using Moda.Common.Application.Interfaces;
 using Moda.Web.Api.Models.AppIntegrations.Connections;
@@ -120,7 +119,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [OpenApiOperation("Import Azure DevOps processes and projects.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> ImportOrganizationConfiguration(Guid id, [FromServices] IAzureDevOpsBoardsImportManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
+    public async Task<ActionResult> ImportOrganizationConfiguration(Guid id, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {
         var result = await azureDevOpsBoardsImportService.SyncOrganizationConfiguration(id, cancellationToken);
         if (result.IsFailure)
@@ -143,7 +142,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> InitWorkProcesssIntegration(Guid id, InitWorkProcessIntegrationRequest request, [FromServices] IAzureDevOpsBoardsImportManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
+    public async Task<ActionResult> InitWorkProcesssIntegration(Guid id, InitWorkProcessIntegrationRequest request, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {
         if (id != request.Id)
             return BadRequest();
@@ -160,8 +159,6 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
             return BadRequest(error);
         }
 
-        await Task.CompletedTask;
-
         return NoContent();
     }
 
@@ -171,7 +168,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> InitWorkspaceIntegration(Guid id, InitWorkspaceIntegrationRequest request, [FromServices] IAzureDevOpsBoardsImportManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
+    public async Task<ActionResult> InitWorkspaceIntegration(Guid id, InitWorkspaceIntegrationRequest request, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {
         if (id != request.Id)
             return BadRequest();

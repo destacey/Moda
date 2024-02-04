@@ -41,6 +41,18 @@ public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
     public bool IsValidConfiguration { get; protected set; } = false;
 
     /// <summary>
+    /// The indicator for whether the connection is enabled for synchronization.
+    /// </summary>
+    public bool IsSyncEnabled { get; private set; } = false;
+
+    public abstract bool HasActiveIntegrationObjects { get; }
+
+    /// <summary>
+    /// The indicator for whether the connection can be synchronized.
+    /// </summary>
+    public bool CanSync => IsActive && IsValidConfiguration && IsSyncEnabled;
+
+    /// <summary>
     /// The process for activating a connector.
     /// </summary>
     /// <param name="timestamp"></param>
@@ -68,9 +80,32 @@ public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
         if (IsActive)
         {
             IsActive = false;
+            IsSyncEnabled = false;
             AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// The process for enabling or disabling the synchronization of the connection.
+    /// </summary>
+    /// <param name="isEnabled"></param>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    public Result SetSyncState(bool isEnabled, Instant timestamp)
+    {
+        if (isEnabled)
+        {
+            if (!IsValidConfiguration)
+                return Result.Failure("Unable to turn on sync. The connector configuration is not valid.");
+
+            if (!HasActiveIntegrationObjects)
+                return Result.Failure("Unable to turn on sync. The connector does not have any active integration objects.");
+        }
+
+        IsSyncEnabled = isEnabled;
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
         return Result.Success();
     }
 }

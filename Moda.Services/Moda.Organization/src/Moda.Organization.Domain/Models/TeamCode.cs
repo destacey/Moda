@@ -24,9 +24,12 @@ public class TeamCode : ValueObject
     }
 
     // only validates that the format is correct
-    private bool ValidateOrganizationCodeFormat(string value) => value.IsValidTeamCodeFormat()
+    private bool ValidateOrganizationCodeFormat(string value)
+    {
+        return value.IsValidTeamCodeFormat()
             ? true
             : throw new ArgumentException("The value submitted does not meet the required format.", nameof(TeamCode));
+    }
 
     public static implicit operator string(TeamCode organizationCode) => organizationCode.Value;
     public static explicit operator TeamCode(string value) => new(value);

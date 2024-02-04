@@ -29,6 +29,7 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
             .HasMaxLength(128);
         builder.Property(c => c.IsActive);
         builder.Property(c => c.IsValidConfiguration);
+        builder.Property(c => c.IsSyncEnabled);
 
         // Audit
         builder.Property(c => c.Created);
@@ -50,8 +51,14 @@ public class AzureDevOpsBoardsConnectionConfig : IEntityTypeConfiguration<AzureD
         builder.OwnsOne(c => c.Configuration, ownedBuilder =>
         {
             ownedBuilder.ToJson();
-            ownedBuilder.OwnsMany(conf => conf.Workspaces);
-            ownedBuilder.OwnsMany(conf => conf.WorkProcesses);
+            ownedBuilder.OwnsMany(conf => conf.Workspaces, wb =>
+            {
+                wb.OwnsOne(w => w.IntegrationState);
+            });
+            ownedBuilder.OwnsMany(conf => conf.WorkProcesses, wb =>
+            {
+                wb.OwnsOne(w => w.IntegrationState);
+            });
         });
     }
 }

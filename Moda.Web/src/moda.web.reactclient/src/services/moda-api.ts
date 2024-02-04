@@ -8689,6 +8689,7 @@ export interface AzureDevOpsBoardsConnectionDetailsDto {
     configuration?: AzureDevOpsBoardsConnectionConfigurationDto;
     isActive?: boolean;
     isValidConfiguration?: boolean;
+    isSyncEnabled?: boolean;
 }
 
 export interface AzureDevOpsBoardsConnectionConfigurationDto {
@@ -8700,17 +8701,18 @@ export interface AzureDevOpsBoardsConnectionConfigurationDto {
 }
 
 export interface AzureDevOpsBoardsWorkProcessDto {
+    id?: string | undefined;
     externalId?: string;
     name?: string;
     description?: string | undefined;
 }
 
 export interface AzureDevOpsBoardsWorkspaceDto {
+    id?: string | undefined;
     externalId?: string;
     name?: string;
     description?: string | undefined;
     workProcessId?: string;
-    sync?: boolean;
 }
 
 export interface CreateAzureDevOpsBoardConnectionRequest {

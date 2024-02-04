@@ -77,11 +77,16 @@ public class WorkProcessConfig : IEntityTypeConfiguration<WorkProcess>
         builder.HasKey(w => w.Id);
         builder.HasAlternateKey(w => w.Key);
 
-        builder.HasIndex(w => w.Id);
+        builder.HasIndex(i => new { i.Id, i.IsDeleted })
+            .IncludeProperties(i => new { i.Key, i.Name, i.ExternalId, i.Ownership, i.IsActive });
 
+        builder.HasIndex(i => new { i.Key, i.IsDeleted })
+            .IncludeProperties(i => new { i.Id, i.Name, i.ExternalId, i.Ownership, i.IsActive });
+
+        builder.Property(p => p.Key).ValueGeneratedOnAdd();
 
         // Properties
-        builder.Property(w => w.Name).IsRequired().HasMaxLength(64);
+        builder.Property(w => w.Name).HasMaxLength(128).IsRequired();
         builder.Property(w => w.Description).HasMaxLength(1024);
 
         builder.Property(w => w.Ownership).IsRequired()
@@ -155,11 +160,13 @@ public class WorkspaceConfig : IEntityTypeConfiguration<Workspace>
         builder.HasKey(w => w.Id);
         builder.HasAlternateKey(w => w.Key);
 
-        builder.HasIndex(w => w.Id)
-            .IncludeProperties(w => new { w.Name, w.Ownership, w.IsActive, w.IsDeleted });
+        builder.HasIndex(w => new { w.Id, w.IsDeleted })
+            .IncludeProperties(w => new { w.Key, w.Name, w.Ownership, w.IsActive });
+        builder.HasIndex(w => new { w.Key, w.IsDeleted })
+            .IncludeProperties(w => new { w.Id, w.Name, w.Ownership, w.IsActive });
         builder.HasIndex(w => w.Name).IsUnique();
         builder.HasIndex(w => new { w.IsActive, w.IsDeleted })
-            .IncludeProperties(w => new { w.Id, w.Name, w.Ownership });
+            .IncludeProperties(w => new { w.Id, w.Key, w.Name, w.Ownership });
 
         // Properties
         builder.Property(w => w.Key).IsRequired()

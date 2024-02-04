@@ -7,7 +7,7 @@ using Moda.Organization.Domain.Models;
 namespace Moda.Planning.Application.PlanningTeams.EventHandlers;
 
 // TODO - putting a dependency on the Organization project is not good.  This should be a named event rather a generic event of T.  Need to refactor this.
-internal sealed class UpsertTeamHandler :
+internal sealed class UpsertTeamEventHandler :
     IEventNotificationHandler<EntityCreatedEvent<Team>>,
     IEventNotificationHandler<EntityUpdatedEvent<Team>>,
     IEventNotificationHandler<EntityActivatedEvent<Team>>,
@@ -20,9 +20,9 @@ internal sealed class UpsertTeamHandler :
     IEventNotificationHandler<EntityDeletedEvent<TeamOfTeams>>
 {
     private readonly IPlanningDbContext _planningDbContext;
-    private readonly ILogger<UpsertTeamHandler> _logger;
+    private readonly ILogger<UpsertTeamEventHandler> _logger;
 
-    public UpsertTeamHandler(IPlanningDbContext planningDbContext, ILogger<UpsertTeamHandler> logger)
+    public UpsertTeamEventHandler(IPlanningDbContext planningDbContext, ILogger<UpsertTeamEventHandler> logger)
     {
         _planningDbContext = planningDbContext;
         _logger = logger;

@@ -9196,6 +9196,9 @@
           },
           "isValidConfiguration": {
             "type": "boolean"
+          },
+          "isSyncEnabled": {
+            "type": "boolean"
           }
         }
       },
@@ -9230,6 +9233,11 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
           "externalId": {
             "type": "string",
             "format": "guid"
@@ -9247,6 +9255,11 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
           "externalId": {
             "type": "string",
             "format": "guid"
@@ -9261,9 +9274,6 @@
           "workProcessId": {
             "type": "string",
             "format": "guid"
-          },
-          "sync": {
-            "type": "boolean"
           }
         }
       },
