@@ -9,7 +9,7 @@ export interface InitWorkspaceIntegrationFormProps {
   showForm: boolean
   connectionId: string
   externalId: string
-  onFormCreate: () => void
+  onFormSave: () => void
   onFormCancel: () => void
 }
 
@@ -73,7 +73,7 @@ const InitWorkspaceIntegrationForm = (
       if (await init(values)) {
         setIsOpen(false)
         form.resetFields()
-        props.onFormCreate()
+        props.onFormSave()
         messageApi.success('Successfully initialized workspace.')
       }
     } catch (errorInfo) {

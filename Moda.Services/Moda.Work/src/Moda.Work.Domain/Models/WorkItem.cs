@@ -2,7 +2,7 @@
 
 public sealed class WorkItem : BaseAuditableEntity<Guid>
 {
-    private readonly List<WorkItemRevision> _history = new();
+    private readonly List<WorkItemRevision> _history = [];
 
     private WorkItem() { }
 
@@ -21,9 +21,9 @@ public sealed class WorkItem : BaseAuditableEntity<Guid>
 
     public WorkType Type { get; private set; } = null!;
 
-    public Guid StateId { get; private set; }
+    public Guid StatusId { get; private set; }
 
-    public WorkState State { get; private set; } = null!;
+    public WorkStatus Status { get; private set; } = null!;
 
     public Guid BacklogLevelId { get; private set; }
 
@@ -34,9 +34,9 @@ public sealed class WorkItem : BaseAuditableEntity<Guid>
     public WorkProcessScheme WorkProcessConfiguration { get; private set; } = null!;
 
     /// <summary>
-    /// The reason the work item is in its current state.
+    /// The reason the work item is in its current status.
     /// </summary>
-    public string? StateReason { get; set; }
+    public string? StatusReason { get; set; }
 
     public int Priority { get; set; }
 

@@ -3026,13 +3026,13 @@
         ]
       }
     },
-    "/api/work/work-state-categories": {
+    "/api/work/work-status-categories": {
       "get": {
         "tags": [
-          "WorkStateCategories"
+          "WorkStatusCategories"
         ],
-        "summary": "Get a list of all work state categories.",
-        "operationId": "WorkStateCategories_GetList",
+        "summary": "Get a list of all work status categories.",
+        "operationId": "WorkStatusCategories_GetList",
         "responses": {
           "200": {
             "description": "",
@@ -3041,7 +3041,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/WorkStateCategoryListDto"
+                    "$ref": "#/components/schemas/WorkStatusCategoryListDto"
                   }
                 }
               }
@@ -3065,13 +3065,13 @@
         ]
       }
     },
-    "/api/work/work-states": {
+    "/api/work/work-statuses": {
       "get": {
         "tags": [
-          "WorkStates"
+          "WorkStatuses"
         ],
-        "summary": "Get a list of all work states.",
-        "operationId": "WorkStates_GetList",
+        "summary": "Get a list of all work statuss.",
+        "operationId": "WorkStatuses_GetList",
         "parameters": [
           {
             "name": "includeInactive",
@@ -3091,7 +3091,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/WorkStateDto"
+                    "$ref": "#/components/schemas/WorkStatusDto"
                   }
                 }
               }
@@ -3116,16 +3116,16 @@
       },
       "post": {
         "tags": [
-          "WorkStates"
+          "WorkStatuses"
         ],
-        "summary": "Create a work state.",
-        "operationId": "WorkStates_Create",
+        "summary": "Create a work status.",
+        "operationId": "WorkStatuses_Create",
         "requestBody": {
           "x-name": "request",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateWorkStateRequest"
+                "$ref": "#/components/schemas/CreateWorkStatusRequest"
               }
             }
           },
@@ -3172,13 +3172,13 @@
         ]
       }
     },
-    "/api/work/work-states/{id}": {
+    "/api/work/work-statuses/{id}": {
       "get": {
         "tags": [
-          "WorkStates"
+          "WorkStatuses"
         ],
-        "summary": "Get work state details using the id.",
-        "operationId": "WorkStates_GetById",
+        "summary": "Get work status details using the id.",
+        "operationId": "WorkStatuses_GetById",
         "parameters": [
           {
             "name": "id",
@@ -3197,7 +3197,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkStateDto"
+                  "$ref": "#/components/schemas/WorkStatusDto"
                 }
               }
             }
@@ -3231,10 +3231,10 @@
       },
       "put": {
         "tags": [
-          "WorkStates"
+          "WorkStatuses"
         ],
-        "summary": "Update a work state.",
-        "operationId": "WorkStates_Update",
+        "summary": "Update a work status.",
+        "operationId": "WorkStatuses_Update",
         "parameters": [
           {
             "name": "id",
@@ -3252,7 +3252,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateWorkStateRequest"
+                "$ref": "#/components/schemas/UpdateWorkStatusRequest"
               }
             }
           },
@@ -6189,6 +6189,69 @@
         ]
       }
     },
+    "/api/app-integrations/azure-devops-boards-connections/{id}/init-work-process-integration": {
+      "post": {
+        "tags": [
+          "AzureDevOpsBoardsConnections"
+        ],
+        "summary": "Initialize Azure DevOps project integration as a Moda workspace.",
+        "operationId": "AzureDevOpsBoardsConnections_InitWorkProcesssIntegration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitWorkProcessIntegrationRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/app-integrations/azure-devops-boards-connections/{id}/init-workspace-integration": {
       "post": {
         "tags": [
@@ -8034,7 +8097,7 @@
           }
         }
       },
-      "WorkStateCategoryListDto": {
+      "WorkStatusCategoryListDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -8055,7 +8118,7 @@
           }
         }
       },
-      "WorkStateDto": {
+      "WorkStatusDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -8075,7 +8138,7 @@
           }
         }
       },
-      "CreateWorkStateRequest": {
+      "CreateWorkStatusRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
@@ -8084,21 +8147,21 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "The name of the work state.  The name cannot be changed.",
+            "description": "The name of the work status.  The name cannot be changed.",
             "maxLength": 64,
             "minLength": 1,
             "nullable": false
           },
           "description": {
             "type": "string",
-            "description": "The description of the work state.",
+            "description": "The description of the work status.",
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
           }
         }
       },
-      "UpdateWorkStateRequest": {
+      "UpdateWorkStatusRequest": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -8108,7 +8171,7 @@
           },
           "description": {
             "type": "string",
-            "description": "The description of the work state.",
+            "description": "The description of the work status.",
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
@@ -9133,6 +9196,9 @@
           },
           "isValidConfiguration": {
             "type": "boolean"
+          },
+          "isSyncEnabled": {
+            "type": "boolean"
           }
         }
       },
@@ -9167,6 +9233,11 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
           "externalId": {
             "type": "string",
             "format": "guid"
@@ -9177,6 +9248,27 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "integrationState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IntegrationStateDto"
+              }
+            ]
+          }
+        }
+      },
+      "IntegrationStateDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "internalId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "isActive": {
+            "type": "boolean"
           }
         }
       },
@@ -9184,6 +9276,11 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true
+          },
           "externalId": {
             "type": "string",
             "format": "guid"
@@ -9199,8 +9296,13 @@
             "type": "string",
             "format": "guid"
           },
-          "sync": {
-            "type": "boolean"
+          "integrationState": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IntegrationStateDto"
+              }
+            ]
           }
         }
       },
@@ -9298,6 +9400,30 @@
           "personalAccessToken": {
             "type": "string",
             "description": "Gets the personal access token."
+          }
+        }
+      },
+      "InitWorkProcessIntegrationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "externalId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Connection Id.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
+          },
+          "externalId": {
+            "type": "string",
+            "description": "External identifier for the work process.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false
           }
         }
       },

@@ -1,4 +1,5 @@
 import {
+  InitWorkProcessIntegrationRequest,
   InitWorkspaceIntegrationRequest,
   TestAzureDevOpsBoardConnectionRequest,
 } from './../moda-api'
@@ -68,6 +69,19 @@ export const useImportAzdoBoardsConnectionOrganizationMutation = () => {
       ).importOrganizationConfiguration(connectionId),
     onSuccess: (data, connectionId) => {
       queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, connectionId])
+    },
+  })
+}
+
+export const useInitAzdoBoardsConnectionWorkProcessMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (initRequest: InitWorkProcessIntegrationRequest) =>
+      (
+        await getAzureDevOpsBoardsConnectionsClient()
+      ).initWorkProcesssIntegration(initRequest.id, initRequest),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, variables.id])
     },
   })
 }

@@ -3765,7 +3765,7 @@ export class BacklogLevelsClient {
     }
 }
 
-export class WorkStateCategoriesClient {
+export class WorkStatusCategoriesClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -3779,10 +3779,10 @@ export class WorkStateCategoriesClient {
     }
 
     /**
-     * Get a list of all work state categories.
+     * Get a list of all work status categories.
      */
-    getList( cancelToken?: CancelToken): Promise<WorkStateCategoryListDto[]> {
-        let url_ = this.baseUrl + "/api/work/work-state-categories";
+    getList( cancelToken?: CancelToken): Promise<WorkStatusCategoryListDto[]> {
+        let url_ = this.baseUrl + "/api/work/work-status-categories";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -3805,7 +3805,7 @@ export class WorkStateCategoriesClient {
         });
     }
 
-    protected processGetList(response: AxiosResponse): Promise<WorkStateCategoryListDto[]> {
+    protected processGetList(response: AxiosResponse): Promise<WorkStatusCategoryListDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -3820,7 +3820,7 @@ export class WorkStateCategoriesClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<WorkStateCategoryListDto[]>(result200);
+            return Promise.resolve<WorkStatusCategoryListDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -3833,11 +3833,11 @@ export class WorkStateCategoriesClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<WorkStateCategoryListDto[]>(null as any);
+        return Promise.resolve<WorkStatusCategoryListDto[]>(null as any);
     }
 }
 
-export class WorkStatesClient {
+export class WorkStatusesClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -3851,11 +3851,11 @@ export class WorkStatesClient {
     }
 
     /**
-     * Get a list of all work states.
+     * Get a list of all work statuss.
      * @param includeInactive (optional) 
      */
-    getList(includeInactive: boolean | undefined, cancelToken?: CancelToken): Promise<WorkStateDto[]> {
-        let url_ = this.baseUrl + "/api/work/work-states?";
+    getList(includeInactive: boolean | undefined, cancelToken?: CancelToken): Promise<WorkStatusDto[]> {
+        let url_ = this.baseUrl + "/api/work/work-statuses?";
         if (includeInactive === null)
             throw new Error("The parameter 'includeInactive' cannot be null.");
         else if (includeInactive !== undefined)
@@ -3882,7 +3882,7 @@ export class WorkStatesClient {
         });
     }
 
-    protected processGetList(response: AxiosResponse): Promise<WorkStateDto[]> {
+    protected processGetList(response: AxiosResponse): Promise<WorkStatusDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -3897,7 +3897,7 @@ export class WorkStatesClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<WorkStateDto[]>(result200);
+            return Promise.resolve<WorkStatusDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -3910,14 +3910,14 @@ export class WorkStatesClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<WorkStateDto[]>(null as any);
+        return Promise.resolve<WorkStatusDto[]>(null as any);
     }
 
     /**
-     * Create a work state.
+     * Create a work status.
      */
-    create(request: CreateWorkStateRequest, cancelToken?: CancelToken): Promise<number> {
-        let url_ = this.baseUrl + "/api/work/work-states";
+    create(request: CreateWorkStatusRequest, cancelToken?: CancelToken): Promise<number> {
+        let url_ = this.baseUrl + "/api/work/work-statuses";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -3979,10 +3979,10 @@ export class WorkStatesClient {
     }
 
     /**
-     * Get work state details using the id.
+     * Get work status details using the id.
      */
-    getById(id: number, cancelToken?: CancelToken): Promise<WorkStateDto> {
-        let url_ = this.baseUrl + "/api/work/work-states/{id}";
+    getById(id: number, cancelToken?: CancelToken): Promise<WorkStatusDto> {
+        let url_ = this.baseUrl + "/api/work/work-statuses/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -4008,7 +4008,7 @@ export class WorkStatesClient {
         });
     }
 
-    protected processGetById(response: AxiosResponse): Promise<WorkStateDto> {
+    protected processGetById(response: AxiosResponse): Promise<WorkStatusDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -4023,7 +4023,7 @@ export class WorkStatesClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<WorkStateDto>(result200);
+            return Promise.resolve<WorkStatusDto>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -4043,14 +4043,14 @@ export class WorkStatesClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<WorkStateDto>(null as any);
+        return Promise.resolve<WorkStatusDto>(null as any);
     }
 
     /**
-     * Update a work state.
+     * Update a work status.
      */
-    update(id: number, request: UpdateWorkStateRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/work/work-states/{id}";
+    update(id: number, request: UpdateWorkStatusRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/work/work-statuses/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -7499,6 +7499,74 @@ export class AzureDevOpsBoardsConnectionsClient {
     /**
      * Initialize Azure DevOps project integration as a Moda workspace.
      */
+    initWorkProcesssIntegration(id: string, request: InitWorkProcessIntegrationRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/init-work-process-integration";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processInitWorkProcesssIntegration(_response);
+        });
+    }
+
+    protected processInitWorkProcesssIntegration(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Initialize Azure DevOps project integration as a Moda workspace.
+     */
     initWorkspaceIntegration(id: string, request: InitWorkspaceIntegrationRequest, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/init-workspace-integration";
         if (id === undefined || id === null)
@@ -8305,30 +8373,30 @@ export interface UpdateBacklogLevelRequest {
     rank?: number;
 }
 
-export interface WorkStateCategoryListDto {
+export interface WorkStatusCategoryListDto {
     id?: number;
     name?: string;
     description?: string | undefined;
     order?: number;
 }
 
-export interface WorkStateDto {
+export interface WorkStatusDto {
     id?: number;
     name?: string;
     description?: string | undefined;
     isActive?: boolean;
 }
 
-export interface CreateWorkStateRequest {
-    /** The name of the work state.  The name cannot be changed. */
+export interface CreateWorkStatusRequest {
+    /** The name of the work status.  The name cannot be changed. */
     name: string;
-    /** The description of the work state. */
+    /** The description of the work status. */
     description?: string | undefined;
 }
 
-export interface UpdateWorkStateRequest {
+export interface UpdateWorkStatusRequest {
     id?: number;
-    /** The description of the work state. */
+    /** The description of the work status. */
     description?: string | undefined;
 }
 
@@ -8621,6 +8689,7 @@ export interface AzureDevOpsBoardsConnectionDetailsDto {
     configuration?: AzureDevOpsBoardsConnectionConfigurationDto;
     isActive?: boolean;
     isValidConfiguration?: boolean;
+    isSyncEnabled?: boolean;
 }
 
 export interface AzureDevOpsBoardsConnectionConfigurationDto {
@@ -8632,17 +8701,25 @@ export interface AzureDevOpsBoardsConnectionConfigurationDto {
 }
 
 export interface AzureDevOpsBoardsWorkProcessDto {
+    id?: string | undefined;
     externalId?: string;
     name?: string;
     description?: string | undefined;
+    integrationState?: IntegrationStateDto | undefined;
+}
+
+export interface IntegrationStateDto {
+    internalId?: string;
+    isActive?: boolean;
 }
 
 export interface AzureDevOpsBoardsWorkspaceDto {
+    id?: string | undefined;
     externalId?: string;
     name?: string;
     description?: string | undefined;
     workProcessId?: string;
-    sync?: boolean;
+    integrationState?: IntegrationStateDto | undefined;
 }
 
 export interface CreateAzureDevOpsBoardConnectionRequest {
@@ -8674,6 +8751,13 @@ export interface TestAzureDevOpsBoardConnectionRequest {
     organization?: string;
     /** Gets the personal access token. */
     personalAccessToken?: string;
+}
+
+export interface InitWorkProcessIntegrationRequest {
+    /** Connection Id. */
+    id: string;
+    /** External identifier for the work process. */
+    externalId: string;
 }
 
 export interface InitWorkspaceIntegrationRequest {

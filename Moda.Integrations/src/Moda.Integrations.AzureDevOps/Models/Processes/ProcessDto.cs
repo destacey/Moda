@@ -19,21 +19,24 @@ internal static class ProcessDtoExtensions
             Name = process.Name,
             Description = process.Description,
             IsEnabled = process.IsEnabled,
-            WorkspaceIds = process.Projects?.Select(p => p.Id).ToList() ?? new List<Guid>(),
+            WorkspaceIds = process.Projects?.Select(p => p.Id).ToList() ?? [],
         };
     }
 
     public static AzdoWorkProcessConfiguration ToAzdoWorkProcessDetails(this ProcessDto process, List<BehaviorDto> behaviors, List<ProcessWorkItemTypeDto> workTypes)
     {
+        //var workflow = workTypes.ToProcessWorkflow();
+
         return new AzdoWorkProcessConfiguration
         {
             Id = process.TypeId,
             Name = process.Name,
             Description = process.Description,
             IsEnabled = process.IsEnabled,
-            WorkspaceIds = process.Projects?.Select(p => p.Id).ToList() ?? new List<Guid>(),
-            BacklogLevels = behaviors.ToAzdoBacklogLevels(),
-            WorkTypes = workTypes.ToAzdoWorkTypes(),
+            WorkspaceIds = process.Projects?.Select(p => p.Id).ToList() ?? [],
+            BacklogLevels = behaviors.ToIExternalBacklogLevels(),
+            WorkTypes = workTypes.ToIExternalWorkTypes(),
+            WorkStatuses = workTypes.ToIExternalWorkStatuses(),
         };
     }
 

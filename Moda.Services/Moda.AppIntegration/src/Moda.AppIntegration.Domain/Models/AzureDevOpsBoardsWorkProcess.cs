@@ -1,20 +1,22 @@
-﻿using Moda.Common.Extensions;
+﻿using Moda.Common.Domain.Models;
+using Moda.Common.Extensions;
 
 namespace Moda.AppIntegration.Domain.Models;
-public sealed class AzureDevOpsBoardsWorkProcess
+public sealed class AzureDevOpsBoardsWorkProcess : IntegrationObject<Guid>
 {
     private string _name = null!;
     private string? _description;
 
     private AzureDevOpsBoardsWorkProcess() { }
-    private AzureDevOpsBoardsWorkProcess(Guid externalId, string name, string? description)
+    private AzureDevOpsBoardsWorkProcess(Guid externalId, string name, string? description, IntegrationState<Guid>? integrationState)
     {
         ExternalId = externalId;
         Name = name;
         Description = description;
+        IntegrationState = integrationState;
     }
 
-    public Guid ExternalId { get; init; }
+    public Guid ExternalId { get; private init; }
 
     public string Name
     {
@@ -43,8 +45,8 @@ public sealed class AzureDevOpsBoardsWorkProcess
         }
     }
 
-    public static AzureDevOpsBoardsWorkProcess Create(Guid id, string name, string? description)
+    public static AzureDevOpsBoardsWorkProcess Create(Guid externalId, string name, string? description)
     {
-        return new AzureDevOpsBoardsWorkProcess(id, name, description);
+        return new AzureDevOpsBoardsWorkProcess(externalId, name, description, null);
     }
 }

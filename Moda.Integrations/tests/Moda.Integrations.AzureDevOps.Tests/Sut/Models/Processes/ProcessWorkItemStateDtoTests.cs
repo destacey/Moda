@@ -19,6 +19,8 @@ public class ProcessWorkItemStateDtoTests : CommonResponseOptions
         actualResponse.Id.Should().Be("28db9425-a6bc-4932-b93d-6a789fb233b3");
         actualResponse.Name.Should().Be("Removed");
         actualResponse.StateCategory.Should().Be("Removed");
+        actualResponse.Order.Should().Be(4);
+        actualResponse.Hidden.Should().BeFalse();
     }
 
     private static string GetJson()
@@ -30,7 +32,7 @@ public class ProcessWorkItemStateDtoTests : CommonResponseOptions
            	"color": "f06673",
            	"stateCategory": "Removed",
            	"order": 4,
-           	"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Initiative/states/28db9425-a6bc-4932-b93d-6a789fb233b3",
+           	"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Initiative/states/28db9425-a6bc-4932-b93d-6a789fb233b3",
            	"customizationType": "custom"
            }
            """;

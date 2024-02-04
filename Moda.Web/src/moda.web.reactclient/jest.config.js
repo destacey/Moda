@@ -7,6 +7,9 @@ const createJestConfig = nextJest({
 const customJestConfig = {
   testEnvironment: 'jest-environment-jsdom',
   collectCoverage: true,
+  moduleNameMapper: {
+     'react-markdown': '<rootDir>/node_modules/react-markdown/lib/index.js',
+  },
 }
 
 module.exports = createJestConfig(customJestConfig)

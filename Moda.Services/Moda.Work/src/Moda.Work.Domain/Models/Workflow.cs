@@ -1,4 +1,6 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
+using Moda.Common.Extensions;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
@@ -10,26 +12,37 @@ namespace Moda.Work.Domain.Models;
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
 public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
 {
-    private readonly List<WorkflowScheme> _schemes = new();
+    private readonly List<WorkflowScheme> _schemes = [];
+    private string _name = null!;
+    private string? _description;
 
     private Workflow() { }
 
-    public Workflow(string name, string? description, Ownership ownership)
+    internal Workflow(string name, string? description, Ownership ownership, Guid? externalId)
     {
-        Name = name.Trim();
-        Description = description?.Trim();
+        Name = name;
+        Description = description;
         Ownership = ownership;
+        ExternalId = externalId;
     }
 
     /// <summary>
     /// The name of the workflow.
     /// </summary>
-    public string Name { get; private set; } = null!;
+    public string Name
+    {
+        get => _name;
+        private init => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    }
 
     /// <summary>
     /// The description of the workflow.
     /// </summary>
-    public string? Description { get; private set; }
+    public string? Description
+    {
+        get => _description;
+        private set => _description = value.NullIfWhiteSpacePlusTrim();
+    }
 
     /// <summary>
     /// Indicates whether the workflow is owned by Moda or a third party system.  This value should not change.
@@ -37,10 +50,15 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
     public Ownership Ownership { get; }
 
     /// <summary>
+    /// Gets the external identifier. The value is required when Ownership is managed; otherwise it's null.  For Azure DevOps, this is the process id.
+    /// </summary>
+    public Guid? ExternalId { get; }
+
+    /// <summary>
     /// Indicates whether the workflow is active or not.  Only active workflows can be assigned 
     /// to work process configurations.  The default is false and the user should activate it after the configuration is complete.
     /// </summary>
-    public bool IsActive { get; private set; } = false;
+    public bool IsActive { get; private set; } = true;
 
     public IReadOnlyCollection<WorkflowScheme> Schemes => _schemes.AsReadOnly();
 
@@ -76,5 +94,26 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
         }
 
         return Result.Success();
+    }
+
+    // TODO move CRUD operations for WorkflowScheme here
+    //public Result AddScheme(int workStatusId, WorkStatusCategory workStatusCategory, int order)
+    //{
+    //    try
+    //    {
+
+    //        _schemes.Add(WorkflowScheme.Create(Id, workStatusId, workStatusCategory, order));
+    //        return Result.Success();
+
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return Result.Failure(ex.ToString());
+    //    }
+    //}
+
+    public static Workflow Create(string name, string? description, Ownership ownership, Guid? externalId)
+    {
+        return new(name, description, ownership, externalId);
     }
 }

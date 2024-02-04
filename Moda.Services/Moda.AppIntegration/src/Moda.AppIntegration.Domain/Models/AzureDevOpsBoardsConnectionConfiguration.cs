@@ -16,8 +16,8 @@ public sealed class AzureDevOpsBoardsConnectionConfiguration
     {
         Organization = organization.Trim();
         PersonalAccessToken = personalAccessToken.Trim();
-        Workspaces = workspaces?.ToList() ?? new List<AzureDevOpsBoardsWorkspace>();
-        WorkProcesses = processes?.ToList() ?? new List<AzureDevOpsBoardsWorkProcess>();
+        Workspaces = workspaces?.ToList() ?? [];
+        WorkProcesses = processes?.ToList() ?? [];
     }
 
     /// <summary>Gets the organization.</summary>
@@ -34,11 +34,11 @@ public sealed class AzureDevOpsBoardsConnectionConfiguration
     /// <summary>Gets the workspaces.</summary>
     /// <value>The workspaces.</value>
     [JsonInclude]
-    public List<AzureDevOpsBoardsWorkspace> Workspaces { get; private set; } = new ();
+    public List<AzureDevOpsBoardsWorkspace> Workspaces { get; private set; } = [];
 
     /// <summary>Gets the work processes.</summary>
     [JsonInclude]
-    public List<AzureDevOpsBoardsWorkProcess> WorkProcesses { get; private set; } = new ();
+    public List<AzureDevOpsBoardsWorkProcess> WorkProcesses { get; private set; } = [];
 
     internal Result AddWorkspace(AzureDevOpsBoardsWorkspace workspace)
     {

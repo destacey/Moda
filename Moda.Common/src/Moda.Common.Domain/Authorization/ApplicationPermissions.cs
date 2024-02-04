@@ -46,8 +46,8 @@ public static class ApplicationResource
     public const string BacklogLevels = nameof(BacklogLevels);
     public const string Workspaces = nameof(Workspaces);
     public const string WorkItems = nameof(WorkItems);
-    public const string WorkStateCategories = nameof(WorkStateCategories);
-    public const string WorkStates = nameof(WorkStates);
+    public const string WorkStatusCategories = nameof(WorkStatusCategories);
+    public const string WorkStatuses = nameof(WorkStatuses);
     public const string WorkTypes = nameof(WorkTypes);
 
     public const string Links = nameof(Links);
@@ -57,18 +57,18 @@ public static class ApplicationResource
 
 public static class ApplicationPermissions
 {
-    private static readonly ApplicationPermission[] _common = Array.Empty<ApplicationPermission>();
+    private static readonly ApplicationPermission[] _common = [];
 
-    private static readonly ApplicationPermission[] _backgroundJobs = new ApplicationPermission[]
-    {
+    private static readonly ApplicationPermission[] _backgroundJobs =
+    [
         new("View Hangfire", ApplicationAction.View, ApplicationResource.Hangfire),
         new("View Background Jobs", ApplicationAction.View, ApplicationResource.BackgroundJobs),
         new("Create Background Jobs", ApplicationAction.Create, ApplicationResource.BackgroundJobs),
         new("Run Background Jobs", ApplicationAction.Run, ApplicationResource.BackgroundJobs)
-    };
+    ];
 
-    private static readonly ApplicationPermission[] _identity = new ApplicationPermission[]
-    {
+    private static readonly ApplicationPermission[] _identity =
+    [
         new("View Users", ApplicationAction.View, ApplicationResource.Users),
         new("Search Users", ApplicationAction.Search, ApplicationResource.Users),
         new("Create Users", ApplicationAction.Create, ApplicationResource.Users),
@@ -88,35 +88,35 @@ public static class ApplicationPermissions
         new("Update RoleClaims", ApplicationAction.Update, ApplicationResource.RoleClaims),
 
         new("View Permissions", ApplicationAction.View, ApplicationResource.Permissions)
-    };
+    ];
 
-    private static readonly ApplicationPermission[] _appIntegration = new ApplicationPermission[]
-    {
+    private static readonly ApplicationPermission[] _appIntegration =
+    [
         new("View Connections", ApplicationAction.View, ApplicationResource.Connections),
         new("Create Connections", ApplicationAction.Create, ApplicationResource.Connections),
         new("Update Connections", ApplicationAction.Update, ApplicationResource.Connections),
         new("Delete Connections", ApplicationAction.Delete, ApplicationResource.Connections),
 
         new("View Connectors", ApplicationAction.View, ApplicationResource.Connectors),
-    };
+    ];
 
-    private static readonly ApplicationPermission[] _healthChecks = new ApplicationPermission[]
-    {
+    private static readonly ApplicationPermission[] _healthChecks =
+    [
         new("View Health Checks", ApplicationAction.View, ApplicationResource.HealthChecks, IsBasic: true),
         new("Create Health Checks", ApplicationAction.Create, ApplicationResource.HealthChecks, IsBasic: true),
         new("Update Health Checks", ApplicationAction.Update, ApplicationResource.HealthChecks, IsBasic: true),
-    };
+    ];
 
-    private static readonly ApplicationPermission[] _links = new ApplicationPermission[]
-    {
+    private static readonly ApplicationPermission[] _links =
+    [
         new("View Links", ApplicationAction.View, ApplicationResource.Links, IsBasic: true),
         new("Create Links", ApplicationAction.Create, ApplicationResource.Links, IsBasic: true),
         new("Update Links", ApplicationAction.Update, ApplicationResource.Links, IsBasic: true),
         new("Delete Links", ApplicationAction.Delete, ApplicationResource.Links, IsBasic: true),
-    };
+    ];
 
-    private static readonly ApplicationPermission[] _organization = new ApplicationPermission[]
-    {
+    private static readonly ApplicationPermission[] _organization =
+    [
         new("View Employees", ApplicationAction.View, ApplicationResource.Employees, IsBasic: true),
         new("Create Employees", ApplicationAction.Create, ApplicationResource.Employees),
         new("Update Employees", ApplicationAction.Update, ApplicationResource.Employees),
@@ -127,10 +127,10 @@ public static class ApplicationPermissions
         new("Update Teams", ApplicationAction.Update, ApplicationResource.Teams),
         new("Manage Team Memberships.  This includes adding, updating, and removing team memberships.", ApplicationAction.ManageTeamMemberships, ApplicationResource.Teams),
         new("Delete Teams", ApplicationAction.Delete, ApplicationResource.Teams),
-    };
+    ];
 
-    private static readonly ApplicationPermission[] _planning = new ApplicationPermission[]
-    {
+    private static readonly ApplicationPermission[] _planning =
+    [
         new("View Planning Intervals", ApplicationAction.View, ApplicationResource.PlanningIntervals, IsBasic: true),
         new("Create Planning Intervals", ApplicationAction.Create, ApplicationResource.PlanningIntervals),
         new("Update Planning Intervals", ApplicationAction.Update, ApplicationResource.PlanningIntervals),
@@ -145,10 +145,10 @@ public static class ApplicationPermissions
         new("Update Risks", ApplicationAction.Update, ApplicationResource.Risks, IsBasic: true),
         new("Delete Risks", ApplicationAction.Delete, ApplicationResource.Risks, IsBasic : true),
         new("Import Risks", ApplicationAction.Import, ApplicationResource.Risks),
-    };
+    ];
 
-    private static readonly ApplicationPermission[] _work = new ApplicationPermission[]
-    {
+    private static readonly ApplicationPermission[] _work =
+    [
         new("View BacklogCategories", ApplicationAction.View, ApplicationResource.BacklogCategories, IsBasic: true),
 
         new("View BacklogLevels", ApplicationAction.View, ApplicationResource.BacklogLevels, IsBasic: true),
@@ -166,18 +166,18 @@ public static class ApplicationPermissions
         new("Update WorkItems", ApplicationAction.Update, ApplicationResource.WorkItems),
         new("Delete WorkItems", ApplicationAction.Delete, ApplicationResource.WorkItems),
 
-        new("View WorkStateCategories", ApplicationAction.View, ApplicationResource.WorkStateCategories, IsBasic: true),
+        new("View WorkStatusCategories", ApplicationAction.View, ApplicationResource.WorkStatusCategories, IsBasic: true),
 
-        new("View WorkStates", ApplicationAction.View, ApplicationResource.WorkStates, IsBasic: true),
-        new("Create WorkStates", ApplicationAction.Create, ApplicationResource.WorkStates),
-        new("Update WorkStates", ApplicationAction.Update, ApplicationResource.WorkStates),
-        new("Delete WorkStates", ApplicationAction.Delete, ApplicationResource.WorkStates),
+        new("View WorkStatuses", ApplicationAction.View, ApplicationResource.WorkStatuses, IsBasic: true),
+        new("Create WorkStatuses", ApplicationAction.Create, ApplicationResource.WorkStatuses),
+        new("Update WorkStatuses", ApplicationAction.Update, ApplicationResource.WorkStatuses),
+        new("Delete WorkStatuses", ApplicationAction.Delete, ApplicationResource.WorkStatuses),
 
         new("View WorkTypes", ApplicationAction.View, ApplicationResource.WorkTypes, IsBasic: true),
         new("Create WorkTypes", ApplicationAction.Create, ApplicationResource.WorkTypes),
         new("Update WorkTypes", ApplicationAction.Update, ApplicationResource.WorkTypes),
         new("Delete WorkTypes", ApplicationAction.Delete, ApplicationResource.WorkTypes),
-    };
+    ];
 
     private static readonly ApplicationPermission[] _all = _common
         .Union(_backgroundJobs)

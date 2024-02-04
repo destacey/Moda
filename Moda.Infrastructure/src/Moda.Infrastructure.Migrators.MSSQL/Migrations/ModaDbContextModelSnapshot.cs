@@ -137,6 +137,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsSyncEnabled")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsValidConfiguration")
                         .HasColumnType("bit");
 
@@ -816,8 +819,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1347,7 +1350,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("Key")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
@@ -1357,8 +1363,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Ownership")
                         .IsRequired()
@@ -1369,12 +1375,68 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasAlternateKey("Key");
 
-                    b.HasIndex("Id");
+                    b.HasIndex("Id", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "IsDeleted"), new[] { "Key", "Name", "ExternalId", "Ownership", "IsActive" });
+
+                    b.HasIndex("Key", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "IsDeleted"), new[] { "Id", "Name", "ExternalId", "Ownership", "IsActive" });
 
                     b.ToTable("WorkProcesses", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkState", b =>
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkProcessScheme", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("WorkProcessId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("WorkTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("WorkflowId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    b.HasIndex("WorkProcessId");
+
+                    b.HasIndex("WorkTypeId");
+
+                    b.ToTable("WorkProcessSchemes", "Work");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkStatus", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1426,7 +1488,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "Name" });
 
-                    b.ToTable("WorkStates", "Work");
+                    b.ToTable("WorkStatuses", "Work");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkType", b =>
@@ -1482,6 +1544,123 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "Name" });
 
                     b.ToTable("WorkTypes", "Work");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.Workflow", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<Guid?>("ExternalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("Ownership")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    b.HasIndex("IsActive", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "Name" });
+
+                    b.ToTable("Workflows", "Work");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkflowScheme", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<string>("WorkStatusCategory")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<int>("WorkStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("WorkflowId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    b.HasIndex("WorkStatusId");
+
+                    b.HasIndex("WorkflowId");
+
+                    b.HasIndex("IsActive", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id" });
+
+                    b.ToTable("WorkflowSchemes", "Work");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.Workspace", b =>
@@ -1543,18 +1722,22 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasAlternateKey("Key");
 
-                    b.HasIndex("Id");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Name", "Ownership", "IsActive", "IsDeleted" });
-
                     b.HasIndex("Name")
                         .IsUnique();
 
                     b.HasIndex("WorkProcessId");
 
+                    b.HasIndex("Id", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "IsDeleted"), new[] { "Key", "Name", "Ownership", "IsActive" });
+
                     b.HasIndex("IsActive", "IsDeleted");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "Name", "Ownership" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "Key", "Name", "Ownership" });
+
+                    b.HasIndex("Key", "IsDeleted");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "IsDeleted"), new[] { "Id", "Name", "Ownership", "IsActive" });
 
                     b.ToTable("Workspaces", "Work");
                 });
@@ -1891,6 +2074,50 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkProcessScheme", b =>
+                {
+                    b.HasOne("Moda.Work.Domain.Models.WorkProcess", "WorkProcess")
+                        .WithMany("Schemes")
+                        .HasForeignKey("WorkProcessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Work.Domain.Models.Workflow", "Workflow")
+                        .WithMany()
+                        .HasForeignKey("WorkProcessId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Work.Domain.Models.WorkType", "WorkType")
+                        .WithMany()
+                        .HasForeignKey("WorkTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("WorkProcess");
+
+                    b.Navigation("WorkType");
+
+                    b.Navigation("Workflow");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkflowScheme", b =>
+                {
+                    b.HasOne("Moda.Work.Domain.Models.WorkStatus", "WorkStatus")
+                        .WithMany()
+                        .HasForeignKey("WorkStatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Work.Domain.Models.Workflow", null)
+                        .WithMany("Schemes")
+                        .HasForeignKey("WorkflowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkStatus");
+                });
+
             modelBuilder.Entity("Moda.Work.Domain.Models.Workspace", b =>
                 {
                     b.HasOne("Moda.Work.Domain.Models.WorkProcess", null)
@@ -1947,8 +2174,34 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                                     b2.ToTable("Connections", "AppIntegrations");
 
+                                    b2.ToJson("WorkProcesses");
+
                                     b2.WithOwner()
                                         .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
+
+                                    b2.OwnsOne("Moda.Common.Domain.Models.IntegrationState<System.Guid>", "IntegrationState", b3 =>
+                                        {
+                                            b3.Property<Guid>("AzureDevOpsBoardsWorkProcessAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
+                                                .HasColumnType("uniqueidentifier");
+
+                                            b3.Property<int>("AzureDevOpsBoardsWorkProcessId")
+                                                .HasColumnType("int");
+
+                                            b3.Property<Guid>("InternalId")
+                                                .HasColumnType("uniqueidentifier");
+
+                                            b3.Property<bool>("IsActive")
+                                                .HasColumnType("bit");
+
+                                            b3.HasKey("AzureDevOpsBoardsWorkProcessAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "AzureDevOpsBoardsWorkProcessId");
+
+                                            b3.ToTable("Connections", "AppIntegrations");
+
+                                            b3.WithOwner()
+                                                .HasForeignKey("AzureDevOpsBoardsWorkProcessAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "AzureDevOpsBoardsWorkProcessId");
+                                        });
+
+                                    b2.Navigation("IntegrationState");
                                 });
 
                             b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace", "Workspaces", b2 =>
@@ -1970,9 +2223,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                         .IsRequired()
                                         .HasColumnType("nvarchar(max)");
 
-                                    b2.Property<bool>("Sync")
-                                        .HasColumnType("bit");
-
                                     b2.Property<Guid?>("WorkProcessId")
                                         .HasColumnType("uniqueidentifier");
 
@@ -1980,8 +2230,34 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                                     b2.ToTable("Connections", "AppIntegrations");
 
+                                    b2.ToJson("Workspaces");
+
                                     b2.WithOwner()
                                         .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
+
+                                    b2.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace.IntegrationState#IntegrationState", "IntegrationState", b3 =>
+                                        {
+                                            b3.Property<Guid>("AzureDevOpsBoardsWorkspaceAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
+                                                .HasColumnType("uniqueidentifier");
+
+                                            b3.Property<int>("AzureDevOpsBoardsWorkspaceId")
+                                                .HasColumnType("int");
+
+                                            b3.Property<Guid>("InternalId")
+                                                .HasColumnType("uniqueidentifier");
+
+                                            b3.Property<bool>("IsActive")
+                                                .HasColumnType("bit");
+
+                                            b3.HasKey("AzureDevOpsBoardsWorkspaceAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "AzureDevOpsBoardsWorkspaceId");
+
+                                            b3.ToTable("Connections", "AppIntegrations");
+
+                                            b3.WithOwner()
+                                                .HasForeignKey("AzureDevOpsBoardsWorkspaceAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId", "AzureDevOpsBoardsWorkspaceId");
+                                        });
+
+                                    b2.Navigation("IntegrationState");
                                 });
 
                             b1.Navigation("WorkProcesses");
@@ -2029,7 +2305,14 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkProcess", b =>
                 {
+                    b.Navigation("Schemes");
+
                     b.Navigation("Workspaces");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.Workflow", b =>
+                {
+                    b.Navigation("Schemes");
                 });
 
             modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOfTeams", b =>

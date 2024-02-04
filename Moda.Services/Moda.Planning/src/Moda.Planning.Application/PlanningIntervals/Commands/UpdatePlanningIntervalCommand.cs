@@ -13,12 +13,12 @@ public sealed class UpdatePlanningIntervalCommandValidator : CustomValidator<Upd
         RuleFor(e => e.Name)
             .NotEmpty()
             .MaximumLength(128)
-            .MustAsync(async (model, name, cancellationToken) 
+            .MustAsync(async (model, name, cancellationToken)
                 => await BeUniquePlanningIntervalName(model.Id, name, cancellationToken))
                 .WithMessage("The Planning Interval name already exists."); ;
 
         RuleFor(e => e.Description)
-            .MaximumLength(1024);
+            .MaximumLength(2048);
     }
 
     public async Task<bool> BeUniquePlanningIntervalName(Guid id, string name, CancellationToken cancellationToken)

@@ -74,6 +74,16 @@ public class AzureDevOpsService : IAzureDevOpsService
             : Result.Failure<List<IExternalWorkProcess>>(result.Error);
     }
 
+    public async Task<Result<IExternalWorkProcessConfiguration>> GetWorkProcess(string organizationUrl, string token, Guid processId, CancellationToken cancellationToken)
+    {
+        var processService = GetService<ProcessService>(organizationUrl, token);
+
+        var result = await processService.GetProcess(processId, cancellationToken);
+        return result.IsSuccess
+            ? result.Value
+            : Result.Failure<IExternalWorkProcessConfiguration>(result.Error);
+    }
+
     public async Task<Result<IExternalWorkspace>> GetWorkspace(string organizationUrl, string token, Guid workspaceId)
     {
         var connection = CreateVssConnection(organizationUrl, token);

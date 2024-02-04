@@ -70,13 +70,13 @@ public static class ConfigureServices
             .UseStaticFiles()
             .UseSecurityHeaders(config)
             .UseExceptionMiddleware()
-            .UseHttpsRedirection()
+            //.UseHttpsRedirection() // TODO: we don't currently need this because we are using docker.  Add a config setting to enable this when needed.
             .UseRouting()
             .UseCorsPolicy()
             .UseAuthentication()
             .UseCurrentUser()
             .UseAuthorization()
-            .UseRequestLogging(config)
+            .UseRequestLogging(config) // TODO: we currently don't log 403 logs because it is lower in the middleware pipeline. It should be above UseRouting, but then we don't get user information.
             .UseHangfireDashboard(config)
             .UseOpenApiDocumentation(config);
 

@@ -17,7 +17,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
 
         // Assert
         Assert.NotNull(workType);
-        workType.Id.Should().Be("ModaAgileProcess.Epic");
+        workType.Id.Should().Be("TestAgileProcess.Epic");
         workType.Name.Should().Be("Epic");
         workType.Description.Should().Be("Epics help teams effectively manage and groom their product backlog");
         workType.BacklogLevelId.Should().Be("Microsoft.VSTS.Agile.EpicBacklogBehavior");
@@ -51,7 +51,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
         var workItemTypes = JsonSerializer.Deserialize<List<ProcessWorkItemTypeDto>>(json, _options);
 
         // Act
-        var workTypes = workItemTypes!.ToAzdoWorkTypes();
+        var workTypes = workItemTypes!.ToIExternalWorkTypes();
 
         // Assert
         Assert.NotNull(workTypes);
@@ -64,10 +64,10 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
     {
         return """
            {
-           	"referenceName": "ModaAgileProcess.Epic",
+           	"referenceName": "TestAgileProcess.Epic",
            	"name": "Epic",
            	"description": "Epics help teams effectively manage and groom their product backlog",
-           	"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic",
+           	"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic",
            	"customization": "inherited",
            	"color": "E06C00",
            	"icon": "icon_crown",
@@ -80,7 +80,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
            			"color": "b2b2b2",
            			"stateCategory": "Proposed",
            			"order": 1,
-           			"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic/states/7b7e3e8c-e500-40b6-ad56-d59b8d64d757",
+           			"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic/states/7b7e3e8c-e500-40b6-ad56-d59b8d64d757",
            			"customizationType": "system"
            		},
            		{
@@ -89,7 +89,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
            			"color": "007acc",
            			"stateCategory": "InProgress",
            			"order": 2,
-           			"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic/states/277237cd-0bc0-4ffb-bdc6-d358b154ba9e",
+           			"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic/states/277237cd-0bc0-4ffb-bdc6-d358b154ba9e",
            			"customizationType": "system"
            		},
            		{
@@ -98,7 +98,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
            			"color": "007acc",
            			"stateCategory": "InProgress",
            			"order": 3,
-           			"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic/states/f36cfea7-889a-448e-b5d1-fbc9b134ec82",
+           			"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic/states/f36cfea7-889a-448e-b5d1-fbc9b134ec82",
            			"customizationType": "system"
            		},
            		{
@@ -107,7 +107,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
            			"color": "339933",
            			"stateCategory": "Completed",
            			"order": 4,
-           			"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic/states/9f479b88-4542-4f9d-8048-5d9c953b5082",
+           			"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic/states/9f479b88-4542-4f9d-8048-5d9c953b5082",
            			"customizationType": "system"
            		},
            		{
@@ -116,7 +116,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
            			"color": "ffffff",
            			"stateCategory": "Removed",
            			"order": 5,
-           			"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic/states/0293a2ce-2a42-4d0e-bbbf-d2237efa0db8",
+           			"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic/states/0293a2ce-2a42-4d0e-bbbf-d2237efa0db8",
            			"customizationType": "system"
            		},
            		{
@@ -125,7 +125,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
            			"color": "007acc",
            			"stateCategory": "InProgress",
            			"order": 6,
-           			"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic/states/f36cfea7-889a-448e-b5d1-fbc9b134ec82",
+           			"url": "https://dev.azure.com/test/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic/states/f36cfea7-889a-448e-b5d1-fbc9b134ec82",
            			"hidden": true,
            			"customizationType": "inherited"
            		}
@@ -201,10 +201,10 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
         return """
             [
                 {
-                    "referenceName": "ModaAgileProcess.Epic",
+                    "referenceName": "TestAgileProcess.Epic",
                     "name": "Epic",
                     "description": "Epics help teams effectively manage and groom their product backlog",
-                    "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic",
+                    "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic",
                     "customization": "inherited",
                     "color": "E06C00",
                     "icon": "icon_crown",
@@ -217,7 +217,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "b2b2b2",
                             "stateCategory": "Proposed",
                             "order": 1,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic/states/7b7e3e8c-e500-40b6-ad56-d59b8d64d757",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic/states/7b7e3e8c-e500-40b6-ad56-d59b8d64d757",
                             "customizationType": "system"
                         },
                         {
@@ -226,7 +226,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "007acc",
                             "stateCategory": "InProgress",
                             "order": 2,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic/states/277237cd-0bc0-4ffb-bdc6-d358b154ba9e",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic/states/277237cd-0bc0-4ffb-bdc6-d358b154ba9e",
                             "customizationType": "system"
                         },
                         {
@@ -235,7 +235,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "007acc",
                             "stateCategory": "InProgress",
                             "order": 3,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic/states/f36cfea7-889a-448e-b5d1-fbc9b134ec82",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic/states/f36cfea7-889a-448e-b5d1-fbc9b134ec82",
                             "customizationType": "system"
                         },
                         {
@@ -244,7 +244,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "339933",
                             "stateCategory": "Completed",
                             "order": 4,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic/states/9f479b88-4542-4f9d-8048-5d9c953b5082",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic/states/9f479b88-4542-4f9d-8048-5d9c953b5082",
                             "customizationType": "system"
                         },
                         {
@@ -253,7 +253,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "ffffff",
                             "stateCategory": "Removed",
                             "order": 5,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic/states/0293a2ce-2a42-4d0e-bbbf-d2237efa0db8",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic/states/0293a2ce-2a42-4d0e-bbbf-d2237efa0db8",
                             "customizationType": "system"
                         },
                         {
@@ -262,7 +262,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "007acc",
                             "stateCategory": "InProgress",
                             "order": 6,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Epic/states/f36cfea7-889a-448e-b5d1-fbc9b134ec82",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Epic/states/f36cfea7-889a-448e-b5d1-fbc9b134ec82",
                             "hidden": true,
                             "customizationType": "inherited"
                         }
@@ -280,10 +280,10 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                     ]
                 },
                 {
-                    "referenceName": "ModaAgileProcess.Spike",
+                    "referenceName": "TestAgileProcess.Spike",
                     "name": "Spike",
                     "description": "Used to track research or investigations.",
-                    "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Spike",
+                    "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Spike",
                     "customization": "custom",
                     "color": "aaaaaa",
                     "icon": "icon_review",
@@ -296,7 +296,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "D5D5D5",
                             "stateCategory": "Proposed",
                             "order": 1,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Spike/states/56ba8e2f-e2a6-4839-83bb-187ec295fb0f",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Spike/states/56ba8e2f-e2a6-4839-83bb-187ec295fb0f",
                             "customizationType": "custom"
                         },
                         {
@@ -305,7 +305,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "007acc",
                             "stateCategory": "InProgress",
                             "order": 2,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Spike/states/71e5a51a-0339-4c13-b289-6a44d5b65fb6",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Spike/states/71e5a51a-0339-4c13-b289-6a44d5b65fb6",
                             "customizationType": "custom"
                         },
                         {
@@ -314,7 +314,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "339933",
                             "stateCategory": "Completed",
                             "order": 3,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Spike/states/8e312e6e-468c-46a3-b7f3-d55d58428291",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Spike/states/8e312e6e-468c-46a3-b7f3-d55d58428291",
                             "customizationType": "custom"
                         }
                     ],
@@ -331,10 +331,10 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                     ]
                 },
                 {
-                    "referenceName": "ModaAgileProcess.Initiative",
+                    "referenceName": "TestAgileProcess.Initiative",
                     "name": "Initiative",
                     "description": "",
-                    "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Initiative",
+                    "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Initiative",
                     "customization": "custom",
                     "color": "009CCC",
                     "icon": "icon_chart",
@@ -347,7 +347,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "b2b2b2",
                             "stateCategory": "Proposed",
                             "order": 1,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Initiative/states/62743a40-e727-4db4-8485-b9e0ebf856a1",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Initiative/states/62743a40-e727-4db4-8485-b9e0ebf856a1",
                             "customizationType": "custom"
                         },
                         {
@@ -356,7 +356,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "007acc",
                             "stateCategory": "InProgress",
                             "order": 2,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Initiative/states/d6e7b40d-6d46-4632-a93e-79ad59264555",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Initiative/states/d6e7b40d-6d46-4632-a93e-79ad59264555",
                             "customizationType": "custom"
                         },
                         {
@@ -365,7 +365,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "339933",
                             "stateCategory": "Completed",
                             "order": 3,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Initiative/states/9887fdc4-819e-474e-aad0-eea428d2ab43",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Initiative/states/9887fdc4-819e-474e-aad0-eea428d2ab43",
                             "customizationType": "custom"
                         },
                         {
@@ -374,7 +374,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "f06673",
                             "stateCategory": "Removed",
                             "order": 4,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Initiative/states/28db9425-a6bc-4932-b93d-6a789fb233b3",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Initiative/states/28db9425-a6bc-4932-b93d-6a789fb233b3",
                             "customizationType": "custom"
                         }
                     ],
@@ -391,10 +391,10 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                     ]
                 },
                 {
-                    "referenceName": "ModaAgileProcess.Feature",
+                    "referenceName": "TestAgileProcess.Feature",
                     "name": "Feature",
                     "description": "Tracks a feature that will be released with the product",
-                    "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Feature",
+                    "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Feature",
                     "customization": "inherited",
                     "color": "773B93",
                     "icon": "icon_trophy",
@@ -407,7 +407,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "b2b2b2",
                             "stateCategory": "Proposed",
                             "order": 1,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Feature/states/7b7e3e8c-e500-40b6-ad56-d59b8d64d757",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Feature/states/7b7e3e8c-e500-40b6-ad56-d59b8d64d757",
                             "customizationType": "system"
                         },
                         {
@@ -416,7 +416,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "007acc",
                             "stateCategory": "InProgress",
                             "order": 2,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Feature/states/277237cd-0bc0-4ffb-bdc6-d358b154ba9e",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Feature/states/277237cd-0bc0-4ffb-bdc6-d358b154ba9e",
                             "customizationType": "system"
                         },
                         {
@@ -425,7 +425,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "007acc",
                             "stateCategory": "InProgress",
                             "order": 3,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Feature/states/f36cfea7-889a-448e-b5d1-fbc9b134ec82",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Feature/states/f36cfea7-889a-448e-b5d1-fbc9b134ec82",
                             "customizationType": "system"
                         },
                         {
@@ -434,7 +434,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "339933",
                             "stateCategory": "Completed",
                             "order": 4,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Feature/states/9f479b88-4542-4f9d-8048-5d9c953b5082",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Feature/states/9f479b88-4542-4f9d-8048-5d9c953b5082",
                             "customizationType": "system"
                         },
                         {
@@ -443,7 +443,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "ffffff",
                             "stateCategory": "Removed",
                             "order": 5,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Feature/states/0293a2ce-2a42-4d0e-bbbf-d2237efa0db8",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Feature/states/0293a2ce-2a42-4d0e-bbbf-d2237efa0db8",
                             "customizationType": "system"
                         },
                         {
@@ -452,7 +452,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "007acc",
                             "stateCategory": "InProgress",
                             "order": 6,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Feature/states/f36cfea7-889a-448e-b5d1-fbc9b134ec82",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Feature/states/f36cfea7-889a-448e-b5d1-fbc9b134ec82",
                             "hidden": true,
                             "customizationType": "inherited"
                         }
@@ -470,10 +470,10 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                     ]
                 },
                 {
-                    "referenceName": "ModaAgileProcess.Issue",
+                    "referenceName": "TestAgileProcess.Issue",
                     "name": "Issue",
                     "description": "Tracks an obstacle to progress.",
-                    "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Issue",
+                    "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Issue",
                     "customization": "inherited",
                     "color": "B4009E",
                     "icon": "icon_traffic_cone",
@@ -486,7 +486,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "007acc",
                             "stateCategory": "InProgress",
                             "order": 1,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Issue/states/277237cd-0bc0-4ffb-bdc6-d358b154ba9e",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Issue/states/277237cd-0bc0-4ffb-bdc6-d358b154ba9e",
                             "customizationType": "system"
                         },
                         {
@@ -495,7 +495,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
                             "color": "339933",
                             "stateCategory": "Completed",
                             "order": 2,
-                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/ModaAgileProcess.Issue/states/9f479b88-4542-4f9d-8048-5d9c953b5082",
+                            "url": "https://dev.azure.com/dstacey/_apis/work/processes/15e0d0dd-8d89-46ae-ad4a-7c1d9742bd77/workItemTypes/TestAgileProcess.Issue/states/9f479b88-4542-4f9d-8048-5d9c953b5082",
                             "customizationType": "system"
                         }
                     ],

@@ -1,4 +1,5 @@
 ﻿using Ardalis.GuardClauses;
+using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Domain.Enums;
 
 namespace Moda.Integrations.AzureDevOps.Models.Processes;
@@ -21,9 +22,9 @@ internal static class BehaviorDtoExtensions
     /// </summary>
     /// <param name="behaviors"></param>
     /// <returns></returns>
-    public static List<AzdoBacklogLevel> ToAzdoBacklogLevels(this List<BehaviorDto> behaviors)
+    public static IList<IExternalBacklogLevel> ToIExternalBacklogLevels(this List<BehaviorDto> behaviors)
     {
-        var backlogLevels = new List<AzdoBacklogLevel>();
+        IList<IExternalBacklogLevel> backlogLevels = [];
         foreach (var behavior in behaviors.Where(b => b.Rank > 0))
         {
             Guard.Against.Null(behavior.Inherits, nameof(behavior.Inherits));

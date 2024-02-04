@@ -1,7 +1,8 @@
-﻿namespace Moda.AppIntegration.Domain.Models;
+﻿using Moda.Common.Domain.Models;
+
+namespace Moda.AppIntegration.Domain.Models;
 public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsConnectionConfiguration>
 {
-
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     private AzureDevOpsBoardsConnection() { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -16,6 +17,10 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
     }
 
     public override AzureDevOpsBoardsConnectionConfiguration Configuration { get; protected set; }
+
+    public override bool HasActiveIntegrationObjects => IsValidConfiguration 
+        && (Configuration.WorkProcesses.Any(p => p.IntegrationIsActive)
+        || Configuration.Workspaces.Any(p => p.IntegrationIsActive));
 
     public Result Update(string name, string? description, string organization, string personalAccessToken, bool configurationIsValid, Instant timestamp)
     {
@@ -42,7 +47,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         }
     }
 
-    public Result ImportWorkspaces(IEnumerable<AzureDevOpsBoardsWorkspace> workspaces, Instant timestamp)
+    public Result SyncWorkspaces(IEnumerable<AzureDevOpsBoardsWorkspace> workspaces, Instant timestamp)
     {
         try
         {
@@ -67,8 +72,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                     var result = existingWorkspace.Update(
                         workspace.Name, 
                         workspace.Description,
-                        workspace.WorkProcessId, 
-                        existingWorkspace.Sync);
+                        workspace.WorkProcessId);
 
                     if (result.IsFailure)
                         return result;
@@ -96,7 +100,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         }
     }
 
-    public Result ImportProcesses(IEnumerable<AzureDevOpsBoardsWorkProcess> processes, Instant timestamp)
+    public Result SyncProcesses(IEnumerable<AzureDevOpsBoardsWorkProcess> processes, Instant timestamp)
     {
         try
         {
@@ -135,6 +139,35 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                     if (result.IsFailure)
                         return result;
                 }
+            }
+
+            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
+    public Result UpdateWorkProcessIntegrationState(Guid workProcessExternalId, IntegrationState<Guid> integrationState, Instant timestamp)
+    {
+        try
+        {
+            Guard.Against.Null(Configuration, nameof(Configuration));
+
+            var workProcess = Configuration.WorkProcesses.FirstOrDefault(wp => wp.ExternalId == workProcessExternalId);
+            if (workProcess is null)
+                return Result.Failure($"Unable to find work process with id {workProcessExternalId} in Azure DevOps Boards connection with id {Id}.");
+
+            if (workProcess.HasIntegration)
+            {
+                workProcess.UpdateIntegrationState(integrationState.IsActive);
+            }
+            else
+            {
+                workProcess.AddIntegrationState(integrationState);
             }
 
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));

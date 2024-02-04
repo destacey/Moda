@@ -119,9 +119,9 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [OpenApiOperation("Import Azure DevOps processes and projects.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> ImportOrganizationConfiguration(Guid id, [FromServices] IAzureDevOpsBoardsImportManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
+    public async Task<ActionResult> ImportOrganizationConfiguration(Guid id, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {
-        var result = await azureDevOpsBoardsImportService.ImportOrganizationConfiguration(id, cancellationToken);
+        var result = await azureDevOpsBoardsImportService.SyncOrganizationConfiguration(id, cancellationToken);
         if (result.IsFailure)
         {
             var error = new ErrorResult
@@ -136,13 +136,39 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
         return NoContent();
     }
 
+    [HttpPost("{id}/init-work-process-integration")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
+    [OpenApiOperation("Initialize Azure DevOps project integration as a Moda workspace.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> InitWorkProcesssIntegration(Guid id, InitWorkProcessIntegrationRequest request, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest();
+
+        var result = await azureDevOpsBoardsImportService.InitWorkProcessIntegration(request.Id, request.ExternalId, cancellationToken);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "AzureDevOpsBoardsConnectionsController.InitWorkProcesssIntegration"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
     [HttpPost("{id}/init-workspace-integration")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
     [OpenApiOperation("Initialize Azure DevOps project integration as a Moda workspace.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> InitWorkspaceIntegration(Guid id, InitWorkspaceIntegrationRequest request, [FromServices] IAzureDevOpsBoardsImportManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
+    public async Task<ActionResult> InitWorkspaceIntegration(Guid id, InitWorkspaceIntegrationRequest request, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {
         if (id != request.Id)
             return BadRequest();

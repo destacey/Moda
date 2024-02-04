@@ -37,6 +37,6 @@ public sealed class UpdatePlanningIntervalRequestValidator : CustomValidator<Upd
             .MaximumLength(128);
 
         RuleFor(t => t.Description)
-            .MaximumLength(1024);
+            .MaximumLength(2048);
     }
 }
