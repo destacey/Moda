@@ -1,6 +1,7 @@
 ﻿using Moda.AppIntegration.Application.Interfaces;
 using Moda.AppIntegration.Domain.Models;
 using Moda.Common.Application.Interfaces;
+using Moda.Planning.Application.PlanningIntervals.Commands;
 using Moda.Web.Api.Models.AppIntegrations.Connections;
 
 namespace Moda.Web.Api.Controllers.AppIntegrations;
@@ -56,9 +57,18 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     {
         var result = await _sender.Send(request.ToCreateAzureDevOpsBoardsConnectionCommand(), cancellationToken);
 
-        return result.IsSuccess
-            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
-            : BadRequest(result.Error);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "AzureDevOpsBoardsConnectionsController.Update"
+            };
+            return BadRequest(error);
+        }
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
     }
 
     [HttpPut("{id}")]
@@ -74,9 +84,41 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
 
         var result = await _sender.Send(request.ToUpadateAzureDevOpsBoardsConnectionCommand(), cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : BadRequest(result.Error);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "AzureDevOpsBoardsConnectionsController.Update"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    [MustHavePermission(ApplicationAction.Delete, ApplicationResource.Connections)]
+    [OpenApiOperation("Delete an Azure DevOps Boards connection.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeleteAzureDevOpsBoardsConnectionCommand(id), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "AzureDevOpsBoardsConnectionsController.Delete"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
     }
 
     [HttpPost("test")]
@@ -114,21 +156,21 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("{id}/import-organization-configuration")]
+    [HttpPost("{id}/sync-organization-configuration")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
-    [OpenApiOperation("Import Azure DevOps processes and projects.", "")]
+    [OpenApiOperation("Sync Azure DevOps processes and projects.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> ImportOrganizationConfiguration(Guid id, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
+    public async Task<ActionResult> SyncOrganizationConfiguration(Guid id, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsInitManager, CancellationToken cancellationToken)
     {
-        var result = await azureDevOpsBoardsImportService.SyncOrganizationConfiguration(id, cancellationToken);
+        var result = await azureDevOpsBoardsInitManager.SyncOrganizationConfiguration(id, cancellationToken);
         if (result.IsFailure)
         {
             var error = new ErrorResult
             {
                 StatusCode = 400,
                 SupportMessage = result.Error,
-                Source = "AzureDevOpsBoardsConnectionsController.ImportOrganizationConfiguration"
+                Source = "AzureDevOpsBoardsConnectionsController.SyncOrganizationConfiguration"
             };
             return BadRequest(error);
         }

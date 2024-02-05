@@ -6105,6 +6105,45 @@
             "Bearer": []
           }
         ]
+      },
+      "delete": {
+        "tags": [
+          "AzureDevOpsBoardsConnections"
+        ],
+        "summary": "Delete an Azure DevOps Boards connection.",
+        "operationId": "AzureDevOpsBoardsConnections_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/app-integrations/azure-devops-boards-connections/test": {
@@ -6148,13 +6187,13 @@
         ]
       }
     },
-    "/api/app-integrations/azure-devops-boards-connections/{id}/import-organization-configuration": {
+    "/api/app-integrations/azure-devops-boards-connections/{id}/sync-organization-configuration": {
       "post": {
         "tags": [
           "AzureDevOpsBoardsConnections"
         ],
-        "summary": "Import Azure DevOps processes and projects.",
-        "operationId": "AzureDevOpsBoardsConnections_ImportOrganizationConfiguration",
+        "summary": "Sync Azure DevOps processes and projects.",
+        "operationId": "AzureDevOpsBoardsConnections_SyncOrganizationConfiguration",
         "parameters": [
           {
             "name": "id",
@@ -7045,7 +7084,7 @@
           "description": {
             "type": "string",
             "description": "Gets the team description.",
-            "maxLength": 1024,
+            "maxLength": 2048,
             "minLength": 0,
             "nullable": true
           },
@@ -7097,7 +7136,7 @@
           "description": {
             "type": "string",
             "description": "Gets the team description.",
-            "maxLength": 1024,
+            "maxLength": 2048,
             "minLength": 0,
             "nullable": true
           },

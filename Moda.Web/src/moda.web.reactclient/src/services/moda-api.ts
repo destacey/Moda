@@ -7382,6 +7382,63 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
+     * Delete an Azure DevOps Boards connection.
+     */
+    delete(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Test Azure DevOps Boards connection configuration.
      */
     testConfig(request: TestAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken): Promise<void> {
@@ -7440,10 +7497,10 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
-     * Import Azure DevOps processes and projects.
+     * Sync Azure DevOps processes and projects.
      */
-    importOrganizationConfiguration(id: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/import-organization-configuration";
+    syncOrganizationConfiguration(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/sync-organization-configuration";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -7464,11 +7521,11 @@ export class AzureDevOpsBoardsConnectionsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processImportOrganizationConfiguration(_response);
+            return this.processSyncOrganizationConfiguration(_response);
         });
     }
 
-    protected processImportOrganizationConfiguration(response: AxiosResponse): Promise<void> {
+    protected processSyncOrganizationConfiguration(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
