@@ -60,13 +60,24 @@ export const useUpdateAzdoBoardsConnectionMutation = () => {
   })
 }
 
-export const useImportAzdoBoardsConnectionOrganizationMutation = () => {
+export const useDeleteAzdoBoardsConnectionMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (connectionId: string) =>
+      (await getAzureDevOpsBoardsConnectionsClient()).delete(connectionId),
+    onSuccess: (data, connectionId) => {
+      queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, connectionId])
+    },
+  })
+}
+
+export const useSyncAzdoBoardsConnectionOrganizationMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (connectionId: string) =>
       (
         await getAzureDevOpsBoardsConnectionsClient()
-      ).importOrganizationConfiguration(connectionId),
+      ).syncOrganizationConfiguration(connectionId),
     onSuccess: (data, connectionId) => {
       queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, connectionId])
     },
