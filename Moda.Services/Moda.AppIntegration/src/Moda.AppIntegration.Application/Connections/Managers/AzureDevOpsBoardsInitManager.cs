@@ -1,9 +1,8 @@
-﻿using CSharpFunctionalExtensions;
-using MediatR;
-using Microsoft.Extensions.Logging;
+﻿using MediatR;
 using Moda.AppIntegration.Application.Connections.Commands;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
+using Moda.Common.Domain.Models;
 using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.WorkProcesses.Queries;
 using Moda.Work.Application.Workspaces.Queries;
@@ -60,7 +59,10 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                 workspaces.Add(workspace);
             }
 
-            var bulkUpsertResult = await _sender.Send(new SyncAzureDevOpsBoardsConnectionConfigurationCommand(connectionId, processes, workspaces), cancellationToken);
+            var existingWorkProcessIntegrationStates = await _sender.Send(new GetIntegrationRegistrationsForWorkProcessesQuery(), cancellationToken);
+
+
+            var bulkUpsertResult = await _sender.Send(new SyncAzureDevOpsBoardsConnectionConfigurationCommand(connectionId, processes, workspaces, existingWorkProcessIntegrationStates), cancellationToken);
 
             return Result.Success();
         }
@@ -130,7 +132,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                 return createProcessResult.ConvertFailure<Guid>();
 
             // update the integration state
-            var updateIntegrationStateResult = await _sender.Send(new UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommand(connectionId, workProcessExternalId, createProcessResult.Value), cancellationToken);
+            var updateIntegrationStateResult = await _sender.Send(new UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommand(connectionId, new IntegrationRegistration<Guid,Guid>(workProcessExternalId, createProcessResult.Value)), cancellationToken);
 
             return updateIntegrationStateResult.IsSuccess
                 ? Result.Success(createProcessResult.Value.InternalId)

@@ -1,10 +1,9 @@
-﻿using CSharpFunctionalExtensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Moda.Common.Domain.Models;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
 
-public sealed record SyncAzureDevOpsBoardsConnectionConfigurationCommand(Guid ConnectionId, IEnumerable<AzureDevOpsBoardsWorkProcess> WorkProcesses, IEnumerable<AzureDevOpsBoardsWorkspace> Workspaces) : ICommand;
+public sealed record SyncAzureDevOpsBoardsConnectionConfigurationCommand(Guid ConnectionId, IEnumerable<AzureDevOpsBoardsWorkProcess> WorkProcesses, IEnumerable<AzureDevOpsBoardsWorkspace> Workspaces, IEnumerable<IntegrationRegistration<Guid, Guid>> WorkProcessIntegrationRegistrations) : ICommand;
 
 internal sealed class SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler : ICommandHandler<SyncAzureDevOpsBoardsConnectionConfigurationCommand>
 {
@@ -30,7 +29,9 @@ internal sealed class SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler
             return Result.Failure($"Unable to find Azure DevOps Boards connection with id {request.ConnectionId}.");
         }
 
-        var importWorkProcessesResult = connection.SyncProcesses(request.WorkProcesses, _dateTimeProvider.Now);
+        var timestamp = _dateTimeProvider.Now;
+
+        var importWorkProcessesResult = connection.SyncProcesses(request.WorkProcesses, timestamp);
         if (importWorkProcessesResult.IsFailure)
         {
             _logger.LogError("Errors occurred while processing {AppRequestName}. {Error}", AppRequestName, importWorkProcessesResult.Error);
@@ -38,7 +39,22 @@ internal sealed class SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler
             return Result.Failure($"Errors occurred while processing {AppRequestName}.");
         }
 
-        var importWorkspacesResult = connection.SyncWorkspaces(request.Workspaces, _dateTimeProvider.Now);
+        foreach (var workProcess in connection.Configuration.WorkProcesses)
+        {
+            var workProcessIntegrationRegistration = request.WorkProcessIntegrationRegistrations.FirstOrDefault(w => w.ExternalId == workProcess.ExternalId);
+            if (workProcessIntegrationRegistration is null) continue;
+
+            var result = connection.UpdateWorkProcessIntegrationState(workProcessIntegrationRegistration, timestamp);
+            if (result.IsFailure)
+            {
+                _logger.LogError("Errors occurred while processing {AppRequestName}. {Error}", AppRequestName, result.Error);
+
+                return Result.Failure($"Errors occurred while processing {AppRequestName}.");
+            }
+
+        }
+
+        var importWorkspacesResult = connection.SyncWorkspaces(request.Workspaces, timestamp);
         if (importWorkspacesResult.IsFailure)
         {
             _logger.LogError("Errors occurred while processing {AppRequestName}. {Error}", AppRequestName, importWorkspacesResult.Error);

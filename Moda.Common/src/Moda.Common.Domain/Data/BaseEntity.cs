@@ -9,7 +9,7 @@ public abstract class BaseEntity<TId> : IEntity<TId>
     /// </summary>
     public TId Id { get; protected set; } = default!;
 
-    private readonly List<DomainEvent> _domainEvents = new();
+    private readonly List<DomainEvent> _domainEvents = [];
 
     [NotMapped]
     public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
