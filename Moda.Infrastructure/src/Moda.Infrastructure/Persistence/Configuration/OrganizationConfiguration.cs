@@ -73,10 +73,8 @@ public class TeamMembershipConfig : IEntityTypeConfiguration<TeamMembership>
             .IncludeProperties(m => new { m.SourceId, m.TargetId, m.IsDeleted });
 
         // Value Objects
-        builder.OwnsOne(m => m.DateRange, options =>
+        builder.ComplexProperty(m => m.DateRange, options =>
         {
-            options.HasIndex(i => new { i.Start, i.End });
-
             options.Property(d => d.Start).HasColumnName("Start").IsRequired();
             options.Property(d => d.End).HasColumnName("End");
         });

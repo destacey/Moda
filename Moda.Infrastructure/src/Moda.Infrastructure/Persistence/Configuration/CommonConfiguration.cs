@@ -39,7 +39,7 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
         builder.Property(e => e.IsActive);
 
         // Value Objects
-        builder.OwnsOne(e => e.Name, options =>
+        builder.ComplexProperty(e => e.Name, options =>
         {
             options.Property(e => e.FirstName).HasColumnName("FirstName").HasMaxLength(100).IsRequired();
             options.Property(e => e.MiddleName).HasColumnName("MiddleName").HasMaxLength(100);

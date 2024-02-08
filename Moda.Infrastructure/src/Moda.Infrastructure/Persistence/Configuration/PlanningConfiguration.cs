@@ -77,10 +77,8 @@ public class PlanningIntervalConfig : IEntityTypeConfiguration<PlanningInterval>
         builder.Property(p => p.Description).HasMaxLength(2048);
 
         // Value Objects
-        builder.OwnsOne(p => p.DateRange, options =>
+        builder.ComplexProperty(p => p.DateRange, options =>
         {
-            options.HasIndex(i => new { i.Start, i.End });
-
             options.Property(d => d.Start).HasColumnName("Start").IsRequired();
             options.Property(d => d.End).HasColumnName("End").IsRequired();
         });
@@ -123,10 +121,8 @@ public class PlanningIntervalIterationConfig : IEntityTypeConfiguration<Planning
             .HasMaxLength(32);
 
         // Value Objects
-        builder.OwnsOne(p => p.DateRange, options =>
+        builder.ComplexProperty(p => p.DateRange, options =>
         {
-            options.HasIndex(i => new { i.Start, i.End });
-
             options.Property(d => d.Start).HasColumnName("Start").IsRequired();
             options.Property(d => d.End).HasColumnName("End").IsRequired();
         });
