@@ -90,6 +90,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 }
             }
 
+            // TODO this will generate duplicate events in some cases
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();
@@ -141,6 +142,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 }
             }
 
+            // TODO this will generate duplicate events in some cases
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();
@@ -151,25 +153,23 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         }
     }
 
-    public Result UpdateWorkProcessIntegrationState(Guid workProcessExternalId, IntegrationState<Guid> integrationState, Instant timestamp)
+    public Result UpdateWorkProcessIntegrationState(IntegrationRegistration<Guid, Guid> registration, Instant timestamp)
     {
         try
         {
             Guard.Against.Null(Configuration, nameof(Configuration));
 
-            var workProcess = Configuration.WorkProcesses.FirstOrDefault(wp => wp.ExternalId == workProcessExternalId);
+            var workProcess = Configuration.WorkProcesses.FirstOrDefault(wp => wp.ExternalId == registration.ExternalId);
             if (workProcess is null)
-                return Result.Failure($"Unable to find work process with id {workProcessExternalId} in Azure DevOps Boards connection with id {Id}.");
+                return Result.Failure($"Unable to find work process with id {registration.ExternalId} in Azure DevOps Boards connection with id {Id}.");
 
-            if (workProcess.HasIntegration)
-            {
-                workProcess.UpdateIntegrationState(integrationState.IsActive);
-            }
-            else
-            {
-                workProcess.AddIntegrationState(integrationState);
-            }
+            Result setResult = workProcess.HasIntegration
+                ? workProcess.UpdateIntegrationState(registration.IntegrationState.IsActive)
+                : workProcess.AddIntegrationState(registration.IntegrationState);
+            if (setResult.IsFailure)
+                return setResult;
 
+            // TODO this will generate duplicate events in some cases
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();

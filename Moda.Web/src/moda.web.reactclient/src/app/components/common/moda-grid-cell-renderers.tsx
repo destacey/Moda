@@ -6,9 +6,7 @@ import './moda-grid-cell-renderers.css'
 import HealthCheckTag from './health-check/health-check-tag'
 import {
   NavigationDto,
-  PlanningTeamNavigationDto,
   PlanningIntervalObjectiveListDto,
-  TeamNavigationDto,
   SimpleNavigationDto,
 } from '@/src/services/moda-api'
 import Link from 'next/link'

@@ -1,10 +1,8 @@
-﻿using CSharpFunctionalExtensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
 using Moda.Common.Domain.Models;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
-public sealed record UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommand(Guid ConnectionId, Guid WorkProcessExternalId, IntegrationState<Guid> IntegrationState) : ICommand;
+public sealed record UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommand(Guid ConnectionId, IntegrationRegistration<Guid,Guid> IntegrationRegistration) : ICommand;
 
 internal sealed class UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommandHandler : ICommandHandler<UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommand>
 {
@@ -30,7 +28,7 @@ internal sealed class UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommandH
             return Result.Failure($"Unable to find Azure DevOps Boards connection with id {request.ConnectionId}.");
         }
 
-        var importWorkProcessesResult = connection.UpdateWorkProcessIntegrationState(request.WorkProcessExternalId, request.IntegrationState, _dateTimeProvider.Now);
+        var importWorkProcessesResult = connection.UpdateWorkProcessIntegrationState(request.IntegrationRegistration, _dateTimeProvider.Now);
         if (importWorkProcessesResult.IsFailure)
         {
             _logger.LogError("Errors occurred while processing {AppRequestName}. {Error}", AppRequestName, importWorkProcessesResult.Error);
