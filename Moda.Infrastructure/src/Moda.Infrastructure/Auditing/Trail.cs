@@ -13,5 +13,5 @@ public class Trail : BaseEntity<Guid>
     public string? NewValues { get; set; }
     public string? AffectedColumns { get; set; }
     public string? PrimaryKey { get; set; }
-    public string? CorrelationId { get; set;}
+    public string? CorrelationId { get; set; }
 }

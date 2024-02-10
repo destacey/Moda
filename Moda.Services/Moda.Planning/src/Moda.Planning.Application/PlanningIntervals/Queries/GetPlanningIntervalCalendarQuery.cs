@@ -54,8 +54,8 @@ internal sealed class GetPlanningIntervalCalendarQueryHandler : IQueryHandler<Ge
             .AsNoTracking()
             .FirstOrDefaultAsync(cancellationToken);
 
-        return planningInterval is null 
-            ? null 
+        return planningInterval is null
+            ? null
             : PlanningIntervalCalendarDto.Create(planningInterval.GetCalendar());
     }
 }

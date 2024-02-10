@@ -4,7 +4,7 @@ namespace Moda.Infrastructure.Middleware;
 
 public class ErrorResult
 {
-    public List<string>? Messages { get; set; } = new();
+    public List<string>? Messages { get; set; } = [];
 
     public string? Source { get; set; }
     public string? Exception { get; set; }
@@ -20,7 +20,7 @@ public class ErrorResult
             Exception = exception,
             ErrorId = errorId,
             StatusCode = (int)HttpStatusCode.InternalServerError,
-            Messages = new List<string> { message },
+            Messages = [message],
             SupportMessage = supportMessage
         };
     }

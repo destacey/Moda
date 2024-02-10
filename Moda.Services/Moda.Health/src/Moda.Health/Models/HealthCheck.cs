@@ -1,12 +1,12 @@
-﻿using Moda.Common.Domain.Data;
-using Moda.Common.Domain.Enums;
-using Moda.Common.Extensions;
-using Moda.Common.Domain.Interfaces;
-using NodaTime;
+﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Ardalis.GuardClauses;
+using Moda.Common.Domain.Data;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Events;
+using Moda.Common.Domain.Interfaces;
+using Moda.Common.Extensions;
+using NodaTime;
 
 namespace Moda.Health.Models;
 

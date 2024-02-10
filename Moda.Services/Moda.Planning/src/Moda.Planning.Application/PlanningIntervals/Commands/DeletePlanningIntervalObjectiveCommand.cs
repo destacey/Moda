@@ -49,7 +49,7 @@ internal sealed class DeletePlanningIntervalObjectiveCommandHandler : ICommandHa
                 _logger.LogError("Unable to delete Planning Interval Objective {PlanningIntervalObjectiveId} from Planning Interval {PlanningIntervalId}.  Error: {Error}", request.PlanningIntervalObjectiveId, request.PlanningIntervalId, deleteResult.Error);
                 return Result.Failure($"Unable to remove Planning Interval Objective {request.PlanningIntervalObjectiveId} from Planning Interval {request.PlanningIntervalId}. Error: {deleteResult.Error}");
             }
-            
+
             // TODO: this is a hack to ensure the PI objective is soft deleted.  We should be able to just remove it from the collection and save changes.
             _planningDbContext.Entry(piObjective).State = EntityState.Deleted;
             await _planningDbContext.SaveChangesAsync(cancellationToken);

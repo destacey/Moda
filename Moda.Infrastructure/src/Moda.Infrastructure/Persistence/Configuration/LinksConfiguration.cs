@@ -14,7 +14,7 @@ public class LinkConfiguration : IEntityTypeConfiguration<Link>
         builder.HasIndex(o => o.Id)
             .IncludeProperties(o => new { o.ObjectId, o.Name, o.Url });
         builder.HasIndex(o => o.ObjectId)
-            .IncludeProperties(o => new { o.Id, o.Name, o.Url});
+            .IncludeProperties(o => new { o.Id, o.Name, o.Url });
 
         builder.Property(o => o.ObjectId).IsRequired();
         builder.Property(o => o.Name).IsRequired().HasMaxLength(128);

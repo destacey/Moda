@@ -1,6 +1,6 @@
-﻿using Moda.Work.Application.WorkStatuses.Queries;
+﻿using Moda.Web.Api.Models.Work.WorkStatuses;
 using Moda.Work.Application.WorkStatuses.Dtos;
-using Moda.Web.Api.Models.Work.WorkStatuses;
+using Moda.Work.Application.WorkStatuses.Queries;
 
 namespace Moda.Web.Api.Controllers.Work;
 

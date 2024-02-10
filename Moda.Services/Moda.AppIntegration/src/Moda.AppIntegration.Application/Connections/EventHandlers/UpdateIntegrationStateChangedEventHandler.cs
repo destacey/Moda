@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Events;
 using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Events;

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using FluentAssertions;
 
 namespace Moda.Common.Tests.Sut.Extensions;
 public class EnumExtensionsTests

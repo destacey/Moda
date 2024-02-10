@@ -2,7 +2,7 @@
 using Moda.Common.Domain.Models;
 
 namespace Moda.Work.Application.WorkProcesses.Queries;
-public sealed record GetIntegrationRegistrationsForWorkProcessesQuery : IQuery<List<IntegrationRegistration<Guid,Guid>>>;
+public sealed record GetIntegrationRegistrationsForWorkProcessesQuery : IQuery<List<IntegrationRegistration<Guid, Guid>>>;
 
 internal sealed class GetIntegrationRegistrationsForWorkProcessesQueryHandler(IWorkDbContext workDbContext) : IQueryHandler<GetIntegrationRegistrationsForWorkProcessesQuery, List<IntegrationRegistration<Guid, Guid>>>
 {

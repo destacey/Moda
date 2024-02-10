@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using MediatR;
+﻿using MediatR;
 
 namespace Moda.Common.Application.Interfaces;
 public interface ICommandHandler<TCommand> : IRequestHandler<TCommand, Result> where TCommand : ICommand

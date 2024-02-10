@@ -5,7 +5,7 @@ public sealed record WorkspaceKeyExistsQuery : IQuery<bool>
 {
     public WorkspaceKeyExistsQuery(string workspaceKey)
     {
-        WorkspaceKey = new WorkspaceKey(workspaceKey);        
+        WorkspaceKey = new WorkspaceKey(workspaceKey);
     }
 
     public WorkspaceKey WorkspaceKey { get; set; }

@@ -36,8 +36,8 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
 
     /// <summary>A unique key to identify the workspace.</summary>
     /// <value>The key.</value>
-    public WorkspaceKey Key 
-    { 
+    public WorkspaceKey Key
+    {
         get => _key;
         private set => _key = Guard.Against.Null(value, nameof(Key));
     }

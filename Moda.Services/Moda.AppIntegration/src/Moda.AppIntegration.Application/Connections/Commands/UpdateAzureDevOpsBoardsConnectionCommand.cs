@@ -1,7 +1,5 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
 public sealed record UpdateAzureDevOpsBoardsConnectionCommand : ICommand<Guid>
@@ -64,7 +62,7 @@ public sealed class UpdateAzureDevOpsBoardsConnectionCommandValidator : CustomVa
     }
 
     public async Task<bool> BeUniqueOrganization(Guid id, string organization, CancellationToken cancellationToken)
-    {        
+    {
         return await _appIntegrationDbContext.AzureDevOpsBoardsConnections
             .Where(c => c.Id != id)
             .AllAsync(c => c.Configuration!.Organization != organization, cancellationToken);
@@ -96,7 +94,7 @@ internal sealed class UpdateAzureDevOpsBoardsConnectionCommandHandler : ICommand
                 return Result.Failure<Guid>("Azure DevOps Boards connection not found.");
 
             // do the first four characters of the PersonalAccessToken match the existing one?
-            var pat = connection.Configuration!.PersonalAccessToken.Length == request.PersonalAccessToken.Length 
+            var pat = connection.Configuration!.PersonalAccessToken.Length == request.PersonalAccessToken.Length
                 && connection.Configuration!.PersonalAccessToken?[..4] == request.PersonalAccessToken[..4]
                     ? connection.Configuration.PersonalAccessToken
                     : request.PersonalAccessToken;

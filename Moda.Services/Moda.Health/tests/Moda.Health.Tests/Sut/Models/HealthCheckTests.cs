@@ -105,7 +105,7 @@ public class HealthCheckTests
 
     #endregion ChangeExpiration
 
-        #region IsExpired
+    #region IsExpired
 
     [Fact]
     public void IsExpired_WhenExpirationGreaterThanNow_ReturnsFalse()

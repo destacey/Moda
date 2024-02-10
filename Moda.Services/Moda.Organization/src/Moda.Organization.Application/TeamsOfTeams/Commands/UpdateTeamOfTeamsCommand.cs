@@ -83,7 +83,7 @@ internal sealed class UpdateTeamOfTeamsCommandHandler : ICommandHandler<UpdateTe
             var updateResult = team.Update(
                 request.Name,
                 request.Code,
-                request.Description, 
+                request.Description,
                 _dateTimeProvider.Now
                 );
 

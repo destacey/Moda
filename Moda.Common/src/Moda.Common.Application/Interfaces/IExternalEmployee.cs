@@ -1,5 +1,4 @@
 ﻿using Moda.Common.Models;
-using NodaTime;
 
 namespace Moda.Common.Application.Interfaces;
 public interface IExternalEmployee

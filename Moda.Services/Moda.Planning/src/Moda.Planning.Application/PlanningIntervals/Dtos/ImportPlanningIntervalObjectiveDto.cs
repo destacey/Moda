@@ -3,14 +3,14 @@
 namespace Moda.Planning.Application.PlanningIntervals.Dtos;
 public sealed record ImportPlanningIntervalObjectiveDto(
     int ImportId,
-    Guid PlanningIntervalId, 
-    Guid TeamId, 
-    string Name, 
-    string? Description, 
+    Guid PlanningIntervalId,
+    Guid TeamId,
+    string Name,
+    string? Description,
     ObjectiveStatus Status,
     double Progress,
     LocalDate? StartDate,
-    LocalDate? TargetDate, 
+    LocalDate? TargetDate,
     bool IsStretch,
     Instant? ClosedDateUtc);
 

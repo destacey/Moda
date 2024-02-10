@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 namespace Moda.Work.Application.Workspaces.Queries;
-public sealed record ExternalWorkspaceExistsQuery(Guid ExternalId): IQuery<bool>;
+public sealed record ExternalWorkspaceExistsQuery(Guid ExternalId) : IQuery<bool>;
 
 internal sealed class ExternalWorkspaceExistsQueryHandler : IQueryHandler<ExternalWorkspaceExistsQuery, bool>
 {

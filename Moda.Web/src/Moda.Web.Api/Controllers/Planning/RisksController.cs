@@ -158,7 +158,7 @@ public class RisksController : ControllerBase
                     return UnprocessableEntity(validationResults);
                 }
                 else
-                { 
+                {
                     risks.Add(risk.ToImportRiskDto());
                 }
             }

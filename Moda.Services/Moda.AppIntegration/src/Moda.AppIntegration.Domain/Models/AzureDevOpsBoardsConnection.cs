@@ -18,7 +18,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
 
     public override AzureDevOpsBoardsConnectionConfiguration Configuration { get; protected set; }
 
-    public override bool HasActiveIntegrationObjects => IsValidConfiguration 
+    public override bool HasActiveIntegrationObjects => IsValidConfiguration
         && (Configuration.WorkProcesses.Any(p => p.IntegrationIsActive)
         || Configuration.Workspaces.Any(p => p.IntegrationIsActive));
 
@@ -27,7 +27,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         try
         {
             Guard.Against.Null(Configuration, nameof(Configuration));
-            Guard.Against.Null(organization, nameof(organization)); 
+            Guard.Against.Null(organization, nameof(organization));
             Guard.Against.Null(personalAccessToken, nameof(personalAccessToken));
 
             Name = name;
@@ -70,7 +70,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 if (existingWorkspace is not null)
                 {
                     var result = existingWorkspace.Update(
-                        workspace.Name, 
+                        workspace.Name,
                         workspace.Description,
                         workspace.WorkProcessId);
 
@@ -81,7 +81,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 {
                     var result = Configuration.AddWorkspace(AzureDevOpsBoardsWorkspace.Create(
                         workspace.ExternalId,
-                        workspace.Name, 
+                        workspace.Name,
                         workspace.Description,
                         workspace.WorkProcessId));
 

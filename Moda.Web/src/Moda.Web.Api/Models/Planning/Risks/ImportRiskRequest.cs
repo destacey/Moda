@@ -78,7 +78,7 @@ public sealed class ImportRiskRequestValidator : CustomValidator<ImportRiskReque
         RuleFor(r => r.Response)
             .MaximumLength(1024);
 
-        When(r => (RiskStatus)r.StatusId == RiskStatus.Closed, 
+        When(r => (RiskStatus)r.StatusId == RiskStatus.Closed,
             () => RuleFor(r => r.ClosedDateUtc)
                 .NotEmpty()
                     .WithMessage("The ClosedDateUtc can not be empty if the status is Closed.")

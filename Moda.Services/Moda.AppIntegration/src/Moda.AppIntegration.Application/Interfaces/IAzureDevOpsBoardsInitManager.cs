@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-
-namespace Moda.AppIntegration.Application.Interfaces;
+﻿namespace Moda.AppIntegration.Application.Interfaces;
 public interface IAzureDevOpsBoardsInitManager : ITransientService
 {
     Task<Result> SyncOrganizationConfiguration(Guid connectionId, CancellationToken cancellationToken);

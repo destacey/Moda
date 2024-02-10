@@ -143,7 +143,7 @@ public static class ApplicationPermissions
         new("View Risks", ApplicationAction.View, ApplicationResource.Risks, IsBasic: true),
         new("Create Risks", ApplicationAction.Create, ApplicationResource.Risks, IsBasic: true),
         new("Update Risks", ApplicationAction.Update, ApplicationResource.Risks, IsBasic: true),
-        new("Delete Risks", ApplicationAction.Delete, ApplicationResource.Risks, IsBasic : true),
+        new("Delete Risks", ApplicationAction.Delete, ApplicationResource.Risks, IsBasic: true),
         new("Import Risks", ApplicationAction.Import, ApplicationResource.Risks),
     ];
 
