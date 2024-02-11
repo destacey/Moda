@@ -18,9 +18,11 @@ interface BreadcrumbSegmentProps {
 }
 
 const BreadcrumbSegment = ({ route, last }: BreadcrumbSegmentProps) => {
-  return ( last || !route.href ) 
-  ? <Text>{route.title}</Text> 
-  : <Link href={route.href}>{route.title}</Link>
+  return last || !route.href ? (
+    <Text>{route.title}</Text>
+  ) : (
+    <Link href={route.href}>{route.title}</Link>
+  )
 }
 
 const AppBreadcrumb = () => {
@@ -29,13 +31,11 @@ const AppBreadcrumb = () => {
   const pathname = usePathname()
   const breadcrumbRoute = useAppSelector(selectBreadcrumb)
 
-
   useEffect(() => {
-    if(pathname === breadcrumbRoute.forPath) {
+    if (pathname === breadcrumbRoute.forPath) {
       setPathItems(breadcrumbRoute.items)
       setIsVisible(breadcrumbRoute.isVisible)
-    }
-    else {
+    } else {
       setPathItems(generateRoute(pathname))
     }
   }, [pathname, breadcrumbRoute])
@@ -50,7 +50,12 @@ const AppBreadcrumb = () => {
     return <BreadcrumbSegment route={route} paths={paths} last={last} />
   }
 
-  if (!isVisible) return null
+  // TODO: how do we make this more configurable without having to use a hook in static scenarios?  Example: We don't want breadcrumbs to show on the Settings page.
+  if (
+    !isVisible ||
+    (pathItems.length >= 1 && pathItems[0].title === 'Settings')
+  )
+    return null
 
   return (
     <Breadcrumb

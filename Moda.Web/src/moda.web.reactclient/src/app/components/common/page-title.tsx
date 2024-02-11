@@ -18,13 +18,10 @@ const PageTitle = ({ title, subtitle, tags, actions }: PageTitleProps) => {
         <Col xs={24} sm={24} md={titleMdSize}>
           <Space>
             <div>
-              <Typography.Title
-                level={2}
-                style={{ margin: '0px', fontWeight: '400' }}
-              >
+              <Title level={2} style={{ margin: '0px', fontWeight: '400' }}>
                 {title}
-              </Typography.Title>
-              {subtitle && <Typography.Text>{subtitle}</Typography.Text>}
+              </Title>
+              {subtitle && <Text>{subtitle}</Text>}
             </div>
             {tags && <div>{tags}</div>}
           </Space>

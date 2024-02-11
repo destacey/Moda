@@ -11,6 +11,7 @@ import { authorizePage } from '@/src/app/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import { useAppDispatch } from '@/src/app/hooks'
+import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
 
 const RoleDetailsPage = ({ params }) => {
   const { data: roleData, isLoading, isFetching } = useGetRoleById(params.id)
@@ -27,9 +28,9 @@ const RoleDetailsPage = ({ params }) => {
     'Permissions.Permissions.View',
   )
 
-
   useEffect(() => {
-    roleData && dispatch(setBreadcrumbTitle({title: roleData?.name, pathname}))
+    roleData &&
+      dispatch(setBreadcrumbTitle({ title: roleData?.name, pathname }))
   }, [roleData, dispatch, pathname])
 
   const tabs = [
@@ -56,6 +57,13 @@ const RoleDetailsPage = ({ params }) => {
 
   return (
     <>
+      <BasicBreadcrumb
+        items={[
+          { title: 'Settings' },
+          { title: 'Roles', href: '/settings/roles' },
+          { title: 'Details' },
+        ]}
+      />
       <PageTitle title={roleData?.name} subtitle="Role Details" />
       <Card
         tabList={tabs}

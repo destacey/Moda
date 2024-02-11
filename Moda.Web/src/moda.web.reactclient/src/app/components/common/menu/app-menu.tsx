@@ -39,6 +39,9 @@ const menu: (Item | MenuItem)[] = [
     // menuItem('Increments', 'plan.increments'),
     // menuItem('Sprints', 'plan.sprints'),
   ]),
+  // menuItem('Work Management', 'work', null, <ProjectOutlined />, [
+  //     menuItem('Workspaces', 'work.workspaces'),
+  // ]),
   // menuItem('Products', 'pdc', null, <DesktopOutlined />, [
   //     menuItem('Product Lines', 'pdc.product-lines'),
   //     menuItem('Product Types', 'pdc.product-types'),
@@ -47,7 +50,7 @@ const menu: (Item | MenuItem)[] = [
   //     menuItem('Releases', 'pdc.releases'),
   //     menuItem('Roadmaps', 'pdc.roadmaps'),
   //     { type: 'divider' },
-  //     menuItem('Requirement Management', 'pdc.requirement-management'),
+  //     menuItem('Requirements Management', 'pdc.requirements-management'),
   // ]),
   // menuItem('Projects', 'ppm', null, <ProjectOutlined />, [
   //     menuItem('Portfolios', 'ppm.portfolios'),
@@ -55,36 +58,7 @@ const menu: (Item | MenuItem)[] = [
   //     menuItem('Projects', 'ppm.projects'),
   // ]),
   { key: 'settings-divider', type: 'divider' },
-  menuItem('Settings', 'settings', null, <SettingOutlined />, [
-    restrictedMenuItem(
-      'Permissions.Users.View',
-      'Permission',
-      'Users',
-      'settings.users',
-      '/settings/users',
-    ),
-    restrictedMenuItem(
-      'Permissions.Roles.View',
-      'Permission',
-      'Roles',
-      'settings.roles',
-      '/settings/roles',
-    ),
-    restrictedMenuItem(
-      'Permissions.Connections.View',
-      'Permission',
-      'Connections',
-      'settings.connections',
-      '/settings/connections',
-    ),
-    restrictedMenuItem(
-      'Permissions.BackgroundJobs.View',
-      'Permission',
-      'Background Jobs',
-      'settings.background-jobs',
-      '/settings/background-jobs',
-    ),
-  ]),
+  menuItem('Settings', 'settings', '/settings', <SettingOutlined />),
 ]
 
 export default function AppMenu() {
@@ -95,22 +69,11 @@ export default function AppMenu() {
 
   useEffect(() => {
     // Reduce the menu items based on the user's claims and transformed into antd menu items using the getItem function
-    const filteredMenu = menu.reduce(
-      (acc, item) => filterAndTransformMenuItem(acc, item, hasClaim),
-      [] as ItemType<MenuItemType>[],
-    )
-
-    const settingsMenuItem = filteredMenu.find(
-      (item) => item.key === 'settings',
-    ) as MenuItemGroupType
-
     setMenuItems(
-      settingsMenuItem.children?.length > 0
-        ? filteredMenu
-        : filteredMenu.filter(
-            (item) =>
-              item.key !== 'settings' && item.key !== 'settings-divider',
-          ),
+      menu.reduce(
+        (acc, item) => filterAndTransformMenuItem(acc, item, hasClaim),
+        [] as ItemType<MenuItemType>[],
+      ),
     )
   }, [hasClaim])
 
