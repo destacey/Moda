@@ -121,12 +121,20 @@ const settingsMenuItems: ItemType[] = [
   ]),
 
   getSectionMenuItem('Work Management', 'work-management', [
-    getRegularMenuItem('Work Types', SettingsTab.WorkTypes, '/settings'),
-    getRegularMenuItem('Work Statuses', SettingsTab.WorkStatuses, '/settings'),
+    getRegularMenuItem(
+      'Work Types',
+      SettingsTab.WorkTypes,
+      '/settings/work-management/work-types',
+    ),
+    getRegularMenuItem(
+      'Work Statuses',
+      SettingsTab.WorkStatuses,
+      '/settings/work-management/work-statuses',
+    ),
     getRegularMenuItem(
       'Work Processes',
       SettingsTab.WorkProcesses,
-      '/settings',
+      '/settings/work-management/work-processes',
     ),
   ]),
 

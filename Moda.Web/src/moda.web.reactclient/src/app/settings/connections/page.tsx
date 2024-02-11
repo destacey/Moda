@@ -9,6 +9,8 @@ import { useGetAzdoBoardsConnections } from '@/src/services/queries/app-integrat
 import { Button, Space, Switch } from 'antd'
 import CreateConnectionForm from './components/create-connection-form'
 import Link from 'next/link'
+import { ConnectionListDto } from '@/src/services/moda-api'
+import { ColDef } from 'ag-grid-community'
 
 const ConnectionLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/settings/connections/${data.id}`}>{value}</Link>
@@ -29,7 +31,7 @@ const ConnectionsPage = () => {
   )
   const showActions = canCreateConnection
 
-  const columnDefs = useMemo(
+  const columnDefs = useMemo<ColDef<ConnectionListDto>[]>(
     () => [
       { field: 'id', hide: true },
       { field: 'name', cellRenderer: ConnectionLinkCellRenderer },
