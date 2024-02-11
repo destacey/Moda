@@ -14,6 +14,7 @@ export interface AuthContextType {
   user: User | null
   isLoading: boolean
   hasClaim: (claimType: string, claimValue: string) => boolean
+  hasPermissionClaim: (claimValue: string) => boolean
   acquireToken: () => Promise<string>
   refreshUser: () => Promise<void>
   login: () => Promise<void>
