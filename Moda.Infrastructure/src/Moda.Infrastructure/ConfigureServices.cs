@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Moda.Integrations.AzureDevOps;
 using Moda.Integrations.MicrosoftGraph;
 using NodaTime;
-using Serilog;
 
 namespace Moda.Infrastructure;
 

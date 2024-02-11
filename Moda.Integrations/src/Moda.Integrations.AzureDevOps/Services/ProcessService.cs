@@ -71,7 +71,7 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
             _logger.LogError("Error getting process {ProcessId} from Azure DevOps: {ErrorMessage}.", processId, errorMessage);
             return Result.Failure<ProcessDto>(errorMessage);
         }
-        else if ((!response.IsSuccessful && response.StatusCode is HttpStatusCode.NotFound) ||response.Data is null)
+        else if ((!response.IsSuccessful && response.StatusCode is HttpStatusCode.NotFound) || response.Data is null)
         {
             var errorMesssage = response.IsSuccessful ? "No process data returned" : response.StatusDescription;
             _logger.LogError("Error getting process {ProcessId} from Azure DevOps: {ErrorMessage}.", processId, errorMesssage);

@@ -71,8 +71,8 @@ public class Risk : BaseAuditableEntity<Guid>
 
     public RiskGrade Likelihood { get; private set; }
 
-    public RiskGrade Exposure 
-    { 
+    public RiskGrade Exposure
+    {
         get
         {
             int exposure = (int)Impact + (int)Likelihood;

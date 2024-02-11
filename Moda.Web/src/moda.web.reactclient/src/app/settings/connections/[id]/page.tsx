@@ -21,6 +21,7 @@ import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { AzdoBoardsConnectionContext } from './azdo-boards-connection-context'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import DeleteAzdoBoardsConnectionForm from '../components/delete-azdo-boards-connection-form'
+import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -191,6 +192,13 @@ const ConnectionDetailsPage = ({ params }) => {
   return (
     <>
       {contextHolder}
+      <BasicBreadcrumb
+        items={[
+          { title: 'Settings' },
+          { title: 'Connections', href: '/settings/connections' },
+          { title: 'Details' },
+        ]}
+      />
       <PageTitle
         title={
           <>

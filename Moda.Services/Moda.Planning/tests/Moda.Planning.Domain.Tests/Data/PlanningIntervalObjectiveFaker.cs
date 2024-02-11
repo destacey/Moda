@@ -13,7 +13,7 @@ public class PlanningIntervalObjectiveFaker : PrivateConstructorFaker<PlanningIn
         RuleFor(x => x.PlanningIntervalId, planningIntervalId);
         RuleFor(x => x.TeamId, team.Id);
         RuleFor(x => x.Team, team);
-        RuleFor(x => x.ObjectiveId, f => f.Random.Guid());        
+        RuleFor(x => x.ObjectiveId, f => f.Random.Guid());
         RuleFor(x => x.Type, SetType(team));
         RuleFor(x => x.Status, status);
         RuleFor(x => x.IsStretch, isStretch);

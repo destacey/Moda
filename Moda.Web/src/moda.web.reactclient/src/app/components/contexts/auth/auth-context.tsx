@@ -21,7 +21,9 @@ const AuthProvider = ({ children }) => {
     claims: [],
   })
   const [isLoading, setIsLoading] = useState(false)
-  const [msalInstanceInitialized, setMsalInstanceInitialized] = useState(msalWrapper.isInitialized)
+  const [msalInstanceInitialized, setMsalInstanceInitialized] = useState(
+    msalWrapper.isInitialized,
+  )
 
   const acquireToken = useCallback(async () => {
     return (await authAcquire())?.token
@@ -79,13 +81,27 @@ const AuthProvider = ({ children }) => {
     [user],
   )
 
+  const hasPermissionClaim = useCallback(
+    (claimValue: string): boolean => {
+      return (
+        user?.claims.some(
+          (claim) => claim.type === 'Permission' && claim.value === claimValue,
+        ) ?? false
+      )
+    },
+    [user],
+  )
+
   useEffect(() => {
-    msalWrapper.getInstance().then(msalInstance => {
+    msalWrapper.getInstance().then((msalInstance) => {
       setMsalInstanceInitialized(msalWrapper.isInitialized)
       msalInstance.handleRedirectPromise().then(async (response) => {
         if (!response) {
           const accounts = msalInstance.getAllAccounts()
-          if (accounts.length === 0 && msalWrapper.interactionStatus() === 'none') {
+          if (
+            accounts.length === 0 &&
+            msalWrapper.interactionStatus() === 'none'
+          ) {
             msalInstance.loginRedirect()
           }
         } else {
@@ -101,6 +117,7 @@ const AuthProvider = ({ children }) => {
     user,
     isLoading,
     hasClaim,
+    hasPermissionClaim,
     acquireToken,
     refreshUser,
     login: async () => (await msalWrapper.getInstance()).loginRedirect(),
@@ -110,11 +127,13 @@ const AuthProvider = ({ children }) => {
   return (
     <>
       {msalInstanceInitialized === false && <Spin />}
-      {msalInstanceInitialized === true &&
+      {msalInstanceInitialized === true && (
         <AuthContext.Provider value={authContext}>
-          <MsalProvider instance={msalWrapper.instance}>{children}</MsalProvider>
+          <MsalProvider instance={msalWrapper.instance}>
+            {children}
+          </MsalProvider>
         </AuthContext.Provider>
-      }
+      )}
     </>
   )
 }

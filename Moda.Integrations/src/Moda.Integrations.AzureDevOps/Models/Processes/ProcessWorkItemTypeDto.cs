@@ -1,7 +1,4 @@
-﻿
-using System.Collections.Generic;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Moda.Common.Application.Interfaces.ExternalWork;
 
 namespace Moda.Integrations.AzureDevOps.Models.Processes;
 
@@ -47,7 +44,7 @@ internal static class ProcessWorkItemTypeDtoExtensions
     {
         // test work types typically have no behaviors
         return workItemTypes
-            .Where(w => !w.IsDisabled 
+            .Where(w => !w.IsDisabled
                 && !_ignoredWorkItemTypes.Contains(w.ReferenceName)
                 && (w.Inherits is null || !_ignoredWorkItemTypes.Contains(w.Inherits)))
             .Select(w => w.ToAzdoWorkType())

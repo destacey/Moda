@@ -18,7 +18,7 @@ public sealed record PlanningIntervalCalendar
     public int Key { get; init; }
     public string Name { get; init; }
     public LocalDateRange DateRange { get; private set; }
-    public IReadOnlyList<ILocalSchedule> IterationSchedules 
+    public IReadOnlyList<ILocalSchedule> IterationSchedules
         => _iterationSchedules
             .OrderBy(s => s.DateRange.Start)
                 .ThenBy(s => s.DateRange.End)

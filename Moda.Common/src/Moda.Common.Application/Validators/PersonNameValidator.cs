@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Moda.Common.Models;
+﻿using Moda.Common.Models;
 
 namespace Moda.Common.Application.Validators;
 public sealed class PersonNameValidator : CustomValidator<PersonName>

@@ -1,6 +1,4 @@
-﻿using NodaTime;
-
-namespace Moda.Common.Application.BackgroundJobs;
+﻿namespace Moda.Common.Application.BackgroundJobs;
 public record BackgroundJobDto
 {
     public string Id { get; set; } = string.Empty;

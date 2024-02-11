@@ -10,7 +10,7 @@ public sealed class HealthReport
     private HealthReport() { }
     public HealthReport(List<HealthCheck> healthChecks)
     {
-        _healthChecks = healthChecks.OrderByDescending(h => h.ReportedOn).ToList();    
+        _healthChecks = healthChecks.OrderByDescending(h => h.ReportedOn).ToList();
     }
 
     public IReadOnlyCollection<HealthCheck> HealthChecks => _healthChecks.AsReadOnly();

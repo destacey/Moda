@@ -23,7 +23,7 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>
         Rank = rank;
     }
 
-    public Guid ParentId { get; init; }
+    public Guid ParentId { get; private init; }
 
     /// <summary>The name of the backlog level.</summary>
     /// <value>The name.</value>
@@ -41,13 +41,13 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>
         private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
-    public BacklogCategory Category { get; init; }
+    public BacklogCategory Category { get; private init; }
 
     /// <summary>
     /// Indicates whether the backlog level is owned by Moda or a third party system.  This value should not change.
     /// </summary>
     /// <value>The ownership.</value>
-    public Ownership Ownership { get; init; }
+    public Ownership Ownership { get; private init; }
 
     /// <summary>
     /// The rank of the backlog level.  The higher the rank, the higher the priority.

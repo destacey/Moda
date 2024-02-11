@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import UserDetails from './user-details'
 import { Card } from 'antd'
+import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
 
 const UserDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')
@@ -42,6 +43,14 @@ const UserDetailsPage = ({ params }) => {
 
   return (
     <>
+      <BasicBreadcrumb
+        items={[
+          { title: 'Settings' },
+          { title: 'User Management' },
+          { title: 'Users', href: './' },
+          { title: 'Details' },
+        ]}
+      />
       <PageTitle title={fullName} subtitle="User Details" />
       <Card
         style={{ width: '100%' }}

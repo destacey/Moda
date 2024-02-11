@@ -20,7 +20,7 @@ internal sealed class GetMyRisksQueryHandler : IQueryHandler<GetMyRisksQuery, IR
         var employeeId = _currentUser.GetEmployeeId();
         if (employeeId is null)
             return Array.Empty<RiskListDto>();
-        
+
         var risks = await _planningDbContext.Risks
             .Include(r => r.Team)
             .Include(r => r.Assignee)

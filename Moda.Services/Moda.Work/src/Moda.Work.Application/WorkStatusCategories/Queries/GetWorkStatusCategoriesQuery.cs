@@ -1,6 +1,4 @@
-﻿using Moda.Work.Application.WorkStatusCategories.Dtos;
-
-namespace Moda.Work.Application.WorkStatusCategories.Queries;
+﻿namespace Moda.Work.Application.WorkStatusCategories.Queries;
 
 public sealed record GetWorkStatusCategoriesQuery : IQuery<IReadOnlyList<WorkStatusCategoryListDto>> { }
 

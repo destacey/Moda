@@ -7,4 +7,4 @@
 /// <typeparam name="TI">Type of the InternalId</typeparam>
 /// <param name="ExternalId"></param>
 /// <param name="IntegrationState"></param>
-public sealed record IntegrationRegistration<TE,TI>(TE ExternalId, IntegrationState<TI> IntegrationState);
+public sealed record IntegrationRegistration<TE, TI>(TE ExternalId, IntegrationState<TI> IntegrationState);

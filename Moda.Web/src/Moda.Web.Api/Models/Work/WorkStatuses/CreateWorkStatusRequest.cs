@@ -1,6 +1,4 @@
-﻿using Moda.Work.Application.WorkStatuses.Commands;
-
-namespace Moda.Web.Api.Models.Work.WorkStatuses;
+﻿namespace Moda.Web.Api.Models.Work.WorkStatuses;
 
 public sealed record CreateWorkStatusRequest
 {

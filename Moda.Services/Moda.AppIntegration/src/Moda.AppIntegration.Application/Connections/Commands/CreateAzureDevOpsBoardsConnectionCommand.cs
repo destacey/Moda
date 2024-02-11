@@ -1,7 +1,5 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
@@ -89,7 +87,7 @@ internal sealed class CreateAzureDevOpsBoardsConnectionCommandHandler : ICommand
             var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, request.PersonalAccessToken);
 
             var testConnectionResult = await _azureDevOpsService.TestConnection(config.OrganizationUrl, config.PersonalAccessToken);
-                
+
             var connection = AzureDevOpsBoardsConnection.Create(request.Name, request.Description, config, testConnectionResult.IsSuccess, timestamp);
 
             await _appIntegrationDbContext.AzureDevOpsBoardsConnections.AddAsync(connection, cancellationToken);

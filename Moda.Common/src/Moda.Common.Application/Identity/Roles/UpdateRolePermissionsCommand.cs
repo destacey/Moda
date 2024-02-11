@@ -1,5 +1,3 @@
-using FluentValidation;
-
 namespace Moda.Common.Application.Identity.Roles;
 
 public sealed record UpdateRolePermissionsCommand

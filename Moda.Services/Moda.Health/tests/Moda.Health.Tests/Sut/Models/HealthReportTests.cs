@@ -23,7 +23,7 @@ public class HealthReportTests
         // Arrange
         var objectId = Guid.NewGuid();
         var healthChecks = new HealthCheckFaker(_dateTimeProvider.Now, objectId)
-            .MultipleWithSameObjectId(objectId,5);
+            .MultipleWithSameObjectId(objectId, 5);
 
         // Act
         var result = new HealthReport(healthChecks);

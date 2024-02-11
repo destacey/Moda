@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Moda.Organization.Domain.Models;
+﻿using Moda.Organization.Domain.Models;
 
 namespace Moda.Common.Tests.Sut.Models;
 

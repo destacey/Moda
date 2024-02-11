@@ -24,7 +24,7 @@ internal static class ConfigureServices
                     .WithOrigins(origins.ToArray())
                     .SetIsOriginAllowedToAllowWildcardSubdomains())
         );
-            
+
     }
 
     internal static IApplicationBuilder UseCorsPolicy(this IApplicationBuilder app) =>

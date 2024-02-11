@@ -61,7 +61,7 @@ const UserDetails = ({ user, canEdit }: UserDetailsProps) => {
           dataSource={userRoleData}
           renderItem={(item) => (
             <List.Item>
-              <Link href={`/settings/roles/${item.roleId}`}>
+              <Link href={`/settings/user-management/roles/${item.roleId}`}>
                 {item.roleName}
               </Link>
               {item.description && (

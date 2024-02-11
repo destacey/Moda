@@ -71,7 +71,7 @@ internal sealed class GetPlanningIntervalObjectiveQueryHandler : IQueryHandler<G
             .AsNoTrackingWithIdentityResolution()
             .FirstOrDefaultAsync(cancellationToken);
         if (planningInterval is null || planningInterval.Objectives.Count != 1
-            || (request.ObjectiveId.HasValue && planningInterval.Objectives.First().Id != request.ObjectiveId) 
+            || (request.ObjectiveId.HasValue && planningInterval.Objectives.First().Id != request.ObjectiveId)
             || (request.ObjectiveKey.HasValue && planningInterval.Objectives.First().Key != request.ObjectiveKey))
             return null;
 

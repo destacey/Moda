@@ -1,4 +1,3 @@
-using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -72,11 +71,7 @@ internal static class ConfigureServices
 
                 document.OperationProcessors.Add(new SwaggerHeaderAttributeProcessor());
 
-                var fluentValidationSchemaProcessor = serviceProvider.CreateScope().ServiceProvider.GetService<FluentValidationSchemaProcessor>();
-                if (fluentValidationSchemaProcessor is null)
-                {
-                    throw new InvalidOperationException("FluentValidationSchemaProcessor is not registered");
-                }
+                var fluentValidationSchemaProcessor = serviceProvider.CreateScope().ServiceProvider.GetService<FluentValidationSchemaProcessor>() ?? throw new InvalidOperationException("FluentValidationSchemaProcessor is not registered");
                 document.SchemaSettings.SchemaProcessors.Add(fluentValidationSchemaProcessor);
             });
 

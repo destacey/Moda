@@ -15,7 +15,7 @@ public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
         builder.HasAlternateKey(o => o.Key);
 
         builder.HasIndex(o => new { o.Id, o.IsDeleted })
-            .IncludeProperties(o => new { o.Key, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId});
+            .IncludeProperties(o => new { o.Key, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId });
         builder.HasIndex(o => new { o.Key, o.IsDeleted })
             .IncludeProperties(o => new { o.Id, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId });
         builder.HasIndex(o => new { o.OwnerId, o.IsDeleted })

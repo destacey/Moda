@@ -97,7 +97,7 @@ public class ProcessServiceTests
         var processId = Guid.NewGuid();
         var expectedErrorMessage = "Not Found";
         var expectedLogMessage = $"Error getting process {processId} from Azure DevOps: Not Found.";
-        
+
         var service = new ProcessService(
             _azdoOrganizationOptions.OrganizationUrl,
             _azdoOrganizationOptions.PersonalAccessToken,

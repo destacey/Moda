@@ -30,10 +30,10 @@ internal sealed class GetRisksByPlanningIntervalQueryHandler : IQueryHandler<Get
 
         var piDates = await _planningDbContext.PlanningIntervals
             .Where(p => p.Id == request.PlanningIntervalId)
-            .Select(p => new 
-            { 
-                start = p.DateRange.Start.ToInstant(), 
-                end = p.DateRange.End.PlusDays(1).ToInstant() 
+            .Select(p => new
+            {
+                start = p.DateRange.Start.ToInstant(),
+                end = p.DateRange.End.PlusDays(1).ToInstant()
             })
             .SingleAsync(cancellationToken);
 
@@ -41,7 +41,7 @@ internal sealed class GetRisksByPlanningIntervalQueryHandler : IQueryHandler<Get
 
         var query = _planningDbContext.Risks
             .Include(r => r.Team)
-            .Include(r => r.Assignee)            
+            .Include(r => r.Assignee)
             .Where(r => r.ReportedOn <= piDates.end && (!r.ClosedDate.HasValue || piDates.start <= r.ClosedDate.Value))
             .AsQueryable();
 

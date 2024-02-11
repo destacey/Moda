@@ -1,8 +1,8 @@
 ﻿using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.Risks.Commands;
-public sealed record UpdateRiskCommand(Guid Id, string Summary, string? Description, Guid TeamId, 
-    RiskStatus Status, RiskCategory Category, RiskGrade Impact, RiskGrade Likelihood, Guid? AssigneeId, 
+public sealed record UpdateRiskCommand(Guid Id, string Summary, string? Description, Guid TeamId,
+    RiskStatus Status, RiskCategory Category, RiskGrade Impact, RiskGrade Likelihood, Guid? AssigneeId,
     LocalDate? FollowUpDate, string? Response) : ICommand<int>;
 
 public sealed class UpdateRiskCommandValidator : CustomValidator<UpdateRiskCommand>
@@ -60,7 +60,7 @@ internal sealed class UpdateRiskCommandHandler : ICommandHandler<UpdateRiskComma
         try
         {
             var risk = await _planningDbContext.Risks
-                .FirstOrDefaultAsync(r => r.Id == request.Id && r.TeamId == request.TeamId,  cancellationToken);
+                .FirstOrDefaultAsync(r => r.Id == request.Id && r.TeamId == request.TeamId, cancellationToken);
             if (risk is null)
                 return Result.Failure<int>("Risk not found.");
 

@@ -45,9 +45,9 @@ public sealed class CreatePlanningIntervalObjectiveCommandValidator : CustomVali
             .AsNoTracking()
             .SingleOrDefaultAsync(p => p.Id == command.PlanningIntervalId, cancellationToken);
 
-        return planningInterval is null 
-            ? false 
-            : planningInterval.DateRange.Start <= date 
+        return planningInterval is null
+            ? false
+            : planningInterval.DateRange.Start <= date
                 && date <= planningInterval.DateRange.End;
     }
 }
@@ -93,12 +93,12 @@ internal sealed class CreatePlanningIntervalObjectiveCommandHandler : ICommandHa
             }
 
             var objectiveResult = await _sender.Send(new CreateObjectiveCommand(
-                request.Name, 
+                request.Name,
                 request.Description,
                 Goals.Domain.Enums.ObjectiveType.PlanningInterval,
                 request.TeamId,
                 request.PlanningIntervalId,
-                request.StartDate, 
+                request.StartDate,
                 request.TargetDate), cancellationToken);
             if (objectiveResult.IsFailure)
             {

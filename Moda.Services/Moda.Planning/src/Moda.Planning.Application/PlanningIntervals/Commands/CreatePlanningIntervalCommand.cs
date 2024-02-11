@@ -1,6 +1,4 @@
-﻿using Moda.Planning.Domain.Enums;
-
-namespace Moda.Planning.Application.PlanningIntervals.Commands;
+﻿namespace Moda.Planning.Application.PlanningIntervals.Commands;
 public sealed record CreatePlanningIntervalCommand(string Name, string? Description, LocalDateRange DateRange, int IterationWeeks, string? IterationPrefix) : ICommand<int>;
 
 public sealed class CreatePlanningIntervalCommandValidator : CustomValidator<CreatePlanningIntervalCommand>

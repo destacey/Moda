@@ -30,7 +30,7 @@ internal static class BehaviorDtoExtensions
             Guard.Against.Null(behavior.Inherits, nameof(behavior.Inherits));
             Guard.Against.NullOrEmpty(behavior.Inherits["behaviorRefName"]?.ToString(), "behaviorRefName");
 
-            BacklogCategory? category = MapBehaviorToBacklogCategory(behavior.ReferenceName) 
+            BacklogCategory? category = MapBehaviorToBacklogCategory(behavior.ReferenceName)
                 ?? MapBehaviorToBacklogCategory(behavior.Inherits["behaviorRefName"].ToString()!);
             Guard.Against.Null(category, nameof(category));
 

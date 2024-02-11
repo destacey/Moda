@@ -1,6 +1,5 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Moda.AppIntegration.Application.Connections.Queries;
 public sealed record GetAzureDevOpsBoardsConnectionQuery(Guid ConnectionId) : IQuery<AzureDevOpsBoardsConnectionDetailsDto?>;

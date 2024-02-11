@@ -384,8 +384,8 @@ public class PlanningInterval : BaseAuditableEntity<Guid>, ILocalSchedule
         var planningInterval = new PlanningInterval(name, description, dateRange);
         var result = planningInterval.InitializeIterations(iterationWeeks, iterationPrefix);
 
-        return result.IsFailure 
-            ? Result.Failure<PlanningInterval>(result.Error) 
+        return result.IsFailure
+            ? Result.Failure<PlanningInterval>(result.Error)
             : planningInterval;
     }
 }

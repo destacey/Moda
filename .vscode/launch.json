@@ -24,9 +24,10 @@
         },
         {
             "name": "Next.js: debug client-side",
-            "type": "chrome",
+            "type": "edge",
             "request": "launch",
-            "url": "http://localhost:3000"
+            "url": "http://localhost:3000",
+            "cwd": "${workspaceFolder}/Moda.Web/src/moda.web.reactclient",
           },
         {
             "name": "Next.js: debug full stack",
@@ -35,9 +36,9 @@
             "command": "npm run dev",
             "cwd": "${workspaceFolder}/Moda.Web/src/moda.web.reactclient",
             "serverReadyAction": {
-                "pattern": "started server on .+, url: (https?://.+)",
+                "pattern": "started server on .+, url: (http://.+)",
                 "uriFormat": "%s",
-                "action": "debugWithChrome"
+                "action": "debugWithEdge"
             }
         },
         {

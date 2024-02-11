@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace Moda.Common.Application.Models;
 
 public static class PaginationResponseExtensions

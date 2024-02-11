@@ -2,7 +2,7 @@
 using Moda.Common.Domain.Models;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
-public sealed record UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommand(Guid ConnectionId, IntegrationRegistration<Guid,Guid> IntegrationRegistration) : ICommand;
+public sealed record UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommand(Guid ConnectionId, IntegrationRegistration<Guid, Guid> IntegrationRegistration) : ICommand;
 
 internal sealed class UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommandHandler : ICommandHandler<UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommand>
 {

@@ -1,8 +1,8 @@
 ﻿using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.Risks.Commands;
-public sealed record CreateRiskCommand(string Summary, string? Description, Guid TeamId, 
-    RiskCategory Category, RiskGrade Impact, RiskGrade Likelihood, Guid? AssigneeId, 
+public sealed record CreateRiskCommand(string Summary, string? Description, Guid TeamId,
+    RiskCategory Category, RiskGrade Impact, RiskGrade Likelihood, Guid? AssigneeId,
     LocalDate? FollowUpDate, string? Response) : ICommand<int>;
 
 public sealed class CreateRiskCommandValidator : CustomValidator<CreateRiskCommand>

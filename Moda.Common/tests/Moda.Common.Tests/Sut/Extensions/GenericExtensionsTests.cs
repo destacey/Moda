@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-
-namespace Moda.Common.Tests.Sut.Extensions;
+﻿namespace Moda.Common.Tests.Sut.Extensions;
 public class GenericExtensionsTests
 {
 

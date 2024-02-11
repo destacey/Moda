@@ -1,12 +1,13 @@
 using System.Reflection;
 using FluentValidation.AspNetCore;
+using Microsoft.ApplicationInsights.Extensibility.Implementation;
 using Moda.AppIntegration.Application;
 using Moda.Common.Application;
 using Moda.Common.Application.Interfaces;
 using Moda.Goals.Application;
+using Moda.Health;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
-using Moda.Health;
 using Moda.Links;
 using Moda.Organization.Application;
 using Moda.Planning.Application;
@@ -15,7 +16,6 @@ using Moda.Web.Api.Services;
 using Moda.Work.Application;
 using NodaTime.Serialization.SystemTextJson;
 using Serilog;
-using Microsoft.ApplicationInsights.Extensibility.Implementation;
 
 TelemetryDebugWriter.IsTracingDisabled = true;
 
@@ -31,7 +31,7 @@ try
         config.ReadFrom.Configuration(context.Configuration);
         config.Enrich.WithProperty("version", Environment.GetEnvironmentVariable("version") ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "none-supplied");
     });
-    if(builder.Environment.IsDevelopment())
+    if (builder.Environment.IsDevelopment())
     {
         Serilog.Debugging.SelfLog.Enable(Console.Error);
     }

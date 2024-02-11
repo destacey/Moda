@@ -4,7 +4,7 @@ using Moda.Planning.Domain.Enums;
 namespace Moda.Planning.Application.Risks.Queries;
 public sealed record GetRisksQuery : IQuery<IReadOnlyList<RiskListDto>>
 {
-    public GetRisksQuery(bool includeClosed) 
+    public GetRisksQuery(bool includeClosed)
     {
         IncludeClosed = includeClosed;
     }

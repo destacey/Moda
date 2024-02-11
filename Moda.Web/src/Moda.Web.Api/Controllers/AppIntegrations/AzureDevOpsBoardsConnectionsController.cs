@@ -1,7 +1,6 @@
 ﻿using Moda.AppIntegration.Application.Interfaces;
 using Moda.AppIntegration.Domain.Models;
 using Moda.Common.Application.Interfaces;
-using Moda.Planning.Application.PlanningIntervals.Commands;
 using Moda.Web.Api.Models.AppIntegrations.Connections;
 
 namespace Moda.Web.Api.Controllers.AppIntegrations;

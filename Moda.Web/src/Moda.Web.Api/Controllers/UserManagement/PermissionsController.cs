@@ -3,7 +3,7 @@
 [Route("api/user-management/permissions")]
 [ApiVersionNeutral]
 [ApiController]
-public class PermissionsController: ControllerBase
+public class PermissionsController : ControllerBase
 {
     public PermissionsController()
     {
