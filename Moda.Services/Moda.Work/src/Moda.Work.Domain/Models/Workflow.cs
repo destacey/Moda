@@ -47,12 +47,12 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
     /// <summary>
     /// Indicates whether the workflow is owned by Moda or a third party system.  This value should not change.
     /// </summary>
-    public Ownership Ownership { get; }
+    public Ownership Ownership { get; private init; }
 
     /// <summary>
     /// Gets the external identifier. The value is required when Ownership is managed; otherwise it's null.  For Azure DevOps, this is the process id.
     /// </summary>
-    public Guid? ExternalId { get; }
+    public Guid? ExternalId { get; private init; }
 
     /// <summary>
     /// Indicates whether the workflow is active or not.  Only active workflows can be assigned 

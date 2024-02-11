@@ -3,15 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Moda.Work.Application.WorkStatuses.Dtos;
 
 namespace Moda.Work.Application.WorkStatuses.Queries;
-public sealed record GetWorkStatusesQuery : IQuery<IReadOnlyList<WorkStatusDto>>
-{
-    public GetWorkStatusesQuery(bool includeInactive = false)
-    {
-        IncludeInactive = includeInactive;
-    }
-
-    public bool IncludeInactive { get; }
-}
+public sealed record GetWorkStatusesQuery(bool IncludeInactive = false) : IQuery<IReadOnlyList<WorkStatusDto>>;
 
 internal sealed class GetWorkStatusesQueryHandler : IQueryHandler<GetWorkStatusesQuery, IReadOnlyList<WorkStatusDto>>
 {

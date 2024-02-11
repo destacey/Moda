@@ -1,5 +1,4 @@
-﻿
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Extensions;
 using NodaTime;
@@ -39,7 +38,7 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
 
     /// <summary>Gets the key.</summary>
     /// <value>The key.</value>
-    public int Key { get; private set; }
+    public int Key { get; private init; }
 
     /// <summary>
     /// The name of the work process.
@@ -63,12 +62,12 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     /// Indicates whether the work process is owned by Moda or a third party system.  This value should not change.
     /// </summary>
     /// <value>The ownership.</value>
-    public Ownership Ownership { get; }
+    public Ownership Ownership { get; private init; }
 
     /// <summary>
     /// Gets the external identifier. The value is required when Ownership is managed; otherwise it's null.  For Azure DevOps, this is the process id.
     /// </summary>
-    public Guid? ExternalId { get; }
+    public Guid? ExternalId { get; private init; }
 
     /// <summary>
     /// Indicates whether the work process is active or not.  Only active work processes can be assigned

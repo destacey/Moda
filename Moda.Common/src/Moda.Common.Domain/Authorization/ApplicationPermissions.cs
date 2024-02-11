@@ -46,6 +46,7 @@ public static class ApplicationResource
     public const string BacklogLevels = nameof(BacklogLevels);
     public const string Workspaces = nameof(Workspaces);
     public const string WorkItems = nameof(WorkItems);
+    public const string WorkProcesses = nameof(WorkProcesses);
     public const string WorkStatusCategories = nameof(WorkStatusCategories);
     public const string WorkStatuses = nameof(WorkStatuses);
     public const string WorkTypes = nameof(WorkTypes);
@@ -165,6 +166,11 @@ public static class ApplicationPermissions
         new("Create WorkItems", ApplicationAction.Create, ApplicationResource.WorkItems),
         new("Update WorkItems", ApplicationAction.Update, ApplicationResource.WorkItems),
         new("Delete WorkItems", ApplicationAction.Delete, ApplicationResource.WorkItems),
+
+        new("View WorkTypes", ApplicationAction.View, ApplicationResource.WorkProcesses, IsBasic: true),
+        new("Create WorkTypes", ApplicationAction.Create, ApplicationResource.WorkProcesses),
+        new("Update WorkTypes", ApplicationAction.Update, ApplicationResource.WorkProcesses),
+        new("Delete WorkTypes", ApplicationAction.Delete, ApplicationResource.WorkProcesses),
 
         new("View WorkStatusCategories", ApplicationAction.View, ApplicationResource.WorkStatusCategories, IsBasic: true),
 
