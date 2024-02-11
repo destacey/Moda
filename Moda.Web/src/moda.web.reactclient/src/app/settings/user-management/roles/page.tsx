@@ -2,15 +2,15 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { useCallback, useMemo, useState } from 'react'
-import ModaGrid from '../../components/common/moda-grid'
-import { authorizePage } from '../../components/hoc'
+import ModaGrid from '@/src/app/components/common/moda-grid'
+import { authorizePage } from '@/src/app/components/hoc'
 import Link from 'next/link'
 import { Button } from 'antd'
-import useAuth from '../../components/contexts/auth'
+import useAuth from '@/src/app/components/contexts/auth'
 import CreateRoleForm from './create-role-form'
 import { useRouter } from 'next/navigation'
 import { useGetRoles } from '@/src/services/queries/user-management-queries'
-import { useDocumentTitle } from '../../hooks'
+import { useDocumentTitle } from '@/src/app/hooks'
 
 const LinkCellRenderer = ({ value, data }) => {
   return <Link href={`roles/${data.id}`}>{value}</Link>
@@ -28,7 +28,7 @@ const RoleListPage = () => {
   const columnDefs = useMemo(
     () => [
       { field: 'name', cellRenderer: LinkCellRenderer },
-      { field: 'description' },
+      { field: 'description', width: 300 },
     ],
     [],
   )

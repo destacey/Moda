@@ -60,7 +60,8 @@ const RoleDetailsPage = ({ params }) => {
       <BasicBreadcrumb
         items={[
           { title: 'Settings' },
-          { title: 'Roles', href: '/settings/roles' },
+          { title: 'User Management' },
+          { title: 'Roles', href: './' },
           { title: 'Details' },
         ]}
       />

@@ -46,7 +46,8 @@ const UserDetailsPage = ({ params }) => {
       <BasicBreadcrumb
         items={[
           { title: 'Settings' },
-          { title: 'Users', href: '/settings/users' },
+          { title: 'User Management' },
+          { title: 'Users', href: './' },
           { title: 'Details' },
         ]}
       />

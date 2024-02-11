@@ -2,14 +2,14 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { useCallback, useMemo } from 'react'
-import ModaGrid from '../../components/common/moda-grid'
-import { authorizePage } from '../../components/hoc'
+import ModaGrid from '@/src/app/components/common/moda-grid'
+import { authorizePage } from '@/src/app/components/hoc'
 import Link from 'next/link'
-import { useDocumentTitle } from '../../hooks'
+import { useDocumentTitle } from '@/src/app/hooks'
 import { useGetUsers } from '@/src/services/queries/user-management-queries'
 
 const UserLinkCellRenderer = ({ value, data }) => {
-  return <Link href={`/settings/users/${data.id}`}>{value}</Link>
+  return <Link href={`users/${data.id}`}>{value}</Link>
 }
 
 const EmployeeLinkCellRenderer = ({ value, data }) => {

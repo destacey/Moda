@@ -110,13 +110,13 @@ const settingsMenuItems: ItemType[] = [
       'Permissions.Users.View',
       'Users',
       SettingsTab.Users,
-      '/settings/users',
+      '/settings/user-management/users',
     ),
     getRestrictedMenuItem(
       'Permissions.Roles.View',
       'Roles',
       SettingsTab.Roles,
-      '/settings/roles',
+      '/settings/user-management/roles',
     ),
   ]),
 

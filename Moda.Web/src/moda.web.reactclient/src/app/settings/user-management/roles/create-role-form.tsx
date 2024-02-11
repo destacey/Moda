@@ -2,7 +2,7 @@
 
 import { Form, Input, Modal, Select, message } from 'antd'
 import { useEffect, useState } from 'react'
-import useAuth from '../../components/contexts/auth'
+import useAuth from '@/src/app/components/contexts/auth'
 import { toFormErrors } from '@/src/utils'
 import { RoleDto } from '@/src/services/moda-api'
 import {
