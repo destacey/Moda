@@ -97,18 +97,6 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
     refetchPlanningInterval()
   }, [refetchPlanningInterval])
 
-  const actions = useMemo(() => {
-    return (
-      <>
-        <Link
-          href={`/planning/planning-intervals/${planningIntervalData?.key}`}
-        >
-          PI Details
-        </Link>
-      </>
-    )
-  }, [planningIntervalData?.key])
-
   const pageContent = useMemo(() => {
     if (planningIntervalData == null) return null
     if (tabs?.length === 0) {
@@ -151,7 +139,6 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
             <Tag title="PI Predictability">{`${predictability}%`}</Tag>
           )
         }
-        actions={actions}
       />
       {pageContent}
     </>
