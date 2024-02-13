@@ -49,6 +49,7 @@ const UsersListPage = () => {
       <PageTitle title="Users" />
 
       <ModaGrid
+        height={600}
         columnDefs={columnDefs}
         rowData={usersData}
         loadData={refresh}

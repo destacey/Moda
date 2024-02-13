@@ -21,8 +21,11 @@ const ConnectionsPage = () => {
   const [openCreateConnectionForm, setOpenCreateConnectionForm] =
     useState(false)
   const [includeDisabled, setIncludeDisabled] = useState(false)
-  const { data: connectionsData, refetch } =
-    useGetAzdoBoardsConnections(includeDisabled)
+  const {
+    data: connectionsData,
+    isLoading,
+    refetch,
+  } = useGetAzdoBoardsConnections(includeDisabled)
 
   const { hasClaim } = useAuth()
   const canCreateConnection = hasClaim(
@@ -84,10 +87,12 @@ const ConnectionsPage = () => {
       <PageTitle title="Connections" actions={actions()} />
 
       <ModaGrid
+        height={600}
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
         rowData={connectionsData}
         loadData={refresh}
+        isDataLoading={isLoading}
       />
 
       {openCreateConnectionForm && (
