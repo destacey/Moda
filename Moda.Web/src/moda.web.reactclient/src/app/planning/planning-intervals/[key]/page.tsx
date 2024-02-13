@@ -103,31 +103,15 @@ const PlanningIntervalDetailsPage = ({ params }) => {
           label: 'Manage Teams',
           onClick: () => setOpenManageTeamsForm(true),
         },
-        {
-          type: 'divider',
-        },
       )
     }
-    items.push({
-      key: 'healthReport-menu-item',
-      label: (
-        <Link
-          href={`/planning/planning-intervals/${params.key}/objectives/health-report`}
-        >
-          Health Report
-        </Link>
-      ),
-    })
     return items
-  }, [canUpdatePlanningInterval, params.key])
+  }, [canUpdatePlanningInterval])
 
   const actions = () => {
     return (
       <>
         <Space>
-          <Link href={`/planning/planning-intervals/${params.key}/plan-review`}>
-            Plan Review
-          </Link>
           <Dropdown placement="bottomRight" menu={{ items: actionsMenuItems }}>
             <Button>
               <Space>

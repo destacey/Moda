@@ -54,6 +54,7 @@ const RoleListPage = () => {
       <PageTitle title="Roles" actions={actions()} />
 
       <ModaGrid
+        height={600}
         columnDefs={columnDefs}
         rowData={roleData}
         loadData={refresh}

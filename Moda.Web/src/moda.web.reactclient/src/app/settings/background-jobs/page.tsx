@@ -111,6 +111,7 @@ const BackgroundJobsListPage = () => {
       <PageTitle title="Background Jobs" actions={showActions && actions()} />
 
       <ModaGrid
+        height={600}
         columnDefs={columnDefs}
         rowData={backgroundJobs}
         loadData={getRunningJobs}

@@ -52,6 +52,7 @@ const WorkTypesPage: React.FC = () => {
       <PageTitle title="Work Types" />
 
       <ModaGrid
+        height={600}
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
         rowData={data}
