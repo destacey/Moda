@@ -7,9 +7,6 @@ import PlanningIntervalDetails from './planning-interval-details'
 import TeamsGrid, {
   TeamsGridProps,
 } from '@/src/app/components/common/organizations/teams-grid'
-import RisksGrid, {
-  RisksGridProps,
-} from '@/src/app/components/common/planning/risks-grid'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
 import ManagePlanningIntervalTeamsForm from './manage-planning-interval-teams-form'
@@ -18,7 +15,6 @@ import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { EditPlanningIntervalForm } from '../../components'
 import {
   useGetPlanningIntervalByKey,
-  useGetPlanningIntervalRisks,
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
 import { authorizePage } from '@/src/app/components/hoc'
@@ -31,17 +27,14 @@ import ManagePlanningIntervalDatesForm from './manage-planning-interval-dates-fo
 enum PlanningIntervalTabs {
   Details = 'details',
   Teams = 'teams',
-  Risks = 'risks',
 }
 
 const PlanningIntervalDetailsPage = ({ params }) => {
   useDocumentTitle('PI Details')
   const [activeTab, setActiveTab] = useState(PlanningIntervalTabs.Details)
-  const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
   const [openEditPlanningIntervalForm, setOpenEditPlanningIntervalForm] =
     useState<boolean>(false)
   const [teamsQueryEnabled, setTeamsQueryEnabled] = useState<boolean>(false)
-  const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [
     openManagePlanningIntervalDatesForm,
     setOpenManagePlanningIntervalDatesForm,
@@ -68,16 +61,6 @@ const PlanningIntervalDetailsPage = ({ params }) => {
     planningIntervalData?.id,
     teamsQueryEnabled,
   )
-
-  const risksQuery = useGetPlanningIntervalRisks(
-    planningIntervalData?.id,
-    includeClosedRisks,
-    risksQueryEnabled,
-  )
-
-  const onIncludeClosedRisksChanged = useCallback((includeClosed: boolean) => {
-    setIncludeClosedRisks(includeClosed)
-  }, [])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
@@ -135,16 +118,6 @@ const PlanningIntervalDetailsPage = ({ params }) => {
         teamsQuery: teamsQuery,
       } as TeamsGridProps),
     },
-    {
-      key: PlanningIntervalTabs.Risks,
-      tab: 'Risk Management',
-      content: createElement(RisksGrid, {
-        risksQuery: risksQuery,
-        updateIncludeClosed: onIncludeClosedRisksChanged,
-        getRisksObjectId: planningIntervalData?.id,
-        newRisksAllowed: true,
-      } as RisksGridProps),
-    },
   ]
 
   useEffect(() => {
@@ -188,11 +161,9 @@ const PlanningIntervalDetailsPage = ({ params }) => {
       // enables the query for the tab on first render if it hasn't been enabled yet
       if (tabKey == PlanningIntervalTabs.Teams && !teamsQueryEnabled) {
         setTeamsQueryEnabled(true)
-      } else if (tabKey == PlanningIntervalTabs.Risks && !risksQueryEnabled) {
-        setRisksQueryEnabled(true)
       }
     },
-    [risksQueryEnabled, teamsQueryEnabled],
+    [teamsQueryEnabled],
   )
 
   if (isLoading) {

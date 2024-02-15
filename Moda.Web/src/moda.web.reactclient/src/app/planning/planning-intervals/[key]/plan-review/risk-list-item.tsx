@@ -5,6 +5,9 @@ import { Button, List, Space, Tag, Typography } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
 
+const { Item } = List
+const { Meta } = Item
+
 export interface RiskListItemProps {
   risk: RiskListDto
   canUpdateRisks: boolean
@@ -56,8 +59,8 @@ const RiskListItem = ({
 
   return (
     <>
-      <List.Item key={risk.key}>
-        <List.Item.Meta title={title()} description={description()} />
+      <Item key={risk.key}>
+        <Meta title={title()} description={description()} />
         {canUpdateRisks && (
           <Button
             type="text"
@@ -66,7 +69,7 @@ const RiskListItem = ({
             onClick={() => setOpenUpdateRiskForm(true)}
           />
         )}
-      </List.Item>
+      </Item>
       {openUpdateRiskForm && (
         <EditRiskForm
           showForm={openUpdateRiskForm}

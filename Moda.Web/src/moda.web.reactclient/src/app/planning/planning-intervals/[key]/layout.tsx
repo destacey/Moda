@@ -48,10 +48,14 @@ const PlanninIntervalLayout = ({
         ),
         key: 'pi-objectives',
       },
-      //   {
-      //     label: 'Risks',
-      //     key: 'pi-risks',
-      //   },
+      {
+        label: (
+          <Link href={`/planning/planning-intervals/${params.key}/risks`}>
+            Risks
+          </Link>
+        ),
+        key: 'pi-risks',
+      },
       {
         label: 'Reports',
         key: 'pi-reports',

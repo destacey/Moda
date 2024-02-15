@@ -10,12 +10,15 @@ import {
 import { BarsOutlined, BuildOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { useCallback, useMemo, useState } from 'react'
-import { PlanningIntervalObjectivesTimeline } from '../../../components'
+import {
+  CreatePlanningIntervalObjectiveForm,
+  PlanningIntervalObjectivesTimeline,
+} from '../../../components'
 import { PageTitle } from '@/src/app/components/common'
 import { notFound } from 'next/navigation'
 import { Button } from 'antd'
 import useAuth from '@/src/app/components/contexts/auth'
-import CreatePlanningIntervalObjectiveForm from '../create-planning-interval-objective-form'
+import { authorizePage } from '@/src/app/components/hoc'
 
 const viewSelectorOptions: SegmentedLabeledOption[] = [
   {
@@ -134,4 +137,10 @@ const PlanningIntervalObjectivesPage = ({ params }) => {
   )
 }
 
-export default PlanningIntervalObjectivesPage
+const PlanningIntervalObjectivesPageWithAuthorization = authorizePage(
+  PlanningIntervalObjectivesPage,
+  'Permission',
+  'Permissions.PlanningIntervals.View',
+)
+
+export default PlanningIntervalObjectivesPageWithAuthorization

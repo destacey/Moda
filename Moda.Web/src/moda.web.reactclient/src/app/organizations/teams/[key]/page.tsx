@@ -104,7 +104,6 @@ const TeamDetailsPage = ({ params }) => {
       content: createElement(RisksGrid, {
         risksQuery: risksQuery,
         updateIncludeClosed: onIncludeClosedRisksChanged,
-        getRisksObjectId: team?.id,
         newRisksAllowed: true,
         teamId: team?.id,
         hideTeamColumn: true,

@@ -14,6 +14,7 @@ import {
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
 import PlanningIntervalPlanReviewLoading from './loading'
+import { authorizePage } from '@/src/app/components/hoc'
 
 const PlanningIntervalPlanReviewPage = ({ params }) => {
   useDocumentTitle('PI Plan Review')
@@ -143,4 +144,10 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
   )
 }
 
-export default PlanningIntervalPlanReviewPage
+const PlanningIntervalPlanReviewPageWithAuthorization = authorizePage(
+  PlanningIntervalPlanReviewPage,
+  'Permission',
+  'Permissions.PlanningIntervals.View',
+)
+
+export default PlanningIntervalPlanReviewPageWithAuthorization
