@@ -65,10 +65,7 @@ const PlanningIntervalListPage = () => {
     return (
       <>
         {canCreatePlanningInterval && (
-          <Button
-            type="link"
-            onClick={() => setOpenCreatePlanningIntervalForm(true)}
-          >
+          <Button onClick={() => setOpenCreatePlanningIntervalForm(true)}>
             Create Planning Interval
           </Button>
         )}
@@ -78,6 +75,7 @@ const PlanningIntervalListPage = () => {
 
   return (
     <>
+      <br />
       <PageTitle
         title="Planning Intervals"
         actions={showActions && actions()}

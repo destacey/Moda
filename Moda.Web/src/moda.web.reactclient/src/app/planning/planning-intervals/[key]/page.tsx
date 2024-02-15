@@ -13,7 +13,6 @@ import RisksGrid, {
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
 import ManagePlanningIntervalTeamsForm from './manage-planning-interval-teams-form'
-import Link from 'next/link'
 import { DownOutlined } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { EditPlanningIntervalForm } from '../../components'
@@ -26,15 +25,13 @@ import { authorizePage } from '@/src/app/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import { useAppDispatch } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
-import PlanningIntervalObjectives from './planning-interval-objectives'
 import PlanningIntervalDetailsLoading from './loading'
 import ManagePlanningIntervalDatesForm from './manage-planning-interval-dates-form'
 
 enum PlanningIntervalTabs {
   Details = 'details',
   Teams = 'teams',
-  Objectives = 'objectives',
-  RiskManagement = 'risk-management',
+  Risks = 'risks',
 }
 
 const PlanningIntervalDetailsPage = ({ params }) => {
@@ -44,8 +41,6 @@ const PlanningIntervalDetailsPage = ({ params }) => {
   const [openEditPlanningIntervalForm, setOpenEditPlanningIntervalForm] =
     useState<boolean>(false)
   const [teamsQueryEnabled, setTeamsQueryEnabled] = useState<boolean>(false)
-  const [objectivesQueryEnabled, setObjectivesQueryEnabled] =
-    useState<boolean>(false)
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [
     openManagePlanningIntervalDatesForm,
@@ -141,23 +136,7 @@ const PlanningIntervalDetailsPage = ({ params }) => {
       } as TeamsGridProps),
     },
     {
-      key: PlanningIntervalTabs.Objectives,
-      tab: 'Objectives',
-      content: (
-        <PlanningIntervalObjectives
-          planningInterval={planningIntervalData}
-          objectivesQueryEnabled={objectivesQueryEnabled}
-          newObjectivesAllowed={
-            !planningIntervalData?.objectivesLocked ?? false
-          }
-          teamNames={teamsQuery?.data
-            ?.filter((t) => t.type == 'Team')
-            .map((t) => t.name)}
-        />
-      ),
-    },
-    {
-      key: PlanningIntervalTabs.RiskManagement,
+      key: PlanningIntervalTabs.Risks,
       tab: 'Risk Management',
       content: createElement(RisksGrid, {
         risksQuery: risksQuery,
@@ -209,20 +188,11 @@ const PlanningIntervalDetailsPage = ({ params }) => {
       // enables the query for the tab on first render if it hasn't been enabled yet
       if (tabKey == PlanningIntervalTabs.Teams && !teamsQueryEnabled) {
         setTeamsQueryEnabled(true)
-      } else if (
-        tabKey == PlanningIntervalTabs.Objectives &&
-        !objectivesQueryEnabled
-      ) {
-        setTeamsQueryEnabled(true)
-        setObjectivesQueryEnabled(true)
-      } else if (
-        tabKey == PlanningIntervalTabs.RiskManagement &&
-        !risksQueryEnabled
-      ) {
+      } else if (tabKey == PlanningIntervalTabs.Risks && !risksQueryEnabled) {
         setRisksQueryEnabled(true)
       }
     },
-    [objectivesQueryEnabled, risksQueryEnabled, teamsQueryEnabled],
+    [risksQueryEnabled, teamsQueryEnabled],
   )
 
   if (isLoading) {
@@ -235,11 +205,7 @@ const PlanningIntervalDetailsPage = ({ params }) => {
 
   return (
     <>
-      <PageTitle
-        title={planningIntervalData?.name}
-        subtitle="Planning Interval Details"
-        actions={actions()}
-      />
+      <PageTitle title="PI Details" actions={actions()} />
       <Card
         style={{ width: '100%' }}
         tabList={tabs}

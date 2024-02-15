@@ -3,8 +3,7 @@
 import { useDocumentTitle } from '@/src/app/hooks'
 import { PlanningIntervalTeamResponse } from '@/src/services/moda-api'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Card, Spin, Tag } from 'antd'
-import Link from 'next/link'
+import { Card, Tag } from 'antd'
 import TeamPlanReview from './team-plan-review'
 import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
@@ -132,8 +131,7 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
   return (
     <>
       <PageTitle
-        title={planningIntervalData?.name}
-        subtitle="PI Plan Review"
+        title="PI Plan Review"
         tags={
           predictability != null && (
             <Tag title="PI Predictability">{`${predictability}%`}</Tag>
