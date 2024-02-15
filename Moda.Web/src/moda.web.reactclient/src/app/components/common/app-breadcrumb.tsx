@@ -53,7 +53,10 @@ const AppBreadcrumb = () => {
   // TODO: how do we make this more configurable without having to use a hook in static scenarios?  Example: We don't want breadcrumbs to show on the Settings page.
   if (
     !isVisible ||
-    (pathItems.length >= 1 && pathItems[0].title === 'Settings')
+    (pathItems.length >= 1 &&
+      (pathItems[0].title === 'Settings' ||
+        (pathItems[0].title === 'Planning' &&
+          pathItems[1].title === 'Planning Intervals')))
   )
     return null
 
