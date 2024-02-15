@@ -4,11 +4,10 @@ import { PlanningIntervalObjectiveListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import ModaGrid from '../moda-grid'
-import { Button, MenuProps, Progress, Space, Switch } from 'antd'
+import { MenuProps, Progress, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import useAuth from '../../contexts/auth'
-import CreatePlanningIntervalObjectiveForm from '@/src/app/planning/planning-intervals/[key]/create-planning-interval-objective-form'
-import EditPlanningIntervalObjectiveForm from '@/src/app/planning/planning-intervals/[key]/edit-planning-interval-objective-form'
+import EditPlanningIntervalObjectiveForm from '@/src/app/planning/components/edit-planning-interval-objective-form'
 import { UseQueryResult } from 'react-query'
 import dayjs from 'dayjs'
 import CreateHealthCheckForm from '../health-check/create-health-check-form'
@@ -29,7 +28,6 @@ export interface PlanningIntervalObjectivesGridProps {
   planningIntervalId?: string
   hidePlanningIntervalColumn?: boolean
   hideTeamColumn?: boolean
-  newObjectivesAllowed?: boolean
   viewSelector?: React.ReactNode
 }
 
@@ -97,15 +95,12 @@ const PlanningIntervalObjectivesGrid = ({
   planningIntervalId,
   hidePlanningIntervalColumn = false,
   hideTeamColumn = false,
-  newObjectivesAllowed = false,
   viewSelector,
 }: PlanningIntervalObjectivesGridProps) => {
   const [hidePlanningInterval, setHidePlanningInterval] = useState<boolean>(
     hidePlanningIntervalColumn,
   )
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
-  const [openCreateObjectiveForm, setOpenCreateObjectiveForm] =
-    useState<boolean>(false)
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
   const [selectedObjectiveId, setSelectedObjectiveId] = useState<string | null>(
@@ -122,12 +117,9 @@ const PlanningIntervalObjectivesGrid = ({
     'Permission',
     'Permissions.PlanningIntervalObjectives.Manage',
   )
-  const canCreateObjectives =
-    newObjectivesAllowed && planningIntervalId && canManageObjectives
   const canCreateHealthChecks =
     !!canManageObjectives &&
     hasClaim('Permission', 'Permissions.HealthChecks.Create')
-  const showActions = canCreateObjectives
 
   const onEditObjectiveMenuClicked = useCallback((id: string) => {
     setSelectedObjectiveId(id)
@@ -150,10 +142,6 @@ const PlanningIntervalObjectivesGrid = ({
   const refresh = useCallback(async () => {
     objectivesQuery.refetch()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const createObjectiveButtonClicked = useCallback(() => {
-    setOpenCreateObjectiveForm(true)
   }, [])
 
   const columnDefs = useMemo<ColDef<PlanningIntervalObjectiveListDto>[]>(
@@ -183,7 +171,7 @@ const PlanningIntervalObjectivesGrid = ({
       { field: 'key', width: 90 },
       {
         field: 'name',
-        width: 400,
+        width: 500,
         cellRenderer: PlanningIntervalObjectiveLinkCellRenderer,
       },
       { field: 'isStretch', width: 100 },
@@ -240,18 +228,6 @@ const PlanningIntervalObjectivesGrid = ({
     setHideTeam(checked)
   }
 
-  const actions = () => {
-    return (
-      <>
-        {canCreateObjectives && (
-          <Button type="link" onClick={createObjectiveButtonClicked}>
-            Create Objective
-          </Button>
-        )}
-      </>
-    )
-  }
-
   const controlItems: ItemType[] = [
     {
       label: (
@@ -280,10 +256,6 @@ const PlanningIntervalObjectivesGrid = ({
     },
   ]
 
-  const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
-    setOpenCreateObjectiveForm(false)
-  }
-
   const onEditObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
     setSelectedObjectiveId(null)
@@ -299,22 +271,13 @@ const PlanningIntervalObjectivesGrid = ({
     <>
       {/* TODO:  setup dynamic height */}
       <ModaGrid
-        height={550}
+        height={650}
         columnDefs={columnDefs}
         rowData={objectivesQuery.data}
         loadData={refresh}
-        actions={showActions && actions()}
         gridControlMenuItems={controlItems}
         toolbarActions={viewSelector}
       />
-      {openCreateObjectiveForm && (
-        <CreatePlanningIntervalObjectiveForm
-          showForm={openCreateObjectiveForm}
-          planningIntervalId={planningIntervalId}
-          onFormCreate={() => onCreateObjectiveFormClosed(true)}
-          onFormCancel={() => onCreateObjectiveFormClosed(false)}
-        />
-      )}
       {openUpdateObjectiveForm && (
         <EditPlanningIntervalObjectiveForm
           showForm={openUpdateObjectiveForm}

@@ -12,7 +12,6 @@ import {
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import EditPlanningIntervalObjectiveForm from '../edit-planning-interval-objective-form'
 import { MenuOutlined } from '@ant-design/icons'
 import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
@@ -20,6 +19,10 @@ import CreateHealthCheckForm from '@/src/app/components/common/health-check/crea
 import { SystemContext } from '@/src/app/components/constants'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
+import { EditPlanningIntervalObjectiveForm } from '../../../components'
+
+const { Item } = List
+const { Meta } = Item
 
 export interface ObjectiveListItemProps {
   objective: PlanningIntervalObjectiveListDto
@@ -174,14 +177,14 @@ const ObjectiveListItem = ({
 
   return (
     <>
-      <List.Item key={objective.key}>
-        <List.Item.Meta title={title()} description={description()} />
+      <Item key={objective.key}>
+        <Meta title={title()} description={description()} />
         {canUpdateObjectives && (
           <Dropdown menu={{ items: menuItems }}>
             <Button type="text" size="small" icon={<MenuOutlined />} />
           </Dropdown>
         )}
-      </List.Item>
+      </Item>
       {openUpdateObjectiveForm && (
         <EditPlanningIntervalObjectiveForm
           showForm={openUpdateObjectiveForm}

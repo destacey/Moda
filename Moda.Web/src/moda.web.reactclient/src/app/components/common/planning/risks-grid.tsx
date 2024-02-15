@@ -10,10 +10,7 @@ import CreateRiskForm from './create-risk-form'
 import { EditOutlined } from '@ant-design/icons'
 import EditRiskForm from './edit-risk-form'
 import { UseQueryResult } from 'react-query'
-import {
-  NestedTeamNameLinkCellRenderer,
-  TeamNameLinkCellRenderer,
-} from '../moda-grid-cell-renderers'
+import { NestedTeamNameLinkCellRenderer } from '../moda-grid-cell-renderers'
 import { ColDef } from 'ag-grid-community'
 
 export interface RisksGridProps {
@@ -22,6 +19,7 @@ export interface RisksGridProps {
   teamId?: string | null
   newRisksAllowed?: boolean
   hideTeamColumn?: boolean
+  gridHeight?: number | null
 }
 
 const RiskLinkCellRenderer = ({ value, data }) => {
@@ -40,6 +38,7 @@ const RisksGrid = ({
   teamId,
   newRisksAllowed = false,
   hideTeamColumn = false,
+  gridHeight = 550,
 }: RisksGridProps) => {
   const [includeClosed, setIncludeClosed] = useState<boolean>(false)
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
@@ -187,7 +186,7 @@ const RisksGrid = ({
     <>
       {/* TODO:  setup dynamic height */}
       <ModaGrid
-        height={550}
+        height={gridHeight}
         columnDefs={columnDefs}
         rowData={risksQuery.data}
         loadData={refresh}

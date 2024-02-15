@@ -1,5 +1,6 @@
 'use client'
 
+import { useGetPlanningIntervalByKey } from '@/src/services/queries/planning-queries'
 import { Layout, Menu, MenuProps } from 'antd'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
@@ -13,8 +14,16 @@ const PlanninIntervalLayout = ({
   params: any
   children: React.ReactNode
 }) => {
+  const { data: planningIntervalData } = useGetPlanningIntervalByKey(params.key)
+
   const items: MenuProps['items'] = useMemo(
     () => [
+      {
+        label: `Planning Interval: ${planningIntervalData?.name}`,
+        key: 'pi-name',
+        type: 'text',
+        disabled: true,
+      },
       {
         label: (
           <Link href={`/planning/planning-intervals/${params.key}`}>
@@ -31,14 +40,22 @@ const PlanninIntervalLayout = ({
         ),
         key: 'pi-plan-review',
       },
-      //   {
-      //     label: 'Objectives',
-      //     key: 'pi-objectives',
-      //   },
-      //   {
-      //     label: 'Risks',
-      //     key: 'pi-risks',
-      //   },
+      {
+        label: (
+          <Link href={`/planning/planning-intervals/${params.key}/objectives`}>
+            Objectives
+          </Link>
+        ),
+        key: 'pi-objectives',
+      },
+      {
+        label: (
+          <Link href={`/planning/planning-intervals/${params.key}/risks`}>
+            Risks
+          </Link>
+        ),
+        key: 'pi-risks',
+      },
       {
         label: 'Reports',
         key: 'pi-reports',
@@ -56,7 +73,7 @@ const PlanninIntervalLayout = ({
         ],
       },
     ],
-    [params.key],
+    [planningIntervalData?.name, params.key],
   )
 
   return (

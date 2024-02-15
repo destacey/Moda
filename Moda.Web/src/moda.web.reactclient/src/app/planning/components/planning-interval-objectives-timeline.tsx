@@ -97,7 +97,7 @@ const PlanningIntervalObjectivesTimeline = ({
     return {
       editable: false,
       orientation: 'top',
-      maxHeight: 700,
+      maxHeight: 650,
       minHeight: 200,
       moveable: true,
       showCurrentTime: true,

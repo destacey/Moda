@@ -1,86 +1,100 @@
 'use client'
 
-import { DatePicker, Form, Input, Modal, Select, Switch, message } from 'antd'
+import {
+  Alert,
+  DatePicker,
+  Descriptions,
+  Form,
+  Input,
+  Modal,
+  Radio,
+  Slider,
+  Switch,
+  message,
+} from 'antd'
 import { useCallback, useEffect, useState } from 'react'
-import useAuth from '../../../components/contexts/auth'
-import { CreatePlanningIntervalObjectiveRequest } from '@/src/services/moda-api'
+import useAuth from '../../components/contexts/auth'
+import {
+  PlanningIntervalObjectiveDetailsDto,
+  UpdatePlanningIntervalObjectiveRequest,
+} from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
+import _ from 'lodash'
 import {
-  CreatePlanningIntervalObjectiveMutationRequest,
-  useCreatePlanningIntervalObjectiveMutation,
+  UpdatePlanningIntervalObjectiveMutationRequest,
   useGetPlanningIntervalById,
-  useGetPlanningIntervalObjectiveStatuses,
-  useGetPlanningIntervalTeams,
+  useGetPlanningIntervalObjectiveById,
+  useGetPlanningIntervalObjectiveStatusOptions,
+  useUpdatePlanningIntervalObjectiveMutation,
 } from '@/src/services/queries/planning-queries'
 
-export interface CreatePlanningIntervalObjectiveFormProps {
+export interface EditPlanningIntervalObjectiveFormProps {
   showForm: boolean
   planningIntervalId: string
-  teamId?: string
-  onFormCreate: () => void
+  objectiveId: string
+  onFormSave: () => void
   onFormCancel: () => void
 }
 
-interface CreatePlanningIntervalObjectiveFormValues {
+interface EditPlanningIntervalObjectiveFormValues {
+  objectiveId: string
   planningIntervalId: string
   teamId: string
   name: string
   statusId: number
   description?: string | null
   isStretch: boolean
+  progress: number
   startDate?: Date | null
   targetDate?: Date | null
 }
 
-interface PlanningIntervalTeamSelectItem {
-  value: string
-  label: string
-}
-
 const mapToRequestValues = (
-  values: CreatePlanningIntervalObjectiveFormValues,
+  values: EditPlanningIntervalObjectiveFormValues,
   planningIntervalKey: number,
 ) => {
   const objective = {
+    objectiveId: values.objectiveId,
     planningIntervalId: values.planningIntervalId,
     teamId: values.teamId,
     name: values.name,
     statusId: values.statusId,
     description: values.description,
     isStretch: values.isStretch,
+    progress: values.progress,
     startDate: (values.startDate as any)?.format('YYYY-MM-DD'),
     targetDate: (values.targetDate as any)?.format('YYYY-MM-DD'),
-  } as CreatePlanningIntervalObjectiveRequest
+  } as UpdatePlanningIntervalObjectiveRequest
   return {
     objective,
     planningIntervalKey,
-  } as CreatePlanningIntervalObjectiveMutationRequest
+  } as UpdatePlanningIntervalObjectiveMutationRequest
 }
 
-const CreatePlanningIntervalObjectiveForm = ({
+const EditPlanningIntervalObjectiveForm = ({
   showForm,
   planningIntervalId,
-  teamId,
-  onFormCreate,
+  objectiveId,
+  onFormSave,
   onFormCancel,
-}: CreatePlanningIntervalObjectiveFormProps) => {
+}: EditPlanningIntervalObjectiveFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreatePlanningIntervalObjectiveFormValues>()
+  const [form] = Form.useForm<EditPlanningIntervalObjectiveFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
-  const [teams, setTeams] = useState<PlanningIntervalTeamSelectItem[]>([])
-  const [defaultStatusId, setDefaultStatusId] = useState<number>(null)
 
   const { data: planningIntervalData } =
     useGetPlanningIntervalById(planningIntervalId)
-  const { data: teamData } = useGetPlanningIntervalTeams(planningIntervalId)
-  const { data: statusData } = useGetPlanningIntervalObjectiveStatuses()
-
-  const createObjective = useCreatePlanningIntervalObjectiveMutation()
+  const { data: objectiveData } = useGetPlanningIntervalObjectiveById(
+    planningIntervalId,
+    objectiveId,
+  )
+  const { data: statusOptions } = useGetPlanningIntervalObjectiveStatusOptions()
+  const updateObjective = useUpdatePlanningIntervalObjectiveMutation()
 
   const { hasClaim } = useAuth()
   const canManageObjectives = hasClaim(
@@ -89,24 +103,35 @@ const CreatePlanningIntervalObjectiveForm = ({
   )
 
   const mapToFormValues = useCallback(
-    (planningIntervalId: string, statusId: number, teamId?: string) => {
+    (objective: PlanningIntervalObjectiveDetailsDto) => {
+      if (!objective) {
+        throw new Error('Objective not found')
+      }
       form.setFieldsValue({
-        planningIntervalId: planningIntervalId,
-        teamId: teamId,
-        statusId: statusId,
-        isStretch: false,
+        objectiveId: objective.id,
+        planningIntervalId: objective.planningInterval.id,
+        teamId: objective.team.id,
+        statusId: objective.status.id,
+        name: objective.name,
+        description: objective.description,
+        startDate: objective.startDate ? dayjs(objective.startDate) : undefined,
+        targetDate: objective.targetDate
+          ? dayjs(objective.targetDate)
+          : undefined,
+        progress: objective.progress,
+        isStretch: objective.isStretch,
       })
     },
     [form],
   )
 
-  const create = async (
-    values: CreatePlanningIntervalObjectiveFormValues,
+  const update = async (
+    values: EditPlanningIntervalObjectiveFormValues,
     planningIntervalKey: number,
-  ): Promise<boolean> => {
+  ) => {
     try {
       const request = mapToRequestValues(values, planningIntervalKey)
-      const key = await createObjective.mutateAsync(request)
+      await updateObjective.mutateAsync(request)
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -115,8 +140,7 @@ const CreatePlanningIntervalObjectiveForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          error.supportMessage ??
-            'An unexpected error occurred while creating the planning interval.',
+          'An unexpected error occurred while updating the PI objective.',
         )
         console.error(error)
       }
@@ -128,15 +152,14 @@ const CreatePlanningIntervalObjectiveForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values, planningIntervalData?.key)) {
+      if (await update(values, objectiveData?.planningInterval.key)) {
         setIsOpen(false)
+        onFormSave()
         form.resetFields()
-        onFormCreate()
-        // TODO: this message is not displaying
-        messageApi.success('Successfully created PI objective.')
+        messageApi.success('Successfully updated PI objective.')
       }
     } catch (errorInfo) {
-      console.log('handleOk error', errorInfo)
+      console.error('handleOk error', errorInfo)
     } finally {
       setIsSaving(false)
     }
@@ -149,42 +172,23 @@ const CreatePlanningIntervalObjectiveForm = ({
   }, [form, onFormCancel])
 
   useEffect(() => {
-    if (!teamData || !statusData) return
-
+    if (!objectiveData) return
     if (canManageObjectives) {
       setIsOpen(showForm)
-      if (showForm === true) {
-        try {
-          setDefaultStatusId(statusData.find((s) => s.order === 1)?.id)
-          setTeams(
-            teamData
-              .filter((t) => t.type === 'Team')
-              .map((t) => ({ value: t.id, label: t.name })),
-          )
-          mapToFormValues(planningIntervalId, defaultStatusId, teamId)
-        } catch (error) {
-          handleCancel()
-          messageApi.error(
-            'An unexpected error occurred while loading form data.',
-          )
-          console.error(error)
-        }
+      if (showForm) {
+        mapToFormValues(objectiveData)
       }
     } else {
       handleCancel()
-      messageApi.error('You do not have permission to create PI objectives.')
+      messageApi.error('You do not have permission to update PI objectives.')
     }
   }, [
     canManageObjectives,
     handleCancel,
-    showForm,
-    messageApi,
     mapToFormValues,
-    planningIntervalId,
-    defaultStatusId,
-    teamId,
-    statusData,
-    teamData,
+    messageApi,
+    objectiveData,
+    showForm,
   ])
 
   useEffect(() => {
@@ -207,8 +211,8 @@ const CreatePlanningIntervalObjectiveForm = ({
   const isDateWithinPiRange = useCallback(
     (date: Date) => {
       return (
-        dayjs(planningIntervalData.start) <= dayjs(date) &&
-        dayjs(date) < dayjs(planningIntervalData.end).add(1, 'day')
+        dayjs(planningIntervalData?.start) <= dayjs(date) &&
+        dayjs(date) < dayjs(planningIntervalData?.end).add(1, 'day')
       )
     },
     [planningIntervalData?.start, planningIntervalData?.end],
@@ -218,11 +222,11 @@ const CreatePlanningIntervalObjectiveForm = ({
     <>
       {contextHolder}
       <Modal
-        title="Create PI Objective"
+        title="Edit PI Objective"
         open={isOpen}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
-        okText="Create"
+        okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
@@ -233,38 +237,34 @@ const CreatePlanningIntervalObjectiveForm = ({
           form={form}
           size="small"
           layout="vertical"
-          name="create-objective-form"
+          name="update-objective-form"
         >
+          {planningIntervalData?.objectivesLocked && (
+            <Alert message="PI Objectives are locked." type="info" showIcon />
+          )}
+          <Descriptions size="small" column={1}>
+            <Descriptions.Item label="Number">
+              {objectiveData?.key}
+            </Descriptions.Item>
+            <Descriptions.Item label="Team">
+              {objectiveData?.team.name}
+            </Descriptions.Item>
+          </Descriptions>
+          <Form.Item name="objectiveId" hidden={true}>
+            <Input />
+          </Form.Item>
           <Form.Item name="planningIntervalId" hidden={true}>
             <Input />
           </Form.Item>
-          <Form.Item name="statusId" hidden={true}>
+          <Form.Item name="teamId" hidden={true}>
             <Input />
-          </Form.Item>
-          <Form.Item name="teamId" label="Team" rules={[{ required: true }]}>
-            <Select
-              showSearch
-              disabled={teamId !== undefined}
-              placeholder="Select a team"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
-              filterSort={(optionA, optionB) =>
-                (optionA?.label ?? '')
-                  .toLowerCase()
-                  .localeCompare((optionB?.label ?? '').toLowerCase())
-              }
-              options={teams}
-            />
           </Form.Item>
           <Form.Item label="Name" name="name" rules={[{ required: true }]}>
             <Input.TextArea
               autoSize={{ minRows: 2, maxRows: 4 }}
               showCount
               maxLength={256}
+              disabled={planningIntervalData?.objectivesLocked}
             />
           </Form.Item>
           <Form.Item
@@ -283,7 +283,25 @@ const CreatePlanningIntervalObjectiveForm = ({
             name="isStretch"
             valuePropName="checked"
           >
-            <Switch checkedChildren="Yes" unCheckedChildren="No" />
+            <Switch
+              checkedChildren="Yes"
+              unCheckedChildren="No"
+              disabled={planningIntervalData?.objectivesLocked}
+            />
+          </Form.Item>
+          <Form.Item
+            name="statusId"
+            label="Status"
+            rules={[{ required: true }]}
+          >
+            <Radio.Group
+              options={statusOptions}
+              optionType="button"
+              buttonStyle="solid"
+            />
+          </Form.Item>
+          <Form.Item label="Progress" name="progress">
+            <Slider />
           </Form.Item>
           <Form.Item
             label="Start"
@@ -323,4 +341,4 @@ const CreatePlanningIntervalObjectiveForm = ({
   )
 }
 
-export default CreatePlanningIntervalObjectiveForm
+export default EditPlanningIntervalObjectiveForm
