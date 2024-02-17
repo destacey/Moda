@@ -2,12 +2,10 @@
 
 import { useDocumentTitle } from '@/src/app/hooks'
 import { PlanningIntervalTeamResponse } from '@/src/services/moda-api'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Card, Tag } from 'antd'
+import { useEffect, useMemo, useState } from 'react'
+import { Alert, Card, Tag } from 'antd'
 import TeamPlanReview from './team-plan-review'
-import { useAppDispatch } from '@/src/app/hooks'
-import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
-import { notFound, usePathname } from 'next/navigation'
+import { notFound, useRouter } from 'next/navigation'
 import { ModaEmpty, PageTitle } from '@/src/app/components/common'
 import {
   useGetPlanningIntervalByKey,
@@ -19,10 +17,10 @@ import { authorizePage } from '@/src/app/components/hoc'
 const PlanningIntervalPlanReviewPage = ({ params }) => {
   useDocumentTitle('PI Plan Review')
   const [teams, setTeams] = useState<PlanningIntervalTeamResponse[]>([])
-  const [activeTab, setActiveTab] = useState<string>()
+  const [activeTab, setActiveTab] = useState<string>(null)
   const [predictability, setPredictability] = useState<number>()
-  const dispatch = useAppDispatch()
-  const pathname = usePathname()
+
+  const router = useRouter()
 
   const {
     data: planningIntervalData,
@@ -40,44 +38,49 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
     if (planningIntervalData == null) return
     setPredictability(planningIntervalData?.predictability)
 
-    const breadcrumbRoute: BreadcrumbItem[] = [
-      {
-        title: 'Planning',
-      },
-      {
-        href: `/planning/planning-intervals`,
-        title: 'Planning Intervals',
-      },
-      {
-        href: `/planning/planning-intervals/${planningIntervalData?.key}`,
-        title: planningIntervalData?.name,
-      },
-      {
-        title: 'Plan Review',
-      },
-    ]
-    dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
+    const currentTeams = teamData
+      ?.sort((a, b) => a.code.localeCompare(b.code))
+      .filter((t) => t.type === 'Team')
 
-    setTeams(
-      teamData
-        ?.sort((a, b) => a.code.localeCompare(b.code))
-        .filter((t) => t.type === 'Team'),
-    )
-  }, [dispatch, params.key, pathname, planningIntervalData, teamData])
+    setTeams(currentTeams)
+
+    if (currentTeams?.length > 0) {
+      const hash = window.location.hash.slice(1)
+      const initialTeamCode =
+        hash && hash !== '' ? hash : currentTeams[0].code.toLowerCase()
+
+      if (!hash || hash === '') {
+        router.replace(`#${initialTeamCode}`, { scroll: false })
+      }
+
+      if (currentTeams.some((t) => t.code.toLowerCase() === initialTeamCode)) {
+        setActiveTab(initialTeamCode)
+      }
+    }
+
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1)
+      setActiveTab(hash)
+    }
+    window.addEventListener('hashchange', handleHashChange)
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange)
+    }
+  }, [planningIntervalData, router, teamData])
 
   useEffect(() => {
-    if (!activeTab && teams?.length > 0) {
-      const active = teams[0].code
-      setActiveTab(active)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teams])
+    const hash = window.location.hash.slice(1)
+    if (!hash || hash === '' || !activeTab || activeTab === hash) return
+
+    router.push(`#${activeTab}`, { scroll: false })
+  }, [activeTab, router])
 
   const tabs = useMemo(
     () =>
       teams?.map((team) => {
         return {
-          key: team.code,
+          key: team.code.toLowerCase(),
           tab: team.code,
           content: <div>{team.code}</div>,
         }
@@ -86,48 +89,19 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
   )
 
   const activeTeam = useMemo((): PlanningIntervalTeamResponse => {
-    return teams?.find((t) => t.code === activeTab)
-  }, [activeTab, teams])
+    if (!teams || teams.length === 0 || !activeTab) return null
+    return teams?.find((t) => t.code.toLowerCase() === activeTab)
+  }, [teams, activeTab])
 
   if (!isLoading && !isFetching && !planningIntervalData) {
     notFound()
   }
+  if (isLoading) return <PlanningIntervalPlanReviewLoading />
+  if (!planningIntervalData) return null
+  if (tabs?.length === 0)
+    return <ModaEmpty message="No teams found for this PI" />
 
-  const refreshPlanningInterval = useCallback(() => {
-    refetchPlanningInterval()
-  }, [refetchPlanningInterval])
-
-  const pageContent = useMemo(() => {
-    if (planningIntervalData == null) return null
-    if (tabs?.length === 0) {
-      return <ModaEmpty message="No teams found for this PI" />
-    }
-
-    return (
-      <Card
-        style={{ width: '100%' }}
-        tabList={tabs}
-        activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
-      >
-        <TeamPlanReview
-          planningInterval={planningIntervalData}
-          team={activeTeam}
-          refreshPlanningInterval={refreshPlanningInterval}
-        />
-      </Card>
-    )
-  }, [
-    activeTab,
-    activeTeam,
-    planningIntervalData,
-    refreshPlanningInterval,
-    tabs,
-  ])
-
-  if (isLoading) {
-    return <PlanningIntervalPlanReviewLoading />
-  }
+  const tabExists = tabs.some((t) => t.key === activeTab)
 
   return (
     <>
@@ -139,7 +113,22 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
           )
         }
       />
-      {pageContent}
+      <Card
+        style={{ width: '100%' }}
+        tabList={tabs}
+        activeTabKey={activeTab}
+        onTabChange={(key) => setActiveTab(key)}
+      >
+        {!tabExists ? (
+          <Alert message="Please select a valid team." type="error" />
+        ) : (
+          <TeamPlanReview
+            planningInterval={planningIntervalData}
+            team={activeTeam}
+            refreshPlanningInterval={() => refetchPlanningInterval()}
+          />
+        )}
+      </Card>
     </>
   )
 }
