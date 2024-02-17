@@ -6,7 +6,7 @@ import { Skeleton } from 'antd'
 export default function PlanningIntervalObjectivesPageLoading() {
   return (
     <>
-      <PageTitle title="PI Objectives" />
+      <PageTitle title="PI Risks" />
       <Skeleton active />
     </>
   )
