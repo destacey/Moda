@@ -1,4 +1,6 @@
-﻿using Moda.Work.Application.WorkProcesses.Dtos;
+﻿using Moda.Planning.Application.PlanningIntervals.Queries;
+using Moda.Work.Application.WorkProcesses.Commands;
+using Moda.Work.Application.WorkProcesses.Dtos;
 using Moda.Work.Application.WorkProcesses.Queries;
 
 namespace Moda.Web.Api.Controllers.Work;
@@ -20,5 +22,59 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     {
         var workTypes = await _sender.Send(new GetWorkProcessesQuery(includeInactive), cancellationToken);
         return Ok(workTypes.OrderBy(s => s.Name));
+    }
+
+    [HttpGet("{idOrKey}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkProcesses)]
+    [OpenApiOperation("Get the PI calendar.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<WorkProcessDto>> Get(string idOrKey, CancellationToken cancellationToken)
+    {
+        GetWorkProcessQuery query;
+        if (Guid.TryParse(idOrKey, out Guid guidId))
+        {
+            query = new GetWorkProcessQuery(guidId);
+        }
+        else if (int.TryParse(idOrKey, out int intId))
+        {
+            query = new GetWorkProcessQuery(intId);
+        }
+        else
+        {
+            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("PlanningIntervalsController.GetCalendar"));
+        }
+
+        var result = await _sender.Send(query, cancellationToken);
+
+        return result.IsFailure
+            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkProcessesController.Get"))
+            : result.Value is not null
+                ? Ok(result.Value)
+                : NotFound();
+    }
+
+    [HttpPost("{id}/activate")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkProcesses)]
+    [OpenApiOperation("Activate a work process.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> Activate(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new ActivateWorkProcessCommand(id), cancellationToken);
+
+        return result.IsSuccess ? NoContent() : BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkProcessesController.Activate"));
+    }
+
+    [HttpPost("{id}/deactivate")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkProcesses)]
+    [OpenApiOperation("Deactivate a work process.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeactivateWorkProcessCommand(id), cancellationToken);
+        return result.IsSuccess ? NoContent() : BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkProcessesController.Deactivate"));
     }
 }

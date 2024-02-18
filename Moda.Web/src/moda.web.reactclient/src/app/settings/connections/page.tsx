@@ -1,12 +1,12 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
-import { ModaGrid, PageTitle } from '../../components/common'
+import { ModaGrid, PageActions, PageTitle } from '../../components/common'
 import { authorizePage } from '../../components/hoc'
 import { useDocumentTitle } from '../../hooks'
 import useAuth from '../../components/contexts/auth'
 import { useGetAzdoBoardsConnections } from '@/src/services/queries/app-integration-queries'
-import { Button, Space, Switch } from 'antd'
+import { MenuProps, Space, Switch } from 'antd'
 import CreateConnectionForm from './components/create-connection-form'
 import Link from 'next/link'
 import { ConnectionListDto } from '@/src/services/moda-api'
@@ -32,7 +32,6 @@ const ConnectionsPage = () => {
     'Permission',
     'Permissions.Connections.Create',
   )
-  const showActions = canCreateConnection
 
   const columnDefs = useMemo<ColDef<ConnectionListDto>[]>(
     () => [
@@ -45,18 +44,17 @@ const ConnectionsPage = () => {
     [],
   )
 
-  const actions = () => {
-    if (!showActions) return null
-    return (
-      <>
-        {canCreateConnection && (
-          <Button onClick={() => setOpenCreateConnectionForm(true)}>
-            Create Connection
-          </Button>
-        )}
-      </>
-    )
-  }
+  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+    const items: MenuProps['items'] = []
+    if (canCreateConnection) {
+      items.push({
+        key: 'create-connection-menu-item',
+        label: 'Create Connection',
+        onClick: () => setOpenCreateConnectionForm(true),
+      })
+    }
+    return items
+  }, [canCreateConnection])
 
   const refresh = useCallback(async () => {
     refetch()
@@ -84,7 +82,10 @@ const ConnectionsPage = () => {
 
   return (
     <>
-      <PageTitle title="Connections" actions={actions()} />
+      <PageTitle
+        title="Connections"
+        actions={<PageActions actionItems={actionsMenuItems} />}
+      />
 
       <ModaGrid
         height={600}

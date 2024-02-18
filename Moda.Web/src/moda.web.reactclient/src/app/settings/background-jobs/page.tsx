@@ -7,11 +7,11 @@ import { BackgroundJobDto, BackgroundJobTypeDto } from '@/src/services/moda-api'
 import { getBackgroundJobsClient } from '@/src/services/clients'
 import { authorizePage } from '../../components/hoc'
 import useAuth from '../../components/contexts/auth'
-import { Button, Dropdown, MenuProps, Space } from 'antd'
-import { DownOutlined } from '@ant-design/icons'
+import { MenuProps } from 'antd'
 import Link from 'next/link'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { useDocumentTitle } from '../../hooks'
+import { PageActions } from '../../components/common'
 
 const BackgroundJobsListPage = () => {
   useDocumentTitle('Background Jobs')
@@ -23,7 +23,6 @@ const BackgroundJobsListPage = () => {
     'Permission',
     'Permissions.BackgroundJobs.Create',
   )
-  const showActions = canViewHangfire || canRunBackgroundJobs
 
   const columnDefs = useMemo(
     () => [
@@ -87,28 +86,16 @@ const BackgroundJobsListPage = () => {
     return items
   }, [canViewHangfire, canRunBackgroundJobs, jobTypes, runJob])
 
-  const actions = () => {
-    return (
-      <>
-        <Dropdown menu={{ items: actionsMenuItems }}>
-          <Button>
-            <Space>
-              Actions
-              <DownOutlined />
-            </Space>
-          </Button>
-        </Dropdown>
-      </>
-    )
-  }
-
   useEffect(() => {
     getJobTypes()
   }, [getJobTypes])
 
   return (
     <>
-      <PageTitle title="Background Jobs" actions={showActions && actions()} />
+      <PageTitle
+        title="Background Jobs"
+        actions={<PageActions actionItems={actionsMenuItems} />}
+      />
 
       <ModaGrid
         height={600}

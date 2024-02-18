@@ -1,9 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-
-namespace Moda.Work.Application.BacklogLevels.Commands;
+﻿namespace Moda.Work.Application.BacklogLevels.Commands;
 public sealed record UpdateBacklogLevelCommand : ICommand<int>
 {
     public UpdateBacklogLevelCommand(int id, string name, string? description, int rank)

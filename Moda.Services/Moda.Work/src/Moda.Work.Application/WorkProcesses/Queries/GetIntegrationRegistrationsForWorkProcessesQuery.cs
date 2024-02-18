@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Moda.Common.Domain.Models;
+﻿using Moda.Common.Domain.Models;
 
 namespace Moda.Work.Application.WorkProcesses.Queries;
 public sealed record GetIntegrationRegistrationsForWorkProcessesQuery : IQuery<List<IntegrationRegistration<Guid, Guid>>>;

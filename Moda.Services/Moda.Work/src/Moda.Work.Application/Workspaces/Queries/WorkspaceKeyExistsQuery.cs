@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace Moda.Work.Application.Workspaces.Queries;
+﻿namespace Moda.Work.Application.Workspaces.Queries;
 public sealed record WorkspaceKeyExistsQuery : IQuery<bool>
 {
     public WorkspaceKeyExistsQuery(string workspaceKey)

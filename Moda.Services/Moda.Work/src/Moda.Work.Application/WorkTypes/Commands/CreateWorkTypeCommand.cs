@@ -1,10 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using NodaTime;
-
-namespace Moda.Work.Application.WorkTypes.Commands;
+﻿namespace Moda.Work.Application.WorkTypes.Commands;
 public sealed record CreateWorkTypeCommand : ICommand<int>
 {
     public CreateWorkTypeCommand(string name, string? description)

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace Moda.AppIntegration.Application.Persistence;
+﻿namespace Moda.AppIntegration.Application.Persistence;
 public interface IWorkDbContext : IModaDbContext
 {
     DbSet<BacklogLevelScheme> BacklogLevelSchemes { get; }

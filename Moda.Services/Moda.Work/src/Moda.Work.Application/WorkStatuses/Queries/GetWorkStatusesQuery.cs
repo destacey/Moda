@@ -1,6 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
-using Moda.Work.Application.WorkStatuses.Dtos;
+﻿using Moda.Work.Application.WorkStatuses.Dtos;
 
 namespace Moda.Work.Application.WorkStatuses.Queries;
 public sealed record GetWorkStatusesQuery(bool IncludeInactive = false) : IQuery<IReadOnlyList<WorkStatusDto>>;
