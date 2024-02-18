@@ -157,6 +157,7 @@ const settingsMenuItems: ItemType[] = [
   ]),
 ]
 
+// TODO: improve style and layout for smaller screens
 export default function SettingsMenu() {
   const [menuItems, setMenuItems] = useState<ItemType<MenuItemType>[]>([])
   const [activeSetting, setActiveSetting] = useState()
