@@ -5,12 +5,13 @@ import {
   AzureDevOpsBoardsWorkspaceDto,
 } from '@/src/services/moda-api'
 import { ExportOutlined } from '@ant-design/icons'
-import { Button, Flex, List, Typography } from 'antd'
+import { Button, Flex, List, Space, Typography } from 'antd'
 import Link from 'next/link'
 import { useContext, useState } from 'react'
 import InitWorkProcessIntegrationForm from '../components/init-work-process-integration-form'
 import AzdoBoardsWorkspaceCard from './azdo-boards-workspace-card'
 import { AzdoBoardsConnectionContext } from './azdo-boards-connection-context'
+import { useGetWorkProcessesByIdOrKey } from '@/src/services/queries/work-management-queries'
 
 const { Title, Text } = Typography
 
@@ -26,6 +27,13 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
   ] = useState<boolean>(false)
 
   const azdoBoardsConnection = useContext(AzdoBoardsConnectionContext)
+  const {
+    data: workProcessData,
+    isLoading,
+    refetch,
+  } = useGetWorkProcessesByIdOrKey(
+    props?.workProcess?.integrationState?.internalId,
+  )
 
   const integrationExists = !!props.workProcess.integrationState
 
@@ -65,6 +73,33 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
     </>
   )
 
+  const integrationContent = () => {
+    if (!integrationExists) {
+      return (
+        <Button
+          title="Setup Work Process Integration"
+          onClick={() => setOpenInitWorkProcessIntegrationForm(true)}
+        >
+          Initialize
+        </Button>
+      )
+    }
+
+    if (workProcessData) {
+      const integrationState = props.workProcess.integrationState.isActive
+        ? 'Active Integration'
+        : 'Inactive Integration'
+
+      return (
+        <Link
+          href={`/settings/work-management/work-processes/${workProcessData?.key}`}
+        >
+          {integrationState}
+        </Link>
+      )
+    }
+  }
+
   return (
     <>
       <Flex vertical>
@@ -83,14 +118,7 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
               </Link>
             </Flex>
           </Flex>
-          {!integrationExists && (
-            <Button
-              title="Setup Work Process Integration"
-              onClick={() => setOpenInitWorkProcessIntegrationForm(true)}
-            >
-              Initialize
-            </Button>
-          )}
+          <Space>{integrationContent()}</Space>
         </Flex>
         <Text>{props.workProcess.description}</Text>
         {workspaceSection(props.workspaces)}
