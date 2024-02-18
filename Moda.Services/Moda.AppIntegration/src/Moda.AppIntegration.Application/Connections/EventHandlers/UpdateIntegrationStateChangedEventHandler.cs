@@ -36,6 +36,8 @@ internal sealed class UpdateIntegrationStateChangedEventHandler : IEventNotifica
                     break;
                 }
             }
+
+            await _appIntegrationDbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }
