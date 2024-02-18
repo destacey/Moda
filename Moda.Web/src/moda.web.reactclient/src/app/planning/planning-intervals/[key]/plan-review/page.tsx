@@ -101,7 +101,7 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
   if (tabs?.length === 0)
     return <ModaEmpty message="No teams found for this PI" />
 
-  const tabExists = tabs.some((t) => t.key === activeTab)
+  const tabExists = tabs?.some((t) => t.key === activeTab)
 
   return (
     <>

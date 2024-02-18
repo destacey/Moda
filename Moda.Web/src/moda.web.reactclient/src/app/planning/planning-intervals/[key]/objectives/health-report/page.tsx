@@ -13,7 +13,6 @@ import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import {
   MarkdownCellRenderer,
-  PlanningIntervalLinkCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,
   HealthCheckStatusCellRenderer,
   HealthCheckStatusColumn,
@@ -48,40 +47,6 @@ const ObjectiveHealthReportPage = ({ params }) => {
     isFetching,
     refetch,
   } = useGetPlanningIntervalObjectivesHealthReport(params.key, null, true)
-
-  const pathname = usePathname()
-  const dispatch = useAppDispatch()
-
-  useEffect(() => {
-    if (!piData) return
-
-    const breadcrumbRoute: BreadcrumbItem[] = [
-      {
-        title: 'Planning',
-      },
-      {
-        href: `/planning/planning-intervals`,
-        title: 'Planning Intervals',
-      },
-    ]
-
-    breadcrumbRoute.push(
-      {
-        href: `/planning/planning-intervals/${piData.key}`,
-        title: piData.name,
-      },
-      {
-        title: 'Health Report',
-      },
-    )
-    // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
-    dispatch(
-      setBreadcrumbRoute({
-        pathname,
-        route: breadcrumbRoute,
-      }),
-    )
-  }, [dispatch, pathname, piData])
 
   const columnDefs = useMemo(
     () => [
@@ -145,7 +110,7 @@ const ObjectiveHealthReportPage = ({ params }) => {
 
   return (
     <>
-      <PageTitle title={piData?.name} subtitle="PI Objectives Health Report" />
+      <PageTitle title="PI Objectives Health Report" />
       {/* TODO:  setup dynamic height */}
       <ModaGrid
         columnDefs={columnDefs}
