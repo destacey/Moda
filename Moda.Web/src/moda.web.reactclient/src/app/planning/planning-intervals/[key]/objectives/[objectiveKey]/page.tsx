@@ -1,13 +1,12 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { Button, Card, Dropdown, MenuProps, Space } from 'antd'
+import { Card, MenuProps } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import PlanningIntervalObjectiveDetails from './planning-interval-objective-details'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
 import EditPlanningIntervalObjectiveForm from '../../../../components/edit-planning-interval-objective-form'
-import { DownOutlined } from '@ant-design/icons'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import DeletePlanningIntervalObjectiveForm from './delete-planning-interval-objective-form'
 import { authorizePage } from '@/src/app/components/hoc'
@@ -21,6 +20,7 @@ import { SystemContext } from '@/src/app/components/constants'
 import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
 import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
 import Link from 'next/link'
+import { PageActions } from '@/src/app/components/common'
 
 const ObjectiveDetailsPage = ({ params }) => {
   useDocumentTitle('PI Objective Details')
@@ -145,18 +145,19 @@ const ObjectiveDetailsPage = ({ params }) => {
               }),
             ),
         },
-        {
-          key: 'healthReport',
-          label: (
-            <Link
-              href={`/planning/planning-intervals/${params.key}/objectives/${params.objectiveKey}/health-report`}
-            >
-              Health Report
-            </Link>
-          ),
-        },
       )
     }
+    items.push({
+      key: 'healthReport',
+      label: (
+        <Link
+          href={`/planning/planning-intervals/${params.key}/objectives/${params.objectiveKey}/health-report`}
+        >
+          Health Report
+        </Link>
+      ),
+    })
+
     return items
   }, [
     canCreateHealthChecks,
@@ -166,23 +167,6 @@ const ObjectiveDetailsPage = ({ params }) => {
     params.key,
     params.objectiveKey,
   ])
-
-  const actions = () => {
-    return (
-      <>
-        {canManageObjectives && (
-          <Dropdown menu={{ items: actionsMenuItems }}>
-            <Button>
-              <Space>
-                Actions
-                <DownOutlined />
-              </Space>
-            </Button>
-          </Dropdown>
-        )}
-      </>
-    )
-  }
 
   if (isLoading) {
     return <PlanningIntervalObjectiveDetailsLoading />
@@ -197,7 +181,7 @@ const ObjectiveDetailsPage = ({ params }) => {
       <PageTitle
         title={`${objectiveData?.key} - ${objectiveData?.name}`}
         subtitle="PI Objective Details"
-        actions={showActions && actions()}
+        actions={<PageActions actionItems={actionsMenuItems} />}
         tags={<HealthCheckTag healthCheck={objectiveData?.healthCheck} />}
       />
       <Card

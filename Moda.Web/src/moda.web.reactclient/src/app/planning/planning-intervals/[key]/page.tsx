@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { Button, Card, Dropdown, MenuProps, Space } from 'antd'
+import { Card, MenuProps } from 'antd'
 import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
 import PlanningIntervalDetails from './planning-interval-details'
 import TeamsGrid, {
@@ -10,8 +10,6 @@ import TeamsGrid, {
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
 import ManagePlanningIntervalTeamsForm from './manage-planning-interval-teams-form'
-import { DownOutlined } from '@ant-design/icons'
-import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { EditPlanningIntervalForm } from '../../components'
 import {
   useGetPlanningIntervalByKey,
@@ -23,6 +21,7 @@ import { useAppDispatch } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import PlanningIntervalDetailsLoading from './loading'
 import ManagePlanningIntervalDatesForm from './manage-planning-interval-dates-form'
+import { PageActions } from '@/src/app/components/common'
 
 enum PlanningIntervalTabs {
   Details = 'details',
@@ -63,7 +62,7 @@ const PlanningIntervalDetailsPage = ({ params }) => {
   )
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
-    const items: ItemType[] = []
+    const items: MenuProps['items'] = []
     if (canUpdatePlanningInterval) {
       items.push(
         {
@@ -85,23 +84,6 @@ const PlanningIntervalDetailsPage = ({ params }) => {
     }
     return items
   }, [canUpdatePlanningInterval])
-
-  const actions = () => {
-    return (
-      <>
-        <Space>
-          <Dropdown placement="bottomRight" menu={{ items: actionsMenuItems }}>
-            <Button>
-              <Space>
-                Actions
-                <DownOutlined />
-              </Space>
-            </Button>
-          </Dropdown>
-        </Space>
-      </>
-    )
-  }
 
   const tabs = [
     {
@@ -176,7 +158,10 @@ const PlanningIntervalDetailsPage = ({ params }) => {
 
   return (
     <>
-      <PageTitle title="PI Details" actions={actions()} />
+      <PageTitle
+        title="PI Details"
+        actions={<PageActions actionItems={actionsMenuItems} />}
+      />
       <Card
         style={{ width: '100%' }}
         tabList={tabs}

@@ -3,7 +3,7 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Button, Card, Dropdown, MenuProps, Space, message } from 'antd'
+import { Card, MenuProps, message } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
@@ -14,14 +14,14 @@ import {
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import EditConnectionForm from '../components/edit-connection-form'
 import AzdoBoardsOrganization from './azdo-boards-organization'
-import { DownOutlined, ExportOutlined } from '@ant-design/icons'
+import { ExportOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { AzdoBoardsConnectionContext } from './azdo-boards-connection-context'
-import { ItemType } from 'antd/es/menu/hooks/useItems'
 import DeleteAzdoBoardsConnectionForm from '../components/delete-azdo-boards-connection-form'
 import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
+import { PageActions } from '@/src/app/components/common'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -50,7 +50,6 @@ const ConnectionDetailsPage = ({ params }) => {
     'Permission',
     'Permissions.Connections.Delete',
   )
-  const showActions = canUpdateConnections || canDeleteConnections
 
   const {
     data: connectionData,
@@ -131,37 +130,37 @@ const ConnectionDetailsPage = ({ params }) => {
   }, [syncOrganizationConfigurationMutation, messageApi, params.id])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
-    const items: ItemType[] = []
-    if (showActions) {
-      items.push(
-        {
-          key: 'edit',
-          label: 'Edit',
-          disabled: !canUpdateConnections,
-          onClick: () => setOpenEditConnectionForm(true),
+    const items: MenuProps['items'] = []
+    if (canUpdateConnections) {
+      items.push({
+        key: 'edit',
+        label: 'Edit',
+        onClick: () => setOpenEditConnectionForm(true),
+      })
+    }
+    if (canDeleteConnections) {
+      items.push({
+        key: 'delete',
+        label: 'Delete',
+        onClick: () => setOpenDeleteConnectionForm(true),
+      })
+    }
+    if (canUpdateConnections) {
+      items.push({
+        key: 'divider',
+        type: 'divider',
+      })
+    }
+    if (canUpdateConnections) {
+      items.push({
+        key: 'sync-organization',
+        label: 'Sync Organization Configuration',
+        disabled: connectionData?.isValidConfiguration ?? true,
+        onClick: () => {
+          setIsSyncingOrganization(true)
+          syncOrganizationConfiguration()
         },
-        {
-          key: 'delete',
-          label: 'Delete',
-          disabled: !canDeleteConnections,
-          onClick: () => setOpenDeleteConnectionForm(true),
-        },
-        {
-          key: 'divider',
-          type: 'divider',
-        },
-        {
-          key: 'sync-organization',
-          label: 'Sync Organization Configuration',
-          disabled:
-            (connectionData?.isValidConfiguration ?? true) &&
-            !canUpdateConnections,
-          onClick: () => {
-            setIsSyncingOrganization(true)
-            syncOrganizationConfiguration()
-          },
-        },
-      )
+      })
     }
     return items
   }, [
@@ -169,21 +168,7 @@ const ConnectionDetailsPage = ({ params }) => {
     canUpdateConnections,
     connectionData?.isValidConfiguration,
     syncOrganizationConfiguration,
-    showActions,
   ])
-
-  const actions = () => {
-    return (
-      <Dropdown menu={{ items: actionsMenuItems }}>
-        <Button>
-          <Space>
-            Actions
-            <DownOutlined />
-          </Space>
-        </Button>
-      </Dropdown>
-    )
-  }
 
   if (!isLoading && !isFetching && !connectionData) {
     notFound()
@@ -215,7 +200,7 @@ const ConnectionDetailsPage = ({ params }) => {
           </>
         }
         subtitle="Connection Details"
-        actions={showActions && actions()}
+        actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <AzdoBoardsConnectionContext.Provider
         value={{
