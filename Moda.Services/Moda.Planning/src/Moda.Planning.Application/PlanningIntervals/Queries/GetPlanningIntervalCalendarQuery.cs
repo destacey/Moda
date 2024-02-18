@@ -5,27 +5,23 @@ public sealed record GetPlanningIntervalCalendarQuery : IQuery<PlanningIntervalC
 {
     public GetPlanningIntervalCalendarQuery(Guid planningIntervalId)
     {
-        PlanningIntervalId = planningIntervalId;
+        Id = planningIntervalId;
     }
     public GetPlanningIntervalCalendarQuery(int planningIntervalKey)
     {
-        PlanningIntervalKey = planningIntervalKey;
+        Key = planningIntervalKey;
     }
 
-    public Guid? PlanningIntervalId { get; }
-    public int? PlanningIntervalKey { get; }
+    public Guid? Id { get; }
+    public int? Key { get; }
 }
 
-internal sealed class GetPlanningIntervalCalendarQueryHandler : IQueryHandler<GetPlanningIntervalCalendarQuery, PlanningIntervalCalendarDto?>
+internal sealed class GetPlanningIntervalCalendarQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalCalendarQueryHandler> logger) : IQueryHandler<GetPlanningIntervalCalendarQuery, PlanningIntervalCalendarDto?>
 {
-    private readonly IPlanningDbContext _planningDbContext;
-    private readonly ILogger<GetPlanningIntervalCalendarQueryHandler> _logger;
+    private const string AppRequestName = nameof(GetPlanningIntervalCalendarQuery);
 
-    public GetPlanningIntervalCalendarQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalCalendarQueryHandler> logger)
-    {
-        _planningDbContext = planningDbContext;
-        _logger = logger;
-    }
+    private readonly IPlanningDbContext _planningDbContext = planningDbContext;
+    private readonly ILogger<GetPlanningIntervalCalendarQueryHandler> _logger = logger;
 
     public async Task<PlanningIntervalCalendarDto?> Handle(GetPlanningIntervalCalendarQuery request, CancellationToken cancellationToken)
     {
@@ -33,20 +29,19 @@ internal sealed class GetPlanningIntervalCalendarQueryHandler : IQueryHandler<Ge
             .Include(p => p.Iterations)
             .AsQueryable();
 
-        if (request.PlanningIntervalId.HasValue)
+        if (request.Id.HasValue)
         {
-            query = query.Where(e => e.Id == request.PlanningIntervalId.Value);
+            query = query.Where(e => e.Id == request.Id.Value);
         }
-        else if (request.PlanningIntervalKey.HasValue)
+        else if (request.Key.HasValue)
         {
-            query = query.Where(e => e.Key == request.PlanningIntervalKey.Value);
+            query = query.Where(e => e.Key == request.Key.Value);
         }
         else
         {
-            var requestName = request.GetType().Name;
-            var exception = new InternalServerException("No planning interval id or local id provided.");
+            var exception = new InternalServerException("No planning interval id or key provided.");
 
-            _logger.LogError(exception, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
+            _logger.LogError(exception, "{AppRequestName}: Exception for request {@Request}", AppRequestName, request);
             throw exception;
         }
 

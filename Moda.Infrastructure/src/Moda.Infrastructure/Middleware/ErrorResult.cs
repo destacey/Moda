@@ -34,4 +34,14 @@ public class ErrorResult
             SupportMessage = supportMessage
         };
     }
+
+    public static ErrorResult CreateUnknownIdOrKeyTypeBadRequest(string source)
+    {
+        return new ErrorResult
+        {
+            Source = source,
+            StatusCode = (int)HttpStatusCode.BadRequest,
+            SupportMessage = "Unknown id or key type.",
+        };
+    }
 }

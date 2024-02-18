@@ -91,7 +91,7 @@ public class PlanningIntervalsController : ControllerBase
         }
         else
         {
-            return UnknownIdOrKeyTypeError("PlanningIntervalsController.GetCalendar");
+            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("PlanningIntervalsController.GetCalendar"));
         }
 
         var calendar = await _sender.Send(query, cancellationToken);
@@ -359,7 +359,7 @@ public class PlanningIntervalsController : ControllerBase
         }
         else
         {
-            return UnknownIdOrKeyTypeError("PlanningIntervalsController.GetObjectivesHealthReport");
+            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("PlanningIntervalsController.GetObjectivesHealthReport"));
         }
 
         var objectives = await _sender.Send(objectivesQuery, cancellationToken);
@@ -502,14 +502,4 @@ public class PlanningIntervalsController : ControllerBase
 
     #endregion Risks
 
-    private ActionResult UnknownIdOrKeyTypeError(string source)
-    {
-        var error = new ErrorResult
-        {
-            StatusCode = 400,
-            SupportMessage = "Unknown id or key type.",
-            Source = source
-        };
-        return BadRequest(error);
-    }
 }

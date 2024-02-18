@@ -16,6 +16,15 @@ export const useGetWorkProcesses = (includeDisabled: boolean = false) => {
   })
 }
 
+export const useGetWorkProcessesByIdOrKey = (idOrKey: string) => {
+  return useQuery({
+    queryKey: [QK.WORK_PROCESSES, idOrKey],
+    queryFn: async () => (await getWorkProcessesClient()).get(idOrKey),
+    enabled: !!idOrKey,
+    staleTime: 60000,
+  })
+}
+
 // WORK STATUSES
 export const useGetWorkStatuses = (includeDisabled: boolean = false) => {
   return useQuery({

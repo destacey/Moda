@@ -3076,6 +3076,145 @@
         ]
       }
     },
+    "/api/work/work-processes/{idOrKey}": {
+      "get": {
+        "tags": [
+          "WorkProcesses"
+        ],
+        "summary": "Get the PI calendar.",
+        "operationId": "WorkProcesses_Get",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkProcessDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/work/work-processes/{id}/activate": {
+      "post": {
+        "tags": [
+          "WorkProcesses"
+        ],
+        "summary": "Activate a work process.",
+        "operationId": "WorkProcesses_Activate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/work/work-processes/{id}/deactivate": {
+      "post": {
+        "tags": [
+          "WorkProcesses"
+        ],
+        "summary": "Deactivate a work process.",
+        "operationId": "WorkProcesses_Deactivate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/work/work-status-categories": {
       "get": {
         "tags": [
@@ -8187,6 +8326,29 @@
         }
       },
       "WorkProcessListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "ownership": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "WorkProcessDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
