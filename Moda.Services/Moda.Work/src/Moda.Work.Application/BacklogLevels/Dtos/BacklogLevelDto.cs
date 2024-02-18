@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Moda.Common.Domain.Enums;
+﻿using Moda.Common.Domain.Enums;
 
 namespace Moda.Work.Application.BacklogLevels.Dtos;
 public sealed record BacklogLevelDto : IMapFrom<BacklogLevel>

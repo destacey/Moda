@@ -1,7 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
-
-namespace Moda.Work.Application.BacklogLevels.Queries;
+﻿namespace Moda.Work.Application.BacklogLevels.Queries;
 public sealed record GetBacklogLevelsQuery : IQuery<IReadOnlyList<BacklogLevelDto>>
 {
 }

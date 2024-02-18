@@ -1,8 +1,4 @@
-﻿using Ardalis.GuardClauses;
-using Mapster;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Exceptions;
+﻿using Moda.Common.Application.Exceptions;
 using Moda.Work.Application.WorkTypes.Dtos;
 
 namespace Moda.Work.Application.WorkTypes.Queries;

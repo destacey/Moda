@@ -1,10 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using NodaTime;
-
-namespace Moda.Work.Application.WorkStatuses.Commands;
+﻿namespace Moda.Work.Application.WorkStatuses.Commands;
 public sealed record CreateWorkStatusCommand : ICommand<int>
 {
     public CreateWorkStatusCommand(string name, string? description)

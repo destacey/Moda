@@ -1,8 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Work.Application.WorkStatuses.Validators;
 
 namespace Moda.Work.Application.WorkStatuses.Commands;

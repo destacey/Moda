@@ -1,9 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-
-namespace Moda.Work.Application.WorkStatuses.Commands;
+﻿namespace Moda.Work.Application.WorkStatuses.Commands;
 public sealed record UpdateWorkStatusCommand : ICommand<int>
 {
     public UpdateWorkStatusCommand(int id, string? description)

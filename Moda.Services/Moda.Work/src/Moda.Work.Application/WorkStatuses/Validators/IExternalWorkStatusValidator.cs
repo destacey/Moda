@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Moda.Common.Application.Interfaces.ExternalWork;
 
 namespace Moda.Work.Application.WorkStatuses.Validators;
 public sealed class IExternalWorkStatusValidator : CustomValidator<IExternalWorkStatus>

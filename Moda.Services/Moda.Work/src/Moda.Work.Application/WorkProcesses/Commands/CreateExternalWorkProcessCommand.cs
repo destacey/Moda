@@ -1,8 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Domain.Models;
 using Moda.Work.Application.WorkProcesses.Validators;
 
@@ -19,7 +15,7 @@ public sealed class CreateExternalWorkProcessCommandValidator : CustomValidator<
     }
 }
 
-public sealed class CreateExternalWorkProcessCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateExternalWorkProcessCommandHandler> logger) : ICommandHandler<CreateExternalWorkProcessCommand, IntegrationState<Guid>>
+internal sealed class CreateExternalWorkProcessCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateExternalWorkProcessCommandHandler> logger) : ICommandHandler<CreateExternalWorkProcessCommand, IntegrationState<Guid>>
 {
     private readonly IWorkDbContext _workDbContext = workDbContext;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;

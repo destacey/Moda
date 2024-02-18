@@ -1,6 +1,4 @@
-﻿using Mapster;
-
-namespace Moda.Work.Application.WorkStatuses.Dtos;
+﻿namespace Moda.Work.Application.WorkStatuses.Dtos;
 public sealed record WorkStatusDto : IMapFrom<WorkStatus>
 {
     public int Id { get; set; }

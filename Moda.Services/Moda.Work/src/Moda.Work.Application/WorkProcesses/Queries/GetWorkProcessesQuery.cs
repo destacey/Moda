@@ -1,7 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moda.Work.Application.WorkProcesses.Dtos;
+﻿using Moda.Work.Application.WorkProcesses.Dtos;
 
 namespace Moda.Work.Application.WorkProcesses.Queries;
 public sealed record GetWorkProcessesQuery(bool IncludeInactive = false) : IQuery<IReadOnlyList<WorkProcessListDto>>;
