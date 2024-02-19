@@ -5,6 +5,7 @@ import { Layout, Button, Space, Typography } from 'antd'
 import useMenuToggle from '../contexts/menu-toggle'
 
 const { Header } = Layout
+const { Title } = Typography
 
 export default function AppHeader() {
   const { menuCollapsed, setMenuCollapsed } = useMenuToggle()
@@ -27,11 +28,9 @@ export default function AppHeader() {
             icon={menuCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setMenuCollapsed(!menuCollapsed)}
           />
-          <Typography.Title
-            style={{ margin: 0, fontSize: 24, fontWeight: 400 }}
-          >
+          <Title style={{ margin: 0, fontSize: 24, fontWeight: 400 }}>
             Moda
-          </Typography.Title>
+          </Title>
         </Space>
         <Profile />
       </Header>

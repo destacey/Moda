@@ -8,6 +8,7 @@ import { useContext, useState } from 'react'
 import InitWorkspaceIntegrationForm from '../components/init-workspace-integration-form'
 import { AzdoBoardsConnectionContext } from './azdo-boards-connection-context'
 
+const { Item } = Descriptions
 const { Text } = Typography
 
 interface AzdoBoardsWorkspaceCardProps {
@@ -62,9 +63,7 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
         }
       >
         <Descriptions column={1} size="small">
-          <Descriptions.Item>
-            {props.workspace.description ?? noDescription}
-          </Descriptions.Item>
+          <Item>{props.workspace.description ?? noDescription}</Item>
         </Descriptions>
       </Card>
       {openInitWorkspaceIntegrationForm && (

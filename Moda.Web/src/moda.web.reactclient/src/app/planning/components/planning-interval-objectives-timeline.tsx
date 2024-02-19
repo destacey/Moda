@@ -21,6 +21,8 @@ import Link from 'next/link'
 import { Space, Typography } from 'antd'
 import useTheme from '../../components/contexts/theme'
 
+const { Text } = Typography
+
 interface PlanningIntervalObjectivesTimelineProps {
   objectivesQuery: UseQueryResult<PlanningIntervalObjectiveListDto[], unknown>
   planningIntervalCalendarQuery: UseQueryResult<
@@ -61,14 +63,14 @@ export const ObjectiveTimelineTemplate = ({
         backgroundColor: timelineForegroundColor,
       }}
     >
-      <Typography.Text style={{ padding: '5px', color: timelineFontColor }}>
+      <Text style={{ padding: '5px', color: timelineFontColor }}>
         <Link
           href={`/planning/planning-intervals/${objective.planningInterval.key}/objectives/${objective.key}`}
         >
           {objective.key}
         </Link>
         <span> - </span> {objective.name}
-      </Typography.Text>
+      </Text>
     </div>
   )
 }
@@ -123,7 +125,7 @@ const PlanningIntervalObjectivesTimeline = ({
           // TODO: styling could use some work
           createRoot(element).render(
             <div>
-              <Typography.Text>{item.title}</Typography.Text>
+              <Text>{item.title}</Text>
             </div>,
           )
         }

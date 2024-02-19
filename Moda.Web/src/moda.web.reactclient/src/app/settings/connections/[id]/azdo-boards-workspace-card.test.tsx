@@ -1,6 +1,5 @@
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import AzdoBoardsWorkspaceCard from './azdo-boards-workspace-card'
 import { createContext } from 'react'
 import {
   AzdoBoardsConnectionContext,
@@ -29,6 +28,7 @@ describe('AzdoBoardsWorkspaceCard', () => {
     const azdoBoardsConnectionContext: AzdoBoardsConnectionContextInterface = {
       connectionId: '1',
       organizationUrl: 'https://dev.azure.com/test',
+      reloadConnectionData: jest.fn(),
     }
 
     return render(

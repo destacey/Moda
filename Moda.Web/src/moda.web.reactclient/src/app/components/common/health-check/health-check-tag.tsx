@@ -9,6 +9,8 @@ import {
 } from '@/src/store/health-check-slice'
 import { healthCheckTagColor } from './health-check-utils'
 
+const { Item } = Descriptions
+
 export interface HealthCheckTagProps {
   healthCheck?: PlanningHealthCheckDto
 }
@@ -42,20 +44,18 @@ const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
         title="Health Check"
         style={{ maxWidth: maxWidth }}
       >
-        <Descriptions.Item label="Reported By">
-          {healthCheckData.reportedBy.name}
-        </Descriptions.Item>
-        <Descriptions.Item label="Reported On">
+        <Item label="Reported By">{healthCheckData.reportedBy.name}</Item>
+        <Item label="Reported On">
           {dayjs(healthCheckData.reportedOn).format('M/D/YYYY')}
-        </Descriptions.Item>
-        <Descriptions.Item label="Expires On">
+        </Item>
+        <Item label="Expires On">
           {dayjs(healthCheckData.expiration).format('M/D/YYYY hh:mm A')}
-        </Descriptions.Item>
-        <Descriptions.Item>
+        </Item>
+        <Item>
           <Space direction="vertical">
             <ReactMarkdown>{healthCheckData.note}</ReactMarkdown>
           </Space>
-        </Descriptions.Item>
+        </Item>
       </Descriptions>
     )
   }

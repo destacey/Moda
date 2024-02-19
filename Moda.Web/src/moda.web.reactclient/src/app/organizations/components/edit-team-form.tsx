@@ -8,6 +8,9 @@ import withModalForm, { FormProps } from '../../components/hoc/withModalForm'
 import { setEditMode, updateTeam, selectEditTeamContext } from '../team-slice'
 import { useAppSelector } from '../../hooks'
 
+const { Item } = Form
+const { TextArea } = Input
+
 interface EditTeamFormProps extends FormProps<EditTeamFormValues> {
   team: TeamDetailsDto | TeamOfTeamsDetailsDto
 }
@@ -33,16 +36,16 @@ const EditTeamForm = ({ form, team }: EditTeamFormProps) => {
   return (
     <>
       <Form form={form} size="small" layout="vertical" name="update-team-form">
-        <Form.Item name="id" hidden={true}>
+        <Item name="id" hidden={true}>
           <Input />
-        </Form.Item>
-        <Form.Item name="type" hidden={true}>
+        </Item>
+        <Item name="type" hidden={true}>
           <Input />
-        </Form.Item>
-        <Form.Item label="Name" name="name" rules={[{ required: true }]}>
+        </Item>
+        <Item label="Name" name="name" rules={[{ required: true }]}>
           <Input showCount maxLength={128} />
-        </Form.Item>
-        <Form.Item
+        </Item>
+        <Item
           label="Code"
           name="code"
           rules={[
@@ -68,18 +71,14 @@ const EditTeamForm = ({ form, team }: EditTeamFormProps) => {
               ).value.toUpperCase())
             }
           />
-        </Form.Item>
-        <Form.Item
-          name="description"
-          label="Description"
-          extra="Markdown enabled"
-        >
-          <Input.TextArea
+        </Item>
+        <Item name="description" label="Description" extra="Markdown enabled">
+          <TextArea
             autoSize={{ minRows: 6, maxRows: 10 }}
             showCount
             maxLength={1024}
           />
-        </Form.Item>
+        </Item>
       </Form>
     </>
   )

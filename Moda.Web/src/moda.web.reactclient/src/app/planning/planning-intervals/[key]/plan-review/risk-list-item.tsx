@@ -7,6 +7,7 @@ import { useState } from 'react'
 
 const { Item } = List
 const { Meta } = Item
+const { Text } = Typography
 
 export interface RiskListItemProps {
   risk: RiskListDto
@@ -42,10 +43,10 @@ const RiskListItem = ({
     return (
       <Space wrap>
         <Tag>{risk.category}</Tag>
-        <Typography.Text>
+        <Text>
           {content}
           {assigneeInfo}
-        </Typography.Text>
+        </Text>
       </Space>
     )
   }

@@ -9,6 +9,9 @@ import { Button, Form, Input, Popconfirm, Space, message } from 'antd'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
+const { Item } = Form
+const { TextArea } = Input
+
 interface RolesDetailProps {
   role: RoleDto
 }
@@ -85,31 +88,31 @@ const RoleDetails = (props: RolesDetailProps) => {
           onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
-          <Form.Item
+          <Item
             label="Name"
             name="name"
             initialValue={role?.name}
             rules={[{ required: true }]}
           >
-            <Input.TextArea
+            <TextArea
               autoSize={{ minRows: 1, maxRows: 4 }}
               showCount
               maxLength={256}
             />
-          </Form.Item>
+          </Item>
 
-          <Form.Item
+          <Item
             label="Description"
             name="description"
             initialValue={role?.description}
           >
-            <Input.TextArea
+            <TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={1024}
             />
-          </Form.Item>
-          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+          </Item>
+          <Item wrapperCol={{ offset: 8, span: 16 }}>
             <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
               <Button type="primary" htmlType="submit">
                 Save
@@ -129,7 +132,7 @@ const RoleDetails = (props: RolesDetailProps) => {
                 </Popconfirm>
               )}
             </Space>
-          </Form.Item>
+          </Item>
         </Form>
       )}
     </div>

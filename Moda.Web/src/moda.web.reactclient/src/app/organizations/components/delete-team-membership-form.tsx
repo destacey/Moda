@@ -9,6 +9,8 @@ import {
 } from '@/src/services/queries/organization-queries'
 import useAuth from '../../components/contexts/auth'
 
+const { Item } = Descriptions
+
 interface DeleteTeamMembershipFormProps {
   showForm: boolean
   membership: TeamMembershipDto
@@ -111,20 +113,16 @@ const DeleteTeamMembershipForm = (props: DeleteTeamMembershipFormProps) => {
         destroyOnClose={true}
       >
         <Descriptions size="small" column={1}>
-          <Descriptions.Item label="Team">
-            {props.membership?.child.name}
-          </Descriptions.Item>
-          <Descriptions.Item label="Parent Team">
-            {props.membership?.parent.name}
-          </Descriptions.Item>
-          <Descriptions.Item label="Start">
+          <Item label="Team">{props.membership?.child.name}</Item>
+          <Item label="Parent Team">{props.membership?.parent.name}</Item>
+          <Item label="Start">
             {dayjs(props.membership?.start).format('M/D/YYYY')}
-          </Descriptions.Item>
-          <Descriptions.Item label="End">
+          </Item>
+          <Item label="End">
             {props.membership?.end
               ? dayjs(props.membership?.end).format('M/D/YYYY')
               : null}
-          </Descriptions.Item>
+          </Item>
         </Descriptions>
       </Modal>
     </>

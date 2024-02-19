@@ -12,6 +12,8 @@ import {
 } from '@/src/services/queries/organization-queries'
 import { TeamTypeName } from '../types'
 
+const { Item } = Form
+
 export interface CreateTeamMembershipFormProps {
   showForm: boolean
   teamId: string
@@ -150,7 +152,7 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
           layout="vertical"
           name="create-team-membership-form"
         >
-          <Form.Item
+          <Item
             name="parentTeamId"
             label="Parent Team"
             rules={[{ required: true }]}
@@ -171,13 +173,13 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
               }
               options={teamOptions?.filter((t) => t.value !== props.teamId)}
             />
-          </Form.Item>
-          <Form.Item label="Start" name="start" rules={[{ required: true }]}>
+          </Item>
+          <Item label="Start" name="start" rules={[{ required: true }]}>
             <DatePicker />
-          </Form.Item>
-          <Form.Item label="End" name="end">
+          </Item>
+          <Item label="End" name="end">
             <DatePicker />
-          </Form.Item>
+          </Item>
         </Form>
       </Modal>
     </>

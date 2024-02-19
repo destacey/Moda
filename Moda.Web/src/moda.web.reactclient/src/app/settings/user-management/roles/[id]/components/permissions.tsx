@@ -16,6 +16,9 @@ import {
 } from 'antd'
 import React, { useEffect, useState } from 'react'
 
+const { Title } = Typography
+const { Item } = List
+
 interface PermissionsProps {
   roleId: string
   permissions: string[]
@@ -136,7 +139,7 @@ const Permissions = (props: PermissionsProps) => {
       {contextHolder}
       <Row>
         <Col span={7}>
-          <Typography.Title level={5}>Permission Groups</Typography.Title>
+          <Title level={5}>Permission Groups</Title>
           <List
             size="small"
             dataSource={permissionGroups}
@@ -145,7 +148,7 @@ const Permissions = (props: PermissionsProps) => {
               overflowY: 'scroll',
             }}
             renderItem={(item) => (
-              <List.Item
+              <Item
                 onClick={() => setActivePermissionGroup(item)}
                 style={{
                   cursor: 'pointer',
@@ -166,7 +169,7 @@ const Permissions = (props: PermissionsProps) => {
                     backgroundColor: theme.token.colorPrimary,
                   }}
                 />
-              </List.Item>
+              </Item>
             )}
           />
         </Col>
@@ -176,9 +179,9 @@ const Permissions = (props: PermissionsProps) => {
           style={{ display: 'flex', flexDirection: 'column' }}
         >
           <Space direction="vertical" style={{ height: '100%' }}>
-            <Typography.Title level={5}>
+            <Title level={5}>
               {activePermissionGroup?.name} Available Permissions
-            </Typography.Title>
+            </Title>
             {activePermissionGroup?.permissions?.map((permission, i) => (
               <Space key={i} style={{ paddingBottom: '15px' }}>
                 <Switch

@@ -17,6 +17,8 @@ import {
   useGetTeamPlanningIntervalPredictability,
 } from '@/src/services/queries/planning-queries'
 
+const { Title } = Typography
+
 export interface TeamPlanReviewProps {
   planningInterval: PlanningIntervalDetailsDto
   team: PlanningIntervalTeamResponse
@@ -69,9 +71,9 @@ const TeamPlanReview = ({
         }}
       >
         <Space>
-          <Typography.Title level={3} style={{ margin: '0' }}>
+          <Title level={3} style={{ margin: '0' }}>
             <Link href={`/organizations/teams/${team?.key}`}>{team?.name}</Link>
-          </Typography.Title>
+          </Title>
           {objectivesQuery?.data?.length > 0 &&
             predictabilityQuery?.data != null && (
               <Tag title="PI Predictability">{`${predictabilityQuery?.data}%`}</Tag>

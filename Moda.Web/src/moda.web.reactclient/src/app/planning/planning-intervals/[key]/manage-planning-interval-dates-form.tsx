@@ -30,6 +30,8 @@ import {
 import dayjs from 'dayjs'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 
+const { Item } = Form
+
 export interface ManagePlanningIntervalDatesFormProps {
   showForm: boolean
   id: string
@@ -225,12 +227,12 @@ const ManagePlanningIntervalDatesForm = ({
           layout="vertical"
           name="manage-planning-interval-dates-form"
         >
-          <Form.Item label="Start" name="start" rules={[{ required: true }]}>
+          <Item label="Start" name="start" rules={[{ required: true }]}>
             <DatePicker />
-          </Form.Item>
-          <Form.Item label="End" name="end" rules={[{ required: true }]}>
+          </Item>
+          <Item label="End" name="end" rules={[{ required: true }]}>
             <DatePicker />
-          </Form.Item>
+          </Item>
 
           <Divider orientation="left">Iterations</Divider>
           <Form.List name="iterations">
@@ -241,14 +243,14 @@ const ManagePlanningIntervalDatesForm = ({
                     <Flex align="center" justify="space-between">
                       <Flex vertical style={{ width: '90%' }}>
                         <Flex gap="small">
-                          <Form.Item
+                          <Item
                             {...restField}
                             name={[name, 'iterationId']}
                             hidden={true}
                           >
                             <Input hidden={true} />
-                          </Form.Item>
-                          <Form.Item
+                          </Item>
+                          <Item
                             {...restField}
                             style={{ width: '100%', marginBottom: '10px' }}
                             name={[name, 'name']}
@@ -259,10 +261,10 @@ const ManagePlanningIntervalDatesForm = ({
                               maxLength={128}
                               placeholder="Iteration Name"
                             />
-                          </Form.Item>
+                          </Item>
                         </Flex>
                         <Flex gap="small">
-                          <Form.Item
+                          <Item
                             {...restField}
                             style={{ margin: '0', width: '35%' }}
                             name={[name, 'typeId']}
@@ -272,8 +274,8 @@ const ManagePlanningIntervalDatesForm = ({
                               placeholder="Select Type"
                               options={iterationTypesOptions}
                             />
-                          </Form.Item>
-                          <Form.Item
+                          </Item>
+                          <Item
                             {...restField}
                             style={{ margin: '0' }}
                             name={[name, 'start']}
@@ -282,15 +284,15 @@ const ManagePlanningIntervalDatesForm = ({
                             ]}
                           >
                             <DatePicker />
-                          </Form.Item>
-                          <Form.Item
+                          </Item>
+                          <Item
                             {...restField}
                             style={{ margin: '0' }}
                             name={[name, 'end']}
                             rules={[{ required: true, message: 'Missing end' }]}
                           >
                             <DatePicker />
-                          </Form.Item>
+                          </Item>
                         </Flex>
                       </Flex>
                       <MinusCircleOutlined
@@ -301,7 +303,7 @@ const ManagePlanningIntervalDatesForm = ({
                     <Divider dashed />
                   </div>
                 ))}
-                <Form.Item>
+                <Item>
                   <Button
                     type="dashed"
                     onClick={() => add()}
@@ -310,7 +312,7 @@ const ManagePlanningIntervalDatesForm = ({
                   >
                     Add Iteration
                   </Button>
-                </Form.Item>
+                </Item>
               </>
             )}
           </Form.List>

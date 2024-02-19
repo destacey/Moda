@@ -13,6 +13,9 @@ import {
   useUpdatePlanningIntervalMutation,
 } from '@/src/services/queries/planning-queries'
 
+const { Item } = Form
+const { TextArea } = Input
+
 export interface EditPlanningIntervalFormProps {
   showForm: boolean
   id: string
@@ -173,34 +176,30 @@ const EditPlanningIntervalForm = ({
           layout="vertical"
           name="edit-planning-interval-form"
         >
-          <Form.Item name="id" hidden={true}>
+          <Item name="id" hidden={true}>
             <Input />
-          </Form.Item>
-          <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-            <Input.TextArea
+          </Item>
+          <Item label="Name" name="name" rules={[{ required: true }]}>
+            <TextArea
               autoSize={{ minRows: 1, maxRows: 2 }}
               showCount
               maxLength={128}
             />
-          </Form.Item>
-          <Form.Item
-            name="description"
-            label="Description"
-            extra="Markdown enabled"
-          >
-            <Input.TextArea
+          </Item>
+          <Item name="description" label="Description" extra="Markdown enabled">
+            <TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={2048}
             />
-          </Form.Item>
-          <Form.Item
+          </Item>
+          <Item
             label="Objectives Locked?"
             name="objectivesLocked"
             valuePropName="checked"
           >
             <Switch checkedChildren="Yes" unCheckedChildren="No" />
-          </Form.Item>
+          </Item>
         </Form>
       </Modal>
     </>

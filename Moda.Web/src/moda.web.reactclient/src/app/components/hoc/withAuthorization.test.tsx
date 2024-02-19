@@ -17,7 +17,10 @@ describe('withAuthorization', () => {
 
   jest.mock('../contexts/auth', () => ({
     __esModule: true,
-    default: () => ({ hasClaim: mockHasClaim }),
+    default: () => ({
+      hasClaim: mockHasClaim,
+      hasPermissionClaim: mockHasClaim,
+    }),
   }))
 
   beforeEach(() => {
@@ -37,6 +40,7 @@ describe('withAuthorization', () => {
       login: () => Promise.resolve(),
       logout: () => Promise.resolve(),
       hasClaim: mockHasClaim,
+      hasPermissionClaim: mockHasClaim,
     }
 
     return render(

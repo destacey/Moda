@@ -6,19 +6,23 @@ import { createTeam, setEditMode, selectEditTeamContext } from '../team-slice'
 import withModalForm, { FormProps } from '../../components/hoc/withModalForm'
 import { useAppSelector } from '../../hooks'
 
+const { Item } = Form
+const { TextArea } = Input
+const { Group: RadioGroup } = Radio
+
 const CreateTeamForm = ({ form }: FormProps<CreateTeamFormValues>) => {
   return (
     <Form form={form} size="small" layout="vertical" name="create-team-form">
-      <Form.Item label="Team Type" name="type" rules={[{ required: true }]}>
-        <Radio.Group>
+      <Item label="Team Type" name="type" rules={[{ required: true }]}>
+        <RadioGroup>
           <Radio value="Team">Team</Radio>
           <Radio value="Team of Teams">Team of Teams</Radio>
-        </Radio.Group>
-      </Form.Item>
-      <Form.Item label="Name" name="name" rules={[{ required: true }]}>
+        </RadioGroup>
+      </Item>
+      <Item label="Name" name="name" rules={[{ required: true }]}>
         <Input showCount maxLength={128} />
-      </Form.Item>
-      <Form.Item
+      </Item>
+      <Item
         label="Code"
         name="code"
         rules={[
@@ -44,18 +48,14 @@ const CreateTeamForm = ({ form }: FormProps<CreateTeamFormValues>) => {
             ).value.toUpperCase())
           }
         />
-      </Form.Item>
-      <Form.Item
-        name="description"
-        label="Description"
-        extra="Markdown enabled"
-      >
-        <Input.TextArea
+      </Item>
+      <Item name="description" label="Description" extra="Markdown enabled">
+        <TextArea
           autoSize={{ minRows: 6, maxRows: 10 }}
           showCount
           maxLength={1024}
         />
-      </Form.Item>
+      </Item>
     </Form>
   )
 }

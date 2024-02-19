@@ -13,6 +13,10 @@ import { toFormErrors } from '@/src/utils'
 import { Button, Divider, Form, Input, Modal, Typography, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
+const { Item } = Form
+const { TextArea } = Input
+const { Text } = Typography
+
 export interface EditConnectionFormProps {
   showForm: boolean
   id: string
@@ -175,49 +179,45 @@ const EditConnectionForm = ({
           layout="vertical"
           name="edit-connection-form"
         >
-          <Form.Item name="id" hidden={true}>
+          <Item name="id" hidden={true}>
             <Input />
-          </Form.Item>
-          <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-            <Input.TextArea
+          </Item>
+          <Item label="Name" name="name" rules={[{ required: true }]}>
+            <TextArea
               autoSize={{ minRows: 1, maxRows: 2 }}
               showCount
               maxLength={128}
             />
-          </Form.Item>
-          <Form.Item
-            name="description"
-            label="Description"
-            extra="Markdown enabled"
-          >
-            <Input.TextArea
+          </Item>
+          <Item name="description" label="Description" extra="Markdown enabled">
+            <TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={1024}
             />
-          </Form.Item>
+          </Item>
 
           {/* TODO: make the configuration section dynamic based on the connector  */}
 
           <Divider orientation="left" style={{ marginTop: '50px' }}>
             Azure DevOps Configuration
           </Divider>
-          <Form.Item
+          <Item
             label="Organization"
             name="organization"
             rules={[{ required: true }]}
           >
             <Input showCount maxLength={128} />
-          </Form.Item>
-          <Form.Item
+          </Item>
+          <Item
             label="Personal Access Token"
             name="personalAccessToken"
             rules={[{ required: true }]}
           >
             <Input showCount maxLength={128} />
-          </Form.Item>
+          </Item>
 
-          <Form.Item>
+          <Item>
             <Button
               type="primary"
               disabled={
@@ -237,10 +237,10 @@ const EditConnectionForm = ({
             >
               Test Configuration
             </Button>
-            <Typography.Text type="secondary" style={{ marginLeft: '10px' }}>
+            <Text type="secondary" style={{ marginLeft: '10px' }}>
               {testConfigurationResult}
-            </Typography.Text>
-          </Form.Item>
+            </Text>
+          </Item>
         </Form>
       </Modal>
     </>

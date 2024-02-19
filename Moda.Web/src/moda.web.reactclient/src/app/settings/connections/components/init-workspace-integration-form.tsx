@@ -5,6 +5,8 @@ import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, message } from 'antd'
 import { useEffect, useState } from 'react'
 
+const { Item } = Form
+
 export interface InitWorkspaceIntegrationFormProps {
   showForm: boolean
   connectionId: string
@@ -126,7 +128,7 @@ const InitWorkspaceIntegrationForm = (
           layout="vertical"
           name="init-workspace-form"
         >
-          <Form.Item
+          <Item
             name="workspaceKey"
             label="Workspace Key"
             extra="The workspace key is a unique identifier for the workspace. Workspace key's must be uppercase letters and numbers only, start with an uppercase letter, and be between 2-20 characters."
@@ -157,7 +159,7 @@ const InitWorkspaceIntegrationForm = (
                 ).value.toUpperCase())
               }
             />
-          </Form.Item>
+          </Item>
         </Form>
       </Modal>
     </>

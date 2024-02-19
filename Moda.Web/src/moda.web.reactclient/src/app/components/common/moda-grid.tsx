@@ -26,6 +26,8 @@ import { ItemType } from 'antd/es/menu/hooks/useItems'
 import useTheme from '../contexts/theme'
 import ModaEmpty from './moda-empty'
 
+const { Text } = Typography
+
 interface ModaGridProps extends AgGridReactProps {
   height?: number
   width?: number
@@ -106,9 +108,9 @@ const ModaGrid = ({
           <Col xs={24} sm={24} md={actions ? 14 : 24}>
             <Space style={{ display: 'flex', justifyContent: 'flex-end' }} wrap>
               <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Typography.Text>
+                <Text>
                   {displayedRowCount} of {rowCount}
-                </Typography.Text>
+                </Text>
                 {showGlobalSearch && (
                   <Input
                     placeholder="Search"

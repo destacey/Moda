@@ -25,6 +25,11 @@ import {
 } from '@/src/services/queries/planning-queries'
 import { useGetEmployeeOptions } from '@/src/services/queries/organization-queries'
 
+const { Item } = Descriptions
+const { Item: FormItem } = Form
+const { TextArea } = Input
+const { Group: RadioGroup } = Radio
+
 export interface EditRiskFormProps {
   showForm: boolean
   riskId: string
@@ -212,82 +217,70 @@ const EditRiskForm = ({
           name="update-risk-form"
         >
           <Descriptions size="small" column={1}>
-            <Descriptions.Item label="Number">{riskNumber}</Descriptions.Item>
-            <Descriptions.Item label="Team">{teamName}</Descriptions.Item>
+            <Item label="Number">{riskNumber}</Item>
+            <Item label="Team">{teamName}</Item>
           </Descriptions>
-          <Form.Item name="riskId" hidden={true}>
+          <FormItem name="riskId" hidden={true}>
             <Input />
-          </Form.Item>
-          <Form.Item name="teamId" hidden={true}>
+          </FormItem>
+          <FormItem name="teamId" hidden={true}>
             <Input />
-          </Form.Item>
-          <Form.Item
-            label="Summary"
-            name="summary"
-            rules={[{ required: true }]}
-          >
-            <Input.TextArea
+          </FormItem>
+          <FormItem label="Summary" name="summary" rules={[{ required: true }]}>
+            <TextArea
               autoSize={{ minRows: 2, maxRows: 4 }}
               showCount
               maxLength={256}
             />
-          </Form.Item>
-          <Form.Item
+          </FormItem>
+          <FormItem
             name="description"
             label="Description"
             extra="Markdown enabled"
           >
-            <Input.TextArea
+            <TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={1024}
             />
-          </Form.Item>
-          <Form.Item
-            name="statusId"
-            label="Status"
-            rules={[{ required: true }]}
-          >
-            <Radio.Group
+          </FormItem>
+          <FormItem name="statusId" label="Status" rules={[{ required: true }]}>
+            <RadioGroup
               options={riskStatusOptions}
               optionType="button"
               buttonStyle="solid"
             />
-          </Form.Item>
-          <Form.Item
+          </FormItem>
+          <FormItem
             name="categoryId"
             label="Category"
             rules={[{ required: true }]}
           >
-            <Radio.Group
+            <RadioGroup
               options={riskCategoryOptions}
               optionType="button"
               buttonStyle="solid"
             />
-          </Form.Item>
-          <Form.Item
-            name="impactId"
-            label="Impact"
-            rules={[{ required: true }]}
-          >
-            <Radio.Group
+          </FormItem>
+          <FormItem name="impactId" label="Impact" rules={[{ required: true }]}>
+            <RadioGroup
               options={riskGradeOptions}
               optionType="button"
               buttonStyle="solid"
             />
-          </Form.Item>
-          <Form.Item
+          </FormItem>
+          <FormItem
             name="likelihoodId"
             label="Likelihood"
             rules={[{ required: true }]}
           >
-            <Radio.Group
+            <RadioGroup
               options={riskGradeOptions}
               optionType="button"
               buttonStyle="solid"
             />
-          </Form.Item>
-          <Form.Item name="assigneeId" label="Assignee">
+          </FormItem>
+          <FormItem name="assigneeId" label="Assignee">
             <Select
               allowClear
               showSearch
@@ -305,17 +298,17 @@ const EditRiskForm = ({
               }
               options={employeeOptions}
             />
-          </Form.Item>
-          <Form.Item label="Follow Up" name="followUpDate">
+          </FormItem>
+          <FormItem label="Follow Up" name="followUpDate">
             <DatePicker />
-          </Form.Item>
-          <Form.Item name="response" label="Response" extra="Markdown enabled">
-            <Input.TextArea
+          </FormItem>
+          <FormItem name="response" label="Response" extra="Markdown enabled">
+            <TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={1024}
             />
-          </Form.Item>
+          </FormItem>
         </Form>
       </Modal>
     </>

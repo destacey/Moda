@@ -126,8 +126,9 @@ const AuthProvider = ({ children }) => {
 
   return (
     <>
-      {msalInstanceInitialized === false && <Spin />}
-      {msalInstanceInitialized === true && (
+      {!msalInstanceInitialized ? (
+        <Spin />
+      ) : (
         <AuthContext.Provider value={authContext}>
           <MsalProvider instance={msalWrapper.instance}>
             {children}

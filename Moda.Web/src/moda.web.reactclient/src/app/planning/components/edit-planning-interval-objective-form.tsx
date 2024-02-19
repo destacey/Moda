@@ -30,6 +30,11 @@ import {
   useUpdatePlanningIntervalObjectiveMutation,
 } from '@/src/services/queries/planning-queries'
 
+const { Item } = Descriptions
+const { Item: FormItem } = Form
+const { TextArea } = Input
+const { Group: RadioGroup } = Radio
+
 export interface EditPlanningIntervalObjectiveFormProps {
   showForm: boolean
   planningIntervalId: string
@@ -243,42 +248,38 @@ const EditPlanningIntervalObjectiveForm = ({
             <Alert message="PI Objectives are locked." type="info" showIcon />
           )}
           <Descriptions size="small" column={1}>
-            <Descriptions.Item label="Number">
-              {objectiveData?.key}
-            </Descriptions.Item>
-            <Descriptions.Item label="Team">
-              {objectiveData?.team.name}
-            </Descriptions.Item>
+            <Item label="Number">{objectiveData?.key}</Item>
+            <Item label="Team">{objectiveData?.team.name}</Item>
           </Descriptions>
-          <Form.Item name="objectiveId" hidden={true}>
+          <FormItem name="objectiveId" hidden={true}>
             <Input />
-          </Form.Item>
-          <Form.Item name="planningIntervalId" hidden={true}>
+          </FormItem>
+          <FormItem name="planningIntervalId" hidden={true}>
             <Input />
-          </Form.Item>
-          <Form.Item name="teamId" hidden={true}>
+          </FormItem>
+          <FormItem name="teamId" hidden={true}>
             <Input />
-          </Form.Item>
-          <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-            <Input.TextArea
+          </FormItem>
+          <FormItem label="Name" name="name" rules={[{ required: true }]}>
+            <TextArea
               autoSize={{ minRows: 2, maxRows: 4 }}
               showCount
               maxLength={256}
               disabled={planningIntervalData?.objectivesLocked}
             />
-          </Form.Item>
-          <Form.Item
+          </FormItem>
+          <FormItem
             name="description"
             label="Description"
             extra="Markdown enabled"
           >
-            <Input.TextArea
+            <TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={1024}
             />
-          </Form.Item>
-          <Form.Item
+          </FormItem>
+          <FormItem
             label="Is Stretch?"
             name="isStretch"
             valuePropName="checked"
@@ -288,22 +289,18 @@ const EditPlanningIntervalObjectiveForm = ({
               unCheckedChildren="No"
               disabled={planningIntervalData?.objectivesLocked}
             />
-          </Form.Item>
-          <Form.Item
-            name="statusId"
-            label="Status"
-            rules={[{ required: true }]}
-          >
-            <Radio.Group
+          </FormItem>
+          <FormItem name="statusId" label="Status" rules={[{ required: true }]}>
+            <RadioGroup
               options={statusOptions}
               optionType="button"
               buttonStyle="solid"
             />
-          </Form.Item>
-          <Form.Item label="Progress" name="progress">
+          </FormItem>
+          <FormItem label="Progress" name="progress">
             <Slider />
-          </Form.Item>
-          <Form.Item
+          </FormItem>
+          <FormItem
             label="Start"
             name="startDate"
             rules={[
@@ -318,8 +315,8 @@ const EditPlanningIntervalObjectiveForm = ({
             ]}
           >
             <DatePicker disabledDate={disabledDate} />
-          </Form.Item>
-          <Form.Item
+          </FormItem>
+          <FormItem
             label="Target"
             name="targetDate"
             rules={[
@@ -334,7 +331,7 @@ const EditPlanningIntervalObjectiveForm = ({
             ]}
           >
             <DatePicker disabledDate={disabledDate} />
-          </Form.Item>
+          </FormItem>
         </Form>
       </Modal>
     </>

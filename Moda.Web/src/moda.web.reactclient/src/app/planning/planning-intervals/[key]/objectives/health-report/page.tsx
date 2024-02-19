@@ -1,16 +1,14 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import { authorizePage } from '@/src/app/components/hoc'
 import {
   useGetPlanningIntervalByKey,
   useGetPlanningIntervalObjectivesHealthReport,
 } from '@/src/services/queries/planning-queries'
-import { notFound, usePathname } from 'next/navigation'
-import { useAppDispatch } from '@/src/app/hooks'
-import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
+import { notFound } from 'next/navigation'
 import {
   MarkdownCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,

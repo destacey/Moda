@@ -15,6 +15,10 @@ import {
 } from '@/src/store/health-check-slice'
 import { useEffect } from 'react'
 
+const { Item } = Form
+const { TextArea } = Input
+const { Group: RadioGroup } = Radio
+
 export interface CreateHealthCheckFormProps {
   showForm: boolean
   objectId: string
@@ -75,21 +79,21 @@ const CreateHealthCheckForm = ({
           expiration: dayjs().add(2, 'week').endOf('day'),
         }}
       >
-        <Form.Item name="statusId" label="Status" rules={[{ required: true }]}>
-          <Radio.Group
+        <Item name="statusId" label="Status" rules={[{ required: true }]}>
+          <RadioGroup
             options={statusOptions}
             optionType="button"
             buttonStyle="solid"
           />
-        </Form.Item>
-        <Form.Item label="Note" name="note" extra="Markdown enabled">
-          <Input.TextArea
+        </Item>
+        <Item label="Note" name="note" extra="Markdown enabled">
+          <TextArea
             autoSize={{ minRows: 6, maxRows: 10 }}
             showCount
             maxLength={1024}
           />
-        </Form.Item>
-        <Form.Item
+        </Item>
+        <Item
           label="Expiration"
           name="expiration"
           rules={[
@@ -110,7 +114,7 @@ const CreateHealthCheckForm = ({
             format="YYYY-MM-DD HH:mm"
             disabledDate={(value) => value && value < dayjs().startOf('day')}
           />
-        </Form.Item>
+        </Item>
       </Form>
     </>
   )

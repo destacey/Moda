@@ -4,6 +4,9 @@ import ModaDateRange from '@/src/app/components/common/moda-date-range'
 import { useGetPlanningIntervalIterations } from '@/src/services/queries/planning-queries'
 import { Card, List } from 'antd'
 
+const { Item } = List
+const { Meta } = Item
+
 interface PlanningIntervalIterationsListProps {
   id: string
 }
@@ -22,13 +25,10 @@ const PlanningIntervalIterationsList = ({
           itemLayout="horizontal"
           dataSource={iterations}
           renderItem={(iteration) => (
-            <List.Item>
-              <List.Item.Meta
-                title={iteration.name}
-                description={iteration.type.name}
-              />
+            <Item>
+              <Meta title={iteration.name} description={iteration.type.name} />
               <ModaDateRange dateRange={iteration} />
-            </List.Item>
+            </Item>
           )}
         />
       </Card>

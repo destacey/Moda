@@ -1,11 +1,9 @@
 'use client'
 
 import { useGetPlanningIntervalByKey } from '@/src/services/queries/planning-queries'
-import { Layout, Menu, MenuProps } from 'antd'
+import { Menu, MenuProps } from 'antd'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
-
-const { Content } = Layout
+import { useMemo } from 'react'
 
 const PlanninIntervalLayout = ({
   params,

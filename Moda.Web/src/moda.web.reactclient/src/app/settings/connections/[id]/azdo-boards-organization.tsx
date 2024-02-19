@@ -7,6 +7,8 @@ import {
 import { Alert, Space, Tabs, Typography } from 'antd'
 import AzdoBoardsProcess from './azdo-boards-process'
 
+const { Text, Title } = Typography
+
 interface AzdoBoardsOrganizationProps {
   workProcesses: AzureDevOpsBoardsWorkProcessDto[]
   workspaces: AzureDevOpsBoardsWorkspaceDto[]
@@ -24,10 +26,10 @@ const AzdoBoardsOrganization = (props: AzdoBoardsOrganizationProps) => {
   return (
     <>
       <Space direction="vertical" size="large" style={{ display: 'flex' }}>
-        <Typography.Text>
+        <Text>
           The work processes and workspaces below represent processes and
           projects pulled from Azure DevOps.
-        </Typography.Text>
+        </Text>
         {props.workProcesses.length === 0 ? (
           <Alert
             message="No work processes were found for this connection."
@@ -35,7 +37,7 @@ const AzdoBoardsOrganization = (props: AzdoBoardsOrganizationProps) => {
           />
         ) : (
           <>
-            <Typography.Title level={5}>Work Processes</Typography.Title>
+            <Title level={5}>Work Processes</Title>
             <Tabs
               tabPosition="left"
               items={props.workProcesses
