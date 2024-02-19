@@ -17,6 +17,7 @@ import { AuthProvider } from './components/contexts/auth'
 import { MenuToggleProvider } from './components/contexts/menu-toggle'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import LoadingAccount from './components/common/loading-account'
+import { AntdRegistry } from '@ant-design/nextjs-registry'
 
 const { Content } = Layout
 
@@ -31,16 +32,11 @@ const queryClient = new QueryClient({
   },
 })
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>
+const RootLayout = ({ children }: React.PropsWithChildren) => (
+  <html lang="en">
+    <body className={inter.className}>
+      <AntdRegistry>
         <Provider store={store}>
-          {/* <StyledComponentsRegistry> */}
           <AuthProvider>
             <ThemeProvider>
               <AuthenticatedTemplate>
@@ -70,9 +66,10 @@ export default function RootLayout({
               </AuthenticatedTemplate>
             </ThemeProvider>
           </AuthProvider>
-          {/* </StyledComponentsRegistry> */}
         </Provider>
-      </body>
-    </html>
-  )
-}
+      </AntdRegistry>
+    </body>
+  </html>
+)
+
+export default RootLayout
