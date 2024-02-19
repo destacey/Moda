@@ -24,7 +24,7 @@ export interface WithAuthorizationProps {
 const withAuthorization = <P extends object>(
   WrappedComponent: ComponentType<P>,
   defaultClaimType?: string,
-  defaultClaimValue?: string
+  defaultClaimValue?: string,
 ): FC<P & WithAuthorizationProps> => {
   const WithAuthorization: ComponentType<P & WithAuthorizationProps> = ({
     claimType,
@@ -40,7 +40,7 @@ const withAuthorization = <P extends object>(
 
     return hasClaim(
       claimType ?? defaultClaimType ?? 'Permission',
-      claimValue ?? defaultClaimValue
+      claimValue ?? defaultClaimValue,
     ) ? (
       <WrappedComponent {...(props as P)} />
     ) : notAuthorizedBehavior === 'DoNotRender' ? (

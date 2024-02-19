@@ -1,15 +1,12 @@
 import { UserDetailsDto } from '@/src/services/moda-api'
 import { useGetUserRoles } from '@/src/services/queries/user-management-queries'
-import {
-  EditOutlined,
-  InfoCircleOutlined,
-  PlusOutlined,
-} from '@ant-design/icons'
-import { Button, Card, Descriptions, List } from 'antd'
+import { InfoCircleOutlined } from '@ant-design/icons'
+import { Card, Descriptions, List } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
 
 const { Item } = Descriptions
+const { Item: ListItem } = List
 
 interface UserDetailsProps {
   user: UserDetailsDto
@@ -60,14 +57,14 @@ const UserDetails = ({ user, canEdit }: UserDetailsProps) => {
           size="small"
           dataSource={userRoleData}
           renderItem={(item) => (
-            <List.Item>
+            <ListItem>
               <Link href={`/settings/user-management/roles/${item.roleId}`}>
                 {item.roleName}
               </Link>
               {item.description && (
                 <InfoCircleOutlined title={item.description} />
               )}
-            </List.Item>
+            </ListItem>
           )}
         />
       </Card>

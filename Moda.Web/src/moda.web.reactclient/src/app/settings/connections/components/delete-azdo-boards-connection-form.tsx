@@ -6,6 +6,8 @@ import { useDeleteAzdoBoardsConnectionMutation } from '@/src/services/queries/ap
 import { Descriptions, Modal, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
+const { Item } = Descriptions
+
 interface DeleteAzdoBoardsConnectionFormProps {
   showForm: boolean
   connection: AzureDevOpsBoardsConnectionDetailsDto
@@ -99,9 +101,7 @@ const DeleteAzdoBoardsConnectionForm = (
         destroyOnClose={true}
       >
         <Descriptions size="small" column={1}>
-          <Descriptions.Item label="Name">
-            {props.connection?.name}
-          </Descriptions.Item>
+          <Item label="Name">{props.connection?.name}</Item>
         </Descriptions>
       </Modal>
     </>

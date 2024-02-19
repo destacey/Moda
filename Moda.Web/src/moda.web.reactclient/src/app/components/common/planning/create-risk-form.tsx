@@ -16,6 +16,10 @@ import {
 } from '@/src/services/queries/planning-queries'
 import { useGetEmployeeOptions } from '@/src/services/queries/organization-queries'
 
+const { Item } = Form
+const { TextArea } = Input
+const { Group: RadioGroup } = Radio
+
 export interface CreateRiskFormProps {
   showForm: boolean
   createForTeamId?: string | undefined
@@ -206,7 +210,7 @@ const CreateRiskForm = ({
           layout="vertical"
           name="create-risk-form"
         >
-          <Form.Item name="teamId" label="Team" rules={[{ required: true }]}>
+          <Item name="teamId" label="Team" rules={[{ required: true }]}>
             <Select
               showSearch
               disabled={createForTeamId !== undefined}
@@ -224,63 +228,47 @@ const CreateRiskForm = ({
               }
               options={teamOptions}
             />
-          </Form.Item>
-          <Form.Item
-            label="Summary"
-            name="summary"
-            rules={[{ required: true }]}
-          >
-            <Input.TextArea
+          </Item>
+          <Item label="Summary" name="summary" rules={[{ required: true }]}>
+            <TextArea
               autoSize={{ minRows: 2, maxRows: 4 }}
               showCount
               maxLength={256}
             />
-          </Form.Item>
-          <Form.Item
-            name="description"
-            label="Description"
-            extra="Markdown enabled"
-          >
-            <Input.TextArea
+          </Item>
+          <Item name="description" label="Description" extra="Markdown enabled">
+            <TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={1024}
             />
-          </Form.Item>
-          <Form.Item
-            name="categoryId"
-            label="Category"
-            rules={[{ required: true }]}
-          >
-            <Radio.Group
+          </Item>
+          <Item name="categoryId" label="Category" rules={[{ required: true }]}>
+            <RadioGroup
               options={riskCategoryOptions}
               optionType="button"
               buttonStyle="solid"
             />
-          </Form.Item>
-          <Form.Item
-            name="impactId"
-            label="Impact"
-            rules={[{ required: true }]}
-          >
-            <Radio.Group
+          </Item>
+          <Item name="impactId" label="Impact" rules={[{ required: true }]}>
+            <RadioGroup
               options={riskGradeOptions}
               optionType="button"
               buttonStyle="solid"
             />
-          </Form.Item>
-          <Form.Item
+          </Item>
+          <Item
             name="likelihoodId"
             label="Likelihood"
             rules={[{ required: true }]}
           >
-            <Radio.Group
+            <RadioGroup
               options={riskGradeOptions}
               optionType="button"
               buttonStyle="solid"
             />
-          </Form.Item>
-          <Form.Item name="assigneeId" label="Assignee">
+          </Item>
+          <Item name="assigneeId" label="Assignee">
             <Select
               allowClear
               showSearch
@@ -298,17 +286,17 @@ const CreateRiskForm = ({
               }
               options={employeeOptions}
             />
-          </Form.Item>
-          <Form.Item label="Follow Up" name="followUpDate">
+          </Item>
+          <Item label="Follow Up" name="followUpDate">
             <DatePicker />
-          </Form.Item>
-          <Form.Item name="response" label="Response" extra="Markdown enabled">
-            <Input.TextArea
+          </Item>
+          <Item name="response" label="Response" extra="Markdown enabled">
+            <TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={1024}
             />
-          </Form.Item>
+          </Item>
         </Form>
       </Modal>
     </>

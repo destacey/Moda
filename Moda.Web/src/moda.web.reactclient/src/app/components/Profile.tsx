@@ -16,6 +16,8 @@ import { useRouter } from 'next/navigation'
 import useTheme from './contexts/theme'
 import useAuth from './contexts/auth'
 
+const { Text } = Typography
+
 export default function Profile() {
   const { setCurrentThemeName, currentThemeName } = useTheme()
   const { login, logout, user, isLoading } = useAuth()
@@ -38,10 +40,10 @@ export default function Profile() {
 
   function WelcomeUser() {
     if (isLoading) {
-      return <Typography.Text>Loading user info...</Typography.Text>
+      return <Text>Loading user info...</Text>
     }
     return user.name && user.name.trim() ? (
-      <Typography.Text>Welcome, {user.name}</Typography.Text>
+      <Text>Welcome, {user.name}</Text>
     ) : null
   }
 

@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import AzdoBoardsConnectionConfiguration from './azdo-boards-connection-configuration'
 
 const { Item } = Descriptions
+const { Title } = Typography
 
 interface AzdoBoardsConnectionDetailsProps {
   connection: AzureDevOpsBoardsConnectionDetailsDto
@@ -36,7 +37,7 @@ const AzdoBoardsConnectionDetails = ({
         </Col>
       </Row>
       <Row>
-        <Typography.Title level={4}>Configuration</Typography.Title>
+        <Title level={4}>Configuration</Title>
         <AzdoBoardsConnectionConfiguration
           configuration={connection.configuration}
         />

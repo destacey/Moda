@@ -4,19 +4,16 @@ import { useDocumentTitle } from '@/src/app/hooks'
 import {
   useGetPlanningIntervalByKey,
   useGetPlanningIntervalRisks,
-  useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
 import { useCallback, useMemo, useState } from 'react'
 import { PageTitle } from '@/src/app/components/common'
 import { notFound } from 'next/navigation'
-import useAuth from '@/src/app/components/contexts/auth'
 import RisksGrid from '@/src/app/components/common/planning/risks-grid'
 import { authorizePage } from '@/src/app/components/hoc'
 
 const PlanningIntervalRisksPage = ({ params }) => {
   useDocumentTitle('PI Risks')
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
-  const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
 
   const {
     data: planningIntervalData,
@@ -28,11 +25,6 @@ const PlanningIntervalRisksPage = ({ params }) => {
   const risksQuery = useGetPlanningIntervalRisks(
     planningIntervalData?.id,
     includeClosedRisks,
-  )
-
-  const { data: teamData } = useGetPlanningIntervalTeams(
-    planningIntervalData?.id,
-    true,
   )
 
   if (!isLoading && !isFetching && !planningIntervalData) {

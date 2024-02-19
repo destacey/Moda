@@ -15,6 +15,9 @@ import {
 import { TeamTypeName } from '../types'
 import dayjs from 'dayjs'
 
+const { Item } = Descriptions
+const { Item: FormItem } = Form
+
 export interface UpdateTeamMembershipFormProps {
   showForm: boolean
   membership: TeamMembershipDto
@@ -175,19 +178,15 @@ const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
           name="edit-team-membership-form"
         >
           <Descriptions size="small" column={1}>
-            <Descriptions.Item label="Team">
-              {props.membership?.child.name}
-            </Descriptions.Item>
-            <Descriptions.Item label="Parent Team">
-              {props.membership?.parent.name}
-            </Descriptions.Item>
+            <Item label="Team">{props.membership?.child.name}</Item>
+            <Item label="Parent Team">{props.membership?.parent.name}</Item>
           </Descriptions>
-          <Form.Item label="Start" name="start" rules={[{ required: true }]}>
+          <FormItem label="Start" name="start" rules={[{ required: true }]}>
             <DatePicker />
-          </Form.Item>
-          <Form.Item label="End" name="end">
+          </FormItem>
+          <FormItem label="End" name="end">
             <DatePicker />
-          </Form.Item>
+          </FormItem>
         </Form>
       </Modal>
     </>

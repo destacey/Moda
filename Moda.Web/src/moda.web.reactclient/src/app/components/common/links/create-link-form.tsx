@@ -7,6 +7,9 @@ import useAuth from '../../contexts/auth'
 import { useCreateLinkMutation } from '@/src/services/queries/link-queries'
 import { toFormErrors } from '@/src/utils'
 
+const { Item } = Form
+const { TextArea } = Input
+
 export interface CreateLinkFormProps {
   showForm: boolean
   objectId: string
@@ -126,20 +129,20 @@ const CreateLinkForm = ({
           layout="vertical"
           name="create-link-form"
         >
-          <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-            <Input.TextArea
+          <Item label="Name" name="name" rules={[{ required: true }]}>
+            <TextArea
               autoSize={{ minRows: 1, maxRows: 2 }}
               showCount
               maxLength={128}
             />
-          </Form.Item>
-          <Form.Item
+          </Item>
+          <Item
             name="url"
             label="URL"
             rules={[{ required: true }, { type: 'url' }]}
           >
-            <Input.TextArea autoSize={{ minRows: 6, maxRows: 10 }} />
-          </Form.Item>
+            <TextArea autoSize={{ minRows: 6, maxRows: 10 }} />
+          </Item>
         </Form>
       </Modal>
     </>

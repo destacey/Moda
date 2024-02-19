@@ -6,8 +6,6 @@ import { TeamMembershipDto } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
 import { UseQueryResult } from 'react-query'
 import {
-  NestedTeamNameLinkCellRenderer,
-  NestedTeamOfTeamsNameLinkCellRenderer,
   RowMenuCellRenderer,
   TeamNameLinkCellRenderer,
 } from '../../components/common/moda-grid-cell-renderers'

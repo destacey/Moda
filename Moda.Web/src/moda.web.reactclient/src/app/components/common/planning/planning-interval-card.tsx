@@ -4,6 +4,8 @@ import { Card, Space, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 
+const { Text } = Typography
+
 export interface PlanningIntervalCardProps {
   planningInterval: PlanningIntervalListDto
 }
@@ -17,15 +19,13 @@ const PlanningIntervalCard = ({
     switch (planningInterval.state) {
       case 'Future':
         return (
-          <Typography.Text>
+          <Text>
             ({daysRemaining(planningInterval.start)} days until start)
-          </Typography.Text>
+          </Text>
         )
       case 'Active':
         return (
-          <Typography.Text>
-            ({daysRemaining(planningInterval.end)} days remaining)
-          </Typography.Text>
+          <Text>({daysRemaining(planningInterval.end)} days remaining)</Text>
         )
       default:
         return null
@@ -37,7 +37,7 @@ const PlanningIntervalCard = ({
       <Space direction="vertical">
         <Space wrap>
           {dayjs(planningInterval.start).format('M/D/YYYY')}
-          <Typography.Text type="secondary"> - </Typography.Text>
+          <Text type="secondary"> - </Text>
           {dayjs(planningInterval.end).format('M/D/YYYY')}
           <DaysCountdownLabel />
         </Space>
@@ -45,7 +45,7 @@ const PlanningIntervalCard = ({
           <Link href={`/planning/planning-intervals/${planningInterval.key}`}>
             Details
           </Link>
-          <Typography.Text type="secondary"> | </Typography.Text>
+          <Text type="secondary"> | </Text>
           <Link
             href={`/planning/planning-intervals/${planningInterval.key}/plan-review`}
           >

@@ -23,6 +23,7 @@ import { EditPlanningIntervalObjectiveForm } from '../../../components'
 
 const { Item } = List
 const { Meta } = Item
+const { Text } = Typography
 
 export interface ObjectiveListItemProps {
   objective: PlanningIntervalObjectiveListDto
@@ -100,11 +101,11 @@ const ObjectiveListItem = ({
           </Tag>
           {objective.isStretch && <Tag>Stretch</Tag>}
           <HealthCheckTag healthCheck={objective?.healthCheck} />
-          <Typography.Text>
+          <Text>
             {startDate}
             {startDate && targetDate && ' - '}
             {targetDate}
-          </Typography.Text>
+          </Text>
         </Space>
         {showProgress && (
           <Progress

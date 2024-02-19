@@ -10,6 +10,9 @@ import {
 } from '@/src/services/queries/link-queries'
 import { toFormErrors } from '@/src/utils'
 
+const { Item } = Form
+const { TextArea } = Input
+
 export interface EditLinkFormProps {
   showForm: boolean
   id: string
@@ -150,16 +153,16 @@ const EditLinkForm = ({
         destroyOnClose={true}
       >
         <Form form={form} size="small" layout="vertical" name="edit-link-form">
-          <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-            <Input.TextArea
+          <Item label="Name" name="name" rules={[{ required: true }]}>
+            <TextArea
               autoSize={{ minRows: 1, maxRows: 2 }}
               showCount
               maxLength={128}
             />
-          </Form.Item>
-          <Form.Item name="url" label="URL">
-            <Input.TextArea autoSize={{ minRows: 6, maxRows: 10 }} />
-          </Form.Item>
+          </Item>
+          <Item name="url" label="URL">
+            <TextArea autoSize={{ minRows: 6, maxRows: 10 }} />
+          </Item>
         </Form>
       </Modal>
     </>

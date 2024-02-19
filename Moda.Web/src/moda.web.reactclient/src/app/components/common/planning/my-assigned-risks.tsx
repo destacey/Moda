@@ -3,6 +3,8 @@ import { RiskListDto } from '@/src/services/moda-api'
 import Link from 'next/link'
 import { useGetMyRisks } from '@/src/services/queries/planning-queries'
 
+const { Item } = List
+
 const riskMessage = (risk: RiskListDto) => {
   if (risk.followUpDate) {
     return `${risk.summary} (follow-up: ${risk.followUpDate})`
@@ -22,11 +24,9 @@ const MyAssignedRisks = () => {
       <Card size="small" title="My Assigned Risks">
         <List size="small">
           {risks.map((r) => (
-            <List.Item key={r.key}>
-              <Link href={`/planning/risks/${r.key}`}>
-                {riskMessage(r)}
-              </Link>
-            </List.Item>
+            <Item key={r.key}>
+              <Link href={`/planning/risks/${r.key}`}>{riskMessage(r)}</Link>
+            </Item>
           ))}
         </List>
       </Card>

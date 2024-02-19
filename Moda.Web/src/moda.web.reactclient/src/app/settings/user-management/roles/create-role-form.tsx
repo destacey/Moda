@@ -11,6 +11,9 @@ import {
   useUpdatePermissionsMutation,
 } from '@/src/services/queries/user-management-queries'
 
+const { Item } = Form
+const { TextArea } = Input
+
 export interface CreateRoleFormProps {
   showForm: boolean
   roles: RoleDto[]
@@ -138,23 +141,23 @@ const CreateRoleForm = ({
           layout="vertical"
           name="create-role-form"
         >
-          <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-            <Input.TextArea
+          <Item label="Name" name="name" rules={[{ required: true }]}>
+            <TextArea
               autoSize={{ minRows: 1, maxRows: 4 }}
               showCount
               maxLength={256}
             />
-          </Form.Item>
+          </Item>
 
-          <Form.Item name="description" label="Description">
-            <Input.TextArea
+          <Item name="description" label="Description">
+            <TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={1024}
             />
-          </Form.Item>
+          </Item>
 
-          <Form.Item name="isDefault" label="Copy Permissions From">
+          <Item name="isDefault" label="Copy Permissions From">
             {roles && (
               <Select
                 allowClear
@@ -175,7 +178,7 @@ const CreateRoleForm = ({
                 }
               />
             )}
-          </Form.Item>
+          </Item>
         </Form>
       </Modal>
     </>

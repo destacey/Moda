@@ -15,6 +15,10 @@ import { CreatePlanningIntervalRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { useCreatePlanningIntervalMutation } from '@/src/services/queries/planning-queries'
 
+const { Item } = Form
+const { TextArea } = Input
+const { Text } = Typography
+
 export interface CreatePlanningIntervalFormProps {
   showForm: boolean
   onFormCreate: () => void
@@ -145,52 +149,48 @@ const CreatePlanningIntervalForm = ({
           layout="vertical"
           name="create-planning-interval-form"
         >
-          <Form.Item label="Name" name="name" rules={[{ required: true }]}>
-            <Input.TextArea
+          <Item label="Name" name="name" rules={[{ required: true }]}>
+            <TextArea
               autoSize={{ minRows: 1, maxRows: 2 }}
               showCount
               maxLength={128}
             />
-          </Form.Item>
-          <Form.Item
-            name="description"
-            label="Description"
-            extra="Markdown enabled"
-          >
-            <Input.TextArea
+          </Item>
+          <Item name="description" label="Description" extra="Markdown enabled">
+            <TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={2048}
             />
-          </Form.Item>
-          <Form.Item label="Start" name="start" rules={[{ required: true }]}>
+          </Item>
+          <Item label="Start" name="start" rules={[{ required: true }]}>
             <DatePicker />
-          </Form.Item>
-          <Form.Item label="End" name="end" rules={[{ required: true }]}>
+          </Item>
+          <Item label="End" name="end" rules={[{ required: true }]}>
             <DatePicker />
-          </Form.Item>
-          <Form.Item
+          </Item>
+          <Item
             label="Iteration Weeks"
             name="iterationWeeks"
             rules={[{ required: true }]}
           >
             <InputNumber min={1} max={10} />
-          </Form.Item>
-          <Form.Item
+          </Item>
+          <Item
             label="Iteration Prefix"
             name="iterationPrefix"
             extra="Iteration Name Template: Iteration Prefix + Iteration Number"
           >
             <Input />
-          </Form.Item>
+          </Item>
           <>
             {formValues &&
               formValues.iterationPrefix &&
               formValues.iterationPrefix != null && (
-                <Typography.Text type="secondary">
+                <Text type="secondary">
                   Iteration name format: {formValues.iterationPrefix}1,{' '}
                   {formValues.iterationPrefix}2, ...
-                </Typography.Text>
+                </Text>
               )}
           </>
         </Form>

@@ -14,6 +14,7 @@ import { AzdoBoardsConnectionContext } from './azdo-boards-connection-context'
 import { useGetWorkProcessesByIdOrKey } from '@/src/services/queries/work-management-queries'
 
 const { Title, Text } = Typography
+const { Item } = List
 
 interface AzdoBoardsProcessProps {
   workProcess: AzureDevOpsBoardsWorkProcessDto
@@ -65,9 +66,9 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
           a.name.localeCompare(b.name),
         )}
         renderItem={(item) => (
-          <List.Item>
+          <Item>
             <AzdoBoardsWorkspaceCard workspace={item} enableInit={false} />
-          </List.Item>
+          </Item>
         )}
       />
     </>

@@ -13,6 +13,8 @@ import type { DescriptionsProps } from 'antd'
 import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
 import PlanningIntervalIterationsList from './planning-interval-iterations-list'
 
+const { Item } = Descriptions
+
 interface PlanningIntervalDetailsProps {
   planningInterval: PlanningIntervalDetailsDto
 }
@@ -118,11 +120,11 @@ const PlanningIntervalDetails = ({
           />
           {planningInterval.description && (
             <Descriptions layout="vertical" size="small">
-              <Descriptions.Item label="Description">
+              <Item label="Description">
                 <ModaMarkdownDescription
                   content={planningInterval.description}
                 />
-              </Descriptions.Item>
+              </Item>
             </Descriptions>
           )}
         </Col>
