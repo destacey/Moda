@@ -18,7 +18,7 @@ const WorkTypesPage: React.FC = () => {
       { field: 'id', hide: true },
       { field: 'name' },
       { field: 'description', width: 300 },
-      { field: 'isActive' }, // TODO: convert to yes/no
+      { field: 'isActive', width: 100 }, // TODO: convert to yes/no
     ],
     [],
   )

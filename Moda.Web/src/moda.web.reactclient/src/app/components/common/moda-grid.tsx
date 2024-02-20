@@ -70,6 +70,14 @@ const ModaGrid = ({
 
   const gridRef = useRef<AgGridReact>(null)
 
+  const rowCount = rowData?.length ?? 0
+
+  const onGridReady = () => {
+    if (!isDataLoading && rowCount === 0 && loadData) {
+      loadData()
+    }
+  }
+
   const onModelUpdated = useCallback(() => {
     setDisplayedRowCount(gridRef.current?.api.getDisplayedRowCount() ?? 0)
   }, [])
@@ -81,8 +89,6 @@ const ModaGrid = ({
   const onBtnExport = useCallback(() => {
     gridRef.current?.api.exportDataAsCsv()
   }, [])
-
-  const rowCount = rowData?.length ?? 0
 
   useEffect(() => {
     if (!gridRef.current?.api) return
@@ -169,7 +175,7 @@ const ModaGrid = ({
           <AgGridReact
             ref={gridRef}
             defaultColDef={defaultColDef ?? modaDefaultColDef}
-            onGridReady={() => loadData?.()}
+            onGridReady={onGridReady}
             animateRows={true}
             rowData={rowData}
             onModelUpdated={onModelUpdated}
