@@ -35,6 +35,7 @@ const workTypeSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchWorkTypes.pending, (state) => {
       state.isLoading = true
+      state.error = null
     })
     builder.addCase(fetchWorkTypes.fulfilled, (state, action) => {
       state.isLoading = false
