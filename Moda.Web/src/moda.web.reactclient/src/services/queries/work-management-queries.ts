@@ -1,10 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { QK } from './query-keys'
-import {
-  getWorkProcessesClient,
-  getWorkStatusesClient,
-  getWorkTypesClient,
-} from '../clients'
+import { getWorkProcessesClient, getWorkStatusesClient } from '../clients'
 
 // WORK PROCESSES
 export const useGetWorkProcesses = (includeDisabled: boolean = false) => {
@@ -52,15 +48,6 @@ export const useGetWorkStatuses = (includeDisabled: boolean = false) => {
     queryKey: [QK.WORK_STATUSES, includeDisabled],
     queryFn: async () =>
       (await getWorkStatusesClient()).getList(includeDisabled),
-    staleTime: 60000,
-  })
-}
-
-// WORK TYPES
-export const useGetWorkTypes = (includeDisabled: boolean = false) => {
-  return useQuery({
-    queryKey: [QK.WORK_TYPES, includeDisabled],
-    queryFn: async () => (await getWorkTypesClient()).getList(includeDisabled),
     staleTime: 60000,
   })
 }
