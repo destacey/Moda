@@ -10,6 +10,7 @@ import { CreatePlanningIntervalForm } from '../components'
 import useAuth from '../../components/contexts/auth'
 import { Button } from 'antd'
 import { useGetPlanningIntervals } from '@/src/services/queries/planning-queries'
+import { authorizePage } from '../../components/hoc'
 
 const PlanningIntervalLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/planning/planning-intervals/${data.key}`}>{value}</Link>
@@ -92,4 +93,10 @@ const PlanningIntervalListPage = () => {
   )
 }
 
-export default PlanningIntervalListPage
+const PlanningIntervalListPageWithAuthorization = authorizePage(
+  PlanningIntervalListPage,
+  'Permission',
+  'Permissions.PlanningIntervals.View',
+)
+
+export default PlanningIntervalListPageWithAuthorization

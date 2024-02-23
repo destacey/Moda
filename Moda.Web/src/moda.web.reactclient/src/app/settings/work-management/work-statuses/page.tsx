@@ -1,17 +1,29 @@
 'use client'
 
 import { ModaGrid, PageTitle } from '@/src/app/components/common'
-import { useDocumentTitle } from '@/src/app/hooks'
+import {
+  useAppDispatch,
+  useAppSelector,
+  useDocumentTitle,
+} from '@/src/app/hooks'
 import { WorkStatusDto } from '@/src/services/moda-api'
-import { useGetWorkStatuses } from '@/src/services/queries/work-management-queries'
 import { ColDef } from 'ag-grid-community'
 import { Space, Switch } from 'antd'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
+import { fetchWorkStatuses, setIncludeInactive } from '../work-status-slice'
+import { authorizePage } from '@/src/app/components/hoc'
 
-const WorkTypesPage: React.FC = () => {
+const WorkStatusesPage = () => {
   useDocumentTitle('Work Management - Work Statuses')
-  const [includeDisabled, setIncludeDisabled] = useState(false)
-  const { data, isLoading, refetch } = useGetWorkStatuses(includeDisabled)
+
+  const { workStatuses, isLoading, error, includeInactive } = useAppSelector(
+    (state) => state.workStatus,
+  )
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    error && console.error(error)
+  }, [error])
 
   const columnDefs = useMemo<ColDef<WorkStatusDto>[]>(
     () => [
@@ -24,11 +36,12 @@ const WorkTypesPage: React.FC = () => {
   )
 
   const refresh = useCallback(async () => {
-    refetch()
-  }, [refetch])
+    dispatch(fetchWorkStatuses(includeInactive))
+  }, [dispatch, includeInactive])
 
-  const onIncludeDisabledChange = (checked: boolean) => {
-    setIncludeDisabled(checked)
+  const onIncludeInactiveChange = (checked: boolean) => {
+    dispatch(setIncludeInactive(checked))
+    dispatch(fetchWorkStatuses(checked))
   }
 
   const controlItems = [
@@ -37,10 +50,10 @@ const WorkTypesPage: React.FC = () => {
         <Space>
           <Switch
             size="small"
-            checked={includeDisabled}
-            onChange={onIncludeDisabledChange}
+            checked={includeInactive}
+            onChange={onIncludeInactiveChange}
           />
-          Include Disabled
+          Include Inactive
         </Space>
       ),
       key: '0',
@@ -55,7 +68,7 @@ const WorkTypesPage: React.FC = () => {
         height={600}
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
-        rowData={data}
+        rowData={workStatuses}
         loadData={refresh}
         isDataLoading={isLoading}
       />
@@ -63,4 +76,10 @@ const WorkTypesPage: React.FC = () => {
   )
 }
 
-export default WorkTypesPage
+const WorkStatusesPageWithAuthorization = authorizePage(
+  WorkStatusesPage,
+  'Permission',
+  'Permissions.WorkStatuses.View',
+)
+
+export default WorkStatusesPageWithAuthorization

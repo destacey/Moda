@@ -11,6 +11,7 @@ import { ColDef } from 'ag-grid-community'
 import { Space, Switch } from 'antd'
 import { useCallback, useEffect, useMemo } from 'react'
 import { fetchWorkTypes, setIncludeInactive } from '../work-type-slice'
+import { authorizePage } from '@/src/app/components/hoc'
 
 const WorkTypesPage = () => {
   useDocumentTitle('Work Management - Work Types')
@@ -75,4 +76,10 @@ const WorkTypesPage = () => {
   )
 }
 
-export default WorkTypesPage
+const WorkTypesPageWithAuthorization = authorizePage(
+  WorkTypesPage,
+  'Permission',
+  'Permissions.WorkTypes.View',
+)
+
+export default WorkTypesPageWithAuthorization

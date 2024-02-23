@@ -3,6 +3,7 @@ import logger from 'redux-logger'
 import breadcrumbReducer from './breadcrumbs/breadcrumb-slice'
 import healthCheckReducer from './health-check-slice'
 import teamReducer from '../app/organizations/team-slice'
+import workStatusReducer from '../app/settings/work-management/work-status-slice'
 import workTypeReducer from '../app/settings/work-management/work-type-slice'
 
 const middlewares = []
@@ -16,6 +17,7 @@ export const store = configureStore({
     team: teamReducer,
     breadcrumb: breadcrumbReducer,
     healthCheck: healthCheckReducer,
+    workStatus: workStatusReducer,
     workType: workTypeReducer,
   },
   middleware: (getDefaultMiddleware) =>

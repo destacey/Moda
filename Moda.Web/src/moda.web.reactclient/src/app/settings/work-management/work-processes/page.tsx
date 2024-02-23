@@ -1,6 +1,7 @@
 'use client'
 
 import { ModaGrid, PageTitle } from '@/src/app/components/common'
+import { authorizePage } from '@/src/app/components/hoc'
 import { useDocumentTitle } from '@/src/app/hooks'
 import { WorkProcessListDto } from '@/src/services/moda-api'
 import { useGetWorkProcesses } from '@/src/services/queries/work-management-queries'
@@ -69,4 +70,10 @@ const WorkProcessesPage: React.FC = () => {
   )
 }
 
-export default WorkProcessesPage
+const WorkProcessesPageWithAuthorization = authorizePage(
+  WorkProcessesPage,
+  'Permission',
+  'Permissions.WorkProcesses.View',
+)
+
+export default WorkProcessesPageWithAuthorization
