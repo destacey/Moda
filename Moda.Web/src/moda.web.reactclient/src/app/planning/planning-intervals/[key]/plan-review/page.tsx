@@ -29,10 +29,8 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
     refetch: refetchPlanningInterval,
   } = useGetPlanningIntervalByKey(params.key)
 
-  const { data: teamData } = useGetPlanningIntervalTeams(
-    planningIntervalData?.id,
-    true,
-  )
+  const { data: teamData, isLoading: teamsIsLoading } =
+    useGetPlanningIntervalTeams(planningIntervalData?.id, true)
 
   useEffect(() => {
     if (planningIntervalData == null) return
@@ -96,7 +94,7 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
   if (!isLoading && !isFetching && !planningIntervalData) {
     notFound()
   }
-  if (isLoading) return <PlanningIntervalPlanReviewLoading />
+  if (isLoading || teamsIsLoading) return <PlanningIntervalPlanReviewLoading />
   if (!planningIntervalData) return null
   if (tabs?.length === 0)
     return <ModaEmpty message="No teams found for this PI" />

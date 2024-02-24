@@ -12,13 +12,13 @@ import {
   PlanningIntervalObjectiveListDto,
 } from '@/src/services/moda-api'
 import dayjs from 'dayjs'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ModaEmpty } from '../../components/common'
 import { UseQueryResult } from 'react-query'
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import Link from 'next/link'
-import { Space, Typography } from 'antd'
+import { Card, Flex, Spin, Typography } from 'antd'
 import useTheme from '../../components/contexts/theme'
 
 const { Text } = Typography
@@ -51,6 +51,7 @@ interface ObjectiveTimelineTemplateProps {
   timelineFontColor: string
   timelineForegroundColor: string
 }
+
 export const ObjectiveTimelineTemplate = ({
   objective,
   timelineFontColor,
@@ -75,6 +76,32 @@ export const ObjectiveTimelineTemplate = ({
   )
 }
 
+const getDataGroups = (
+  teamNames: string[],
+  objectives: TimelineItem[],
+  timelineFontColor: string,
+): DataGroup[] => {
+  let teams = []
+  if (!teamNames || teamNames.length === 0) {
+    teams = objectives.reduce((acc, obj) => {
+      if (!acc.includes(obj.group)) {
+        acc.push(obj.group)
+      }
+      return acc
+    }, [])
+  } else {
+    teams = teamNames
+  }
+
+  return teams.map((team) => {
+    return {
+      id: team,
+      content: team,
+      style: `color: ${timelineFontColor};`,
+    } as DataGroup
+  })
+}
+
 const PlanningIntervalObjectivesTimeline = ({
   objectivesQuery,
   planningIntervalCalendarQuery,
@@ -82,10 +109,13 @@ const PlanningIntervalObjectivesTimeline = ({
   teamNames,
   viewSelector,
 }: PlanningIntervalObjectivesTimelineProps) => {
+  const [isLoading, setIsLoading] = useState(true)
   const [piStart, setPiStart] = useState<Date>(undefined)
   const [piEnd, setPiEnd] = useState<Date>(undefined)
   const [iterations, setIterations] = useState<TimelineItem[]>([])
   const [objectives, setObjectives] = useState<TimelineItem[]>([])
+  const timelineRef = useRef<HTMLDivElement>(null)
+
   const { currentThemeName } = useTheme()
   const timelineBackgroundColor =
     currentThemeName === 'light' ? '#f5f5f5' : '#303030'
@@ -98,6 +128,7 @@ const PlanningIntervalObjectivesTimeline = ({
   const options = useMemo(() => {
     return {
       editable: false,
+      selectable: true,
       orientation: 'top',
       maxHeight: 650,
       minHeight: 200,
@@ -177,54 +208,42 @@ const PlanningIntervalObjectivesTimeline = ({
           } as TimelineItem
         }),
     )
+
+    setIsLoading(false)
   }, [
-    objectivesQuery?.data,
+    objectivesQuery,
+    objectivesQuery.data,
+    planningIntervalCalendarQuery,
     planningIntervalCalendarQuery.data,
     timelineBackgroundColor,
     timelineFontColor,
   ])
 
   useEffect(() => {
-    if (!objectives || objectives.length === 0) return
+    if (!objectives || objectives.length === 0 || isLoading) return
 
     // TODO: add the ability for content to overflow if the text is too long
     const items: TimelineItem[] = [...iterations, ...objectives]
 
-    var container = document.getElementById('timeline-vis')
-    const timeline = new Timeline(container, items, options as TimelineOptions)
+    const timeline = new Timeline(
+      timelineRef.current,
+      items,
+      options as TimelineOptions,
+    )
 
     if (enableGroups === true) {
-      let teams = []
-      if (!teamNames || teamNames.length === 0) {
-        teams = objectives.reduce((acc, obj) => {
-          if (!acc.includes(obj.group)) {
-            acc.push(obj.group)
-          }
-          return acc
-        }, [])
-      } else {
-        teams = teamNames
-      }
-
-      const groups = teams.map((team, index) => {
-        return {
-          id: team,
-          content: team,
-          style: `color: ${timelineFontColor};`,
-        } as DataGroup
-      })
-
-      timeline.setGroups(groups)
+      timeline.setGroups(
+        getDataGroups(teamNames, objectives, timelineFontColor),
+      )
     }
   }, [
     enableGroups,
+    isLoading,
+    iterations,
     objectives,
     options,
-    piStart,
-    piEnd,
     teamNames,
     timelineFontColor,
-    iterations,
   ])
 
   const TimelineChart = () => {
@@ -235,24 +254,22 @@ const PlanningIntervalObjectivesTimeline = ({
     return (
       <>
         {viewSelector && (
-          <Space
-            style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              alignItems: 'center',
-              paddingBottom: '16px',
-            }}
-          >
+          <Flex justify="end" align="center" style={{ paddingBottom: '16px' }}>
             {viewSelector}
-          </Space>
+          </Flex>
         )}
-        <div id="timeline-vis"></div>
+        <Card size="small" bordered={false}>
+          <div ref={timelineRef} id="timeline-vis"></div>
+        </Card>
       </>
     )
   }
 
-  // TODO: add a loading indicator
-  return <TimelineChart />
+  return (
+    <Spin spinning={isLoading} tip="Loading timeline..." size="large">
+      <TimelineChart />
+    </Spin>
+  )
 }
 
 export default PlanningIntervalObjectivesTimeline
