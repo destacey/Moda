@@ -5,7 +5,11 @@ import { useCallback, useEffect } from 'react'
 import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
 import { EditTeamFormValues } from '../types'
 import withModalForm, { FormProps } from '../../components/hoc/withModalForm'
-import { setEditMode, updateTeam, selectEditTeamContext } from '../team-slice'
+import {
+  setEditMode,
+  updateTeam,
+  selectEditTeamContext,
+} from '../../../store/features/organizations/team-slice'
 import { useAppSelector } from '../../hooks'
 
 const { Item } = Form

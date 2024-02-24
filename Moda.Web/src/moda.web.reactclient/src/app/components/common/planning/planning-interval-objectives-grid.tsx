@@ -13,7 +13,7 @@ import dayjs from 'dayjs'
 import CreateHealthCheckForm from '../health-check/create-health-check-form'
 import { SystemContext } from '../../constants'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
-import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
+import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import {
   NestedHealthCheckStatusCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,

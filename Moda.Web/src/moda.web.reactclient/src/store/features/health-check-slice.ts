@@ -1,14 +1,14 @@
-import createCrudSlice, { CrudState } from './crud-slice'
+import createCrudSlice, { CrudState } from '../crud-slice'
 import {
   CreateHealthCheckRequest,
   HealthCheckDto,
   UpdateHealthCheckRequest,
-} from '../services/moda-api'
-import { getHealthChecksClient } from '../services/clients'
-import { CreateHealthCheckFormValues } from '../app/components/common/health-check/create-health-check-form'
-import { SystemContext } from '../app/components/constants'
+} from '../../services/moda-api'
+import { getHealthChecksClient } from '../../services/clients'
+import { CreateHealthCheckFormValues } from '../../app/components/common/health-check/create-health-check-form'
+import { SystemContext } from '../../app/components/constants'
 import { PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import { OptionModel } from '../app/components/types'
+import { OptionModel } from '../../app/components/types'
 
 interface HealthCheckState extends CrudState<HealthCheckDto> {
   objectId?: string

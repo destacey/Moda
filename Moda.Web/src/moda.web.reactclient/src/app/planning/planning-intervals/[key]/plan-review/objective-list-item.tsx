@@ -18,7 +18,7 @@ import { ItemType } from 'antd/es/menu/hooks/useItems'
 import CreateHealthCheckForm from '@/src/app/components/common/health-check/create-health-check-form'
 import { SystemContext } from '@/src/app/components/constants'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
-import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
+import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import { EditPlanningIntervalObjectiveForm } from '../../../components'
 
 const { Item } = List

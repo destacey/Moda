@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import {
   getHealthCheck,
   selectHealthCheckContext,
-} from '@/src/store/health-check-slice'
+} from '@/src/store/features/health-check-slice'
 import { healthCheckTagColor } from './health-check-utils'
 
 const { Item } = Descriptions

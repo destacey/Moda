@@ -12,7 +12,7 @@ import {
   selectHealthCheckEditContext,
   cancelHealthCheckCreate,
   getHealthCheckStatusOptions,
-} from '@/src/store/health-check-slice'
+} from '@/src/store/features/health-check-slice'
 import { useEffect } from 'react'
 
 const { Item } = Form

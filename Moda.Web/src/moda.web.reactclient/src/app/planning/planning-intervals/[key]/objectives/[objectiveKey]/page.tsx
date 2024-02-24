@@ -18,7 +18,7 @@ import PlanningIntervalObjectiveDetailsLoading from './loading'
 import CreateHealthCheckForm from '@/src/app/components/common/health-check/create-health-check-form'
 import { SystemContext } from '@/src/app/components/constants'
 import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
-import { beginHealthCheckCreate } from '@/src/store/health-check-slice'
+import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import Link from 'next/link'
 import { PageActions } from '@/src/app/components/common'
 
