@@ -1,9 +1,11 @@
+'use client'
+
 import {
   PlanningIntervalDetailsDto,
   PlanningIntervalTeamResponse,
 } from '@/src/services/moda-api'
-import { Col, Row, Segmented, Space, Tag, Typography } from 'antd'
-import { useState } from 'react'
+import { Col, Flex, Row, Segmented, Space, Tag, Typography } from 'antd'
+import { useMemo, useState } from 'react'
 import TeamObjectivesListCard from './team-objectives-list-card'
 import TeamRisksListCard from './team-risks-list-card'
 import Link from 'next/link'
@@ -60,15 +62,23 @@ const TeamPlanReview = ({
     team?.id,
   )
 
+  const viewSelector = useMemo(
+    () => (
+      <Segmented
+        options={viewSelectorOptions}
+        value={currentView}
+        onChange={setCurrentView}
+      />
+    ),
+    [currentView],
+  )
+
   return (
     <>
-      <Space
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingBottom: '16px',
-        }}
+      <Flex
+        justify="space-between"
+        align="center"
+        style={{ paddingBottom: '16px' }}
       >
         <Space>
           <Title level={3} style={{ margin: '0' }}>
@@ -79,13 +89,9 @@ const TeamPlanReview = ({
               <Tag title="PI Predictability">{`${predictabilityQuery?.data}%`}</Tag>
             )}
         </Space>
-        <Segmented
-          options={viewSelectorOptions}
-          value={currentView}
-          onChange={setCurrentView}
-        />
-      </Space>
-      {currentView === 'List' && (
+        {viewSelector}
+      </Flex>
+      {currentView === 'List' ? (
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={24} md={24} lg={12}>
             <TeamObjectivesListCard
@@ -102,8 +108,7 @@ const TeamPlanReview = ({
             <TeamRisksListCard riskQuery={risksQuery} teamId={team?.id} />
           </Col>
         </Row>
-      )}
-      {currentView === 'Timeline' && (
+      ) : (
         <PlanningIntervalObjectivesTimeline
           objectivesQuery={objectivesQuery}
           planningIntervalCalendarQuery={calendarQuery}
