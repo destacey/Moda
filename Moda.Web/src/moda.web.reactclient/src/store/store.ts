@@ -3,6 +3,7 @@ import logger from 'redux-logger'
 import breadcrumbReducer from './breadcrumbs/breadcrumb-slice'
 import healthCheckReducer from './features/health-check-slice'
 import teamReducer from './features/organizations/team-slice'
+import workProcessReducer from './features/work-management/work-process-slice'
 import workStatusReducer from './features/work-management/work-status-slice'
 import workTypeReducer from './features/work-management/work-type-slice'
 
@@ -17,6 +18,7 @@ export const store = configureStore({
     team: teamReducer,
     breadcrumb: breadcrumbReducer,
     healthCheck: healthCheckReducer,
+    workProcess: workProcessReducer,
     workStatus: workStatusReducer,
     workType: workTypeReducer,
   },

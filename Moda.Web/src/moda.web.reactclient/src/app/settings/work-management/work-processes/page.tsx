@@ -2,13 +2,20 @@
 
 import { ModaGrid, PageTitle } from '@/src/app/components/common'
 import { authorizePage } from '@/src/app/components/hoc'
-import { useDocumentTitle } from '@/src/app/hooks'
+import {
+  useAppDispatch,
+  useAppSelector,
+  useDocumentTitle,
+} from '@/src/app/hooks'
 import { WorkProcessListDto } from '@/src/services/moda-api'
-import { useGetWorkProcesses } from '@/src/services/queries/work-management-queries'
+import {
+  fetchWorkProcesss,
+  setIncludeInactive,
+} from '@/src/store/features/work-management/work-process-slice'
 import { ColDef } from 'ag-grid-community'
 import { Space, Switch } from 'antd'
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 const WorkProcessLinkCellRenderer = ({ value, data }) => {
   return <Link href={`./work-processes/${data.key}`}>{value}</Link>
@@ -16,8 +23,11 @@ const WorkProcessLinkCellRenderer = ({ value, data }) => {
 
 const WorkProcessesPage: React.FC = () => {
   useDocumentTitle('Work Management - Work Processes')
-  const [includeDisabled, setIncludeDisabled] = useState(true)
-  const { data, isLoading, refetch } = useGetWorkProcesses(includeDisabled)
+
+  const { workProcesses, isLoading, error, includeInactive } = useAppSelector(
+    (state) => state.workProcess,
+  )
+  const dispatch = useAppDispatch()
 
   const columnDefs = useMemo<ColDef<WorkProcessListDto>[]>(
     () => [
@@ -30,12 +40,17 @@ const WorkProcessesPage: React.FC = () => {
     [],
   )
 
-  const refresh = useCallback(async () => {
-    refetch()
-  }, [refetch])
+  useEffect(() => {
+    error && console.error(error)
+  }, [error])
 
-  const onIncludeDisabledChange = (checked: boolean) => {
-    setIncludeDisabled(checked)
+  const refresh = useCallback(async () => {
+    dispatch(fetchWorkProcesss(includeInactive))
+  }, [dispatch, includeInactive])
+
+  const onIncludeInactiveChange = (checked: boolean) => {
+    dispatch(setIncludeInactive(checked))
+    dispatch(fetchWorkProcesss(checked))
   }
 
   const controlItems = [
@@ -44,8 +59,8 @@ const WorkProcessesPage: React.FC = () => {
         <Space>
           <Switch
             size="small"
-            checked={includeDisabled}
-            onChange={onIncludeDisabledChange}
+            checked={includeInactive}
+            onChange={onIncludeInactiveChange}
           />
           Include Disabled
         </Space>
@@ -62,7 +77,7 @@ const WorkProcessesPage: React.FC = () => {
         height={600}
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
-        rowData={data}
+        rowData={workProcesses}
         loadData={refresh}
         isDataLoading={isLoading}
       />

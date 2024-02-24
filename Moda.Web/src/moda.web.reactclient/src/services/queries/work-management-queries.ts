@@ -3,15 +3,6 @@ import { QK } from './query-keys'
 import { getWorkProcessesClient } from '../clients'
 
 // WORK PROCESSES
-export const useGetWorkProcesses = (includeDisabled: boolean = false) => {
-  return useQuery({
-    queryKey: [QK.WORK_PROCESSES, includeDisabled],
-    queryFn: async () =>
-      (await getWorkProcessesClient()).getList(includeDisabled),
-    staleTime: 60000,
-  })
-}
-
 export const useGetWorkProcessesByIdOrKey = (idOrKey: string) => {
   return useQuery({
     queryKey: [QK.WORK_PROCESSES, idOrKey],
