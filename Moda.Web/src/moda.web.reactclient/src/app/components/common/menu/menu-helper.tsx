@@ -60,6 +60,7 @@ function getItem(
     children,
     label: route ? <Link href={route}>{label}</Link> : label,
     type,
+    title: null,
   } as MenuItem
 }
 
