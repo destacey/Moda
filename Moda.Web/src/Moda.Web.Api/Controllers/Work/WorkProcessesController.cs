@@ -1,5 +1,4 @@
-﻿using Moda.Planning.Application.PlanningIntervals.Queries;
-using Moda.Work.Application.WorkProcesses.Commands;
+﻿using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.WorkProcesses.Dtos;
 using Moda.Work.Application.WorkProcesses.Queries;
 
@@ -20,8 +19,8 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<WorkProcessListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
-        var workTypes = await _sender.Send(new GetWorkProcessesQuery(includeInactive), cancellationToken);
-        return Ok(workTypes.OrderBy(s => s.Name));
+        var workProcesses = await _sender.Send(new GetWorkProcessesQuery(includeInactive), cancellationToken);
+        return Ok(workProcesses.OrderBy(s => s.Name));
     }
 
     [HttpGet("{idOrKey}")]
