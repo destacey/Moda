@@ -3,15 +3,15 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card, MenuProps } from 'antd'
 import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
 import WorkProcessDetailsLoading from './loading'
-import { useGetWorkProcessesByIdOrKey } from '@/src/services/queries/work-management-queries'
 import WorkProcessDetails from './work-process-details'
 import { PageActions } from '@/src/app/components/common'
 import useAuth from '@/src/app/components/contexts/auth'
 import ChangeWorkProcessIsActiveForm from '../components/change-work-process-isactive-form'
+import { useGetWorkProcessQuery } from '@/src/store/features/work-management/work-process-api'
 
 const WorkProcessDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')
@@ -29,8 +29,12 @@ const WorkProcessDetailsPage = ({ params }) => {
   const {
     data: workProcessData,
     isLoading,
-    refetch,
-  } = useGetWorkProcessesByIdOrKey(params.key)
+    error,
+  } = useGetWorkProcessQuery(params.key)
+
+  useEffect(() => {
+    error && console.error(error)
+  }, [error])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     if (!workProcessData?.isActive === undefined) return []
@@ -67,10 +71,6 @@ const WorkProcessDetailsPage = ({ params }) => {
 
   const onChangeWorkProcessIsActiveFormClosed = (wasSaved: boolean) => {
     setOpenChangeWorkProcessIsActiveForm(false)
-    if (wasSaved) {
-      // TODO: refetch not always working
-      refetch()
-    }
   }
 
   return (

@@ -8,10 +8,8 @@ import {
   useDocumentTitle,
 } from '@/src/app/hooks'
 import { WorkProcessListDto } from '@/src/services/moda-api'
-import {
-  fetchWorkProcesss,
-  setIncludeInactive,
-} from '@/src/store/features/work-management/work-process-slice'
+import { useGetWorkProcessesQuery } from '@/src/store/features/work-management/work-process-api'
+import { setIncludeInactive } from '@/src/store/features/work-management/work-process-slice'
 import { ColDef } from 'ag-grid-community'
 import { Space, Switch } from 'antd'
 import Link from 'next/link'
@@ -24,9 +22,14 @@ const WorkProcessLinkCellRenderer = ({ value, data }) => {
 const WorkProcessesPage: React.FC = () => {
   useDocumentTitle('Work Management - Work Processes')
 
-  const { workProcesses, isLoading, error, includeInactive } = useAppSelector(
-    (state) => state.workProcess,
-  )
+  const { includeInactive } = useAppSelector((state) => state.workProcess)
+
+  const {
+    data: workProcessesData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetWorkProcessesQuery(includeInactive)
   const dispatch = useAppDispatch()
 
   const columnDefs = useMemo<ColDef<WorkProcessListDto>[]>(
@@ -45,12 +48,11 @@ const WorkProcessesPage: React.FC = () => {
   }, [error])
 
   const refresh = useCallback(async () => {
-    dispatch(fetchWorkProcesss(includeInactive))
-  }, [dispatch, includeInactive])
+    refetch()
+  }, [refetch])
 
   const onIncludeInactiveChange = (checked: boolean) => {
     dispatch(setIncludeInactive(checked))
-    dispatch(fetchWorkProcesss(checked))
   }
 
   const controlItems = [
@@ -77,7 +79,7 @@ const WorkProcessesPage: React.FC = () => {
         height={600}
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
-        rowData={workProcesses}
+        rowData={workProcessesData}
         loadData={refresh}
         isDataLoading={isLoading}
       />
