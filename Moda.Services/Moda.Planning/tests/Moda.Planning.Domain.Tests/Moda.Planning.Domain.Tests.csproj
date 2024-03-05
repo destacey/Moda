@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-      <PackageReference Include="Bogus" Version="35.4.0" />
+      <PackageReference Include="Bogus" Version="35.4.1" />
       <PackageReference Include="FluentAssertions" Version="6.12.0" />
       <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
       <PackageReference Include="NodaTime" Version="3.1.11" />
@@ -16,7 +16,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="coverlet.collector" Version="6.0.0">
+      <PackageReference Include="coverlet.collector" Version="6.0.1">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
       </PackageReference>
