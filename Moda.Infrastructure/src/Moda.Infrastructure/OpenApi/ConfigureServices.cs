@@ -61,6 +61,14 @@ internal static class ConfigureServices
                 document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor());
                 document.OperationProcessors.Add(new SwaggerGlobalAuthProcessor());
 
+                document.SchemaSettings.TypeMappers.Add(new PrimitiveTypeMapper(typeof(Guid), schema =>
+                {
+                    schema.Type = NJsonSchema.JsonObjectType.String;
+                    schema.Format = NJsonSchema.JsonFormatStrings.Guid;
+                    schema.IsNullableRaw = false;
+                    schema.Example = Guid.Empty;
+                }));
+
                 document.SchemaSettings.TypeMappers.Add(new PrimitiveTypeMapper(typeof(TimeSpan), schema =>
                 {
                     schema.Type = NJsonSchema.JsonObjectType.String;

@@ -16,7 +16,11 @@ import {
 } from '@/src/services/queries/organization-queries'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
-import { retrieveTeam, setEditMode, selectTeamContext } from '../../team-slice'
+import {
+  retrieveTeam,
+  setEditMode,
+  selectTeamContext,
+} from '../../../../store/features/organizations/team-slice'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import { CreateTeamMembershipForm } from '../../components'

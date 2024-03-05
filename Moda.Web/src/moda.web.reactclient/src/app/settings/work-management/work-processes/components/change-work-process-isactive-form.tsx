@@ -1,5 +1,5 @@
 import useAuth from '@/src/app/components/contexts/auth'
-import { useChangeWorkProcessIsActiveMutation } from '@/src/services/queries/work-management-queries'
+import { useChangeWorkProcessIsActiveMutation } from '@/src/store/features/work-management/work-process-api'
 import { Modal, Typography, message } from 'antd'
 import { useEffect, useState } from 'react'
 
@@ -30,7 +30,7 @@ const ChangeWorkProcessIsActiveForm = (
     'Permissions.WorkProcesses.Update',
   )
 
-  const changeWorkProcessIsActiveMutation =
+  const [changeWorkProcessIsActive, { error }] =
     useChangeWorkProcessIsActiveMutation()
 
   const init = async (): Promise<boolean> => {
@@ -39,7 +39,7 @@ const ChangeWorkProcessIsActiveForm = (
         id: props.workProcessId,
         isActive: !props.isActive,
       }
-      await changeWorkProcessIsActiveMutation.mutateAsync(request)
+      await changeWorkProcessIsActive(request)
       messageApi.success('Successfully initialized work process.')
       return true
     } catch (error) {

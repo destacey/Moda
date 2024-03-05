@@ -898,7 +898,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "format": "guid"
+                  "format": "guid",
+                  "nullable": false,
+                  "example": "00000000-0000-0000-0000-000000000000"
                 }
               }
             }
@@ -945,7 +947,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -1001,7 +1005,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -1179,7 +1185,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -1237,7 +1245,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -1286,7 +1296,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -1339,7 +1351,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -1349,7 +1363,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -1399,7 +1415,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -1452,7 +1470,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -1542,7 +1562,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -1552,7 +1574,8 @@
             "schema": {
               "type": "string",
               "format": "guid",
-              "nullable": true
+              "nullable": true,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -1601,7 +1624,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -1682,7 +1707,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -1692,7 +1719,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -1748,7 +1777,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -1758,7 +1789,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -1829,7 +1862,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -1839,7 +1874,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -1957,7 +1994,8 @@
             "schema": {
               "type": "string",
               "format": "guid",
-              "nullable": true
+              "nullable": true,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -2008,7 +2046,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -2133,7 +2173,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -2330,7 +2372,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -2386,7 +2430,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -3147,7 +3193,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -3188,7 +3236,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -3873,7 +3923,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -3926,7 +3978,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -3977,7 +4031,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -4191,7 +4247,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -4254,7 +4312,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -4303,7 +4363,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -4366,7 +4428,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -4376,7 +4440,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -4437,7 +4503,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -4447,7 +4515,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -4488,7 +4558,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -4556,7 +4628,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -4580,7 +4654,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "format": "guid"
+                  "format": "guid",
+                  "nullable": false,
+                  "example": "00000000-0000-0000-0000-000000000000"
                 }
               }
             }
@@ -4637,7 +4713,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -4647,7 +4725,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -4703,7 +4783,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -4713,7 +4795,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -4949,7 +5033,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -5012,7 +5098,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -5061,7 +5149,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -5124,7 +5214,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -5134,7 +5226,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -5195,7 +5289,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -5205,7 +5301,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -5246,7 +5344,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -5314,7 +5414,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -5338,7 +5440,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "format": "guid"
+                  "format": "guid",
+                  "nullable": false,
+                  "example": "00000000-0000-0000-0000-000000000000"
                 }
               }
             }
@@ -5395,7 +5499,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -5405,7 +5511,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -5461,7 +5569,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           },
@@ -5471,7 +5581,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -5534,7 +5646,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -5585,7 +5699,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -5641,7 +5757,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -5709,7 +5827,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -5762,7 +5882,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "format": "guid"
+                  "format": "guid",
+                  "nullable": false,
+                  "example": "00000000-0000-0000-0000-000000000000"
                 }
               }
             }
@@ -5809,7 +5931,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -5865,7 +5989,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -5935,7 +6061,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -5998,7 +6126,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "format": "guid"
+                  "format": "guid",
+                  "nullable": false,
+                  "example": "00000000-0000-0000-0000-000000000000"
                 }
               }
             }
@@ -6144,7 +6274,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "format": "guid"
+                  "format": "guid",
+                  "nullable": false,
+                  "example": "00000000-0000-0000-0000-000000000000"
                 }
               }
             }
@@ -6191,7 +6323,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -6247,7 +6381,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -6308,7 +6444,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -6390,7 +6528,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -6431,7 +6571,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -6494,7 +6636,9 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
           }
@@ -6806,7 +6950,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -6915,11 +7061,15 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "userId": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "type": {
             "type": "string",
@@ -7089,7 +7239,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -7117,7 +7269,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -7157,7 +7311,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -7188,7 +7344,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -7313,7 +7471,9 @@
           "id": {
             "type": "string",
             "description": "Gets or sets the identifier.",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string",
@@ -7342,7 +7502,9 @@
           "id": {
             "type": "string",
             "description": "Gets or sets the identifier.",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -7404,7 +7566,8 @@
             "type": "string",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "start": {
             "type": "string",
@@ -7439,7 +7602,8 @@
           "iterationId": {
             "type": "string",
             "format": "guid",
-            "nullable": true
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string",
@@ -7473,13 +7637,17 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "teamIds": {
             "type": "array",
             "items": {
               "type": "string",
-              "format": "guid"
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             }
           }
         }
@@ -7490,7 +7658,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -7552,7 +7722,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -7606,7 +7778,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -7623,7 +7797,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -7690,13 +7866,16 @@
         "properties": {
           "planningIntervalId": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "teamId": {
             "type": "string",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string",
@@ -7734,11 +7913,15 @@
         "properties": {
           "planningIntervalId": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "objectiveId": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string",
@@ -7784,7 +7967,9 @@
           "id": {
             "type": "string",
             "description": "Gets or sets the identifier.",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -7825,7 +8010,8 @@
             "type": "string",
             "description": "The id of the health check.",
             "format": "guid",
-            "nullable": true
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "healthStatus": {
             "description": "The status of the health check.",
@@ -7882,7 +8068,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -7933,7 +8121,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -8012,7 +8202,8 @@
             "type": "string",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "summary": {
             "type": "string",
@@ -8041,7 +8232,8 @@
           "assigneeId": {
             "type": "string",
             "format": "guid",
-            "nullable": true
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "followUpDate": {
             "type": "string",
@@ -8066,13 +8258,16 @@
         "properties": {
           "riskId": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "teamId": {
             "type": "string",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "summary": {
             "type": "string",
@@ -8105,7 +8300,8 @@
           "assigneeId": {
             "type": "string",
             "format": "guid",
-            "nullable": true
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "followUpDate": {
             "type": "string",
@@ -8331,7 +8527,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -8354,7 +8552,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -8522,7 +8722,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -8570,7 +8772,8 @@
           "managerId": {
             "type": "string",
             "format": "guid",
-            "nullable": true
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "managerKey": {
             "type": "integer",
@@ -8592,7 +8795,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -8648,7 +8853,8 @@
           "managerId": {
             "type": "string",
             "format": "guid",
-            "nullable": true
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "managerKey": {
             "type": "integer",
@@ -8754,7 +8960,8 @@
             "type": "string",
             "description": "Gets the manager identifier.",
             "format": "guid",
-            "nullable": true
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           }
         }
       },
@@ -8771,7 +8978,9 @@
           "id": {
             "type": "string",
             "description": "Gets or sets the identifier.",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "firstName": {
             "type": "string",
@@ -8853,7 +9062,8 @@
             "type": "string",
             "description": "Gets the manager identifier.",
             "format": "guid",
-            "nullable": true
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           }
         }
       },
@@ -8863,7 +9073,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -8897,7 +9109,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -8970,7 +9184,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string",
@@ -9001,7 +9217,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "child": {
             "$ref": "#/components/schemas/TeamNavigationDto"
@@ -9036,13 +9254,15 @@
             "type": "string",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "parentTeamId": {
             "type": "string",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "start": {
             "type": "string",
@@ -9069,13 +9289,15 @@
             "type": "string",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "teamMembershipId": {
             "type": "string",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "start": {
             "type": "string",
@@ -9095,7 +9317,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -9129,7 +9353,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
             "type": "integer",
@@ -9200,7 +9426,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string",
@@ -9231,11 +9459,15 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "objectId": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string"
@@ -9258,7 +9490,8 @@
             "type": "string",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string",
@@ -9286,7 +9519,8 @@
             "type": "string",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string",
@@ -9307,11 +9541,15 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "objectId": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -9345,7 +9583,8 @@
             "type": "string",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "contextId": {
             "type": "integer",
@@ -9381,7 +9620,8 @@
             "type": "string",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "contextId": {
             "type": "integer",
@@ -9432,7 +9672,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string"
@@ -9454,7 +9696,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string"
@@ -9514,11 +9758,14 @@
           "id": {
             "type": "string",
             "format": "guid",
-            "nullable": true
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "externalId": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string"
@@ -9543,7 +9790,9 @@
         "properties": {
           "internalId": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "isActive": {
             "type": "boolean"
@@ -9557,11 +9806,14 @@
           "id": {
             "type": "string",
             "format": "guid",
-            "nullable": true
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "externalId": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string"
@@ -9572,7 +9824,9 @@
           },
           "workProcessId": {
             "type": "string",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "integrationState": {
             "nullable": true,
@@ -9635,7 +9889,9 @@
           "id": {
             "type": "string",
             "description": "Gets or sets the identifier.",
-            "format": "guid"
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string",
@@ -9694,14 +9950,16 @@
             "description": "Connection Id.",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "externalId": {
             "type": "string",
             "description": "External identifier for the work process.",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           }
         }
       },
@@ -9719,14 +9977,16 @@
             "description": "Connection Id.",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "externalId": {
             "type": "string",
             "description": "External identifier for the workspace.",
             "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "workspaceKey": {
             "type": "string",

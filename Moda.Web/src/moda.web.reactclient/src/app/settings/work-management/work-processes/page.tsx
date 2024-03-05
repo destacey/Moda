@@ -2,13 +2,18 @@
 
 import { ModaGrid, PageTitle } from '@/src/app/components/common'
 import { authorizePage } from '@/src/app/components/hoc'
-import { useDocumentTitle } from '@/src/app/hooks'
+import {
+  useAppDispatch,
+  useAppSelector,
+  useDocumentTitle,
+} from '@/src/app/hooks'
 import { WorkProcessListDto } from '@/src/services/moda-api'
-import { useGetWorkProcesses } from '@/src/services/queries/work-management-queries'
+import { useGetWorkProcessesQuery } from '@/src/store/features/work-management/work-process-api'
+import { setIncludeInactive } from '@/src/store/features/work-management/work-process-slice'
 import { ColDef } from 'ag-grid-community'
 import { Space, Switch } from 'antd'
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 const WorkProcessLinkCellRenderer = ({ value, data }) => {
   return <Link href={`./work-processes/${data.key}`}>{value}</Link>
@@ -16,8 +21,16 @@ const WorkProcessLinkCellRenderer = ({ value, data }) => {
 
 const WorkProcessesPage: React.FC = () => {
   useDocumentTitle('Work Management - Work Processes')
-  const [includeDisabled, setIncludeDisabled] = useState(true)
-  const { data, isLoading, refetch } = useGetWorkProcesses(includeDisabled)
+
+  const { includeInactive } = useAppSelector((state) => state.workProcess)
+
+  const {
+    data: workProcessesData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetWorkProcessesQuery(includeInactive)
+  const dispatch = useAppDispatch()
 
   const columnDefs = useMemo<ColDef<WorkProcessListDto>[]>(
     () => [
@@ -30,12 +43,16 @@ const WorkProcessesPage: React.FC = () => {
     [],
   )
 
+  useEffect(() => {
+    error && console.error(error)
+  }, [error])
+
   const refresh = useCallback(async () => {
     refetch()
   }, [refetch])
 
-  const onIncludeDisabledChange = (checked: boolean) => {
-    setIncludeDisabled(checked)
+  const onIncludeInactiveChange = (checked: boolean) => {
+    dispatch(setIncludeInactive(checked))
   }
 
   const controlItems = [
@@ -44,8 +61,8 @@ const WorkProcessesPage: React.FC = () => {
         <Space>
           <Switch
             size="small"
-            checked={includeDisabled}
-            onChange={onIncludeDisabledChange}
+            checked={includeInactive}
+            onChange={onIncludeInactiveChange}
           />
           Include Disabled
         </Space>
@@ -62,7 +79,7 @@ const WorkProcessesPage: React.FC = () => {
         height={600}
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
-        rowData={data}
+        rowData={workProcessesData}
         loadData={refresh}
         isDataLoading={isLoading}
       />

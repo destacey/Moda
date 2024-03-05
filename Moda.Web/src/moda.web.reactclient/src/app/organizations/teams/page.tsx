@@ -14,7 +14,7 @@ import {
   setEditMode,
   selectTeamsContext,
   selectTeamIsInEditMode,
-} from '../team-slice'
+} from '../../../store/features/organizations/team-slice'
 import { ModalCreateTeamForm } from '../components/create-team-form'
 import {
   NestedTeamOfTeamsNameLinkCellRenderer,

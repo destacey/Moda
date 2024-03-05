@@ -11,7 +11,7 @@ import { useContext, useState } from 'react'
 import InitWorkProcessIntegrationForm from '../components/init-work-process-integration-form'
 import AzdoBoardsWorkspaceCard from './azdo-boards-workspace-card'
 import { AzdoBoardsConnectionContext } from './azdo-boards-connection-context'
-import { useGetWorkProcessesByIdOrKey } from '@/src/services/queries/work-management-queries'
+import { useGetWorkProcessQuery } from '@/src/store/features/work-management/work-process-api'
 
 const { Title, Text } = Typography
 const { Item } = List
@@ -28,12 +28,11 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
   ] = useState<boolean>(false)
 
   const azdoBoardsConnection = useContext(AzdoBoardsConnectionContext)
-  const {
-    data: workProcessData,
-    isLoading,
-    refetch,
-  } = useGetWorkProcessesByIdOrKey(
+
+  const skip = !props?.workProcess?.integrationState?.internalId
+  const { data: workProcessData } = useGetWorkProcessQuery(
     props?.workProcess?.integrationState?.internalId,
+    { skip },
   )
 
   const integrationExists = !!props.workProcess.integrationState

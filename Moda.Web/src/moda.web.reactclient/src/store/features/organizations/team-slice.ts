@@ -4,7 +4,7 @@ import {
   EditTeamFormValues,
   TeamListItem,
   TeamTypeName,
-} from './types'
+} from '../../../app/organizations/types'
 import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
 

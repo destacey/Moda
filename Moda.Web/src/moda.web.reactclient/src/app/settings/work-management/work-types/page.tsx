@@ -10,7 +10,10 @@ import { WorkTypeDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import { Space, Switch } from 'antd'
 import { useCallback, useEffect, useMemo } from 'react'
-import { fetchWorkTypes, setIncludeInactive } from '../work-type-slice'
+import {
+  fetchWorkTypes,
+  setIncludeInactive,
+} from '../../../../store/features/work-management/work-type-slice'
 import { authorizePage } from '@/src/app/components/hoc'
 
 const WorkTypesPage = () => {

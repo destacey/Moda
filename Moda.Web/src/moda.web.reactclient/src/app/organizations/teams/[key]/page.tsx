@@ -24,7 +24,7 @@ import {
   retrieveTeam,
   setEditMode,
   selectEditTeamContext,
-} from '../../team-slice'
+} from '../../../../store/features/organizations/team-slice'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 

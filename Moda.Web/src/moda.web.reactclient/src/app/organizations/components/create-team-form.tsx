@@ -2,7 +2,11 @@
 
 import { Form, Input, Radio } from 'antd'
 import { CreateTeamFormValues } from '../types'
-import { createTeam, setEditMode, selectEditTeamContext } from '../team-slice'
+import {
+  createTeam,
+  setEditMode,
+  selectEditTeamContext,
+} from '../../../store/features/organizations/team-slice'
 import withModalForm, { FormProps } from '../../components/hoc/withModalForm'
 import { useAppSelector } from '../../hooks'
 

@@ -10,7 +10,10 @@ import { WorkStatusDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import { Space, Switch } from 'antd'
 import { useCallback, useEffect, useMemo } from 'react'
-import { fetchWorkStatuses, setIncludeInactive } from '../work-status-slice'
+import {
+  fetchWorkStatuses,
+  setIncludeInactive,
+} from '../../../../store/features/work-management/work-status-slice'
 import { authorizePage } from '@/src/app/components/hoc'
 
 const WorkStatusesPage = () => {
