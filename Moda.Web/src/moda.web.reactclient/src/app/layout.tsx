@@ -1,6 +1,8 @@
 'use client'
 
 import '@/styles/globals.css'
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-balham.css'
 import React from 'react'
 import { Provider } from 'react-redux'
 import { Inter } from 'next/font/google'
