@@ -36,6 +36,8 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
   )
 
   const integrationExists = !!props.workProcess.integrationState
+  const processIntegrationIsActive =
+    props.workProcess.integrationState?.isActive
 
   const onInitWorkProcessIntegrationFormClosed = (wasSaved: boolean) => {
     setOpenInitWorkProcessIntegrationForm(false)
@@ -47,6 +49,7 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
 
   const workspaceSection = (
     processWorkspaces: AzureDevOpsBoardsWorkspaceDto[],
+    processIntegrationIsActive: boolean,
   ) => (
     <>
       <Title level={5}>Workspaces</Title>
@@ -66,7 +69,12 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
         )}
         renderItem={(item) => (
           <Item>
-            <AzdoBoardsWorkspaceCard workspace={item} enableInit={false} />
+            <AzdoBoardsWorkspaceCard
+              workspace={item}
+              enableInit={
+                !item.integrationState?.isActive && processIntegrationIsActive
+              }
+            />
           </Item>
         )}
       />
@@ -86,7 +94,7 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
     }
 
     if (workProcessData) {
-      const integrationState = props.workProcess.integrationState.isActive
+      const integrationState = processIntegrationIsActive
         ? 'Active Integration'
         : 'Inactive Integration'
 
@@ -121,7 +129,7 @@ const AzdoBoardsProcess = (props: AzdoBoardsProcessProps) => {
           <Space>{integrationContent()}</Space>
         </Flex>
         <Text>{props.workProcess.description}</Text>
-        {workspaceSection(props.workspaces)}
+        {workspaceSection(props.workspaces, processIntegrationIsActive)}
       </Flex>
       {openInitWorkProcessIntegrationForm && (
         <InitWorkProcessIntegrationForm

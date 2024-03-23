@@ -28,12 +28,6 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
 
   const azdoBoardsConnection = useContext(AzdoBoardsConnectionContext)
 
-  const noDescription = (
-    <Text type="secondary" italic>
-      No description provided.
-    </Text>
-  )
-
   return (
     <>
       <Card
@@ -63,7 +57,13 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
         }
       >
         <Descriptions column={1} size="small">
-          <Item>{props.workspace.description ?? noDescription}</Item>
+          <Item>
+            {props.workspace.description ?? (
+              <Text type="secondary" italic>
+                No description provided.
+              </Text>
+            )}
+          </Item>
         </Descriptions>
       </Card>
       {openInitWorkspaceIntegrationForm && (
