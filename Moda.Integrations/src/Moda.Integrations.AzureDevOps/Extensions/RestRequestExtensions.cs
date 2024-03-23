@@ -6,9 +6,13 @@ using RestSharp;
 namespace Moda.Integrations.AzureDevOps.Extensions;
 internal static class RestRequestExtensions
 {
-    internal static void AddAcceptHeaderWithApiVersion(this RestRequest request, string apiVersion)
+    internal static void AddAcceptHeaderWithApiVersion(this RestRequest request, string apiVersion, bool includePreviewTag = false)
     {
         Guard.Against.NullOrWhiteSpace(apiVersion);
+
+        if (includePreviewTag)
+            apiVersion = $"{apiVersion}-preview";
+
         request.AddHeader("Accept", $"application/json;api-version={apiVersion}");
     }
 

@@ -1,33 +1,37 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Net;
+using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.TeamFoundation.Core.WebApi;
-using Microsoft.VisualStudio.Services.WebApi;
+using Moda.Integrations.AzureDevOps.Clients;
+using Moda.Integrations.AzureDevOps.Models.Projects;
 
 namespace Moda.Integrations.AzureDevOps.Services;
-internal sealed class ProjectService
+internal sealed class ProjectService(string organizationUrl, string token, string apiVersion, ILogger<ProjectService> logger)
 {
-    private readonly ProjectHttpClient _projectClient;
-    private readonly ILogger<ProjectService> _logger;
+    private readonly ProjectClient _projectClient = new ProjectClient(organizationUrl, token, apiVersion);
+    private readonly ILogger<ProjectService> _logger = logger;
     private readonly int _maxBatchSize = 100;
 
-    public ProjectService(VssConnection connection, ILogger<ProjectService> logger)
-    {
-        _projectClient = connection.GetClient<ProjectHttpClient>();
-        _logger = logger;
-    }
-
-    public async Task<Result<List<TeamProjectReference>>> GetProjects()
+    public async Task<Result<List<ProjectDto>>> GetProjects(CancellationToken cancellationToken)
     {
         try
         {
-            List<TeamProjectReference> projects = new();
+            List<ProjectDto> projects = [];
 
             while (true)
             {
-                var batch = await _projectClient.GetProjects(top: _maxBatchSize, skip: projects.Count);
-                projects.AddRange(batch);
+                var batch = await _projectClient.GetProjects(top: _maxBatchSize, skip: projects.Count, cancellationToken);
+                if (!batch.IsSuccessful)
+                {
+                    _logger.LogError("Error getting projects from Azure DevOps: {ErrorMessage}.", batch.ErrorMessage);
+                    return Result.Failure<List<ProjectDto>>(batch.ErrorMessage);
+                }
 
-                if (batch.Count < _maxBatchSize)
+                if (batch.Data is null)
+                    break;
+
+                projects.AddRange(batch.Data.Items);
+
+                if (batch.Data.Count < _maxBatchSize)
                     break;
             }
 
@@ -38,27 +42,50 @@ internal sealed class ProjectService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception thrown getting projects from Azure DevOps");
-            return Result.Failure<List<TeamProjectReference>>(ex.ToString());
+            return Result.Failure<List<ProjectDto>>(ex.ToString());
         }
     }
 
-    public async Task<Result<TeamProject>> GetProject(Guid projectId)
+    public async Task<Result<ProjectDetailsDto>> GetProject(Guid projectId, CancellationToken cancellationToken)
     {
         try
         {
-            var project = await _projectClient.GetProject(projectId.ToString());
-            if (project is null)
+            var projectResponse = await _projectClient.GetProject(projectId, cancellationToken);
+            if (!projectResponse.IsSuccessful && projectResponse.StatusCode != HttpStatusCode.NotFound)
             {
-                _logger.LogWarning("No project found with id {ProjectId}", projectId);
-                return Result.Failure<TeamProject>($"No project found with id {projectId}");
+                var statusDescription = projectResponse.StatusCode is 0 ? "Connection Error" : projectResponse.StatusDescription;
+                var errorMessage = projectResponse.ErrorMessage is null ? statusDescription : $"{statusDescription} - {projectResponse.ErrorMessage}";
+                _logger.LogError("Error getting project {ProjectId} from Azure DevOps: {ErrorMessage}.", projectId, errorMessage);
+                return Result.Failure<ProjectDetailsDto>(errorMessage);
+            }
+            else if ((!projectResponse.IsSuccessful && projectResponse.StatusCode is HttpStatusCode.NotFound) || projectResponse.Data is null)
+            {
+                var errorMesssage = projectResponse.IsSuccessful ? "No project data returned" : projectResponse.StatusDescription;
+                _logger.LogError("Error getting project {ProjectId} from Azure DevOps: {ErrorMessage}.", projectId, errorMesssage);
+                return Result.Failure<ProjectDetailsDto>(errorMesssage);
             }
 
-            return Result.Success(project);
+            var propertiesResponse = await _projectClient.GetProjectProperties(projectId, cancellationToken);
+            if (!propertiesResponse.IsSuccessful && propertiesResponse.StatusCode != HttpStatusCode.NotFound)
+            {
+                var statusDescription = propertiesResponse.StatusCode is 0 ? "Connection Error" : propertiesResponse.StatusDescription;
+                var errorMessage = propertiesResponse.ErrorMessage is null ? statusDescription : $"{statusDescription} - {propertiesResponse.ErrorMessage}";
+                _logger.LogError("Error getting project properties {ProjectId} from Azure DevOps: {ErrorMessage}.", projectId, errorMessage);
+                return Result.Failure<ProjectDetailsDto>(errorMessage);
+            }
+            else if ((!propertiesResponse.IsSuccessful && propertiesResponse.StatusCode is HttpStatusCode.NotFound) || propertiesResponse.Data is null)
+            {
+                var errorMesssage = propertiesResponse.IsSuccessful ? "No project properties data returned" : propertiesResponse.StatusDescription;
+                _logger.LogError("Error getting project properties {ProjectId} from Azure DevOps: {ErrorMessage}.", projectId, errorMesssage);
+                return Result.Failure<ProjectDetailsDto>(errorMesssage);
+            }
+
+            return Result.Success(ProjectDetailsDto.Create(projectResponse.Data, [.. propertiesResponse.Data.Value]));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception thrown getting project {ProjectId} from Azure DevOps", projectId);
-            return Result.Failure<TeamProject>(ex.ToString());
+            return Result.Failure<ProjectDetailsDto>(ex.ToString());
         }
     }
 }

@@ -47,7 +47,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
             }
 
             // Load workspaces
-            var workspacesResult = await _azureDevOpsService.GetWorkspaces(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken);
+            var workspacesResult = await _azureDevOpsService.GetWorkspaces(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, cancellationToken);
             if (workspacesResult.IsFailure)
                 return workspacesResult;
 
@@ -182,6 +182,9 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                 return connectionResult;
 
             // get the workspace
+            var workspaceResult = await _azureDevOpsService.GetWorkspace(connectionResult.Value.Configuration.OrganizationUrl, connectionResult.Value.Configuration.PersonalAccessToken, workspaceExternalId, cancellationToken);
+            if (workspaceResult.IsFailure)
+                return workspaceResult.ConvertFailure<Guid>();
 
 
 
