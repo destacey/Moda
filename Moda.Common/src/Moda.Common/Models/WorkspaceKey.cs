@@ -1,8 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Work.Domain.Extensions;
 
-namespace Moda.Work.Domain.Models;
+namespace Moda.Common.Models;
 public sealed class WorkspaceKey : ValueObject
 {
     /// <summary>

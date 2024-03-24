@@ -9969,7 +9969,8 @@
         "required": [
           "id",
           "externalId",
-          "workspaceKey"
+          "workspaceKey",
+          "workspaceName"
         ],
         "properties": {
           "id": {
@@ -9992,6 +9993,13 @@
             "type": "string",
             "description": "The key for the workspace.",
             "maxLength": 20,
+            "minLength": 1,
+            "nullable": false
+          },
+          "workspaceName": {
+            "type": "string",
+            "description": "The name for the workspace.",
+            "maxLength": 64,
             "minLength": 1,
             "nullable": false
           }

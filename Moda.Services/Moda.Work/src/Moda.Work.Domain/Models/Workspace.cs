@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Extensions;
+using Moda.Common.Models;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;

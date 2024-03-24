@@ -71,6 +71,7 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
           showForm={openInitWorkspaceIntegrationForm}
           connectionId={azdoBoardsConnection.connectionId}
           externalId={props.workspace.externalId}
+          workspaceName={props.workspace.name}
           onFormSave={() => onInitWorkspaceFormClosed(false)}
           onFormCancel={() => onInitWorkspaceFormClosed(false)}
         />

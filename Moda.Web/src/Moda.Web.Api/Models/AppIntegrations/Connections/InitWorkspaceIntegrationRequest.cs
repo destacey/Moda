@@ -1,4 +1,4 @@
-﻿using Moda.Work.Domain.Extensions;
+﻿using Moda.Common.Extensions;
 
 namespace Moda.Web.Api.Models.AppIntegrations.Connections;
 
@@ -18,6 +18,11 @@ public sealed record InitWorkspaceIntegrationRequest
     /// The key for the workspace.
     /// </summary>
     public required string WorkspaceKey { get; set; }
+
+    /// <summary>
+    /// The name for the workspace.
+    /// </summary>
+    public required string WorkspaceName { get; set; }
 }
 
 public sealed class InitWorkspaceIntegrationRequestValidator : CustomValidator<InitWorkspaceIntegrationRequest>
@@ -38,5 +43,9 @@ public sealed class InitWorkspaceIntegrationRequestValidator : CustomValidator<I
             .MaximumLength(20)
             .Must(t => t.IsValidWorkspaceKeyFormat())
                 .WithMessage("Invalid workspace key format. Workspace key's must be uppercase letters and numbers only and start with an uppercase letter.");
+
+        RuleFor(c => c.WorkspaceName)
+            .NotEmpty()
+            .MaximumLength(64);
     }
 }

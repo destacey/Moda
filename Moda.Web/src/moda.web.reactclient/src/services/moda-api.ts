@@ -9100,6 +9100,8 @@ export interface InitWorkspaceIntegrationRequest {
     externalId: string;
     /** The key for the workspace. */
     workspaceKey: string;
+    /** The name for the workspace. */
+    workspaceName: string;
 }
 
 export interface ConnectorListDto {

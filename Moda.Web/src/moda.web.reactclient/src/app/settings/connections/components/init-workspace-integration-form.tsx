@@ -3,7 +3,7 @@ import { InitWorkspaceIntegrationRequest } from '@/src/services/moda-api'
 import { useInitAzdoBoardsConnectionWorkspaceMutation } from '@/src/services/queries/app-integration-queries'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, message } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
 
@@ -11,17 +11,20 @@ export interface InitWorkspaceIntegrationFormProps {
   showForm: boolean
   connectionId: string
   externalId: string
+  workspaceName: string
   onFormSave: () => void
   onFormCancel: () => void
 }
 
 interface InitWorkspaceIntegrationFormValues {
   workspaceKey: string
+  workspaceName: string
 }
 
 const mapToRequestValues = (values: InitWorkspaceIntegrationFormValues) => {
   return {
     workspaceKey: values.workspaceKey,
+    workspaceName: values.workspaceName,
   } as InitWorkspaceIntegrationRequest
 }
 
@@ -42,6 +45,16 @@ const InitWorkspaceIntegrationForm = (
   )
 
   const initWorkspaceMutation = useInitAzdoBoardsConnectionWorkspaceMutation()
+
+  const mapToFormValues = useCallback(
+    (workspaceName: string) => {
+      form.setFieldsValue({
+        workspaceName: workspaceName,
+      })
+    },
+    [form],
+  )
+
   const init = async (
     values: InitWorkspaceIntegrationFormValues,
   ): Promise<boolean> => {
@@ -94,11 +107,12 @@ const InitWorkspaceIntegrationForm = (
   useEffect(() => {
     if (canUpdateConnection) {
       setIsOpen(props.showForm)
+      mapToFormValues(props.workspaceName)
     } else {
       props.onFormCancel()
       messageApi.error('You do not have permission to initialize workspaces.')
     }
-  }, [canUpdateConnection, messageApi, props])
+  }, [canUpdateConnection, mapToFormValues, messageApi, props])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -159,6 +173,13 @@ const InitWorkspaceIntegrationForm = (
                 ).value.toUpperCase())
               }
             />
+          </Item>
+          <Item
+            label="Workspace Name"
+            name="workspaceName"
+            rules={[{ required: true }]}
+          >
+            <Input showCount maxLength={64} />
           </Item>
         </Form>
       </Modal>

@@ -1,6 +1,6 @@
-﻿using Moda.Work.Domain.Models;
+﻿using Moda.Common.Models;
 
-namespace Moda.Work.Domain.Tests.Sut.Models;
+namespace Moda.Common.Tests.Sut.Models;
 public class WorkspaceKeyTests
 {
     [Theory]

@@ -28,10 +28,10 @@ internal sealed class UpdateAzureDevOpsBoardsWorkProcessIntegrationStateCommandH
             return Result.Failure($"Unable to find Azure DevOps Boards connection with id {request.ConnectionId}.");
         }
 
-        var importWorkProcessesResult = connection.UpdateWorkProcessIntegrationState(request.IntegrationRegistration, _dateTimeProvider.Now);
-        if (importWorkProcessesResult.IsFailure)
+        var updateWorkProcessesResult = connection.UpdateWorkProcessIntegrationState(request.IntegrationRegistration, _dateTimeProvider.Now);
+        if (updateWorkProcessesResult.IsFailure)
         {
-            _logger.LogError("Errors occurred while processing {AppRequestName}. {Error}", AppRequestName, importWorkProcessesResult.Error);
+            _logger.LogError("Errors occurred while processing {AppRequestName}. {Error}", AppRequestName, updateWorkProcessesResult.Error);
 
             return Result.Failure($"Errors occurred while processing {AppRequestName}.");
         }
