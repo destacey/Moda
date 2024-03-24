@@ -15,14 +15,14 @@
         <PackageReference Include="CsvHelper" Version="31.0.2" />
         <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
         <PackageReference Include="Hangfire.Console.Extensions.Serilog" Version="2.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
-        <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2" />
-        <PackageReference Include="NSwag.AspNetCore" Version="14.0.3" />
-        <PackageReference Include="NSwag.MSBuild" Version="14.0.3">
+        <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.2.0" />
+        <PackageReference Include="NSwag.AspNetCore" Version="14.0.4" />
+        <PackageReference Include="NSwag.MSBuild" Version="14.0.4">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
