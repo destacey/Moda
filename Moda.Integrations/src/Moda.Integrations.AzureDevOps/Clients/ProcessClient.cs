@@ -1,6 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using Moda.Integrations.AzureDevOps.Extensions;
-using Moda.Integrations.AzureDevOps.Models;
+using Moda.Integrations.AzureDevOps.Models.Contracts;
 using Moda.Integrations.AzureDevOps.Models.Processes;
 using RestSharp;
 

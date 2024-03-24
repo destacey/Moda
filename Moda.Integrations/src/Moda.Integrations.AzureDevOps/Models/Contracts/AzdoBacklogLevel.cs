@@ -1,7 +1,7 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Domain.Enums;
 
-namespace Moda.Integrations.AzureDevOps.Models;
+namespace Moda.Integrations.AzureDevOps.Models.Contracts;
 public sealed record AzdoBacklogLevel : IExternalBacklogLevel
 {
     public required string Id { get; set; }

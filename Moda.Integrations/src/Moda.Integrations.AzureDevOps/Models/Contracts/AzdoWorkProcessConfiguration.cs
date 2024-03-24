@@ -1,6 +1,6 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 
-namespace Moda.Integrations.AzureDevOps.Models;
+namespace Moda.Integrations.AzureDevOps.Models.Contracts;
 public sealed record AzdoWorkProcessConfiguration : AzdoWorkProcess, IExternalWorkProcessConfiguration
 {
     public IList<IExternalBacklogLevel> BacklogLevels { get; set; } = [];

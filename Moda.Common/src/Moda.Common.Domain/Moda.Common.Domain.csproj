@@ -11,8 +11,4 @@
       <ProjectReference Include="..\Moda.Common\Moda.Common.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Models\Organization\" />
-    </ItemGroup>
-
 </Project>

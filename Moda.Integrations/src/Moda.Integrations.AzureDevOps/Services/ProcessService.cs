@@ -2,7 +2,7 @@
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Moda.Integrations.AzureDevOps.Clients;
-using Moda.Integrations.AzureDevOps.Models;
+using Moda.Integrations.AzureDevOps.Models.Contracts;
 using Moda.Integrations.AzureDevOps.Models.Processes;
 
 namespace Moda.Integrations.AzureDevOps.Services;

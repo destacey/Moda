@@ -180,6 +180,33 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         }
     }
 
+    public Result UpdateWorkspaceIntegrationState(IntegrationRegistration<Guid, Guid> registration, Instant timestamp)
+    {
+        try
+        {
+            Guard.Against.Null(Configuration, nameof(Configuration));
+
+            var workspace = Configuration.Workspaces.FirstOrDefault(wp => wp.ExternalId == registration.ExternalId);
+            if (workspace is null)
+                return Result.Failure($"Unable to find workspace with id {registration.ExternalId} in Azure DevOps Boards connection with id {Id}.");
+
+            Result setResult = workspace.HasIntegration
+                ? workspace.UpdateIntegrationState(registration.IntegrationState.IsActive)
+                : workspace.AddIntegrationState(registration.IntegrationState);
+            if (setResult.IsFailure)
+                return setResult;
+
+            // TODO this will generate duplicate events in some cases
+            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
     public static AzureDevOpsBoardsConnection Create(string name, string? description, AzureDevOpsBoardsConnectionConfiguration configuration, bool configurationIsValid, Instant timestamp)
     {
         var connector = new AzureDevOpsBoardsConnection(name, description, configuration, configurationIsValid);

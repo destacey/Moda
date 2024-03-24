@@ -1,7 +1,7 @@
 ﻿using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Moda.Common.Application.Interfaces.Work;
 
-namespace Moda.Integrations.AzureDevOps.Models;
+namespace Moda.Integrations.AzureDevOps.Models.Contracts;
 public record AzdoWorkItem : IExternalWorkItem
 {
     public AzdoWorkItem(WorkItem workItem)
