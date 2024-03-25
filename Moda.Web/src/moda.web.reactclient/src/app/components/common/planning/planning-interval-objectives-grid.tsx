@@ -152,7 +152,7 @@ const PlanningIntervalObjectivesGrid = ({
         filter: false,
         sortable: false,
         hide: !canManageObjectives,
-        suppressMenu: true,
+        suppressHeaderMenuButton: true,
         cellRenderer: (params) => {
           const menuItems = getRowMenuItems({
             objectiveId: params.data.id,

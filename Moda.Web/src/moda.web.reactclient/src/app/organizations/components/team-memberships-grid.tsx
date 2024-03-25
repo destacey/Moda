@@ -104,7 +104,7 @@ const TeamMembershipsGrid = ({
         filter: false,
         sortable: false,
         hide: !showRowActions,
-        suppressMenu: true,
+        suppressHeaderMenuButton: true,
         cellRenderer: (params) => {
           // only allow editing memberships for current team
           if (teamId != params.data.child.id) return null
