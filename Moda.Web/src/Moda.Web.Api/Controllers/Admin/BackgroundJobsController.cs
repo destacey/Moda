@@ -1,5 +1,6 @@
 ﻿using Moda.AppIntegration.Application.Interfaces;
 using Moda.Common.Application.BackgroundJobs;
+using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Interfaces;
 
 namespace Moda.Web.Api.Controllers.Admin;

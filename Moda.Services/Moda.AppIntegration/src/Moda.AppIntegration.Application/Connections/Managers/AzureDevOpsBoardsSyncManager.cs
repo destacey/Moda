@@ -13,56 +13,45 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
     private readonly IAzureDevOpsService _azureDevOpsService = azureDevOpsService;
     private readonly ISender _sender = sender;
 
-    public async Task<Result> Sync(CancellationToken cancellationToken)
+    public async Task Sync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Syncing Azure DevOps Boards");
 
-        try
+        var connections = await _sender.Send(new GetConnectionsQuery(false, Connector.AzureDevOpsBoards), cancellationToken);
+        if (!connections.Any(c => c.IsValidConfiguration && c.IsSyncEnabled))
         {
-            var connections = await _sender.Send(new GetConnectionsQuery(false, Connector.AzureDevOpsBoards), cancellationToken);
-            if (!connections.Any(c => c.IsValidConfiguration && c.IsSyncEnabled))
+            _logger.LogInformation("No active Azure DevOps Boards connections found.");
+            return;
+        }
+
+        foreach (var connection in connections.Where(c => c.IsValidConfiguration && c.IsSyncEnabled))
+        {
+            var connectionDetails = await _sender.Send(new GetAzureDevOpsBoardsConnectionQuery(connection.Id), cancellationToken);
+            if (connectionDetails is null)
             {
-                _logger.LogInformation("No active Azure DevOps Boards connections found.");
-                return Result.Success();
+                _logger.LogError("Unable to retrieve connection details for Azure DevOps Boards connection with ID {ConnectionId}.", connection.Id);
+                continue;
             }
 
-            foreach (var connection in connections.Where(c => c.IsValidConfiguration && c.IsSyncEnabled))
+            foreach (var workProcess in connectionDetails.Configuration.WorkProcesses)
             {
-                var connectionDetails = await _sender.Send(new GetAzureDevOpsBoardsConnectionQuery(connection.Id), cancellationToken);
-                if (connectionDetails is null)
+                if (workProcess.IntegrationState is null || !workProcess.IntegrationState.IsActive)
+                    continue;
+
+                var syncResult = await SyncWorkProcess(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workProcess.ExternalId, cancellationToken);
+                if (syncResult.IsFailure)
                 {
-                    _logger.LogError("Unable to retrieve connection details for Azure DevOps Boards connection with ID {ConnectionId}.", connection.Id);
+                    _logger.LogError("An error occurred while syncing Azure DevOps Boards work process with ID {WorkProcessId}. Error: {Error}", workProcess.Id, syncResult.Error);
                     continue;
                 }
-
-                foreach (var workProcess in connectionDetails.Configuration.WorkProcesses)
+                else
                 {
-                    if (workProcess.IntegrationState is null || !workProcess.IntegrationState.IsActive)
-                        continue;
-
-                    var syncResult = await SyncWorkProcess(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workProcess.ExternalId, cancellationToken);
-                    if (syncResult.IsFailure)
-                    {
-                        _logger.LogError("An error occurred while syncing Azure DevOps Boards work process with ID {WorkProcessId}. Error: {Error}", workProcess.Id, syncResult.Error);
-                        continue;
-                    }
-                    else
-                    {
-                        _logger.LogInformation("Successfully synced Azure DevOps Boards work process with ID {WorkProcessId}.", workProcess.Id);
-                    }
-
-                    // TODO: sync workspaces
+                    _logger.LogInformation("Successfully synced Azure DevOps Boards work process with ID {WorkProcessId}.", workProcess.Id);
                 }
+
+                // TODO: sync workspaces
             }
         }
-        catch (Exception ex)
-        {
-            // TODO: this doesn't fail the job
-            _logger.LogError(ex, "An error occurred while syncing Azure DevOps Boards.");
-            return Result.Failure("An error occurred while syncing Azure DevOps Boards.");
-        }
-
-        return Result.Success();
     }
 
     private async Task<Result> SyncWorkProcess(string organizationUrl, string personalAccessToken, Guid workProcessExternalId, CancellationToken cancellationToken)
@@ -100,5 +89,4 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
             ? Result.Success()
             : updateWorkProcessResult;
     }
-
 }

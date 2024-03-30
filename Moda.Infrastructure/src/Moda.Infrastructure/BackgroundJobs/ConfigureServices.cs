@@ -24,8 +24,7 @@ internal static class ConfigureServices
 
         if (string.IsNullOrEmpty(storageSettings.StorageProvider)) throw new Exception("Hangfire Storage Provider is not configured.");
         if (string.IsNullOrEmpty(storageSettings.ConnectionString)) throw new Exception("Hangfire Storage Provider ConnectionString is not configured.");
-        _logger.Information($"Hangfire: Current Storage Provider : {storageSettings.StorageProvider}");
-        _logger.Information("For more Hangfire storage, visit https://www.hangfire.io/extensions.html");
+        _logger.Information("Hangfire: Current Storage Provider : {StorageProvider}", storageSettings.StorageProvider);
 
         services.AddSingleton<JobActivator, ModaJobActivator>();
 
@@ -34,6 +33,7 @@ internal static class ConfigureServices
             .UseDatabase(storageSettings.StorageProvider, storageSettings.ConnectionString, config)
             .UseFilter(new ModaJobFilter(provider))
             .UseFilter(new LogJobFilter())
+            .UseFilter(new AutomaticRetryAttribute { Attempts = 3, DelaysInSeconds = [30, 60, 120] })
             .UseConsole());
 
         return services;
