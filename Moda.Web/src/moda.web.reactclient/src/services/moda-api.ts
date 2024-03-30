@@ -9012,6 +9012,7 @@ export interface ConnectionListDto {
     connector?: string;
     isActive?: boolean;
     isValidConfiguration?: boolean;
+    isSyncEnabled?: boolean;
 }
 
 export interface AzureDevOpsBoardsConnectionDetailsDto {

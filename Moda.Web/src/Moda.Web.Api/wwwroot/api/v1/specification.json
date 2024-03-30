@@ -9687,6 +9687,9 @@
           },
           "isValidConfiguration": {
             "type": "boolean"
+          },
+          "isSyncEnabled": {
+            "type": "boolean"
           }
         }
       },
