@@ -26,6 +26,12 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
         foreach (var connection in connections.Where(c => c.IsValidConfiguration && c.IsSyncEnabled))
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogInformation("Cancellation requested. Stopping sync.");
+                return;
+            }
+
             var connectionDetails = await _sender.Send(new GetAzureDevOpsBoardsConnectionQuery(connection.Id), cancellationToken);
             if (connectionDetails is null)
             {
@@ -35,6 +41,12 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
             foreach (var workProcess in connectionDetails.Configuration.WorkProcesses)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    _logger.LogInformation("Cancellation requested. Stopping sync.");
+                    return;
+                }
+
                 if (workProcess.IntegrationState is null || !workProcess.IntegrationState.IsActive)
                     continue;
 
