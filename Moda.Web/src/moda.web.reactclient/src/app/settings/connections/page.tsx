@@ -40,6 +40,7 @@ const ConnectionsPage = () => {
       { field: 'connector' },
       { field: 'isActive' },
       { field: 'isValidConfiguration' },
+      { field: 'isSyncEnabled' },
     ],
     [],
   )
