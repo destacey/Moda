@@ -29,6 +29,11 @@ public sealed record ConnectionListDto : IMapFrom<Connection>
     /// </value>
     public bool IsValidConfiguration { get; set; }
 
+    /// <summary>
+    /// The indicator for whether the connection is enabled for synchronization.
+    /// </summary>
+    public bool IsSyncEnabled { get; set; }
+
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Connection, ConnectionListDto>()

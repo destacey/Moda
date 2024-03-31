@@ -108,7 +108,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
             if (processResult.IsFailure)
                 return processResult.ConvertFailure<Guid>();
 
-            // create types
+            // create new types
             if (processResult.Value.WorkTypes.Any())
             {
                 var syncWorkTypesResult = await _sender.Send(new SyncExternalWorkTypesCommand(processResult.Value.WorkTypes), cancellationToken);
@@ -116,7 +116,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                     return syncWorkTypesResult.ConvertFailure<Guid>();
             }
 
-            // create statuses
+            // create new statuses
             if (processResult.Value.WorkStatuses.Any())
             {
                 var syncWorkStatusesResult = await _sender.Send(new SyncExternalWorkStatusesCommand(processResult.Value.WorkStatuses), cancellationToken);

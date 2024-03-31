@@ -6473,6 +6473,67 @@
         ]
       }
     },
+    "/api/app-integrations/azure-devops-boards-connections/{id}/sync-state": {
+      "post": {
+        "tags": [
+          "AzureDevOpsBoardsConnections"
+        ],
+        "summary": "Update an Azure DevOps Boards connection sync state.",
+        "operationId": "AzureDevOpsBoardsConnections_UpdateSyncState",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "isSyncEnabled",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/app-integrations/azure-devops-boards-connections/test": {
       "post": {
         "tags": [
@@ -9686,6 +9747,9 @@
             "type": "boolean"
           },
           "isValidConfiguration": {
+            "type": "boolean"
+          },
+          "isSyncEnabled": {
             "type": "boolean"
           }
         }

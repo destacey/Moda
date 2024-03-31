@@ -24,6 +24,9 @@ const AzdoBoardsConnectionDetails = ({
             <Item label="Is Valid Configuration?">
               {connection.isValidConfiguration ? 'Yes' : 'No'}
             </Item>
+            <Item label="Is Sync Enabled?">
+              {connection.isSyncEnabled ? 'Yes' : 'No'}
+            </Item>
           </Descriptions>
         </Col>
         <Col xs={24} md={12}>

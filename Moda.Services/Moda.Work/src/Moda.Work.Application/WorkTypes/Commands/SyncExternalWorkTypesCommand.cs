@@ -34,7 +34,7 @@ public sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbCon
             .Select(e => WorkType.Create(e.Name, e.Description, _dateTimeProvider.Now))
             .ToList();
 
-        if (workTypesToCreate.Count != 0)
+        if (workTypesToCreate.Count > 0)
         {
             _workDbContext.WorkTypes.AddRange(workTypesToCreate);
             await _workDbContext.SaveChangesAsync(cancellationToken);

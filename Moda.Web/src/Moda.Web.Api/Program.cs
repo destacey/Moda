@@ -12,6 +12,7 @@ using Moda.Links;
 using Moda.Organization.Application;
 using Moda.Planning.Application;
 using Moda.Web.Api.Configurations;
+using Moda.Web.Api.Interfaces;
 using Moda.Web.Api.Services;
 using Moda.Work.Application;
 using NodaTime.Serialization.SystemTextJson;
@@ -74,6 +75,7 @@ try
     builder.Services.AddAppIntegrationApplication();
 
     builder.Services.AddScoped<ICsvService, CsvService>();
+    builder.Services.AddScoped<IJobManager, JobManager>();
 
     var app = builder.Build();
 

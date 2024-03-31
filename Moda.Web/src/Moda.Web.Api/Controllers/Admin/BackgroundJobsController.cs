@@ -1,5 +1,5 @@
 ﻿using Moda.Common.Application.BackgroundJobs;
-using Moda.Common.Application.Interfaces;
+using Moda.Web.Api.Interfaces;
 
 namespace Moda.Web.Api.Controllers.Admin;
 
@@ -11,14 +11,12 @@ public class BackgroundJobsController : ControllerBase
     private readonly ILogger<BackgroundJobsController> _logger;
     private readonly IJobService _jobService;
     private readonly ISender _sender;
-    private readonly IEmployeeService _employeeService;
 
-    public BackgroundJobsController(ILogger<BackgroundJobsController> logger, IJobService jobService, ISender sender, IEmployeeService employeeService)
+    public BackgroundJobsController(ILogger<BackgroundJobsController> logger, IJobService jobService, ISender sender)
     {
         _logger = logger;
         _jobService = jobService;
         _sender = sender;
-        _employeeService = employeeService;
     }
 
     [HttpGet("job-types")]
@@ -49,14 +47,21 @@ public class BackgroundJobsController : ControllerBase
     [OpenApiOperation("Run a background job.", "")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public IActionResult Run(int jobTypeId, CancellationToken cancellationToken)
+    public IActionResult Run(int jobTypeId, [FromServices] IJobManager jobManager, CancellationToken cancellationToken)
     {
-        switch ((BackgroundJobType)jobTypeId)
+        var jobType = (BackgroundJobType)jobTypeId;
+
+        // TODO: should this code be moved to the manager?
+        switch (jobType)
         {
-            case BackgroundJobType.EmployeeImport:
-                _jobService.Enqueue(() => _employeeService.SyncExternalEmployees(cancellationToken));
+            case BackgroundJobType.EmployeeSync:
+                _jobService.Enqueue(() => jobManager.RunSyncExternalEmployees(cancellationToken));
+                break;
+            case BackgroundJobType.AzdoBoardsSync:
+                _jobService.Enqueue(() => jobManager.RunSyncAzureDevOpsBoards(cancellationToken));
                 break;
             default:
+                _logger.LogWarning("Unknown job type {jobType} requested", jobType);
                 return BadRequest();
         }
         return Accepted();

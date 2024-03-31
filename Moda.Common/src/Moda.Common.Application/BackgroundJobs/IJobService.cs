@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 
 namespace Moda.Common.Application.BackgroundJobs;
 
-public interface IJobService : ITransientService
+public interface IJobService : IScopedService
 {
     IEnumerable<BackgroundJobDto> GetRunningJobs();
 

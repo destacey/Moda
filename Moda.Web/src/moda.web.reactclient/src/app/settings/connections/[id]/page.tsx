@@ -10,6 +10,7 @@ import { authorizePage } from '@/src/app/components/hoc'
 import {
   useGetAzdoBoardsConnectionById,
   useSyncAzdoBoardsConnectionOrganizationMutation,
+  useUpdateAzdoBoardsConnectionSyncStateMutation,
 } from '@/src/services/queries/app-integration-queries'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import EditConnectionForm from '../components/edit-connection-form'
@@ -58,6 +59,9 @@ const ConnectionDetailsPage = ({ params }) => {
     refetch,
   } = useGetAzdoBoardsConnectionById(params.id)
   const azdoOrgUrl = connectionData?.configuration?.organizationUrl
+
+  const updateSyncStateMutation =
+    useUpdateAzdoBoardsConnectionSyncStateMutation()
 
   const syncOrganizationConfigurationMutation =
     useSyncAzdoBoardsConnectionOrganizationMutation()
@@ -114,6 +118,25 @@ const ConnectionDetailsPage = ({ params }) => {
     }
   }
 
+  const updateSyncState = useCallback(async () => {
+    try {
+      await updateSyncStateMutation.mutateAsync({
+        connectionId: params.id,
+        isSyncEnabled: !connectionData.isSyncEnabled,
+      })
+      messageApi.success(
+        `Sync setting has been ${
+          connectionData.isSyncEnabled ? 'disabled' : 'enabled'
+        }`,
+      )
+    } catch (error) {
+      console.error(error)
+      messageApi.error(
+        `Failed to change sync setting. Error: ${error.supportMessage}`,
+      )
+    }
+  }, [updateSyncStateMutation, messageApi, connectionData, params.id])
+
   const syncOrganizationConfiguration = useCallback(async () => {
     try {
       await syncOrganizationConfigurationMutation.mutateAsync(params.id)
@@ -152,22 +175,32 @@ const ConnectionDetailsPage = ({ params }) => {
       })
     }
     if (canUpdateConnections) {
-      items.push({
-        key: 'sync-organization',
-        label: 'Sync Organization Configuration',
-        disabled: connectionData?.isValidConfiguration ?? true,
-        onClick: () => {
-          setIsSyncingOrganization(true)
-          syncOrganizationConfiguration()
+      items.push(
+        {
+          key: 'toggle-sync-setting',
+          label: connectionData?.isSyncEnabled ? 'Disable Sync' : 'Enable Sync',
+          disabled: !connectionData?.isValidConfiguration ?? true,
+          onClick: () => updateSyncState(),
         },
-      })
+        {
+          key: 'sync-organization',
+          label: 'Sync Organization Configuration',
+          disabled: !connectionData?.isValidConfiguration ?? true,
+          onClick: () => {
+            setIsSyncingOrganization(true)
+            syncOrganizationConfiguration()
+          },
+        },
+      )
     }
     return items
   }, [
     canDeleteConnections,
     canUpdateConnections,
+    connectionData?.isSyncEnabled,
     connectionData?.isValidConfiguration,
     syncOrganizationConfiguration,
+    updateSyncState,
   ])
 
   if (!isLoading && !isFetching && !connectionData) {

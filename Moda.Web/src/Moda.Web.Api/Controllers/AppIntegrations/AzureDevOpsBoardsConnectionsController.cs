@@ -97,6 +97,30 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
         return NoContent();
     }
 
+    [HttpPost("{id}/sync-state")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
+    [OpenApiOperation("Update an Azure DevOps Boards connection sync state.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> UpdateSyncState(Guid id, bool isSyncEnabled, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new UpdateAzureDevOpsBoardsConnectionSyncStateCommand(id, isSyncEnabled), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "AzureDevOpsBoardsConnectionsController.Update"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
     [HttpDelete("{id}")]
     [MustHavePermission(ApplicationAction.Delete, ApplicationResource.Connections)]
     [OpenApiOperation("Delete an Azure DevOps Boards connection.", "")]

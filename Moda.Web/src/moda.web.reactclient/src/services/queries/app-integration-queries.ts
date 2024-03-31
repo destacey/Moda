@@ -71,6 +71,31 @@ export const useDeleteAzdoBoardsConnectionMutation = () => {
   })
 }
 
+export interface UpdateAzdoBoardsConnectionSyncStateMutationRequest {
+  connectionId: string
+  isSyncEnabled: boolean
+}
+export const useUpdateAzdoBoardsConnectionSyncStateMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (
+      request: UpdateAzdoBoardsConnectionSyncStateMutationRequest,
+    ) =>
+      (await getAzureDevOpsBoardsConnectionsClient()).updateSyncState(
+        request.connectionId,
+        request.isSyncEnabled,
+      ),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, false])
+      queryClient.invalidateQueries([QK.AZDO_BOARDS_CONNECTIONS, true])
+      queryClient.invalidateQueries([
+        QK.AZDO_BOARDS_CONNECTIONS,
+        variables.connectionId,
+      ])
+    },
+  })
+}
+
 export const useSyncAzdoBoardsConnectionOrganizationMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
