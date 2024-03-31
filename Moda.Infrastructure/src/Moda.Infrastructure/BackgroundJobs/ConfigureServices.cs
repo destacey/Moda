@@ -33,7 +33,6 @@ internal static class ConfigureServices
             .UseDatabase(storageSettings.StorageProvider, storageSettings.ConnectionString, config)
             .UseFilter(new ModaJobFilter(provider))
             .UseFilter(new LogJobFilter())
-            .UseFilter(new AutomaticRetryAttribute { Attempts = 3, DelaysInSeconds = [30, 60, 120] })
             .UseConsole());
 
         return services;

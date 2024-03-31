@@ -9,7 +9,7 @@ public class HangfireService : IJobService
 {
     public IEnumerable<BackgroundJobDto> GetRunningJobs()
     {
-        List<BackgroundJobDto> backgroundJobs = new();
+        List<BackgroundJobDto> backgroundJobs = [];
 
         var jobs = JobStorage.Current.GetMonitoringApi().ProcessingJobs(0, 1000);
 

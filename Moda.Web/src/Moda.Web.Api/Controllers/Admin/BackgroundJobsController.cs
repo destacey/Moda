@@ -1,7 +1,5 @@
-﻿using Moda.AppIntegration.Application.Interfaces;
-using Moda.Common.Application.BackgroundJobs;
-using Moda.Common.Application.Exceptions;
-using Moda.Common.Application.Interfaces;
+﻿using Moda.Common.Application.BackgroundJobs;
+using Moda.Web.Api.Interfaces;
 
 namespace Moda.Web.Api.Controllers.Admin;
 
@@ -49,21 +47,18 @@ public class BackgroundJobsController : ControllerBase
     [OpenApiOperation("Run a background job.", "")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public IActionResult Run(int jobTypeId, 
-        [FromServices] IEmployeeService employeeService,
-        [FromServices] IAzureDevOpsBoardsSyncManager azdoBoardsSyncManager,
-        CancellationToken cancellationToken)
+    public IActionResult Run(int jobTypeId, [FromServices] IJobManager jobManager, CancellationToken cancellationToken)
     {
         var jobType = (BackgroundJobType)jobTypeId;
-        _logger.LogInformation("Running job type {jobType}", jobType);
 
+        // TODO: should this code be moved to the manager?
         switch (jobType)
         {
             case BackgroundJobType.EmployeeSync:
-                _jobService.Enqueue(() => employeeService.SyncExternalEmployees(cancellationToken));
+                _jobService.Enqueue(() => jobManager.RunSyncExternalEmployees(cancellationToken));
                 break;
             case BackgroundJobType.AzdoBoardsSync:
-                _jobService.Enqueue(() => azdoBoardsSyncManager.Sync(cancellationToken));
+                _jobService.Enqueue(() => jobManager.RunSyncAzureDevOpsBoards(cancellationToken));
                 break;
             default:
                 _logger.LogWarning("Unknown job type {jobType} requested", jobType);
