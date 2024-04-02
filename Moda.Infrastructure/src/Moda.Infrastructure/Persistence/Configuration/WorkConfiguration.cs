@@ -195,10 +195,10 @@ public class WorkspaceConfig : IEntityTypeConfiguration<Workspace>
         builder.Property(w => w.IsDeleted);
 
         // Relationships
-        builder.HasOne<WorkProcess>()
+        builder.HasOne(w => w.WorkProcess)
             .WithMany(w => w.Workspaces)
             .HasForeignKey(w => w.WorkProcessId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
 
