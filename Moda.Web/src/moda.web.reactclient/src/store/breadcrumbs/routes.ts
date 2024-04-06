@@ -15,6 +15,7 @@ const routes = {
   teams: {
     title: 'Teams',
   },
+
   planning: {
     title: 'Planning',
     href: null,
@@ -26,6 +27,15 @@ const routes = {
     title: 'Teams',
     href: null,
   },
+
+  work: {
+    title: 'Work',
+    href: null,
+  },
+  workspaces: {
+    title: 'Workspaces',
+  },
+
   settings: {
     title: 'Settings',
     href: null,

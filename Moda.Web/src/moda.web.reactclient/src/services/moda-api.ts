@@ -3779,7 +3779,7 @@ export class WorkProcessesClient {
     }
 
     /**
-     * Get a list of all work processes.
+     * Get a list of work processes.
      * @param includeInactive (optional) 
      */
     getList(includeInactive: boolean | undefined, cancelToken?: CancelToken): Promise<WorkProcessListDto[]> {
@@ -3842,7 +3842,7 @@ export class WorkProcessesClient {
     }
 
     /**
-     * Get the PI calendar.
+     * Get work process details.
      */
     get(idOrKey: string, cancelToken?: CancelToken): Promise<WorkProcessDto> {
         let url_ = this.baseUrl + "/api/work/work-processes/{idOrKey}";
@@ -4021,6 +4021,151 @@ export class WorkProcessesClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
+    }
+}
+
+export class WorkspacesClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get a list of workspaces.
+     * @param includeInactive (optional) 
+     */
+    getList(includeInactive: boolean | undefined, cancelToken?: CancelToken): Promise<WorkspaceListDto[]> {
+        let url_ = this.baseUrl + "/api/work/workspaces?";
+        if (includeInactive === null)
+            throw new Error("The parameter 'includeInactive' cannot be null.");
+        else if (includeInactive !== undefined)
+            url_ += "includeInactive=" + encodeURIComponent("" + includeInactive) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetList(_response);
+        });
+    }
+
+    protected processGetList(response: AxiosResponse): Promise<WorkspaceListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<WorkspaceListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<WorkspaceListDto[]>(null as any);
+    }
+
+    /**
+     * Get workspace details.
+     */
+    get(idOrKey: string, cancelToken?: CancelToken): Promise<WorkspaceDto> {
+        let url_ = this.baseUrl + "/api/work/workspaces/{idOrKey}";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGet(_response);
+        });
+    }
+
+    protected processGet(response: AxiosResponse): Promise<WorkspaceDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<WorkspaceDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<WorkspaceDto>(null as any);
     }
 }
 
@@ -8772,6 +8917,26 @@ export interface WorkProcessDto {
     name?: string;
     description?: string | undefined;
     ownership?: SimpleNavigationDto;
+    isActive?: boolean;
+}
+
+export interface WorkspaceListDto {
+    id?: string;
+    key?: string;
+    name?: string;
+    description?: string | undefined;
+    ownership?: SimpleNavigationDto;
+    isActive?: boolean;
+}
+
+export interface WorkspaceDto {
+    id?: string;
+    key?: string;
+    name?: string;
+    description?: string | undefined;
+    ownership?: SimpleNavigationDto;
+    workProcess?: SimpleNavigationDto;
+    externalId?: string | undefined;
     isActive?: boolean;
 }
 

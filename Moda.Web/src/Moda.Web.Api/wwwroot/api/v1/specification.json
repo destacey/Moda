@@ -3077,7 +3077,7 @@
         "tags": [
           "WorkProcesses"
         ],
-        "summary": "Get a list of all work processes.",
+        "summary": "Get a list of work processes.",
         "operationId": "WorkProcesses_GetList",
         "parameters": [
           {
@@ -3127,7 +3127,7 @@
         "tags": [
           "WorkProcesses"
         ],
-        "summary": "Get the PI calendar.",
+        "summary": "Get work process details.",
         "operationId": "WorkProcesses_Get",
         "parameters": [
           {
@@ -3246,6 +3246,113 @@
         "responses": {
           "204": {
             "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/work/workspaces": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get a list of workspaces.",
+        "operationId": "Workspaces_GetList",
+        "parameters": [
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkspaceListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/work/workspaces/{idOrKey}": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get workspace details.",
+        "operationId": "Workspaces_Get",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "400": {
             "description": "",
@@ -8630,6 +8737,71 @@
           },
           "ownership": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "WorkspaceListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "ownership": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "WorkspaceDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "ownership": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "workProcess": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "externalId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "isActive": {
             "type": "boolean"

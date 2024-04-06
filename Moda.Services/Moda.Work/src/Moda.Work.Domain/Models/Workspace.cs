@@ -76,6 +76,11 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     public Guid WorkProcessId { get; private set; }
 
     /// <summary>
+    /// The work process assigned to the workspace.
+    /// </summary>
+    public WorkProcess? WorkProcess { get; private set; }
+
+    /// <summary>
     /// Indicates whether the workspace is active or not.  Inactive workspaces will be locked.  This means that
     /// users won't be able to add or updated work items.
     /// </summary>

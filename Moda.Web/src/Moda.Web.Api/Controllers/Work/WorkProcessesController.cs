@@ -14,7 +14,7 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkProcesses)]
-    [OpenApiOperation("Get a list of all work processes.", "")]
+    [OpenApiOperation("Get a list of work processes.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<WorkProcessListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
@@ -25,7 +25,7 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
 
     [HttpGet("{idOrKey}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkProcesses)]
-    [OpenApiOperation("Get the PI calendar.", "")]
+    [OpenApiOperation("Get work process details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
@@ -42,7 +42,7 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("PlanningIntervalsController.GetCalendar"));
+            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkProcessesController.GetCalendar"));
         }
 
         var result = await _sender.Send(query, cancellationToken);

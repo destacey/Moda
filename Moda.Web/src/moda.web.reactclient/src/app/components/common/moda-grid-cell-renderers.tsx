@@ -139,3 +139,13 @@ export const RowMenuCellRenderer = (props: RowMenuCellRendererProps) => {
     </Dropdown>
   )
 }
+
+export interface WorkspaceLinkCellRendererProps {
+  data: NavigationDto
+}
+export const WorkspaceLinkCellRenderer = ({
+  data,
+}: WorkspaceLinkCellRendererProps) => {
+  if (!data) return null
+  return <Link href={`/work/workspaces/${data.key}`}>{data.name}</Link>
+}
