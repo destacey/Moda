@@ -18,21 +18,22 @@ export const workspaceApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         QueryTags.Workspace,
-        ...result.map(({ id }) => ({ type: QueryTags.Workspace, id })),
+        ...result.map(({ key }) => ({ type: QueryTags.Workspace, key })),
       ],
     }),
     getWorkspace: builder.query<WorkspaceDto, string>({
       queryFn: async (idOrKey: string) => {
         try {
           const data = await (await getWorkspacesClient()).get(idOrKey)
+          console.log('Data:', data)
           return { data }
         } catch (error) {
+          console.error('Error:', error)
           return { error }
         }
       },
       providesTags: (result, error, arg) => [
         { type: QueryTags.Workspace, id: arg }, // typically arg is the key
-        { type: QueryTags.Workspace, id: result.id },
       ],
     }),
   }),

@@ -2,6 +2,7 @@
 
 import { WorkspaceListDto } from '@/src/services/moda-api'
 import { Card, Descriptions, Flex, List, Tag, Typography } from 'antd'
+import { useRouter } from 'next/navigation'
 import { ReactElement } from 'react'
 
 const { Item: ListItem } = List
@@ -54,8 +55,15 @@ interface WorkspaceCardProps {
 }
 
 const WorkspaceCard = (props: WorkspaceCardProps) => {
+  const router = useRouter()
+
   return (
-    <Card title={props.workspace.name} size="small">
+    <Card
+      title={props.workspace.name}
+      size="small"
+      hoverable
+      onClick={() => router.push(`/work/workspaces/${props.workspace.key}`)}
+    >
       <Descriptions column={1} size="small">
         <DiscriptionItem label="Key">{props.workspace.key}</DiscriptionItem>
         <DiscriptionItem>

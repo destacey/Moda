@@ -5,6 +5,7 @@ import { ColDef } from 'ag-grid-community'
 import { Card, Flex, List } from 'antd'
 import { ReactElement, useCallback, useMemo } from 'react'
 import { ModaGrid } from '../../components/common'
+import { WorkspaceLinkCellRenderer } from '../../components/common/moda-grid-cell-renderers'
 
 export interface WorkspacesGridProps {
   workspaces: WorkspaceListDto[]
@@ -19,7 +20,7 @@ const WorkspacesGrid = (props: WorkspacesGridProps) => {
   const columnDefs = useMemo<ColDef<WorkspaceListDto>[]>(
     () => [
       { field: 'key', width: 90 },
-      { field: 'name' },
+      { field: 'name', cellRenderer: WorkspaceLinkCellRenderer },
       { field: 'description', width: 300 },
       { field: 'ownership.name', headerName: 'Ownership' },
       { field: 'isActive' },

@@ -39,7 +39,7 @@ const WorkspacesPage: React.FC = () => {
     error,
     refetch,
   } = useGetWorkspacesQuery(true)
-  const dispatch = useAppDispatch()
+  //const dispatch = useAppDispatch()
 
   useEffect(() => {
     error && console.error(error)
