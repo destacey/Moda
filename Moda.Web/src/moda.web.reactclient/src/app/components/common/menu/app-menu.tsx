@@ -3,6 +3,7 @@ import {
   HomeOutlined,
   SettingOutlined,
   ScheduleOutlined,
+  ProjectOutlined,
 } from '@ant-design/icons'
 import { Layout, Menu } from 'antd'
 import { useEffect, useState } from 'react'
@@ -39,9 +40,9 @@ const menu: (Item | MenuItem)[] = [
     // menuItem('Increments', 'plan.increments'),
     // menuItem('Sprints', 'plan.sprints'),
   ]),
-  // menuItem('Work Management', 'work', null, <ProjectOutlined />, [
-  //     menuItem('Workspaces', 'work.workspaces'),
-  // ]),
+  menuItem('Work Management', 'work', null, <ProjectOutlined />, [
+    menuItem('Workspaces', 'work.workspaces', '/work/workspaces'),
+  ]),
   // menuItem('Products', 'pdc', null, <DesktopOutlined />, [
   //     menuItem('Product Lines', 'pdc.product-lines'),
   //     menuItem('Product Types', 'pdc.product-types'),

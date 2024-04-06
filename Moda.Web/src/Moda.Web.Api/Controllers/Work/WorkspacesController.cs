@@ -17,10 +17,10 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
     [OpenApiOperation("Get a list of workspaces.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<WorkspaceListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
+    public async Task<ActionResult<IEnumerable<WorkspaceListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var workspaces = await _sender.Send(new GetWorkspacesQuery(includeInactive), cancellationToken);
-        return Ok(workspaces.OrderBy(s => s.Name));
+        return Ok(workspaces);
     }
 
     [HttpGet("{idOrKey}")]
@@ -50,7 +50,7 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
         return result.IsFailure
             ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.Get"))
             : result.Value is not null
-                ? Ok(result.Value)
+                ? result.Value
                 : NotFound();
     }
 }
