@@ -8759,6 +8759,10 @@
           "name": {
             "type": "string"
           },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "ownership": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },

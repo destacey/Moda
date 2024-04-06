@@ -8924,6 +8924,7 @@ export interface WorkspaceListDto {
     id?: string;
     key?: string;
     name?: string;
+    description?: string | undefined;
     ownership?: SimpleNavigationDto;
     isActive?: boolean;
 }
