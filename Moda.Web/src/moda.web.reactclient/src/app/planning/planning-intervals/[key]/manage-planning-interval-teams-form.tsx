@@ -15,7 +15,6 @@ import {
   PlanningIntervalTeamResponse,
 } from '@/src/services/moda-api'
 import type { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
-import type { TransferItem } from 'antd/es/transfer'
 
 export interface ManagePlanningIntervalTeamsFormProps {
   showForm: boolean
@@ -32,7 +31,7 @@ interface PlanningIntervalTeamModel {
   teamOfTeams: string
 }
 
-interface TableTransferProps extends TransferProps<TransferItem> {
+interface TableTransferProps extends TransferProps<PlanningIntervalTeamModel> {
   dataSource: PlanningIntervalTeamModel[]
   leftColumns: ColumnsType<PlanningIntervalTeamModel>
   rightColumns: ColumnsType<PlanningIntervalTeamModel>
@@ -54,7 +53,7 @@ const TableTransfer = ({
     }) => {
       const columns = direction === 'left' ? leftColumns : rightColumns
 
-      const rowSelection: TableRowSelection<TransferItem> = {
+      const rowSelection: TableRowSelection<PlanningIntervalTeamModel> = {
         getCheckboxProps: (item) => ({
           disabled: listDisabled || item.disabled,
         }),
