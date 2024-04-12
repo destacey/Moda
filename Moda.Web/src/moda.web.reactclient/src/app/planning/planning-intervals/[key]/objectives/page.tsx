@@ -7,7 +7,7 @@ import {
   useGetPlanningIntervalObjectives,
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
-import { BarsOutlined, BuildOutlined } from '@ant-design/icons'
+import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { useCallback, useMemo, useState } from 'react'
 import {
@@ -23,7 +23,7 @@ import { authorizePage } from '@/src/app/components/hoc'
 const viewSelectorOptions: SegmentedLabeledOption[] = [
   {
     value: 'List',
-    icon: <BarsOutlined alt="List" title="List" />,
+    icon: <MenuOutlined alt="List" title="List" />,
   },
   {
     value: 'Timeline',

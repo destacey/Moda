@@ -135,6 +135,7 @@ const RisksGrid = ({
         width: 50,
         filter: false,
         sortable: false,
+        resizable: false,
         hide: !canUpdateRisks,
         cellRenderer: (params) => {
           return (

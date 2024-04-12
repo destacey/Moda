@@ -147,12 +147,11 @@ const PlanningIntervalObjectivesGrid = ({
   const columnDefs = useMemo<ColDef<PlanningIntervalObjectiveListDto>[]>(
     () => [
       {
-        headerName: 'Actions',
         width: 50,
         filter: false,
         sortable: false,
+        resizable: false,
         hide: !canManageObjectives,
-        suppressHeaderMenuButton: true,
         cellRenderer: (params) => {
           const menuItems = getRowMenuItems({
             objectiveId: params.data.id,

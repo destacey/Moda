@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { authorizePage } from '../../components/hoc'
-import { useAppDispatch, useAppSelector, useDocumentTitle } from '../../hooks'
+import { useDocumentTitle } from '../../hooks'
 import { useGetWorkspacesQuery } from '@/src/store/features/work-management/workspace-api'
 import { useEffect, useMemo, useState } from 'react'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
