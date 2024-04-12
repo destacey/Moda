@@ -12,7 +12,7 @@ import {
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { MenuOutlined } from '@ant-design/icons'
+import { MoreOutlined } from '@ant-design/icons'
 import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import CreateHealthCheckForm from '@/src/app/components/common/health-check/create-health-check-form'
@@ -182,7 +182,7 @@ const ObjectiveListItem = ({
         <Meta title={title()} description={description()} />
         {canUpdateObjectives && (
           <Dropdown menu={{ items: menuItems }}>
-            <Button type="text" size="small" icon={<MenuOutlined />} />
+            <Button type="text" size="small" icon={<MoreOutlined />} />
           </Dropdown>
         )}
       </Item>

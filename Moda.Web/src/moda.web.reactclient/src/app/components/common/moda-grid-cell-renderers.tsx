@@ -1,4 +1,4 @@
-import { MenuOutlined } from '@ant-design/icons'
+import { MoreOutlined } from '@ant-design/icons'
 import { Button, Dropdown, Tag } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import ReactMarkdown from 'react-markdown'
@@ -135,7 +135,7 @@ export const RowMenuCellRenderer = (props: RowMenuCellRendererProps) => {
 
   return (
     <Dropdown menu={{ items: props.menuItems }} trigger={['click']}>
-      <Button type="text" size="small" icon={<MenuOutlined />} />
+      <Button type="text" size="small" icon={<MoreOutlined />} />
     </Dropdown>
   )
 }
