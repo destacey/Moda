@@ -11,7 +11,7 @@ public static class StringHelpers
     /// <returns>The concatenated string.  Returns an empty string when the array is null or empty.</returns>
     public static string Concat(params string?[] words)
     {
-        if (words is null || !words.Any())
+        if (words is null || words.Length == 0)
             return string.Empty;
 
         var builder = new StringBuilder();

@@ -23,7 +23,12 @@ const EmployeeListPage = () => {
   useDocumentTitle('Employees')
   const [includeInactive, setIncludeInactive] = useState<boolean>(false)
 
-  const { data: employeesData, refetch } = useGetEmployees(includeInactive)
+  const {
+    data: employeesData,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetEmployees(includeInactive)
 
   const columnDefs = useMemo(
     () => [
@@ -78,6 +83,7 @@ const EmployeeListPage = () => {
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
         rowData={employeesData}
+        isDataLoading={isLoading}
         loadData={refresh}
       />
     </>
