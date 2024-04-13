@@ -85,15 +85,15 @@ public sealed record EmployeeDetailsDto : IMapFrom<Employee>
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Employee, EmployeeDetailsDto>()
-            .Map(dest => dest.DisplayName, src => $"{StringHelpers.Concat(src.Name.FirstName, src.Name.LastName)}")
-            .Map(dest => dest.FullName, src => $"{StringHelpers.Concat(src.Name.Title, src.Name.FirstName, src.Name.MiddleName, src.Name.LastName, src.Name.Suffix)}")
+            .Map(dest => dest.DisplayName, src => StringHelpers.Concat(src.Name.FirstName, src.Name.LastName))
+            .Map(dest => dest.FullName, src => StringHelpers.Concat(src.Name.Title, src.Name.FirstName, src.Name.MiddleName, src.Name.LastName, src.Name.Suffix))
             .Map(dest => dest.FirstName, src => src.Name.FirstName)
             .Map(dest => dest.MiddleName, src => src.Name.MiddleName)
             .Map(dest => dest.LastName, src => src.Name.LastName)
             .Map(dest => dest.Suffix, src => src.Name.Suffix)
             .Map(dest => dest.Title, src => src.Name.Title)
             .Map(dest => dest.Email, src => src.Email.Value)
-            .Map(dest => dest.ManagerKey, src => src.Manager!.Key)
-            .Map(dest => dest.ManagerName, src => $"{src.Manager!.Name.FirstName} {src.Manager!.Name.LastName}", srcCond => srcCond.ManagerId.HasValue && srcCond.Manager!.IsActive);
+            .Map(dest => dest.ManagerKey, src => src.Manager!.Key, cond => cond.Manager != null) // cond does not support .HasValue
+            .Map(dest => dest.ManagerName, src => StringHelpers.Concat(src.Manager!.Name.FirstName, src.Manager!.Name.LastName), srcCond => srcCond.Manager != null && srcCond.Manager.IsActive);
     }
 }
