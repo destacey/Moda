@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using Moda.AppIntegration.Application.Interfaces;
+using Moda.Common.Application.Enums;
 using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Interfaces;
 using Moda.Web.Api.Interfaces;
@@ -30,10 +31,10 @@ public class JobManager(ILogger<JobManager> logger, IEmployeeService employeeSer
 
     [DisableConcurrentExecution(60 * 3)]
     [AutomaticRetry(Attempts = 3, DelaysInSeconds = [30, 60, 120])]
-    public async Task RunSyncAzureDevOpsBoards(CancellationToken cancellationToken)
+    public async Task RunSyncAzureDevOpsBoards(SyncType syncType, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Running SyncAzureDevOpsBoards job");
-        await _azdoBoardsSyncManager.Sync(cancellationToken);
+        await _azdoBoardsSyncManager.Sync(syncType, cancellationToken);
         _logger.LogInformation("Completed SyncAzureDevOpsBoards job");
     }
 }

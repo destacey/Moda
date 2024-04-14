@@ -107,22 +107,22 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
 
     public async Task<Result<IExternalWorkItem>> GetWorkItem(string organizationUrl, string token, Guid projectId, int workItemId, CancellationToken cancellationToken)
     {
-        var connection = CreateVssConnection(organizationUrl, token);
-        var workItemService = GetService<WorkItemService>(connection);
+        throw new NotImplementedException();
+        //var connection = CreateVssConnection(organizationUrl, token);
+        //var workItemService = GetService<WorkItemService>(connection);
 
-        var result = await workItemService.GetWorkItem(projectId, workItemId, cancellationToken);
+        //var result = await workItemService.GetWorkItem(projectId, workItemId, cancellationToken);
 
-        return result.IsSuccess
-            ? Result.Success<IExternalWorkItem>(new AzdoWorkItem(result.Value))
-            : Result.Failure<IExternalWorkItem>(result.Error);
+        //return result.IsSuccess
+        //    ? Result.Success<IExternalWorkItem>(new AzdoWorkItem(result.Value))
+        //    : Result.Failure<IExternalWorkItem>(result.Error);
     }
 
-    public async Task<Result<List<IExternalWorkItem>>> GetWorkItems(string organizationUrl, string token, Guid projectId, string projectName, CancellationToken cancellationToken)
+    public async Task<Result<List<IExternalWorkItem>>> GetWorkItems(string organizationUrl, string token, string projectName, DateTime lastChangedDate, string[] workItemTypes, CancellationToken cancellationToken)
     {
-        var connection = CreateVssConnection(organizationUrl, token);
-        var workItemService = GetService<WorkItemService>(connection);
+        var workItemService = GetService<WorkItemService>(organizationUrl, token);
 
-        var result = await workItemService.GetWorkItems(projectId, projectName, cancellationToken);
+        var result = await workItemService.GetWorkItems(projectName, lastChangedDate, workItemTypes, cancellationToken);
         if (result.IsFailure)
             return Result.Failure<List<IExternalWorkItem>>(result.Error);
 
@@ -135,18 +135,20 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
 
     public async Task<Result<List<IExternalWorkItem>>> GetWorkItems(string organizationUrl, string token, Guid projectId, int[] workItemIds, CancellationToken cancellationToken)
     {
-        var connection = CreateVssConnection(organizationUrl, token);
-        var workItemService = GetService<WorkItemService>(connection);
 
-        var result = await workItemService.GetWorkItems(projectId, workItemIds, cancellationToken);
-        if (result.IsFailure)
-            return Result.Failure<List<IExternalWorkItem>>(result.Error);
+        throw new NotImplementedException();
+        //var connection = CreateVssConnection(organizationUrl, token);
+        //var workItemService = GetService<WorkItemService>(connection);
 
-        var workItems = result.Value
-            .Select(w => new AzdoWorkItem(w))
-            .ToList<IExternalWorkItem>();
+        //var result = await workItemService.GetWorkItems(projectId, workItemIds, cancellationToken);
+        //if (result.IsFailure)
+        //    return Result.Failure<List<IExternalWorkItem>>(result.Error);
 
-        return Result.Success(workItems);
+        //var workItems = result.Value
+        //    .Select(w => new AzdoWorkItem(w))
+        //    .ToList<IExternalWorkItem>();
+
+        //return Result.Success(workItems);
     }
 
     //public async Task<Result<List<IExternalWorkType>>> GetWorkItemTypes(string organizationUrl, string token, Guid projectId, CancellationToken cancellationToken)
@@ -176,7 +178,6 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         {
             Type type when type == typeof(AreaService) => (TService)Activator.CreateInstance(typeof(AreaService), connection, logger!)!,
             Type type when type == typeof(IterationService) => (TService)Activator.CreateInstance(typeof(IterationService), connection, logger!)!,
-            Type type when type == typeof(WorkItemService) => (TService)Activator.CreateInstance(typeof(WorkItemService), connection, logger!)!,
             Type type when type == typeof(WorkItemTypeService) => (TService)Activator.CreateInstance(typeof(WorkItemTypeService), connection, logger!)!,
             _ => throw new NotImplementedException(),
         };
@@ -192,6 +193,7 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         {
             Type type when type == typeof(ProcessService) => (TService)Activator.CreateInstance(typeof(ProcessService), organizationUrl, token, _apiVersion, logger!)!,
             Type type when type == typeof(ProjectService) => (TService)Activator.CreateInstance(typeof(ProjectService), organizationUrl, token, _apiVersion, logger!)!,
+            Type type when type == typeof(WorkItemService) => (TService)Activator.CreateInstance(typeof(WorkItemService), organizationUrl, token, _apiVersion, logger!)!,
             _ => throw new NotImplementedException(),
         };
     }

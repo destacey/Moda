@@ -1,5 +1,8 @@
-﻿namespace Moda.Work.Application.WorkTypes.Dtos;
-public sealed record WorkTypeDto : IMapFrom<WorkType>
+﻿using Moda.Common.Application.Requests.WorkManagement.Interfaces;
+
+namespace Moda.Work.Application.WorkTypes.Dtos;
+
+public sealed record WorkTypeDto : IMapFrom<WorkType>, IWorkTypeDto
 {
     public int Id { get; set; }
 
