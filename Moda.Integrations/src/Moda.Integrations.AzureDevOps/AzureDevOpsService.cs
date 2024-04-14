@@ -25,12 +25,12 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     {
         try
         {
-            var connection = CreateVssConnection(organizationUrl, token);
-            await connection.ConnectAsync().ConfigureAwait(false);
+            // use the GetWorkProcesses method to test the connection
+            var result = await GetWorkProcesses(organizationUrl, token, CancellationToken.None);
 
-            // there is weired behavior where this returns success if the organization in the url is 'test3' or 'test4' regardless of the token
-
-            return Result.Success();
+            return result.IsSuccess
+                ? Result.Success()
+                : Result.Failure("Unable to verify connection.");
         }
         catch (Exception ex)
         {
@@ -151,22 +151,6 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         //return Result.Success(workItems);
     }
 
-    //public async Task<Result<List<IExternalWorkType>>> GetWorkItemTypes(string organizationUrl, string token, Guid projectId, CancellationToken cancellationToken)
-    //{
-    //    var connection = CreateVssConnection(organizationUrl, token);
-    //    var workItemTypeService = GetService<WorkItemTypeService>(connection);
-
-    //    var result = await workItemTypeService.GetWorkItemTypes(projectId, cancellationToken);
-    //    if (result.IsFailure)
-    //        return Result.Failure<List<IExternalWorkType>>(result.Error);
-
-    //    var workItems = result.Value
-    //        .Select(w => new AzdoWorkType(w))
-    //        .ToList<IExternalWorkType>();
-
-    //    return Result.Success(workItems);
-    //}
-
     // TODO should these be cached?  any impact on GC if cached?  // should the client be created and cached here rather than in the service constructor?
     private TService GetService<TService>(VssConnection? connection)
     {
@@ -178,7 +162,6 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         {
             Type type when type == typeof(AreaService) => (TService)Activator.CreateInstance(typeof(AreaService), connection, logger!)!,
             Type type when type == typeof(IterationService) => (TService)Activator.CreateInstance(typeof(IterationService), connection, logger!)!,
-            Type type when type == typeof(WorkItemTypeService) => (TService)Activator.CreateInstance(typeof(WorkItemTypeService), connection, logger!)!,
             _ => throw new NotImplementedException(),
         };
     }
