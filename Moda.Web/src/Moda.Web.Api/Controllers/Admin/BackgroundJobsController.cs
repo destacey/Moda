@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Application.BackgroundJobs;
+using Moda.Common.Application.Enums;
 using Moda.Web.Api.Interfaces;
 
 namespace Moda.Web.Api.Controllers.Admin;
@@ -57,8 +58,11 @@ public class BackgroundJobsController : ControllerBase
             case BackgroundJobType.EmployeeSync:
                 _jobService.Enqueue(() => jobManager.RunSyncExternalEmployees(cancellationToken));
                 break;
-            case BackgroundJobType.AzdoBoardsSync:
-                _jobService.Enqueue(() => jobManager.RunSyncAzureDevOpsBoards(cancellationToken));
+            case BackgroundJobType.AzdoBoardsFullSync:
+                _jobService.Enqueue(() => jobManager.RunSyncAzureDevOpsBoards(SyncType.Full, cancellationToken));
+                break;
+            case BackgroundJobType.AzdoBoardsDiffSync:
+                _jobService.Enqueue(() => jobManager.RunSyncAzureDevOpsBoards(SyncType.Differential, cancellationToken));
                 break;
             default:
                 _logger.LogWarning("Unknown job type {jobType} requested", jobType);

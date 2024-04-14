@@ -2,19 +2,21 @@
 using MediatR;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
+using Moda.Common.Application.Enums;
 using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.WorkStatuses.Commands;
 using Moda.Work.Application.WorkTypes.Commands;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
+
 public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender) : IAzureDevOpsBoardsSyncManager
 {
     private readonly ILogger<AzureDevOpsBoardsSyncManager> _logger = logger;
     private readonly IAzureDevOpsService _azureDevOpsService = azureDevOpsService;
     private readonly ISender _sender = sender;
 
-    public async Task<Result> Sync(CancellationToken cancellationToken)
+    public async Task<Result> Sync(SyncType syncType, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Syncing Azure DevOps Boards");
 
@@ -114,6 +116,21 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
                         _logger.LogInformation("Successfully synced Azure DevOps Boards workspace {WorkspaceId}.", workspace.IntegrationState!.InternalId);
                         activeWorkspacesSyncedCount++;
+
+                        try
+                        {
+                            var syncWorkItemsResult = await SyncWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, syncType, workspace.IntegrationState!.InternalId, workspace.Name, cancellationToken);
+                            if (syncWorkItemsResult.IsFailure)
+                            {
+                                _logger.LogError("An error occurred while syncing Azure DevOps Boards workspace {WorkspaceId} work items. Error: {Error}", workspace.IntegrationState!.InternalId, syncWorkItemsResult.Error);
+                                continue;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "An exception occurred while syncing Azure DevOps Boards workspace {WorkspaceId} work items.", workspace.IntegrationState!.InternalId);
+                            continue;
+                        }
                     }
                 }
             }
@@ -124,7 +141,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         }
         catch (Exception ex)
         {
-            string message = "An error occurred while trying to sync external employees.";
+            string message = "An exception occurred while trying to sync Azure DevOps Boards.";
             _logger.LogError(ex, message);
             return Result.Failure(message);
         }
@@ -181,5 +198,35 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         return updateResult.IsSuccess
             ? Result.Success()
             : updateResult;
+    }
+
+    private async Task<Result> SyncWorkItems(string organizationUrl, string personalAccessToken, SyncType syncType, Guid workspaceId, string azdoWorkspaceName, CancellationToken cancellationToken)
+    {
+        Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
+        Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
+        Guard.Against.Default(workspaceId, nameof(workspaceId));
+
+        var workTypesResult = await _sender.Send(new GetWorkspaceWorkTypesQuery(workspaceId), cancellationToken);
+        if (workTypesResult.IsFailure)
+            return workTypesResult.ConvertFailure();
+
+        var lastChangedDate = syncType switch
+        {
+            SyncType.Full => new DateTime(1900,01,01),
+            SyncType.Differential => DateTime.UtcNow.AddDays(-1),  // TODO: get the latest change date based on what is in the db
+            _ => new DateTime(1900, 01, 01)
+        };
+
+        var workItemsResult = await _azureDevOpsService.GetWorkItems(organizationUrl, personalAccessToken, azdoWorkspaceName, lastChangedDate, workTypesResult.Value.Select(t => t.Name).ToArray(), cancellationToken);
+        if (workItemsResult.IsFailure)
+            return workItemsResult.ConvertFailure();
+
+        _logger.LogInformation("Retrieved {WorkItemCount} work items to sync for Azure DevOps project {Project}.", workItemsResult.Value.Count, azdoWorkspaceName);
+
+        //var syncWorkItemsResult = await _sender.Send(new SyncExternalWorkItemsCommand(workItemsResult.Value), cancellationToken);
+
+        return workItemsResult.IsSuccess
+            ? Result.Success()
+            : workItemsResult.ConvertFailure();
     }
 }
