@@ -7,8 +7,8 @@ using Microsoft.VisualStudio.Services.WebApi;
 using Moda.Common.Application.Interfaces;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Interfaces.Work;
-using Moda.Integrations.AzureDevOps.Models.Contracts;
 using Moda.Integrations.AzureDevOps.Models.Projects;
+using Moda.Integrations.AzureDevOps.Models.WorkItems;
 using Moda.Integrations.AzureDevOps.Services;
 
 namespace Moda.Integrations.AzureDevOps;
@@ -105,50 +105,15 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         return Result.Success(result.Value.ToAzdoWorkspaces().ToList<IExternalWorkspace>());
     }
 
-    public async Task<Result<IExternalWorkItem>> GetWorkItem(string organizationUrl, string token, Guid projectId, int workItemId, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-        //var connection = CreateVssConnection(organizationUrl, token);
-        //var workItemService = GetService<WorkItemService>(connection);
-
-        //var result = await workItemService.GetWorkItem(projectId, workItemId, cancellationToken);
-
-        //return result.IsSuccess
-        //    ? Result.Success<IExternalWorkItem>(new AzdoWorkItem(result.Value))
-        //    : Result.Failure<IExternalWorkItem>(result.Error);
-    }
-
     public async Task<Result<List<IExternalWorkItem>>> GetWorkItems(string organizationUrl, string token, string projectName, DateTime lastChangedDate, string[] workItemTypes, CancellationToken cancellationToken)
     {
         var workItemService = GetService<WorkItemService>(organizationUrl, token);
 
         var result = await workItemService.GetWorkItems(projectName, lastChangedDate, workItemTypes, cancellationToken);
-        if (result.IsFailure)
-            return Result.Failure<List<IExternalWorkItem>>(result.Error);
-
-        var workItems = result.Value
-            .Select(w => new AzdoWorkItem(w))
-            .ToList<IExternalWorkItem>();
-
-        return Result.Success(workItems);
-    }
-
-    public async Task<Result<List<IExternalWorkItem>>> GetWorkItems(string organizationUrl, string token, Guid projectId, int[] workItemIds, CancellationToken cancellationToken)
-    {
-
-        throw new NotImplementedException();
-        //var connection = CreateVssConnection(organizationUrl, token);
-        //var workItemService = GetService<WorkItemService>(connection);
-
-        //var result = await workItemService.GetWorkItems(projectId, workItemIds, cancellationToken);
-        //if (result.IsFailure)
-        //    return Result.Failure<List<IExternalWorkItem>>(result.Error);
-
-        //var workItems = result.Value
-        //    .Select(w => new AzdoWorkItem(w))
-        //    .ToList<IExternalWorkItem>();
-
-        //return Result.Success(workItems);
+        
+        return result.IsSuccess
+            ? Result.Success(result.Value.ToIExternalWorkItems())
+            : Result.Failure<List<IExternalWorkItem>>(result.Error);
     }
 
     // TODO should these be cached?  any impact on GC if cached?  // should the client be created and cached here rather than in the service constructor?
