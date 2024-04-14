@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using Moda.Integrations.AzureDevOps.Models.WorkItems;
 using RestSharp;
 

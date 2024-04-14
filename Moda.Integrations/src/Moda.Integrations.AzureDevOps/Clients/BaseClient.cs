@@ -27,9 +27,9 @@ internal abstract class BaseClient : IDisposable
         _client = new RestClient(options);
     }
 
-    protected void SetupRequest(RestRequest request)
+    protected void SetupRequest(RestRequest request, bool includePreviewTag = false)
     {
-        request.AddAcceptHeaderWithApiVersion(_apiVersion);
+        request.AddAcceptHeaderWithApiVersion(_apiVersion, includePreviewTag);
         request.AddAuthorizationHeaderForPersonalAccessToken(_token);
     }
 
