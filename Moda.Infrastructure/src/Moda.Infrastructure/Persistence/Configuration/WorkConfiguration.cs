@@ -79,10 +79,13 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
         builder.HasAlternateKey(w => w.Key);
 
         builder.HasIndex(w => w.Id)
-            .IncludeProperties(w => new { w.Key, w.Title, w.WorkspaceId, w.TypeId, w.StatusId, w.Priority });
+            .IncludeProperties(w => new { w.Key, w.Title, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.Priority });
 
         builder.HasIndex(w => w.Key)
-            .IncludeProperties(w => new { w.Id, w.Title, w.WorkspaceId, w.TypeId, w.StatusId, w.Priority });
+            .IncludeProperties(w => new { w.Id, w.Title, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.Priority });
+
+        builder.HasIndex(w => w.ExternalId)
+            .IncludeProperties(w => new { w.Id, w.Key , w.Title, w.WorkspaceId, w.AssignedToId, w.TypeId, w.StatusId, w.Priority });
 
         // Properties
         builder.Property(w => w.Key).IsRequired()
@@ -92,12 +95,11 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .HasColumnType("varchar")
             .HasMaxLength(64);
         builder.Property(w => w.Title).IsRequired().HasMaxLength(128);
+        builder.Property(w => w.ExternalId);
         builder.Property(w => w.Priority);
 
         builder.Property(w => w.Created);
-        builder.Property(w => w.CreatedBy);
         builder.Property(w => w.LastModified);
-        builder.Property(w => w.LastModifiedBy);
 
 
         // Relationships
@@ -109,6 +111,21 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
         builder.HasOne(w => w.Status)
             .WithMany()
             .HasForeignKey(w => w.StatusId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(w => w.AssignedTo)
+            .WithMany()
+            .HasForeignKey(w => w.AssignedToId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(w => w.CreatedBy)
+            .WithMany()
+            .HasForeignKey(w => w.CreatedById)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(w => w.LastModifiedBy)
+            .WithMany()
+            .HasForeignKey(w => w.LastModifiedById)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

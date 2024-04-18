@@ -1,4 +1,5 @@
 ﻿using Ardalis.GuardClauses;
+using Moda.Common.Domain.Employees;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
@@ -12,17 +13,19 @@ public sealed class WorkItem : BaseEntity<Guid>
 
     private WorkItem() { }
 
-    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int typeId, int statusId, Instant created, Guid? createdBy, Instant lastModified, Guid? lastModifiedBy, int priority)
+    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, int typeId, int statusId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int priority)
     {
         Key = key;
         Title = title;
         WorkspaceId = workspaceId;
+        ExternalId = externalId;
         TypeId = typeId;
         StatusId = statusId;
         Created = created;
-        CreatedBy = createdBy;
+        CreatedById = createdById;
         LastModified = lastModified;
-        LastModifiedBy = lastModifiedBy;
+        LastModifiedById = lastModifiedById;
+        AssignedToId = assignedToId;
         Priority = priority;
     }
 
@@ -40,9 +43,12 @@ public sealed class WorkItem : BaseEntity<Guid>
         private set => _title = Guard.Against.NullOrWhiteSpace(value, nameof(Title)).Trim();
 
     }
+
     public Guid WorkspaceId { get; private init; }
 
     public Workspace Workspace { get; private set; } = null!;
+
+    public int? ExternalId { get; private init; }
 
     public int TypeId { get; private set; }
 
@@ -60,13 +66,21 @@ public sealed class WorkItem : BaseEntity<Guid>
 
     //public WorkProcessScheme WorkProcessConfiguration { get; private set; } = null!;
 
+    public Guid? AssignedToId { get; private set; }
+
+    public Employee? AssignedTo { get; private set; }
+
     public Instant Created { get; private set; }
 
-    public Guid? CreatedBy { get; private set; }
+    public Guid? CreatedById { get; private set; }
+
+    public Employee? CreatedBy { get; private set; }
 
     public Instant LastModified { get; private set; }
 
-    public Guid? LastModifiedBy { get; private set; }
+    public Guid? LastModifiedById { get; private set; }
+
+    public Employee? LastModifiedBy { get; private set; }
 
     public int Priority { get; private set; }
 
@@ -80,10 +94,20 @@ public sealed class WorkItem : BaseEntity<Guid>
     //public IReadOnlyCollection<WorkItemRevision> History => _history.AsReadOnly();
 
 
-    public static WorkItem CreateExternal(Workspace workspace, int number, string title, int typeId, int statusId, Instant created, Guid? createdBy, Instant lastModified, Guid? lastModifiedBy, int priority)
+    public static WorkItem CreateExternal(Workspace workspace, int number, string title, int? externalId, int typeId, int statusId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int priority)
     {
+        Guard.Against.Null(workspace, nameof(workspace));
+        if (workspace.Ownership != Ownership.Owned)
+        {
+            throw new InvalidOperationException("Owned work items cannot have an external id.");
+        }
+        else if (workspace.Ownership != Ownership.Owned && !externalId.HasValue)
+        {
+            throw new InvalidOperationException("External work items must have an external id.");
+        }
+        
         var key = new WorkItemKey(workspace.Key, number);
-        var workItem = new WorkItem(key, title, workspace.Id, typeId, statusId, created, createdBy, lastModified, lastModifiedBy, priority);
+        var workItem = new WorkItem(key, title, workspace.Id, externalId, typeId, statusId, created, createdById, lastModified, lastModifiedById, assignedToId, priority);
 
         var result = workspace.AddWorkItem(workItem);
         return result.IsSuccess ? workItem : throw new InvalidOperationException(result.Error);

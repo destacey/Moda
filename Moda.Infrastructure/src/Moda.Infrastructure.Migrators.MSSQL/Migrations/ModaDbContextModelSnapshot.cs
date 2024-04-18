@@ -1396,11 +1396,17 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("AssignedToId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("CreatedBy")
+                    b.Property<Guid?>("CreatedById")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("ExternalId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Key")
                         .IsRequired()
@@ -1410,7 +1416,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("LastModifiedBy")
+                    b.Property<Guid?>("LastModifiedById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Priority")
@@ -1434,13 +1440,23 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasAlternateKey("Key");
 
+                    b.HasIndex("AssignedToId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ExternalId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ExternalId"), new[] { "Id", "Key", "Title", "WorkspaceId", "AssignedToId", "TypeId", "StatusId", "Priority" });
+
                     b.HasIndex("Id");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Key", "Title", "WorkspaceId", "TypeId", "StatusId", "Priority" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Key", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "Priority" });
 
                     b.HasIndex("Key");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id", "Title", "WorkspaceId", "TypeId", "StatusId", "Priority" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "Priority" });
+
+                    b.HasIndex("LastModifiedById");
 
                     b.HasIndex("StatusId");
 
@@ -2085,6 +2101,21 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkItem", b =>
                 {
+                    b.HasOne("Moda.Common.Domain.Employees.Employee", "AssignedTo")
+                        .WithMany()
+                        .HasForeignKey("AssignedToId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Moda.Common.Domain.Employees.Employee", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Moda.Common.Domain.Employees.Employee", "LastModifiedBy")
+                        .WithMany()
+                        .HasForeignKey("LastModifiedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Moda.Work.Domain.Models.WorkStatus", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
@@ -2102,6 +2133,12 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("AssignedTo");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("LastModifiedBy");
 
                     b.Navigation("Status");
 
