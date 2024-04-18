@@ -69,6 +69,50 @@ public class BacklogLevelConfig : IEntityTypeConfiguration<BacklogLevel>
     }
 }
 
+public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
+{
+    public void Configure(EntityTypeBuilder<WorkItem> builder)
+    {
+        builder.ToTable("WorkItems", SchemaNames.Work);
+
+        builder.HasKey(w => w.Id);
+        builder.HasAlternateKey(w => w.Key);
+
+        builder.HasIndex(w => w.Id)
+            .IncludeProperties(w => new { w.Key, w.Title, w.WorkspaceId, w.TypeId, w.StatusId, w.Priority });
+
+        builder.HasIndex(w => w.Key)
+            .IncludeProperties(w => new { w.Id, w.Title, w.WorkspaceId, w.TypeId, w.StatusId, w.Priority });
+
+        // Properties
+        builder.Property(w => w.Key).IsRequired()
+            .HasConversion(
+                w => w.Value,
+                w => new WorkItemKey(w))
+            .HasColumnType("varchar")
+            .HasMaxLength(64);
+        builder.Property(w => w.Title).IsRequired().HasMaxLength(128);
+        builder.Property(w => w.Priority);
+
+        builder.Property(w => w.Created);
+        builder.Property(w => w.CreatedBy);
+        builder.Property(w => w.LastModified);
+        builder.Property(w => w.LastModifiedBy);
+
+
+        // Relationships
+        builder.HasOne(w => w.Type)
+            .WithMany()
+            .HasForeignKey(w => w.TypeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(w => w.Status)
+            .WithMany()
+            .HasForeignKey(w => w.StatusId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
 public class WorkProcessConfig : IEntityTypeConfiguration<WorkProcess>
 {
     public void Configure(EntityTypeBuilder<WorkProcess> builder)
@@ -198,6 +242,11 @@ public class WorkspaceConfig : IEntityTypeConfiguration<Workspace>
         builder.HasOne(w => w.WorkProcess)
             .WithMany(w => w.Workspaces)
             .HasForeignKey(w => w.WorkProcessId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(w => w.WorkItems)
+            .WithOne(w => w.Workspace)
+            .HasForeignKey(w => w.WorkspaceId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

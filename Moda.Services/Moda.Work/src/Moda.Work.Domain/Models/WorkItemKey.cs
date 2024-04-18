@@ -53,6 +53,13 @@ public sealed class WorkItemKey : ValueObject
             : throw new ArgumentException("The value submitted does not meet the required format.", nameof(WorkItemKey));
     }
 
+    // split the work item key into its parts
+    public (WorkspaceKey WorkspaceKey, int Number) Split()
+    {
+        string[] parts = Value.Split('-');
+        return (new WorkspaceKey(parts[0]), int.Parse(parts[1]));
+    }
+
     public override string ToString() => Value;
 
     public static implicit operator string(WorkItemKey workItemKey) => workItemKey.Value;

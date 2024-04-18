@@ -76,6 +76,21 @@ public class WorkItemKeyTests
         exception.Message.Should().Be(expectedExceptionMessage);
     }
 
+    [Theory]
+    [InlineData("CORE-444", "CORE", 444)]
+    [InlineData("MP-5", "MP", 5)]
+    [InlineData("WORKSPACE123-453244", "WORKSPACE123", 453244)]
+    public void Split(string workItemKey, string workspaceKeyString, int number)
+    {
+        var key = new WorkItemKey(workItemKey);
+        var workspaceKey = new WorkspaceKey(workspaceKeyString);
+
+        var result = key.Split();
+
+        result.WorkspaceKey.Should().Be(workspaceKey);
+        result.Number.Should().Be(number);
+    }
+
     [Fact]
     public void EqualityCheck()
     {

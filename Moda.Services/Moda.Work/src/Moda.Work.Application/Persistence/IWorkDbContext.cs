@@ -3,6 +3,7 @@ public interface IWorkDbContext : IModaDbContext
 {
     DbSet<BacklogLevelScheme> BacklogLevelSchemes { get; }
     DbSet<Workflow> Workflows { get; }
+    DbSet<WorkItem> WorkItems { get; }
     DbSet<WorkProcess> WorkProcesses { get; }
     DbSet<Workspace> Workspaces { get; }
     DbSet<WorkStatus> WorkStatuses { get; }
