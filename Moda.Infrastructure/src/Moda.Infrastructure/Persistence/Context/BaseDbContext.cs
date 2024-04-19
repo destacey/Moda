@@ -46,6 +46,18 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+
+        // add shadow properties for entities that implement ISystemAuditable
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (typeof(ISystemAuditable).IsAssignableFrom(entityType.ClrType))
+            {
+                modelBuilder.Entity(entityType.ClrType).Property<DateTime>("SystemCreated");
+                modelBuilder.Entity(entityType.ClrType).Property<Guid?>("SystemCreatedBy");
+                modelBuilder.Entity(entityType.ClrType).Property<DateTime>("SystemLastModified");
+                modelBuilder.Entity(entityType.ClrType).Property<Guid?>("SystemLastModifiedBy");
+            }
+        }
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -79,20 +91,38 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
 
     private List<AuditTrail> HandleAuditingBeforeSaveChanges(Guid userId, string correlationId)
     {
-        foreach (var entry in ChangeTracker.Entries<IAuditable>().ToList())
+        var timestamp = _dateTimeProvider.Now;
+        foreach (var entry in ChangeTracker.Entries()
+            .Where(e => e.Entity is IAuditable || e.Entity is ISystemAuditable || e.Entity is ISoftDelete)
+            .ToList())
         {
-            var timestamp = _dateTimeProvider.Now;
 
             if (entry.State == EntityState.Added)
             {
-                entry.Entity.CreatedBy = userId;
-                entry.Entity.Created = timestamp;
+                if (entry.Entity is ISystemAuditable systemAuditable)
+                {
+                    entry.Property("SystemCreated").CurrentValue = timestamp;
+                    entry.Property("SystemCreatedBy").CurrentValue = userId;
+                }
+                if (entry.Entity is IAuditable auditable)
+                {
+                    auditable.CreatedBy = userId;
+                    auditable.Created = timestamp;
+                }
             }
 
             if (entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.HasChangedOwnedEntities())
             {
-                entry.Entity.LastModifiedBy = userId;
-                entry.Entity.LastModified = timestamp;
+                if (entry.Entity is ISystemAuditable systemAuditable)
+                {
+                    entry.Property("SystemLastModified").CurrentValue = timestamp;
+                    entry.Property("SystemLastModifiedBy").CurrentValue = userId;
+                }
+                if (entry.Entity is IAuditable auditable)
+                {
+                    auditable.LastModifiedBy = userId;
+                    auditable.LastModified = timestamp;
+                }
             }
 
             if (entry.State == EntityState.Deleted && entry.Entity is ISoftDelete softDelete)

@@ -9,4 +9,5 @@ public static class EntityEntryExtensions
             r.TargetEntry != null &&
             r.TargetEntry.Metadata.IsOwned() &&
             (r.TargetEntry.State == EntityState.Added || r.TargetEntry.State == EntityState.Modified));
+    // TODO: should we check for deleted entities as well?
 }
