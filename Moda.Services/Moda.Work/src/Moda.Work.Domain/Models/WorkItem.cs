@@ -4,7 +4,7 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-public sealed class WorkItem : BaseEntity<Guid>
+public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
 {
     private WorkItemKey _key = null!;
     private string _title = null!;
