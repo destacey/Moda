@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.Workspaces.Validators;
+using Moda.Work.Domain.Models;
 
 namespace Moda.Work.Application.Workspaces.Commands;
 
@@ -39,6 +40,10 @@ internal sealed class UpdateExternalWorkspaceCommandHandler(IWorkDbContext workD
         var workspaceResult = workspace.Update(workspace.Name, request.ExternalWorkspace.Description, _dateTimeProvider.Now);
         if (workspaceResult.IsFailure)
         {
+            // Reset the entity
+            await _workDbContext.Entry(workspace).ReloadAsync(cancellationToken);
+            workspace.ClearDomainEvents();
+
             _logger.LogError("{AppRequestName}: failed to update workspace {WorkspaceId}. Error: {Error}", AppRequestName, workspace.Id, workspaceResult.Error);
             return Result.Failure(workspaceResult.Error);
         }

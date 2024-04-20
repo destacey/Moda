@@ -27,6 +27,8 @@ public sealed class UpdateWorkTypeCommandValidator : CustomValidator<UpdateWorkT
 
 internal sealed class UpdateWorkTypeCommandHandler : ICommandHandler<UpdateWorkTypeCommand, int>
 {
+    private const string AppRequestName = nameof(UpdateWorkTypeCommand);
+
     private readonly IWorkDbContext _workDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<UpdateWorkTypeCommandHandler> _logger;
@@ -55,8 +57,7 @@ internal sealed class UpdateWorkTypeCommandHandler : ICommandHandler<UpdateWorkT
                 await _workDbContext.Entry(workType).ReloadAsync(cancellationToken);
                 workType.ClearDomainEvents();
 
-                var requestName = request.GetType().Name;
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
+                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", AppRequestName, request, updateResult.Error);
                 return Result.Failure<int>(updateResult.Error);
             }
 
