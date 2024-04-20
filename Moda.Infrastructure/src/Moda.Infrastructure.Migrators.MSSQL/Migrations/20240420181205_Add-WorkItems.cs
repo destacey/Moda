@@ -27,7 +27,12 @@ public partial class AddWorkItems : Migration
                 CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
                 LastModifiedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                Priority = table.Column<int>(type: "int", nullable: false)
+                Priority = table.Column<int>(type: "int", nullable: true),
+                StackRank = table.Column<double>(type: "float", nullable: false),
+                SystemCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                SystemCreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                SystemLastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                SystemLastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
             },
             constraints: table =>
             {
@@ -94,21 +99,21 @@ public partial class AddWorkItems : Migration
             schema: "Work",
             table: "WorkItems",
             column: "ExternalId")
-            .Annotation("SqlServer:Include", new[] { "Id", "Key", "Title", "WorkspaceId", "AssignedToId", "TypeId", "StatusId", "Priority" });
+            .Annotation("SqlServer:Include", new[] { "Id", "Key", "Title", "WorkspaceId", "AssignedToId", "TypeId", "StatusId" });
 
         migrationBuilder.CreateIndex(
             name: "IX_WorkItems_Id",
             schema: "Work",
             table: "WorkItems",
             column: "Id")
-            .Annotation("SqlServer:Include", new[] { "Key", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "Priority" });
+            .Annotation("SqlServer:Include", new[] { "Key", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId" });
 
         migrationBuilder.CreateIndex(
             name: "IX_WorkItems_Key",
             schema: "Work",
             table: "WorkItems",
             column: "Key")
-            .Annotation("SqlServer:Include", new[] { "Id", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "Priority" });
+            .Annotation("SqlServer:Include", new[] { "Id", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId" });
 
         migrationBuilder.CreateIndex(
             name: "IX_WorkItems_LastModifiedById",

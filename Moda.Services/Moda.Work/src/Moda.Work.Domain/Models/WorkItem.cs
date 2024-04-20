@@ -13,7 +13,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
 
     private WorkItem() { }
 
-    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, int typeId, int statusId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int priority)
+    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, int typeId, int statusId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank)
     {
         Key = key;
         Title = title;
@@ -27,6 +27,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         LastModifiedById = lastModifiedById;
         AssignedToId = assignedToId;
         Priority = priority;
+        StackRank = stackRank;
     }
 
     /// <summary>A unique key to identify the work item.</summary>
@@ -82,10 +83,10 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
 
     public Employee? LastModifiedBy { get; private set; }
 
-    public int Priority { get; private set; }
+    public int? Priority { get; private set; }
 
-    // TODO: saving everything as string won't work for systems that use numbers because the sorting will be incorrect.
-    //public string StackRank { get; set; }  
+    // TODO: other systems will use different types.  How to handle this?
+    public double StackRank { get; private set; }  
 
 
     /// <summary>
@@ -93,21 +94,28 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
     /// </summary>
     //public IReadOnlyCollection<WorkItemRevision> History => _history.AsReadOnly();
 
+    public void Update(string title, int typeId, int statusId, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank)
+    {
+        Title = title;
+        TypeId = typeId;
+        StatusId = statusId;
+        LastModified = lastModified;
+        LastModifiedById = lastModifiedById;
+        AssignedToId = assignedToId;
+        Priority = priority;
+        StackRank = stackRank;
+    }
 
-    public static WorkItem CreateExternal(Workspace workspace, int number, string title, int? externalId, int typeId, int statusId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int priority)
+    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, int typeId, int statusId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank)
     {
         Guard.Against.Null(workspace, nameof(workspace));
-        if (workspace.Ownership != Ownership.Owned)
+        if (workspace.Ownership != Ownership.Managed)
         {
-            throw new InvalidOperationException("Owned work items cannot have an external id.");
-        }
-        else if (workspace.Ownership != Ownership.Owned && !externalId.HasValue)
-        {
-            throw new InvalidOperationException("External work items must have an external id.");
+            throw new InvalidOperationException("Only managed workspaces can have external work items.");
         }
         
-        var key = new WorkItemKey(workspace.Key, number);
-        var workItem = new WorkItem(key, title, workspace.Id, externalId, typeId, statusId, created, createdById, lastModified, lastModifiedById, assignedToId, priority);
+        var key = new WorkItemKey(workspace.Key, externalId);
+        var workItem = new WorkItem(key, title, workspace.Id, externalId, typeId, statusId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank);
 
         var result = workspace.AddWorkItem(workItem);
         return result.IsSuccess ? workItem : throw new InvalidOperationException(result.Error);

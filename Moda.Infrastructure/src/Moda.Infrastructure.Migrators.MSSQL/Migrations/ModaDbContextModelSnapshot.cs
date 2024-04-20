@@ -1419,8 +1419,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid?>("LastModifiedById")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Priority")
+                    b.Property<int?>("Priority")
                         .HasColumnType("int");
+
+                    b.Property<double>("StackRank")
+                        .HasColumnType("float");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
@@ -1458,15 +1461,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasIndex("ExternalId");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ExternalId"), new[] { "Id", "Key", "Title", "WorkspaceId", "AssignedToId", "TypeId", "StatusId", "Priority" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ExternalId"), new[] { "Id", "Key", "Title", "WorkspaceId", "AssignedToId", "TypeId", "StatusId" });
 
                     b.HasIndex("Id");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Key", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "Priority" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Key", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId" });
 
                     b.HasIndex("Key");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "Priority" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId" });
 
                     b.HasIndex("LastModifiedById");
 

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
 using Moda.Infrastructure.Common.Services;
 using Moda.Infrastructure.Persistence.Extensions;
+using NodaTime;
 
 namespace Moda.Infrastructure.Persistence.Context;
 
@@ -52,9 +53,9 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         {
             if (typeof(ISystemAuditable).IsAssignableFrom(entityType.ClrType))
             {
-                modelBuilder.Entity(entityType.ClrType).Property<DateTime>("SystemCreated");
+                modelBuilder.Entity(entityType.ClrType).Property<Instant>("SystemCreated");
                 modelBuilder.Entity(entityType.ClrType).Property<Guid?>("SystemCreatedBy");
-                modelBuilder.Entity(entityType.ClrType).Property<DateTime>("SystemLastModified");
+                modelBuilder.Entity(entityType.ClrType).Property<Instant>("SystemLastModified");
                 modelBuilder.Entity(entityType.ClrType).Property<Guid?>("SystemLastModifiedBy");
             }
         }

@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20240418004241_Add-WorkItems")]
+    [Migration("20240420181205_Add-WorkItems")]
     partial class AddWorkItems
     {
         /// <inheritdoc />
@@ -1422,11 +1422,26 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid?>("LastModifiedById")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Priority")
+                    b.Property<int?>("Priority")
                         .HasColumnType("int");
+
+                    b.Property<double>("StackRank")
+                        .HasColumnType("float");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -1449,15 +1464,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasIndex("ExternalId");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ExternalId"), new[] { "Id", "Key", "Title", "WorkspaceId", "AssignedToId", "TypeId", "StatusId", "Priority" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ExternalId"), new[] { "Id", "Key", "Title", "WorkspaceId", "AssignedToId", "TypeId", "StatusId" });
 
                     b.HasIndex("Id");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Key", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "Priority" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Key", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId" });
 
                     b.HasIndex("Key");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "Priority" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId" });
 
                     b.HasIndex("LastModifiedById");
 
