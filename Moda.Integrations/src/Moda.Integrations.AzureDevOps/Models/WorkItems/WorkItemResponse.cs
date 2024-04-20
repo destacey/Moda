@@ -1,12 +1,19 @@
-﻿using Moda.Common.Application.Interfaces.Work;
+﻿using System.Text.Json.Serialization;
+using Moda.Common.Application.Interfaces.Work;
 using Moda.Integrations.AzureDevOps.Models.Contracts;
+using NodaTime;
 
 namespace Moda.Integrations.AzureDevOps.Models.WorkItems;
 internal class WorkItemResponse
 {
+    [JsonPropertyName("id")]
     public int Id { get; set; }
+
+    [JsonPropertyName("rev")]
     public int? Rev { get; set; }
-    public IDictionary<string, object> Fields { get; set; } = new Dictionary<string, object>();
+
+    [JsonPropertyName("fields")]
+    public required WorkItemFieldsResponse Fields { get; set; }
 }
 
 internal static class WorkItemResponseExtensions
@@ -16,8 +23,16 @@ internal static class WorkItemResponseExtensions
         return new AzdoWorkItem()
         {
             Id = workItem.Id,
-            Rev = workItem.Rev,
-            Fields = workItem.Fields
+            Title = workItem.Fields.Title,
+            WorkType = workItem.Fields.WorkItemType,
+            WorkStatus = workItem.Fields.State,
+            AssignedTo = workItem.Fields.AssignedTo?.UniqueName,
+            Created = Instant.FromDateTimeOffset(workItem.Fields.CreatedDate),
+            CreatedBy = workItem.Fields.CreatedBy.UniqueName,
+            LastModified = Instant.FromDateTimeOffset(workItem.Fields.ChangedDate),
+            LastModifiedBy = workItem.Fields.ChangedBy.UniqueName,
+            Priority = workItem.Fields.Priority,
+            StackRank = workItem.Fields.StackRank
         };
     }
 
