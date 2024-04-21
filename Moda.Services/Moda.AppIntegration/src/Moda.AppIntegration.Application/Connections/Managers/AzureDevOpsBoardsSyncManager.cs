@@ -7,6 +7,7 @@ using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.WorkStatuses.Commands;
 using Moda.Work.Application.WorkTypes.Commands;
+using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
 
@@ -143,7 +144,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         {
             string message = "An exception occurred while trying to sync Azure DevOps Boards.";
             _logger.LogError(ex, message);
-            return Result.Failure(message);
+            throw;
         }
     }
 
@@ -212,10 +213,10 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
         var lastChangedDate = syncType switch
         {
-            SyncType.Full => new DateTime(1900,01,01),
-            SyncType.Differential => DateTime.UtcNow.AddDays(-1),  // TODO: get the latest change date based on what is in the db
+            SyncType.Full => new DateTime(1900, 01, 01),
+            SyncType.Differential => await GetWorkspaceMostRecentChangeDate(_sender, workspaceId, cancellationToken),
             _ => new DateTime(1900, 01, 01)
-        };
+        };        
 
         var workItemsResult = await _azureDevOpsService.GetWorkItems(organizationUrl, personalAccessToken, azdoWorkspaceName, lastChangedDate, workTypesResult.Value.Select(t => t.Name).ToArray(), cancellationToken);
         if (workItemsResult.IsFailure)
@@ -223,10 +224,23 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
         _logger.LogInformation("Retrieved {WorkItemCount} work items to sync for Azure DevOps project {Project}.", workItemsResult.Value.Count, azdoWorkspaceName);
 
-        //var syncWorkItemsResult = await _sender.Send(new SyncExternalWorkItemsCommand(workItemsResult.Value), cancellationToken);
+        if (workItemsResult.Value.Count == 0)
+            return Result.Success();
 
-        return workItemsResult.IsSuccess
+        var syncWorkItemsResult = await _sender.Send(new SyncExternalWorkItemsCommand(workspaceId, workItemsResult.Value), cancellationToken);
+
+        // get deleted work items and remove them from the workspace
+
+        return syncWorkItemsResult.IsSuccess
             ? Result.Success()
-            : workItemsResult.ConvertFailure();
+            : syncWorkItemsResult;
+        
+        static async Task<DateTime> GetWorkspaceMostRecentChangeDate(ISender sender, Guid workspaceId, CancellationToken cancellationToken)
+        {
+            var result = await sender.Send(new GetWorkspaceMostRecentChangeDateQuery(workspaceId), cancellationToken);
+            return result.IsSuccess && result.Value != null
+                ? ((Instant)result.Value).ToDateTimeUtc()
+                : new DateTime(1900, 01, 01);
+        }
     }
 }

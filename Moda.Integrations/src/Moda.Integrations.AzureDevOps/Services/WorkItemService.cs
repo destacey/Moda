@@ -27,14 +27,17 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
             // TODO: make this configurable
             List<string> fields =
             [
-                "System.AreaPath",
-                "System.ChangedDate",
                 "System.CreatedDate",
-                "System.IterationPath",
+                "System.CreatedBy",
+                "System.ChangedDate",
+                "System.ChangedBy",
                 "System.State",
                 "System.Title",
                 "System.WorkItemType",
 
+                "System.AreaPath",
+                "System.AssignedTo",
+                "System.IterationPath",
                 "Microsoft.VSTS.Common.Priority",
                 "Microsoft.VSTS.Common.StackRank"
             ];

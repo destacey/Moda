@@ -14,7 +14,7 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     private WorkspaceKey _key = null!;
     private string _name = null!;
     private string? _description;
-    //private readonly List<WorkItem> _workItems = new();
+    private readonly List<WorkItem> _workItems = [];
 
     private Workspace() { }
 
@@ -89,21 +89,43 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     /// <summary>
     /// A collection of work items in the workspace.
     /// </summary>
-    //public IReadOnlyCollection<WorkItem> WorkItems => _workItems.AsReadOnly();
+    public IReadOnlyCollection<WorkItem> WorkItems => _workItems.AsReadOnly();
 
     /// <summary>
-    /// The process for adding a work item to the workspace.
+    /// Creates a work item within the workspace.
     /// </summary>
     /// <param name="workItem"></param>
     /// <returns></returns>
-    //public Result AddWorkItem(WorkItem workItem)
-    //{
-    //    if (!IsActive)
-    //        return Result.Failure("Unable to add work items to an inactive work space.");
+    public Result AddWorkItem(WorkItem workItem)
+    {
+        if (!IsActive)
+            return Result.Failure("Unable to create work items within an inactive work space.");
 
-    //    _workItems.Add(workItem);
-    //    return Result.Success();
-    //}
+        // TODO: validate unique key, currently handled by the database
+
+        _workItems.Add(workItem);
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Removes work items from the workspace.
+    /// </summary>
+    /// <param name="workItemIds"></param>
+    /// <returns></returns>
+    public Result RemoveWorkItems(IEnumerable<Guid> workItemIds)
+    {
+        if (!IsActive)
+            return Result.Failure("Unable to remove work items in an inactive work space.");
+
+        foreach (var workItemId in workItemIds)
+        {
+            var workItem = _workItems.FirstOrDefault(x => x.Id == workItemId);
+            if (workItem != null)
+                _workItems.Remove(workItem);
+        }
+        
+        return Result.Success();
+    }
 
     /// <summary>
     /// The process for updating the workspace properties.

@@ -35,6 +35,8 @@ public sealed class WorkspaceKey : ValueObject
             : throw new ArgumentException("The value submitted does not meet the required format.", nameof(WorkspaceKey));
     }
 
+    public override string ToString() => Value;
+
     public static implicit operator string(WorkspaceKey workspaceKey) => workspaceKey.Value;
     public static explicit operator WorkspaceKey(string value) => new(value);
 }

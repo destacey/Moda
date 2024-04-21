@@ -1,9 +1,15 @@
 ﻿namespace Moda.Common.Application.Interfaces.Work;
 public interface IExternalWorkItem
 {
-    int? Id { get; }
-    int? Rev { get; }
-
-    // TODO: flatten this out to the fields we want to use
-    IDictionary<string, object> Fields { get; }
+    int Id { get; }
+    string Title { get; }
+    string WorkType { get; }
+    string WorkStatus { get; }
+    string? AssignedTo { get; }
+    Instant Created { get; }
+    string CreatedBy { get; }
+    Instant LastModified { get; }
+    string LastModifiedBy { get; }
+    int? Priority { get; }
+    double StackRank { get; }
 }
