@@ -14,6 +14,11 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
     public async Task<Result> Handle(SyncExternalWorkItemsCommand request, CancellationToken cancellationToken)
     {
+        if (request.WorkItems.Count == 0)
+        {
+            return Result.Success();
+        }
+
         var workspace = await _workDbContext.Workspaces
             .FirstOrDefaultAsync(w => w.Id == request.WorkspaceId && w.Ownership == Ownership.Managed, cancellationToken);
         if (workspace is null)
@@ -85,7 +90,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "An error occurred while syncing external work item {ExternalId} in workspace {WorkspaceId} ({WorkspaceName}).", externalWorkItem.Id, workspace.Id, workspace.Name);
+                        _logger.LogError(ex, "Exception thrown while syncing external work item {ExternalId} in workspace {WorkspaceId} ({WorkspaceName}).", externalWorkItem.Id, workspace.Id, workspace.Name);
                         throw;
                     }
                 }
