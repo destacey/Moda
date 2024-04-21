@@ -92,6 +92,20 @@ internal sealed class WorkItemClient : BaseClient
         return workItems;
     }
 
+    internal async Task<int[]> GetDeletedWorkItemIds(string projectName, CancellationToken cancellationToken)
+    {
+        Guard.Against.NullOrWhiteSpace(projectName, nameof(projectName));
+
+        var request = new RestRequest($"/{projectName}/_apis/wit/recyclebin", Method.Get);
+        SetupRequest(request);
+
+        var response = await _client.ExecuteAsync<ListResponse<WiqlWorkItemResponse>>(request, cancellationToken);
+
+        return response.IsSuccessful
+            ? response.Data?.Value.Select(w => w.Id).ToArray() ?? []
+            : throw new Exception($"Error getting deleted work item ids for project {projectName} from Azure DevOps: {response.ErrorMessage}");
+    }
+
     private static WiqlRequest CreateWiqlQueryForSync(string project, DateTime dateTime, string[] workItemTypes, int startingId)
     {
         var workItemTypesFilter = "";

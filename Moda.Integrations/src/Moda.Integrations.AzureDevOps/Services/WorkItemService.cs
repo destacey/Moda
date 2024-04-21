@@ -54,4 +54,21 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
             return Result.Failure<List<WorkItemResponse>>(ex.ToString());
         }
     }
+
+    public async Task<Result<int[]>> GetDeletedWorkItemIds(string projectName, CancellationToken cancellationToken)
+    {
+        try
+        {
+            int[] workItemIds = await _workItemClient.GetDeletedWorkItemIds(projectName, cancellationToken);
+
+            _logger.LogDebug("{WorkItemIdCount} deleted work item ids found for project {Project}", workItemIds.Length, projectName);
+
+            return Result.Success(workItemIds);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception thrown getting deleted work item ids for project {Project} from Azure DevOps", projectName);
+            return Result.Failure<int[]>(ex.ToString());
+        }
+    }
 }

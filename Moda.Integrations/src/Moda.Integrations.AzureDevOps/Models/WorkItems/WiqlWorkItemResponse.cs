@@ -2,5 +2,5 @@
 internal sealed record WiqlWorkItemResponse
 {
     public int Id { get; set; }
-    public required string Url { get; set; }
+    //public required string Url { get; set; } // not currently used
 }

@@ -116,6 +116,17 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
             : Result.Failure<List<IExternalWorkItem>>(result.Error);
     }
 
+    public async Task<Result<int[]>> GetDeletedWorkItemIds(string organizationUrl, string token, string projectName, CancellationToken cancellationToken)
+    {
+        var workItemService = GetService<WorkItemService>(organizationUrl, token);
+
+        var result = await workItemService.GetDeletedWorkItemIds(projectName, cancellationToken);
+
+        return result.IsSuccess
+            ? Result.Success(result.Value)
+            : Result.Failure<int[]>(result.Error);
+    }
+
     // TODO should these be cached?  any impact on GC if cached?  // should the client be created and cached here rather than in the service constructor?
     private TService GetService<TService>(VssConnection? connection)
     {
