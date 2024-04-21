@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.Common.Application.Enums;
@@ -7,6 +8,7 @@ using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.WorkStatuses.Commands;
 using Moda.Work.Application.WorkTypes.Commands;
+using Moda.Work.Domain.Models;
 using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
@@ -33,6 +35,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
             var activeConnections = connections.Where(c => c.IsValidConfiguration && c.IsSyncEnabled).ToList();
 
+            // TODO: convert to a sync result object that can be returned to hangfire
             var activeConnectionsCount = activeConnections.Count;
             var activeWorkProcessesCount = 0;
             var activeWorkProcessesSyncedCount = 0;
@@ -126,6 +129,15 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                                 _logger.LogError("An error occurred while syncing Azure DevOps Boards workspace {WorkspaceId} work items. Error: {Error}", workspace.IntegrationState!.InternalId, syncWorkItemsResult.Error);
                                 continue;
                             }
+
+                            var syncDeletedWorkItemsResult = await SyncDeletedWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workspace.IntegrationState!.InternalId, workspace.Name, cancellationToken);
+                            if (syncDeletedWorkItemsResult.IsFailure)
+                            {
+                                _logger.LogError("An error occurred while syncing Azure DevOps Boards workspace {WorkspaceId} deleted work items. Error: {Error}", workspace.IntegrationState!.InternalId, syncDeletedWorkItemsResult.Error);
+                                continue;
+                            }
+
+                            _logger.LogInformation("Successfully synced Azure DevOps Boards workspace {WorkspaceId} work items.", workspace.IntegrationState!.InternalId);
                         }
                         catch (Exception ex)
                         {
@@ -242,5 +254,28 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                 ? ((Instant)result.Value).ToDateTimeUtc()
                 : new DateTime(1900, 01, 01);
         }
+    }
+
+    private async Task<Result> SyncDeletedWorkItems(string organizationUrl, string personalAccessToken, Guid workspaceId, string azdoWorkspaceName, CancellationToken cancellationToken)
+    {
+        Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
+        Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
+        Guard.Against.Default(workspaceId, nameof(workspaceId));
+
+        var getDeletedWorkItemIdsResult = await _azureDevOpsService.GetDeletedWorkItemIds(organizationUrl, personalAccessToken, azdoWorkspaceName, cancellationToken);
+        if (getDeletedWorkItemIdsResult.IsFailure)
+            return getDeletedWorkItemIdsResult.ConvertFailure();
+
+        int deletedWorkItemCount = getDeletedWorkItemIdsResult.Value.Length;
+        _logger.LogInformation("Retrieved {WorkItemCount} deleted work items for Azure DevOps project {Project}.", deletedWorkItemCount, azdoWorkspaceName);
+
+        if (deletedWorkItemCount > 0)
+        {
+            var deleteWorkItemsResult = await _sender.Send(new DeleteExternalWorkItemsCommand(workspaceId, getDeletedWorkItemIdsResult.Value), cancellationToken);
+            if (deleteWorkItemsResult.IsFailure)
+                return deleteWorkItemsResult;
+        }
+
+        return Result.Success();
     }
 }
