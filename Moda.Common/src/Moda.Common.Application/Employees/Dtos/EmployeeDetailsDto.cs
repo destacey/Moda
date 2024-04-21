@@ -65,17 +65,7 @@ public sealed record EmployeeDetailsDto : IMapFrom<Employee>
     /// <value>The office location.</value>
     public string? OfficeLocation { get; set; }
 
-    /// <summary>Gets the manager identifier.</summary>
-    /// <value>The manager identifier.</value>
-    public Guid? ManagerId { get; set; }
-
-    /// <summary>Gets the key.</summary>
-    /// <value>The key.</value>
-    public int? ManagerKey { get; set; }
-
-    /// <summary>Gets the manager.</summary>
-    /// <value>The manager.</value>
-    public string? ManagerName { get; set; }
+    public EmployeeNavigationDto? Manager { get; set; }
 
     /// <summary>
     /// Indicates whether the employee is active or not.  
@@ -93,7 +83,6 @@ public sealed record EmployeeDetailsDto : IMapFrom<Employee>
             .Map(dest => dest.Suffix, src => src.Name.Suffix)
             .Map(dest => dest.Title, src => src.Name.Title)
             .Map(dest => dest.Email, src => src.Email.Value)
-            .Map(dest => dest.ManagerKey, src => src.Manager!.Key, cond => cond.Manager != null) // cond does not support .HasValue
-            .Map(dest => dest.ManagerName, src => StringHelpers.Concat(src.Manager!.Name.FirstName, src.Manager!.Name.LastName), srcCond => srcCond.Manager != null && srcCond.Manager.IsActive);
+            .Map(dest => dest.Manager, src => src.Manager == null ? null : EmployeeNavigationDto.From(src.Manager));
     }
 }

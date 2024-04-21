@@ -51,13 +51,6 @@ internal sealed class GetEmployeeQueryHandler : IQueryHandler<GetEmployeeQuery, 
             throw exception;
         }
 
-        // TODO: Mapsters ProjectToType is not working as expected because of the conditional on manager name
-        //return await query.ProjectToType<EmployeeDetailsDto>().FirstOrDefaultAsync(cancellationToken);
-
-        var employee = await query
-            .Include(e => e.Manager)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return employee?.Adapt<EmployeeDetailsDto>();
+        return await query.ProjectToType<EmployeeDetailsDto>().FirstOrDefaultAsync(cancellationToken);
     }
 }
