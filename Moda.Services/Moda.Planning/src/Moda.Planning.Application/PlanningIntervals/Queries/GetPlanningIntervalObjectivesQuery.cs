@@ -83,12 +83,12 @@ internal sealed class GetPlanningIntervalObjectivesQueryHandler : IQueryHandler<
         var planningInterval = await query
             .AsNoTrackingWithIdentityResolution()
             .FirstOrDefaultAsync(cancellationToken);
-        if (planningInterval is null || !planningInterval.Objectives.Any())
-            return new List<PlanningIntervalObjectiveListDto>();
+        if (planningInterval is null || planningInterval.Objectives.Count == 0)
+            return [];
 
         // call the objective query handler
         var teamIds = request.TeamId.HasValue ? new Guid[] { request.TeamId.Value } : null;
-        var objectives = await _sender.Send(new GetObjectivesForPlanningIntervalsQuery(new Guid[] { planningInterval.Id }, teamIds), cancellationToken);
+        var objectives = await _sender.Send(new GetObjectivesForPlanningIntervalsQuery([planningInterval.Id], teamIds), cancellationToken);
         if (!objectives.Any() || planningInterval.Objectives.Count != objectives.Count)
             ThrowAndLogException(request, $"Error mapping objectives for planning interval {planningInterval.Id}.");
 
