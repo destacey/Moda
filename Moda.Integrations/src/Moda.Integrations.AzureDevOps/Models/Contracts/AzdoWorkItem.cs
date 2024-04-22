@@ -10,9 +10,9 @@ public record AzdoWorkItem : IExternalWorkItem
     public required string WorkStatus { get; set; }
     public string? AssignedTo { get; set; }
     public Instant Created { get; set; }
-    public required string CreatedBy { get; set; }
+    public string? CreatedBy { get; set; }
     public Instant LastModified { get; set; }
-    public required string LastModifiedBy { get; set; }
+    public string? LastModifiedBy { get; set; }
     public int? Priority { get; set; }
     public double StackRank { get; set; }
 }

@@ -94,7 +94,7 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
                 w => new WorkItemKey(w))
             .HasColumnType("varchar")
             .HasMaxLength(64);
-        builder.Property(w => w.Title).IsRequired().HasMaxLength(128);
+        builder.Property(w => w.Title).IsRequired().HasMaxLength(256);
         builder.Property(w => w.ExternalId);
         builder.Property(w => w.Priority);
         builder.Property(w => w.StackRank);

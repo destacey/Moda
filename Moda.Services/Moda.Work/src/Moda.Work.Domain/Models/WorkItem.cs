@@ -115,9 +115,8 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         }
         
         var key = new WorkItemKey(workspace.Key, externalId);
-        var workItem = new WorkItem(key, title, workspace.Id, externalId, typeId, statusId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank);
+        return new WorkItem(key, title, workspace.Id, externalId, typeId, statusId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank);
 
-        var result = workspace.AddWorkItem(workItem);
-        return result.IsSuccess ? workItem : throw new InvalidOperationException(result.Error);
+        //var result = workspace.AddWorkItem(workItem);  // this is handled in the handler for performance reasons
     }
 }

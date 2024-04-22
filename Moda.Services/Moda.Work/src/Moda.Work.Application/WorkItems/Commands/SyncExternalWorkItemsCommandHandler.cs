@@ -35,7 +35,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
             var workStatuses = (await _workDbContext.WorkStatuses.Select(s => new { s.Id, s.Name }).ToListAsync(cancellationToken)).ToHashSet();
             var employees = (await _workDbContext.Employees.Select(e => new { e.Id, e.Email }).ToListAsync(cancellationToken)).ToHashSet();
 
-            var chunks = request.WorkItems.OrderBy(w => w.LastModified).Chunk(1000);
+            int chunkSize = 500;
+            var chunks = request.WorkItems.OrderBy(w => w.LastModified).Chunk(chunkSize);
 
             foreach (var chunk in chunks)
             {
@@ -45,6 +46,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                     .Query()
                     .Where(wi => chunk.Select(c => c.Id).Contains(wi.ExternalId!.Value))
                     .LoadAsync(cancellationToken);
+
+                List<WorkItem> newWorkItems = new(chunkSize);
 
                 foreach (var externalWorkItem in chunk)
                 {
@@ -69,6 +72,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 externalWorkItem.Priority,
                                 externalWorkItem.StackRank
                             );
+                            newWorkItems.Add( workItem );
 
                             syncLog.ItemCreated();
                         }
@@ -93,6 +97,11 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                         _logger.LogError(ex, "Exception thrown while syncing external work item {ExternalId} in workspace {WorkspaceId} ({WorkspaceName}).", externalWorkItem.Id, workspace.Id, workspace.Name);
                         throw;
                     }
+                }
+
+                if (newWorkItems.Count > 0)
+                {
+                    await _workDbContext.WorkItems.AddRangeAsync(newWorkItems, cancellationToken);
                 }
 
                 await _workDbContext.SaveChangesAsync(cancellationToken);
