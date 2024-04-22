@@ -7,9 +7,9 @@ public interface IExternalWorkItem
     string WorkStatus { get; }
     string? AssignedTo { get; }
     Instant Created { get; }
-    string CreatedBy { get; }
+    string? CreatedBy { get; }
     Instant LastModified { get; }
-    string LastModifiedBy { get; }
+    string? LastModifiedBy { get; }
     int? Priority { get; }
     double StackRank { get; }
 }

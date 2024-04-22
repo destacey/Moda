@@ -28,11 +28,11 @@ internal static class WorkItemResponseExtensions
             WorkStatus = workItem.Fields.State,
             AssignedTo = workItem.Fields.AssignedTo?.UniqueName,
             Created = Instant.FromDateTimeOffset(workItem.Fields.CreatedDate),
-            CreatedBy = workItem.Fields.CreatedBy.UniqueName,
+            CreatedBy = workItem.Fields.CreatedBy?.UniqueName,
             LastModified = Instant.FromDateTimeOffset(workItem.Fields.ChangedDate),
-            LastModifiedBy = workItem.Fields.ChangedBy.UniqueName,
+            LastModifiedBy = workItem.Fields.ChangedBy?.UniqueName,
             Priority = workItem.Fields.Priority,
-            StackRank = workItem.Fields.StackRank
+            StackRank = workItem.Fields.StackRank > 0 ? workItem.Fields.StackRank : 999_999_999_999
         };
     }
 
