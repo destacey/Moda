@@ -22,12 +22,6 @@ internal sealed class GetEmployeesQueryHandler : IQueryHandler<GetEmployeesQuery
         if (!request.IncludeInactive)
             query = query.Where(e => e.IsActive);
 
-        // TODO: Mapsters ProjectToType is not working as expected because of the conditional on manager name
-        //return await query.ProjectToType<EmployeeListDto>().ToListAsync(cancellationToken);
-        var employees = await query
-            .Include(e => e.Manager)
-            .ToListAsync(cancellationToken);
-
-        return employees.Adapt<List<EmployeeListDto>>();
+        return await query.ProjectToType<EmployeeListDto>().ToListAsync(cancellationToken);
     }
 }

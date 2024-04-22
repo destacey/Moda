@@ -1,0 +1,52 @@
+﻿using Moda.Common.Models;
+using Moda.Work.Application.WorkItems.Dtos;
+
+namespace Moda.Work.Application.WorkItems.Queries;
+public sealed record GetWorkItemQuery : IQuery<Result<WorkItemDetailsDto?>>
+{
+    public GetWorkItemQuery(Guid workspaceId, WorkItemKey workItemKey)
+    {
+        Id = Guard.Against.NullOrEmpty(workspaceId);
+        WorkItemKey = workItemKey;
+    }
+
+    public GetWorkItemQuery(WorkspaceKey workspaceKey, WorkItemKey workItemKey)
+    {
+        Key = Guard.Against.Default(workspaceKey);
+        WorkItemKey = workItemKey;
+    }
+
+    public Guid? Id { get; }
+    public WorkspaceKey? Key { get; }
+    public WorkItemKey WorkItemKey { get; }
+}
+
+internal sealed class GetWorkItemQueryHandler(IWorkDbContext workDbContext, ILogger<GetWorkItemQueryHandler> logger) : IQueryHandler<GetWorkItemQuery, Result<WorkItemDetailsDto?>>
+{
+    private const string AppRequestName = nameof(GetWorkItemQuery);
+
+    private readonly IWorkDbContext _workDbContext = workDbContext;
+    private readonly ILogger<GetWorkItemQueryHandler> _logger = logger;
+
+    public async Task<Result<WorkItemDetailsDto?>> Handle(GetWorkItemQuery request, CancellationToken cancellationToken)
+    {
+        var query = _workDbContext.WorkItems
+            .AsQueryable();
+
+        if (request.Id.HasValue)
+        {
+            query = query.Where(e => e.WorkspaceId == request.Id);
+        }
+        else if (request.Key is not null)
+        {
+            query = query.Where(e => e.Workspace.Key == request.Key);
+        }
+        else
+        {
+            _logger.LogError("{AppRequestName}: No workspace id or key provided. {@Request}", AppRequestName, request);
+            return Result.Failure<WorkItemDetailsDto?>("No valid workspace id or key provided.");
+        }
+
+        return await query.ProjectToType<WorkItemDetailsDto>().FirstOrDefaultAsync(cancellationToken);
+    }
+}

@@ -15,7 +15,7 @@ const EmployeeLinkCellRenderer = ({ value, data }) => {
 
 const ManagerLinkCellRenderer = ({ value, data }) => {
   return (
-    <Link href={`/organizations/employees/${data.managerKey}`}>{value}</Link>
+    <Link href={`/organizations/employees/${data.manager?.key}`}>{value}</Link>
   )
 }
 
@@ -41,7 +41,7 @@ const EmployeeListPage = () => {
       { field: 'jobTitle' },
       { field: 'department' },
       {
-        field: 'managerName',
+        field: 'manager.name',
         headerName: 'Manager',
         cellRenderer: ManagerLinkCellRenderer,
       },

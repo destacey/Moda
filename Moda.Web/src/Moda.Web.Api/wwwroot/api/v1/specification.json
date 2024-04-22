@@ -3372,6 +3372,122 @@
         ]
       }
     },
+    "/api/work/workspaces/{idOrKey}/work-items": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get work items for a workspace.",
+        "operationId": "Workspaces_GetWorkItems",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkItemListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/work/workspaces/{idOrKey}/work-items/{workItemKey}": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get work item details.",
+        "operationId": "Workspaces_GetWorkItem",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "workItemKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkItemDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/work/work-status-categories": {
       "get": {
         "tags": [
@@ -7113,6 +7229,17 @@
         }
       },
       "NavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDtoOfGuidAndInteger"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "NavigationDtoOfGuidAndInteger": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -8272,7 +8399,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/NavigationDto"
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
               }
             ]
           },
@@ -8282,6 +8409,17 @@
             "nullable": true
           }
         }
+      },
+      "EmployeeNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
       },
       "RiskDetailsDto": {
         "type": "object",
@@ -8808,6 +8946,140 @@
           }
         }
       },
+      "WorkItemListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/WorkspaceNavigationDto"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "assignedTo": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
+          }
+        }
+      },
+      "WorkspaceNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDtoOfGuidAndString"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "NavigationDtoOfGuidAndString": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkItemDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "externalId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "title": {
+            "type": "string"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/WorkspaceNavigationDto"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "assignedTo": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
+          },
+          "lastModified": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastModifiedBy": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
+          }
+        }
+      },
       "WorkStatusCategoryListDto": {
         "type": "object",
         "additionalProperties": false,
@@ -9002,20 +9274,13 @@
             "type": "string",
             "nullable": true
           },
-          "managerId": {
-            "type": "string",
-            "format": "guid",
+          "manager": {
             "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "managerKey": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "managerName": {
-            "type": "string",
-            "nullable": true
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
           },
           "isActive": {
             "type": "boolean"
@@ -9083,20 +9348,13 @@
             "type": "string",
             "nullable": true
           },
-          "managerId": {
-            "type": "string",
-            "format": "guid",
+          "manager": {
             "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "managerKey": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "managerName": {
-            "type": "string",
-            "nullable": true
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
           },
           "isActive": {
             "type": "boolean"

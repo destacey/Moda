@@ -52,10 +52,8 @@ internal sealed class GetRiskQueryHandler : IQueryHandler<GetRiskQuery, RiskDeta
             throw exception;
         }
 
-        var risk = await query
-            .AsNoTracking()
+        return await query
+            .ProjectToType<RiskDetailsDto>()
             .FirstOrDefaultAsync(cancellationToken);
-
-        return risk?.Adapt<RiskDetailsDto>();
     }
 }

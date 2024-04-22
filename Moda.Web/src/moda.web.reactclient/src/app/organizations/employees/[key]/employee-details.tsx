@@ -18,8 +18,8 @@ const EmployeeDetails = ({ employee }: EmployeeDetailsProps) => {
         <Item label="Job Title">{employee.jobTitle}</Item>
         <Item label="Department">{employee.department}</Item>
         <Item label="Manager">
-          <Link href={`/organizations/employees/${employee.managerKey}`}>
-            {employee.managerName}
+          <Link href={`/organizations/employees/${employee.manager?.key}`}>
+            {employee.manager?.name}
           </Link>
         </Item>
         <Item label="Office Location">{employee.officeLocation}</Item>

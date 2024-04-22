@@ -13,7 +13,7 @@ public sealed record WorkspaceListDto : IMapFrom<Workspace>
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Workspace, WorkspaceListDto>()
-            .Map(dest => dest.Key, src => src.Key.Value)
+            .Map(dest => dest.Key, src => src.Key.ToString())
             .Map(dest => dest.Ownership, src => SimpleNavigationDto.FromEnum(src.Ownership));
     }
 }

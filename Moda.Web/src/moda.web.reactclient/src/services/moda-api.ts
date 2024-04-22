@@ -4167,6 +4167,138 @@ export class WorkspacesClient {
         }
         return Promise.resolve<WorkspaceDto>(null as any);
     }
+
+    /**
+     * Get work items for a workspace.
+     */
+    getWorkItems(idOrKey: string, cancelToken?: CancelToken): Promise<WorkItemListDto[]> {
+        let url_ = this.baseUrl + "/api/work/workspaces/{idOrKey}/work-items";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetWorkItems(_response);
+        });
+    }
+
+    protected processGetWorkItems(response: AxiosResponse): Promise<WorkItemListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<WorkItemListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<WorkItemListDto[]>(null as any);
+    }
+
+    /**
+     * Get work item details.
+     */
+    getWorkItem(idOrKey: string, workItemKey: string, cancelToken?: CancelToken): Promise<WorkItemDetailsDto> {
+        let url_ = this.baseUrl + "/api/work/workspaces/{idOrKey}/work-items/{workItemKey}";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (workItemKey === undefined || workItemKey === null)
+            throw new Error("The parameter 'workItemKey' must be defined.");
+        url_ = url_.replace("{workItemKey}", encodeURIComponent("" + workItemKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetWorkItem(_response);
+        });
+    }
+
+    protected processGetWorkItem(response: AxiosResponse): Promise<WorkItemDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<WorkItemDetailsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<WorkItemDetailsDto>(null as any);
+    }
 }
 
 export class WorkStatusCategoriesClient {
@@ -8453,10 +8585,13 @@ export interface UserDetailsDto {
     employee?: NavigationDto | undefined;
 }
 
-export interface NavigationDto {
+export interface NavigationDtoOfGuidAndInteger {
     id?: string;
     key?: number;
     name?: string;
+}
+
+export interface NavigationDto extends NavigationDtoOfGuidAndInteger {
 }
 
 export interface ProblemDetails {
@@ -8785,8 +8920,11 @@ export interface RiskListDto {
     status?: string;
     category?: string;
     exposure?: string;
-    assignee?: NavigationDto | undefined;
+    assignee?: EmployeeNavigationDto | undefined;
     followUpDate?: Date | undefined;
+}
+
+export interface EmployeeNavigationDto extends NavigationDto {
 }
 
 export interface RiskDetailsDto {
@@ -8940,6 +9078,41 @@ export interface WorkspaceDto {
     isActive?: boolean;
 }
 
+export interface WorkItemListDto {
+    id?: string;
+    key?: string;
+    title?: string;
+    workspace?: WorkspaceNavigationDto;
+    type?: string;
+    status?: string;
+    assignedTo?: EmployeeNavigationDto | undefined;
+}
+
+export interface NavigationDtoOfGuidAndString {
+    id?: string;
+    key?: string | undefined;
+    name?: string;
+}
+
+export interface WorkspaceNavigationDto extends NavigationDtoOfGuidAndString {
+}
+
+export interface WorkItemDetailsDto {
+    id?: string;
+    key?: string;
+    externalId?: number | undefined;
+    title?: string;
+    workspace?: WorkspaceNavigationDto;
+    type?: string;
+    status?: string;
+    priority?: number | undefined;
+    assignedTo?: EmployeeNavigationDto | undefined;
+    created?: Date;
+    createdBy?: EmployeeNavigationDto | undefined;
+    lastModified?: Date;
+    lastModifiedBy?: EmployeeNavigationDto | undefined;
+}
+
 export interface WorkStatusCategoryListDto {
     id?: number;
     name?: string;
@@ -9001,9 +9174,7 @@ export interface EmployeeListDto {
     jobTitle?: string | undefined;
     department?: string | undefined;
     officeLocation?: string | undefined;
-    managerId?: string | undefined;
-    managerKey?: number | undefined;
-    managerName?: string | undefined;
+    manager?: EmployeeNavigationDto | undefined;
     isActive?: boolean;
 }
 
@@ -9023,9 +9194,7 @@ export interface EmployeeDetailsDto {
     jobTitle?: string | undefined;
     department?: string | undefined;
     officeLocation?: string | undefined;
-    managerId?: string | undefined;
-    managerKey?: number | undefined;
-    managerName?: string | undefined;
+    manager?: EmployeeNavigationDto | undefined;
     isActive?: boolean;
 }
 

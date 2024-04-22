@@ -12,6 +12,7 @@ public class AuditService : IAuditService
     public async Task<List<AuditDto>> GetUserTrailsAsync(Guid userId)
     {
         var trails = await _context.AuditTrails
+            .AsNoTracking()
             .Where(a => a.UserId == userId)
             .OrderByDescending(a => a.DateTime)
             .Take(250)

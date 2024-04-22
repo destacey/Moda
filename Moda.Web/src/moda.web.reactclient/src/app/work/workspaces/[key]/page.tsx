@@ -4,15 +4,20 @@ import { PageTitle } from '@/src/app/components/common'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
-import { useGetWorkspaceQuery } from '@/src/store/features/work-management/workspace-api'
+import {
+  useGetWorkItemsQuery,
+  useGetWorkspaceQuery,
+} from '@/src/store/features/work-management/workspace-api'
 import { Card } from 'antd'
 import { notFound, usePathname } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import WorkspaceDetailsLoading from './loading'
 import WorkspaceDetails from './workspace-details'
+import WorkItemsGrid from './work-items-grid'
 
 enum WorkspaceTabs {
   Details = 'details',
+  WorkItems = 'workItems',
 }
 
 const WorkspaceDetailsPage = ({ params }) => {
@@ -27,6 +32,8 @@ const WorkspaceDetailsPage = ({ params }) => {
     refetch,
   } = useGetWorkspaceQuery(workspaceKey)
 
+  const workItemsQuery = useGetWorkItemsQuery(workspaceKey)
+
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
@@ -38,6 +45,10 @@ const WorkspaceDetailsPage = ({ params }) => {
   useEffect(() => {
     error && console.error(error)
   }, [error])
+
+  useEffect(() => {
+    workItemsQuery.error && console.error(workItemsQuery.error)
+  }, [workItemsQuery.error])
 
   // doesn't trigger on first render
   const onTabChange = useCallback((tabKey) => {
@@ -57,6 +68,17 @@ const WorkspaceDetailsPage = ({ params }) => {
       key: WorkspaceTabs.Details,
       tab: 'Details',
       content: <WorkspaceDetails workspace={workspaceData} />,
+    },
+    {
+      key: WorkspaceTabs.WorkItems,
+      tab: 'Work Items',
+      content: (
+        <WorkItemsGrid
+          workItems={workItemsQuery.data}
+          isLoading={workItemsQuery.isLoading}
+          refetch={workItemsQuery.refetch}
+        />
+      ),
     },
   ]
 

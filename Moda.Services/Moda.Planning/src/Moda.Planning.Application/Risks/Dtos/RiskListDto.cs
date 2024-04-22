@@ -1,4 +1,4 @@
-﻿using Moda.Common.Application.Dtos;
+﻿using Moda.Common.Application.Employees.Dtos;
 using Moda.Common.Extensions;
 using Moda.Planning.Application.Models;
 
@@ -13,7 +13,7 @@ public class RiskListDto : IMapFrom<Risk>
     public required string Status { get; set; }
     public required string Category { get; set; }
     public required string Exposure { get; set; }
-    public NavigationDto? Assignee { get; set; }
+    public EmployeeNavigationDto? Assignee { get; set; }
     public LocalDate? FollowUpDate { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
@@ -22,6 +22,6 @@ public class RiskListDto : IMapFrom<Risk>
             .Map(dest => dest.Status, src => src.Status.GetDisplayName())
             .Map(dest => dest.Category, src => src.Category.GetDisplayName())
             .Map(dest => dest.Exposure, src => src.Exposure.GetDisplayName())
-            .Map(dest => dest.Assignee, src => src.Assignee == null ? null : NavigationDto.Create(src.Assignee.Id, src.Assignee.Key, src.Assignee.Name.FullName));
+            .Map(dest => dest.Assignee, src => src.Assignee == null ? null : EmployeeNavigationDto.From(src.Assignee));
     }
 }

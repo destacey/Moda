@@ -19,14 +19,11 @@ internal sealed class GetMyRisksQueryHandler : IQueryHandler<GetMyRisksQuery, IR
     {
         var employeeId = _currentUser.GetEmployeeId();
         if (employeeId is null)
-            return Array.Empty<RiskListDto>();
+            return [];
 
-        var risks = await _planningDbContext.Risks
-            .Include(r => r.Team)
-            .Include(r => r.Assignee)
+        return await _planningDbContext.Risks
             .Where(r => r.Status == RiskStatus.Open && r.AssigneeId == employeeId)
+            .ProjectToType<RiskListDto>()
             .ToListAsync(cancellationToken);
-
-        return risks.Adapt<IReadOnlyList<RiskListDto>>();
     }
 }

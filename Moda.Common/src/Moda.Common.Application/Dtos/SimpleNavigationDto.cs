@@ -4,6 +4,17 @@ public record SimpleNavigationDto
     public int Id { get; set; }
     public required string Name { get; set; }
 
+    public static SimpleNavigationDto Create(int id, string name)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+
+        return new()
+        {
+            Id = id,
+            Name = name
+        };
+    }
+
     public static SimpleNavigationDto FromEnum<T>(T value) where T : struct, Enum
     {
         ArgumentNullException.ThrowIfNull(value);
