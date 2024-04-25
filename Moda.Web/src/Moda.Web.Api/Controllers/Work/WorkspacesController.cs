@@ -82,7 +82,7 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
 
         return result.IsFailure
             ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetWorkItems"))
-            : Ok(result.Value);
+            : Ok(result.Value.OrderByKey(true));
     }
 
     [HttpGet("{idOrKey}/work-items/{workItemKey}")]

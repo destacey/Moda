@@ -16,6 +16,11 @@ export interface WorkspacesCardGridProps {
 }
 
 const WorkspacesCardGrid = (props: WorkspacesCardGridProps) => {
+  const sortedWorkspaces =
+    props.workspaces && props.workspaces.length > 0
+      ? [...props.workspaces].sort((a, b) => a.name.localeCompare(b.name))
+      : []
+
   return (
     <>
       <Flex justify="end" align="center" style={{ paddingBottom: '16px' }}>
@@ -37,9 +42,7 @@ const WorkspacesCardGrid = (props: WorkspacesCardGridProps) => {
           size: 'large',
         }}
         locale={{ emptyText: 'No workspaces found.' }}
-        dataSource={props.workspaces?.sort((a, b) =>
-          a.name.localeCompare(b.name),
-        )}
+        dataSource={sortedWorkspaces}
         renderItem={(item) => (
           <ListItem>
             <WorkspaceCard workspace={item} />
