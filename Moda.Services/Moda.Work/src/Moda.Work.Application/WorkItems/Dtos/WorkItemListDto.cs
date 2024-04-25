@@ -21,3 +21,15 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo));
     }
 }
+
+public static class WorkItemListDtoExtensions
+{
+    public static IEnumerable<WorkItemListDto> OrderByKey(this IEnumerable<WorkItemListDto> query, bool ascending)
+    {
+        return ascending
+            ? query.OrderBy(x => x.Key.Split('-')[0])
+                   .ThenBy(x => int.Parse(x.Key.Split('-')[1]))
+            : query.OrderByDescending(x => x.Key.Split('-')[0])
+                   .ThenByDescending(x => int.Parse(x.Key.Split('-')[1]));
+    }
+}
