@@ -20,12 +20,22 @@ const AssignedToLinkCellRenderer = ({ value, data }) => {
   )
 }
 
+const workItemKeyComparator = (key1, key2) => {
+  const [str1, num1] = key1.split('-')
+  const [str2, num2] = key2.split('-')
+
+  if (str1 < str2) return -1
+  if (str1 > str2) return 1
+
+  return parseInt(num1) - parseInt(num2)
+}
+
 const WorkItemsGrid = (props: WorkItemsGridProps) => {
   const { refetch } = props
 
   const columnDefs = useMemo<ColDef<WorkItemListDto>[]>(
     () => [
-      { field: 'key' },
+      { field: 'key', comparator: workItemKeyComparator },
       { field: 'title', width: 400 },
       { field: 'type', width: 125 },
       { field: 'status', width: 125 },
@@ -45,6 +55,7 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
   return (
     <>
       <ModaGrid
+        height={550}
         columnDefs={columnDefs}
         rowData={props.workItems}
         loadData={refresh}
