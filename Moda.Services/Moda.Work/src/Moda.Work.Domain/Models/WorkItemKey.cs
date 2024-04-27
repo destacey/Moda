@@ -38,7 +38,10 @@ public sealed class WorkItemKey : ValueObject
         }
     }
 
-    public string Value { get; init; } = null!;
+    public string Value { get; init; } = default!;
+
+    public string WorkspaceKey => Value.Split('-')[0];
+    public int WorkItemNumber => int.Parse(Value.Split('-')[1]);
 
     protected override IEnumerable<IComparable> GetEqualityComponents()
     {
