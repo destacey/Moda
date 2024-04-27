@@ -4,9 +4,10 @@ import { WorkItemsListCard } from '@/src/app/components/common/work'
 import useAuth from '@/src/app/components/contexts/auth'
 import { useDebounce } from '@/src/app/hooks'
 import { useSearchWorkItemsQuery } from '@/src/store/features/work-management/workspace-api'
-import { PlusOutlined } from '@ant-design/icons'
+import { FormOutlined } from '@ant-design/icons'
 import { Button, Card, Input, Select, SelectProps } from 'antd'
 import { useState } from 'react'
+import ManagePlanningIntervalObjectiveWorkItemsForm from './manage-planning-interval-objective-work-items-form'
 
 const { Search } = Input
 
@@ -19,36 +20,29 @@ const PlanningIntervalObjectiveWorkItemsCard = ({
   objectiveId,
   canLinkWorkItems,
 }: PlanningIntervalObjectiveWorkItemsCardProps) => {
-  const [data, setData] = useState<SelectProps['options']>([])
-  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [openManageWorkItemsForm, setOpenManageWorkItemsForm] =
+    useState<boolean>(false)
 
-  const debounceSearchQuery = useDebounce(searchQuery, 500)
-  const {
-    data: searchResult,
-    isSuccess,
-    isLoading,
-    isError,
-  } = useSearchWorkItemsQuery(debounceSearchQuery, {
-    skip: debounceSearchQuery === '',
-  })
+  //   const [data, setData] = useState<SelectProps['options']>([])
+  //   const [searchQuery, setSearchQuery] = useState<string>('')
 
+  //   const debounceSearchQuery = useDebounce(searchQuery, 500)
   //   const {
   //     data: searchResult,
   //     isSuccess,
-  //     isFetching,
+  //     isLoading,
   //     isError,
-  //     refetch: fetch,
-  //   } = useSearchWorkItemsQuery(searchQuery, {
-  //     skip: searchQuery === '',
+  //   } = useSearchWorkItemsQuery(debounceSearchQuery, {
+  //     skip: debounceSearchQuery === '',
   //   })
 
-  const handleSearch = (newValue: string) => {
-    setSearchQuery(newValue)
-  }
+  //   const handleSearch = (newValue: string) => {
+  //     setSearchQuery(newValue)
+  //   }
 
-  const handleChange = (newValue: string) => {
-    //setSearchQuery(newValue)
-  }
+  //   const handleChange = (newValue: string) => {
+  //     //setSearchQuery(newValue)
+  //   }
 
   const testWorkItems = [
     {
@@ -70,6 +64,14 @@ const PlanningIntervalObjectiveWorkItemsCard = ({
       status: 'In Progress',
     },
   ]
+
+  const onManageWorkItemsFormClosed = (wasSaved: boolean) => {
+    setOpenManageWorkItemsForm(false)
+    if (wasSaved) {
+      //refreshObjectives()
+    }
+  }
+
   return (
     <>
       <Card
@@ -80,12 +82,18 @@ const PlanningIntervalObjectiveWorkItemsCard = ({
         extra={
           <>
             {canLinkWorkItems && (
-              <Search
-                size="small"
-                placeholder="Add work item key"
-                allowClear
-                onSearch={handleSearch}
+              <Button
+                type="text"
+                icon={<FormOutlined />}
+                title="Manage work items"
+                onClick={() => setOpenManageWorkItemsForm(true)}
               />
+              //   <Search
+              //     size="small"
+              //     placeholder="Add work item key"
+              //     allowClear
+              //     onSearch={handleSearch}
+              //   />
               //   <Select
               //     showSearch
               //     allowClear
@@ -128,6 +136,14 @@ const PlanningIntervalObjectiveWorkItemsCard = ({
       >
         <WorkItemsListCard workItems={testWorkItems} />
       </Card>
+      {openManageWorkItemsForm && (
+        <ManagePlanningIntervalObjectiveWorkItemsForm
+          id={objectiveId}
+          showForm={openManageWorkItemsForm}
+          onFormSave={() => onManageWorkItemsFormClosed(true)}
+          onFormCancel={() => onManageWorkItemsFormClosed(false)}
+        />
+      )}
     </>
   )
 }
