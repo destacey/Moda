@@ -68,7 +68,7 @@
             "name": "Compound: Launch Moda on Host",
             "configurations": [
                 "Debug Moda API on Host",
-                "Next.js: debug client side"
+                "Next.js: debug full stack"
             ],
             "stopAll": true
         },
