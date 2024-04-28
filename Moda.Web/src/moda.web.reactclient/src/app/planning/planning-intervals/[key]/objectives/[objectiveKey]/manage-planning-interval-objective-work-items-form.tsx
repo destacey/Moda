@@ -117,11 +117,11 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
         skip: debounceSearchQuery === '',
     })
 
-    const merge = (searchResult: WorkItemListDto[], workItems: WorkItemListDto[]) : WorkItemListDto[] => {
+    const merge = (searchResult: WorkItemListDto[], workItems: WorkItemListDto[]): WorkItemListDto[] => {
         const spread = [...searchResult ?? []]
         workItems.forEach((item) => {
             const found = searchResult.find((x) => x.key === item.key)
-            if(!found) spread.push(item)
+            if (!found) spread.push(item)
         })
         return spread;
     }
@@ -178,7 +178,7 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
             <Modal
                 title="Manage PI Objective Work Items"
                 open={isOpen}
-                width={900}
+                width={950}
                 onOk={handleOk}
                 okText="Save"
                 confirmLoading={isSaving}
