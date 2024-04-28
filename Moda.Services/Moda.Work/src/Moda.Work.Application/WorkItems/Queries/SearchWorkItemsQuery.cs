@@ -18,14 +18,18 @@ internal sealed class SearchWorkItemsQueryHandler(IWorkDbContext workDbContext, 
             return Result.Failure<IReadOnlyCollection<WorkItemListDto>>("No search term provided.");
         }
 
-        return await _workDbContext.WorkItems
-            .Where(e => e.Title.Contains(request.SearchTerm))
-            //|| e.Key.ToString().Contains(request.SearchTerm))
-            //.OrderBy(e => e.Key.WorkspaceKey)
-            //    .ThenBy(e => e.Key.WorkItemNumber)
-            .Take(request.Top)
+        var workitems = await _workDbContext.WorkItems
+            .Where(e => e.Title.Contains(request.SearchTerm)
+                || ((string)e.Key).Contains(request.SearchTerm))
             .ProjectToType<WorkItemListDto>()
-            .ToListAsync(cancellationToken);
+            .ToArrayAsync(cancellationToken);
+
+        // TODO: This is a temporary solution to sort the work items by key.  Need to link the STRING_SPLIT function in the OrderBy clause.
+
+        return workitems
+            .OrderByKey(true)
+            .Take(request.Top)
+            .ToArray();
     }
 }
 
