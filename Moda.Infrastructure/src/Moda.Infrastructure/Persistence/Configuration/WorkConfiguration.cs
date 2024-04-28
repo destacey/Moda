@@ -84,6 +84,9 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
         builder.HasIndex(w => w.Key)
             .IncludeProperties(w => new { w.Id, w.Title, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId });
 
+        builder.HasIndex(w => new { w.Key, w.Title })
+            .IncludeProperties(w => new { w.Id, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId });
+
         builder.HasIndex(w => w.ExternalId)
             .IncludeProperties(w => new { w.Id, w.Key , w.Title, w.WorkspaceId, w.AssignedToId, w.TypeId, w.StatusId });
 
