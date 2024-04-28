@@ -68,6 +68,30 @@ public class BacklogLevelConfig : IEntityTypeConfiguration<BacklogLevel>
         builder.Property(w => w.IsDeleted);
     }
 }
+public class WorkItemLinkConfig : IEntityTypeConfiguration<WorkItemLink>
+{
+    public void Configure(EntityTypeBuilder<WorkItemLink> builder)
+    {
+        builder.ToTable("WorkItemLinks", SchemaNames.Work);
+
+        builder.HasKey(w => new { w.WorkItemId, w.ObjectId });
+
+        builder.HasIndex(w => w.WorkItemId)
+            .IncludeProperties(w => new { w.ObjectId, w.Context });
+
+        builder.HasIndex(w => new { w.ObjectId, w.Context })
+            .IncludeProperties(w => new { w.WorkItemId });
+
+        // Properties
+        builder.Property(h => h.Context).IsRequired()
+            .HasConversion<EnumConverter<SystemContext>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(64);
+
+
+        // Relationships
+    }
+}
 
 public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
 {
@@ -131,6 +155,11 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .WithMany()
             .HasForeignKey(w => w.LastModifiedById)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany<WorkItemLink>()
+            .WithOne()
+            .HasForeignKey(w => w.WorkItemId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
