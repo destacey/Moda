@@ -166,8 +166,9 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
     }
 
     const onChange = (nextTargetKeys: string[]) => {
-        var workItems = searchResult?.filter((item) => nextTargetKeys.includes(item.key))
-        setWorkItems(workItems)
+        var selectedWorkItems = searchResult?.filter((item) => nextTargetKeys.includes(item.key))
+        var mergedWorkItems = merge(workItems ?? [], selectedWorkItems ?? [])
+        setWorkItems(mergedWorkItems)
         setTargetKeys(nextTargetKeys)
     }
 
