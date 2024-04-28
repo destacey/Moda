@@ -1,12 +1,23 @@
 'use client'
 
+import { ModaEmpty } from '@/src/app/components/common'
 import { useDebounce } from '@/src/app/hooks'
 import { WorkItemListDto } from '@/src/services/moda-api'
 import { useSearchWorkItemsQuery } from '@/src/store/features/work-management/workspace-api'
-import { Modal, Spin, Table, Transfer, TransferProps, message } from 'antd'
+import {
+  Modal,
+  Spin,
+  Table,
+  Transfer,
+  TransferProps,
+  Typography,
+  message,
+} from 'antd'
 import type { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
 import { difference } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+
+const { Text } = Typography
 
 export type TransferDirection = 'left' | 'right'
 
@@ -27,7 +38,7 @@ const TableTransfer = ({
   rightColumns,
   ...restProps
 }: TableTransferProps) => (
-  <Transfer oneWay {...restProps}>
+  <Transfer {...restProps}>
     {({
       direction,
       filteredItems,
@@ -62,9 +73,12 @@ const TableTransfer = ({
           dataSource={filteredItems}
           size="small"
           pagination={false}
-          scroll={{ y: 600 }}
+          scroll={{ y: '50vh' }}
           style={{
             pointerEvents: listDisabled ? 'none' : undefined,
+          }}
+          locale={{
+            emptyText: <ModaEmpty message="No work items found" />,
           }}
           onRow={({ key }) => ({
             onClick: () => {
@@ -169,7 +183,6 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
   }
 
   const handleSearch = (direction: TransferDirection, newValue: string) => {
-    console.log('handleSearch', direction, newValue)
     if (direction === 'left') {
       setSearchQuery(newValue)
     }
@@ -213,6 +226,7 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
               leftColumns={tableColumns}
               rightColumns={tableColumns}
             />
+            <Text>Search results are limited to 50 records.</Text>
           </Spin>
         }
       </Modal>
