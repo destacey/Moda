@@ -69,3 +69,9 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
     }),
   }),
 })
+
+export const {
+  useGetPlanningIntervalsQuery,
+  useGetPlanningIntervalQuery,
+  useGetObjectiveWorkItemsQuery,
+} = planningIntervalApi

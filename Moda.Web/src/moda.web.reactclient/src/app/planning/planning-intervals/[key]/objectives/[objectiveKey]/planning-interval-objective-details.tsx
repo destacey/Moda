@@ -79,6 +79,7 @@ const PlanningIntervalObjectiveDetails = ({
           <HealthReportChart objectId={objective.id} />
         </Card>
         <PlanningIntervalObjectiveWorkItemsCard
+          planningIntervalId={objective.planningInterval?.id}
           objectiveId={objective.id}
           canLinkWorkItems={canManageObjectives}
         />

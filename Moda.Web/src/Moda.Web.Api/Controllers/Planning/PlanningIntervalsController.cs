@@ -396,7 +396,7 @@ public class PlanningIntervalsController : ControllerBase
 
         var workItems = await _sender.Send(new GetExternalObjectWorkItemsQuery(objectiveId), cancellationToken);
 
-        return Ok(workItems);
+        return Ok(workItems.OrderByKey(true));
     }
 
     [HttpPost("{id}/objectives/import")]

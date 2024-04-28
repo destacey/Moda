@@ -23,7 +23,7 @@ export type TransferDirection = 'left' | 'right'
 
 export interface ManagePlanningIntervalObjectiveWorkItemsFormProps {
   showForm: boolean
-  id: string
+  objectiveId: string
   onFormSave: () => void
   onFormCancel: () => void
 }
