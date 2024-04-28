@@ -28,8 +28,3 @@ body {
 .site-layout .site-layout-background {
   background: #fff;
 }
-
-.ant-transfer-list-body-customize-wrapper {
-    height: 400px; /* static height here, maybe more? */
-    overflow-y: auto;
-}
