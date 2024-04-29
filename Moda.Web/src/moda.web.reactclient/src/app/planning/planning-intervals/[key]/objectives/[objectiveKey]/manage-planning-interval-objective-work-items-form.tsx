@@ -2,11 +2,20 @@
 
 import { ModaEmpty } from '@/src/app/components/common'
 import { useDebounce } from '@/src/app/hooks'
-import { WorkItemListDto } from '@/src/services/moda-api'
-import { useSearchWorkItemsQuery } from '@/src/store/features/work-management/workspace-api'
 import {
+  ManagePlanningIntervalObjectiveWorkItemsRequest,
+  WorkItemListDto,
+} from '@/src/services/moda-api'
+import {
+  useGetObjectiveWorkItemsQuery,
+  useManageObjectiveWorkItemsMutation,
+} from '@/src/store/features/planning/planning-interval-api'
+import { useSearchWorkItemsQuery } from '@/src/store/features/work-management/workspace-api'
+import { SearchOutlined } from '@ant-design/icons'
+import {
+  Input,
   Modal,
-  Spin,
+  Space,
   Table,
   Transfer,
   TransferProps,
@@ -15,7 +24,7 @@ import {
 } from 'antd'
 import type { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
 import { difference } from 'lodash'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const { Text } = Typography
 
@@ -23,14 +32,19 @@ export type TransferDirection = 'left' | 'right'
 
 export interface ManagePlanningIntervalObjectiveWorkItemsFormProps {
   showForm: boolean
+  planningIntervalId: string
   objectiveId: string
   onFormSave: () => void
   onFormCancel: () => void
 }
 
-interface TableTransferProps extends TransferProps<WorkItemListDto> {
-  leftColumns: ColumnsType<WorkItemListDto>
-  rightColumns: ColumnsType<WorkItemListDto>
+type WorkItemModel = WorkItemListDto & {
+  disabled: boolean
+}
+
+interface TableTransferProps extends TransferProps<WorkItemModel> {
+  leftColumns: ColumnsType<WorkItemModel>
+  rightColumns: ColumnsType<WorkItemModel>
 }
 
 const TableTransfer = ({
@@ -49,12 +63,14 @@ const TableTransfer = ({
     }) => {
       const columns = direction === 'left' ? leftColumns : rightColumns
 
-      const rowSelection: TableRowSelection<WorkItemListDto> = {
+      const rowSelection: TableRowSelection<WorkItemModel> = {
         getCheckboxProps: (item) => ({
-          disabled: listDisabled,
+          disabled: listDisabled || item.disabled,
         }),
         onSelectAll(selected, selectedRows) {
-          const treeSelectedKeys = selectedRows.map(({ key }) => key)
+          const treeSelectedKeys = selectedRows
+            .filter((item) => !item.disabled)
+            .map(({ key }) => key)
           const diffKeys = selected
             ? difference(treeSelectedKeys, listSelectedKeys)
             : difference(listSelectedKeys, treeSelectedKeys)
@@ -80,8 +96,9 @@ const TableTransfer = ({
           locale={{
             emptyText: <ModaEmpty message="No work items found" />,
           }}
-          onRow={({ key }) => ({
+          onRow={({ key, disabled: itemDisabled }) => ({
             onClick: () => {
+              if (itemDisabled || listDisabled) return
               onItemSelect(
                 key as string,
                 !listSelectedKeys.includes(key as string),
@@ -94,7 +111,7 @@ const TableTransfer = ({
   </Transfer>
 )
 
-const tableColumns: ColumnsType<WorkItemListDto> = [
+const tableColumns: ColumnsType<WorkItemModel> = [
   {
     dataIndex: 'key',
     title: 'Key',
@@ -122,11 +139,24 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
 ) => {
   const [isOpen, setIsOpen] = useState(props.showForm)
   const [isSaving, setIsSaving] = useState(false)
-  const [workItems, setWorkItems] = useState<WorkItemListDto[]>([])
+  const [searchResultWorkItems, setSearchResultWorkItems] = useState<
+    WorkItemModel[]
+  >([])
+  const [sourceWorkItems, setSourceWorkItems] = useState<WorkItemModel[]>([])
+  const [targetWorkItems, setTargetWorkItems] = useState<WorkItemModel[]>([])
   const [targetKeys, setTargetKeys] = useState<string[]>([])
   const [messageApi, contextHolder] = message.useMessage()
 
   const [searchQuery, setSearchQuery] = useState<string>('')
+
+  const {
+    data: existingWorkItemsData,
+    isLoading: existingWorkItemsQueryIsLoading,
+    isError: existingWorkItemsQueryIsError,
+  } = useGetObjectiveWorkItemsQuery({
+    planningIntervalId: props.planningIntervalId,
+    objectiveId: props.objectiveId,
+  })
 
   const debounceSearchQuery = useDebounce(searchQuery, 500)
   const {
@@ -138,33 +168,63 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
     skip: debounceSearchQuery === '',
   })
 
-  const merge = (
-    searchResult: WorkItemListDto[],
-    workItems: WorkItemListDto[],
-  ): WorkItemListDto[] => {
-    const spread = [...(searchQuery === '' ? [] : searchResult ?? [])]
-    workItems.forEach((item) => {
-      const found = searchResult.find((x) => x.key === item.key)
-      if (!found) spread.push(item)
-    })
-    return spread
+  const [manageObjectiveWorkItems, { error }] =
+    useManageObjectiveWorkItemsMutation()
+
+  useEffect(() => {
+    if (!existingWorkItemsData) return
+    setTargetWorkItems(
+      existingWorkItemsData?.map((item) => ({ ...item, disabled: false })) ??
+        [],
+    )
+    setTargetKeys(existingWorkItemsData.map((item) => item.key))
+  }, [existingWorkItemsData])
+
+  useEffect(() => {
+    if (!searchResult) return
+
+    setSearchResultWorkItems(
+      searchResult?.map((item) => ({ ...item, disabled: false })) ?? [],
+    )
+  }, [searchResult])
+
+  useEffect(() => {
+    if (searchQuery === '') {
+      setSourceWorkItems(targetWorkItems)
+    } else if (targetWorkItems.length === 0) {
+      setSourceWorkItems(searchResultWorkItems)
+    } else {
+      const mergedWorkItems = new Set([
+        ...searchResultWorkItems,
+        ...targetWorkItems,
+      ])
+      setSourceWorkItems(Array.from(mergedWorkItems))
+    }
+  }, [searchQuery, searchResultWorkItems, targetWorkItems])
+
+  const saveWorkItemChanges = async (): Promise<boolean> => {
+    try {
+      const request: ManagePlanningIntervalObjectiveWorkItemsRequest = {
+        planningIntervalId: props.planningIntervalId,
+        objectiveId: props.objectiveId,
+        workItemIds: targetWorkItems.map((item) => item.id),
+      }
+      await manageObjectiveWorkItems(request)
+      messageApi.success('Successfully updated objective work items.')
+      return true
+    } catch (error) {
+      messageApi.error(
+        `Failed to update objective work items. Error: ${error.supportMessage}`,
+      )
+      console.error(error)
+      return false
+    }
   }
-
-  // useEffect(() => {
-  //   if (!props.id) return
-  //   setSearchQuery('AHTG')
-  // }, [props.id])
-
-  // useEffect(() => {
-  //   console.log('searchResult:', searchResult?.length)
-  //   setWorkItems(searchResult ?? [])
-  // }, [searchQuery, searchResult])
 
   const handleOk = async () => {
     setIsSaving(true)
     try {
-      if (true) {
-        // add api call to save
+      if (await saveWorkItemChanges()) {
         setIsOpen(false)
         setIsSaving(false)
         props.onFormSave()
@@ -182,19 +242,16 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
     props.onFormCancel()
   }
 
-  const handleSearch = (direction: TransferDirection, newValue: string) => {
-    if (direction === 'left') {
-      setSearchQuery(newValue)
-    }
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value)
   }
 
   const onChange = (nextTargetKeys: string[]) => {
-    var selectedWorkItems = searchResult?.filter((item) =>
+    var selectedWorkItems = sourceWorkItems?.filter((item) =>
       nextTargetKeys.includes(item.key),
     )
-    var mergedWorkItems = merge(workItems ?? [], selectedWorkItems ?? [])
-    setWorkItems(mergedWorkItems)
     setTargetKeys(nextTargetKeys)
+    setTargetWorkItems(selectedWorkItems)
   }
 
   return (
@@ -213,21 +270,23 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
         destroyOnClose={true}
       >
         {
-          <Spin spinning={isLoading} size="large">
+          <Space direction="vertical">
+            <Input
+              size="small"
+              placeholder="Search for work items by key or title"
+              allowClear
+              onChange={handleSearch}
+              suffix={<SearchOutlined />}
+            />
             <TableTransfer
-              dataSource={merge(searchResult, workItems)}
+              dataSource={sourceWorkItems}
               targetKeys={targetKeys}
-              showSearch={true}
               onChange={onChange}
-              onSearch={handleSearch}
-              filterOption={(inputValue, item, direction) =>
-                direction === 'left'
-              }
               leftColumns={tableColumns}
               rightColumns={tableColumns}
             />
             <Text>Search results are limited to 50 records.</Text>
-          </Spin>
+          </Space>
         }
       </Modal>
     </>

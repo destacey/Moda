@@ -94,7 +94,6 @@ export const workspaceApi = apiSlice.injectEndpoints({
       ],
     }),
   }),
-  overrideExisting: false,
 })
 
 export const {

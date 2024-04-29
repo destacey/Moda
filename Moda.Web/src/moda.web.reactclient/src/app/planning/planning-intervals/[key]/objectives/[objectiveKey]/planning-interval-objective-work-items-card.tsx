@@ -125,6 +125,7 @@ const PlanningIntervalObjectiveWorkItemsCard = (
       </Card>
       {openManageWorkItemsForm && (
         <ManagePlanningIntervalObjectiveWorkItemsForm
+          planningIntervalId={props.planningIntervalId}
           objectiveId={props.objectiveId}
           showForm={openManageWorkItemsForm}
           onFormSave={() => onManageWorkItemsFormClosed(true)}

@@ -72,15 +72,17 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
       null,
       ManagePlanningIntervalObjectiveWorkItemsRequest
     >({
+      // TODO: why is this warning of an error
       queryFn: async (request) => {
         try {
-          await (
+          const data = await (
             await getPlanningIntervalsClient()
           ).manageObjectiveWorkItems(
             request.planningIntervalId,
             request.objectiveId,
             request,
           )
+          return { data }
         } catch (error) {
           console.error('Error:', error)
           return { error }
@@ -96,7 +98,6 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
       },
     }),
   }),
-  overrideExisting: false,
 })
 
 export const {

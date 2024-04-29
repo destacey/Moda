@@ -11,8 +11,6 @@ const WorkItemsListCard = ({ workItems }: WorkItemsListCardProps) => {
   if (!workItems || workItems.length === 0)
     return <ModaEmpty message="No work items" />
 
-  console.log(workItems)
-
   return (
     <List
       size="small"
