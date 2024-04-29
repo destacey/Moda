@@ -79,7 +79,6 @@ export const workspaceApi = apiSlice.injectEndpoints({
     searchWorkItems: builder.query<WorkItemListDto[], string>({
       queryFn: async (searchTerm: string) => {
         try {
-          console.log('searchWorkItems:', searchTerm)
           const data = await (
             await getWorkspacesClient()
           ).searchWorkItems(searchTerm, 50)
@@ -95,6 +94,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
       ],
     }),
   }),
+  overrideExisting: false,
 })
 
 export const {

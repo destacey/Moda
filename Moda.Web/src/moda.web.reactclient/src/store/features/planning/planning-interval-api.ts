@@ -1,4 +1,5 @@
 import {
+  ManagePlanningIntervalObjectiveWorkItemsRequest,
   PlanningIntervalDetailsDto,
   PlanningIntervalListDto,
   WorkItemListDto,
@@ -67,11 +68,40 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
         })),
       ],
     }),
+    manageObjectiveWorkItems: builder.mutation<
+      null,
+      ManagePlanningIntervalObjectiveWorkItemsRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          await (
+            await getPlanningIntervalsClient()
+          ).manageObjectiveWorkItems(
+            request.planningIntervalId,
+            request.objectiveId,
+            request,
+          )
+        } catch (error) {
+          console.error('Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          {
+            type: QueryTags.PlanningIntervalObjectiveWorkItem,
+            id: arg.objectiveId,
+          },
+        ]
+      },
+    }),
   }),
+  overrideExisting: false,
 })
 
 export const {
   useGetPlanningIntervalsQuery,
   useGetPlanningIntervalQuery,
   useGetObjectiveWorkItemsQuery,
+  useManageObjectiveWorkItemsMutation,
 } = planningIntervalApi
