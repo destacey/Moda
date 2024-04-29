@@ -69,10 +69,9 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
       ],
     }),
     manageObjectiveWorkItems: builder.mutation<
-      null,
+      void,
       ManagePlanningIntervalObjectiveWorkItemsRequest
     >({
-      // TODO: why is this warning of an error
       queryFn: async (request) => {
         try {
           const data = await (
