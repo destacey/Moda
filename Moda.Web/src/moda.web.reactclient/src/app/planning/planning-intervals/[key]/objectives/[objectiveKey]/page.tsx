@@ -59,7 +59,12 @@ const ObjectiveDetailsPage = ({ params }) => {
     {
       key: 'details',
       tab: 'Details',
-      content: <PlanningIntervalObjectiveDetails objective={objectiveData} />,
+      content: (
+        <PlanningIntervalObjectiveDetails
+          objective={objectiveData}
+          canManageObjectives={canManageObjectives}
+        />
+      ),
     },
   ]
 

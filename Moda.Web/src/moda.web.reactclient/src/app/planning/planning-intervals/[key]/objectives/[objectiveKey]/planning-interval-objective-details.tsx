@@ -5,15 +5,18 @@ import { Card, Col, Descriptions, Progress, Row, Space, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
+import PlanningIntervalObjectiveWorkItemsCard from './planning-interval-objective-work-items-card'
 
 const { Item } = Descriptions
 
 interface PlanningIntervalObjectiveDetailsProps {
   objective: PlanningIntervalObjectiveDetailsDto
+  canManageObjectives: boolean
 }
 
 const PlanningIntervalObjectiveDetails = ({
   objective,
+  canManageObjectives,
 }: PlanningIntervalObjectiveDetailsProps) => {
   if (!objective) return null
 
@@ -75,6 +78,11 @@ const PlanningIntervalObjectiveDetails = ({
         <Card size="small">
           <HealthReportChart objectId={objective.id} />
         </Card>
+        <PlanningIntervalObjectiveWorkItemsCard
+          planningIntervalId={objective.planningInterval?.id}
+          objectiveId={objective.id}
+          canLinkWorkItems={canManageObjectives}
+        />
         <LinksCard objectId={objective.id} />
       </Space>
     </>

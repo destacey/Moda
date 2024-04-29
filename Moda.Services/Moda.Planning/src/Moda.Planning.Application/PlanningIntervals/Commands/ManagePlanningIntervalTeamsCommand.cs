@@ -4,6 +4,8 @@ public sealed record ManagePlanningIntervalTeamsCommand(Guid Id, IEnumerable<Gui
 
 internal sealed class ManagePlanningIntervalTeamsCommandHandler : ICommandHandler<ManagePlanningIntervalTeamsCommand>
 {
+    private const string AppRequestName = nameof(ManagePlanningIntervalTeamsCommand);
+
     private readonly IPlanningDbContext _planningDbContext;
     private readonly ILogger<ManagePlanningIntervalTeamsCommandHandler> _logger;
 
@@ -38,8 +40,8 @@ internal sealed class ManagePlanningIntervalTeamsCommandHandler : ICommandHandle
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error handling {CommandName} command.", nameof(ManagePlanningIntervalTeamsCommand));
-            return Result.Failure($"Error handling {nameof(ManagePlanningIntervalTeamsCommand)} command.");
+            _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
+            return Result.Failure($"Error handling {AppRequestName} command.");
         }
     }
 }

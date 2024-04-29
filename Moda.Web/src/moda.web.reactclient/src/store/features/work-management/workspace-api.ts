@@ -76,6 +76,23 @@ export const workspaceApi = apiSlice.injectEndpoints({
         { type: QueryTags.WorkItem, id: arg.workItemKey }, // typically arg is the key
       ],
     }),
+    searchWorkItems: builder.query<WorkItemListDto[], string>({
+      queryFn: async (searchTerm: string) => {
+        try {
+          const data = await (
+            await getWorkspacesClient()
+          ).searchWorkItems(searchTerm, 50)
+          return { data }
+        } catch (error) {
+          console.error('Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        QueryTags.WorkItemSearch,
+        ...result.map(({ key }) => ({ type: QueryTags.WorkItemSearch, key })),
+      ],
+    }),
   }),
 })
 
@@ -84,4 +101,5 @@ export const {
   useGetWorkspaceQuery,
   useGetWorkItemsQuery,
   useGetWorkItemQuery,
+  useSearchWorkItemsQuery,
 } = workspaceApi

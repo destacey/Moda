@@ -2032,6 +2032,166 @@
         ]
       }
     },
+    "/api/planning/planning-intervals/{id}/objectives/{objectiveId}/work-items": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get work items for an objective.",
+        "operationId": "PlanningIntervals_GetObjectiveWorkItems",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "objectiveId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkItemListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Manage objective work items.",
+        "operationId": "PlanningIntervals_ManageObjectiveWorkItems",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "objectiveId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagePlanningIntervalObjectiveWorkItemsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/planning-intervals/{id}/objectives/import": {
       "post": {
         "tags": [
@@ -3466,6 +3626,65 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/work/workspaces/work-items/search": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Search for a work item using its key or title.",
+        "operationId": "Workspaces_SearchWorkItems",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "top",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkItemListDto"
+                  }
                 }
               }
             }
@@ -8336,6 +8555,109 @@
           }
         }
       },
+      "WorkItemListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/WorkspaceNavigationDto"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "assignedTo": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
+          }
+        }
+      },
+      "WorkspaceNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDtoOfGuidAndString"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "NavigationDtoOfGuidAndString": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "EmployeeNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "ManagePlanningIntervalObjectiveWorkItemsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "planningIntervalId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "objectiveId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "workItemIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          }
+        }
+      },
       "PlanningIntervalObjectiveStatusDto": {
         "type": "object",
         "additionalProperties": false,
@@ -8409,17 +8731,6 @@
             "nullable": true
           }
         }
-      },
-      "EmployeeNavigationDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/NavigationDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false
-          }
-        ]
       },
       "RiskDetailsDto": {
         "type": "object",
@@ -8943,71 +9254,6 @@
           },
           "isActive": {
             "type": "boolean"
-          }
-        }
-      },
-      "WorkItemListDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "key": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "workspace": {
-            "$ref": "#/components/schemas/WorkspaceNavigationDto"
-          },
-          "type": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "assignedTo": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/EmployeeNavigationDto"
-              }
-            ]
-          }
-        }
-      },
-      "WorkspaceNavigationDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/NavigationDtoOfGuidAndString"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false
-          }
-        ]
-      },
-      "NavigationDtoOfGuidAndString": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "key": {
-            "type": "string",
-            "nullable": true
-          },
-          "name": {
-            "type": "string"
           }
         }
       },

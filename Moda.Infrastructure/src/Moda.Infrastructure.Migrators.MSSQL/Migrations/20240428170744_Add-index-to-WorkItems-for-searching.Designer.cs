@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Moda.Infrastructure.Persistence.Context;
 
@@ -12,9 +13,11 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    partial class ModaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240428170744_Add-index-to-WorkItems-for-searching")]
+    partial class AddindextoWorkItemsforsearching
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1486,44 +1489,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("WorkItems", "Work");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItemLink", b =>
-                {
-                    b.Property<Guid>("WorkItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ObjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Context")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar");
-
-                    b.Property<DateTime>("SystemCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("SystemLastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("WorkItemId", "ObjectId");
-
-                    b.HasIndex("WorkItemId");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("WorkItemId"), new[] { "ObjectId", "Context" });
-
-                    b.HasIndex("ObjectId", "Context");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ObjectId", "Context"), new[] { "WorkItemId" });
-
-                    b.ToTable("WorkItemLinks", "Work");
-                });
-
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkProcess", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2202,15 +2167,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Type");
 
                     b.Navigation("Workspace");
-                });
-
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItemLink", b =>
-                {
-                    b.HasOne("Moda.Work.Domain.Models.WorkItem", null)
-                        .WithMany()
-                        .HasForeignKey("WorkItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkProcessScheme", b =>

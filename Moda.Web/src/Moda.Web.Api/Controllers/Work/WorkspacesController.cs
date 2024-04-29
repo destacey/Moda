@@ -117,4 +117,19 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
                 ? result.Value
                 : NotFound();
     }
+
+    [HttpGet("work-items/search")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
+    [OpenApiOperation("Search for a work item using its key or title.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<WorkItemListDto>>> SearchWorkItems(string query, CancellationToken cancellationToken, int top = 50)
+    {
+        var result = await _sender.Send(new SearchWorkItemsQuery(query, top), cancellationToken);
+
+        return result.IsFailure
+            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.SearchWorkItems"))
+            : Ok(result.Value.OrderByKey(true));
+    }
+
 }

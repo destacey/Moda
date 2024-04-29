@@ -12,6 +12,8 @@ using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
 using Moda.Web.Api.Dtos.Planning;
 using Moda.Web.Api.Models.Planning.PlanningIntervals;
+using Moda.Work.Application.WorkItems.Dtos;
+using Moda.Work.Application.WorkItems.Queries;
 
 namespace Moda.Web.Api.Controllers.Planning;
 
@@ -380,6 +382,46 @@ public class PlanningIntervalsController : ControllerBase
         return Ok(objectiveHealthChecks);
     }
 
+    [HttpGet("{id}/objectives/{objectiveId}/work-items")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
+    [OpenApiOperation("Get work items for an objective.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IEnumerable<WorkItemListDto>>> GetObjectiveWorkItems(Guid id, Guid objectiveId, CancellationToken cancellationToken)
+    {
+        var exists = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(id, objectiveId), cancellationToken);
+        if (!exists)
+            return NotFound();
+
+        var workItems = await _sender.Send(new GetExternalObjectWorkItemsQuery(objectiveId), cancellationToken);
+
+        return Ok(workItems.OrderByKey(true));
+    }
+
+    [HttpPost("{id}/objectives/{objectiveId}/work-items")]
+    [MustHavePermission(ApplicationAction.Manage, ApplicationResource.PlanningIntervalObjectives)]
+    [OpenApiOperation("Manage objective work items.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ManageObjectiveWorkItems(Guid id, Guid objectiveId, [FromBody] ManagePlanningIntervalObjectiveWorkItemsRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.PlanningIntervalId || objectiveId != request.ObjectiveId)
+            return BadRequest();
+
+        var exists = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(id, objectiveId), cancellationToken);
+        if (!exists)
+            return NotFound();
+
+        var result = await _sender.Send(request.ToManageExternalObjectWorkItemsCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.ManageObjectiveWorkItems"));
+    }
+
     [HttpPost("{id}/objectives/import")]
     [MustHavePermission(ApplicationAction.Import, ApplicationResource.PlanningIntervalObjectives)]
     [OpenApiOperation("Import objectives for a planning interval from a csv file.", "")]
@@ -392,7 +434,7 @@ public class PlanningIntervalsController : ControllerBase
         {
             var importedObjectives = _csvService.ReadCsv<ImportPlanningIntervalObjectivesRequest>(file.OpenReadStream());
 
-            List<ImportPlanningIntervalObjectiveDto> objectives = new();
+            List<ImportPlanningIntervalObjectiveDto> objectives = [];
             var validator = new ImportPlanningIntervalObjectivesRequestValidator();
             foreach (var objective in importedObjectives)
             {

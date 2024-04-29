@@ -66,14 +66,12 @@ export const workProcessApi = apiSlice.injectEndpoints({
           } else {
             data = await (await getWorkProcessesClient()).deactivate(id)
           }
-          console.log('changeWorkProcessIsActive', data)
           return { data }
         } catch (error) {
           return { error }
         }
       },
       invalidatesTags: (result, error, arg) => {
-        console.log('invalidatesTags', result, error, arg)
         return [{ type: QueryTags.WorkProcess, id: arg.id }]
       },
     }),
