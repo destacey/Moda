@@ -384,7 +384,7 @@ public class PlanningIntervalsController : ControllerBase
 
     [HttpGet("{id}/objectives/{objectiveId}/work-items")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
-    [OpenApiOperation("Get work items for a planning interval objective.", "")]
+    [OpenApiOperation("Get work items for an objective.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -397,6 +397,27 @@ public class PlanningIntervalsController : ControllerBase
         var workItems = await _sender.Send(new GetExternalObjectWorkItemsQuery(objectiveId), cancellationToken);
 
         return Ok(workItems.OrderByKey(true));
+    }
+
+    [HttpPost("{id}/objectives/{objectiveId}/work-items")]
+    [MustHavePermission(ApplicationAction.Manage, ApplicationResource.PlanningIntervalObjectives)]
+    [OpenApiOperation("Manage objective work items.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> ManageObjectiveWorkItems(Guid id, Guid objectiveId, [FromBody] ManagePlanningIntervalObjectiveWorkItemsRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.PlanningIntervalId || objectiveId != request.ObjectiveId)
+            return BadRequest();
+
+        var exists = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(id, objectiveId), cancellationToken);
+        if (!exists)
+            return NotFound();
+
+        var result = await _sender.Send(request.ToManageExternalObjectWorkItemsCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.ManageObjectiveWorkItems"));
     }
 
     [HttpPost("{id}/objectives/import")]

@@ -2037,7 +2037,7 @@
         "tags": [
           "PlanningIntervals"
         ],
-        "summary": "Get work items for a planning interval objective.",
+        "summary": "Get work items for an objective.",
         "operationId": "PlanningIntervals_GetObjectiveWorkItems",
         "parameters": [
           {
@@ -2095,6 +2095,71 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Manage objective work items.",
+        "operationId": "PlanningIntervals_ManageObjectiveWorkItems",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "objectiveId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagePlanningIntervalObjectiveWorkItemsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
                 }
               }
             }
@@ -8545,6 +8610,33 @@
             "additionalProperties": false
           }
         ]
+      },
+      "ManagePlanningIntervalObjectiveWorkItemsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "planningIntervalId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "objectiveId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "workItemIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          }
+        }
       },
       "PlanningIntervalObjectiveStatusDto": {
         "type": "object",
