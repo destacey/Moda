@@ -34,20 +34,21 @@ const mapToRequestValues = (values: CreateRecurringJobRequest) => {
 }
 
 const CreateRecurringJobForm = (props: CreateRecurringJobFormProps) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(props.showForm)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreateRecurringJobFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const createMutation = useCreateRecurringJobMutation()
+  const [createRecurringJob, { error: mutationError }] =
+    useCreateRecurringJobMutation()
 
   const create = async (values: CreateRecurringJobFormValues) => {
     setIsSaving(true)
     try {
       const request = mapToRequestValues(values)
-      //await createMutation.mutateAsync(request)
+      await createRecurringJob(request)
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -55,6 +56,7 @@ const CreateRecurringJobForm = (props: CreateRecurringJobFormProps) => {
         form.setFields(formErrors)
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
+        console.error('Mutation error:', mutationError)
         messageApi.error(
           error.supportMessage ??
             'An unexpected error occurred while creating a recurring job.',
@@ -146,7 +148,7 @@ const CreateRecurringJobForm = (props: CreateRecurringJobFormProps) => {
             name="cronExpression"
             rules={[{ required: true }]}
           >
-            <Input />
+            <Input placeholder="Example for Every 5 minutes: */5 * * * *" />
           </Item>
         </Form>
       </Modal>
