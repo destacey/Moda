@@ -8718,7 +8718,7 @@ export class BackgroundJobsClient {
      * @param jobTypeId (optional) 
      */
     run(jobTypeId: number | undefined, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/admin/background-jobs?";
+        let url_ = this.baseUrl + "/api/admin/background-jobs/run?";
         if (jobTypeId === null)
             throw new Error("The parameter 'jobTypeId' cannot be null.");
         else if (jobTypeId !== undefined)
@@ -8745,6 +8745,64 @@ export class BackgroundJobsClient {
     }
 
     protected processRun(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 202) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Create a recurring background job.
+     */
+    create(request: CreateRecurringJobRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/admin/background-jobs";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -9752,6 +9810,12 @@ export interface BackgroundJobDto {
     action?: string;
     inProcessingState?: boolean;
     startedAt?: Date | undefined;
+}
+
+export interface CreateRecurringJobRequest {
+    jobId?: string;
+    jobTypeId?: number;
+    cronExpression?: string;
 }
 
 export class ApiException extends Error {

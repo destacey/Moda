@@ -1,6 +1,9 @@
-﻿using Moda.Common.Application.BackgroundJobs;
+﻿using System.Linq.Expressions;
+using Hangfire;
+using Moda.Common.Application.BackgroundJobs;
 using Moda.Common.Application.Enums;
 using Moda.Web.Api.Interfaces;
+using Moda.Web.Api.Models.Admin;
 
 namespace Moda.Web.Api.Controllers.Admin;
 
@@ -43,7 +46,7 @@ public class BackgroundJobsController : ControllerBase
         return Ok(jobs);
     }
 
-    [HttpPost]
+    [HttpPost("run")]
     [MustHavePermission(ApplicationAction.Run, ApplicationResource.BackgroundJobs)]
     [OpenApiOperation("Run a background job.", "")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
@@ -69,5 +72,28 @@ public class BackgroundJobsController : ControllerBase
                 return BadRequest();
         }
         return Accepted();
+    }
+
+    [HttpPost]
+    [MustHavePermission(ApplicationAction.Run, ApplicationResource.BackgroundJobs)]
+    [OpenApiOperation("Create a recurring background job.", "")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public IActionResult Create([FromBody] CreateRecurringJobRequest request, [FromServices] IJobManager jobManager, CancellationToken cancellationToken)
+    {
+        _jobService.AddOrUpdate(request.JobId, GetMethodCall((BackgroundJobType)request.JobTypeId), () => request.CronExpression);
+
+        return Accepted();
+
+        Expression<Func<Task>> GetMethodCall(BackgroundJobType jobType)
+        {
+            return jobType switch
+            {
+                BackgroundJobType.EmployeeSync => () => jobManager.RunSyncExternalEmployees(cancellationToken),
+                BackgroundJobType.AzdoBoardsFullSync => () => jobManager.RunSyncAzureDevOpsBoards(SyncType.Full, cancellationToken),
+                BackgroundJobType.AzdoBoardsDiffSync => () => jobManager.RunSyncAzureDevOpsBoards(SyncType.Differential, cancellationToken),
+                _ => throw new ArgumentOutOfRangeException(nameof(jobType), jobType, "Unknown job type requested")
+            };
+        }
     }
 }
