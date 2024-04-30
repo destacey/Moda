@@ -76,4 +76,8 @@ public class HangfireService : IJobService
 
     public string Schedule<T>(Expression<Func<T, Task>> methodCall, DateTimeOffset enqueueAt) =>
         BackgroundJob.Schedule(methodCall, enqueueAt);
+
+    // public static void AddOrUpdate([NotNull] string recurringJobId, [NotNull][InstantHandle] Expression<Action> methodCall, [NotNull] Func<string> cronExpression, [NotNull] RecurringJobOptions options)
+    public void AddOrUpdate(string jobId, Expression<Func<Task>> methodCall, Func<string> cronExpression) =>
+        RecurringJob.AddOrUpdate(jobId, methodCall, cronExpression, new RecurringJobOptions());
 }

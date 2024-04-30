@@ -9,6 +9,7 @@ namespace Moda.Infrastructure.BackgroundJobs;
 public class ModaJobFilter : IClientFilter
 {
     private static readonly ILog _logger = LogProvider.GetCurrentClassLogger();
+    private const string JobAdminUserId = "11111111-1111-1111-1111-111111111111";
 
     private readonly IServiceProvider _services;
 
@@ -23,9 +24,9 @@ public class ModaJobFilter : IClientFilter
         using var scope = _services.CreateScope();
 
         var httpContext = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>()?.HttpContext;
-        _ = httpContext ?? throw new InvalidOperationException("Can't create a Job without HttpContext.");
+        //_ = httpContext ?? throw new InvalidOperationException("Can't create a Job without HttpContext.");
 
-        string? userId = httpContext.User.GetUserId();
+        string? userId = httpContext?.User.GetUserId() ?? JobAdminUserId;
         context.SetJobParameter(QueryStringKeys.UserId, userId);
     }
 

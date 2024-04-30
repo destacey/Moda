@@ -37,4 +37,6 @@ public interface IJobService : IScopedService
     bool Requeue(string jobId);
 
     bool Requeue(string jobId, string fromState);
+
+    void AddOrUpdate(string jobId, Expression<Func<Task>> methodCall, Func<string> cronExpression);
 }

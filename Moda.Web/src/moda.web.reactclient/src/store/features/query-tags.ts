@@ -1,4 +1,7 @@
 export enum QueryTags {
+  // ADMIN
+  BackgroundJob = 'Admin.BackgroundJob',
+  BackgroundJobType = 'Admin.BackgroundJobType',
   // PLANNING
   PlanningInterval = 'Planning.PlanningInterval',
   PlanningIntervalObjective = 'Planning.PlanningIntervalObjective',

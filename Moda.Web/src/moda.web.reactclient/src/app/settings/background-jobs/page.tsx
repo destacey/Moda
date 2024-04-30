@@ -2,8 +2,8 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import ModaGrid from '../../components/common/moda-grid'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { BackgroundJobDto, BackgroundJobTypeDto } from '@/src/services/moda-api'
+import { useCallback, useMemo, useState } from 'react'
+import { BackgroundJobDto } from '@/src/services/moda-api'
 import { getBackgroundJobsClient } from '@/src/services/clients'
 import { authorizePage } from '../../components/hoc'
 import useAuth from '../../components/contexts/auth'
@@ -12,11 +12,15 @@ import Link from 'next/link'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import { useDocumentTitle } from '../../hooks'
 import { PageActions } from '../../components/common'
+import { useGetJobTypesQuery } from '@/src/store/features/admin/background-jobs-api'
+import CreateRecurringJobForm from './create-recurring-job-form'
 
 const BackgroundJobsListPage = () => {
   useDocumentTitle('Background Jobs')
-  const [jobTypes, setJobTypes] = useState<BackgroundJobTypeDto[]>([])
   const [backgroundJobs, setBackgroundJobs] = useState<BackgroundJobDto[]>([])
+  const [openCreateRecurringJobForm, setOpenCreateRecurringJobForm] =
+    useState(false)
+
   const { hasClaim } = useAuth()
   const canViewHangfire = hasClaim('Permission', 'Permissions.Hangfire.View')
   const canRunBackgroundJobs = hasClaim(
@@ -36,11 +40,7 @@ const BackgroundJobsListPage = () => {
     [],
   )
 
-  const getJobTypes = useCallback(async () => {
-    const backgroundJobsClient = await getBackgroundJobsClient()
-    const jobTypes = await backgroundJobsClient.getJobTypes()
-    setJobTypes(jobTypes)
-  }, [])
+  const { data: jobTypeData = [] } = useGetJobTypesQuery()
 
   const getRunningJobs = useCallback(async () => {
     const backgroundJobsClient = await getBackgroundJobsClient()
@@ -69,13 +69,21 @@ const BackgroundJobsListPage = () => {
         key: 'view-hangfire',
       })
     }
-    if (canRunBackgroundJobs && jobTypes.length > 0) {
+    if (canRunBackgroundJobs && jobTypeData.length > 0) {
       if (canViewHangfire) {
         items.push({
           type: 'divider',
         })
       }
-      jobTypes.map((jobType) => {
+      items.push({
+        label: 'Create Recurring Job',
+        key: 'create-recurring-job',
+        onClick: () => setOpenCreateRecurringJobForm(true),
+      })
+      items.push({
+        type: 'divider',
+      })
+      jobTypeData.map((jobType) => {
         items.push({
           label: jobType.name,
           key: jobType.name,
@@ -84,11 +92,14 @@ const BackgroundJobsListPage = () => {
       })
     }
     return items
-  }, [canViewHangfire, canRunBackgroundJobs, jobTypes, runJob])
+  }, [canViewHangfire, canRunBackgroundJobs, jobTypeData, runJob])
 
-  useEffect(() => {
-    getJobTypes()
-  }, [getJobTypes])
+  const onCreateRecurringJobFormClosed = (wasSaved: boolean) => {
+    setOpenCreateRecurringJobForm(false)
+    if (wasSaved) {
+      getRunningJobs()
+    }
+  }
 
   return (
     <>
@@ -103,6 +114,14 @@ const BackgroundJobsListPage = () => {
         rowData={backgroundJobs}
         loadData={getRunningJobs}
       />
+      {openCreateRecurringJobForm && (
+        <CreateRecurringJobForm
+          showForm={openCreateRecurringJobForm}
+          jobTypes={jobTypeData}
+          onFormCreate={() => onCreateRecurringJobFormClosed(true)}
+          onFormCancel={() => onCreateRecurringJobFormClosed(false)}
+        />
+      )}
     </>
   )
 }

@@ -7307,7 +7307,7 @@
         ]
       }
     },
-    "/api/admin/background-jobs": {
+    "/api/admin/background-jobs/run": {
       "post": {
         "tags": [
           "BackgroundJobs"
@@ -7325,6 +7325,47 @@
             "x-position": 1
           }
         ],
+        "responses": {
+          "202": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/background-jobs": {
+      "post": {
+        "tags": [
+          "BackgroundJobs"
+        ],
+        "summary": "Create a recurring background job.",
+        "operationId": "BackgroundJobs_Create",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRecurringJobRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
         "responses": {
           "202": {
             "description": ""
@@ -10809,6 +10850,22 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          }
+        }
+      },
+      "CreateRecurringJobRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "jobId": {
+            "type": "string"
+          },
+          "jobTypeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cronExpression": {
+            "type": "string"
           }
         }
       }
