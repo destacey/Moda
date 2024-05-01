@@ -13,11 +13,11 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
     {
         try
         {
-            List<int> workItemIds = await _workItemClient.GetWorkItemIds(projectName, lastChangedDate, workItemTypes, cancellationToken);
+            var workItemIds = await _workItemClient.GetWorkItemIds(projectName, lastChangedDate, workItemTypes, cancellationToken);
 
-            _logger.LogDebug("{WorkItemIdCount} work item ids found for project {Project}", workItemIds.Count, projectName);
+            _logger.LogDebug("{WorkItemIdCount} work item ids found for project {Project}", workItemIds.Length, projectName);
 
-            if (workItemIds.Count == 0)
+            if (workItemIds.Length == 0)
             {
                 return Result.Success<List<WorkItemResponse>>([]);
             }
@@ -25,7 +25,7 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
             // TODO: add cancellation process
 
             // TODO: make this configurable
-            List<string> fields =
+            string[] fields =
             [
                 "System.CreatedDate",
                 "System.CreatedBy",
@@ -35,6 +35,7 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
                 "System.Title",
                 "System.WorkItemType",
 
+                "System.Parent",
                 "System.AreaPath",
                 "System.AssignedTo",
                 "System.IterationPath",

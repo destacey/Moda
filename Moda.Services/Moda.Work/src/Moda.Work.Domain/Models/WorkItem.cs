@@ -8,12 +8,13 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
 {
     private WorkItemKey _key = null!;
     private string _title = null!;
+    private readonly List<WorkItem> _children = [];
 
     //private readonly List<WorkItemRevision> _history = [];
 
     private WorkItem() { }
 
-    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, int typeId, int statusId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank)
+    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, int typeId, int statusId, Guid? parentId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank)
     {
         Key = key;
         Title = title;
@@ -21,6 +22,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         ExternalId = externalId;
         TypeId = typeId;
         StatusId = statusId;
+        ParentId = parentId;
         Created = created;
         CreatedById = createdById;
         LastModified = lastModified;
@@ -67,6 +69,12 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
 
     //public WorkProcessScheme WorkProcessConfiguration { get; private set; } = null!;
 
+    public Guid? ParentId { get; private set; }
+
+    public WorkItem? Parent { get; private set; }
+
+    public IReadOnlyCollection<WorkItem> Children => _children.AsReadOnly();
+
     public Guid? AssignedToId { get; private set; }
 
     public Employee? AssignedTo { get; private set; }
@@ -94,11 +102,12 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
     /// </summary>
     //public IReadOnlyCollection<WorkItemRevision> History => _history.AsReadOnly();
 
-    public void Update(string title, int typeId, int statusId, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank)
+    public void Update(string title, int typeId, int statusId, Guid? parentId, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank)
     {
         Title = title;
         TypeId = typeId;
         StatusId = statusId;
+        ParentId = parentId;
         LastModified = lastModified;
         LastModifiedById = lastModifiedById;
         AssignedToId = assignedToId;
@@ -106,7 +115,12 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         StackRank = stackRank;
     }
 
-    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, int typeId, int statusId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank)
+    public void UpdateParent(Guid? parentId)
+    {
+        ParentId = parentId;
+    }
+
+    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, int typeId, int statusId, Guid? parentId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank)
     {
         Guard.Against.Null(workspace, nameof(workspace));
         if (workspace.Ownership != Ownership.Managed)
@@ -115,7 +129,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         }
         
         var key = new WorkItemKey(workspace.Key, externalId);
-        return new WorkItem(key, title, workspace.Id, externalId, typeId, statusId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank);
+        return new WorkItem(key, title, workspace.Id, externalId, typeId, statusId, parentId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank);
 
         //var result = workspace.AddWorkItem(workItem);  // this is handled in the handler for performance reasons
     }

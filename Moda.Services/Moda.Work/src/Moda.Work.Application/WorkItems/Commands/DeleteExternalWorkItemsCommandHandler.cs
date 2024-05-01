@@ -27,6 +27,7 @@ internal sealed class DeleteExternalWorkItemsCommandHandler(IWorkDbContext workD
             }
 
             var workItems = await _workDbContext.WorkItems
+                .Include(w => w.Children)
                 .Where(w => w.WorkspaceId == workspace.Id && request.WorkItemIds.Contains(w.ExternalId!.Value))
                 .ToListAsync(cancellationToken);
 

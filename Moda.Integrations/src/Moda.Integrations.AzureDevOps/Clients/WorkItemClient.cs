@@ -11,7 +11,7 @@ internal sealed class WorkItemClient : BaseClient
         : base(organizationUrl, token, apiVersion)
     { }
 
-    internal async Task<List<int>> GetWorkItemIds(string projectName, DateTime lastChangedDate, string[] workItemTypes, CancellationToken cancellationToken)
+    internal async Task<int[]> GetWorkItemIds(string projectName, DateTime lastChangedDate, string[] workItemTypes, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(projectName, nameof(projectName));
 
@@ -53,14 +53,14 @@ internal sealed class WorkItemClient : BaseClient
             request.RemoveParameter(bodyParameter);
         }
 
-        return workItemIds.Distinct().ToList();
+        return workItemIds.Distinct().ToArray();
     }
 
-    internal async Task<List<WorkItemResponse>> GetWorkItems(string projectName, List<int> workItemIds, List<string> fields, CancellationToken cancellationToken)
+    internal async Task<List<WorkItemResponse>> GetWorkItems(string projectName, int[] workItemIds, string[] fields, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(projectName, nameof(projectName));
 
-        if (workItemIds.Count == 0)
+        if (workItemIds.Length == 0)
             return [];
 
         var request = new RestRequest($"/{projectName}/_apis/wit/workitemsbatch", Method.Post);

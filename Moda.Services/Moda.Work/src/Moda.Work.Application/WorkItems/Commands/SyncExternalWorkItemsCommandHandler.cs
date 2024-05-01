@@ -1,4 +1,5 @@
-﻿using Moda.Common.Application.Requests.WorkManagement;
+﻿using Moda.Common.Application.Interfaces.Work;
+using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Common.Domain.Enums;
 
 namespace Moda.Work.Application.WorkItems.Commands;
@@ -34,10 +35,12 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
             var workTypes = (await _workDbContext.WorkTypes.Select(t => new { t.Id, t.Name }).ToListAsync(cancellationToken)).ToHashSet();
             var workStatuses = (await _workDbContext.WorkStatuses.Select(s => new { s.Id, s.Name }).ToListAsync(cancellationToken)).ToHashSet();
             var employees = (await _workDbContext.Employees.Select(e => new { e.Id, e.Email }).ToListAsync(cancellationToken)).ToHashSet();
+            var workItemIds = (await _workDbContext.WorkItems.Where(w => w.WorkspaceId == request.WorkspaceId).Select(w => new { w.Id, w.ExternalId}).ToListAsync(cancellationToken)).ToHashSet();
 
-            int chunkSize = 500;
+            int chunkSize = 1000;
             var chunks = request.WorkItems.OrderBy(w => w.LastModified).Chunk(chunkSize);
 
+            var missingParents = new Dictionary<int, int>();
             foreach (var chunk in chunks)
             {
                 // TODO: this is not a performant way to do this.  Make it better.
@@ -55,6 +58,16 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
                     try
                     {
+                        Guid? parentId = null;
+                        if (externalWorkItem.ParentId.HasValue)
+                        {
+                            parentId = workItemIds.FirstOrDefault(wi => wi.ExternalId == externalWorkItem.ParentId.Value)?.Id;
+                            if (parentId is null || parentId == Guid.Empty)
+                            { 
+                                missingParents.Add(externalWorkItem.Id, externalWorkItem.ParentId.Value);
+                            }
+                        }
+
                         var workItem = workspace.WorkItems.FirstOrDefault(wi => wi.ExternalId == externalWorkItem.Id);
                         if (workItem is null)
                         {
@@ -64,6 +77,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 externalWorkItem.Title,
                                 workTypes.Single(t => t.Name == externalWorkItem.WorkType).Id,
                                 workStatuses.Single(s => s.Name == externalWorkItem.WorkStatus).Id,
+                                parentId,
                                 externalWorkItem.Created,
                                 employees.SingleOrDefault(e => e.Email == externalWorkItem.CreatedBy)?.Id,
                                 externalWorkItem.LastModified,
@@ -82,6 +96,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 externalWorkItem.Title,
                                 workTypes.Single(t => t.Name == externalWorkItem.WorkType).Id,
                                 workStatuses.Single(s => s.Name == externalWorkItem.WorkStatus).Id,
+                                parentId,
                                 externalWorkItem.LastModified,
                                 employees.SingleOrDefault(e => e.Email == externalWorkItem.LastModifiedBy)?.Id,
                                 employees.SingleOrDefault(e => e.Email == externalWorkItem.AssignedTo)?.Id,
@@ -106,6 +121,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
                 await _workDbContext.SaveChangesAsync(cancellationToken);
             }
+
+            await MapMissingParents(workspace, missingParents, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -122,6 +139,36 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
         }
 
         return Result.Success();
+    }
+
+    private async Task MapMissingParents(Workspace workspace, Dictionary<int, int> missingParents, CancellationToken cancellationToken)
+    {
+        _logger.LogDebug("Mapping {WorkItemCount} missing parents for workspace {WorkspaceId}.", missingParents.Count, workspace.Id);
+        if (missingParents.Count == 0)
+        {
+            return;
+        }
+
+        var missingParentIds = missingParents.Values.Distinct().ToArray();
+        var parentWorkItemIds = (await _workDbContext.WorkItems.Where(w => w.WorkspaceId == workspace.Id && missingParentIds.Contains(w.ExternalId!.Value)).Select(w => new { w.Id, w.ExternalId }).ToListAsync(cancellationToken)).ToHashSet();
+
+        var workItemsMissingParents = missingParents.Keys.ToArray();
+        var missingParentWorkItems = await _workDbContext.WorkItems.Where(w => w.WorkspaceId == workspace.Id && workItemsMissingParents.Contains(w.ExternalId!.Value)).ToListAsync(cancellationToken);
+        foreach (var workItem in missingParentWorkItems)
+        {
+            var parentExternalId = missingParents[workItem.ExternalId!.Value];
+            var parentId = parentWorkItemIds.FirstOrDefault(wi => wi.ExternalId == parentExternalId)?.Id;
+            if (parentId is not null)
+            {
+                workItem.UpdateParent(parentId);
+            }
+            else
+            {
+                _logger.LogWarning("Unable to map missing parent for work item {ExternalId} in workspace {WorkspaceId}.", workItem.ExternalId, workspace.Id);
+            }
+        }
+
+        await _workDbContext.SaveChangesAsync(cancellationToken);
     }
 
     private sealed class WorkItemSyncLog(int requested)
