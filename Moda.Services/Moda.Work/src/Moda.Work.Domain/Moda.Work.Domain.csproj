@@ -2,7 +2,7 @@
 
     <ItemGroup>
         <PackageReference Include="Ardalis.GuardClauses" Version="4.5.0" />
-        <PackageReference Include="CSharpFunctionalExtensions" Version="2.41.0" />
+        <PackageReference Include="CSharpFunctionalExtensions" Version="2.42.0" />
     </ItemGroup>
 
     <ItemGroup>
