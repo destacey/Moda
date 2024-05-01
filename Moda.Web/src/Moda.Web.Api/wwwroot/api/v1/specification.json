@@ -8621,6 +8621,14 @@
           "status": {
             "type": "string"
           },
+          "parent": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkItemNavigationDto"
+              }
+            ]
+          },
           "assignedTo": {
             "nullable": true,
             "oneOf": [
@@ -8657,6 +8665,24 @@
             "nullable": true
           },
           "name": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkItemNavigationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
             "type": "string"
           }
         }
@@ -9332,6 +9358,14 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "parent": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkItemNavigationDto"
+              }
+            ]
           },
           "assignedTo": {
             "nullable": true,

@@ -10,6 +10,7 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
     public required WorkspaceNavigationDto Workspace { get; set; }
     public required string Type { get; set; }
     public required string Status { get; set; }
+    public WorkItemNavigationDto? Parent { get; set; }
     public EmployeeNavigationDto? AssignedTo { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)

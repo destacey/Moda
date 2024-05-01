@@ -12,6 +12,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
     public required string Type { get; set; }
     public required string Status { get; set; }
     public int? Priority { get; set; }
+    public WorkItemNavigationDto? Parent { get; set; }
     public EmployeeNavigationDto? AssignedTo { get; set; }
     public Instant Created { get; private set; }
     public EmployeeNavigationDto? CreatedBy { get; set; }
