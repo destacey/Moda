@@ -9186,6 +9186,7 @@ export interface WorkItemListDto {
     workspace?: WorkspaceNavigationDto;
     type?: string;
     status?: string;
+    parent?: WorkItemNavigationDto | undefined;
     assignedTo?: EmployeeNavigationDto | undefined;
 }
 
@@ -9196,6 +9197,12 @@ export interface NavigationDtoOfGuidAndString {
 }
 
 export interface WorkspaceNavigationDto extends NavigationDtoOfGuidAndString {
+}
+
+export interface WorkItemNavigationDto {
+    id?: string;
+    key?: string;
+    title?: string;
 }
 
 export interface EmployeeNavigationDto extends NavigationDto {
@@ -9387,6 +9394,7 @@ export interface WorkItemDetailsDto {
     type?: string;
     status?: string;
     priority?: number | undefined;
+    parent?: WorkItemNavigationDto | undefined;
     assignedTo?: EmployeeNavigationDto | undefined;
     created?: Date;
     createdBy?: EmployeeNavigationDto | undefined;

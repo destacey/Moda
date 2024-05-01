@@ -26,6 +26,7 @@ internal static class WorkItemResponseExtensions
             Title = workItem.Fields.Title,
             WorkType = workItem.Fields.WorkItemType,
             WorkStatus = workItem.Fields.State,
+            ParentId = workItem.Fields.Parent,
             AssignedTo = workItem.Fields.AssignedTo?.UniqueName,
             Created = Instant.FromDateTimeOffset(workItem.Fields.CreatedDate),
             CreatedBy = workItem.Fields.CreatedBy?.UniqueName,

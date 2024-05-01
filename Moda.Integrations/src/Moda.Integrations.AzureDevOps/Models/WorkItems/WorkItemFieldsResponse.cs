@@ -12,6 +12,9 @@ internal class WorkItemFieldsResponse
     [JsonPropertyName("System.State")]
     public required string State { get; set; }
 
+    [JsonPropertyName("System.Parent")]
+    public int? Parent { get; set; }
+
     [JsonPropertyName("System.CreatedDate")]
     public DateTime CreatedDate { get; set; }
 

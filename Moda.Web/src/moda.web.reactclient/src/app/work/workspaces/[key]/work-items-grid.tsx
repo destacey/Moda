@@ -21,6 +21,9 @@ const AssignedToLinkCellRenderer = ({ value, data }) => {
 }
 
 const workItemKeyComparator = (key1, key2) => {
+  if (!key1) return 1 // sort empty keys to the end
+  if (!key2) return -1
+
   const [str1, num1] = key1.split('-')
   const [str2, num2] = key2.split('-')
 
@@ -43,6 +46,11 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         field: 'assignedTo.name',
         headerName: 'Assigned To',
         cellRenderer: AssignedToLinkCellRenderer,
+      },
+      {
+        field: 'parent.key',
+        headerName: 'Parent',
+        comparator: workItemKeyComparator,
       },
     ],
     [],

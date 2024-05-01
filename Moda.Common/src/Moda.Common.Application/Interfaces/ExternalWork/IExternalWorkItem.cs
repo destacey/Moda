@@ -5,6 +5,7 @@ public interface IExternalWorkItem
     string Title { get; }
     string WorkType { get; }
     string WorkStatus { get; }
+    int? ParentId { get; }
     string? AssignedTo { get; }
     Instant Created { get; }
     string? CreatedBy { get; }

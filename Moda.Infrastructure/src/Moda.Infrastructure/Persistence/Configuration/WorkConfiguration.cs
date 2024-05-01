@@ -141,10 +141,15 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .HasForeignKey(w => w.StatusId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(w => w.Parent)
+            .WithMany(p => p.Children)
+            .HasForeignKey(w => w.ParentId)
+            .OnDelete(DeleteBehavior.ClientSetNull);
+
         builder.HasOne(w => w.AssignedTo)
             .WithMany()
             .HasForeignKey(w => w.AssignedToId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.ClientSetNull);
 
         builder.HasOne(w => w.CreatedBy)
             .WithMany()
