@@ -23,6 +23,11 @@ public sealed record InitWorkspaceIntegrationRequest
     /// The name for the workspace.
     /// </summary>
     public required string WorkspaceName { get; set; }
+
+    /// <summary>
+    /// A url template for external work items.  This template plus the work item external id will create a url to view the work item in the external system.
+    /// </summary>
+    public string? ExternalViewWorkItemUrlTemplate { get; set; }
 }
 
 public sealed class InitWorkspaceIntegrationRequestValidator : CustomValidator<InitWorkspaceIntegrationRequest>
@@ -47,5 +52,8 @@ public sealed class InitWorkspaceIntegrationRequestValidator : CustomValidator<I
         RuleFor(c => c.WorkspaceName)
             .NotEmpty()
             .MaximumLength(64);
+
+        RuleFor(c => c.ExternalViewWorkItemUrlTemplate)
+            .MaximumLength(256);
     }
 }

@@ -10817,6 +10817,13 @@
             "maxLength": 64,
             "minLength": 1,
             "nullable": false
+          },
+          "externalViewWorkItemUrlTemplate": {
+            "type": "string",
+            "description": "A url template for external work items.  This template plus the work item external id will create a url to view the work item in the external system.",
+            "maxLength": 256,
+            "minLength": 0,
+            "nullable": true
           }
         }
       },

@@ -9795,6 +9795,8 @@ export interface InitWorkspaceIntegrationRequest {
     workspaceKey: string;
     /** The name for the workspace. */
     workspaceName: string;
+    /** A url template for external work items.  This template plus the work item external id will create a url to view the work item in the external system. */
+    externalViewWorkItemUrlTemplate?: string | undefined;
 }
 
 export interface ConnectorListDto {

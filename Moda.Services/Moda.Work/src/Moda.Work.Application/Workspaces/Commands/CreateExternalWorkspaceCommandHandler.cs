@@ -26,6 +26,9 @@ public sealed class CreateExternalWorkspaceCommandHandlerValidator : CustomValid
             .NotEmpty()
             .MaximumLength(64)
             .MustAsync(BeUniqueWorkspaceName).WithMessage("The workspace name already exists.");
+
+        RuleFor(c => c.ExternalViewWorkItemUrlTemplate)
+            .MaximumLength(256);
     }
 
     public async Task<bool> BeUniqueWorkspaceKey(WorkspaceKey workspaceKey, CancellationToken cancellationToken)
@@ -58,7 +61,7 @@ internal sealed class CreateExternalWorkspaceCommandHandler(IWorkDbContext workD
 
         var timestamp = _dateTimeProvider.Now;
 
-        var workspace = Workspace.CreateExternal(request.WorkspaceKey, request.WorkspaceName, request.ExternalWorkspace.Description, request.ExternalWorkspace.Id, workProcess.Id, timestamp);
+        var workspace = Workspace.CreateExternal(request.WorkspaceKey, request.WorkspaceName, request.ExternalWorkspace.Description, request.ExternalWorkspace.Id, workProcess.Id, request.ExternalViewWorkItemUrlTemplate, timestamp);
 
         _workDbContext.Workspaces.Add(workspace);
         await _workDbContext.SaveChangesAsync(cancellationToken);

@@ -146,7 +146,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
         }
     }
 
-    public async Task<Result<Guid>> InitWorkspaceIntegration(Guid connectionId, Guid workspaceExternalId, string workspaceKey, string workspaceName, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> InitWorkspaceIntegration(Guid connectionId, Guid workspaceExternalId, string workspaceKey, string workspaceName, string? externalViewWorkItemUrlTemplate, CancellationToken cancellationToken)
     {
         try
         {
@@ -188,7 +188,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                 return workspaceResult.ConvertFailure<Guid>();
 
             // create the workspace
-            var createWorkspaceResult = await _sender.Send(new CreateExternalWorkspaceCommand(workspaceResult.Value, new WorkspaceKey(workspaceKey), workspaceName), cancellationToken);
+            var createWorkspaceResult = await _sender.Send(new CreateExternalWorkspaceCommand(workspaceResult.Value, new WorkspaceKey(workspaceKey), workspaceName, externalViewWorkItemUrlTemplate), cancellationToken);
             if (createWorkspaceResult.IsFailure)
                 return createWorkspaceResult.ConvertFailure<Guid>();
 

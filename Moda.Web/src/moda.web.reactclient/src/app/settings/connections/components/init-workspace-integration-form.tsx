@@ -6,6 +6,7 @@ import { Form, Input, Modal, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
+const { TextArea } = Input
 
 export interface InitWorkspaceIntegrationFormProps {
   showForm: boolean
@@ -19,12 +20,14 @@ export interface InitWorkspaceIntegrationFormProps {
 interface InitWorkspaceIntegrationFormValues {
   workspaceKey: string
   workspaceName: string
+  viewWorkItemUrlTemplate?: string
 }
 
 const mapToRequestValues = (values: InitWorkspaceIntegrationFormValues) => {
   return {
     workspaceKey: values.workspaceKey,
     workspaceName: values.workspaceName,
+    externalViewWorkItemUrlTemplate: values.viewWorkItemUrlTemplate,
   } as InitWorkspaceIntegrationRequest
 }
 
@@ -180,6 +183,23 @@ const InitWorkspaceIntegrationForm = (
             rules={[{ required: true }]}
           >
             <Input showCount maxLength={64} />
+          </Item>
+          <Item
+            label="View Work Item URL Template"
+            name="viewWorkItemUrlTemplate"
+            extra={
+              <span>
+                <br />
+                This template plus the work item external id will create a URL
+                to view the work item in the external system.
+              </span>
+            }
+          >
+            <TextArea
+              autoSize={{ minRows: 1, maxRows: 4 }}
+              showCount
+              maxLength={256}
+            />
           </Item>
         </Form>
       </Modal>
