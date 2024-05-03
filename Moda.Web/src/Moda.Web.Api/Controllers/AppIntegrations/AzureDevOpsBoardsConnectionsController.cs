@@ -238,7 +238,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
         if (id != request.Id)
             return BadRequest();
 
-        var result = await azureDevOpsBoardsImportService.InitWorkspaceIntegration(request.Id, request.ExternalId, request.WorkspaceKey, request.WorkspaceName, cancellationToken);
+        var result = await azureDevOpsBoardsImportService.InitWorkspaceIntegration(request.Id, request.ExternalId, request.WorkspaceKey, request.WorkspaceName, request.ExternalViewWorkItemUrlTemplate, cancellationToken);
         if (result.IsFailure)
         {
             var error = new ErrorResult

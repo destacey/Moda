@@ -1,7 +1,6 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.Workspaces.Validators;
-using Moda.Work.Domain.Models;
 
 namespace Moda.Work.Application.Workspaces.Commands;
 

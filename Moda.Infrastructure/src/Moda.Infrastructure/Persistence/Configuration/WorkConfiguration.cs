@@ -282,6 +282,7 @@ public class WorkspaceConfig : IEntityTypeConfiguration<Workspace>
             .HasColumnType("varchar")
             .HasMaxLength(32);
         builder.Property(w => w.ExternalId);
+        builder.Property(w => w.ExternalViewWorkItemUrlTemplate).HasMaxLength(256);
         builder.Property(w => w.IsActive);
 
         // Audit

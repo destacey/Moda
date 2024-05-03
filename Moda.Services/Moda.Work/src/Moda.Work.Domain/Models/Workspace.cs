@@ -14,11 +14,12 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     private WorkspaceKey _key = null!;
     private string _name = null!;
     private string? _description;
+    private string? _externalViewWorkItemUrlTemplate;
     private readonly List<WorkItem> _workItems = [];
 
     private Workspace() { }
 
-    private Workspace(WorkspaceKey key, string name, string? description, Ownership ownership, Guid? externalId, Guid workProcessId)
+    private Workspace(WorkspaceKey key, string name, string? description, Ownership ownership, Guid? externalId, Guid workProcessId, string? externalViewWorkItemUrlTemplate)
     {
         Key = key;
         Name = name;
@@ -32,6 +33,7 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
                 throw new ArgumentException("The external identifier is required when the ownership is managed.", nameof(externalId));
 
             ExternalId = externalId.Value;
+            ExternalViewWorkItemUrlTemplate = null;
         }
     }
 
@@ -79,6 +81,15 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     /// The work process assigned to the workspace.
     /// </summary>
     public WorkProcess? WorkProcess { get; private set; }
+
+    /// <summary>
+    /// A url template for external work items.  This template plus the work item external id will create a url to view the work item in the external system.
+    /// </summary>
+    public string? ExternalViewWorkItemUrlTemplate 
+    { 
+        get => _externalViewWorkItemUrlTemplate; 
+        private set => _externalViewWorkItemUrlTemplate = value.NullIfWhiteSpacePlusTrim(); 
+    }
 
     /// <summary>
     /// Indicates whether the workspace is active or not.  Inactive workspaces will be locked.  This means that
@@ -137,6 +148,20 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     {
         Name = name.Trim();
         Description = description?.Trim();
+
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+        return Result.Success();
+    }
+
+    public Result SetExternalViewWorkItemUrlTemplate(string? externalWorkItemUrlTemplate, Instant timestamp)
+    {
+        if (Ownership is not Ownership.Managed)
+            return Result.Failure($"Unable to set the external view work item url template for an {Ownership.GetDisplayName()} workspace.");
+
+        // TODO: validate the template
+
+        ExternalViewWorkItemUrlTemplate = externalWorkItemUrlTemplate;
 
         AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
@@ -207,7 +232,7 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     /// <returns></returns>
     public static Workspace Create(WorkspaceKey key, string name, string? description, Guid workProcessId, Instant timestamp)
     {
-        var workspace = new Workspace(key, name, description, Ownership.Owned, null, workProcessId);
+        var workspace = new Workspace(key, name, description, Ownership.Owned, null, workProcessId, null);
 
         workspace.AddDomainEvent(EntityCreatedEvent.WithEntity(workspace, timestamp));
         return workspace;
@@ -219,11 +244,12 @@ public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<Workspac
     /// <param name="description">The description.</param>
     /// <param name="externalId">The external identifier.</param>
     /// <param name="workProcess">The work process.</param>
+    /// <param name="externalViewWorkItemUrlTemplate">The external view work item URL template.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public static Workspace CreateExternal(WorkspaceKey key, string name, string? description, Guid externalId, Guid workProcessId, Instant timestamp)
+    public static Workspace CreateExternal(WorkspaceKey key, string name, string? description, Guid externalId, Guid workProcessId, string? externalViewWorkItemUrlTemplate, Instant timestamp)
     {
-        var workspace = new Workspace(key, name, description, Ownership.Managed, externalId, workProcessId);
+        var workspace = new Workspace(key, name, description, Ownership.Managed, externalId, workProcessId, externalViewWorkItemUrlTemplate);
 
         workspace.AddDomainEvent(EntityCreatedEvent.WithEntity(workspace, timestamp));
         return workspace;

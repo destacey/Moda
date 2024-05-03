@@ -8,12 +8,14 @@ import {
   useGetWorkItemsQuery,
   useGetWorkspaceQuery,
 } from '@/src/store/features/work-management/workspace-api'
-import { Card } from 'antd'
+import { Button, Card } from 'antd'
 import { notFound, usePathname } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import WorkspaceDetailsLoading from './loading'
 import WorkspaceDetails from './workspace-details'
 import WorkItemsGrid from './work-items-grid'
+import useAuth from '@/src/app/components/contexts/auth'
+import SetWorkspaceExternalUrlTemplatesForm from './set-workspace-external-url-templates-form'
 
 enum WorkspaceTabs {
   Details = 'details',
@@ -23,7 +25,18 @@ enum WorkspaceTabs {
 const WorkspaceDetailsPage = ({ params }) => {
   const workspaceKey = params.key.toUpperCase()
   useDocumentTitle('Workspace Details')
+
   const [activeTab, setActiveTab] = useState(WorkspaceTabs.Details)
+  const [
+    openSetWorkspaceExternalUrlTemplatesForm,
+    setOpenSetWorkspaceExternalUrlTemplatesForm,
+  ] = useState<boolean>(false)
+
+  const { hasClaim } = useAuth()
+  const canUpdateWorkspace = hasClaim(
+    'Permission',
+    'Permissions.Workspaces.Update',
+  )
 
   const {
     data: workspaceData,
@@ -38,9 +51,8 @@ const WorkspaceDetailsPage = ({ params }) => {
   const pathname = usePathname()
 
   useEffect(() => {
-    workspaceData &&
-      dispatch(setBreadcrumbTitle({ title: workspaceData.name, pathname }))
-  }, [dispatch, pathname, workspaceData])
+    dispatch(setBreadcrumbTitle({ title: workspaceKey, pathname }))
+  }, [dispatch, pathname, workspaceKey])
 
   useEffect(() => {
     error && console.error(error)
@@ -63,6 +75,22 @@ const WorkspaceDetailsPage = ({ params }) => {
     notFound()
   }
 
+  const actions = () => {
+    if (!workspaceData) return null
+
+    return (
+      <>
+        {canUpdateWorkspace && (
+          <Button
+            onClick={() => setOpenSetWorkspaceExternalUrlTemplatesForm(true)}
+          >
+            Set External URLs
+          </Button>
+        )}
+      </>
+    )
+  }
+
   const tabs = [
     {
       key: WorkspaceTabs.Details,
@@ -82,9 +110,20 @@ const WorkspaceDetailsPage = ({ params }) => {
     },
   ]
 
+  const onSetWorkspaceExternalUrlTemplatesFormClosed = (wasSaved: boolean) => {
+    setOpenSetWorkspaceExternalUrlTemplatesForm(false)
+    if (wasSaved) {
+      refetch()
+    }
+  }
+
   return (
     <>
-      <PageTitle title={workspaceData.name} subtitle="Workspace Details" />
+      <PageTitle
+        title={workspaceData.name}
+        subtitle="Workspace Details"
+        actions={actions()}
+      />
       <Card
         style={{ width: '100%' }}
         tabList={tabs}
@@ -93,6 +132,18 @@ const WorkspaceDetailsPage = ({ params }) => {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
+      {openSetWorkspaceExternalUrlTemplatesForm && (
+        <SetWorkspaceExternalUrlTemplatesForm
+          showForm={openSetWorkspaceExternalUrlTemplatesForm}
+          workspaceId={workspaceData.id}
+          onFormUpdate={() =>
+            onSetWorkspaceExternalUrlTemplatesFormClosed(true)
+          }
+          onFormCancel={() =>
+            onSetWorkspaceExternalUrlTemplatesFormClosed(false)
+          }
+        />
+      )}
     </>
   )
 }

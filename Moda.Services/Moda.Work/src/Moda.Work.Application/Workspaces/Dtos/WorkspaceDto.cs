@@ -10,6 +10,7 @@ public sealed record WorkspaceDto : IMapFrom<Workspace>
     public required SimpleNavigationDto Ownership { get; set; }
     public required SimpleNavigationDto WorkProcess { get; set; }
     public Guid? ExternalId { get; set; }
+    public string? ExternalViewWorkItemUrlTemplate { get; set; }
     public bool IsActive { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)

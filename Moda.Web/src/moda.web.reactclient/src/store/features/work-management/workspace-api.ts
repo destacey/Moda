@@ -2,6 +2,7 @@ import { getWorkspacesClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import {
+  SetExternalUrlTemplatesRequest,
   WorkItemDetailsDto,
   WorkItemListDto,
   WorkspaceDto,
@@ -11,6 +12,11 @@ import {
 export interface GetWorkItemRequest {
   idOrKey: string
   workItemKey: string
+}
+
+export interface SetWorkspaceExternalUrlTemplatesRequest {
+  workspaceId: string
+  externalUrlTemplatesRequest: SetExternalUrlTemplatesRequest
 }
 
 export const workspaceApi = apiSlice.injectEndpoints({
@@ -43,6 +49,27 @@ export const workspaceApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         { type: QueryTags.Workspace, id: arg }, // typically arg is the key
+      ],
+    }),
+    setWorkspaceExternalUrlTemplates: builder.mutation<
+      void,
+      SetWorkspaceExternalUrlTemplatesRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          await (
+            await getWorkspacesClient()
+          ).setExternalUrlTemplates(
+            request.workspaceId,
+            request.externalUrlTemplatesRequest,
+          )
+        } catch (error) {
+          console.error('Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.Workspace, id: arg.workspaceId },
       ],
     }),
     getWorkItems: builder.query<WorkItemListDto[], string>({
@@ -102,4 +129,5 @@ export const {
   useGetWorkItemsQuery,
   useGetWorkItemQuery,
   useSearchWorkItemsQuery,
+  useSetWorkspaceExternalUrlTemplatesMutation,
 } = workspaceApi

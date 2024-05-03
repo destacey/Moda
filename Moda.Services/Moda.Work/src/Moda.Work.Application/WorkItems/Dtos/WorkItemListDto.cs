@@ -12,6 +12,7 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
     public required string Status { get; set; }
     public WorkItemNavigationDto? Parent { get; set; }
     public EmployeeNavigationDto? AssignedTo { get; set; }
+    public string? ExternalViewWorkItemUrl { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
@@ -19,7 +20,8 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
             .Map(dest => dest.Key, src => src.Key.ToString())
             .Map(dest => dest.Type, src => src.Type.Name)
             .Map(dest => dest.Status, src => src.Status.Name)
-            .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo));
+            .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))
+            .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}");
     }
 }
 
