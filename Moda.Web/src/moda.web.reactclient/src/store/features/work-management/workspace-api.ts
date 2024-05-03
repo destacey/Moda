@@ -9,7 +9,7 @@ import {
 } from '@/src/services/moda-api'
 
 export interface GetWorkItemRequest {
-  workspaceIdOrKey: string
+  idOrKey: string
   workItemKey: string
 }
 
@@ -65,7 +65,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
         try {
           const data = await (
             await getWorkspacesClient()
-          ).getWorkItem(request.workspaceIdOrKey, request.workItemKey)
+          ).getWorkItem(request.idOrKey, request.workItemKey)
           return { data }
         } catch (error) {
           console.error('Error:', error)

@@ -47,7 +47,6 @@ const modaDefaultColDef = {
   floatingFilter: true,
 }
 
-// TODO: create a custom implementation for react-query
 const ModaGrid = ({
   height,
   width,

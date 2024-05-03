@@ -31,6 +31,7 @@ internal sealed class GetWorkItemQueryHandler(IWorkDbContext workDbContext, ILog
     public async Task<Result<WorkItemDetailsDto?>> Handle(GetWorkItemQuery request, CancellationToken cancellationToken)
     {
         var query = _workDbContext.WorkItems
+            .Where(e => e.Key == request.WorkItemKey)
             .AsQueryable();
 
         if (request.Id.HasValue)

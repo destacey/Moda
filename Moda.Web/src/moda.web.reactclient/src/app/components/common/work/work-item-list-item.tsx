@@ -1,5 +1,6 @@
 import { WorkItemListDto } from '@/src/services/moda-api'
 import { List, Space, Tag } from 'antd'
+import Link from 'next/link'
 
 const { Item } = List
 const { Meta } = Item
@@ -12,7 +13,13 @@ const WorkItemListItem = ({ workItem }: WorkItemListItemProps) => {
   return (
     <Item key={workItem.id}>
       <Meta
-        title={`${workItem.key} - ${workItem.title}`}
+        title={
+          <Link
+            href={`/work/workspaces/${workItem.workspace.key}/work-items/${workItem.key}`}
+          >
+            {workItem.key} - {workItem.title}
+          </Link>
+        }
         description={<WorkItemListItemDescription workItem={workItem} />}
       />
     </Item>

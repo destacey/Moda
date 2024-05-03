@@ -11,9 +11,8 @@ import { ItemType } from 'antd/es/menu/hooks/useItems'
 import DeletePlanningIntervalObjectiveForm from './delete-planning-interval-objective-form'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useGetPlanningIntervalObjectiveByKey } from '@/src/services/queries/planning-queries'
-import { notFound, useRouter, usePathname } from 'next/navigation'
+import { notFound, useRouter } from 'next/navigation'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
-import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import PlanningIntervalObjectiveDetailsLoading from './loading'
 import CreateHealthCheckForm from '@/src/app/components/common/health-check/create-health-check-form'
 import { SystemContext } from '@/src/app/components/constants'
@@ -49,7 +48,6 @@ const ObjectiveDetailsPage = ({ params }) => {
     hasClaim('Permission', 'Permissions.HealthChecks.Create')
   const showActions = canManageObjectives
 
-  const pathname = usePathname()
   const dispatch = useAppDispatch()
   const editingObjectiveId = useAppSelector(
     (state) => state.healthCheck.createContext.objectId,
@@ -67,37 +65,6 @@ const ObjectiveDetailsPage = ({ params }) => {
       ),
     },
   ]
-
-  useEffect(() => {
-    if (!objectiveData) return
-
-    const breadcrumbRoute: BreadcrumbItem[] = [
-      {
-        title: 'Planning',
-      },
-      {
-        href: `/planning/planning-intervals`,
-        title: 'Planning Intervals',
-      },
-    ]
-
-    breadcrumbRoute.push(
-      {
-        href: `/planning/planning-intervals/${objectiveData.planningInterval?.key}`,
-        title: objectiveData.planningInterval?.name,
-      },
-      {
-        title: objectiveData.name,
-      },
-    )
-    // TODO: for a split second, the breadcrumb shows the default path route, then the new one.
-    dispatch(
-      setBreadcrumbRoute({
-        pathname,
-        route: breadcrumbRoute,
-      }),
-    )
-  }, [dispatch, objectiveData, pathname])
 
   const onUpdateObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
