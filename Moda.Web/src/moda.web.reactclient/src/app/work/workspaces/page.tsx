@@ -31,7 +31,6 @@ const WorkspacesPage: React.FC = () => {
   const [currentView, setCurrentView] = useState<string | number>(Views.Cards)
 
   // TODO: add the ability to filter by active/inactive workspaces on both views
-  //const { includeInactive } = useAppSelector((state) => state.workspace)
 
   const {
     data: workspaceData,
@@ -39,7 +38,6 @@ const WorkspacesPage: React.FC = () => {
     error,
     refetch,
   } = useGetWorkspacesQuery(true)
-  //const dispatch = useAppDispatch()
 
   useEffect(() => {
     error && console.error(error)

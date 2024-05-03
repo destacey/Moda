@@ -3532,6 +3532,61 @@
         ]
       }
     },
+    "/api/work/workspaces/{id}/external-url-templates": {
+      "put": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Set the external view work item URL template for a workspace.",
+        "operationId": "Workspaces_SetExternalUrlTemplates",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetExternalUrlTemplatesRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/work/workspaces/{idOrKey}/work-items": {
       "get": {
         "tags": [
@@ -9319,8 +9374,24 @@
             "nullable": true,
             "example": "00000000-0000-0000-0000-000000000000"
           },
+          "externalViewWorkItemUrlTemplate": {
+            "type": "string",
+            "nullable": true
+          },
           "isActive": {
             "type": "boolean"
+          }
+        }
+      },
+      "SetExternalUrlTemplatesRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "externalViewWorkItemUrlTemplate": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 0,
+            "nullable": true
           }
         }
       },

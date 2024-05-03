@@ -12,7 +12,7 @@
                 "default",
                 "notdefault"
             ],
-            "SchedulePollingInterval": "00:00:15",
+            "SchedulePollingInterval": "00:01:00",
             "ServerCheckInterval": "00:05:00",
             "ServerName": null,
             "ServerTimeout": "00:05:00",
@@ -24,7 +24,7 @@
             "ConnectionString": "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=Moda;Integrated Security=True;MultipleActiveResultSets=True",
             "Options": {
                 "CommandBatchMaxTimeout": "00:05:00",
-                "QueuePollInterval": "00:00:01",
+                "QueuePollInterval": "00:00:15",
                 "UseRecommendedIsolationLevel": true,
                 "SlidingInvisibilityTimeout": "00:05:00",
                 "DisableGlobalLocks": true,

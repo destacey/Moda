@@ -1,6 +1,8 @@
 ﻿using Moda.Common.Extensions;
+using Moda.Web.Api.Models.Work.Workspaces;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
+using Moda.Work.Application.Workspaces.Commands;
 using Moda.Work.Application.Workspaces.Dtos;
 using Moda.Work.Application.Workspaces.Queries;
 using Moda.Work.Domain.Models;
@@ -56,6 +58,22 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
                 ? result.Value
                 : NotFound();
     }
+
+    [HttpPut("{id}/external-url-templates")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Workspaces)]
+    [OpenApiOperation("Set the external view work item URL template for a workspace.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> SetExternalUrlTemplates(Guid id, [FromBody] SetExternalUrlTemplatesRequest dto, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new SetExternalViewWorkItemUrlTemplateCommand(id, dto.ExternalViewWorkItemUrlTemplate), cancellationToken);
+
+        return result.IsFailure
+            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.SetExternalViewWorkItemUrlTemplate"))
+            : NoContent();
+    }
+
+    #region Work Items
 
     [HttpGet("{idOrKey}/work-items")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
@@ -132,4 +150,5 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
             : Ok(result.Value.OrderByKey(true));
     }
 
+    #endregion Work Items
 }
