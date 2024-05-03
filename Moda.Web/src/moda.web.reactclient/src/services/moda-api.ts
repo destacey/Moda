@@ -9249,6 +9249,7 @@ export interface WorkItemListDto {
     status?: string;
     parent?: WorkItemNavigationDto | undefined;
     assignedTo?: EmployeeNavigationDto | undefined;
+    externalViewWorkItemUrl?: string | undefined;
 }
 
 export interface NavigationDtoOfGuidAndString {
@@ -9467,6 +9468,7 @@ export interface WorkItemDetailsDto {
     createdBy?: EmployeeNavigationDto | undefined;
     lastModified?: Date;
     lastModifiedBy?: EmployeeNavigationDto | undefined;
+    externalViewWorkItemUrl?: string | undefined;
 }
 
 export interface WorkStatusCategoryListDto {

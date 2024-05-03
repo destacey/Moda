@@ -1,11 +1,7 @@
 'use client'
 
 import { useAppDispatch, useDocumentTitle } from '@/src/app/hooks'
-import {
-  BreadcrumbItem,
-  setBreadcrumbRoute,
-  setBreadcrumbTitle,
-} from '@/src/store/breadcrumbs'
+import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { useGetWorkItemQuery } from '@/src/store/features/work-management/workspace-api'
 import { notFound, usePathname } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
@@ -14,6 +10,9 @@ import { PageTitle } from '@/src/app/components/common'
 import { Card } from 'antd'
 import { authorizePage } from '@/src/app/components/hoc'
 import WorkItemDetails from './work-item-details'
+import Link from 'next/link'
+import { ExportOutlined } from '@ant-design/icons'
+import ExternalIconLink from '@/src/app/components/common/external-icon-link'
 
 enum WorkItemTabs {
   Details = 'details',
@@ -84,7 +83,16 @@ const WorkItemDetailsPage = ({ params }) => {
 
   return (
     <>
-      <PageTitle title={workItemData.title} subtitle="Work Item Details" />
+      <PageTitle
+        title={
+          <ExternalIconLink
+            content={workItemData?.title}
+            url={workItemData.externalViewWorkItemUrl}
+            tooltip="Open in external system"
+          />
+        }
+        subtitle="Work Item Details"
+      />
       <Card
         style={{ width: '100%' }}
         tabList={tabs}

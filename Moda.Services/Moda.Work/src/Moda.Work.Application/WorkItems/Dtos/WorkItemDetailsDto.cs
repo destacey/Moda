@@ -18,6 +18,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
     public EmployeeNavigationDto? CreatedBy { get; set; }
     public Instant LastModified { get; private set; }
     public EmployeeNavigationDto? LastModifiedBy { get; set; }
+    public string? ExternalViewWorkItemUrl { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
@@ -27,6 +28,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
             .Map(dest => dest.Status, src => src.Status.Name)
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))
             .Map(dest => dest.CreatedBy, src => src.CreatedBy == null ? null : EmployeeNavigationDto.From(src.CreatedBy))
-            .Map(dest => dest.LastModifiedBy, src => src.LastModifiedBy == null ? null : EmployeeNavigationDto.From(src.LastModifiedBy));
+            .Map(dest => dest.LastModifiedBy, src => src.LastModifiedBy == null ? null : EmployeeNavigationDto.From(src.LastModifiedBy))
+            .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}");
     }
 }
