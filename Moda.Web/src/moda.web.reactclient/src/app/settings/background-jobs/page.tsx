@@ -14,6 +14,7 @@ import { useDocumentTitle } from '../../hooks'
 import { PageActions } from '../../components/common'
 import { useGetJobTypesQuery } from '@/src/store/features/admin/background-jobs-api'
 import CreateRecurringJobForm from './create-recurring-job-form'
+import { ColDef } from 'ag-grid-community'
 
 const BackgroundJobsListPage = () => {
   useDocumentTitle('Background Jobs')
@@ -28,7 +29,7 @@ const BackgroundJobsListPage = () => {
     'Permissions.BackgroundJobs.Create',
   )
 
-  const columnDefs = useMemo(
+  const columnDefs = useMemo<ColDef<BackgroundJobDto>[]>(
     () => [
       { field: 'id' },
       { field: 'action' },

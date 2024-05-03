@@ -8739,6 +8739,9 @@
           },
           "title": {
             "type": "string"
+          },
+          "workspaceKey": {
+            "type": "string"
           }
         }
       },

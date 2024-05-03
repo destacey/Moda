@@ -12,9 +12,31 @@ export interface WorkItemsGridProps {
   refetch: () => void
 }
 
-const AssignedToLinkCellRenderer = ({ value, data }) => {
+const WorkItemLinkCellRenderer = ({ value, data }) => {
   return (
-    <Link href={`/organizations/employees/${data.assignedTo?.key}`}>
+    <Link
+      href={`/work/workspaces/${data.workspace.key}/work-items/${data.key}`}
+    >
+      {value}
+    </Link>
+  )
+}
+
+const ParentWorkItemLinkCellRenderer = ({ value, data }) => {
+  if (!data.parent) return null
+  return (
+    <Link
+      href={`/work/workspaces/${data.parent.workspaceKey}/work-items/${data.parent.key}`}
+    >
+      {value}
+    </Link>
+  )
+}
+
+const AssignedToLinkCellRenderer = ({ value, data }) => {
+  if (!data.assignedTo) return null
+  return (
+    <Link href={`/organizations/employees/${data.assignedTo.key}`}>
       {value}
     </Link>
   )
@@ -38,7 +60,11 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
 
   const columnDefs = useMemo<ColDef<WorkItemListDto>[]>(
     () => [
-      { field: 'key', comparator: workItemKeyComparator },
+      {
+        field: 'key',
+        comparator: workItemKeyComparator,
+        cellRenderer: WorkItemLinkCellRenderer,
+      },
       { field: 'title', width: 400 },
       { field: 'type', width: 125 },
       { field: 'status', width: 125 },
@@ -51,6 +77,7 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         field: 'parent.key',
         headerName: 'Parent',
         comparator: workItemKeyComparator,
+        cellRenderer: ParentWorkItemLinkCellRenderer,
       },
     ],
     [],

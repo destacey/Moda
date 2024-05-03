@@ -9264,6 +9264,7 @@ export interface WorkItemNavigationDto {
     id?: string;
     key?: string;
     title?: string;
+    workspaceKey?: string;
 }
 
 export interface EmployeeNavigationDto extends NavigationDto {
