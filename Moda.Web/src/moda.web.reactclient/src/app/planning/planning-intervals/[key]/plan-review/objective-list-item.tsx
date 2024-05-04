@@ -2,6 +2,7 @@ import { PlanningIntervalObjectiveListDto } from '@/src/services/moda-api'
 import {
   Button,
   Dropdown,
+  Flex,
   List,
   MenuProps,
   Progress,
@@ -12,7 +13,7 @@ import {
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { MoreOutlined } from '@ant-design/icons'
+import { HolderOutlined, MoreOutlined } from '@ant-design/icons'
 import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import CreateHealthCheckForm from '@/src/app/components/common/health-check/create-health-check-form'
@@ -194,9 +195,16 @@ const ObjectiveListItem = ({
         key={objective.key}
         ref={setNodeRef}
         {...attributes}
-        {...listeners}
         style={sortableStyle}
       >
+        {canUpdateObjectives && (
+          // TODO: add a visual indicator that the item is draggable for the whole row
+          <HolderOutlined
+            {...listeners}
+            rotate={90}
+            style={{ marginRight: 12 }}
+          />
+        )}
         <Meta title={title()} description={description()} />
         {canUpdateObjectives && (
           <Dropdown menu={{ items: menuItems }}>
