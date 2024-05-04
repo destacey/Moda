@@ -128,8 +128,8 @@ const tableColumns: ColumnsType<WorkItemModel> = [
     key: '3',
   },
   {
-    dataIndex: 'status',
-    title: 'Status',
+    dataIndex: ['parent', 'key'],
+    title: 'Parent Key',
     key: '4',
   },
 ]
@@ -273,7 +273,7 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
           <Space direction="vertical">
             <Input
               size="small"
-              placeholder="Search for work items by key or title"
+              placeholder="Search for work items by key, title, or parent key"
               allowClear
               onChange={handleSearch}
               suffix={<SearchOutlined />}

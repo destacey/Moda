@@ -20,7 +20,8 @@ internal sealed class SearchWorkItemsQueryHandler(IWorkDbContext workDbContext, 
 
         var workitems = await _workDbContext.WorkItems
             .Where(e => e.Title.Contains(request.SearchTerm)
-                || ((string)e.Key).Contains(request.SearchTerm))
+                || ((string)e.Key).Contains(request.SearchTerm) 
+                || (e.ParentId.HasValue && ((string)e.Parent!.Key).Contains(request.SearchTerm)))
             .ProjectToType<WorkItemListDto>()
             .ToArrayAsync(cancellationToken);
 
