@@ -343,6 +343,34 @@ public class PlanningIntervalsController : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{id}/objectives/order")]
+    [MustHavePermission(ApplicationAction.Manage, ApplicationResource.PlanningIntervalObjectives)]
+    [OpenApiOperation("Update the order of planning interval objectives.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> UpdateObjectivesOrder(Guid id, [FromBody] UpdatePlanningIntervalObjectivesOrderRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.PlanningIntervalId)
+            return BadRequest();
+
+        var result = await _sender.Send(new UpdatePlanningIntervalObjectivesOrderCommand(request.PlanningIntervalId, request.Objectives), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "PlanningIntervalsController.UpdateObjectivesOrder"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
     [HttpGet("{idOrKey}/objectives/health-report")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
     [OpenApiOperation("Get a health report for planning interval objectives.", "")]

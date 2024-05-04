@@ -123,12 +123,28 @@ const TeamObjectivesListCard = ({
 
     if (active.id === over.id) return
 
-    setObjectives((objectives) => {
-      const originalPosition = getObjectivePosition(active.id)
-      const newPosition = getObjectivePosition(over.id)
+    const originalPosition = getObjectivePosition(active.id)
+    const newPosition = getObjectivePosition(over.id)
 
-      return arrayMove(objectives, originalPosition, newPosition)
+    const updatedObjectives = arrayMove(
+      objectives,
+      originalPosition,
+      newPosition,
+    )
+
+    setObjectives(updatedObjectives)
+
+    console.log('after optimistic update')
+    let changedObjectives = []
+    updatedObjectives.forEach((o, i) => {
+      const position = i + 1
+      if (o.order !== position) {
+        console.log('updating order:', o.key, o.order, '->', position)
+        changedObjectives.push({ id: o.id, order: position })
+      }
     })
+
+    console.log('changedObjectives:', changedObjectives)
 
     // TODO: call the api to update the objective order
   }

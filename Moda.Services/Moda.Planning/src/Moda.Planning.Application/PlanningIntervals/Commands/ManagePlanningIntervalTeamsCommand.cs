@@ -25,8 +25,8 @@ internal sealed class ManagePlanningIntervalTeamsCommandHandler : ICommandHandle
 
             if (planningInterval == null)
             {
-                _logger.LogWarning("Planning Interval with Id {PlanningIntervalId} not found.", request.Id);
-                return Result.Failure($"Planning Interval with Id {request.Id} not found.");
+                _logger.LogWarning("Planning Interval {PlanningIntervalId} not found.", request.Id);
+                return Result.Failure<int>($"Planning Interval {request.Id} not found.");
             }
 
             // TODO validate teams exist, currently they are in a different bounded context
