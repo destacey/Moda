@@ -9166,6 +9166,7 @@ export interface PlanningIntervalObjectiveListDto {
     startDate?: Date | undefined;
     targetDate?: Date | undefined;
     isStretch?: boolean;
+    order?: number | undefined;
 }
 
 export interface PlanningHealthCheckDto {
@@ -9199,6 +9200,7 @@ export interface CreatePlanningIntervalObjectiveRequest {
     startDate?: Date | undefined;
     targetDate?: Date | undefined;
     isStretch?: boolean;
+    order?: number | undefined;
 }
 
 export interface UpdatePlanningIntervalObjectiveRequest {

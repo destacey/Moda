@@ -48,6 +48,11 @@ public sealed record PlanningIntervalObjectiveListDto
     /// <value><c>true</c> if this instance is stretch; otherwise, <c>false</c>.</value>
     public bool IsStretch { get; set; }
 
+    /// <summary>
+    /// The order of the Objective compared to other Objectives in the same context.
+    /// </summary>
+    public int? Order { get; set; }
+
     public static PlanningIntervalObjectiveListDto Create(PlanningIntervalObjective piObjective, ObjectiveListDto objective, NavigationDto piNavigationDto, Instant now)
     {
         return new PlanningIntervalObjectiveListDto()
@@ -63,7 +68,8 @@ public sealed record PlanningIntervalObjectiveListDto
             Type = SimpleNavigationDto.FromEnum(piObjective.Type),
             StartDate = objective.StartDate,
             TargetDate = objective.TargetDate,
-            IsStretch = piObjective.IsStretch
+            IsStretch = piObjective.IsStretch,
+            Order = objective.Order
         };
     }
 }

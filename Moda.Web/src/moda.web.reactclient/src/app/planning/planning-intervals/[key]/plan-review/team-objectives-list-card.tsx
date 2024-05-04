@@ -85,7 +85,15 @@ const TeamObjectivesListCard = ({
   useEffect(() => {
     if (!objectivesQuery.data) return
 
-    setObjectives(objectivesQuery.data)
+    setObjectives(
+      objectivesQuery.data.sort((a, b) => {
+        if (a.order === null && b.order === null) return a.key - b.key
+        if (a.order === null) return 1
+        if (b.order === null) return -1
+        if (a.order === b.order) return a.key - b.key
+        return a.order - b.order
+      }),
+    )
   }, [objectivesQuery.data])
 
   const refreshObjectives = useCallback(() => {
@@ -168,6 +176,14 @@ const TeamObjectivesListCard = ({
     }
   }
 
+  const newObjectiveOrderValue = () => {
+    if (!objectives || objectives.length === 0) return null
+
+    const lastObjectiveOrder = objectives[objectives.length - 1].order
+
+    return !lastObjectiveOrder ? null : lastObjectiveOrder + 1
+  }
+
   const getObjectivePosition = (id) => objectives.findIndex((o) => o.id === id)
 
   const onDragEnd = (event: DragEndEvent) => {
@@ -181,6 +197,8 @@ const TeamObjectivesListCard = ({
 
       return arrayMove(objectives, originalPosition, newPosition)
     })
+
+    // TODO: call the api to update the objective order
   }
 
   return (
@@ -230,6 +248,7 @@ const TeamObjectivesListCard = ({
         <CreatePlanningIntervalObjectiveForm
           planningIntervalId={planningIntervalId}
           teamId={teamId}
+          order={newObjectiveOrderValue()}
           showForm={openCreateObjectiveForm}
           onFormCreate={() => onCreateObjectiveFormClosed(true)}
           onFormCancel={() => onCreateObjectiveFormClosed(false)}

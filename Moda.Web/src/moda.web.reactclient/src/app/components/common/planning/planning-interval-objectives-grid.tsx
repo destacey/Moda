@@ -208,6 +208,16 @@ const PlanningIntervalObjectivesGrid = ({
             ? dayjs(params.data.targetDate).format('M/D/YYYY')
             : null,
       },
+      {
+        field: 'order',
+        width: 80,
+        comparator: (a, b) => {
+          if (!a) return 1 // sort empty at the end
+          if (!b) return -1
+
+          return a - b
+        },
+      },
     ],
     [
       canCreateHealthChecks,
@@ -265,6 +275,8 @@ const PlanningIntervalObjectivesGrid = ({
       refresh()
     }
   }
+
+  if (!planningIntervalId) return null
 
   return (
     <>

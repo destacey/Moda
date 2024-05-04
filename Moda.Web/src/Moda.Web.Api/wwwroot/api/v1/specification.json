@@ -8379,6 +8379,11 @@
           },
           "isStretch": {
             "type": "boolean"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         }
       },
@@ -8511,6 +8516,11 @@
           },
           "isStretch": {
             "type": "boolean"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         }
       },

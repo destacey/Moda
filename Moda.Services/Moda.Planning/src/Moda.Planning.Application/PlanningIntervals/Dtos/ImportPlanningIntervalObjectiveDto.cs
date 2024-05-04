@@ -12,7 +12,8 @@ public sealed record ImportPlanningIntervalObjectiveDto(
     LocalDate? StartDate,
     LocalDate? TargetDate,
     bool IsStretch,
-    Instant? ClosedDateUtc);
+    Instant? ClosedDateUtc,
+    int? Order);
 
 public sealed class ImportPlanningIntervalObjectiveDtoValidator : CustomValidator<ImportPlanningIntervalObjectiveDto>
 {

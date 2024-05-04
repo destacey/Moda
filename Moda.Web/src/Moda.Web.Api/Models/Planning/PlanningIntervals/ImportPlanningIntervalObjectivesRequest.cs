@@ -17,13 +17,14 @@ public class ImportPlanningIntervalObjectivesRequest
     public DateTime? TargetDate { get; set; }
     public bool IsStretch { get; set; }
     public DateTime? ClosedDateUtc { get; set; }
+    public int? Order { get; set; }
 
     public ImportPlanningIntervalObjectiveDto ToImportPlanningIntervalObjectiveDto()
     {
         LocalDate? startDate = StartDate?.ToLocalDateTime().Date;
         LocalDate? targetDate = TargetDate?.ToLocalDateTime().Date;
         Instant? closedDateUtc = ClosedDateUtc.HasValue ? Instant.FromDateTimeUtc(DateTime.SpecifyKind(ClosedDateUtc.Value, DateTimeKind.Utc)) : null;
-        return new ImportPlanningIntervalObjectiveDto(ImportId, PlanningIntervalId, TeamId, Name, Description, (ObjectiveStatus)StatusId, Progress, startDate, targetDate, IsStretch, closedDateUtc);
+        return new ImportPlanningIntervalObjectiveDto(ImportId, PlanningIntervalId, TeamId, Name, Description, (ObjectiveStatus)StatusId, Progress, startDate, targetDate, IsStretch, closedDateUtc, Order);
     }
 }
 

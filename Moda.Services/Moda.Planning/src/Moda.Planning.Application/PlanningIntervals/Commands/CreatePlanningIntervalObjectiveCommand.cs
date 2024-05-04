@@ -2,7 +2,7 @@
 using Moda.Goals.Application.Objectives.Commands;
 
 namespace Moda.Planning.Application.PlanningIntervals.Commands;
-public sealed record CreatePlanningIntervalObjectiveCommand(Guid PlanningIntervalId, Guid TeamId, string Name, string? Description, LocalDate? StartDate, LocalDate? TargetDate, bool IsStretch) : ICommand<int>;
+public sealed record CreatePlanningIntervalObjectiveCommand(Guid PlanningIntervalId, Guid TeamId, string Name, string? Description, LocalDate? StartDate, LocalDate? TargetDate, bool IsStretch, int? Order) : ICommand<int>;
 
 public sealed class CreatePlanningIntervalObjectiveCommandValidator : CustomValidator<CreatePlanningIntervalObjectiveCommand>
 {
@@ -99,7 +99,8 @@ internal sealed class CreatePlanningIntervalObjectiveCommandHandler : ICommandHa
                 request.TeamId,
                 request.PlanningIntervalId,
                 request.StartDate,
-                request.TargetDate), cancellationToken);
+                request.TargetDate,
+                request.Order), cancellationToken);
             if (objectiveResult.IsFailure)
             {
                 _logger.LogError("Unable to create objective.  Error: {Error}", objectiveResult.Error);
