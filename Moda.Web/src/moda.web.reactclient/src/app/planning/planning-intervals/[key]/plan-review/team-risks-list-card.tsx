@@ -16,6 +16,9 @@ export interface TeamRisksListCardProps {
   teamId: string
 }
 
+const categoryOrder = ['Owned', 'Accepted', 'Mitigated', 'Resolved']
+const exposureOrder = ['High', 'Medium', 'Low']
+
 const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
   const theme = useTheme()
@@ -43,18 +46,12 @@ const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
   }, [riskQuery?.data?.length, theme.badgeColor])
 
   const risksList = useMemo(() => {
-    if (!riskQuery?.data || riskQuery?.data.length === 0) {
-      return <ModaEmpty message="No risks" />
-    }
-
-    const sortedRisks = riskQuery?.data.sort((a, b) => {
-      const categoryOrder = ['Owned', 'Accepted', 'Mitigated', 'Resolved']
+    const sortedRisks = riskQuery?.data?.sort((a, b) => {
       const aIndex = categoryOrder.indexOf(a.category)
       const bIndex = categoryOrder.indexOf(b.category)
       if (aIndex !== bIndex) {
         return aIndex - bIndex
       } else {
-        const exposureOrder = ['High', 'Medium', 'Low']
         const aExposureIndex = exposureOrder.indexOf(a.exposure)
         const bExposureIndex = exposureOrder.indexOf(b.exposure)
         return aExposureIndex - bExposureIndex
@@ -65,6 +62,9 @@ const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
       <List
         size="small"
         dataSource={sortedRisks}
+        locale={{
+          emptyText: <ModaEmpty message="No risks" />,
+        }}
         renderItem={(risk) => (
           <RiskListItem
             risk={risk}

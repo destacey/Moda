@@ -20,6 +20,8 @@ import { SystemContext } from '@/src/app/components/constants'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import { EditPlanningIntervalObjectiveForm } from '../../../components'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const { Item } = List
 const { Meta } = Item
@@ -57,6 +59,9 @@ const ObjectiveListItem = ({
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
 
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: objective.id })
+
   const dispatch = useAppDispatch()
   const editingObjectiveId = useAppSelector(
     (state) => state.healthCheck.createContext.objectId,
@@ -93,6 +98,7 @@ const ObjectiveListItem = ({
     )
       ? 'exception'
       : undefined
+
     return (
       <>
         <Space wrap>
@@ -176,9 +182,21 @@ const ObjectiveListItem = ({
     }
   }
 
+  const sortableStyle = {
+    transition: transition,
+    transform: CSS.Transform.toString(transform),
+    touchAction: 'none',
+  }
+
   return (
     <>
-      <Item key={objective.key}>
+      <Item
+        key={objective.key}
+        ref={setNodeRef}
+        {...attributes}
+        {...listeners}
+        style={sortableStyle}
+      >
         <Meta title={title()} description={description()} />
         {canUpdateObjectives && (
           <Dropdown menu={{ items: menuItems }}>
