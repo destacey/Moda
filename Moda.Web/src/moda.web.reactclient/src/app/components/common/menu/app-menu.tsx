@@ -3,22 +3,17 @@ import {
   HomeOutlined,
   SettingOutlined,
   ScheduleOutlined,
-  ProjectOutlined,
+  CarryOutOutlined,
 } from '@ant-design/icons'
 import { Layout, Menu } from 'antd'
 import { useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
-import {
-  ItemType,
-  MenuItemGroupType,
-  MenuItemType,
-} from 'antd/es/menu/hooks/useItems'
+import { ItemType, MenuItemType } from 'antd/es/menu/hooks/useItems'
 import {
   Item,
   MenuItem,
   filterAndTransformMenuItem,
   menuItem,
-  restrictedMenuItem,
 } from './menu-helper'
 import useMenuToggle from '../../contexts/menu-toggle'
 import useTheme from '../../contexts/theme'
@@ -40,7 +35,7 @@ const menu: (Item | MenuItem)[] = [
     // menuItem('Increments', 'plan.increments'),
     // menuItem('Sprints', 'plan.sprints'),
   ]),
-  menuItem('Work Management', 'work', null, <ProjectOutlined />, [
+  menuItem('Work Management', 'work', null, <CarryOutOutlined />, [
     menuItem('Workspaces', 'work.workspaces', '/work/workspaces'),
   ]),
   // menuItem('Products', 'pdc', null, <DesktopOutlined />, [
