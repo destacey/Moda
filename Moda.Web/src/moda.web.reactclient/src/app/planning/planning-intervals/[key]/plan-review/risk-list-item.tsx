@@ -1,7 +1,7 @@
 import EditRiskForm from '@/src/app/components/common/planning/edit-risk-form'
 import { RiskListDto } from '@/src/services/moda-api'
 import { EditOutlined } from '@ant-design/icons'
-import { Button, List, Space, Tag, Typography } from 'antd'
+import { Button, Card, List, Space, Tag, Typography } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -60,17 +60,23 @@ const RiskListItem = ({
 
   return (
     <>
-      <Item key={risk.key}>
-        <Meta title={title()} description={description()} />
-        {canUpdateRisks && (
-          <Button
-            type="text"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => setOpenUpdateRiskForm(true)}
-          />
-        )}
-      </Item>
+      <Card
+        size="small"
+        style={{ marginBottom: 4 }}
+        styles={{ body: { padding: 0 } }}
+      >
+        <Item key={risk.key}>
+          <Meta title={title()} description={description()} />
+          {canUpdateRisks && (
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => setOpenUpdateRiskForm(true)}
+            />
+          )}
+        </Item>
+      </Card>
       {openUpdateRiskForm && (
         <EditRiskForm
           showForm={openUpdateRiskForm}

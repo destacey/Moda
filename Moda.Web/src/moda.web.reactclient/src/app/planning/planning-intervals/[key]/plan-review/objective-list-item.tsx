@@ -1,8 +1,8 @@
 import { PlanningIntervalObjectiveListDto } from '@/src/services/moda-api'
 import {
   Button,
+  Card,
   Dropdown,
-  Flex,
   List,
   MenuProps,
   Progress,
@@ -187,31 +187,35 @@ const ObjectiveListItem = ({
     transition: transition,
     transform: CSS.Transform.toString(transform),
     touchAction: 'none',
+    marginBottom: 4,
   }
 
   return (
     <>
-      <Item
-        key={objective.key}
+      <Card
+        size="small"
         ref={setNodeRef}
         {...attributes}
         style={sortableStyle}
+        styles={{ body: { padding: 0 } }}
       >
-        {canUpdateObjectives && (
-          // TODO: add a visual indicator that the item is draggable for the whole row
-          <HolderOutlined
-            {...listeners}
-            rotate={90}
-            style={{ marginRight: 12 }}
-          />
-        )}
-        <Meta title={title()} description={description()} />
-        {canUpdateObjectives && (
-          <Dropdown menu={{ items: menuItems }}>
-            <Button type="text" size="small" icon={<MoreOutlined />} />
-          </Dropdown>
-        )}
-      </Item>
+        <Item key={objective.key}>
+          {canUpdateObjectives && (
+            // TODO: add a visual indicator that the item is draggable for the whole row
+            <HolderOutlined
+              {...listeners}
+              rotate={90}
+              style={{ marginRight: 12 }}
+            />
+          )}
+          <Meta title={title()} description={description()} />
+          {canUpdateObjectives && (
+            <Dropdown menu={{ items: menuItems }}>
+              <Button type="text" size="small" icon={<MoreOutlined />} />
+            </Dropdown>
+          )}
+        </Item>
+      </Card>
       {openUpdateObjectiveForm && (
         <EditPlanningIntervalObjectiveForm
           showForm={openUpdateObjectiveForm}

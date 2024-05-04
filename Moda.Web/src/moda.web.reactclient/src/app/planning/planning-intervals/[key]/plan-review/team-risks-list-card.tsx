@@ -97,6 +97,7 @@ const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
             />
           )
         }
+        styles={{ body: { padding: 4 } }}
       >
         {risksList}
       </Card>

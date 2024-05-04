@@ -2,13 +2,12 @@
 
 import { PlanningIntervalObjectiveListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
-import { Badge, Button, Card, List, Space, message } from 'antd'
+import { Badge, Button, Card, List, Space } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import useAuth from '@/src/app/components/contexts/auth'
 import CreatePlanningIntervalObjectiveForm from '../../../components/create-planning-interval-objective-form'
-import dayjs from 'dayjs'
 import { UseQueryResult } from 'react-query'
 import useTheme from '@/src/app/components/contexts/theme'
 import {
@@ -35,18 +34,6 @@ export interface TeamObjectivesListCardProps {
   newObjectivesAllowed?: boolean
   refreshPlanningInterval: () => void
 }
-
-// interface ObjectiveListItem extends PlanningIntervalObjectiveListDto {
-//   id: string
-// }
-
-const statusOrder = [
-  'Not Started',
-  'In Progress',
-  'Completed',
-  'Canceled',
-  'Missed',
-]
 
 const TeamObjectivesListCard = ({
   objectivesQuery,
@@ -114,61 +101,6 @@ const TeamObjectivesListCard = ({
     )
   }, [objectives.length, badgeColor])
 
-  // const objectivesList = useMemo(() => {
-  //   if (!objectivesQuery?.data || objectivesQuery?.data.length === 0) {
-  //     return <ModaEmpty message="No objectives" />
-  //   }
-
-  //   const sortedObjectives = objectivesQuery?.data.sort((a, b) => {
-  //     if (a.isStretch && !b.isStretch) {
-  //       return 1
-  //     } else if (!a.isStretch && b.isStretch) {
-  //       return -1
-  //     } else {
-  //       const aStatusIndex = statusOrder.indexOf(a.status.name)
-  //       const bStatusIndex = statusOrder.indexOf(b.status.name)
-  //       if (aStatusIndex === bStatusIndex) {
-  //         if (a.targetDate && b.targetDate) {
-  //           const targetDateDiff = dayjs(a.targetDate).diff(dayjs(b.targetDate))
-  //           if (targetDateDiff !== 0) {
-  //             return targetDateDiff
-  //           }
-  //         } else if (a.targetDate) {
-  //           return -1
-  //         } else if (b.targetDate) {
-  //           return 1
-  //         }
-  //         return a.key - b.key
-  //       } else {
-  //         return aStatusIndex - bStatusIndex
-  //       }
-  //     }
-  //   })
-
-  //   return (
-  //     <DndContext collisionDetection={closestCorners}>
-  //       <List
-  //         size="small"
-  //         dataSource={sortedObjectives}
-  //         renderItem={(objective) => (
-  //           <ObjectiveListItem
-  //             objective={objective}
-  //             piKey={objective.planningInterval.key}
-  //             canUpdateObjectives={canManageObjectives}
-  //             canCreateHealthChecks={canCreateHealthChecks}
-  //             refreshObjectives={refreshObjectives}
-  //           />
-  //         )}
-  //       />
-  //     </DndContext>
-  //   )
-  // }, [
-  //   canCreateHealthChecks,
-  //   canManageObjectives,
-  //   objectivesQuery?.data,
-  //   refreshObjectives,
-  // ])
-
   const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
     setOpenCreateObjectiveForm(false)
     if (wasCreated) {
@@ -215,6 +147,7 @@ const TeamObjectivesListCard = ({
             />
           )
         }
+        styles={{ body: { padding: 4 } }}
       >
         <DndContext
           sensors={sensors}
