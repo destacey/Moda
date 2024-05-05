@@ -11,7 +11,10 @@ import TeamRisksListCard from './team-risks-list-card'
 import Link from 'next/link'
 import { BarsOutlined, BuildOutlined } from '@ant-design/icons'
 import { SegmentedLabeledOption } from 'antd/es/segmented'
-import { PlanningIntervalObjectivesTimeline } from '../../../components'
+import {
+  PlanningIntervalObjectiveDetailsDrawer,
+  PlanningIntervalObjectivesTimeline,
+} from '../../../components'
 import {
   useGetPlanningIntervalCalendar,
   useGetPlanningIntervalRisksByTeamId,
@@ -44,6 +47,10 @@ const TeamPlanReview = ({
   refreshPlanningInterval,
 }: TeamPlanReviewProps) => {
   const [currentView, setCurrentView] = useState<string | number>('List')
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [selectedObjectiveId, setSelectedObjectiveId] = useState<string | null>(
+    null,
+  )
 
   const calendarQuery = useGetPlanningIntervalCalendar(planningInterval?.id)
 
@@ -77,6 +84,20 @@ const TeamPlanReview = ({
     [currentView],
   )
 
+  const showDrawer = () => {
+    setDrawerOpen(true)
+  }
+
+  const onDrawerClose = () => {
+    setDrawerOpen(false)
+    setSelectedObjectiveId(null)
+  }
+
+  const onObjectiveClick = (objectiveId: string) => {
+    setSelectedObjectiveId(objectiveId)
+    showDrawer()
+  }
+
   return (
     <>
       <Flex
@@ -106,6 +127,7 @@ const TeamPlanReview = ({
                 !planningInterval?.objectivesLocked ?? false
               }
               refreshPlanningInterval={refreshPlanningInterval}
+              onObjectiveClick={onObjectiveClick}
             />
           </Col>
           <Col xs={24} sm={24} md={24} lg={12}>
@@ -116,6 +138,14 @@ const TeamPlanReview = ({
         <PlanningIntervalObjectivesTimeline
           objectivesData={objectivesData}
           planningIntervalCalendarQuery={calendarQuery}
+        />
+      )}
+      {planningInterval?.id && selectedObjectiveId && (
+        <PlanningIntervalObjectiveDetailsDrawer
+          planningIntervalId={planningInterval?.id}
+          objectiveId={selectedObjectiveId}
+          drawerOpen={drawerOpen}
+          onDrawerClose={onDrawerClose}
         />
       )}
     </>

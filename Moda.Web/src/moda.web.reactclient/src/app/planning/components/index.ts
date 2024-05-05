@@ -3,3 +3,4 @@ export { default as EditPlanningIntervalForm } from './edit-planning-interval-fo
 export { default as PlanningIntervalObjectivesTimeline } from './planning-interval-objectives-timeline'
 export { default as CreatePlanningIntervalObjectiveForm } from './create-planning-interval-objective-form'
 export { default as EditPlanningIntervalObjectiveForm } from './edit-planning-interval-objective-form'
+export { default as PlanningIntervalObjectiveDetailsDrawer } from './planning-interval-objectives-drawer'
