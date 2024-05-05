@@ -34,6 +34,7 @@ export interface TeamObjectivesListCardProps {
   teamId: string
   newObjectivesAllowed?: boolean
   refreshPlanningInterval: () => void
+  onObjectiveClick: (objectiveId: string) => void
 }
 
 const sortOrderedObjectives = (
@@ -56,6 +57,7 @@ const TeamObjectivesListCard = ({
   teamId,
   newObjectivesAllowed = false,
   refreshPlanningInterval,
+  onObjectiveClick,
 }: TeamObjectivesListCardProps) => {
   const [openCreateObjectiveForm, setOpenCreateObjectiveForm] =
     useState<boolean>(false)
@@ -214,6 +216,7 @@ const TeamObjectivesListCard = ({
                   canUpdateObjectives={canManageObjectives}
                   canCreateHealthChecks={canCreateHealthChecks}
                   refreshObjectives={refresh}
+                  onObjectiveClick={onObjectiveClick}
                 />
               </SortableContext>
             )}

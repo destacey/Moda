@@ -34,6 +34,7 @@ export interface ObjectiveListItemProps {
   canUpdateObjectives: boolean
   canCreateHealthChecks: boolean
   refreshObjectives: () => void
+  onObjectiveClick: (objectiveId: string) => void
 }
 
 const getColorForStatus = (status: string) => {
@@ -56,6 +57,7 @@ const ObjectiveListItem = ({
   canUpdateObjectives,
   canCreateHealthChecks,
   refreshObjectives,
+  onObjectiveClick,
 }: ObjectiveListItemProps) => {
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
@@ -71,6 +73,7 @@ const ObjectiveListItem = ({
   const title = () => {
     return (
       <Link
+        onClick={(e) => e.stopPropagation()} // prevents the parent component onClick event from firing
         href={`/planning/planning-intervals/${piKey}/objectives/${objective.key}`}
       >
         {objective.key} - {objective.name}
@@ -134,22 +137,28 @@ const ObjectiveListItem = ({
           key: 'edit',
           label: 'Edit',
           disabled: !canUpdateObjectives,
-          onClick: () => setOpenUpdateObjectiveForm(true),
+          onClick: (info) => {
+            info.domEvent.stopPropagation() // prevents the parent component onClick event from firing
+            setOpenUpdateObjectiveForm(true)
+          },
         },
         {
           key: 'createHealthCheck',
           label: 'Create Health Check',
           disabled: !canCreateHealthChecks,
-          onClick: () =>
+          onClick: (info) => {
+            info.domEvent.stopPropagation() // prevents the parent component onClick event from firing
             dispatch(
               beginHealthCheckCreate({
                 objectId: objective.id,
                 contextId: SystemContext.PlanningPlanningIntervalObjective,
               }),
-            ),
+            )
+          },
         },
         {
           key: 'healthReport',
+          onClick: (info) => info.domEvent.stopPropagation(), // prevents the parent component onClick event from firing
           label: (
             <Link
               href={`/planning/planning-intervals/${objective.planningInterval.key}/objectives/${objective.key}/health-report`}
@@ -198,6 +207,8 @@ const ObjectiveListItem = ({
         {...attributes}
         style={sortableStyle}
         styles={{ body: { padding: 0 } }}
+        hoverable
+        onClick={() => onObjectiveClick(objective.id)}
       >
         <Item key={objective.key}>
           {canUpdateObjectives && (
@@ -211,7 +222,12 @@ const ObjectiveListItem = ({
           <Meta title={title()} description={description()} />
           {canUpdateObjectives && (
             <Dropdown menu={{ items: menuItems }}>
-              <Button type="text" size="small" icon={<MoreOutlined />} />
+              <Button
+                type="text"
+                size="small"
+                icon={<MoreOutlined />}
+                onClick={(e) => e.stopPropagation()} // prevents the parent component onClick event from firing
+              />
             </Dropdown>
           )}
         </Item>

@@ -77,6 +77,10 @@ const TeamPlanReview = ({
     [currentView],
   )
 
+  const onObjectiveClick = (objectiveId: string) => {
+    console.log('Objective clicked', objectiveId)
+  }
+
   return (
     <>
       <Flex
@@ -106,6 +110,7 @@ const TeamPlanReview = ({
                 !planningInterval?.objectivesLocked ?? false
               }
               refreshPlanningInterval={refreshPlanningInterval}
+              onObjectiveClick={onObjectiveClick}
             />
           </Col>
           <Col xs={24} sm={24} md={24} lg={12}>
