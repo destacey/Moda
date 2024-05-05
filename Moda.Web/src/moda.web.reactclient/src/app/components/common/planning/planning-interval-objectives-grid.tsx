@@ -211,7 +211,7 @@ const PlanningIntervalObjectivesGrid = ({
       },
       {
         field: 'order',
-        width: 80,
+        width: 100,
         comparator: (a, b) => {
           if (!a) return 1 // sort empty at the end
           if (!b) return -1

@@ -2,7 +2,7 @@
 
 import { PlanningIntervalObjectiveListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
-import { Badge, Button, Card, List, Space } from 'antd'
+import { Badge, Button, Card, List, Space, message } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -25,6 +25,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
+import { useUpdateObjectivesOrderMutation } from '@/src/store/features/planning/planning-interval-api'
 
 export interface TeamObjectivesListCardProps {
   objectivesData: PlanningIntervalObjectiveListDto[]
@@ -33,6 +34,19 @@ export interface TeamObjectivesListCardProps {
   teamId: string
   newObjectivesAllowed?: boolean
   refreshPlanningInterval: () => void
+}
+
+const sortOrderedObjectives = (
+  objectivesData: PlanningIntervalObjectiveListDto[],
+) => {
+  // .slice() is used to prevent: TypeError: Cannot assign to read only property '0' of object '[object Array]'
+  return objectivesData.slice().sort((a, b) => {
+    if (a.order === null && b.order === null) return a.key - b.key
+    if (a.order === null) return 1
+    if (b.order === null) return -1
+    if (a.order === b.order) return a.key - b.key
+    return a.order - b.order
+  })
 }
 
 const TeamObjectivesListCard = ({
@@ -48,6 +62,8 @@ const TeamObjectivesListCard = ({
   const [objectives, setObjectives] = useState<
     PlanningIntervalObjectiveListDto[]
   >([])
+
+  const [messageApi, contextHolder] = message.useMessage()
 
   const { badgeColor } = useTheme()
 
@@ -70,20 +86,28 @@ const TeamObjectivesListCard = ({
     }),
   )
 
+  const [updateObjectivesOrder, { error: updateObjectivesOrderError }] =
+    useUpdateObjectivesOrderMutation()
+
   useEffect(() => {
     if (!objectivesData) return
 
-    // .slice() is used to prevent: TypeError: Cannot assign to read only property '0' of object '[object Array]'
-    setObjectives(
-      objectivesData.slice().sort((a, b) => {
-        if (a.order === null && b.order === null) return a.key - b.key
-        if (a.order === null) return 1
-        if (b.order === null) return -1
-        if (a.order === b.order) return a.key - b.key
-        return a.order - b.order
-      }),
-    )
+    setObjectives(sortOrderedObjectives(objectivesData))
   }, [objectivesData])
+
+  useEffect(() => {
+    if (!updateObjectivesOrderError) return
+
+    setObjectives(sortOrderedObjectives(objectivesData))
+
+    // TODO: show error message not working
+    messageApi.error('Error updating objectives order.  Resetting order...')
+
+    console.error(
+      'Error updating objectives order:',
+      updateObjectivesOrderError,
+    )
+  }, [messageApi, objectivesData, updateObjectivesOrderError])
 
   const refresh = useCallback(() => {
     refreshObjectives()
@@ -136,23 +160,24 @@ const TeamObjectivesListCard = ({
 
     setObjectives(updatedObjectives)
 
-    console.log('after optimistic update')
-    let changedObjectives = []
+    // after optimistic update
+    let changedObjectivesDictionary: { [key: string]: number } = {}
     updatedObjectives.forEach((o, i) => {
       const position = i + 1
       if (o.order !== position) {
-        console.log('updating order:', o.key, o.order, '->', position)
-        changedObjectives.push({ id: o.id, order: position })
+        changedObjectivesDictionary[o.id] = position
       }
     })
 
-    console.log('changedObjectives:', changedObjectives)
-
-    // TODO: call the api to update the objective order
+    updateObjectivesOrder({
+      planningIntervalId: planningIntervalId,
+      objectives: changedObjectivesDictionary,
+    })
   }
 
   return (
     <>
+      {contextHolder}
       <Card
         size="small"
         title={cardTitle}

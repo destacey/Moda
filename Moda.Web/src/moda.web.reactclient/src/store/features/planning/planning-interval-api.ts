@@ -4,6 +4,7 @@ import {
   PlanningIntervalListDto,
   PlanningIntervalObjectiveDetailsDto,
   PlanningIntervalObjectiveListDto,
+  UpdatePlanningIntervalObjectivesOrderRequest,
   WorkItemListDto,
 } from '@/src/services/moda-api'
 import { apiSlice } from '../apiSlice'
@@ -124,6 +125,25 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
         })),
       ],
     }),
+    updateObjectivesOrder: builder.mutation<
+      void,
+      UpdatePlanningIntervalObjectivesOrderRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await (
+            await getPlanningIntervalsClient()
+          ).updateObjectivesOrder(request.planningIntervalId, request)
+          return { data }
+        } catch (error) {
+          console.error('Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [{ type: QueryTags.PlanningIntervalObjective }]
+      },
+    }),
     manageObjectiveWorkItems: builder.mutation<
       void,
       ManagePlanningIntervalObjectiveWorkItemsRequest
@@ -161,5 +181,6 @@ export const {
   useGetPlanningIntervalObjectivesQuery,
   useGetPlanningIntervalObjectiveQuery,
   useGetObjectiveWorkItemsQuery,
+  useUpdateObjectivesOrderMutation,
   useManageObjectiveWorkItemsMutation,
 } = planningIntervalApi
