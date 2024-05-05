@@ -40,9 +40,10 @@ internal sealed class UpdatePlanningIntervalObjectivesOrderCommandHandler : ICom
         try
         {
             var piObjectives = await _planningDbContext.PlanningIntervals
-                .Include(p => p.Objectives.Where(o => request.Objectives.Keys.Contains(o.Id)))
                 .Where(p => p.Id == request.PlanningIntervalId)
-                .SelectMany(p => p.Objectives.Select(o => new {o.Id, o.ObjectiveId}))
+                .SelectMany(p => p.Objectives
+                    .Where(o => request.Objectives.Keys.Contains(o.Id))
+                    .Select(o => new {o.Id, o.ObjectiveId}))
                 .ToListAsync(cancellationToken);
 
             if (piObjectives is null)
@@ -58,7 +59,14 @@ internal sealed class UpdatePlanningIntervalObjectivesOrderCommandHandler : ICom
                 return Result.Failure("Not all objectives provided were found.");
             }
 
-            var objectivResult = await _sender.Send(new UpdateObjectivesOrderCommand(request.Objectives), cancellationToken);
+            // map the PI objectives values to the Goal objectives values
+            Dictionary<Guid, int?> updatedGoalObjectives = [];
+            foreach (var piObjective in piObjectives)
+            {
+                updatedGoalObjectives.Add(piObjective.ObjectiveId, request.Objectives[piObjective.Id]);
+            }
+
+            var objectivResult = await _sender.Send(new UpdateObjectivesOrderCommand(updatedGoalObjectives), cancellationToken);
 
             return objectivResult.IsSuccess
                 ? Result.Success()
