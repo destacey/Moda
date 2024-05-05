@@ -11,10 +11,11 @@ public class CreatePlanningIntervalObjectiveRequest
     public LocalDate? StartDate { get; set; }
     public LocalDate? TargetDate { get; set; }
     public bool IsStretch { get; set; }
+    public int? Order { get; set; }
 
     public CreatePlanningIntervalObjectiveCommand ToCreatePlanningIntervalObjectiveCommand()
     {
-        return new CreatePlanningIntervalObjectiveCommand(PlanningIntervalId, TeamId, Name, Description, StartDate, TargetDate, IsStretch);
+        return new CreatePlanningIntervalObjectiveCommand(PlanningIntervalId, TeamId, Name, Description, StartDate, TargetDate, IsStretch, Order);
     }
 }
 

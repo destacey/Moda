@@ -45,6 +45,11 @@ public sealed record ObjectiveListDto : IMapFrom<Objective>
     /// <value>The target date.</value>
     public LocalDate? TargetDate { get; set; }
 
+    /// <summary>
+    /// The order of the Objective compared to other Objectives in the same context.
+    /// </summary>
+    public int? Order { get; set; }
+
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Objective, ObjectiveListDto>()

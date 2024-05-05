@@ -4,7 +4,6 @@ import { useDocumentTitle } from '@/src/app/hooks'
 import {
   useGetPlanningIntervalByKey,
   useGetPlanningIntervalCalendar,
-  useGetPlanningIntervalObjectives,
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
@@ -19,6 +18,7 @@ import { notFound } from 'next/navigation'
 import { Button } from 'antd'
 import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
+import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
 
 const viewSelectorOptions: SegmentedLabeledOption[] = [
   {
@@ -44,10 +44,14 @@ const PlanningIntervalObjectivesPage = ({ params }) => {
     refetch: refetchPlanningInterval,
   } = useGetPlanningIntervalByKey(params.key)
 
-  const objectivesQuery = useGetPlanningIntervalObjectives(
-    planningIntervalData?.id,
-    true,
-  )
+  const { data: objectivesData, refetch: refectObjectives } =
+    useGetPlanningIntervalObjectivesQuery(
+      {
+        planningIntervalId: planningIntervalData?.id,
+        teamId: null,
+      },
+      { skip: !planningIntervalData?.id },
+    )
 
   const calendarQuery = useGetPlanningIntervalCalendar(planningIntervalData?.id)
 
@@ -107,7 +111,8 @@ const PlanningIntervalObjectivesPage = ({ params }) => {
       <PageTitle title="PI Objectives" actions={showActions && actions()} />
       {currentView === 'List' && (
         <PlanningIntervalObjectivesGrid
-          objectivesQuery={objectivesQuery}
+          objectivesData={objectivesData}
+          refreshObjectives={refectObjectives}
           planningIntervalId={planningIntervalData?.id}
           hidePlanningIntervalColumn={true}
           hideTeamColumn={false}
@@ -116,7 +121,7 @@ const PlanningIntervalObjectivesPage = ({ params }) => {
       )}
       {currentView === 'Timeline' && (
         <PlanningIntervalObjectivesTimeline
-          objectivesQuery={objectivesQuery}
+          objectivesData={objectivesData}
           planningIntervalCalendarQuery={calendarQuery}
           enableGroups={true}
           teamNames={teamData

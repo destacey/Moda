@@ -11,7 +11,7 @@ public class Objective : BaseAuditableEntity<Guid>
 
     private Objective() { }
 
-    public Objective(string name, string? description, ObjectiveType type, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate)
+    public Objective(string name, string? description, ObjectiveType type, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate, int? order)
     {
         Status = ObjectiveStatus.NotStarted;
         Progress = 0.0d;
@@ -23,6 +23,7 @@ public class Objective : BaseAuditableEntity<Guid>
         PlanId = planId;
         StartDate = startDate;
         TargetDate = targetDate;
+        Order = order;
     }
 
     /// <summary>Gets the key.</summary>
@@ -87,6 +88,11 @@ public class Objective : BaseAuditableEntity<Guid>
     /// <value>The closed date.</value>
     public Instant? ClosedDate { get; private set; }
 
+    /// <summary>
+    /// The order of the Objective compared to other Objectives in the same context.
+    /// </summary>
+    public int? Order { get; private set; }
+
     /// <summary>Updates the specified objective.</summary>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
@@ -117,6 +123,11 @@ public class Objective : BaseAuditableEntity<Guid>
         }
     }
 
+    public void UpdateOrder(int? order)
+    {
+        Order = order;
+    }
+
     private void ChangeStatus(ObjectiveStatus status, Instant timestamp)
     {
         if (Status == status) return;
@@ -141,10 +152,11 @@ public class Objective : BaseAuditableEntity<Guid>
     /// <param name="planId">The plan identifier.</param>
     /// <param name="startDate">The start date.</param>
     /// <param name="targetDate">The target date.</param>
+    /// <param name="order">The order compared to other objectives in the same context.</param>
     /// <returns></returns>
-    public static Objective Create(string name, string? description, ObjectiveType type, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate)
+    public static Objective Create(string name, string? description, ObjectiveType type, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate, int? order)
     {
-        return new Objective(name, description, type, ownerId, planId, startDate, targetDate);
+        return new Objective(name, description, type, ownerId, planId, startDate, targetDate, order);
     }
 
     /// <summary>Creates an objective.</summary>
@@ -157,8 +169,9 @@ public class Objective : BaseAuditableEntity<Guid>
     /// <param name="startDate">The start date.</param>
     /// <param name="targetDate">The target date.</param>
     /// <param name="closedDate">The closed date.</param>
+    /// <param name="order">The order compared to other objectives in the same context.</param>
     /// <returns></returns>
-    public static Objective Import(string name, string? description, ObjectiveType type, ObjectiveStatus status, double progress, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate, Instant? closedDate)
+    public static Objective Import(string name, string? description, ObjectiveType type, ObjectiveStatus status, double progress, Guid? ownerId, Guid? planId, LocalDate? startDate, LocalDate? targetDate, Instant? closedDate, int? order)
     {
         return new Objective()
         {
@@ -171,7 +184,8 @@ public class Objective : BaseAuditableEntity<Guid>
             PlanId = planId,
             StartDate = startDate,
             TargetDate = targetDate,
-            ClosedDate = closedDate
+            ClosedDate = closedDate,
+            Order = order
         };
     }
 }

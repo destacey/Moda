@@ -1971,6 +1971,81 @@
         ]
       }
     },
+    "/api/planning/planning-intervals/{id}/objectives/order": {
+      "put": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Update the order of planning interval objectives.",
+        "operationId": "PlanningIntervals_UpdateObjectivesOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlanningIntervalObjectivesOrderRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/planning-intervals/{idOrKey}/objectives/health-report": {
       "get": {
         "tags": [
@@ -8379,6 +8454,11 @@
           },
           "isStretch": {
             "type": "boolean"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         }
       },
@@ -8511,6 +8591,11 @@
           },
           "isStretch": {
             "type": "boolean"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         }
       },
@@ -8567,6 +8652,26 @@
           },
           "isStretch": {
             "type": "boolean"
+          }
+        }
+      },
+      "UpdatePlanningIntervalObjectivesOrderRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "planningIntervalId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "objectives": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            }
           }
         }
       },

@@ -82,8 +82,12 @@ internal sealed class UpdatePlanningIntervalObjectiveCommandHandler : ICommandHa
             var planningInterval = await _planningDbContext.PlanningIntervals
                 .Include(pi => pi.Objectives.Where(o => o.Id == request.PlanningIntervalObjectiveId))
                 .FirstOrDefaultAsync(p => p.Id == request.PlanningIntervalId, cancellationToken);
+
             if (planningInterval is null)
+            {
+                _logger.LogWarning("Planning Interval {PlanningIntervalId} not found.", request.PlanningIntervalId);
                 return Result.Failure<int>($"Planning Interval {request.PlanningIntervalId} not found.");
+            }
 
             var updatePiObjectiveResult = planningInterval.UpdateObjective(request.PlanningIntervalObjectiveId, request.Status, request.IsStretch);
             if (updatePiObjectiveResult.IsFailure)

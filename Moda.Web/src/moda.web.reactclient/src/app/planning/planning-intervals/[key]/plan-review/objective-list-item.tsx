@@ -1,6 +1,7 @@
 import { PlanningIntervalObjectiveListDto } from '@/src/services/moda-api'
 import {
   Button,
+  Card,
   Dropdown,
   List,
   MenuProps,
@@ -12,7 +13,7 @@ import {
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { MoreOutlined } from '@ant-design/icons'
+import { HolderOutlined, MoreOutlined } from '@ant-design/icons'
 import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import CreateHealthCheckForm from '@/src/app/components/common/health-check/create-health-check-form'
@@ -20,6 +21,8 @@ import { SystemContext } from '@/src/app/components/constants'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import { EditPlanningIntervalObjectiveForm } from '../../../components'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const { Item } = List
 const { Meta } = Item
@@ -57,6 +60,9 @@ const ObjectiveListItem = ({
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
 
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: objective.id })
+
   const dispatch = useAppDispatch()
   const editingObjectiveId = useAppSelector(
     (state) => state.healthCheck.createContext.objectId,
@@ -93,6 +99,7 @@ const ObjectiveListItem = ({
     )
       ? 'exception'
       : undefined
+
     return (
       <>
         <Space wrap>
@@ -176,16 +183,39 @@ const ObjectiveListItem = ({
     }
   }
 
+  const sortableStyle = {
+    transition: transition,
+    transform: CSS.Transform.toString(transform),
+    touchAction: 'none',
+    marginBottom: 4,
+  }
+
   return (
     <>
-      <Item key={objective.key}>
-        <Meta title={title()} description={description()} />
-        {canUpdateObjectives && (
-          <Dropdown menu={{ items: menuItems }}>
-            <Button type="text" size="small" icon={<MoreOutlined />} />
-          </Dropdown>
-        )}
-      </Item>
+      <Card
+        size="small"
+        ref={setNodeRef}
+        {...attributes}
+        style={sortableStyle}
+        styles={{ body: { padding: 0 } }}
+      >
+        <Item key={objective.key}>
+          {canUpdateObjectives && (
+            // TODO: add a visual indicator that the item is draggable for the whole row
+            <HolderOutlined
+              {...listeners}
+              rotate={90}
+              style={{ marginRight: 12 }}
+            />
+          )}
+          <Meta title={title()} description={description()} />
+          {canUpdateObjectives && (
+            <Dropdown menu={{ items: menuItems }}>
+              <Button type="text" size="small" icon={<MoreOutlined />} />
+            </Dropdown>
+          )}
+        </Item>
+      </Card>
       {openUpdateObjectiveForm && (
         <EditPlanningIntervalObjectiveForm
           showForm={openUpdateObjectiveForm}

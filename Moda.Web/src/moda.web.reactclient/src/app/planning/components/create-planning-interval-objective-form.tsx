@@ -22,6 +22,7 @@ export interface CreatePlanningIntervalObjectiveFormProps {
   showForm: boolean
   planningIntervalId: string
   teamId?: string
+  order?: number
   onFormCreate: () => void
   onFormCancel: () => void
 }
@@ -45,6 +46,7 @@ interface PlanningIntervalTeamSelectItem {
 const mapToRequestValues = (
   values: CreatePlanningIntervalObjectiveFormValues,
   planningIntervalKey: number,
+  order?: number,
 ) => {
   const objective = {
     planningIntervalId: values.planningIntervalId,
@@ -55,6 +57,7 @@ const mapToRequestValues = (
     isStretch: values.isStretch,
     startDate: (values.startDate as any)?.format('YYYY-MM-DD'),
     targetDate: (values.targetDate as any)?.format('YYYY-MM-DD'),
+    order: order,
   } as CreatePlanningIntervalObjectiveRequest
   return {
     objective,
@@ -66,6 +69,7 @@ const CreatePlanningIntervalObjectiveForm = ({
   showForm,
   planningIntervalId,
   teamId,
+  order,
   onFormCreate,
   onFormCancel,
 }: CreatePlanningIntervalObjectiveFormProps) => {
@@ -108,7 +112,7 @@ const CreatePlanningIntervalObjectiveForm = ({
     planningIntervalKey: number,
   ): Promise<boolean> => {
     try {
-      const request = mapToRequestValues(values, planningIntervalKey)
+      const request = mapToRequestValues(values, planningIntervalKey, order)
       const key = await createObjective.mutateAsync(request)
       return true
     } catch (error) {

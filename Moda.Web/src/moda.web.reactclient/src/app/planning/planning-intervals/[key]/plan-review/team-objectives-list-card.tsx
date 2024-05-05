@@ -5,31 +5,53 @@ import { PlusOutlined } from '@ant-design/icons'
 import { Badge, Button, Card, List, Space, message } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import useAuth from '@/src/app/components/contexts/auth'
 import CreatePlanningIntervalObjectiveForm from '../../../components/create-planning-interval-objective-form'
-import dayjs from 'dayjs'
-import { UseQueryResult } from 'react-query'
 import useTheme from '@/src/app/components/contexts/theme'
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  closestCorners,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { useUpdateObjectivesOrderMutation } from '@/src/store/features/planning/planning-interval-api'
 
 export interface TeamObjectivesListCardProps {
-  objectivesQuery: UseQueryResult<PlanningIntervalObjectiveListDto[], unknown>
+  objectivesData: PlanningIntervalObjectiveListDto[]
+  refreshObjectives: () => void
   planningIntervalId: string
   teamId: string
   newObjectivesAllowed?: boolean
   refreshPlanningInterval: () => void
 }
 
-const statusOrder = [
-  'Not Started',
-  'In Progress',
-  'Completed',
-  'Canceled',
-  'Missed',
-]
+const sortOrderedObjectives = (
+  objectivesData: PlanningIntervalObjectiveListDto[],
+) => {
+  // .slice() is used to prevent: TypeError: Cannot assign to read only property '0' of object '[object Array]'
+  return objectivesData.slice().sort((a, b) => {
+    if (a.order === null && b.order === null) return a.key - b.key
+    if (a.order === null) return 1
+    if (b.order === null) return -1
+    if (a.order === b.order) return a.key - b.key
+    return a.order - b.order
+  })
+}
 
 const TeamObjectivesListCard = ({
-  objectivesQuery,
+  objectivesData,
+  refreshObjectives,
   planningIntervalId,
   teamId,
   newObjectivesAllowed = false,
@@ -37,6 +59,12 @@ const TeamObjectivesListCard = ({
 }: TeamObjectivesListCardProps) => {
   const [openCreateObjectiveForm, setOpenCreateObjectiveForm] =
     useState<boolean>(false)
+  const [objectives, setObjectives] = useState<
+    PlanningIntervalObjectiveListDto[]
+  >([])
+
+  const [messageApi, contextHolder] = message.useMessage()
+
   const { badgeColor } = useTheme()
 
   const { hasClaim } = useAuth()
@@ -50,15 +78,46 @@ const TeamObjectivesListCard = ({
     !!canManageObjectives &&
     hasClaim('Permission', 'Permissions.HealthChecks.Create')
 
-  const refreshObjectives = useCallback(() => {
-    objectivesQuery.refetch()
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(TouchSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
+
+  const [updateObjectivesOrder, { error: updateObjectivesOrderError }] =
+    useUpdateObjectivesOrderMutation()
+
+  useEffect(() => {
+    if (!objectivesData) return
+
+    setObjectives(sortOrderedObjectives(objectivesData))
+  }, [objectivesData])
+
+  useEffect(() => {
+    if (!updateObjectivesOrderError) return
+
+    setObjectives(sortOrderedObjectives(objectivesData))
+
+    // TODO: show error message not working
+    messageApi.error('Error updating objectives order.  Resetting order...')
+
+    console.error(
+      'Error updating objectives order:',
+      updateObjectivesOrderError,
+    )
+  }, [messageApi, objectivesData, updateObjectivesOrderError])
+
+  const refresh = useCallback(() => {
+    refreshObjectives()
     // this will update the PI predictability on the plan review page title
     refreshPlanningInterval()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const cardTitle = useMemo(() => {
-    const count = objectivesQuery?.data?.length ?? 0
+    const count = objectives.length ?? 0
     const showBadge = count > 0
     return (
       <Space>
@@ -66,70 +125,59 @@ const TeamObjectivesListCard = ({
         {showBadge && <Badge color={badgeColor} size="small" count={count} />}
       </Space>
     )
-  }, [objectivesQuery?.data?.length, badgeColor])
-
-  const objectivesList = useMemo(() => {
-    if (!objectivesQuery?.data || objectivesQuery?.data.length === 0) {
-      return <ModaEmpty message="No objectives" />
-    }
-
-    const sortedObjectives = objectivesQuery?.data.sort((a, b) => {
-      if (a.isStretch && !b.isStretch) {
-        return 1
-      } else if (!a.isStretch && b.isStretch) {
-        return -1
-      } else {
-        const aStatusIndex = statusOrder.indexOf(a.status.name)
-        const bStatusIndex = statusOrder.indexOf(b.status.name)
-        if (aStatusIndex === bStatusIndex) {
-          if (a.targetDate && b.targetDate) {
-            const targetDateDiff = dayjs(a.targetDate).diff(dayjs(b.targetDate))
-            if (targetDateDiff !== 0) {
-              return targetDateDiff
-            }
-          } else if (a.targetDate) {
-            return -1
-          } else if (b.targetDate) {
-            return 1
-          }
-          return a.key - b.key
-        } else {
-          return aStatusIndex - bStatusIndex
-        }
-      }
-    })
-
-    return (
-      <List
-        size="small"
-        dataSource={sortedObjectives}
-        renderItem={(objective) => (
-          <ObjectiveListItem
-            objective={objective}
-            piKey={objective.planningInterval.key}
-            canUpdateObjectives={canManageObjectives}
-            canCreateHealthChecks={canCreateHealthChecks}
-            refreshObjectives={refreshObjectives}
-          />
-        )}
-      />
-    )
-  }, [
-    canCreateHealthChecks,
-    canManageObjectives,
-    objectivesQuery?.data,
-    refreshObjectives,
-  ])
+  }, [objectives.length, badgeColor])
 
   const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
     setOpenCreateObjectiveForm(false)
     if (wasCreated) {
-      refreshObjectives()
+      refresh()
     }
+  }
+
+  const newObjectiveOrderValue = () => {
+    if (!objectives || objectives.length === 0) return null
+
+    const lastObjectiveOrder = objectives[objectives.length - 1].order
+
+    return !lastObjectiveOrder ? null : lastObjectiveOrder + 1
+  }
+
+  const getObjectivePosition = (id) => objectives.findIndex((o) => o.id === id)
+
+  const onDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (active.id === over.id) return
+
+    const originalPosition = getObjectivePosition(active.id)
+    const newPosition = getObjectivePosition(over.id)
+
+    const updatedObjectives = arrayMove(
+      objectives,
+      originalPosition,
+      newPosition,
+    )
+
+    setObjectives(updatedObjectives)
+
+    // after optimistic update
+    let changedObjectivesDictionary: { [key: string]: number } = {}
+    updatedObjectives.forEach((o, i) => {
+      const position = i + 1
+      if (o.order !== position) {
+        changedObjectivesDictionary[o.id] = position
+      }
+    })
+
+    updateObjectivesOrder({
+      planningIntervalId: planningIntervalId,
+      objectives: changedObjectivesDictionary,
+    })
   }
 
   return (
     <>
+      {contextHolder}
       <Card
         size="small"
         title={cardTitle}
@@ -142,13 +190,41 @@ const TeamObjectivesListCard = ({
             />
           )
         }
+        styles={{ body: { padding: 4 } }}
       >
-        {objectivesList}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragEnd={onDragEnd}
+        >
+          <List
+            size="small"
+            dataSource={objectives}
+            locale={{
+              emptyText: <ModaEmpty message="No objectives" />,
+            }}
+            renderItem={(objective) => (
+              <SortableContext
+                items={objectives.map((objective) => objective.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <ObjectiveListItem
+                  objective={objective}
+                  piKey={objective.planningInterval.key}
+                  canUpdateObjectives={canManageObjectives}
+                  canCreateHealthChecks={canCreateHealthChecks}
+                  refreshObjectives={refresh}
+                />
+              </SortableContext>
+            )}
+          />
+        </DndContext>
       </Card>
       {openCreateObjectiveForm && (
         <CreatePlanningIntervalObjectiveForm
           planningIntervalId={planningIntervalId}
           teamId={teamId}
+          order={newObjectiveOrderValue()}
           showForm={openCreateObjectiveForm}
           onFormCreate={() => onCreateObjectiveFormClosed(true)}
           onFormCancel={() => onCreateObjectiveFormClosed(false)}

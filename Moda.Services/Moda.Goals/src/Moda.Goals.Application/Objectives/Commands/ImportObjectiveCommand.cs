@@ -4,7 +4,7 @@ using Moda.Goals.Domain.Enums;
 using Moda.Goals.Domain.Models;
 
 namespace Moda.Goals.Application.Objectives.Commands;
-public sealed record ImportObjectiveCommand(string Name, string? Description, ObjectiveType Type, ObjectiveStatus Status, double Progress, Guid? OwnerId, Guid? PlanId, LocalDate? StartDate, LocalDate? TargetDate, Instant? ClosedDate) : ICommand<Guid>;
+public sealed record ImportObjectiveCommand(string Name, string? Description, ObjectiveType Type, ObjectiveStatus Status, double Progress, Guid? OwnerId, Guid? PlanId, LocalDate? StartDate, LocalDate? TargetDate, Instant? ClosedDate, int? Order) : ICommand<Guid>;
 
 public sealed class ImportObjectiveCommandValidator : CustomValidator<ImportObjectiveCommand>
 {
@@ -89,7 +89,8 @@ internal sealed class ImportObjectiveCommandHandler : ICommandHandler<ImportObje
                 request.PlanId,
                 request.StartDate,
                 request.TargetDate,
-                request.ClosedDate
+                request.ClosedDate,
+                request.Order
                 );
 
             await _goalsDbContext.Objectives.AddAsync(objective, cancellationToken);

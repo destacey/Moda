@@ -3,7 +3,7 @@ using Moda.Goals.Domain.Enums;
 using Moda.Goals.Domain.Models;
 
 namespace Moda.Goals.Application.Objectives.Commands;
-public sealed record CreateObjectiveCommand(string Name, string? Description, ObjectiveType Type, Guid? OwnerId, Guid? PlanId, LocalDate? StartDate, LocalDate? TargetDate) : ICommand<Guid>;
+public sealed record CreateObjectiveCommand(string Name, string? Description, ObjectiveType Type, Guid? OwnerId, Guid? PlanId, LocalDate? StartDate, LocalDate? TargetDate, int? Order) : ICommand<Guid>;
 
 public sealed class CreateObjectiveCommandValidator : CustomValidator<CreateObjectiveCommand>
 {
@@ -67,7 +67,8 @@ internal sealed class CreateObjectiveCommandHandler : ICommandHandler<CreateObje
                 request.OwnerId,
                 request.PlanId,
                 request.StartDate,
-                request.TargetDate
+                request.TargetDate,
+                request.Order
                 );
 
             await _goalsDbContext.Objectives.AddAsync(objective, cancellationToken);

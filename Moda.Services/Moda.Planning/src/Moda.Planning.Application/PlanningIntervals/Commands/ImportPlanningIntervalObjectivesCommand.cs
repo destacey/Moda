@@ -81,7 +81,8 @@ internal sealed class ImportPlanningIntervalObjectivesCommandHandler : ICommandH
                     importedObjective.PlanningIntervalId,
                     importedObjective.StartDate,
                     importedObjective.TargetDate,
-                    importedObjective.ClosedDateUtc), cancellationToken);
+                    importedObjective.ClosedDateUtc,
+                    importedObjective.Order), cancellationToken);
                 if (objectiveResult.IsFailure)
                     return Result.Failure<int>($"Unable to create objective. (Record Id: {importedObjective.ImportId}).  Error: {objectiveResult.Error}");
 

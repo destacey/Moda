@@ -160,33 +160,6 @@ export const useGetPlanningIntervalTeams = (
 }
 
 // PLANNING INTERVAL - OBJECTIVES
-export const useGetPlanningIntervalObjectives = (
-  id: string,
-  enabled: boolean = true,
-) => {
-  return useQuery({
-    queryKey: [QK.PLANNING_INTERVAL_OBJECTIVES, id],
-    queryFn: async () =>
-      (await getPlanningIntervalsClient()).getObjectives(id, null),
-    // staleTime: 10000,
-    enabled: !!id && enabled,
-  })
-}
-
-export const useGetPlanningIntervalObjectivesByTeamId = (
-  id: string,
-  teamId: string,
-  enabled: boolean = true,
-) => {
-  return useQuery({
-    queryKey: [QK.PLANNING_INTERVAL_OBJECTIVES, id, teamId],
-    queryFn: async () =>
-      (await getPlanningIntervalsClient()).getObjectives(id, teamId),
-    // staleTime: 20000,
-    enabled: !!id && !!teamId && enabled,
-  })
-}
-
 export const useGetPlanningIntervalObjectivesHealthReport = (
   idOrKey: string,
   teamId?: string,
