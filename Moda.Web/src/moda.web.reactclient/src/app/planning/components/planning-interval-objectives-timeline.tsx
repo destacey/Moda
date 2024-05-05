@@ -24,7 +24,7 @@ import useTheme from '../../components/contexts/theme'
 const { Text } = Typography
 
 interface PlanningIntervalObjectivesTimelineProps {
-  objectivesQuery: UseQueryResult<PlanningIntervalObjectiveListDto[], unknown>
+  objectivesData: PlanningIntervalObjectiveListDto[]
   planningIntervalCalendarQuery: UseQueryResult<
     PlanningIntervalCalendarDto,
     unknown
@@ -103,7 +103,7 @@ const getDataGroups = (
 }
 
 const PlanningIntervalObjectivesTimeline = ({
-  objectivesQuery,
+  objectivesData,
   planningIntervalCalendarQuery,
   enableGroups = false,
   teamNames,
@@ -165,7 +165,7 @@ const PlanningIntervalObjectivesTimeline = ({
   }, [piStart, piEnd, timelineFontColor, timelineForegroundColor])
 
   useEffect(() => {
-    if (!objectivesQuery?.data || !planningIntervalCalendarQuery?.data) return
+    if (!objectivesData || !planningIntervalCalendarQuery?.data) return
 
     setPiStart(planningIntervalCalendarQuery.data.start)
     setPiEnd(planningIntervalCalendarQuery.data.end)
@@ -186,7 +186,7 @@ const PlanningIntervalObjectivesTimeline = ({
     )
 
     setObjectives(
-      objectivesQuery?.data
+      objectivesData
         .filter((obj) => obj.status?.name !== 'Canceled')
         .map((obj) => {
           return {
@@ -211,8 +211,7 @@ const PlanningIntervalObjectivesTimeline = ({
 
     setIsLoading(false)
   }, [
-    objectivesQuery,
-    objectivesQuery.data,
+    objectivesData,
     planningIntervalCalendarQuery,
     planningIntervalCalendarQuery.data,
     timelineBackgroundColor,

@@ -95,8 +95,6 @@ const CreatePlanningIntervalObjectiveForm = ({
     'Permissions.PlanningIntervalObjectives.Manage',
   )
 
-  console.log('order', order)
-
   const mapToFormValues = useCallback(
     (planningIntervalId: string, statusId: number, teamId?: string) => {
       form.setFieldsValue({

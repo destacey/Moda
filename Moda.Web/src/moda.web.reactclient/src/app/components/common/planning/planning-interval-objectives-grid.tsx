@@ -8,7 +8,6 @@ import { MenuProps, Progress, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/hooks/useItems'
 import useAuth from '../../contexts/auth'
 import EditPlanningIntervalObjectiveForm from '@/src/app/planning/components/edit-planning-interval-objective-form'
-import { UseQueryResult } from 'react-query'
 import dayjs from 'dayjs'
 import CreateHealthCheckForm from '../health-check/create-health-check-form'
 import { SystemContext } from '../../constants'
@@ -24,7 +23,8 @@ import {
 import { ColDef } from 'ag-grid-community'
 
 export interface PlanningIntervalObjectivesGridProps {
-  objectivesQuery: UseQueryResult<PlanningIntervalObjectiveListDto[], unknown>
+  objectivesData: PlanningIntervalObjectiveListDto[]
+  refreshObjectives: () => void
   planningIntervalId?: string
   hidePlanningIntervalColumn?: boolean
   hideTeamColumn?: boolean
@@ -91,7 +91,8 @@ const getRowMenuItems = (props: RowMenuProps) => {
 }
 
 const PlanningIntervalObjectivesGrid = ({
-  objectivesQuery,
+  objectivesData,
+  refreshObjectives,
   planningIntervalId,
   hidePlanningIntervalColumn = false,
   hideTeamColumn = false,
@@ -140,7 +141,7 @@ const PlanningIntervalObjectivesGrid = ({
   )
 
   const refresh = useCallback(async () => {
-    objectivesQuery.refetch()
+    refreshObjectives()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -268,6 +269,9 @@ const PlanningIntervalObjectivesGrid = ({
   const onEditObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
     setSelectedObjectiveId(null)
+    if (wasSaved) {
+      refresh()
+    }
   }
 
   const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
@@ -284,7 +288,7 @@ const PlanningIntervalObjectivesGrid = ({
       <ModaGrid
         height={650}
         columnDefs={columnDefs}
-        rowData={objectivesQuery.data}
+        rowData={objectivesData}
         loadData={refresh}
         gridControlMenuItems={controlItems}
         toolbarActions={viewSelector}

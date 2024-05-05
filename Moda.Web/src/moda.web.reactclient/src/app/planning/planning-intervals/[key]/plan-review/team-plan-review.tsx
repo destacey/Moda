@@ -14,10 +14,10 @@ import { SegmentedLabeledOption } from 'antd/es/segmented'
 import { PlanningIntervalObjectivesTimeline } from '../../../components'
 import {
   useGetPlanningIntervalCalendar,
-  useGetPlanningIntervalObjectivesByTeamId,
   useGetPlanningIntervalRisksByTeamId,
   useGetTeamPlanningIntervalPredictability,
 } from '@/src/services/queries/planning-queries'
+import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
 
 const { Title } = Typography
 
@@ -47,10 +47,14 @@ const TeamPlanReview = ({
 
   const calendarQuery = useGetPlanningIntervalCalendar(planningInterval?.id)
 
-  const objectivesQuery = useGetPlanningIntervalObjectivesByTeamId(
-    planningInterval?.id,
-    team?.id,
-  )
+  const { data: objectivesData, refetch: refetchObjectives } =
+    useGetPlanningIntervalObjectivesQuery(
+      {
+        planningIntervalId: planningInterval?.id,
+        teamId: team?.id,
+      },
+      { skip: !planningInterval?.id || !team?.id },
+    )
 
   const risksQuery = useGetPlanningIntervalRisksByTeamId(
     planningInterval?.id,
@@ -84,10 +88,9 @@ const TeamPlanReview = ({
           <Title level={3} style={{ margin: '0' }}>
             <Link href={`/organizations/teams/${team?.key}`}>{team?.name}</Link>
           </Title>
-          {objectivesQuery?.data?.length > 0 &&
-            predictabilityQuery?.data != null && (
-              <Tag title="PI Predictability">{`${predictabilityQuery?.data}%`}</Tag>
-            )}
+          {objectivesData?.length > 0 && predictabilityQuery?.data != null && (
+            <Tag title="PI Predictability">{`${predictabilityQuery?.data}%`}</Tag>
+          )}
         </Space>
         {viewSelector}
       </Flex>
@@ -95,7 +98,8 @@ const TeamPlanReview = ({
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={24} md={24} lg={12}>
             <TeamObjectivesListCard
-              objectivesQuery={objectivesQuery}
+              objectivesData={objectivesData}
+              refreshObjectives={refetchObjectives}
               teamId={team?.id}
               planningIntervalId={planningInterval?.id}
               newObjectivesAllowed={
@@ -110,7 +114,7 @@ const TeamPlanReview = ({
         </Row>
       ) : (
         <PlanningIntervalObjectivesTimeline
-          objectivesQuery={objectivesQuery}
+          objectivesData={objectivesData}
           planningIntervalCalendarQuery={calendarQuery}
         />
       )}

@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { Card, MenuProps } from 'antd'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import PlanningIntervalObjectiveDetails from './planning-interval-objective-details'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
@@ -24,18 +24,18 @@ import { PageActions } from '@/src/app/components/common'
 const ObjectiveDetailsPage = ({ params }) => {
   useDocumentTitle('PI Objective Details')
 
+  const [activeTab, setActiveTab] = useState('details')
+  const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
+    useState<boolean>(false)
+  const [openDeleteObjectiveForm, setOpenDeleteObjectiveForm] =
+    useState<boolean>(false)
+
   const {
     data: objectiveData,
     isLoading,
     isFetching,
     refetch: refetchObjective,
   } = useGetPlanningIntervalObjectiveByKey(params.key, params.objectiveKey)
-
-  const [activeTab, setActiveTab] = useState('details')
-  const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
-    useState<boolean>(false)
-  const [openDeleteObjectiveForm, setOpenDeleteObjectiveForm] =
-    useState<boolean>(false)
 
   const router = useRouter()
   const { hasClaim } = useAuth()

@@ -123,7 +123,7 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
           <TeamPlanReview
             planningInterval={planningIntervalData}
             team={activeTeam}
-            refreshPlanningInterval={() => refetchPlanningInterval()}
+            refreshPlanningInterval={refetchPlanningInterval}
           />
         )}
       </Card>

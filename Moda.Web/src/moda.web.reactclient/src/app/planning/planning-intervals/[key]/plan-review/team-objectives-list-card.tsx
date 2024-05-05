@@ -8,7 +8,6 @@ import ModaEmpty from '@/src/app/components/common/moda-empty'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import useAuth from '@/src/app/components/contexts/auth'
 import CreatePlanningIntervalObjectiveForm from '../../../components/create-planning-interval-objective-form'
-import { UseQueryResult } from 'react-query'
 import useTheme from '@/src/app/components/contexts/theme'
 import {
   DndContext,
@@ -28,7 +27,8 @@ import {
 } from '@dnd-kit/sortable'
 
 export interface TeamObjectivesListCardProps {
-  objectivesQuery: UseQueryResult<PlanningIntervalObjectiveListDto[], unknown>
+  objectivesData: PlanningIntervalObjectiveListDto[]
+  refreshObjectives: () => void
   planningIntervalId: string
   teamId: string
   newObjectivesAllowed?: boolean
@@ -36,7 +36,8 @@ export interface TeamObjectivesListCardProps {
 }
 
 const TeamObjectivesListCard = ({
-  objectivesQuery,
+  objectivesData,
+  refreshObjectives,
   planningIntervalId,
   teamId,
   newObjectivesAllowed = false,
@@ -70,10 +71,11 @@ const TeamObjectivesListCard = ({
   )
 
   useEffect(() => {
-    if (!objectivesQuery.data) return
+    if (!objectivesData) return
 
+    // .slice() is used to prevent: TypeError: Cannot assign to read only property '0' of object '[object Array]'
     setObjectives(
-      objectivesQuery.data.sort((a, b) => {
+      objectivesData.slice().sort((a, b) => {
         if (a.order === null && b.order === null) return a.key - b.key
         if (a.order === null) return 1
         if (b.order === null) return -1
@@ -81,10 +83,10 @@ const TeamObjectivesListCard = ({
         return a.order - b.order
       }),
     )
-  }, [objectivesQuery.data])
+  }, [objectivesData])
 
-  const refreshObjectives = useCallback(() => {
-    objectivesQuery.refetch()
+  const refresh = useCallback(() => {
+    refreshObjectives()
     // this will update the PI predictability on the plan review page title
     refreshPlanningInterval()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,7 +106,7 @@ const TeamObjectivesListCard = ({
   const onCreateObjectiveFormClosed = (wasCreated: boolean) => {
     setOpenCreateObjectiveForm(false)
     if (wasCreated) {
-      refreshObjectives()
+      refresh()
     }
   }
 
@@ -186,7 +188,7 @@ const TeamObjectivesListCard = ({
                   piKey={objective.planningInterval.key}
                   canUpdateObjectives={canManageObjectives}
                   canCreateHealthChecks={canCreateHealthChecks}
-                  refreshObjectives={refreshObjectives}
+                  refreshObjectives={refresh}
                 />
               </SortableContext>
             )}
