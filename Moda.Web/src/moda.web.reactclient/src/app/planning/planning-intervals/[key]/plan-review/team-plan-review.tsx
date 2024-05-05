@@ -4,39 +4,25 @@ import {
   PlanningIntervalDetailsDto,
   PlanningIntervalTeamResponse,
 } from '@/src/services/moda-api'
-import {
-  Col,
-  Descriptions,
-  Drawer,
-  Flex,
-  Row,
-  Segmented,
-  Space,
-  Tag,
-  Typography,
-} from 'antd'
+import { Col, Flex, Row, Segmented, Space, Tag, Typography } from 'antd'
 import { useMemo, useState } from 'react'
 import TeamObjectivesListCard from './team-objectives-list-card'
 import TeamRisksListCard from './team-risks-list-card'
 import Link from 'next/link'
 import { BarsOutlined, BuildOutlined } from '@ant-design/icons'
 import { SegmentedLabeledOption } from 'antd/es/segmented'
-import { PlanningIntervalObjectivesTimeline } from '../../../components'
+import {
+  PlanningIntervalObjectiveDetailsDrawer,
+  PlanningIntervalObjectivesTimeline,
+} from '../../../components'
 import {
   useGetPlanningIntervalCalendar,
   useGetPlanningIntervalRisksByTeamId,
   useGetTeamPlanningIntervalPredictability,
 } from '@/src/services/queries/planning-queries'
-import {
-  useGetPlanningIntervalObjectiveQuery,
-  useGetPlanningIntervalObjectivesQuery,
-} from '@/src/store/features/planning/planning-interval-api'
-import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
-import PlanningIntervalObjectiveWorkItemsCard from '../objectives/[objectiveKey]/planning-interval-objective-work-items-card'
-import dayjs from 'dayjs'
+import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
 
 const { Title } = Typography
-const { Item: DescriptionsItem } = Descriptions
 
 export interface TeamPlanReviewProps {
   planningInterval: PlanningIntervalDetailsDto
@@ -155,7 +141,7 @@ const TeamPlanReview = ({
         />
       )}
       {planningInterval?.id && selectedObjectiveId && (
-        <ObjectiveDetailsDrawer
+        <PlanningIntervalObjectiveDetailsDrawer
           planningIntervalId={planningInterval?.id}
           objectiveId={selectedObjectiveId}
           drawerOpen={drawerOpen}
@@ -163,90 +149,6 @@ const TeamPlanReview = ({
         />
       )}
     </>
-  )
-}
-
-interface ObjectiveDetailsDrawerProps {
-  planningIntervalId: string
-  objectiveId: string
-  drawerOpen: boolean
-  onDrawerClose: () => void
-}
-
-const ObjectiveDetailsDrawer = (props: ObjectiveDetailsDrawerProps) => {
-  const { data: objectiveData, isLoading: objectiveDataIsLoading } =
-    useGetPlanningIntervalObjectiveQuery(
-      {
-        planningIntervalId: props.planningIntervalId,
-        objectiveId: props.objectiveId,
-      },
-      { skip: !props.planningIntervalId || !props.objectiveId },
-    )
-
-  if (!props.planningIntervalId || !props.objectiveId) {
-    return null
-  }
-
-  if (!objectiveData) return null
-
-  return (
-    <Drawer
-      title={objectiveData?.name ?? 'Objective'}
-      placement="right"
-      onClose={props.onDrawerClose}
-      open={props.drawerOpen}
-      destroyOnClose={true}
-      width={
-        window.innerWidth >= 1024
-          ? '25%'
-          : window.innerWidth >= 768
-            ? '33%'
-            : '80%'
-      }
-    >
-      <Descriptions column={1}>
-        <DescriptionsItem label="Key">
-          {objectiveData && (
-            <Link
-              href={`/planning/planning-intervals/${objectiveData.planningInterval.key}/objectives/${objectiveData.key}`}
-            >
-              {objectiveData.key}
-            </Link>
-          )}
-        </DescriptionsItem>
-        <DescriptionsItem label="Is Stretch?">
-          {objectiveData?.isStretch ? 'Yes' : 'No'}
-        </DescriptionsItem>
-        <DescriptionsItem label="Status">
-          {objectiveData?.status.name}
-        </DescriptionsItem>
-      </Descriptions>
-      <Descriptions column={1} layout="vertical">
-        <DescriptionsItem label="Description">
-          <ModaMarkdownDescription content={objectiveData?.description} />
-        </DescriptionsItem>
-      </Descriptions>
-      <Descriptions column={1}>
-        <DescriptionsItem label="Start Date">
-          {objectiveData?.startDate &&
-            dayjs(objectiveData?.startDate).format('M/D/YYYY')}
-        </DescriptionsItem>
-        <DescriptionsItem label="Target Date">
-          {objectiveData?.targetDate &&
-            dayjs(objectiveData?.targetDate).format('M/D/YYYY')}
-        </DescriptionsItem>
-        {objectiveData?.closedDate && (
-          <DescriptionsItem label="Closed Date">
-            {dayjs(objectiveData?.closedDate).format('M/D/YYYY')}
-          </DescriptionsItem>
-        )}
-      </Descriptions>
-      <PlanningIntervalObjectiveWorkItemsCard
-        planningIntervalId={props.planningIntervalId}
-        objectiveId={props.objectiveId}
-        canLinkWorkItems={false}
-      />
-    </Drawer>
   )
 }
 
