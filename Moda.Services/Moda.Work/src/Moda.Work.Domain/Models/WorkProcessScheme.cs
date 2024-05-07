@@ -6,7 +6,7 @@ namespace Moda.Work.Domain.Models;
 public sealed class WorkProcessScheme : BaseAuditableEntity<Guid>, IActivatable
 {
     private WorkProcessScheme() { }
-    internal WorkProcessScheme(Guid workProcessId, int workTypeId, Guid workflowId)
+    internal WorkProcessScheme(Guid workProcessId, int workTypeId, Guid? workflowId)
     {
         WorkProcessId = workProcessId;
         WorkTypeId = workTypeId;
@@ -17,7 +17,7 @@ public sealed class WorkProcessScheme : BaseAuditableEntity<Guid>, IActivatable
     public WorkProcess? WorkProcess { get; private set; }
     public int WorkTypeId { get; }
     public WorkType? WorkType { get; private set; }
-    public Guid WorkflowId { get; private set; }
+    public Guid? WorkflowId { get; private set; }
     public Workflow? Workflow { get; private set; }
 
 
@@ -55,7 +55,7 @@ public sealed class WorkProcessScheme : BaseAuditableEntity<Guid>, IActivatable
         return Result.Success();
     }
 
-    public Result Update(Guid workflowId, Instant timestamp)
+    internal Result Update(Guid workflowId, Instant timestamp)
     {
         try
         {
@@ -71,9 +71,8 @@ public sealed class WorkProcessScheme : BaseAuditableEntity<Guid>, IActivatable
         }
     }
 
-    public static WorkProcessScheme Create(Guid workProcessId, int workTypeId, Guid workflowId)
+    internal static WorkProcessScheme Create(Guid workProcessId, int workTypeId)
     {
-        // TODO move this to be managed by the Work Process as the aggregate root
-        return new(workProcessId, workTypeId, workflowId);
+        return new(workProcessId, workTypeId, null);
     }
 }

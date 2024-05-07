@@ -131,11 +131,92 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
             if (Workspaces.Any(w => w.IsActive))
                 return Result.Failure("Unable to deactive with active workspaces.");
 
+            foreach (WorkProcessScheme scheme in Schemes)
+            {
+                if (!scheme.IsActive) continue;
+                
+                var deactivateSchemeResult = scheme.Deactivate(timestamp);
+                if (deactivateSchemeResult.IsFailure)
+                    return Result.Failure(deactivateSchemeResult.Error);
+            }
+
             IsActive = false;
             AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
 
             TryAddIntegrationStateChangedEvent(timestamp);
         }
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// The process for adding a work type to the work process.
+    /// </summary>
+    /// <param name="workType"></param>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    public Result AddWorkType(WorkType workType, Instant timestamp)
+    {
+        Guard.Against.Null(workType, nameof(workType));
+
+        if (!workType.IsActive)
+            return Result.Failure("The work type is not active.  Only active work types can be added to a work process.");
+
+        if (_schemes.Any(s => s.WorkTypeId == workType.Id))
+            return Result.Failure("The work type is already associated to this work process.");
+
+        WorkProcessScheme scheme = WorkProcessScheme.Create(Id, workType.Id);
+        _schemes.Add(scheme);
+
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// The process for disabling a work type within the work process. This will prevent new work items from being created with the work type.
+    /// </summary>
+    /// <param name="workTypeId"></param>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    public Result DisableWorkType(int workTypeId, Instant timestamp)
+    {
+        var scheme = _schemes.FirstOrDefault(s => s.WorkTypeId == workTypeId);
+        if (scheme is null)
+            return Result.Failure("The work type is not associated to this work process.");
+
+        if (!scheme.IsActive)
+            return Result.Failure("The work type is already disabled for this work process.");
+
+        var deactivateResult = scheme.Deactivate(timestamp);
+        if (deactivateResult.IsFailure)
+            return Result.Failure(deactivateResult.Error);
+
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// The process for enabling a work type within the work process.
+    /// </summary>
+    /// <param name="workTypeId"></param>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    public Result EnableWorkType(int workTypeId, Instant timestamp)
+    {
+        var scheme = _schemes.FirstOrDefault(s => s.WorkTypeId == workTypeId);
+        if (scheme is null)
+            return Result.Failure("The work type is not associated to this work process.");
+
+        if (scheme.IsActive)
+            return Result.Failure("The work type is already enabled for this work process.");
+
+        var activateResult = scheme.Activate(timestamp);
+        if (activateResult.IsFailure)
+            return Result.Failure(activateResult.Error);
+
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
         return Result.Success();
     }
