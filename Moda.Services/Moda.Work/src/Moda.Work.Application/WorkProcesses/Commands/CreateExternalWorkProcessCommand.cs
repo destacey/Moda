@@ -3,7 +3,7 @@ using Moda.Common.Domain.Models;
 using Moda.Work.Application.WorkProcesses.Validators;
 
 namespace Moda.Work.Application.WorkProcesses.Commands;
-public sealed record CreateExternalWorkProcessCommand(IExternalWorkProcessConfiguration ExternalWorkProcess) : ICommand<IntegrationState<Guid>>;
+public sealed record CreateExternalWorkProcessCommand(IExternalWorkProcessConfiguration ExternalWorkProcess, IEnumerable<int> WorkTypeIds) : ICommand<IntegrationState<Guid>>;
 
 public sealed class CreateExternalWorkProcessCommandValidator : CustomValidator<CreateExternalWorkProcessCommand>
 {
@@ -32,6 +32,13 @@ internal sealed class CreateExternalWorkProcessCommandHandler(IWorkDbContext wor
         var timestamp = _dateTimeProvider.Now;
 
         var workProcess = WorkProcess.CreateExternal(request.ExternalWorkProcess.Name, request.ExternalWorkProcess.Description, request.ExternalWorkProcess.Id, timestamp);
+
+        var workTypes = await _workDbContext.WorkTypes.Where(wt => request.WorkTypeIds.Contains(wt.Id)).ToArrayAsync(cancellationToken);
+        foreach (var workType in workTypes)
+        {
+            workProcess.AddWorkType(workType, timestamp);
+        }
+
 
         _workDbContext.WorkProcesses.Add(workProcess);
         await _workDbContext.SaveChangesAsync(cancellationToken);

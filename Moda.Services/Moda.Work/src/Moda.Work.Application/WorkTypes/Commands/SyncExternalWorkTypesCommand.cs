@@ -2,7 +2,7 @@
 using Moda.Work.Application.WorkTypes.Validators;
 
 namespace Moda.Work.Application.WorkTypes.Commands;
-public sealed record SyncExternalWorkTypesCommand(IList<IExternalWorkType> WorkTypes) : ICommand;
+public sealed record SyncExternalWorkTypesCommand(IList<IExternalWorkType> WorkTypes) : ICommand<int[]>;
 
 public sealed class SyncExternalWorkTypesCommandValidator : CustomValidator<SyncExternalWorkTypesCommand>
 {
@@ -17,7 +17,7 @@ public sealed class SyncExternalWorkTypesCommandValidator : CustomValidator<Sync
     }
 }
 
-public sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<SyncExternalWorkTypesCommandHandler> logger) : ICommandHandler<SyncExternalWorkTypesCommand>
+public sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<SyncExternalWorkTypesCommandHandler> logger) : ICommandHandler<SyncExternalWorkTypesCommand, int[]>
 {
     private const string AppRequestName = nameof(SyncExternalWorkTypesCommand);
 
@@ -25,7 +25,7 @@ public sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbCon
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<SyncExternalWorkTypesCommandHandler> _logger = logger;
 
-    public async Task<Result> Handle(SyncExternalWorkTypesCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int[]>> Handle(SyncExternalWorkTypesCommand request, CancellationToken cancellationToken)
     {
         var existingWorkTypeNames = new HashSet<string>(await _workDbContext.WorkTypes.Select(wt => wt.Name).ToListAsync(cancellationToken));
 
@@ -52,6 +52,7 @@ public sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbCon
 
         // TODO: add the ability to disable work types if they are no longer used within moda and disabled externally
 
-        return Result.Success();
+        var workTypeIds = await _workDbContext.WorkTypes.Where(wt => workTypesToCreate.Select(wtc => wtc.Id).Contains(wt.Id)).Select(wt => wt.Id).ToArrayAsync(cancellationToken);
+        return Result.Success(workTypeIds);
     }
 }
