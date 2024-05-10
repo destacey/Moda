@@ -19,8 +19,6 @@ public sealed class WorkProcessScheme : BaseAuditableEntity<Guid>, IActivatable
     public WorkType? WorkType { get; private set; }
     public Guid? WorkflowId { get; private set; }
     public Workflow? Workflow { get; private set; }
-
-
     public bool IsActive { get; private set; } = true;
 
     /// <summary>
@@ -71,8 +69,14 @@ public sealed class WorkProcessScheme : BaseAuditableEntity<Guid>, IActivatable
         }
     }
 
-    internal static WorkProcessScheme Create(Guid workProcessId, int workTypeId)
+    internal static WorkProcessScheme CreateExternal(Guid workProcessId, int workTypeId, bool isActive)
     {
-        return new(workProcessId, workTypeId, null);
+        var scheme = new WorkProcessScheme (workProcessId, workTypeId, null);
+
+        // external work process schemes do not have to be active when they are first created in Moda
+        if (scheme.IsActive != isActive)
+            scheme.IsActive = isActive;
+
+        return scheme;
     }
 }

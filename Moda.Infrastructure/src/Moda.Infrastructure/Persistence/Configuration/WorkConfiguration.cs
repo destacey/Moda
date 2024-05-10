@@ -246,7 +246,7 @@ public class WorkProcessSchemeConfig : IEntityTypeConfiguration<WorkProcessSchem
 
         builder.HasOne(w => w.Workflow)
             .WithMany()
-            .HasForeignKey(w => w.WorkProcessId)
+            .HasForeignKey(w => w.WorkflowId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

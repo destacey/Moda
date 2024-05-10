@@ -155,17 +155,12 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     /// <param name="workType"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result AddWorkType(WorkType workType, Instant timestamp)
+    public Result AddWorkType(int workTypeId, bool isActive, Instant timestamp)
     {
-        Guard.Against.Null(workType, nameof(workType));
-
-        if (!workType.IsActive)
-            return Result.Failure("The work type is not active.  Only active work types can be added to a work process.");
-
-        if (_schemes.Any(s => s.WorkTypeId == workType.Id))
+        if (_schemes.Any(s => s.WorkTypeId == workTypeId))
             return Result.Failure("The work type is already associated to this work process.");
 
-        WorkProcessScheme scheme = WorkProcessScheme.Create(Id, workType.Id);
+        WorkProcessScheme scheme = WorkProcessScheme.CreateExternal(Id, workTypeId, isActive);
         _schemes.Add(scheme);
 
         AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));

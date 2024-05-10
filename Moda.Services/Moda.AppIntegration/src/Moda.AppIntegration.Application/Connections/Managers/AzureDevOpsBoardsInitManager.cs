@@ -109,14 +109,11 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                 return processResult.ConvertFailure<Guid>();
 
             // create new types
-            IEnumerable<int> workTypeIds = [];
             if (processResult.Value.WorkTypes.Any())
             {
                 var syncWorkTypesResult = await _sender.Send(new SyncExternalWorkTypesCommand(processResult.Value.WorkTypes), cancellationToken);
                 if (syncWorkTypesResult.IsFailure)
                     return syncWorkTypesResult.ConvertFailure<Guid>();
-
-                workTypeIds = syncWorkTypesResult.Value;
             }
 
             // create new statuses
@@ -131,7 +128,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
             // TODO
 
             // create process
-            var createProcessResult = await _sender.Send(new CreateExternalWorkProcessCommand(processResult.Value, workTypeIds), cancellationToken);
+            var createProcessResult = await _sender.Send(new CreateExternalWorkProcessCommand(processResult.Value, processResult.Value.WorkTypes), cancellationToken);
             if (createProcessResult.IsFailure)
                 return createProcessResult.ConvertFailure<Guid>();
 

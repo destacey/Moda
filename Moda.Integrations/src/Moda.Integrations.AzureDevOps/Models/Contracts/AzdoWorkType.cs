@@ -7,5 +7,5 @@ public record AzdoWorkType : IExternalWorkType
     public required string Name { get; set; }
     public string? Description { get; set; }
     public required string BacklogLevelId { get; set; }
-    public bool IsDisabled { get; set; }
+    public bool IsActive { get; set; }
 }

@@ -1647,6 +1647,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasIndex("WorkTypeId");
 
+                    b.HasIndex("WorkflowId");
+
                     b.ToTable("WorkProcessSchemes", "Work");
                 });
 
@@ -2238,17 +2240,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.Work.Domain.Models.Workflow", "Workflow")
-                        .WithMany()
-                        .HasForeignKey("WorkProcessId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Moda.Work.Domain.Models.WorkType", "WorkType")
                         .WithMany()
                         .HasForeignKey("WorkTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Moda.Work.Domain.Models.Workflow", "Workflow")
+                        .WithMany()
+                        .HasForeignKey("WorkflowId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("WorkProcess");
 
