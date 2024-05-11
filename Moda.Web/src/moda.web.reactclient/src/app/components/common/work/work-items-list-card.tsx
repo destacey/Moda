@@ -5,16 +5,19 @@ import WorkItemListItem from './work-item-list-item'
 
 export interface WorkItemsListCardProps {
   workItems: WorkItemListDto[]
+  isLoading: boolean
 }
 
-const WorkItemsListCard = ({ workItems }: WorkItemsListCardProps) => {
-  if (!workItems || workItems.length === 0)
-    return <ModaEmpty message="No work items" />
-
+const WorkItemsListCard = ({
+  workItems,
+  isLoading,
+}: WorkItemsListCardProps) => {
   return (
     <List
       size="small"
+      loading={isLoading}
       dataSource={workItems}
+      locale={{ emptyText: <ModaEmpty message="No work items" /> }}
       renderItem={(workItem) => <WorkItemListItem workItem={workItem} />}
     />
   )

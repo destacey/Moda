@@ -59,7 +59,7 @@ const PlanningIntervalObjectiveWorkItemsCard = (
           </>
         }
       >
-        <WorkItemsListCard workItems={workItemsData} />
+        <WorkItemsListCard workItems={workItemsData} isLoading={isLoading} />
       </Card>
       {openManageWorkItemsForm && (
         <ManagePlanningIntervalObjectiveWorkItemsForm
