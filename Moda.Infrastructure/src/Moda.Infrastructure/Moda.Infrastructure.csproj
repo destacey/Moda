@@ -47,7 +47,7 @@
     <PackageReference Include="Serilog.Sinks.Datadog.Logs" Version="0.5.2" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="6.6.0" />
-    <PackageReference Include="Serilog.Sinks.Seq" Version="7.0.0" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="7.0.1" />
     <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="8.0.1" />
     <PackageReference Include="ZymLabs.NSwag.FluentValidation.AspNetCore" Version="0.7.0-alpha0007" />
   </ItemGroup>
