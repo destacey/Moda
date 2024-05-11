@@ -21,6 +21,7 @@ import {
   useGetTeamPlanningIntervalPredictability,
 } from '@/src/services/queries/planning-queries'
 import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
+import useAuth from '@/src/app/components/contexts/auth'
 
 const { Title } = Typography
 
@@ -72,6 +73,17 @@ const TeamPlanReview = ({
     planningInterval?.id,
     team?.id,
   )
+
+  const { hasClaim } = useAuth()
+  const canManageObjectives = hasClaim(
+    'Permission',
+    'Permissions.PlanningIntervalObjectives.Manage',
+  )
+  const canCreatePIObjectiveHealthChecks =
+    !!canManageObjectives &&
+    hasClaim('Permission', 'Permissions.HealthChecks.Create')
+  const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
+  const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
 
   const viewSelector = useMemo(
     () => (
@@ -128,10 +140,17 @@ const TeamPlanReview = ({
               }
               refreshPlanningInterval={refreshPlanningInterval}
               onObjectiveClick={onObjectiveClick}
+              canManageObjectives={canManageObjectives}
+              canCreateHealthChecks={canCreatePIObjectiveHealthChecks}
             />
           </Col>
           <Col xs={24} sm={24} md={24} lg={12}>
-            <TeamRisksListCard riskQuery={risksQuery} teamId={team?.id} />
+            <TeamRisksListCard
+              riskQuery={risksQuery}
+              teamId={team?.id}
+              canCreateRisks={canCreateRisks}
+              canUpdateRisks={canUpdateRisks}
+            />
           </Col>
         </Row>
       ) : (
@@ -146,6 +165,7 @@ const TeamPlanReview = ({
           objectiveId={selectedObjectiveId}
           drawerOpen={drawerOpen}
           onDrawerClose={onDrawerClose}
+          canManageObjectives={canManageObjectives}
         />
       )}
     </>

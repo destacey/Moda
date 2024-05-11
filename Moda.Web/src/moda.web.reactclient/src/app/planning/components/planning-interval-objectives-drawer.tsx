@@ -14,6 +14,7 @@ interface PlanningIntervalObjectiveDetailsDrawerProps {
   objectiveId: string
   drawerOpen: boolean
   onDrawerClose: () => void
+  canManageObjectives: boolean
 }
 
 const PlanningIntervalObjectiveDetailsDrawer = (
@@ -93,7 +94,7 @@ const PlanningIntervalObjectiveDetailsDrawer = (
       <PlanningIntervalObjectiveWorkItemsCard
         planningIntervalId={props.planningIntervalId}
         objectiveId={props.objectiveId}
-        canLinkWorkItems={false}
+        canLinkWorkItems={props.canManageObjectives}
       />
     </Drawer>
   )

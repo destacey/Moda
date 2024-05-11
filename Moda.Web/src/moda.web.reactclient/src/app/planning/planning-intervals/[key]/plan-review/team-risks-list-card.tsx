@@ -6,7 +6,6 @@ import { Badge, Button, Card, List, Space } from 'antd'
 import RiskListItem from './risk-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
 import { useCallback, useMemo, useState } from 'react'
-import useAuth from '@/src/app/components/contexts/auth'
 import CreateRiskForm from '@/src/app/components/common/planning/create-risk-form'
 import { UseQueryResult } from 'react-query'
 import useTheme from '@/src/app/components/contexts/theme'
@@ -14,18 +13,21 @@ import useTheme from '@/src/app/components/contexts/theme'
 export interface TeamRisksListCardProps {
   riskQuery: UseQueryResult<RiskListDto[], unknown>
   teamId: string
+  canCreateRisks: boolean
+  canUpdateRisks: boolean
 }
 
 const categoryOrder = ['Owned', 'Accepted', 'Mitigated', 'Resolved']
 const exposureOrder = ['High', 'Medium', 'Low']
 
-const TeamRisksListCard = ({ riskQuery, teamId }: TeamRisksListCardProps) => {
+const TeamRisksListCard = ({
+  riskQuery,
+  teamId,
+  canCreateRisks,
+  canUpdateRisks,
+}: TeamRisksListCardProps) => {
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
   const theme = useTheme()
-
-  const { hasClaim } = useAuth()
-  const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
-  const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
 
   const refreshRisks = useCallback(() => {
     riskQuery.refetch()
