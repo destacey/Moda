@@ -6,7 +6,6 @@ import { Badge, Button, Card, List, Space, message } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import useAuth from '@/src/app/components/contexts/auth'
 import CreatePlanningIntervalObjectiveForm from '../../../components/create-planning-interval-objective-form'
 import useTheme from '@/src/app/components/contexts/theme'
 import {
@@ -35,6 +34,8 @@ export interface TeamObjectivesListCardProps {
   newObjectivesAllowed?: boolean
   refreshPlanningInterval: () => void
   onObjectiveClick: (objectiveId: string) => void
+  canManageObjectives: boolean
+  canCreateHealthChecks: boolean
 }
 
 const sortOrderedObjectives = (
@@ -58,6 +59,8 @@ const TeamObjectivesListCard = ({
   newObjectivesAllowed = false,
   refreshPlanningInterval,
   onObjectiveClick,
+  canManageObjectives,
+  canCreateHealthChecks,
 }: TeamObjectivesListCardProps) => {
   const [openCreateObjectiveForm, setOpenCreateObjectiveForm] =
     useState<boolean>(false)
@@ -69,16 +72,8 @@ const TeamObjectivesListCard = ({
 
   const { badgeColor } = useTheme()
 
-  const { hasClaim } = useAuth()
-  const canManageObjectives = hasClaim(
-    'Permission',
-    'Permissions.PlanningIntervalObjectives.Manage',
-  )
   const canCreateObjectives =
     newObjectivesAllowed && planningIntervalId && canManageObjectives
-  const canCreateHealthChecks =
-    !!canManageObjectives &&
-    hasClaim('Permission', 'Permissions.HealthChecks.Create')
 
   const sensors = useSensors(
     useSensor(PointerSensor),

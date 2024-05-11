@@ -14,6 +14,7 @@ interface PlanningIntervalObjectiveDetailsDrawerProps {
   objectiveId: string
   drawerOpen: boolean
   onDrawerClose: () => void
+  canManageObjectives: boolean
 }
 
 const PlanningIntervalObjectiveDetailsDrawer = (
@@ -32,7 +33,7 @@ const PlanningIntervalObjectiveDetailsDrawer = (
     return null
   }
 
-  if (!objectiveData) return null
+  if (!objectiveDataIsLoading && !objectiveData) return null
 
   return (
     <Drawer
@@ -41,6 +42,7 @@ const PlanningIntervalObjectiveDetailsDrawer = (
       onClose={props.onDrawerClose}
       open={props.drawerOpen}
       destroyOnClose={true}
+      loading={objectiveDataIsLoading}
       width={
         window.innerWidth >= 1500
           ? '30%'
@@ -93,7 +95,7 @@ const PlanningIntervalObjectiveDetailsDrawer = (
       <PlanningIntervalObjectiveWorkItemsCard
         planningIntervalId={props.planningIntervalId}
         objectiveId={props.objectiveId}
-        canLinkWorkItems={false}
+        canLinkWorkItems={props.canManageObjectives}
       />
     </Drawer>
   )
