@@ -13,6 +13,7 @@ export interface PlanningIntervalObjectiveWorkItemsCardProps {
   planningIntervalId: string
   objectiveId: string
   canLinkWorkItems: boolean
+  width?: string | number
 }
 
 const PlanningIntervalObjectiveWorkItemsCard = (
@@ -43,7 +44,7 @@ const PlanningIntervalObjectiveWorkItemsCard = (
       <Card
         size="small"
         title="Work Items"
-        style={{ width: 400 }}
+        style={{ width: props.width ? props.width : '100%' }}
         // add search from api input
         extra={
           <>

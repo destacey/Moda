@@ -82,6 +82,7 @@ const PlanningIntervalObjectiveDetails = ({
           planningIntervalId={objective.planningInterval?.id}
           objectiveId={objective.id}
           canLinkWorkItems={canManageObjectives}
+          width={400}
         />
         <LinksCard objectId={objective.id} />
       </Space>
