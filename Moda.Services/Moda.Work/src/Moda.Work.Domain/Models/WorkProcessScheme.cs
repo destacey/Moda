@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
@@ -6,9 +7,16 @@ namespace Moda.Work.Domain.Models;
 public sealed class WorkProcessScheme : BaseAuditableEntity<Guid>, IActivatable
 {
     private WorkProcessScheme() { }
+
     internal WorkProcessScheme(Guid workProcessId, int workTypeId, Guid? workflowId)
     {
         WorkProcessId = workProcessId;
+        WorkTypeId = workTypeId;
+        WorkflowId = workflowId;
+    }
+    internal WorkProcessScheme(WorkProcess workProcess, int workTypeId, Guid? workflowId)
+    {
+        WorkProcess = workProcess;
         WorkTypeId = workTypeId;
         WorkflowId = workflowId;
     }
@@ -71,7 +79,26 @@ public sealed class WorkProcessScheme : BaseAuditableEntity<Guid>, IActivatable
 
     internal static WorkProcessScheme CreateExternal(Guid workProcessId, int workTypeId, bool isActive)
     {
+        Guard.Against.Default(workProcessId, nameof(workProcessId));
         var scheme = new WorkProcessScheme (workProcessId, workTypeId, null);
+
+        // external work process schemes do not have to be active when they are first created in Moda
+        if (scheme.IsActive != isActive)
+            scheme.IsActive = isActive;
+
+        return scheme;
+    }
+
+    /// <summary>
+    /// Used when creating a new external work process scheme and work process together.  EF will set the WorkProcessId when the work process is saved.
+    /// </summary>
+    /// <param name="workProcess"></param>
+    /// <param name="workTypeId"></param>
+    /// <param name="isActive"></param>
+    /// <returns></returns>
+    internal static WorkProcessScheme CreateExternal(WorkProcess workProcess, int workTypeId, bool isActive)
+    {
+        var scheme = new WorkProcessScheme(workProcess, workTypeId, null);
 
         // external work process schemes do not have to be active when they are first created in Moda
         if (scheme.IsActive != isActive)

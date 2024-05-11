@@ -35,7 +35,6 @@ internal sealed class CreateExternalWorkProcessCommandHandler(IWorkDbContext wor
 
         var workProcess = WorkProcess.CreateExternal(request.ExternalWorkProcess.Name, request.ExternalWorkProcess.Description, request.ExternalWorkProcess.Id, timestamp);
 
-
         var workTypes = await _workDbContext.WorkTypes.Where(wt => request.ExternalWorkTypes.Select(wt => wt.Name).Contains(wt.Name)).ToArrayAsync(cancellationToken);
 
         foreach (var externalWorkType in request.ExternalWorkTypes)
@@ -48,7 +47,6 @@ internal sealed class CreateExternalWorkProcessCommandHandler(IWorkDbContext wor
             }
             workProcess.AddWorkType(workType.Id, externalWorkType.IsActive, timestamp);
         }
-
 
         _workDbContext.WorkProcesses.Add(workProcess);
         await _workDbContext.SaveChangesAsync(cancellationToken);

@@ -241,8 +241,6 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
         var syncWorkItemsResult = await _sender.Send(new SyncExternalWorkItemsCommand(workspaceId, workItemsResult.Value), cancellationToken);
 
-        // get deleted work items and remove them from the workspace
-
         return syncWorkItemsResult.IsSuccess
             ? Result.Success()
             : syncWorkItemsResult;

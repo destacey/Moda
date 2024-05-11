@@ -160,7 +160,10 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
         if (_schemes.Any(s => s.WorkTypeId == workTypeId))
             return Result.Failure("The work type is already associated to this work process.");
 
-        WorkProcessScheme scheme = WorkProcessScheme.CreateExternal(Id, workTypeId, isActive);
+        WorkProcessScheme scheme = Id == Guid.Empty
+            ? WorkProcessScheme.CreateExternal(this, workTypeId, isActive)
+            : WorkProcessScheme.CreateExternal(Id, workTypeId, isActive);
+
         _schemes.Add(scheme);
 
         AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
