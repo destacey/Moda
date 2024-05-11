@@ -128,7 +128,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
             // TODO
 
             // create process
-            var createProcessResult = await _sender.Send(new CreateExternalWorkProcessCommand(processResult.Value), cancellationToken);
+            var createProcessResult = await _sender.Send(new CreateExternalWorkProcessCommand(processResult.Value, processResult.Value.WorkTypes), cancellationToken);
             if (createProcessResult.IsFailure)
                 return createProcessResult.ConvertFailure<Guid>();
 

@@ -21,7 +21,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
         workType.Name.Should().Be("Epic");
         workType.Description.Should().Be("Epics help teams effectively manage and groom their product backlog");
         workType.BacklogLevelId.Should().Be("Microsoft.VSTS.Agile.EpicBacklogBehavior");
-        workType.IsDisabled.Should().BeFalse();
+        workType.IsActive.Should().BeTrue();
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public class ProcessWorkItemTypeDtoExtensionsTests : CommonResponseOptions
         workType.Name.Should().Be("Bug");
         workType.Description.Should().Be("Describes a divergence between required and actual behavior, and tracks the work done to correct the defect and verify the correction.");
         workType.BacklogLevelId.Should().Be("System.RequirementBacklogBehavior");
-        workType.IsDisabled.Should().BeFalse();
+        workType.IsActive.Should().BeTrue();
     }
 
     [Fact]

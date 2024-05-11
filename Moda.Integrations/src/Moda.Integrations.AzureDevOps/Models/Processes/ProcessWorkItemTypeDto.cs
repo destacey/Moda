@@ -37,7 +37,7 @@ internal static class ProcessWorkItemTypeDtoExtensions
             Name = workItemType.Name,
             Description = workItemType.Description,
             BacklogLevelId = backlogLevelId,
-            IsDisabled = workItemType.IsDisabled,
+            IsActive = !workItemType.IsDisabled,
         };
     }
 
@@ -45,8 +45,7 @@ internal static class ProcessWorkItemTypeDtoExtensions
     {
         // test work types typically have no behaviors
         return workItemTypes
-            .Where(w => !w.IsDisabled
-                && !_ignoredWorkItemTypes.Contains(w.ReferenceName)
+            .Where(w => !_ignoredWorkItemTypes.Contains(w.ReferenceName)
                 && (w.Inherits is null || !_ignoredWorkItemTypes.Contains(w.Inherits)))
             .Select(w => w.ToAzdoWorkType())
             .ToList<IExternalWorkType>();
@@ -55,8 +54,7 @@ internal static class ProcessWorkItemTypeDtoExtensions
     public static IList<IExternalWorkStatus> ToIExternalWorkStatuses(this List<ProcessWorkItemTypeDto> workItemTypes)
     {
         return workItemTypes
-            .Where(w => !w.IsDisabled
-                && !_ignoredWorkItemTypes.Contains(w.ReferenceName)
+            .Where(w => !_ignoredWorkItemTypes.Contains(w.ReferenceName)
                 && (w.Inherits is null || !_ignoredWorkItemTypes.Contains(w.Inherits)))
             .SelectMany(w => w.States)
             .DistinctBy(s => s.Name)
@@ -67,8 +65,7 @@ internal static class ProcessWorkItemTypeDtoExtensions
     public static List<ProcessWorkflowItemDto> ToProcessWorkflow(this List<ProcessWorkItemTypeDto> workItemTypes)
     {
         var types = workItemTypes
-            .Where(w => !w.IsDisabled
-                && !_ignoredWorkItemTypes.Contains(w.ReferenceName)
+            .Where(w => !_ignoredWorkItemTypes.Contains(w.ReferenceName)
                 && (w.Inherits is null || !_ignoredWorkItemTypes.Contains(w.Inherits)))
             .ToList();
 

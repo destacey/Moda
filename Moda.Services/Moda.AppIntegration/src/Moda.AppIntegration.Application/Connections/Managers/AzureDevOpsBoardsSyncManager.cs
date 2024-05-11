@@ -189,7 +189,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
         // update the work process
         // TODO: update work process scheme
-        var updateWorkProcessResult = await _sender.Send(new UpdateExternalWorkProcessCommand(processResult.Value), cancellationToken);
+        var updateWorkProcessResult = await _sender.Send(new UpdateExternalWorkProcessCommand(processResult.Value, processResult.Value.WorkTypes), cancellationToken);
 
         return updateWorkProcessResult.IsSuccess
             ? Result.Success()
@@ -240,8 +240,6 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
             return Result.Success();
 
         var syncWorkItemsResult = await _sender.Send(new SyncExternalWorkItemsCommand(workspaceId, workItemsResult.Value), cancellationToken);
-
-        // get deleted work items and remove them from the workspace
 
         return syncWorkItemsResult.IsSuccess
             ? Result.Success()
