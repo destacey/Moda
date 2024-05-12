@@ -4,11 +4,14 @@ import useTheme from '@/src/app/components/contexts/theme'
 import React, { useCallback, useRef, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { Flex } from 'antd'
+import { AgGridReactProps } from 'ag-grid-react/dist/types/src/shared/interfaces'
 
 export const asDraggableColDefs = <TData extends object>(colDefs: ColDef<TData>[]): ColDef<TData>[] => [
   {
     rowDrag: true,
     maxWidth: 50,
+    filter: false,
+    sortable: false,
     suppressHeaderMenuButton: true,
     rowDragText: (params, dragItemCount) => {
       if (dragItemCount > 1) {
@@ -21,19 +24,23 @@ export const asDraggableColDefs = <TData extends object>(colDefs: ColDef<TData>[
 ]
 
 export const asDeletableColDefs = <TData extends object>(colDefs: ColDef<TData>[]): ColDef<TData>[] => [
-  ...colDefs,
   {
     maxWidth: 50,
     suppressHeaderMenuButton: true,
     cellStyle: { textAlign: 'center' },
+    filter: false,
+    sortable: false,
     cellRenderer: (props: ICellRendererParams<TData>) => (
       <DeleteFilled
         onClick={() => {
           props.api.applyTransaction({ remove: [props.data] })
+
+          props.context.leftGridRef?.current?.api?.applyTransaction({ add: [props.data] });
         }}
       />
     )
-  }
+  },
+  ...colDefs
 ]
 
 interface GridTransferProps<TData extends object> {
@@ -43,8 +50,10 @@ interface GridTransferProps<TData extends object> {
   rightColumnDef: ColDef<TData>[];
   getRowId: (params: GetRowIdParams<TData>) => string;
   removeRowFromSource?: boolean;
+  includeCheckboxes?: boolean;
   leftGridRef?: React.MutableRefObject<AgGridReact<TData>>;
   rightGridRef?: React.MutableRefObject<AgGridReact<TData>>;
+  GridProps?: AgGridReactProps<TData>;
 }
 
 const defaultColDef: ColDef = {
@@ -64,7 +73,7 @@ export const AgGridTransfer = <TData extends object>(props: GridTransferProps<TD
 
   const onDragStop = useCallback((params: RowDragEndEvent) => {
     if (props.removeRowFromSource)
-      leftGridRef.current.api?.applyTransaction({ remove: [params.node.data] })
+      leftGridRef.current.api?.applyTransaction({ remove: params.nodes.map(node => node.data) })
     else
       leftGridRef.current.api?.setNodesSelected({ nodes: params.nodes, newValue: false })
   }, [leftGridRef, props.removeRowFromSource])
@@ -84,7 +93,6 @@ export const AgGridTransfer = <TData extends object>(props: GridTransferProps<TD
     <div className={agGridTheme} style={{ minHeight: 250, width: '100%' }}>
       <AgGridReact
         ref={isLeft ? leftGridRef : rightGridRef}
-        defaultColDef={defaultColDef}
         getRowId={props.getRowId}
         rowDragManaged={true}
         rowSelection={isLeft ? 'multiple' : undefined}
@@ -95,9 +103,12 @@ export const AgGridTransfer = <TData extends object>(props: GridTransferProps<TD
         rowData={isLeft ? props.leftGridData : props.rightGridData}
         columnDefs={isLeft ? props.leftColumnDef : props.rightColumnDef}
         onGridReady={onGridReady}
+        context={isLeft ? { rightGridRef: rightGridRef } : { leftGridRef: leftGridRef }}
+        {...props.GridProps}
+        defaultColDef={{ ...defaultColDef, ...(props?.GridProps?.defaultColDef ?? {}) }}
       />
     </div>
-  ), [agGridTheme, leftGridRef, rightGridRef, props.getRowId, props.leftGridData, props.rightGridData, props.leftColumnDef, props.rightColumnDef, onGridReady])
+  ), [agGridTheme, leftGridRef, rightGridRef, props.getRowId, props.leftGridData, props.rightGridData, props.leftColumnDef, props.rightColumnDef, props.GridProps, onGridReady])
 
 
   return (
