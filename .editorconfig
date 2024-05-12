@@ -24,6 +24,10 @@ dotnet_style_prefer_simplified_interpolation = true:suggestion
 dotnet_style_namespace_match_folder = true:suggestion
 dotnet_style_readonly_field = true:warning
 
+# ts/tsx/js/jsx
+[*.{ts,tsx,js,jsx}]
+indent_size = 2
+
 # Xml files
 [*.xml]
 indent_size = 2
