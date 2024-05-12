@@ -1,5 +1,5 @@
 import { ColDef, GetRowIdParams, GridReadyEvent, ICellRendererParams, RowDragEndEvent } from 'ag-grid-community'
-import { DeleteFilled } from '@ant-design/icons'
+import { DeleteOutlined } from '@ant-design/icons'
 import useTheme from '@/src/app/components/contexts/theme'
 import React, { useCallback, useRef, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
@@ -31,7 +31,7 @@ export const asDeletableColDefs = <TData extends object>(colDefs: ColDef<TData>[
     filter: false,
     sortable: false,
     cellRenderer: (props: ICellRendererParams<TData>) => (
-      <DeleteFilled
+      <DeleteOutlined
         onClick={() => {
           props.api.applyTransaction({ remove: [props.data] })
 

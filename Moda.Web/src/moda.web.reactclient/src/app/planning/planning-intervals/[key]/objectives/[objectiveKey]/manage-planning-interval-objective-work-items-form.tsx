@@ -12,7 +12,7 @@ import { Input, message, Modal, Space, Typography } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-import { AgGridTransfer, asDeletableColDefs, asDraggableColDefs } from '@/src/app/components/common/grid/AgGridTransfer'
+import { AgGridTransfer, asDeletableColDefs, asDraggableColDefs } from '@/src/app/components/common/grid/ag-grid-transfer'
 
 const { Text } = Typography
 
