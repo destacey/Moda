@@ -27,8 +27,6 @@ internal static class ProcessDtoExtensions
 
     public static AzdoWorkProcessConfiguration ToAzdoWorkProcessDetails(this ProcessDto process, List<BehaviorDto> behaviors, List<ProcessWorkItemTypeDto> workTypes)
     {
-        //var workflow = workTypes.ToProcessWorkflow();
-
         return new AzdoWorkProcessConfiguration
         {
             Id = process.TypeId,
@@ -38,7 +36,7 @@ internal static class ProcessDtoExtensions
             WorkspaceIds = process.Projects?.Select(p => p.Id).ToList() ?? [],
             BacklogLevels = behaviors.ToIExternalBacklogLevels(),
             WorkTypes = workTypes.ToIExternalWorkTypes(),
-            WorkStatuses = workTypes.ToIExternalWorkStatuses(),
+            WorkStatuses = workTypes.ToIExternalWorkStatuses()
         };
     }
 

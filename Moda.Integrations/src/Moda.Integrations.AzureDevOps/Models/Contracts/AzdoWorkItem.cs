@@ -2,7 +2,7 @@
 using NodaTime;
 
 namespace Moda.Integrations.AzureDevOps.Models.Contracts;
-public record AzdoWorkItem : IExternalWorkItem
+public sealed record AzdoWorkItem : IExternalWorkItem
 {
     public int Id { get; set; }
     public required string Title { get; set; }

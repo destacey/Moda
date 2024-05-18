@@ -3,4 +3,3 @@ global using Moda.Common.Domain.Enums;
 global using Moda.Common.Domain.Events;
 global using Moda.Common.Domain.Interfaces;
 global using Moda.Common.Domain.Models;
-global using Moda.Work.Domain.Enums;

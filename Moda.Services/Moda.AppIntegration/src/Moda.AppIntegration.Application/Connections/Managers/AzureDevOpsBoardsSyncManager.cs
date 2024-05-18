@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.Common.Application.Enums;
+using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.WorkStatuses.Commands;
@@ -172,15 +173,16 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
             return processResult.ConvertFailure();
 
         // create new types
-        if (processResult.Value.WorkTypes.Any())
+        var workTypes = processResult.Value.WorkTypes.OfType<IExternalWorkType>().ToList();
+        if (workTypes.Count != 0)
         {
-            var syncWorkTypesResult = await _sender.Send(new SyncExternalWorkTypesCommand(processResult.Value.WorkTypes), cancellationToken);
+            var syncWorkTypesResult = await _sender.Send(new SyncExternalWorkTypesCommand(workTypes), cancellationToken);
             if (syncWorkTypesResult.IsFailure)
                 return syncWorkTypesResult.ConvertFailure<Guid>();
         }
 
         // create new statuses
-        if (processResult.Value.WorkStatuses.Any())
+        if (processResult.Value.WorkStatuses.Count != 0)
         {
             var syncWorkStatusesResult = await _sender.Send(new SyncExternalWorkStatusesCommand(processResult.Value.WorkStatuses), cancellationToken);
             if (syncWorkStatusesResult.IsFailure)
