@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums.Work;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;

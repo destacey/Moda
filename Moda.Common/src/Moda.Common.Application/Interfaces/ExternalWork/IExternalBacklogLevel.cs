@@ -1,4 +1,4 @@
-﻿using Moda.Common.Domain.Enums;
+﻿using Moda.Common.Domain.Enums.Work;
 
 namespace Moda.Common.Application.Interfaces.ExternalWork;
 public interface IExternalBacklogLevel

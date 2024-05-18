@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.Work.Domain.Enums;
+namespace Moda.Common.Domain.Enums.Work;
 
 // Max length of 32 characters
 public enum WorkStatusCategory

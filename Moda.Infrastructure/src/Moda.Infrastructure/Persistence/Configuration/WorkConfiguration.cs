@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Models;
-using Moda.Work.Domain.Enums;
 using Moda.Work.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
