@@ -1,6 +1,6 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 
-namespace Moda.Work.Application.WorkProcesses.Validators;
+namespace Moda.Common.Application.Validators;
 public sealed class IExternalWorkProcessConfigurationValidator : CustomValidator<IExternalWorkProcessConfiguration>
 {
     public IExternalWorkProcessConfigurationValidator()

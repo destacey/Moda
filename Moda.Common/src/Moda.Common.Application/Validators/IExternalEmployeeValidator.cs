@@ -1,7 +1,7 @@
 ﻿namespace Moda.Common.Application.Validators;
-public sealed class ExternalEmployeeValidator : CustomValidator<IExternalEmployee>
+public sealed class IExternalEmployeeValidator : CustomValidator<IExternalEmployee>
 {
-    public ExternalEmployeeValidator()
+    public IExternalEmployeeValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
