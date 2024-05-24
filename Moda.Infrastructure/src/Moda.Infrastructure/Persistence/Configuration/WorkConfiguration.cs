@@ -378,13 +378,12 @@ public class WorkflowConfig : IEntityTypeConfiguration<Workflow>
             .IncludeProperties(w => new { w.Id, w.Name });
 
         // Properties
-        builder.Property(w => w.Name).IsRequired().HasMaxLength(64);
+        builder.Property(w => w.Name).IsRequired().HasMaxLength(128);
         builder.Property(w => w.Description).HasMaxLength(1024);
         builder.Property(w => w.Ownership).IsRequired()
             .HasConversion<EnumConverter<Ownership>>()
             .HasColumnType("varchar")
             .HasMaxLength(32);
-        builder.Property(w => w.ExternalId);
         builder.Property(w => w.IsActive);
 
         // Audit
@@ -398,7 +397,7 @@ public class WorkflowConfig : IEntityTypeConfiguration<Workflow>
 
         // Relationships
         builder.HasMany(w => w.Schemes)
-            .WithOne()
+            .WithOne(s => s.Workflow)
             .HasForeignKey(w => w.WorkflowId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -420,8 +419,6 @@ public class WorkflowSchemeConfig : IEntityTypeConfiguration<WorkflowScheme>
             .IncludeProperties(w => new { w.Id });
 
         // Properties
-        builder.Property(w => w.WorkflowId);
-        builder.Property(w => w.WorkStatusId);
         builder.Property(w => w.WorkStatusCategory).IsRequired()
             .HasConversion<EnumConverter<WorkStatusCategory>>()
             .HasColumnType("varchar")

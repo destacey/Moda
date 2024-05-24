@@ -1,12 +1,14 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Extensions;
+using Moda.Work.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
 /// <summary>
-/// 
+/// A workflow is a sequence of work statuses that a work item can move through.  It is used to define the process for a work item.
 /// </summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
@@ -18,12 +20,11 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
 
     private Workflow() { }
 
-    internal Workflow(string name, string? description, Ownership ownership, Guid? externalId)
+    internal Workflow(string name, string? description, Ownership ownership)
     {
         Name = name;
         Description = description;
         Ownership = ownership;
-        ExternalId = externalId;
     }
 
     /// <summary>
@@ -48,11 +49,6 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
     /// Indicates whether the workflow is owned by Moda or a third party system.  This value should not change.
     /// </summary>
     public Ownership Ownership { get; private init; }
-
-    /// <summary>
-    /// Gets the external identifier. The value is required when Ownership is managed; otherwise it's null.  For Azure DevOps, this is the process id.
-    /// </summary>
-    public Guid? ExternalId { get; private init; }
 
     /// <summary>
     /// Indicates whether the workflow is active or not.  Only active workflows can be assigned 
@@ -96,24 +92,32 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
         return Result.Success();
     }
 
-    // TODO move CRUD operations for WorkflowScheme here
-    //public Result AddScheme(int workStatusId, WorkStatusCategory workStatusCategory, int order)
-    //{
-    //    try
-    //    {
-
-    //        _schemes.Add(WorkflowScheme.Create(Id, workStatusId, workStatusCategory, order));
-    //        return Result.Success();
-
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return Result.Failure(ex.ToString());
-    //    }
-    //}
-
-    public static Workflow Create(string name, string? description, Ownership ownership, Guid? externalId)
+    public Result AddScheme(int workStatusId, WorkStatusCategory workStatusCategory, int order, bool isActive)
     {
-        return new(name, description, ownership, externalId);
+        try
+        {
+            _schemes.Add(WorkflowScheme.CreateExternal(this, workStatusId, workStatusCategory, order, isActive));
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
+    public static Workflow CreateExternal(string name, string? description, IEnumerable<ICreateWorkflowScheme> workflowSchemes)
+    {
+        var workflow = new Workflow(name, description, Ownership.Managed);
+
+        foreach (var scheme in workflowSchemes)
+        {
+            var result = workflow.AddScheme(scheme.WorkStatusId, scheme.Category, scheme.Order, scheme.IsActive);
+            if (result.IsFailure)
+            {
+                throw new InvalidOperationException(result.Error);
+            }
+        }
+
+        return workflow;
     }
 }
