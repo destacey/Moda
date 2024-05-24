@@ -1,5 +1,5 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Work.Application.WorkProcesses.Validators;
+using Moda.Common.Application.Validators;
 
 namespace Moda.Work.Application.WorkProcesses.Commands;
 public sealed record UpdateExternalWorkProcessCommand(IExternalWorkProcessConfiguration ExternalWorkProcess, IEnumerable<IExternalWorkType> ExternalWorkTypes) : ICommand;
@@ -46,7 +46,6 @@ internal sealed class UpdateExternalWorkProcessCommandHandler(IWorkDbContext wor
             return syncWorkTypesResult;
         }
 
-        //_workDbContext.WorkProcesses.Update(workProcess);
         await _workDbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("{AppRequestName}: updated work process {WorkProcessName}.", AppRequestName, workProcess.Name);
@@ -81,7 +80,7 @@ internal sealed class UpdateExternalWorkProcessCommandHandler(IWorkDbContext wor
             var scheme = workProcess.Schemes.FirstOrDefault(s => s.WorkTypeId == workType.Id);
             if (scheme is null)
             {
-                var addResult = workProcess.AddWorkType(workType.Id, externalWorkType.IsActive, _timestamp);
+                var addResult = workProcess.AddWorkType(workType.Id, null, externalWorkType.IsActive, _timestamp);
                 if (addResult.IsFailure)
                 {
                     _logger.LogError("{AppRequestName}: failed to add work type {WorkTypeId} to work process {WorkProcessId}. Error: {Error}", AppRequestName, workType.Id, workProcess.Id, addResult.Error);

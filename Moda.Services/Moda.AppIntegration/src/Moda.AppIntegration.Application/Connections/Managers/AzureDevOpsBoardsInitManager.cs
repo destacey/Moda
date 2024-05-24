@@ -6,6 +6,7 @@ using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Common.Domain.Models;
 using Moda.Common.Models;
+using Moda.Work.Application.Workflows.Dtos;
 using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.WorkProcesses.Queries;
 using Moda.Work.Application.Workspaces.Queries;
@@ -126,11 +127,22 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                     return syncWorkStatusesResult.ConvertFailure<Guid>();
             }
 
-            // create workflow
-            // TODO
+            // create workflow for each work type and map the workflow id to the type
+            var workProcessSchemes = new List<CreateWorkProcessSchemeDto>(processResult.Value.WorkTypes.Count);
+            foreach (var workType in processResult.Value.WorkTypes)
+            {
+                var createWorkflowResult = await _sender.Send(new CreateExternalWorkflowCommand(
+                    $"{processResult.Value.Name} - {workType.Name}",
+                    "Auto-generated workflow for Azure DevOps work process.",
+                    workType), cancellationToken);
+                if (createWorkflowResult.IsFailure)
+                    return createWorkflowResult.ConvertFailure<Guid>();
+
+                workProcessSchemes.Add(CreateWorkProcessSchemeDto.Create(workType.Name, workType.IsActive, createWorkflowResult.Value));
+            }
 
             // create process
-            var createProcessResult = await _sender.Send(new CreateExternalWorkProcessCommand(processResult.Value, processResult.Value.WorkTypes), cancellationToken);
+            var createProcessResult = await _sender.Send(new CreateExternalWorkProcessCommand(processResult.Value, workProcessSchemes), cancellationToken);
             if (createProcessResult.IsFailure)
                 return createProcessResult.ConvertFailure<Guid>();
 

@@ -1,19 +1,7 @@
-﻿using Moda.Common.Application.Interfaces.ExternalWork;
+﻿using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Common.Domain.Models;
-using Moda.Work.Application.WorkProcesses.Validators;
 
 namespace Moda.Work.Application.WorkProcesses.Commands;
-public sealed record CreateExternalWorkProcessCommand(IExternalWorkProcessConfiguration ExternalWorkProcess, IEnumerable<IExternalWorkType> ExternalWorkTypes) : ICommand<IntegrationState<Guid>>;
-
-public sealed class CreateExternalWorkProcessCommandValidator : CustomValidator<CreateExternalWorkProcessCommand>
-{
-    public CreateExternalWorkProcessCommandValidator()
-    {
-        RuleFor(c => c.ExternalWorkProcess)
-            .NotNull()
-            .SetValidator(new IExternalWorkProcessConfigurationValidator());
-    }
-}
 
 internal sealed class CreateExternalWorkProcessCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateExternalWorkProcessCommandHandler> logger) : ICommandHandler<CreateExternalWorkProcessCommand, IntegrationState<Guid>>
 {
@@ -35,17 +23,18 @@ internal sealed class CreateExternalWorkProcessCommandHandler(IWorkDbContext wor
 
         var workProcess = WorkProcess.CreateExternal(request.ExternalWorkProcess.Name, request.ExternalWorkProcess.Description, request.ExternalWorkProcess.Id, timestamp);
 
-        var workTypes = await _workDbContext.WorkTypes.Where(wt => request.ExternalWorkTypes.Select(wt => wt.Name).Contains(wt.Name)).ToArrayAsync(cancellationToken);
+        var workTypes = await _workDbContext.WorkTypes.Where(wt => request.WorkProcessSchemes.Select(wps => wps.WorkTypeName).Contains(wt.Name)).ToArrayAsync(cancellationToken);
 
-        foreach (var externalWorkType in request.ExternalWorkTypes)
+        foreach (var workProcessScheme in request.WorkProcessSchemes)
         {
-            var workType = workTypes.FirstOrDefault(wt => wt.Name == externalWorkType.Name);
+            var workType = workTypes.FirstOrDefault(wt => wt.Name == workProcessScheme.WorkTypeName);
             if (workType is null)
             {
-                _logger.LogError("{AppRequestName}: work type {WorkTypeName} not found.", AppRequestName, externalWorkType.Name);
-                return Result.Failure<IntegrationState<Guid>>($"Work type {externalWorkType.Name} not found.");
+                _logger.LogError("{AppRequestName}: work type {WorkTypeName} not found.", AppRequestName, workProcessScheme.WorkTypeName);
+                return Result.Failure<IntegrationState<Guid>>($"Work type {workProcessScheme.WorkTypeName} not found.");
             }
-            workProcess.AddWorkType(workType.Id, externalWorkType.IsActive, timestamp);
+
+            workProcess.AddWorkType(workType.Id, workProcessScheme.WorkflowId, workProcessScheme.WorkTypeIsActive, timestamp);
         }
 
         _workDbContext.WorkProcesses.Add(workProcess);
