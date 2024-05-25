@@ -1,18 +1,7 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Application.Validators;
+using Moda.Common.Application.Requests.WorkManagement;
 
 namespace Moda.Work.Application.WorkProcesses.Commands;
-public sealed record UpdateExternalWorkProcessCommand(IExternalWorkProcessConfiguration ExternalWorkProcess, IEnumerable<IExternalWorkType> ExternalWorkTypes) : ICommand;
-
-public sealed class UpdateExternalWorkProcessCommandValidator : CustomValidator<UpdateExternalWorkProcessCommand>
-{
-    public UpdateExternalWorkProcessCommandValidator()
-    {
-        RuleFor(c => c.ExternalWorkProcess)
-            .NotNull()
-            .SetValidator(new IExternalWorkProcessConfigurationValidator());
-    }
-}
 
 internal sealed class UpdateExternalWorkProcessCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateExternalWorkProcessCommandHandler> logger) : ICommandHandler<UpdateExternalWorkProcessCommand>
 {

@@ -1,15 +1,12 @@
 ﻿using Ardalis.GuardClauses;
 using MediatR;
-using Microsoft.Extensions.Logging;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.Common.Application.Enums;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
-using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.WorkStatuses.Commands;
 using Moda.Work.Application.WorkTypes.Commands;
-using Moda.Work.Domain.Models;
 using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
@@ -188,6 +185,25 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
             if (syncWorkStatusesResult.IsFailure)
                 return syncWorkStatusesResult.ConvertFailure<Guid>();
         }
+
+
+
+
+
+
+        // get the work process, scheme, and workflow
+
+        // identify the missing or changed workflows
+
+        // include the data in the update command
+
+
+
+
+
+
+
+
 
         // update the work process
         // TODO: update work process scheme
