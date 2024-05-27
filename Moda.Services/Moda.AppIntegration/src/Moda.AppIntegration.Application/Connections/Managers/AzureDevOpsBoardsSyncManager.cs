@@ -195,7 +195,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         var workflowMappings = new List<CreateWorkProcessSchemeDto>(processResult.Value.WorkTypes.Count);
         foreach (var workType in processResult.Value.WorkTypes)
         {
-            var scheme = workProcessSchemes.FirstOrDefault(s => s.WorkType.Name == workType.Name);
+            var scheme = workProcessSchemes.SingleOrDefault(s => s.WorkType.Name == workType.Name);
             if (scheme is null || scheme.Workflow is null)
             {
                 // create new workflow

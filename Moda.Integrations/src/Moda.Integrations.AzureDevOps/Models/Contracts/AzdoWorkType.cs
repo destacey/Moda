@@ -7,5 +7,7 @@ public sealed record AzdoWorkType : IExternalWorkTypeWorkflow
     public string? Description { get; set; }
     public required string BacklogLevelId { get; set; }
     public bool IsActive { get; set; }
-    public IList<IExternalWorkflowState> WorkflowStates { get; set; } = [];
+    public required List<AzdoWorkflowState> WorkflowStates { get; set; } = [];
+
+    IList<IExternalWorkflowState> IExternalWorkTypeWorkflow.WorkflowStates => WorkflowStates.OfType<IExternalWorkflowState>().ToList();
 }

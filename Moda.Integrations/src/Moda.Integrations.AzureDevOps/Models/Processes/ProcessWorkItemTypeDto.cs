@@ -31,15 +31,35 @@ internal static class ProcessWorkItemTypeDtoExtensions
         // TODO make this configurable
         var backlogLevelId = workItemType.Behaviors.FirstOrDefault()?.Behavior.Id ?? "System.RequirementBacklogBehavior";
 
-        return new AzdoWorkType
+        var azdoWorkType = new AzdoWorkType
         {
             Name = workItemType.Name,
             Description = workItemType.Description,
             BacklogLevelId = backlogLevelId,
             IsActive = !workItemType.IsDisabled,
-            WorkflowStates = workItemType.States.Select(workItemState => workItemState.ToAzdoWorkflowState())
-                .ToList<IExternalWorkflowState>()
+            WorkflowStates = []
+            //WorkflowStates = workItemType.States.Select(workItemState => workItemState.ToAzdoWorkflowState()).ToList<IExternalWorkflowState>()
         };
+
+        // there seems to be a bug in the API when including states that duplicates hidden states. Override with the last one for now.
+        foreach (var state in workItemType.States)
+        {
+            var existing = azdoWorkType.WorkflowStates.SingleOrDefault(s => s.StatusName == state.Name);
+            if (existing is null)
+            {
+                azdoWorkType.WorkflowStates.Add(state.ToAzdoWorkflowState());
+            }
+            else
+            {
+                var duplicate = state.ToAzdoWorkflowState();
+
+                existing.Category = duplicate.Category;
+                existing.Order = duplicate.Order;
+                existing.IsActive = duplicate.IsActive;
+            }
+        }
+
+        return azdoWorkType;
     }
 
     public static IList<IExternalWorkTypeWorkflow> ToIExternalWorkTypes(this List<ProcessWorkItemTypeDto> workItemTypes)
