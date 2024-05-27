@@ -28,6 +28,11 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
     }
 
     /// <summary>
+    /// The key of the workflow.  This is the unique identifier for the workflow and should not change.
+    /// </summary>
+    public int Key { get; private init; }
+
+    /// <summary>
     /// The name of the workflow.
     /// </summary>
     public string Name

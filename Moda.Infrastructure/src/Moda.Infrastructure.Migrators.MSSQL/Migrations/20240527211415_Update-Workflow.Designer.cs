@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20240524002100_Update-Workflow")]
+    [Migration("20240527211415_Update-Workflow")]
     partial class UpdateWorkflow
     {
         /// <inheritdoc />
@@ -1793,6 +1793,12 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Key")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
+
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
 
@@ -1811,11 +1817,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasAlternateKey("Key");
+
                     b.HasIndex("Id");
+
+                    b.HasIndex("Key");
 
                     b.HasIndex("IsActive", "IsDeleted");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "Name" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "Key", "Name" });
 
                     b.ToTable("Workflows", "Work");
                 });

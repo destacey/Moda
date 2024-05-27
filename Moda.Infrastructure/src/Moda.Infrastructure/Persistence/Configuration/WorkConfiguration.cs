@@ -372,12 +372,16 @@ public class WorkflowConfig : IEntityTypeConfiguration<Workflow>
         builder.ToTable("Workflows", SchemaNames.Work);
 
         builder.HasKey(w => w.Id);
+        builder.HasAlternateKey(w => w.Key);
+
 
         builder.HasIndex(w => w.Id);
+        builder.HasIndex(w => w.Key);
         builder.HasIndex(w => new { w.IsActive, w.IsDeleted })
-            .IncludeProperties(w => new { w.Id, w.Name });
+            .IncludeProperties(w => new { w.Id, w.Key, w.Name });
 
         // Properties
+        builder.Property(p => p.Key).ValueGeneratedOnAdd();
         builder.Property(w => w.Name).IsRequired().HasMaxLength(128);
         builder.Property(w => w.Description).HasMaxLength(1024);
         builder.Property(w => w.Ownership).IsRequired()

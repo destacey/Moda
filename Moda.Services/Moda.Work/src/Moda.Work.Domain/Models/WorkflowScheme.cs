@@ -80,7 +80,7 @@ public sealed class WorkflowScheme : BaseAuditableEntity<Guid>, IActivatable
     /// <param name="order"></param>
     /// <param name="isActive"></param>
     /// <returns></returns>
-    public static WorkflowScheme Create(Workflow workflow, int workStatusId, WorkStatusCategory workStatusCategory, int order, bool isActive)
+    internal static WorkflowScheme Create(Workflow workflow, int workStatusId, WorkStatusCategory workStatusCategory, int order, bool isActive)
     {
         return new(workflow, workStatusId, workStatusCategory, order, isActive);
     }
