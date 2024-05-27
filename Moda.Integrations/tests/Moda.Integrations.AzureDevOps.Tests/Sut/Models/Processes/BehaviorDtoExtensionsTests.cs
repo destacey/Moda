@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.Work;
 using Moda.Integrations.AzureDevOps.Models.Processes;
 using Moda.Integrations.AzureDevOps.Tests.Models;
 

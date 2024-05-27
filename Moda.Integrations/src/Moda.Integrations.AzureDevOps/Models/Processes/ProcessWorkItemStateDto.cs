@@ -1,4 +1,5 @@
-﻿using Moda.Integrations.AzureDevOps.Models.Contracts;
+﻿using Moda.Common.Domain.Enums.Work;
+using Moda.Integrations.AzureDevOps.Models.Contracts;
 
 namespace Moda.Integrations.AzureDevOps.Models.Processes;
 
@@ -18,6 +19,25 @@ internal static class ProcessWorkItemStateDtoExtensions
         return new AzdoWorkStatus
         {
             Name = workItemState.Name
+        };
+    }
+
+    public static AzdoWorkflowState ToAzdoWorkflowState(this ProcessWorkItemStateDto workItemState)
+    {
+        return new AzdoWorkflowState
+        {
+            StatusName = workItemState.Name,
+            Category = workItemState.StateCategory switch
+            {
+                "Proposed" => WorkStatusCategory.Proposed,
+                "InProgress" => WorkStatusCategory.Active,
+                "Resolved" => WorkStatusCategory.Active,
+                "Completed" => WorkStatusCategory.Done,
+                "Removed" => WorkStatusCategory.Removed,
+                _ => throw new ArgumentOutOfRangeException(nameof(workItemState.StateCategory), workItemState.StateCategory, null)
+            },
+            Order = workItemState.Order,
+            IsActive = !workItemState.Hidden
         };
     }
 }

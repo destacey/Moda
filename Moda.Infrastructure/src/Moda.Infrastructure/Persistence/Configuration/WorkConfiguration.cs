@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Models;
-using Moda.Work.Domain.Enums;
 using Moda.Work.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
@@ -372,19 +372,22 @@ public class WorkflowConfig : IEntityTypeConfiguration<Workflow>
         builder.ToTable("Workflows", SchemaNames.Work);
 
         builder.HasKey(w => w.Id);
+        builder.HasAlternateKey(w => w.Key);
+
 
         builder.HasIndex(w => w.Id);
+        builder.HasIndex(w => w.Key);
         builder.HasIndex(w => new { w.IsActive, w.IsDeleted })
-            .IncludeProperties(w => new { w.Id, w.Name });
+            .IncludeProperties(w => new { w.Id, w.Key, w.Name });
 
         // Properties
-        builder.Property(w => w.Name).IsRequired().HasMaxLength(64);
+        builder.Property(p => p.Key).ValueGeneratedOnAdd();
+        builder.Property(w => w.Name).IsRequired().HasMaxLength(128);
         builder.Property(w => w.Description).HasMaxLength(1024);
         builder.Property(w => w.Ownership).IsRequired()
             .HasConversion<EnumConverter<Ownership>>()
             .HasColumnType("varchar")
             .HasMaxLength(32);
-        builder.Property(w => w.ExternalId);
         builder.Property(w => w.IsActive);
 
         // Audit
@@ -398,7 +401,7 @@ public class WorkflowConfig : IEntityTypeConfiguration<Workflow>
 
         // Relationships
         builder.HasMany(w => w.Schemes)
-            .WithOne()
+            .WithOne(s => s.Workflow)
             .HasForeignKey(w => w.WorkflowId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -420,8 +423,6 @@ public class WorkflowSchemeConfig : IEntityTypeConfiguration<WorkflowScheme>
             .IncludeProperties(w => new { w.Id });
 
         // Properties
-        builder.Property(w => w.WorkflowId);
-        builder.Property(w => w.WorkStatusId);
         builder.Property(w => w.WorkStatusCategory).IsRequired()
             .HasConversion<EnumConverter<WorkStatusCategory>>()
             .HasColumnType("varchar")

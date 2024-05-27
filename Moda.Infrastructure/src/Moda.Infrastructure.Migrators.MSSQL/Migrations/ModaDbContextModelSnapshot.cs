@@ -1784,14 +1784,17 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
 
-                    b.Property<Guid?>("ExternalId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<int>("Key")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
@@ -1801,8 +1804,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Ownership")
                         .IsRequired()
@@ -1811,11 +1814,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasAlternateKey("Key");
+
                     b.HasIndex("Id");
+
+                    b.HasIndex("Key");
 
                     b.HasIndex("IsActive", "IsDeleted");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "Name" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "Key", "Name" });
 
                     b.ToTable("Workflows", "Work");
                 });
@@ -2266,13 +2273,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Moda.Work.Domain.Models.Workflow", null)
+                    b.HasOne("Moda.Work.Domain.Models.Workflow", "Workflow")
                         .WithMany("Schemes")
                         .HasForeignKey("WorkflowId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("WorkStatus");
+
+                    b.Navigation("Workflow");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.Workspace", b =>

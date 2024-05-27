@@ -33,7 +33,17 @@ internal sealed class ProcessClient : BaseClient
         SetupRequest(request);
         request.AddParameter("$expand", "states,behaviors");
 
+        // there seems to be a bug in the API when including states that duplicates hidden states
+
         return await _client.ExecuteAsync<AzdoListResponse<ProcessWorkItemTypeDto>>(request, cancellationToken);
+    }
+
+    internal async Task<RestResponse<AzdoListResponse<ProcessWorkItemStateDto>>> GetWorkItemTypeStates(Guid processId, string workItemTypeReferenceName, CancellationToken cancellationToken)
+    {
+        var request = new RestRequest($"/_apis/work/processes/{processId}/workitemtypes/{workItemTypeReferenceName}/states", Method.Get);
+        SetupRequest(request);
+
+        return await _client.ExecuteAsync<AzdoListResponse<ProcessWorkItemStateDto>>(request, cancellationToken);
     }
 
     internal async Task<RestResponse<AzdoListResponse<BehaviorDto>>> GetBehaviors(Guid processId, CancellationToken cancellationToken)

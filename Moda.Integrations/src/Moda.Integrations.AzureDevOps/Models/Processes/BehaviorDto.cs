@@ -1,6 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using Moda.Common.Application.Interfaces.ExternalWork;
-using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.Work;
 using Moda.Integrations.AzureDevOps.Models.Contracts;
 
 namespace Moda.Integrations.AzureDevOps.Models.Processes;

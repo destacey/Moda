@@ -1,5 +1,7 @@
-﻿namespace Moda.Work.Application.WorkStatuses.Dtos;
-public sealed record WorkStatusDto : IMapFrom<WorkStatus>
+﻿using Moda.Common.Application.Requests.WorkManagement.Interfaces;
+
+namespace Moda.Work.Application.WorkStatuses.Dtos;
+public sealed record WorkStatusDto : IMapFrom<WorkStatus>, IWorkStatusDto
 {
     public int Id { get; set; }
 

@@ -1,12 +1,14 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Extensions;
+using Moda.Work.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
 /// <summary>
-/// 
+/// A workflow is a sequence of work statuses that a work item can move through.  It is used to define the process for a work item.
 /// </summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
@@ -18,13 +20,17 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
 
     private Workflow() { }
 
-    internal Workflow(string name, string? description, Ownership ownership, Guid? externalId)
+    internal Workflow(string name, string? description, Ownership ownership)
     {
         Name = name;
         Description = description;
         Ownership = ownership;
-        ExternalId = externalId;
     }
+
+    /// <summary>
+    /// The key of the workflow.  This is the unique identifier for the workflow and should not change.
+    /// </summary>
+    public int Key { get; private init; }
 
     /// <summary>
     /// The name of the workflow.
@@ -32,7 +38,7 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
     public string Name
     {
         get => _name;
-        private init => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
     }
 
     /// <summary>
@@ -48,11 +54,6 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
     /// Indicates whether the workflow is owned by Moda or a third party system.  This value should not change.
     /// </summary>
     public Ownership Ownership { get; private init; }
-
-    /// <summary>
-    /// Gets the external identifier. The value is required when Ownership is managed; otherwise it's null.  For Azure DevOps, this is the process id.
-    /// </summary>
-    public Guid? ExternalId { get; private init; }
 
     /// <summary>
     /// Indicates whether the workflow is active or not.  Only active workflows can be assigned 
@@ -90,30 +91,83 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
         {
             // TODO is there logic that would prevent deactivation?
             IsActive = false;
+
+            foreach (var scheme in _schemes)
+            {
+                var deactivateResult = scheme.Deactivate(timestamp);
+                if (deactivateResult.IsFailure)
+                {
+                    return Result.Failure(deactivateResult.Error);
+                }
+            }
+
             AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
     }
 
-    // TODO move CRUD operations for WorkflowScheme here
-    //public Result AddScheme(int workStatusId, WorkStatusCategory workStatusCategory, int order)
-    //{
-    //    try
-    //    {
-
-    //        _schemes.Add(WorkflowScheme.Create(Id, workStatusId, workStatusCategory, order));
-    //        return Result.Success();
-
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return Result.Failure(ex.ToString());
-    //    }
-    //}
-
-    public static Workflow Create(string name, string? description, Ownership ownership, Guid? externalId)
+    public Result Update(string name, string? description, Instant timestamp)
     {
-        return new(name, description, ownership, externalId);
+        Name = name;
+        Description = description;
+
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+        return Result.Success();
+    }
+
+    public Result AddScheme(int workStatusId, WorkStatusCategory workStatusCategory, int order, bool isActive)
+    {
+        if (_schemes.Any(s => s.WorkStatusId == workStatusId))
+        {
+            return Result.Failure($"Scheme for Work Status {workStatusId} already exists.");
+        }
+        _schemes.Add(WorkflowScheme.Create(this, workStatusId, workStatusCategory, order, isActive));
+        return Result.Success();
+    }
+
+    public Result ActivateScheme(Guid schemeId, Instant timestamp)
+    {
+        var scheme = _schemes.SingleOrDefault(s => s.Id == schemeId);
+        if (scheme is null)
+        {
+            return Result.Failure($"Scheme {schemeId} not found.");
+        }
+
+        if (!IsActive)
+        {
+            return Result.Failure("Unable to active a Workflow Scheme while the Workflow is not active.");
+        }
+
+        return scheme.Activate(timestamp);
+    }
+
+    public Result DeactivateScheme(Guid schemeId, Instant timestamp)
+    {
+        var scheme = _schemes.SingleOrDefault(s => s.Id == schemeId);
+        if (scheme is null)
+        {
+            return Result.Failure($"Scheme {schemeId} not found.");
+        }
+
+        return scheme.Deactivate(timestamp);
+    }
+
+
+    public static Workflow CreateExternal(string name, string? description, IEnumerable<ICreateWorkflowScheme> workflowSchemes)
+    {
+        var workflow = new Workflow(name, description, Ownership.Managed);
+
+        foreach (var scheme in workflowSchemes)
+        {
+            var result = workflow.AddScheme(scheme.WorkStatusId, scheme.Category, scheme.Order, scheme.IsActive);
+            if (result.IsFailure)
+            {
+                throw new InvalidOperationException(result.Error);
+            }
+        }
+
+        return workflow;
     }
 }

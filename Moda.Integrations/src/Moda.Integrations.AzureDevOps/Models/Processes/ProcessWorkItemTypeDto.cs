@@ -31,24 +31,45 @@ internal static class ProcessWorkItemTypeDtoExtensions
         // TODO make this configurable
         var backlogLevelId = workItemType.Behaviors.FirstOrDefault()?.Behavior.Id ?? "System.RequirementBacklogBehavior";
 
-        return new AzdoWorkType
+        var azdoWorkType = new AzdoWorkType
         {
-            Id = workItemType.ReferenceName,
             Name = workItemType.Name,
             Description = workItemType.Description,
             BacklogLevelId = backlogLevelId,
             IsActive = !workItemType.IsDisabled,
+            WorkflowStates = []
+            //WorkflowStates = workItemType.States.Select(workItemState => workItemState.ToAzdoWorkflowState()).ToList<IExternalWorkflowState>()
         };
+
+        // there seems to be a bug in the API when including states that duplicates hidden states. Override with the last one for now.
+        foreach (var state in workItemType.States)
+        {
+            var existing = azdoWorkType.WorkflowStates.SingleOrDefault(s => s.StatusName == state.Name);
+            if (existing is null)
+            {
+                azdoWorkType.WorkflowStates.Add(state.ToAzdoWorkflowState());
+            }
+            else
+            {
+                var duplicate = state.ToAzdoWorkflowState();
+
+                existing.Category = duplicate.Category;
+                existing.Order = duplicate.Order;
+                existing.IsActive = duplicate.IsActive;
+            }
+        }
+
+        return azdoWorkType;
     }
 
-    public static IList<IExternalWorkType> ToIExternalWorkTypes(this List<ProcessWorkItemTypeDto> workItemTypes)
+    public static IList<IExternalWorkTypeWorkflow> ToIExternalWorkTypes(this List<ProcessWorkItemTypeDto> workItemTypes)
     {
         // test work types typically have no behaviors
         return workItemTypes
             .Where(w => !_ignoredWorkItemTypes.Contains(w.ReferenceName)
                 && (w.Inherits is null || !_ignoredWorkItemTypes.Contains(w.Inherits)))
             .Select(w => w.ToAzdoWorkType())
-            .ToList<IExternalWorkType>();
+            .ToList<IExternalWorkTypeWorkflow>();
     }
 
     public static IList<IExternalWorkStatus> ToIExternalWorkStatuses(this List<ProcessWorkItemTypeDto> workItemTypes)
@@ -60,37 +81,5 @@ internal static class ProcessWorkItemTypeDtoExtensions
             .DistinctBy(s => s.Name)
             .Select(s => s.ToAzdoWorkStatus())
             .ToList<IExternalWorkStatus>();
-    }
-
-    public static List<ProcessWorkflowItemDto> ToProcessWorkflow(this List<ProcessWorkItemTypeDto> workItemTypes)
-    {
-        var types = workItemTypes
-            .Where(w => !_ignoredWorkItemTypes.Contains(w.ReferenceName)
-                && (w.Inherits is null || !_ignoredWorkItemTypes.Contains(w.Inherits)))
-            .ToList();
-
-        List<ProcessWorkflowItemDto> workflow = [];
-
-        foreach (var type in types)
-        {
-            foreach (var state in type.States)
-            {
-                workflow.Add(new ProcessWorkflowItemDto
-                {
-                    TypeReferenceName = type.ReferenceName,
-                    TypeName = type.Name,
-                    TypeIsDisabled = type.IsDisabled,
-                    BacklogLevelId = type.Behaviors.FirstOrDefault()?.Behavior.Id ?? "System.RequirementBacklogBehavior",
-                    StateId = state.Id,
-                    StateName = state.Name,
-                    StateCategory = state.StateCategory,
-                    StateOrder = state.Order,
-                    StateIsDisabled = state.Hidden
-                });
-            }
-
-        }
-
-        return workflow;
     }
 }

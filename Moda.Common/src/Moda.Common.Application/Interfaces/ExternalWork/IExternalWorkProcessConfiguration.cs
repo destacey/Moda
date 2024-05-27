@@ -2,6 +2,6 @@
 public interface IExternalWorkProcessConfiguration : IExternalWorkProcess
 {
     IList<IExternalBacklogLevel> BacklogLevels { get; }
-    IList<IExternalWorkType> WorkTypes { get; }
+    IList<IExternalWorkTypeWorkflow> WorkTypes { get; }
     IList<IExternalWorkStatus> WorkStatuses { get; }
 }

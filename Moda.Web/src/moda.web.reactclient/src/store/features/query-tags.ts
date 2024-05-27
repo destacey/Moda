@@ -10,5 +10,6 @@ export enum QueryTags {
   WorkItem = 'Work.WorkItem',
   WorkItemSearch = 'Work.WorkItem.Search',
   WorkProcess = 'Work.WorkProcess',
+  WorkProcessScheme = 'Work.WorkProcessScheme',
   Workspace = 'Work.Workspace',
 }

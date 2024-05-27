@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums.Work;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
@@ -13,8 +14,17 @@ public sealed class WorkflowScheme : BaseAuditableEntity<Guid>, IActivatable
         WorkStatusCategory = workStatusCategory;
         Order = order;
     }
+    internal WorkflowScheme(Workflow workflow, int workStatusId, WorkStatusCategory workStatusCategory, int order, bool isActive)
+    {
+        Workflow = workflow;
+        WorkStatusId = workStatusId;
+        WorkStatusCategory = workStatusCategory;
+        Order = order;
+        IsActive = isActive;
+    }
 
     public Guid WorkflowId { get; }
+    public Workflow? Workflow { get; private set; }
     public int WorkStatusId { get; }
     public WorkStatus? WorkStatus { get; private set; }
     public WorkStatusCategory WorkStatusCategory { get; private set; }
@@ -61,9 +71,17 @@ public sealed class WorkflowScheme : BaseAuditableEntity<Guid>, IActivatable
         }
     }
 
-    public static WorkflowScheme Create(Guid workflowId, int workStatusId, WorkStatusCategory workStatusCategory, int order)
+    /// <summary>
+    /// Used when creating a new workflow scheme and workflow together.  EF will set the WorkflowId when the workflow is saved.
+    /// </summary>
+    /// <param name="workflow"></param>
+    /// <param name="workStatusId"></param>
+    /// <param name="workStatusCategory"></param>
+    /// <param name="order"></param>
+    /// <param name="isActive"></param>
+    /// <returns></returns>
+    internal static WorkflowScheme Create(Workflow workflow, int workStatusId, WorkStatusCategory workStatusCategory, int order, bool isActive)
     {
-        // TODO move this to be managed by the Workflow as the aggregate root
-        return new(workflowId, workStatusId, workStatusCategory, order);
+        return new(workflow, workStatusId, workStatusCategory, order, isActive);
     }
 }

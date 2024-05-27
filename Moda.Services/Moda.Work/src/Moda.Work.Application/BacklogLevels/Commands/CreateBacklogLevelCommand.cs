@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.Work;
 
 namespace Moda.Work.Application.BacklogLevels.Commands;
 public sealed record CreateBacklogLevelCommand : ICommand<int>

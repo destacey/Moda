@@ -51,7 +51,6 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
             if (workTypesResult.IsFailure)
                 return Result.Failure<AzdoWorkProcessConfiguration>(workTypesResult.Error);
 
-            // TODO: Get the work flow configuration for the work types
             return Result.Success(processResult.Value.ToAzdoWorkProcessDetails(behaviorsResult.Value, workTypesResult.Value));
         }
         catch (Exception ex)

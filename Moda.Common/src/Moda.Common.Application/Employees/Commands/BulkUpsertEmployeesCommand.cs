@@ -29,7 +29,7 @@ public sealed class BulkUpsertEmployeesCommandValidator : CustomValidator<BulkUp
 
         RuleForEach(e => e.Employees)
             .NotNull()
-            .SetValidator(new ExternalEmployeeValidator());
+            .SetValidator(new IExternalEmployeeValidator());
     }
 }
 

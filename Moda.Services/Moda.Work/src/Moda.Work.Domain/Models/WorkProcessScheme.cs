@@ -52,6 +52,8 @@ public sealed class WorkProcessScheme : BaseAuditableEntity<Guid>, IActivatable
     /// <returns>Result that indicates success or a list of errors</returns>
     public Result Deactivate(Instant timestamp)
     {
+        Guard.Against.Null(WorkProcess, nameof(WorkProcess));
+
         if (IsActive)
         {
             IsActive = false;
@@ -61,26 +63,21 @@ public sealed class WorkProcessScheme : BaseAuditableEntity<Guid>, IActivatable
         return Result.Success();
     }
 
-    internal Result Update(Guid workflowId, Instant timestamp)
+    internal Result ChangeWorkflow(Guid workflowId)
     {
-        try
-        {
-            WorkflowId = workflowId;
+        Guard.Against.Default(workflowId, nameof(workflowId));
 
-            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+        WorkflowId = workflowId;
 
-            return Result.Success();
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure(ex.ToString());
-        }
+        return Result.Success();
     }
 
-    internal static WorkProcessScheme CreateExternal(Guid workProcessId, int workTypeId, bool isActive)
+    internal static WorkProcessScheme CreateExternal(Guid workProcessId, int workTypeId, Guid workflowId, bool isActive)
     {
         Guard.Against.Default(workProcessId, nameof(workProcessId));
-        var scheme = new WorkProcessScheme (workProcessId, workTypeId, null);
+        Guard.Against.Default(workflowId, nameof(workflowId));
+
+        var scheme = new WorkProcessScheme(workProcessId, workTypeId, workflowId);
 
         // external work process schemes do not have to be active when they are first created in Moda
         if (scheme.IsActive != isActive)
@@ -94,11 +91,12 @@ public sealed class WorkProcessScheme : BaseAuditableEntity<Guid>, IActivatable
     /// </summary>
     /// <param name="workProcess"></param>
     /// <param name="workTypeId"></param>
+    /// <param name="workflowId"></param>
     /// <param name="isActive"></param>
     /// <returns></returns>
-    internal static WorkProcessScheme CreateExternal(WorkProcess workProcess, int workTypeId, bool isActive)
+    internal static WorkProcessScheme CreateExternal(WorkProcess workProcess, int workTypeId, Guid workflowId, bool isActive)
     {
-        var scheme = new WorkProcessScheme(workProcess, workTypeId, null);
+        var scheme = new WorkProcessScheme(workProcess, workTypeId, workflowId);
 
         // external work process schemes do not have to be active when they are first created in Moda
         if (scheme.IsActive != isActive)
