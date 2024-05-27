@@ -5,6 +5,7 @@ using Moda.AppIntegration.Application.Interfaces;
 using Moda.Common.Application.Enums;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Work.Application.Workflows.Dtos;
 using Moda.Work.Application.WorkStatuses.Commands;
 using Moda.Work.Application.WorkTypes.Commands;
 using NodaTime;
@@ -76,7 +77,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                         return Result.Success();
                     }
 
-                    var syncResult = await SyncWorkProcess(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workProcess.ExternalId, cancellationToken);
+                    var syncResult = await SyncWorkProcess(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workProcess.ExternalId, workProcess.IntegrationState!.InternalId, cancellationToken);
                     if (syncResult.IsFailure)
                     {
                         _logger.LogError("An error occurred while syncing Azure DevOps Boards work process {WorkProcessId}. Error: {Error}", workProcess.IntegrationState!.InternalId, syncResult.Error);
@@ -158,11 +159,12 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         }
     }
 
-    private async Task<Result> SyncWorkProcess(string organizationUrl, string personalAccessToken, Guid workProcessExternalId, CancellationToken cancellationToken)
+    private async Task<Result> SyncWorkProcess(string organizationUrl, string personalAccessToken, Guid workProcessExternalId, Guid workProcessId, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
         Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
         Guard.Against.Default(workProcessExternalId, nameof(workProcessExternalId));
+        Guard.Against.Default(workProcessId, nameof(workProcessId));
 
         // get the process, types, states, and workflow
         var processResult = await _azureDevOpsService.GetWorkProcess(organizationUrl, personalAccessToken, workProcessExternalId, cancellationToken);
@@ -186,28 +188,38 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                 return syncWorkStatusesResult.ConvertFailure<Guid>();
         }
 
+        // get the work process scheme, work type, and workflow
+        var workProcessSchemes = await _sender.Send(new GetWorkProcessSchemesQuery(workProcessId), cancellationToken);
 
+        // create or update work flows
+        var workflowMappings = new List<CreateWorkProcessSchemeDto>(processResult.Value.WorkTypes.Count);
+        foreach (var workType in processResult.Value.WorkTypes)
+        {
+            var scheme = workProcessSchemes.FirstOrDefault(s => s.WorkType.Name == workType.Name);
+            if (scheme is null || scheme.Workflow is null)
+            {
+                // create new workflow
+                var createWorkflowResult = await _sender.Send(new CreateExternalWorkflowCommand(
+                    $"{processResult.Value.Name} - {workType.Name}",
+                    "Auto-generated workflow for Azure DevOps work process.",
+                    workType), cancellationToken);
+                if (createWorkflowResult.IsFailure)
+                    return createWorkflowResult.ConvertFailure<Guid>();
 
+                workflowMappings.Add(CreateWorkProcessSchemeDto.Create(workType.Name, workType.IsActive, createWorkflowResult.Value));
+            }
+            else
+            {
+                var syncWorkflowResult = await _sender.Send(new UpdateExternalWorkflowCommand(scheme.Workflow.Id, scheme.Workflow.Name, scheme.Workflow.Description, workType), cancellationToken);
+                if (syncWorkflowResult.IsFailure)
+                    return syncWorkflowResult.ConvertFailure<Guid>();
 
-
-
-        // get the work process, scheme, and workflow
-
-        // identify the missing or changed workflows
-
-        // include the data in the update command
-
-
-
-
-
-
-
-
+                workflowMappings.Add(CreateWorkProcessSchemeDto.Create(workType.Name, workType.IsActive, scheme.Workflow.Id));
+            }
+        }
 
         // update the work process
-        // TODO: update work process scheme
-        var updateWorkProcessResult = await _sender.Send(new UpdateExternalWorkProcessCommand(processResult.Value, processResult.Value.WorkTypes), cancellationToken);
+        var updateWorkProcessResult = await _sender.Send(new UpdateExternalWorkProcessCommand(processResult.Value, processResult.Value.WorkTypes, workflowMappings), cancellationToken);
 
         return updateWorkProcessResult.IsSuccess
             ? Result.Success()

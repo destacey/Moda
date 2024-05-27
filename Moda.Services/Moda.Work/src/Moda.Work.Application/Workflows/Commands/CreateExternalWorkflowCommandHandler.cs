@@ -5,19 +5,16 @@ using Moda.Work.Domain.Interfaces;
 
 namespace Moda.Work.Application.Workflows.Commands;
 
-internal sealed class CreateExternalWorkflowCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateExternalWorkProcessCommandHandler> logger) : ICommandHandler<CreateExternalWorkflowCommand, Guid>
+internal sealed class CreateExternalWorkflowCommandHandler(IWorkDbContext workDbContext, ILogger<CreateExternalWorkProcessCommandHandler> logger) : ICommandHandler<CreateExternalWorkflowCommand, Guid>
 {
     private const string AppRequestName = nameof(CreateExternalWorkflowCommand);
 
     private readonly IWorkDbContext _workDbContext = workDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<CreateExternalWorkProcessCommandHandler> _logger = logger;
 
     public async Task<Result<Guid>> Handle(CreateExternalWorkflowCommand request, CancellationToken cancellationToken)
     {
         var workStatuses = await _workDbContext.WorkStatuses.Where(ws => request.ExternalWorkTypeWorkflow.WorkflowStates.Select(ws => ws.StatusName).Contains(ws.Name)).ToArrayAsync(cancellationToken);
-
-        var timestamp = _dateTimeProvider.Now;
 
         List<ICreateWorkflowScheme> schemes = new(request.ExternalWorkTypeWorkflow.WorkflowStates.Count);
         foreach (var ws in request.ExternalWorkTypeWorkflow.WorkflowStates)

@@ -1,6 +1,5 @@
 ﻿namespace Moda.Common.Application.Requests.WorkManagement.Interfaces;
-
-public interface IWorkTypeDto
+public interface IWorkStatusDto
 {
     int Id { get; set; }
     string Name { get; set; }

@@ -1,9 +1,9 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 
 namespace Moda.Common.Application.Validators;
-public sealed class IExternalWorkProcessConfigurationValidator : CustomValidator<IExternalWorkProcessConfiguration>
+public sealed class IExternalWorkProcessValidator : CustomValidator<IExternalWorkProcess>
 {
-    public IExternalWorkProcessConfigurationValidator()
+    public IExternalWorkProcessValidator()
     {
         RuleFor(c => c.Id)
             .NotEmpty();

@@ -157,13 +157,13 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     /// <param name="isActive"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result AddWorkType(int workTypeId, Guid? workflowId, bool isActive, Instant timestamp)
+    public Result AddWorkType(int workTypeId, Guid workflowId, bool isActive, Instant timestamp)
     {
         if (_schemes.Any(s => s.WorkTypeId == workTypeId))
             return Result.Failure("The work type is already associated to this work process.");
 
         WorkProcessScheme scheme = Id == Guid.Empty
-            ? WorkProcessScheme.CreateExternal(this, workTypeId, (Guid)workflowId!, isActive)
+            ? WorkProcessScheme.CreateExternal(this, workTypeId, workflowId, isActive)
             : WorkProcessScheme.CreateExternal(Id, workTypeId, workflowId, isActive);
 
         _schemes.Add(scheme);
@@ -179,7 +179,7 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     /// <param name="workTypeId"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result DisableWorkType(int workTypeId, Instant timestamp)
+    public Result DeactivateWorkType(int workTypeId, Instant timestamp)
     {
         var scheme = _schemes.FirstOrDefault(s => s.WorkTypeId == workTypeId);
         if (scheme is null)
@@ -203,7 +203,7 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
     /// <param name="workTypeId"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result EnableWorkType(int workTypeId, Instant timestamp)
+    public Result ActivateWorkType(int workTypeId, Instant timestamp)
     {
         var scheme = _schemes.FirstOrDefault(s => s.WorkTypeId == workTypeId);
         if (scheme is null)
@@ -221,21 +221,20 @@ public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
         return Result.Success();
     }
 
-    // add workflow for worktypeid
-    //public Result SetWorkflow(int workTypeId, Workflow workflow, Instant timestamp)
-    //{
-    //    var scheme = _schemes.FirstOrDefault(s => s.WorkTypeId == workTypeId);
-    //    if (scheme is null)
-    //        return Result.Failure("The work type is not associated to this work process.");
+    public Result ChangeWorkTypeWorkflow(int workTypeId, Guid workflowId, Instant timestamp)
+    {
+        var scheme = _schemes.FirstOrDefault(s => s.WorkTypeId == workTypeId);
+        if (scheme is null)
+            return Result.Failure("The work type is not associated to this work process.");
 
-    //    var addWorkflowResult = scheme.AddWorkflow(workflow, timestamp);
-    //    if (addWorkflowResult.IsFailure)
-    //        return Result.Failure(addWorkflowResult.Error);
+        var addWorkflowResult = scheme.ChangeWorkflow(workflowId);
+        if (addWorkflowResult.IsFailure)
+            return Result.Failure(addWorkflowResult.Error);
 
-    //    AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
-    //    return Result.Success();
-    //}
+        return Result.Success();
+    }
 
     private void TryAddIntegrationStateChangedEvent(Instant timestamp)
     {

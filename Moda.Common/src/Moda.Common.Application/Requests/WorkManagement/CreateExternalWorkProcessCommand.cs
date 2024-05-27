@@ -13,5 +13,7 @@ public sealed class CreateExternalWorkProcessCommandValidator : CustomValidator<
         RuleFor(c => c.ExternalWorkProcess)
             .NotNull()
             .SetValidator(new IExternalWorkProcessConfigurationValidator());
+
+        // TODO: Add validation for WorkProcessSchemes
     }
 }

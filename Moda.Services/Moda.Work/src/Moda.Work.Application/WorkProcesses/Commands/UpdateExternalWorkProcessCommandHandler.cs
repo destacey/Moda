@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Common.Application.Requests.WorkManagement.Interfaces;
 
 namespace Moda.Work.Application.WorkProcesses.Commands;
 
@@ -22,17 +23,20 @@ internal sealed class UpdateExternalWorkProcessCommandHandler(IWorkDbContext wor
             return Result.Failure($"Work process {request.ExternalWorkProcess.Id} not found.");
         }
 
-        var updateResult = workProcess.Update(request.ExternalWorkProcess.Name, request.ExternalWorkProcess.Description, _timestamp);
-        if (updateResult.IsFailure)
+        if (workProcess.Name != request.ExternalWorkProcess.Name || workProcess.Description != request.ExternalWorkProcess.Description)
         {
-            _logger.LogError("{AppRequestName}: failed to update work process {WorkProcessId}. Error: {Error}", AppRequestName, workProcess.Id, updateResult.Error);
-            return Result.Failure(updateResult.Error);
+            var updateResult = workProcess.Update(request.ExternalWorkProcess.Name, request.ExternalWorkProcess.Description, _timestamp);
+            if (updateResult.IsFailure)
+            {
+                _logger.LogError("{AppRequestName}: failed to update work process {WorkProcessId}. Error: {Error}", AppRequestName, workProcess.Id, updateResult.Error);
+                return Result.Failure(updateResult.Error);
+            }
         }
 
-        var syncWorkTypesResult = await SyncWorkTypes(workProcess, request.ExternalWorkTypes, cancellationToken);
-        if (syncWorkTypesResult.IsFailure)
+        var syncSchemesResult = await SyncSchemes(workProcess, request.ExternalWorkTypes, request.WorkflowMappings, cancellationToken);
+        if (syncSchemesResult.IsFailure)
         {
-            return syncWorkTypesResult;
+            return syncSchemesResult;
         }
 
         await _workDbContext.SaveChangesAsync(cancellationToken);
@@ -42,19 +46,13 @@ internal sealed class UpdateExternalWorkProcessCommandHandler(IWorkDbContext wor
         return Result.Success();
     }
 
-    private async Task<Result> SyncWorkTypes(WorkProcess workProcess, IEnumerable<IExternalWorkType> externalWorkTypes, CancellationToken cancellationToken)
+    private async Task<Result> SyncSchemes(WorkProcess workProcess, IEnumerable<IExternalWorkType> externalWorkTypes, IEnumerable<ICreateWorkProcessScheme> workflowMappings, CancellationToken cancellationToken)
     {
         var workTypes = await _workDbContext.WorkTypes.Where(wt => externalWorkTypes.Select(wt => wt.Name).Contains(wt.Name)).ToArrayAsync(cancellationToken);
-
-        var removedSchemes = workProcess.Schemes.Where(s => s.IsActive && !workTypes.Select(t => t.Id).Contains(s.WorkTypeId)).Select(s => s.WorkTypeId).ToArray();
-        foreach (var scheme in removedSchemes)
+        if (workTypes.Length < 1)
         {
-            var deactivateResult = workProcess.DisableWorkType(scheme, _timestamp);
-            if (deactivateResult.IsFailure)
-            {
-                _logger.LogError("{AppRequestName}: failed to disable work type {WorkTypeId} for work process {WorkProcessId}. Error: {Error}", AppRequestName, scheme, workProcess.Id, deactivateResult.Error);
-                return Result.Failure(deactivateResult.Error);
-            }
+            _logger.LogError("{AppRequestName}: no work types found.", AppRequestName);
+            return Result.Failure("No work types found.");
         }
 
         foreach (var externalWorkType in externalWorkTypes)
@@ -66,33 +64,63 @@ internal sealed class UpdateExternalWorkProcessCommandHandler(IWorkDbContext wor
                 return Result.Failure($"Work type {externalWorkType.Name} not found.");
             }
 
+            var workflowId = workflowMappings.Single(m => m.WorkTypeName == externalWorkType.Name).WorkflowId;
+            Guard.Against.Default(workflowId, nameof(workflowId));
+
             var scheme = workProcess.Schemes.FirstOrDefault(s => s.WorkTypeId == workType.Id);
             if (scheme is null)
             {
-                var addResult = workProcess.AddWorkType(workType.Id, null, externalWorkType.IsActive, _timestamp);
+                var addResult = workProcess.AddWorkType(workType.Id, workflowId, externalWorkType.IsActive, _timestamp);
                 if (addResult.IsFailure)
                 {
                     _logger.LogError("{AppRequestName}: failed to add work type {WorkTypeId} to work process {WorkProcessId}. Error: {Error}", AppRequestName, workType.Id, workProcess.Id, addResult.Error);
                     return Result.Failure(addResult.Error);
                 }
             }
-            else if (!scheme.IsActive && externalWorkType.IsActive)
+            else
             {
-                var activateResult = workProcess.EnableWorkType(scheme.WorkTypeId, _timestamp);
-                if (activateResult.IsFailure)
+                if (scheme.WorkflowId != workflowId)
                 {
-                    _logger.LogError("{AppRequestName}: failed to disable work type {WorkTypeId} for work process {WorkProcessId}. Error: {Error}", AppRequestName, scheme.WorkTypeId, workProcess.Id, activateResult.Error);
-                    return Result.Failure(activateResult.Error);
+                    var updateResult = workProcess.ChangeWorkTypeWorkflow(scheme.WorkTypeId, workflowId, _timestamp);
+                    if (updateResult.IsFailure)
+                    {
+                        _logger.LogError("{AppRequestName}: failed to change the workflow for work type on work process scheme {WorkProcessSchemeId}. Error: {Error}", AppRequestName, scheme.Id, updateResult.Error);
+                        return Result.Failure(updateResult.Error);
+                    }
+                }
+
+                if (!scheme.IsActive && externalWorkType.IsActive)
+                {
+                    var activateResult = workProcess.ActivateWorkType(scheme.WorkTypeId, _timestamp);
+                    if (activateResult.IsFailure)
+                    {
+                        _logger.LogError("{AppRequestName}: failed to disable work type {WorkTypeId} for work process {WorkProcessId}. Error: {Error}", AppRequestName, scheme.WorkTypeId, workProcess.Id, activateResult.Error);
+                        return Result.Failure(activateResult.Error);
+                    }
+                }
+                else if (scheme.IsActive && !externalWorkType.IsActive)
+                {
+                    var deactivateResult = workProcess.DeactivateWorkType(scheme.WorkTypeId, _timestamp);
+                    if (deactivateResult.IsFailure)
+                    {
+                        _logger.LogError("{AppRequestName}: failed to enable work type {WorkTypeId} for work process {WorkProcessId}. Error: {Error}", AppRequestName, scheme.WorkTypeId, workProcess.Id, deactivateResult.Error);
+                        return Result.Failure(deactivateResult.Error);
+                    }
                 }
             }
-            else if (scheme.IsActive && !externalWorkType.IsActive)
+        }
+
+        var removedSchemes = workProcess.Schemes
+            .Where(s => s.IsActive && !workTypes.Select(t => t.Id).Contains(s.WorkTypeId))
+            .Select(s => s.WorkTypeId)
+            .ToArray();
+        foreach (var scheme in removedSchemes)
+        {
+            var deactivateResult = workProcess.DeactivateWorkType(scheme, _timestamp);
+            if (deactivateResult.IsFailure)
             {
-                var deactivateResult = workProcess.DisableWorkType(scheme.WorkTypeId, _timestamp);
-                if (deactivateResult.IsFailure)
-                {
-                    _logger.LogError("{AppRequestName}: failed to enable work type {WorkTypeId} for work process {WorkProcessId}. Error: {Error}", AppRequestName, scheme.WorkTypeId, workProcess.Id, deactivateResult.Error);
-                    return Result.Failure(deactivateResult.Error);
-                }
+                _logger.LogError("{AppRequestName}: failed to disable work type {WorkTypeId} for work process {WorkProcessId}. Error: {Error}", AppRequestName, scheme, workProcess.Id, deactivateResult.Error);
+                return Result.Failure(deactivateResult.Error);
             }
         }
 

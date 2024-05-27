@@ -33,7 +33,7 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
     public string Name
     {
         get => _name;
-        private init => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
     }
 
     /// <summary>
@@ -86,24 +86,65 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
         {
             // TODO is there logic that would prevent deactivation?
             IsActive = false;
+
+            foreach (var scheme in _schemes)
+            {
+                var deactivateResult = scheme.Deactivate(timestamp);
+                if (deactivateResult.IsFailure)
+                {
+                    return Result.Failure(deactivateResult.Error);
+                }
+            }
+
             AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
         }
 
         return Result.Success();
     }
 
+    public Result Update(string name, string? description, Instant timestamp)
+    {
+        Name = name;
+        Description = description;
+
+        AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+        return Result.Success();
+    }
+
     public Result AddScheme(int workStatusId, WorkStatusCategory workStatusCategory, int order, bool isActive)
     {
-        try
-        {
-            _schemes.Add(WorkflowScheme.CreateExternal(this, workStatusId, workStatusCategory, order, isActive));
-            return Result.Success();
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure(ex.ToString());
-        }
+        _schemes.Add(WorkflowScheme.Create(this, workStatusId, workStatusCategory, order, isActive));
+        return Result.Success();
     }
+
+    public Result ActivateScheme(Guid schemeId, Instant timestamp)
+    {
+        var scheme = _schemes.SingleOrDefault(s => s.Id == schemeId);
+        if (scheme is null)
+        {
+            return Result.Failure($"Scheme {schemeId} not found.");
+        }
+
+        if (!IsActive)
+        {
+            return Result.Failure("Unable to active a Workflow Scheme while the Workflow is not active.");
+        }
+
+        return scheme.Activate(timestamp);
+    }
+
+    public Result DeactivateScheme(Guid schemeId, Instant timestamp)
+    {
+        var scheme = _schemes.SingleOrDefault(s => s.Id == schemeId);
+        if (scheme is null)
+        {
+            return Result.Failure($"Scheme {schemeId} not found.");
+        }
+
+        return scheme.Deactivate(timestamp);
+    }
+
 
     public static Workflow CreateExternal(string name, string? description, IEnumerable<ICreateWorkflowScheme> workflowSchemes)
     {
