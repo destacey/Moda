@@ -1,4 +1,5 @@
-﻿using Moda.Work.Application.WorkProcesses.Commands;
+﻿using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.WorkProcesses.Dtos;
 using Moda.Work.Application.WorkProcesses.Queries;
 
@@ -75,5 +76,21 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     {
         var result = await _sender.Send(new DeactivateWorkProcessCommand(id), cancellationToken);
         return result.IsSuccess ? NoContent() : BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkProcessesController.Deactivate"));
+    }
+
+    // get work process schemes
+    [HttpGet("{id}/schemes")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkProcesses)]
+    [OpenApiOperation("Get work process schemes.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<WorkProcessSchemeDto>>> GetSchemes(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new GetWorkProcessSchemesQuery(id), cancellationToken);
+
+        return result is not null
+                ? Ok(result)
+                : NotFound();
     }
 }

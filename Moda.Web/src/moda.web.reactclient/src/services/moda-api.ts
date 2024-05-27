@@ -4246,6 +4246,74 @@ export class WorkProcessesClient {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    /**
+     * Get work process schemes.
+     */
+    getSchemes(id: string, cancelToken?: CancelToken): Promise<WorkProcessSchemeDto[]> {
+        let url_ = this.baseUrl + "/api/work/work-processes/{id}/schemes";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetSchemes(_response);
+        });
+    }
+
+    protected processGetSchemes(response: AxiosResponse): Promise<WorkProcessSchemeDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<WorkProcessSchemeDto[]>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<WorkProcessSchemeDto[]>(null as any);
+    }
 }
 
 export class WorkspacesClient {
@@ -9510,6 +9578,81 @@ export interface WorkProcessDto {
     isActive?: boolean;
 }
 
+export interface WorkProcessSchemeDto {
+    id?: string;
+    workType?: WorkTypeDto;
+    workflow?: WorkflowDto;
+    isActive?: boolean;
+    "moda.Common.Application.Requests.WorkManagement.Interfaces.IWorkProcessSchemeDto.WorkType"?: IWorkTypeDto;
+    "moda.Common.Application.Requests.WorkManagement.Interfaces.IWorkProcessSchemeDto.Workflow"?: IWorkflowDto;
+}
+
+export interface WorkTypeDto {
+    id?: number;
+    name?: string;
+    description?: string | undefined;
+    isActive?: boolean;
+}
+
+export interface WorkflowDto {
+    id?: string;
+    key?: number;
+    name?: string;
+    description?: string | undefined;
+    ownership?: SimpleNavigationDto;
+    isActive?: boolean;
+    schemes?: WorkflowSchemeDto[];
+    "moda.Common.Application.Requests.WorkManagement.Interfaces.IWorkflowDto.Schemes"?: IWorkflowSchemeDto[];
+}
+
+export interface WorkflowSchemeDto {
+    id?: string;
+    workStatus?: WorkStatusDto;
+    workStatusCategory?: SimpleNavigationDto;
+    order?: number;
+    isActive?: boolean;
+    "moda.Common.Application.Requests.WorkManagement.Interfaces.IWorkflowSchemeDto.WorkStatus"?: IWorkStatusDto;
+}
+
+export interface WorkStatusDto {
+    id?: number;
+    name?: string;
+    description?: string | undefined;
+    isActive?: boolean;
+}
+
+export interface IWorkStatusDto {
+    id?: number;
+    name?: string;
+    description?: string | undefined;
+    isActive?: boolean;
+}
+
+export interface IWorkflowSchemeDto {
+    id?: string;
+    workStatus?: IWorkStatusDto;
+    workStatusCategory?: SimpleNavigationDto;
+    order?: number;
+    isActive?: boolean;
+}
+
+export interface IWorkTypeDto {
+    id?: number;
+    name?: string;
+    description?: string | undefined;
+    isActive?: boolean;
+}
+
+export interface IWorkflowDto {
+    id?: string;
+    key?: number;
+    name?: string;
+    description?: string | undefined;
+    ownership?: SimpleNavigationDto;
+    isActive?: boolean;
+    schemes?: IWorkflowSchemeDto[];
+}
+
 export interface WorkspaceListDto {
     id?: string;
     key?: string;
@@ -9560,13 +9703,6 @@ export interface WorkStatusCategoryListDto {
     order?: number;
 }
 
-export interface WorkStatusDto {
-    id?: number;
-    name?: string;
-    description?: string | undefined;
-    isActive?: boolean;
-}
-
 export interface CreateWorkStatusRequest {
     /** The name of the work status.  The name cannot be changed. */
     name: string;
@@ -9578,13 +9714,6 @@ export interface UpdateWorkStatusRequest {
     id?: number;
     /** The description of the work status. */
     description?: string | undefined;
-}
-
-export interface WorkTypeDto {
-    id?: number;
-    name?: string;
-    description?: string | undefined;
-    isActive?: boolean;
 }
 
 export interface CreateWorkTypeRequest {

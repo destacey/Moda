@@ -1,5 +1,9 @@
 import { getWorkProcessesClient } from '@/src/services/clients'
-import { WorkProcessDto, WorkProcessListDto } from '@/src/services/moda-api'
+import {
+  WorkProcessDto,
+  WorkProcessListDto,
+  WorkProcessSchemeDto,
+} from '@/src/services/moda-api'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 
@@ -75,6 +79,25 @@ export const workProcessApi = apiSlice.injectEndpoints({
         return [{ type: QueryTags.WorkProcess, id: arg.id }]
       },
     }),
+    getWorkProcessSchemes: builder.query<WorkProcessSchemeDto[], string>({
+      queryFn: async (workProcessId: string) => {
+        try {
+          const data = await (
+            await getWorkProcessesClient()
+          ).getSchemes(workProcessId)
+
+          data.sort((a, b) => a.workType.name.localeCompare(b.workType.name))
+
+          return { data }
+        } catch (error) {
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.WorkProcessScheme, id: arg },
+        ...result.map(({ id }) => ({ type: QueryTags.WorkProcessScheme, id })),
+      ],
+    }),
   }),
   overrideExisting: false,
 })
@@ -83,4 +106,5 @@ export const {
   useGetWorkProcessesQuery,
   useGetWorkProcessQuery,
   useChangeWorkProcessIsActiveMutation,
+  useGetWorkProcessSchemesQuery,
 } = workProcessApi
