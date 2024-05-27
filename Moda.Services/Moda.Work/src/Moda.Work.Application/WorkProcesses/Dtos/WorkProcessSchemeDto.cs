@@ -7,9 +7,9 @@ public sealed record WorkProcessSchemeDto : IMapFrom<WorkProcessScheme>, IWorkPr
 {
     public Guid Id { get; set; }
     public required WorkTypeDto WorkType { get; set; }
-    public WorkflowDto? Workflow { get; set; }
+    public required WorkflowDto Workflow { get; set; }
     public bool IsActive { get; set; }
 
     IWorkTypeDto IWorkProcessSchemeDto.WorkType => WorkType;
-    IWorkflowDto? IWorkProcessSchemeDto.Workflow => Workflow;
+    IWorkflowDto IWorkProcessSchemeDto.Workflow => Workflow;
 }

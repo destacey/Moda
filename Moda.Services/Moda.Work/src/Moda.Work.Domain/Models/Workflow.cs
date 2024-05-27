@@ -114,6 +114,10 @@ public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
 
     public Result AddScheme(int workStatusId, WorkStatusCategory workStatusCategory, int order, bool isActive)
     {
+        if (_schemes.Any(s => s.WorkStatusId == workStatusId))
+        {
+            return Result.Failure($"Scheme for Work Status {workStatusId} already exists.");
+        }
         _schemes.Add(WorkflowScheme.Create(this, workStatusId, workStatusCategory, order, isActive));
         return Result.Success();
     }

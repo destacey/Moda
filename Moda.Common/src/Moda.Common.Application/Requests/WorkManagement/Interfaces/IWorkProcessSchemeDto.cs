@@ -3,6 +3,6 @@ public interface IWorkProcessSchemeDto
 {
     Guid Id { get; }
     IWorkTypeDto WorkType { get; }
-    IWorkflowDto? Workflow { get; }
+    IWorkflowDto Workflow { get; }
     bool IsActive { get; }
 }
