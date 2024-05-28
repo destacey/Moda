@@ -7,7 +7,7 @@ import PlanningIntervalObjectiveDetails from './planning-interval-objective-deta
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
 import EditPlanningIntervalObjectiveForm from '../../../../components/edit-planning-interval-objective-form'
-import { ItemType } from 'antd/es/menu/hooks/useItems'
+import { ItemType } from 'antd/es/menu/interface'
 import DeletePlanningIntervalObjectiveForm from './delete-planning-interval-objective-form'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useGetPlanningIntervalObjectiveByKey } from '@/src/services/queries/planning-queries'

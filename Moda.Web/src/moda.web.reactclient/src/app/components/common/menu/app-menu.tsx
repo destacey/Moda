@@ -8,7 +8,6 @@ import {
 import { Layout, Menu } from 'antd'
 import { useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
-import { ItemType, MenuItemType } from 'antd/es/menu/hooks/useItems'
 import {
   Item,
   MenuItem,
@@ -17,6 +16,7 @@ import {
 } from './menu-helper'
 import useMenuToggle from '../../contexts/menu-toggle'
 import useTheme from '../../contexts/theme'
+import { ItemType, MenuItemType } from 'antd/es/menu/interface'
 
 const { Sider } = Layout
 

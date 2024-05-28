@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { Card, MenuProps } from 'antd'
+import { Card } from 'antd'
 import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
 import PlanningIntervalDetails from './planning-interval-details'
 import TeamsGrid, {
@@ -22,6 +22,7 @@ import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import PlanningIntervalDetailsLoading from './loading'
 import ManagePlanningIntervalDatesForm from './manage-planning-interval-dates-form'
 import { PageActions } from '@/src/app/components/common'
+import { ItemType } from 'antd/es/menu/interface'
 
 enum PlanningIntervalTabs {
   Details = 'details',
@@ -61,8 +62,8 @@ const PlanningIntervalDetailsPage = ({ params }) => {
     teamsQueryEnabled,
   )
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
-    const items: MenuProps['items'] = []
+  const actionsMenuItems = useMemo(() => {
+    const items = [] as ItemType[]
     if (canUpdatePlanningInterval) {
       items.push(
         {

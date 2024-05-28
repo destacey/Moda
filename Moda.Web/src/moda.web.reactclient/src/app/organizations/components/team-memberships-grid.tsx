@@ -11,7 +11,7 @@ import {
 } from '../../components/common/moda-grid-cell-renderers'
 import useAuth from '../../components/contexts/auth'
 import { MenuProps } from 'antd'
-import { ItemType } from 'antd/es/menu/hooks/useItems'
+import { ItemType } from 'antd/es/menu/interface'
 import EditTeamMembershipForm from './edit-team-membership-form'
 import { TeamTypeName } from '../types'
 import DeleteTeamMembershipForm from './delete-team-membership-form'

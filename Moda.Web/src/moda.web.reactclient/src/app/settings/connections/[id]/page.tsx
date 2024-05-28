@@ -3,7 +3,7 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Card, MenuProps, message } from 'antd'
+import { Card, message } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
@@ -23,6 +23,7 @@ import { AzdoBoardsConnectionContext } from './azdo-boards-connection-context'
 import DeleteAzdoBoardsConnectionForm from '../components/delete-azdo-boards-connection-form'
 import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
 import { PageActions } from '@/src/app/components/common'
+import { ItemType } from 'antd/es/menu/interface'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -152,8 +153,8 @@ const ConnectionDetailsPage = ({ params }) => {
     setIsSyncingOrganization(false)
   }, [syncOrganizationConfigurationMutation, messageApi, params.id])
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
-    const items: MenuProps['items'] = []
+  const actionsMenuItems = useMemo(() => {
+    const items = [] as ItemType[]
     if (canUpdateConnections) {
       items.push({
         key: 'edit',

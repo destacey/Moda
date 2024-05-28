@@ -6,11 +6,12 @@ import { authorizePage } from '../../components/hoc'
 import { useDocumentTitle } from '../../hooks'
 import useAuth from '../../components/contexts/auth'
 import { useGetAzdoBoardsConnections } from '@/src/services/queries/app-integration-queries'
-import { MenuProps, Space, Switch } from 'antd'
+import { Space, Switch } from 'antd'
 import CreateConnectionForm from './components/create-connection-form'
 import Link from 'next/link'
 import { ConnectionListDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
+import { ItemType } from 'antd/es/menu/interface'
 
 const ConnectionLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/settings/connections/${data.id}`}>{value}</Link>
@@ -45,8 +46,8 @@ const ConnectionsPage = () => {
     [],
   )
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
-    const items: MenuProps['items'] = []
+  const actionsMenuItems = useMemo(() => {
+    const items = [] as ItemType[]
     if (canCreateConnection) {
       items.push({
         key: 'create-connection-menu-item',

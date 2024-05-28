@@ -5,7 +5,7 @@ import {
   MenuItemGroupType,
   MenuItemType,
   SubMenuType,
-} from 'antd/es/menu/hooks/useItems'
+} from 'antd/es/menu/interface'
 import useAuth from '../../components/contexts/auth'
 import { useEffect, useState } from 'react'
 import { Menu } from 'antd'
