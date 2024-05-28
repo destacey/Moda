@@ -3,7 +3,7 @@
 import PageTitle from '@/src/app/components/common/page-title'
 import ModaGrid from '../../components/common/moda-grid'
 import { useCallback, useMemo, useState } from 'react'
-import { ItemType } from 'antd/es/menu/hooks/useItems'
+import { ItemType } from 'antd/es/menu/interface'
 import { Space, Switch } from 'antd'
 import Link from 'next/link'
 import { useDocumentTitle } from '../../hooks/use-document-title'

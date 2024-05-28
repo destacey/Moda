@@ -4,7 +4,7 @@ import PageTitle from '@/src/app/components/common/page-title'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
-import { Card, MenuProps } from 'antd'
+import { Card } from 'antd'
 import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
 import WorkProcessDetailsLoading from './loading'
 import WorkProcessDetails from './work-process-details'
@@ -12,6 +12,7 @@ import { PageActions } from '@/src/app/components/common'
 import useAuth from '@/src/app/components/contexts/auth'
 import ChangeWorkProcessIsActiveForm from '../components/change-work-process-isactive-form'
 import { useGetWorkProcessQuery } from '@/src/store/features/work-management/work-process-api'
+import { ItemType } from 'antd/es/menu/interface'
 
 const WorkProcessDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')
@@ -36,10 +37,10 @@ const WorkProcessDetailsPage = ({ params }) => {
     error && console.error(error)
   }, [error])
 
-  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
-    if (!workProcessData?.isActive === undefined) return []
+  const actionsMenuItems = useMemo(() => {
+    if (!workProcessData?.isActive === undefined) return [] as ItemType[]
 
-    const items: MenuProps['items'] = []
+    const items = [] as ItemType[]
     if (canUpdateWorkProcess) {
       const activationManagementLabel = workProcessData?.isActive
         ? 'Deactivate'

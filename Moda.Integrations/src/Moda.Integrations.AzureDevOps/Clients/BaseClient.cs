@@ -21,7 +21,7 @@ internal abstract class BaseClient : IDisposable
 
         var options = new RestClientOptions(organizationUrl)
         {
-            MaxTimeout = 300_000,
+            Timeout = TimeSpan.FromSeconds(300),
         };
 
         _client = new RestClient(options);

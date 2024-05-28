@@ -1,5 +1,5 @@
 import { MenuProps } from 'antd'
-import { ItemType, MenuItemType } from 'antd/es/menu/hooks/useItems'
+import { ItemType, MenuItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
 
 export type MenuItem = Required<MenuProps>['items'][number]
