@@ -42,8 +42,8 @@ public static class ApplicationResource
     public const string PlanningIntervalObjectives = nameof(PlanningIntervalObjectives);
     public const string Risks = nameof(Risks);
 
-    public const string BacklogCategories = nameof(BacklogCategories);
-    public const string BacklogLevels = nameof(BacklogLevels);
+    public const string WorkTypeTiers = nameof(WorkTypeTiers);
+    public const string WorkTypeLevels = nameof(WorkTypeLevels);
     public const string Workspaces = nameof(Workspaces);
     public const string WorkItems = nameof(WorkItems);
     public const string WorkProcesses = nameof(WorkProcesses);
@@ -150,12 +150,12 @@ public static class ApplicationPermissions
 
     private static readonly ApplicationPermission[] _work =
     [
-        new("View BacklogCategories", ApplicationAction.View, ApplicationResource.BacklogCategories, IsBasic: true),
+        new("View work type tiers", ApplicationAction.View, ApplicationResource.WorkTypeTiers, IsBasic: true),
 
-        new("View BacklogLevels", ApplicationAction.View, ApplicationResource.BacklogLevels, IsBasic: true),
-        new("Create BacklogLevels", ApplicationAction.Create, ApplicationResource.BacklogLevels),
-        new("Update BacklogLevels", ApplicationAction.Update, ApplicationResource.BacklogLevels),
-        new("Delete BacklogLevels", ApplicationAction.Delete, ApplicationResource.BacklogLevels),
+        new("View work type levels", ApplicationAction.View, ApplicationResource.WorkTypeLevels, IsBasic: true),
+        new("Create work type levels", ApplicationAction.Create, ApplicationResource.WorkTypeLevels),
+        new("Update work type levels", ApplicationAction.Update, ApplicationResource.WorkTypeLevels),
+        new("Delete work type levels", ApplicationAction.Delete, ApplicationResource.WorkTypeLevels),
 
         new("View Workspaces", ApplicationAction.View, ApplicationResource.Workspaces, IsBasic: true),
         new("Create Workspaces", ApplicationAction.Create, ApplicationResource.Workspaces),

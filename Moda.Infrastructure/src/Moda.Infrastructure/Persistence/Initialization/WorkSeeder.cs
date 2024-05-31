@@ -7,17 +7,17 @@ public class WorkSeeder : ICustomSeeder
 {
     public async Task Initialize(ModaDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
     {
-        await SeedBacklogLevelScheme(dbContext, dateTimeProvider, cancellationToken);
+        await SeedWorkTypeLevelScheme(dbContext, dateTimeProvider, cancellationToken);
     }
 
-    public static async Task SeedBacklogLevelScheme(ModaDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
+    public static async Task SeedWorkTypeLevelScheme(ModaDbContext dbContext, IDateTimeProvider dateTimeProvider, CancellationToken cancellationToken)
     {
         Instant timestamp = dateTimeProvider.Now;
 
-        if (await dbContext.BacklogLevelSchemes.AnyAsync(cancellationToken))
+        if (await dbContext.WorkTypeHierarchies.AnyAsync(cancellationToken))
         {
-            BacklogLevelScheme scheme = await dbContext.BacklogLevelSchemes
-                .Include(s => s.BacklogLevels)
+            WorkTypeHierarchy scheme = await dbContext.WorkTypeHierarchies
+                .Include(s => s.Levels)
                 .SingleAsync(cancellationToken);
             var result = scheme.Reinitialize(timestamp);
             if (result.IsFailure)
@@ -29,8 +29,8 @@ public class WorkSeeder : ICustomSeeder
         }
         else
         {
-            BacklogLevelScheme scheme = BacklogLevelScheme.Initialize(timestamp);
-            dbContext.BacklogLevelSchemes.Add(scheme);
+            WorkTypeHierarchy scheme = WorkTypeHierarchy.Initialize(timestamp);
+            dbContext.WorkTypeHierarchies.Add(scheme);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
     }

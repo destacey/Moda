@@ -1,7 +1,7 @@
 ﻿using Moda.Common.Domain.Enums.Organization;
-using Moda.Work.Application.BacklogCategories.Dtos;
+using Moda.Organization.Application.TeamTypes.Dtos;
 
-namespace Moda.Work.Application.BacklogCategories.Queries;
+namespace Moda.Organization.Application.TeamTypes.Queries;
 
 public sealed record GetTeamTypesQuery : IQuery<IReadOnlyList<TeamTypeDto>> { }
 

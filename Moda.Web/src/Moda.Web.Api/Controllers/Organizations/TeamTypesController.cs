@@ -1,5 +1,5 @@
-﻿using Moda.Work.Application.BacklogCategories.Dtos;
-using Moda.Work.Application.BacklogCategories.Queries;
+﻿using Moda.Organization.Application.TeamTypes.Dtos;
+using Moda.Organization.Application.TeamTypes.Queries;
 
 namespace Moda.Web.Api.Controllers.Work;
 
@@ -16,7 +16,7 @@ public class TeamTypesController : ControllerBase
     }
 
     [HttpGet]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.BacklogCategories)]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkTypeTiers)]
     [OpenApiOperation("Get a list of all team types.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]

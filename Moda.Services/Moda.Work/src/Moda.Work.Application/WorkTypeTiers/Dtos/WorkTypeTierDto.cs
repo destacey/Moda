@@ -1,6 +1,6 @@
-﻿namespace Moda.Work.Application.BacklogCategories.Dtos;
+﻿namespace Moda.Work.Application.WorkTypeTiers.Dtos;
 
-public sealed record BacklogCategoryDto
+public sealed record WorkTypeTierDto
 {
     public int Id { get; set; }
     public required string Name { get; set; }

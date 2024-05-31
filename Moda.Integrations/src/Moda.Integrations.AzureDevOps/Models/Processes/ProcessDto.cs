@@ -34,7 +34,7 @@ internal static class ProcessDtoExtensions
             Description = process.Description,
             IsEnabled = process.IsEnabled,
             WorkspaceIds = process.Projects?.Select(p => p.Id).ToList() ?? [],
-            BacklogLevels = behaviors.ToIExternalBacklogLevels(),
+            WorkTypeLevels = behaviors.ToIExternalWorkTypeLevels(),
             WorkTypes = workTypes.ToIExternalWorkTypes(),
             WorkStatuses = workTypes.ToIExternalWorkStatuses()
         };

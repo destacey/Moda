@@ -8,25 +8,23 @@ namespace Moda.Work.Domain.Models;
 
 /// <summary>Allows work types to be grouped and defined in a hierarchy.</summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Int32&gt;" />
-public sealed class BacklogLevel : BaseAuditableEntity<int>
+public sealed class WorkTypeLevel : BaseEntity<int>, ISystemAuditable
 {
     private string _name = null!;
     private string? _description;
 
-    private BacklogLevel() { }
+    private WorkTypeLevel() { }
 
-    private BacklogLevel(string name, string? description, BacklogCategory category, Ownership ownership, int rank)
+    private WorkTypeLevel(string name, string? description, WorkTypeTier tier, Ownership ownership, int order)
     {
         Name = name;
         Description = description;
-        Category = category;
+        Tier = tier;
         Ownership = ownership;
-        Rank = rank;
+        Order = order;
     }
 
-    public Guid ParentId { get; private init; }
-
-    /// <summary>The name of the backlog level.</summary>
+    /// <summary>The name of the work type level.</summary>
     /// <value>The name.</value>
     public string Name
     {
@@ -34,7 +32,7 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>
         private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
     }
 
-    /// <summary>The description of the backlog level.</summary>
+    /// <summary>The description of the work type level.</summary>
     /// <value>The description.</value>
     public string? Description
     {
@@ -42,33 +40,33 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>
         private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
-    public BacklogCategory Category { get; private init; }
+    public WorkTypeTier Tier { get; private init; }
 
     /// <summary>
-    /// Indicates whether the backlog level is owned by Moda or a third party system.  This value should not change.
+    /// Indicates whether the work type level is owned by Moda or a third party system.  This value can not change.
     /// </summary>
     /// <value>The ownership.</value>
     public Ownership Ownership { get; private init; }
 
     /// <summary>
-    /// The rank of the backlog level.  The higher the rank, the higher the priority.
+    /// The order of the work type level.
     /// </summary>
-    /// <value>The rank.</value>
-    public int Rank { get; private set; }
+    /// <value>The order.</value>
+    public int Order { get; private set; }
 
     /// <summary>Updates the specified name.</summary>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
-    /// <param name="rank">The rank.</param>
+    /// <param name="order">The rank.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public Result Update(string name, string? description, int rank, Instant timestamp)
+    public Result Update(string name, string? description, int order, Instant timestamp)
     {
         try
         {
             Name = name;
             Description = description;
-            Rank = rank;
+            Order = order;
 
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
@@ -80,19 +78,21 @@ public sealed class BacklogLevel : BaseAuditableEntity<int>
         }
     }
 
-    /// <summary>Creates the specified BacklogLevel.</summary>
-    /// <param name="name">The name.</param>
-    /// <param name="description">The description.</param>
-    /// <param name="category">The category.</param>
-    /// <param name="ownership">The ownership.</param>
-    /// <param name="rank">The rank.</param>
-    /// <param name="timestamp">The timestamp.</param>
+    /// <summary>
+    /// Creates a new work type level.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="description"></param>
+    /// <param name="tier"></param>
+    /// <param name="ownership"></param>
+    /// <param name="order"></param>
+    /// <param name="timestamp"></param>
     /// <returns></returns>
-    public static BacklogLevel Create(string name, string? description, BacklogCategory category, Ownership ownership, int rank, Instant timestamp)
+    public static WorkTypeLevel Create(string name, string? description, WorkTypeTier tier, Ownership ownership, int order, Instant timestamp)
     {
-        BacklogLevel backlogLevel = new(name, description, category, ownership, rank);
+        WorkTypeLevel workTypeLevel = new(name, description, tier, ownership, order);
 
-        backlogLevel.AddDomainEvent(EntityCreatedEvent.WithEntity(backlogLevel, timestamp));
-        return backlogLevel;
+        workTypeLevel.AddDomainEvent(EntityCreatedEvent.WithEntity(workTypeLevel, timestamp));
+        return workTypeLevel;
     }
 }

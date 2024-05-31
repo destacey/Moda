@@ -3,7 +3,7 @@ global using Moda.Common.Application.Interfaces;
 global using Moda.Common.Application.Persistence;
 global using Moda.Common.Application.Validation;
 global using Moda.Common.Extensions;
-global using Moda.Work.Application.BacklogLevels.Dtos;
+global using Moda.Work.Application.WorkTypeLevels.Dtos;
 global using Moda.Work.Application.WorkStatusCategories.Dtos;
 global using Moda.Work.Domain.Models;
 

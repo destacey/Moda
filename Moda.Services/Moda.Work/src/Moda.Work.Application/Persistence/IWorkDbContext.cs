@@ -1,7 +1,7 @@
 ﻿namespace Moda.AppIntegration.Application.Persistence;
 public interface IWorkDbContext : IModaDbContext
 {
-    DbSet<BacklogLevelScheme> BacklogLevelSchemes { get; }
+    DbSet<WorkTypeHierarchy> WorkTypeHierarchies { get; }
     DbSet<Workflow> Workflows { get; }
     DbSet<WorkItemLink> WorkItemLinks { get; }
     DbSet<WorkItem> WorkItems { get; }

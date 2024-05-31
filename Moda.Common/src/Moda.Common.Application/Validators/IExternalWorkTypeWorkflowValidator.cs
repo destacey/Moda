@@ -14,9 +14,9 @@ public sealed class IExternalWorkTypeWorkflowValidator : CustomValidator<IExtern
         RuleFor(e => e.Description)
             .MaximumLength(1024);
 
-        RuleFor(e => e.BacklogLevelId)
+        RuleFor(e => e.WorkTypeLevelId)
             .NotEmpty()
-            .MaximumLength(256);
+            .MaximumLength(128);
 
         RuleFor(e => e.IsActive)
             .NotNull();
