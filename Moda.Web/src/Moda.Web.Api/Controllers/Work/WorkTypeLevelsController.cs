@@ -1,4 +1,5 @@
-﻿using Moda.Web.Api.Models.Work.WorkTypeLevels;
+﻿using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Web.Api.Models.Work.WorkTypeLevels;
 using Moda.Work.Application.WorkTypeLevels.Dtos;
 using Moda.Work.Application.WorkTypeLevels.Queries;
 

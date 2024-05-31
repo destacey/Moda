@@ -1,9 +1,9 @@
-﻿using Moda.Work.Application.WorkTypeLevels.Dtos;
+﻿using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Common.Application.Requests.WorkManagement.Interfaces;
 
 namespace Moda.Work.Application.WorkTypeLevels.Queries;
-public sealed record GetWorkTypeLevelsQuery() : IQuery<IReadOnlyList<WorkTypeLevelDto>>;
 
-internal sealed class GetWorkTypeLevelsQueryHandler : IQueryHandler<GetWorkTypeLevelsQuery, IReadOnlyList<WorkTypeLevelDto>>
+internal sealed class GetWorkTypeLevelsQueryHandler : IQueryHandler<GetWorkTypeLevelsQuery, IReadOnlyList<IWorkTypeLevelDto>>
 {
     private readonly IWorkDbContext _workDbContext;
 
@@ -12,7 +12,7 @@ internal sealed class GetWorkTypeLevelsQueryHandler : IQueryHandler<GetWorkTypeL
         _workDbContext = workDbContext;
     }
 
-    public async Task<IReadOnlyList<WorkTypeLevelDto>> Handle(GetWorkTypeLevelsQuery request, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<IWorkTypeLevelDto>> Handle(GetWorkTypeLevelsQuery request, CancellationToken cancellationToken)
     {
         return await _workDbContext.WorkTypeHierarchies
             .SelectMany(s => s.Levels)

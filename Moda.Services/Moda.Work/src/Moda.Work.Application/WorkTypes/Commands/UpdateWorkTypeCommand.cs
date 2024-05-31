@@ -1,18 +1,5 @@
 ﻿namespace Moda.Work.Application.WorkTypes.Commands;
-public sealed record UpdateWorkTypeCommand : ICommand<int>
-{
-    public UpdateWorkTypeCommand(int id, string? description)
-    {
-        Id = id;
-        Description = description;
-    }
-
-    public int Id { get; }
-
-    /// <summary>The description of the work type.</summary>
-    /// <value>The description.</value>
-    public string? Description { get; }
-}
+public sealed record UpdateWorkTypeCommand(int Id, string? Description, int LevelId) : ICommand<int>;
 
 public sealed class UpdateWorkTypeCommandValidator : CustomValidator<UpdateWorkTypeCommand>
 {
@@ -22,6 +9,9 @@ public sealed class UpdateWorkTypeCommandValidator : CustomValidator<UpdateWorkT
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);
+
+        RuleFor(c => c.LevelId)
+            .GreaterThan(0);
     }
 }
 
@@ -30,13 +20,13 @@ internal sealed class UpdateWorkTypeCommandHandler : ICommandHandler<UpdateWorkT
     private const string AppRequestName = nameof(UpdateWorkTypeCommand);
 
     private readonly IWorkDbContext _workDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly Instant _timestamp;
     private readonly ILogger<UpdateWorkTypeCommandHandler> _logger;
 
     public UpdateWorkTypeCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateWorkTypeCommandHandler> logger)
     {
         _workDbContext = workDbContext;
-        _dateTimeProvider = dateTimeProvider;
+        _timestamp = dateTimeProvider.Now;
         _logger = logger;
     }
 
@@ -49,7 +39,7 @@ internal sealed class UpdateWorkTypeCommandHandler : ICommandHandler<UpdateWorkT
             if (workType is null)
                 return Result.Failure<int>("Work Type not found.");
 
-            var updateResult = workType.Update(request.Description, _dateTimeProvider.Now);
+            var updateResult = workType.Update(request.Description, request.LevelId, _timestamp);
 
             if (updateResult.IsFailure)
             {

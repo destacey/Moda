@@ -2,7 +2,7 @@
 using Moda.Work.Application.WorkTypes.Validators;
 
 namespace Moda.Work.Application.WorkTypes.Commands;
-public sealed record SyncExternalWorkTypesCommand(IList<IExternalWorkType> WorkTypes) : ICommand;
+public sealed record SyncExternalWorkTypesCommand(IList<IExternalWorkType> WorkTypes, int DefaultWorkTypeLevelId) : ICommand;
 
 public sealed class SyncExternalWorkTypesCommandValidator : CustomValidator<SyncExternalWorkTypesCommand>
 {
@@ -14,6 +14,9 @@ public sealed class SyncExternalWorkTypesCommandValidator : CustomValidator<Sync
         RuleForEach(c => c.WorkTypes)
             .NotNull()
             .SetValidator(new IExternalWorkTypeValidator());
+
+        RuleFor(c => c.DefaultWorkTypeLevelId)
+            .GreaterThan(0);
     }
 }
 
@@ -31,7 +34,7 @@ public sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbCon
 
         var workTypesToCreate = request.WorkTypes
             .Where(e => !existingWorkTypeNames.Contains(e.Name))
-            .Select(e => WorkType.Create(e.Name, e.Description, _dateTimeProvider.Now))
+            .Select(e => WorkType.Create(e.Name, e.Description, request.DefaultWorkTypeLevelId, _dateTimeProvider.Now))
             .ToList();
 
         if (workTypesToCreate.Count > 0)
@@ -47,8 +50,6 @@ public sealed class SyncExternalWorkTypesCommandHandler(IWorkDbContext workDbCon
         }
 
         // Work types are global and cannot be deleted or updated at this time
-
-        // TODO: add backlog level
 
         // TODO: add the ability to disable work types if they are no longer used within moda and disabled externally
 

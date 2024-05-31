@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20240531033515_Update-worktypehierarchy-config")]
+    [Migration("20240531122152_Update-worktypehierarchy-config")]
     partial class Updateworktypehierarchyconfig
     {
         /// <inheritdoc />
@@ -1651,6 +1651,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("LevelId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -1659,6 +1662,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Id");
+
+                    b.HasIndex("LevelId");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -2241,6 +2246,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("WorkType");
 
                     b.Navigation("Workflow");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkType", b =>
+                {
+                    b.HasOne("Moda.Work.Domain.Models.WorkTypeLevel", "Level")
+                        .WithMany()
+                        .HasForeignKey("LevelId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Level");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkTypeLevel", b =>

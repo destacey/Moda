@@ -1,7 +1,8 @@
-﻿using Moda.Common.Domain.Enums.Work;
+﻿using Moda.Common.Application.Requests.WorkManagement.Interfaces;
+using Moda.Common.Domain.Enums.Work;
 
 namespace Moda.Work.Application.WorkTypeLevels.Dtos;
-public sealed record WorkTypeLevelDto : IMapFrom<WorkTypeLevel>
+public sealed record WorkTypeLevelDto : IMapFrom<WorkTypeLevel>, IWorkTypeLevelDto
 {
     public int Id { get; set; }
 

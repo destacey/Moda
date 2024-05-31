@@ -175,7 +175,13 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         var workTypes = processResult.Value.WorkTypes.OfType<IExternalWorkType>().ToList();
         if (workTypes.Count != 0)
         {
-            var syncWorkTypesResult = await _sender.Send(new SyncExternalWorkTypesCommand(workTypes), cancellationToken);
+            var levels = await _sender.Send(new GetWorkTypeLevelsQuery(), cancellationToken);
+            if (levels is null)
+                return Result.Failure<Guid>("Unable to get work type levels.");
+
+            int defaultLevelId = levels.Where(l => l.Tier == Common.Domain.Enums.Work.WorkTypeTier.Other).Select(l => l.Id).SingleOrDefault();
+
+            var syncWorkTypesResult = await _sender.Send(new SyncExternalWorkTypesCommand(workTypes, defaultLevelId), cancellationToken);
             if (syncWorkTypesResult.IsFailure)
                 return syncWorkTypesResult.ConvertFailure<Guid>();
         }

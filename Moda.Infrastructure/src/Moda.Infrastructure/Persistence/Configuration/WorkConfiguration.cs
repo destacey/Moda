@@ -337,6 +337,12 @@ public class WorkTypeConfig : IEntityTypeConfiguration<WorkType>
         builder.Property(w => w.Deleted);
         builder.Property(w => w.DeletedBy);
         builder.Property(w => w.IsDeleted);
+
+        // Relationships
+        builder.HasOne(w => w.Level)
+            .WithMany()
+            .HasForeignKey(w => w.LevelId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
 

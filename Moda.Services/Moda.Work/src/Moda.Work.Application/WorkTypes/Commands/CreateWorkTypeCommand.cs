@@ -1,20 +1,5 @@
 ﻿namespace Moda.Work.Application.WorkTypes.Commands;
-public sealed record CreateWorkTypeCommand : ICommand<int>
-{
-    public CreateWorkTypeCommand(string name, string? description)
-    {
-        Name = name;
-        Description = description;
-    }
-
-    /// <summary>The name of the work type.  The name cannot be changed.</summary>
-    /// <value>The name.</value>
-    public string Name { get; }
-
-    /// <summary>The description of the work type.</summary>
-    /// <value>The description.</value>
-    public string? Description { get; }
-}
+public sealed record CreateWorkTypeCommand(string Name, string? Description, int LevelId) : ICommand<int>;
 
 public sealed class CreateWorkTypeCommandValidator : CustomValidator<CreateWorkTypeCommand>
 {
@@ -33,6 +18,9 @@ public sealed class CreateWorkTypeCommandValidator : CustomValidator<CreateWorkT
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);
+
+        RuleFor(c => c.LevelId)
+            .GreaterThan(0);
     }
 
     public async Task<bool> BeUniqueName(string name, CancellationToken cancellationToken)
@@ -45,13 +33,13 @@ public sealed class CreateWorkTypeCommandValidator : CustomValidator<CreateWorkT
 internal sealed class CreateWorkTypeCommandHandler : ICommandHandler<CreateWorkTypeCommand, int>
 {
     private readonly IWorkDbContext _workDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly Instant _timestamp;
     private readonly ILogger<CreateWorkTypeCommandHandler> _logger;
 
     public CreateWorkTypeCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateWorkTypeCommandHandler> logger)
     {
         _workDbContext = workDbContext;
-        _dateTimeProvider = dateTimeProvider;
+        _timestamp = dateTimeProvider.Now;
         _logger = logger;
     }
 
@@ -59,9 +47,7 @@ internal sealed class CreateWorkTypeCommandHandler : ICommandHandler<CreateWorkT
     {
         try
         {
-            Instant timestamp = _dateTimeProvider.Now;
-
-            var workType = WorkType.Create(request.Name, request.Description, timestamp);
+            var workType = WorkType.Create(request.Name, request.Description, request.LevelId, _timestamp);
 
             await _workDbContext.WorkTypes.AddAsync(workType, cancellationToken);
 

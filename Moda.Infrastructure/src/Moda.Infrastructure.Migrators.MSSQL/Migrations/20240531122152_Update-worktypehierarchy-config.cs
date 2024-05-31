@@ -18,6 +18,13 @@ public partial class Updateworktypehierarchyconfig : Migration
             name: "BacklogLevelSchemes",
             schema: "Work");
 
+        migrationBuilder.AddColumn<int>(
+            name: "LevelId",
+            schema: "Work",
+            table: "WorkTypes",
+            type: "int",
+            nullable: true);
+
         migrationBuilder.CreateTable(
             name: "WorkTypeHierarchies",
             schema: "Work",
@@ -65,6 +72,12 @@ public partial class Updateworktypehierarchyconfig : Migration
             });
 
         migrationBuilder.CreateIndex(
+            name: "IX_WorkTypes_LevelId",
+            schema: "Work",
+            table: "WorkTypes",
+            column: "LevelId");
+
+        migrationBuilder.CreateIndex(
             name: "IX_WorkTypeHierarchies_Id",
             schema: "Work",
             table: "WorkTypeHierarchies",
@@ -81,11 +94,26 @@ public partial class Updateworktypehierarchyconfig : Migration
             schema: "Work",
             table: "WorkTypeLevels",
             column: "WorkTypeHierarchyId");
+
+        migrationBuilder.AddForeignKey(
+            name: "FK_WorkTypes_WorkTypeLevels_LevelId",
+            schema: "Work",
+            table: "WorkTypes",
+            column: "LevelId",
+            principalSchema: "Work",
+            principalTable: "WorkTypeLevels",
+            principalColumn: "Id",
+            onDelete: ReferentialAction.Restrict);
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
+        migrationBuilder.DropForeignKey(
+            name: "FK_WorkTypes_WorkTypeLevels_LevelId",
+            schema: "Work",
+            table: "WorkTypes");
+
         migrationBuilder.DropTable(
             name: "WorkTypeLevels",
             schema: "Work");
@@ -93,6 +121,16 @@ public partial class Updateworktypehierarchyconfig : Migration
         migrationBuilder.DropTable(
             name: "WorkTypeHierarchies",
             schema: "Work");
+
+        migrationBuilder.DropIndex(
+            name: "IX_WorkTypes_LevelId",
+            schema: "Work",
+            table: "WorkTypes");
+
+        migrationBuilder.DropColumn(
+            name: "LevelId",
+            schema: "Work",
+            table: "WorkTypes");
 
         migrationBuilder.CreateTable(
             name: "BacklogLevelSchemes",

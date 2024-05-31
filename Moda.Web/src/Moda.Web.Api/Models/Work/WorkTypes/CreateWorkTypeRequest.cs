@@ -12,9 +12,14 @@ public sealed record CreateWorkTypeRequest
     /// <value>The description.</value>
     public string? Description { get; set; }
 
+    /// <summary>
+    /// The work type level identifier.
+    /// </summary>
+    public int LevelId { get; set; }
+
     public CreateWorkTypeCommand ToCreateWorkTypeCommand()
     {
-        return new CreateWorkTypeCommand(Name, Description);
+        return new CreateWorkTypeCommand(Name, Description, LevelId);
     }
 }
 
@@ -30,5 +35,8 @@ public sealed class CreateWorkTypeRequestValidator : CustomValidator<CreateWorkT
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);
+
+        RuleFor(c => c.LevelId)
+            .GreaterThan(0);
     }
 }

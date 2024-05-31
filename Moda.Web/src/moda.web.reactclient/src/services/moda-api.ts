@@ -9714,12 +9714,16 @@ export interface CreateWorkTypeRequest {
     name: string;
     /** The description of the work type. */
     description?: string | undefined;
+    /** The work type level identifier. */
+    levelId?: number;
 }
 
 export interface UpdateWorkTypeRequest {
     id?: number;
     /** The description of the work type. */
     description?: string | undefined;
+    /** The work type level identifier. */
+    levelId?: number;
 }
 
 export interface WorkTypeTierDto {

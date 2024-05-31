@@ -9951,6 +9951,13 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
+          },
+          "levelId": {
+            "type": "integer",
+            "description": "The work type level identifier.",
+            "format": "int32",
+            "minimum": 0.0,
+            "exclusiveMinimum": true
           }
         }
       },
@@ -9968,6 +9975,13 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
+          },
+          "levelId": {
+            "type": "integer",
+            "description": "The work type level identifier.",
+            "format": "int32",
+            "minimum": 0.0,
+            "exclusiveMinimum": true
           }
         }
       },
