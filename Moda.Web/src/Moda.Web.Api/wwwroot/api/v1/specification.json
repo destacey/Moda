@@ -9411,7 +9411,7 @@
             "nullable": true
           },
           "level": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "isActive": {
             "type": "boolean"
@@ -9571,7 +9571,7 @@
             "nullable": true
           },
           "level": {
-            "type": "string"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "isActive": {
             "type": "boolean"

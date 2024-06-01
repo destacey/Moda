@@ -8,14 +8,20 @@ import {
 } from '@/src/app/hooks'
 import { WorkTypeDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
-import { Space, Switch } from 'antd'
-import { useCallback, useEffect, useMemo } from 'react'
+import { Button, Space, Switch } from 'antd'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { setIncludeInactive } from '../../../../store/features/work-management/work-type-slice'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useGetWorkTypesQuery } from '@/src/store/features/work-management/work-type-api'
+import useAuth from '@/src/app/components/contexts/auth'
+import { EditOutlined } from '@ant-design/icons'
+import EditWorkTypeForm from './components/edit-work-type-form'
 
 const WorkTypesPage = () => {
   useDocumentTitle('Work Management - Work Types')
+  const [openUpdateWorkTypeForm, setOpenUpdateWorkTypeForm] =
+    useState<boolean>(false)
+  const [editWorkTypeId, setEditWorkTypeId] = useState<number | null>(null)
 
   const { includeInactive } = useAppSelector((state) => state.workType)
 
@@ -27,19 +33,49 @@ const WorkTypesPage = () => {
   } = useGetWorkTypesQuery(includeInactive)
   const dispatch = useAppDispatch()
 
+  const { hasClaim } = useAuth()
+  const canUpdateWorkTypes = hasClaim(
+    'Permission',
+    'Permissions.WorkTypes.Update',
+  )
+
   useEffect(() => {
     error && console.error(error)
   }, [error])
 
+  const editWorkTypeButtonClicked = (id: number) => {
+    setEditWorkTypeId(id)
+    setOpenUpdateWorkTypeForm(true)
+  }
+
   const columnDefs = useMemo<ColDef<WorkTypeDto>[]>(
     () => [
+      {
+        width: 50,
+        filter: false,
+        sortable: false,
+        resizable: false,
+        hide: !canUpdateWorkTypes,
+        cellRenderer: (params) => {
+          return (
+            canUpdateWorkTypes && (
+              <Button
+                type="text"
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => editWorkTypeButtonClicked(params.data.id)}
+              />
+            )
+          )
+        },
+      },
       { field: 'id', hide: true },
       { field: 'name' },
       { field: 'description', width: 300 },
-      { field: 'level' },
+      { field: 'level.name', headerName: 'Level' },
       { field: 'isActive', width: 100 }, // TODO: convert to yes/no
     ],
-    [],
+    [canUpdateWorkTypes],
   )
 
   const refresh = useCallback(async () => {
@@ -67,6 +103,14 @@ const WorkTypesPage = () => {
     },
   ]
 
+  const onEditWorkTypeFormClosed = (wasSaved: boolean) => {
+    setOpenUpdateWorkTypeForm(false)
+    setEditWorkTypeId(null)
+    if (wasSaved) {
+      refresh()
+    }
+  }
+
   return (
     <>
       <PageTitle title="Work Types" />
@@ -79,6 +123,14 @@ const WorkTypesPage = () => {
         loadData={refresh}
         isDataLoading={isLoading}
       />
+      {openUpdateWorkTypeForm && (
+        <EditWorkTypeForm
+          showForm={openUpdateWorkTypeForm}
+          workTypeId={editWorkTypeId}
+          onFormSave={() => onEditWorkTypeFormClosed(true)}
+          onFormCancel={() => onEditWorkTypeFormClosed(false)}
+        />
+      )}
     </>
   )
 }

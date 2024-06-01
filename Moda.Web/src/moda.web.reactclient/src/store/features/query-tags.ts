@@ -15,4 +15,5 @@ export enum QueryTags {
   WorkStatus = 'Work.WorkStatus',
   WorkType = 'Work.WorkType',
   WorkTypeLevel = 'Work.WorkTypeLevel',
+  WorkTypeLevelOption = 'Work.WorkTypeLevelOption',
 }

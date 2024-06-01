@@ -1,7 +1,12 @@
 import { getWorkTypesClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
-import { WorkTypeDto, WorkTypeLevelDto } from '@/src/services/moda-api'
+import {
+  UpdateWorkTypeRequest,
+  WorkTypeDto,
+  WorkTypeLevelDto,
+} from '@/src/services/moda-api'
+import { update } from 'lodash'
 
 export const workTypeApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -36,8 +41,28 @@ export const workTypeApi = apiSlice.injectEndpoints({
         { type: QueryTags.WorkType, id: result.id },
       ],
     }),
+    updateWorkType: builder.mutation<void, UpdateWorkTypeRequest>({
+      queryFn: async (request) => {
+        try {
+          const data = await (
+            await getWorkTypesClient()
+          ).update(request.id, request)
+          return { data }
+        } catch (error) {
+          console.error('Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.WorkType, id: arg.id },
+      ],
+    }),
   }),
   overrideExisting: false,
 })
 
-export const { useGetWorkTypesQuery, useGetWorkTypeQuery } = workTypeApi
+export const {
+  useGetWorkTypesQuery,
+  useGetWorkTypeQuery,
+  useUpdateWorkTypeMutation,
+} = workTypeApi

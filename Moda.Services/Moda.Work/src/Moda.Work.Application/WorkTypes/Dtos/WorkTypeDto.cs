@@ -1,4 +1,5 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Interfaces;
+﻿using Moda.Common.Application.Dtos;
+using Moda.Common.Application.Requests.WorkManagement.Interfaces;
 
 namespace Moda.Work.Application.WorkTypes.Dtos;
 
@@ -17,7 +18,7 @@ public sealed record WorkTypeDto : IMapFrom<WorkType>, IWorkTypeDto
     /// <summary>
     /// The work type level name.
     /// </summary>
-    public required string Level { get; set; }
+    public required SimpleNavigationDto Level { get; set; }
 
     /// <summary>Indicates whether the work type is active or not.</summary>
     /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
@@ -26,6 +27,6 @@ public sealed record WorkTypeDto : IMapFrom<WorkType>, IWorkTypeDto
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<WorkType, WorkTypeDto>()
-            .Map(dest => dest.Level, src => src.Level!.Name);
+            .Map(dest => dest.Level, src => SimpleNavigationDto.Create(src.LevelId, src.Level!.Name));
     }
 }

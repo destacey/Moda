@@ -30,13 +30,13 @@ interface SetWorkspaceExternalUrlTemplatesFormValues {
 const mapToRequestValues = (
   workspaceId: string,
   values: SetWorkspaceExternalUrlTemplatesFormValues,
-) => {
+): SetWorkspaceExternalUrlTemplatesRequest => {
   return {
     workspaceId: workspaceId,
     externalUrlTemplatesRequest: {
       externalViewWorkItemUrlTemplate: values.externalViewWorkItemUrlTemplate,
     } as SetExternalUrlTemplatesRequest,
-  } as SetWorkspaceExternalUrlTemplatesRequest
+  }
 }
 
 const SetWorkspaceExternalUrlTemplatesForm = (

@@ -57,6 +57,7 @@ public class WorkTypesController : ControllerBase
             : BadRequest(result.Error);
     }
 
+
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkTypes)]
     [OpenApiOperation("Update a work type.", "")]

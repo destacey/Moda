@@ -9550,7 +9550,7 @@ export interface WorkTypeDto {
     id?: number;
     name?: string;
     description?: string | undefined;
-    level?: string;
+    level?: SimpleNavigationDto;
     isActive?: boolean;
 }
 
@@ -9600,7 +9600,7 @@ export interface IWorkTypeDto {
     id?: number;
     name?: string;
     description?: string | undefined;
-    level?: string;
+    level?: SimpleNavigationDto;
     isActive?: boolean;
 }
 
