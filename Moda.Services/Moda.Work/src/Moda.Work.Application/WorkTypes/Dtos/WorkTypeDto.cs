@@ -14,7 +14,18 @@ public sealed record WorkTypeDto : IMapFrom<WorkType>, IWorkTypeDto
     /// <value>The description.</value>
     public string? Description { get; set; }
 
+    /// <summary>
+    /// The work type level name.
+    /// </summary>
+    public required string Level { get; set; }
+
     /// <summary>Indicates whether the work type is active or not.</summary>
     /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; set; }
+
+    public void ConfigureMapping(TypeAdapterConfig config)
+    {
+        config.NewConfig<WorkType, WorkTypeDto>()
+            .Map(dest => dest.Level, src => src.Level!.Name);
+    }
 }

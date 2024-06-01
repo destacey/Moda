@@ -12,6 +12,11 @@ public sealed record WorkflowDto : IMapFrom<Workflow>, IWorkflowDto
     public bool IsActive { get; set; }
     public IReadOnlyList<WorkflowSchemeDto> Schemes { get; set; } = [];
 
-
     IReadOnlyList<IWorkflowSchemeDto> IWorkflowDto.Schemes => Schemes;
+
+    public void ConfigureMapping(TypeAdapterConfig config)
+    {
+        config.NewConfig<Workflow, WorkflowDto>()
+            .Map(dest => dest.Ownership, src => SimpleNavigationDto.FromEnum(src.Ownership));
+    }
 }

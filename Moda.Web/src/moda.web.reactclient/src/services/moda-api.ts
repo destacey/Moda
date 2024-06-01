@@ -9550,6 +9550,7 @@ export interface WorkTypeDto {
     id?: number;
     name?: string;
     description?: string | undefined;
+    level?: string;
     isActive?: boolean;
 }
 
@@ -9599,6 +9600,7 @@ export interface IWorkTypeDto {
     id?: number;
     name?: string;
     description?: string | undefined;
+    level?: string;
     isActive?: boolean;
 }
 
@@ -9679,15 +9681,8 @@ export interface WorkTypeLevelDto {
     id?: number;
     name?: string;
     description?: string | undefined;
-    tier?: WorkTypeTier;
+    tier?: SimpleNavigationDto;
     order?: number;
-}
-
-export enum WorkTypeTier {
-    Portfolio = 0,
-    Requirement = 1,
-    Task = 2,
-    Other = 3,
 }
 
 export interface CreateWorkTypeLevelRequest {

@@ -17,6 +17,7 @@ import {
   WorkTypesClient,
   WorkProcessesClient,
   WorkspacesClient,
+  WorkTypeLevelsClient,
 } from './moda-api'
 import auth from './auth'
 
@@ -71,5 +72,7 @@ export const getWorkspacesClient = async (accessToken?: string) =>
   new WorkspacesClient('', await createDefaultAxiosInstance(accessToken))
 export const getWorkStatusesClient = async (accessToken?: string) =>
   new WorkStatusesClient('', await createDefaultAxiosInstance(accessToken))
+export const getWorkTypeLevelsClient = async (accessToken?: string) =>
+  new WorkTypeLevelsClient('', await createDefaultAxiosInstance(accessToken))
 export const getWorkTypesClient = async (accessToken?: string) =>
   new WorkTypesClient('', await createDefaultAxiosInstance(accessToken))

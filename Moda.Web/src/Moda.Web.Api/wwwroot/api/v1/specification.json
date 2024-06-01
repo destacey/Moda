@@ -9410,6 +9410,9 @@
             "type": "string",
             "nullable": true
           },
+          "level": {
+            "type": "string"
+          },
           "isActive": {
             "type": "boolean"
           }
@@ -9566,6 +9569,9 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "level": {
+            "type": "string"
           },
           "isActive": {
             "type": "boolean"
@@ -9847,29 +9853,13 @@
             "nullable": true
           },
           "tier": {
-            "$ref": "#/components/schemas/WorkTypeTier"
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "order": {
             "type": "integer",
             "format": "int32"
           }
         }
-      },
-      "WorkTypeTier": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Portfolio",
-          "Requirement",
-          "Task",
-          "Other"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          3
-        ]
       },
       "CreateWorkTypeLevelRequest": {
         "type": "object",

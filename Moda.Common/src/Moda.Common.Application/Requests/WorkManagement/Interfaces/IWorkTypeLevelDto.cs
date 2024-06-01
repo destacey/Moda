@@ -1,4 +1,4 @@
-﻿using Moda.Common.Domain.Enums.Work;
+﻿using Moda.Common.Application.Dtos;
 
 namespace Moda.Common.Application.Requests.WorkManagement.Interfaces;
 public interface IWorkTypeLevelDto
@@ -6,6 +6,6 @@ public interface IWorkTypeLevelDto
     int Id { get; }
     string Name { get; }
     string? Description { get; }
-    WorkTypeTier Tier { get; }
+    SimpleNavigationDto Tier { get; }
     int Order { get; }
 }

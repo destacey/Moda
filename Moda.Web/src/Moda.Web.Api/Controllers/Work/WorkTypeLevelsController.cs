@@ -28,7 +28,7 @@ public class WorkTypeLevelsController : ControllerBase
     {
         var levels = await _sender.Send(new GetWorkTypeLevelsQuery(), cancellationToken);
 
-        return Ok(levels.OrderBy(l => (int)l.Tier).ThenByDescending(s => s.Order));
+        return Ok(levels.OrderBy(l => l.Tier.Id).ThenByDescending(s => s.Order));
     }
 
     [HttpGet("{id}")]

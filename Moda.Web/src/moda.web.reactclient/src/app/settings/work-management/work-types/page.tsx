@@ -10,18 +10,21 @@ import { WorkTypeDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import { Space, Switch } from 'antd'
 import { useCallback, useEffect, useMemo } from 'react'
-import {
-  fetchWorkTypes,
-  setIncludeInactive,
-} from '../../../../store/features/work-management/work-type-slice'
+import { setIncludeInactive } from '../../../../store/features/work-management/work-type-slice'
 import { authorizePage } from '@/src/app/components/hoc'
+import { useGetWorkTypesQuery } from '@/src/store/features/work-management/work-type-api'
 
 const WorkTypesPage = () => {
   useDocumentTitle('Work Management - Work Types')
 
-  const { workTypes, isLoading, error, includeInactive } = useAppSelector(
-    (state) => state.workType,
-  )
+  const { includeInactive } = useAppSelector((state) => state.workType)
+
+  const {
+    data: workTypes,
+    isLoading,
+    error,
+    refetch,
+  } = useGetWorkTypesQuery(includeInactive)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
@@ -33,18 +36,19 @@ const WorkTypesPage = () => {
       { field: 'id', hide: true },
       { field: 'name' },
       { field: 'description', width: 300 },
+      { field: 'level' },
       { field: 'isActive', width: 100 }, // TODO: convert to yes/no
     ],
     [],
   )
 
   const refresh = useCallback(async () => {
-    dispatch(fetchWorkTypes(includeInactive))
-  }, [dispatch, includeInactive])
+    refetch()
+  }, [refetch])
 
   const onIncludeInactiveChange = (checked: boolean) => {
     dispatch(setIncludeInactive(checked))
-    dispatch(fetchWorkTypes(checked))
+    refresh()
   }
 
   const controlItems = [

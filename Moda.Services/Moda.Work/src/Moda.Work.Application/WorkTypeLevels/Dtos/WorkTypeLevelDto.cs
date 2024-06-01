@@ -1,5 +1,5 @@
-﻿using Moda.Common.Application.Requests.WorkManagement.Interfaces;
-using Moda.Common.Domain.Enums.Work;
+﻿using Moda.Common.Application.Dtos;
+using Moda.Common.Application.Requests.WorkManagement.Interfaces;
 
 namespace Moda.Work.Application.WorkTypeLevels.Dtos;
 public sealed record WorkTypeLevelDto : IMapFrom<WorkTypeLevel>, IWorkTypeLevelDto
@@ -16,9 +16,15 @@ public sealed record WorkTypeLevelDto : IMapFrom<WorkTypeLevel>, IWorkTypeLevelD
 
     /// <summary>Gets or sets the tier.</summary>
     /// <value>The tier.</value>
-    public WorkTypeTier Tier { get; set; }
+    public required SimpleNavigationDto Tier { get; set; }
 
     /// <summary>Gets or sets the order.</summary>
     /// <value>The order.</value>
     public int Order { get; set; }
+
+    public void ConfigureMapping(TypeAdapterConfig config)
+    {
+        config.NewConfig<WorkTypeLevel, WorkTypeLevelDto>()
+            .Map(dest => dest.Tier, src => SimpleNavigationDto.FromEnum(src.Tier));
+    }
 }
