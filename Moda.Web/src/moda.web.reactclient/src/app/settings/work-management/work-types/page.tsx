@@ -16,6 +16,7 @@ import { useGetWorkTypesQuery } from '@/src/store/features/work-management/work-
 import useAuth from '@/src/app/components/contexts/auth'
 import { EditOutlined } from '@ant-design/icons'
 import EditWorkTypeForm from './components/edit-work-type-form'
+import Link from 'next/link'
 
 const WorkTypesPage = () => {
   useDocumentTitle('Work Management - Work Types')
@@ -37,6 +38,10 @@ const WorkTypesPage = () => {
   const canUpdateWorkTypes = hasClaim(
     'Permission',
     'Permissions.WorkTypes.Update',
+  )
+  const canViewWorkTypeHierarchy = hasClaim(
+    'Permission',
+    'Permissions.WorkTypeLevels.View',
   )
 
   useEffect(() => {
@@ -82,6 +87,18 @@ const WorkTypesPage = () => {
     refetch()
   }, [refetch])
 
+  const actions = () => {
+    return (
+      <>
+        {canViewWorkTypeHierarchy && (
+          <Link href="/settings/work-management/work-types/hierarchy">
+            Work Type Hierarchy
+          </Link>
+        )}
+      </>
+    )
+  }
+
   const onIncludeInactiveChange = (checked: boolean) => {
     dispatch(setIncludeInactive(checked))
     refresh()
@@ -113,7 +130,7 @@ const WorkTypesPage = () => {
 
   return (
     <>
-      <PageTitle title="Work Types" />
+      <PageTitle title="Work Types" actions={actions()} />
 
       <ModaGrid
         height={600}

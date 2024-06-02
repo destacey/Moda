@@ -9881,11 +9881,6 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
-          },
-          "order": {
-            "type": "integer",
-            "description": "The order of the work type level.",
-            "format": "int32"
           }
         }
       },
@@ -9913,11 +9908,6 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
-          },
-          "order": {
-            "type": "integer",
-            "description": "The order of the work type level.",
-            "format": "int32"
           }
         }
       },

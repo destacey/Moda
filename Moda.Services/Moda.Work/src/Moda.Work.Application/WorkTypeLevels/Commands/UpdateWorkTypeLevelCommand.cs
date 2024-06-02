@@ -1,12 +1,13 @@
-﻿namespace Moda.Work.Application.WorkTypeLevels.Commands;
-public sealed record UpdateWorkTypeLevelCommand : ICommand<int>
+﻿using Moda.Work.Application.WorkItems.Commands;
+
+namespace Moda.Work.Application.WorkTypeLevels.Commands;
+public sealed record UpdateWorkTypeLevelCommand : ICommand
 {
-    public UpdateWorkTypeLevelCommand(int id, string name, string? description, int rank)
+    public UpdateWorkTypeLevelCommand(int id, string name, string? description)
     {
         Id = id;
         Name = name;
         Description = description;
-        Order = rank;
     }
 
     public int Id { get; }
@@ -18,12 +19,6 @@ public sealed record UpdateWorkTypeLevelCommand : ICommand<int>
     /// <summary>The description of the work type.</summary>
     /// <value>The description.</value>
     public string? Description { get; }
-
-    /// <summary>
-    /// The order of the work type level.
-    /// </summary>
-    /// <value>The order.</value>
-    public int Order { get; }
 }
 
 public sealed class UpdateWorkTypeLevelCommandValidator : CustomValidator<UpdateWorkTypeLevelCommand>
@@ -55,20 +50,22 @@ public sealed class UpdateWorkTypeLevelCommandValidator : CustomValidator<Update
     }
 }
 
-internal sealed class UpdateWorkTypeLevelCommandHandler : ICommandHandler<UpdateWorkTypeLevelCommand, int>
+internal sealed class UpdateWorkTypeLevelCommandHandler : ICommandHandler<UpdateWorkTypeLevelCommand>
 {
+    private const string AppRequestName = nameof(UpdateWorkTypeLevelCommand);
+
     private readonly IWorkDbContext _workDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly Instant _timestamp;
     private readonly ILogger<UpdateWorkTypeLevelCommandHandler> _logger;
 
     public UpdateWorkTypeLevelCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<UpdateWorkTypeLevelCommandHandler> logger)
     {
         _workDbContext = workDbContext;
-        _dateTimeProvider = dateTimeProvider;
+        _timestamp = dateTimeProvider.Now;
         _logger = logger;
     }
 
-    public async Task<Result<int>> Handle(UpdateWorkTypeLevelCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateWorkTypeLevelCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -77,33 +74,25 @@ internal sealed class UpdateWorkTypeLevelCommandHandler : ICommandHandler<Update
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (hierarchy is null)
-                return Result.Failure<int>("The system work type hierarchy does not exist.");
+                return Result.Failure("The system work type hierarchy does not exist.");
 
-            var level = hierarchy.Levels.FirstOrDefault(p => p.Id == request.Id);
-            if (level is null)
-                return Result.Failure<int>("Work type Level was not found.");
-
-            var updateResult = level.Update(request.Name, request.Description, request.Order, _dateTimeProvider.Now);
+            var updateResult = hierarchy.UpdatePortfolioWorkTypeLevel(request.Id, request.Name, request.Description, _timestamp);
 
             if (updateResult.IsFailure)
             {
-                var requestName = request.GetType().Name;
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
-                return Result.Failure<int>(updateResult.Error);
+                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", AppRequestName, request, updateResult.Error);
+                return Result.Failure(updateResult.Error);
             }
 
             await _workDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(level.Id);
+            return Result.Success();
         }
         catch (Exception ex)
         {
-            var requestName = request.GetType().Name;
+            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", AppRequestName, request);
 
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-
-            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure($"Moda Request: Exception for Request {AppRequestName} {request}");
         }
     }
 }
-

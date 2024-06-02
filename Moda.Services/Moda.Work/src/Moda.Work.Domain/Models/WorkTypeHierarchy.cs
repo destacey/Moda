@@ -30,19 +30,20 @@ public class WorkTypeHierarchy : BaseEntity<int>, ISystemAuditable
     /// <param name="workTypeLevel"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result AddPortfolioWorkTypeLevel(WorkTypeLevel workTypeLevel, Instant timestamp)
+    public Result<WorkTypeLevel> AddPortfolioWorkTypeLevel(string name, string? description, Instant timestamp)
     {
-        Guard.Against.Null(workTypeLevel);
+        Guard.Against.NullOrWhiteSpace(name);
 
-        if (workTypeLevel.Tier != WorkTypeTier.Portfolio)
-            return Result.Failure("Work type level must be of tier Portfolio.");
+        if (_levels.Any(l => l.Name == name))
+            return Result.Failure<WorkTypeLevel>($"A work type level with the name '{name}' already exists.");
 
-        if (_levels.Any(l => l.Name == workTypeLevel.Name))
-            return Result.Failure($"A work type level with the name '{workTypeLevel.Name}' already exists.");
+        var maxOrder = _levels.Where(l => l.Tier == WorkTypeTier.Portfolio).Max(l => l.Order);
 
-        _levels.Add(workTypeLevel);
+        var level = WorkTypeLevel.Create(name, description, WorkTypeTier.Portfolio, Ownership.Owned, maxOrder + 1, timestamp);
+
+        _levels.Add(level);
         AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
-        return Result.Success();
+        return Result.Success(level);
     }
 
     /// <summary>
@@ -51,13 +52,11 @@ public class WorkTypeHierarchy : BaseEntity<int>, ISystemAuditable
     /// <param name="id"></param>
     /// <param name="name"></param>
     /// <param name="description"></param>
-    /// <param name="rank"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
     public Result UpdatePortfolioWorkTypeLevel(int id,
             string name,
             string? description,
-            int rank,
             Instant timestamp)
     {
         var workTypeLevel = _levels.FirstOrDefault(x => x.Id == id);
@@ -70,7 +69,7 @@ public class WorkTypeHierarchy : BaseEntity<int>, ISystemAuditable
         if (_levels.Where(l => l.Id != id).Any(l => l.Name == workTypeLevel.Name))
             return Result.Failure($"A work type level with the name '{workTypeLevel.Name}' already exists.");
 
-        var result = workTypeLevel.Update(name, description, rank, timestamp);
+        var result = workTypeLevel.Update(name, description, timestamp);
         if (result.IsFailure)
             return Result.Failure<int>(result.Error);
 
@@ -97,7 +96,6 @@ public class WorkTypeHierarchy : BaseEntity<int>, ISystemAuditable
                         var result = existing.Update(
                             defaultWorkTypeLevel.Name,
                             defaultWorkTypeLevel.Description,
-                            defaultWorkTypeLevel.Order,
                             timestamp);
 
                         if (result.IsSuccess)

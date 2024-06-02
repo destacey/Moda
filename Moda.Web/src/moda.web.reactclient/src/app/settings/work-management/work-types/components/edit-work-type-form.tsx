@@ -1,3 +1,5 @@
+'use client'
+
 import { UpdateWorkTypeRequest, WorkTypeDto } from '@/src/services/moda-api'
 import {
   useGetWorkTypeQuery,

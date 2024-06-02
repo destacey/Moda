@@ -9690,8 +9690,6 @@ export interface CreateWorkTypeLevelRequest {
     name: string;
     /** The description of the work type level. */
     description?: string | undefined;
-    /** The order of the work type level. */
-    order?: number;
 }
 
 export interface UpdateWorkTypeLevelRequest {
@@ -9700,8 +9698,6 @@ export interface UpdateWorkTypeLevelRequest {
     name: string;
     /** The description of the work type level. */
     description?: string | undefined;
-    /** The order of the work type level. */
-    order?: number;
 }
 
 export interface CreateWorkTypeRequest {

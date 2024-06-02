@@ -57,16 +57,14 @@ public sealed class WorkTypeLevel : BaseEntity<int>, ISystemAuditable
     /// <summary>Updates the specified name.</summary>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
-    /// <param name="order">The rank.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public Result Update(string name, string? description, int order, Instant timestamp)
+    internal Result Update(string name, string? description, Instant timestamp)
     {
         try
         {
             Name = name;
             Description = description;
-            Order = order;
 
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
@@ -88,7 +86,7 @@ public sealed class WorkTypeLevel : BaseEntity<int>, ISystemAuditable
     /// <param name="order"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public static WorkTypeLevel Create(string name, string? description, WorkTypeTier tier, Ownership ownership, int order, Instant timestamp)
+    internal static WorkTypeLevel Create(string name, string? description, WorkTypeTier tier, Ownership ownership, int order, Instant timestamp)
     {
         WorkTypeLevel workTypeLevel = new(name, description, tier, ownership, order);
 

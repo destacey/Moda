@@ -12,15 +12,9 @@ public sealed record CreateWorkTypeLevelRequest
     /// <value>The description.</value>
     public string? Description { get; set; }
 
-    /// <summary>
-    /// The order of the work type level.
-    /// </summary>
-    /// <value>The order.</value>
-    public int Order { get; set; }
-
     public CreateWorkTypeLevelCommand ToCreateWorkTypeLevelCommand()
     {
-        return new CreateWorkTypeLevelCommand(Name, Description, Order);
+        return new CreateWorkTypeLevelCommand(Name, Description);
     }
 }
 

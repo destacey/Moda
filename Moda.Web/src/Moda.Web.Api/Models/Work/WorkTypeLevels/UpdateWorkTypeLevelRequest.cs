@@ -4,7 +4,6 @@ namespace Moda.Web.Api.Models.Work.WorkTypeLevels;
 
 public sealed record UpdateWorkTypeLevelRequest
 {
-
     public int Id { get; set; }
 
     /// <summary>The name of the work type level.  The name cannot be changed.</summary>
@@ -15,15 +14,9 @@ public sealed record UpdateWorkTypeLevelRequest
     /// <value>The description.</value>
     public string? Description { get; set; }
 
-    /// <summary>
-    /// The order of the work type level.
-    /// </summary>
-    /// <value>The order.</value>
-    public int Order { get; set; }
-
     public UpdateWorkTypeLevelCommand ToUpdateWorkTypeLevelCommand()
     {
-        return new UpdateWorkTypeLevelCommand(Id, Name, Description, Order);
+        return new UpdateWorkTypeLevelCommand(Id, Name, Description);
     }
 }
 

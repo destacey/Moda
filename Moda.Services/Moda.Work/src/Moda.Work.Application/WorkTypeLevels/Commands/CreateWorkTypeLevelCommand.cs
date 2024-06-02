@@ -4,11 +4,10 @@ using Moda.Common.Domain.Enums.Work;
 namespace Moda.Work.Application.WorkTypeLevels.Commands;
 public sealed record CreateWorkTypeLevelCommand : ICommand<int>
 {
-    public CreateWorkTypeLevelCommand(string name, string? description, int order)
+    public CreateWorkTypeLevelCommand(string name, string? description)
     {
         Name = name;
         Description = description;
-        Order = order;
     }
 
     /// <summary>The name of the work type.  The name cannot be changed.</summary>
@@ -18,12 +17,6 @@ public sealed record CreateWorkTypeLevelCommand : ICommand<int>
     /// <summary>The description of the work type.</summary>
     /// <value>The description.</value>
     public string? Description { get; }
-
-    /// <summary>
-    /// The order of the work type level.
-    /// </summary>
-    /// <value>The order.</value>
-    public int Order { get; }
 }
 
 public sealed class CreateWorkTypeLevelCommandValidator : CustomValidator<CreateWorkTypeLevelCommand>
@@ -56,14 +49,16 @@ public sealed class CreateWorkTypeLevelCommandValidator : CustomValidator<Create
 
 internal sealed class CreateWorkTypeLevelCommandHandler : ICommandHandler<CreateWorkTypeLevelCommand, int>
 {
+    private const string AppRequestName = nameof(CreateWorkTypeLevelCommand);
+
     private readonly IWorkDbContext _workDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly Instant _timestamp;
     private readonly ILogger<CreateWorkTypeLevelCommandHandler> _logger;
 
     public CreateWorkTypeLevelCommandHandler(IWorkDbContext workDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateWorkTypeLevelCommandHandler> logger)
     {
         _workDbContext = workDbContext;
-        _dateTimeProvider = dateTimeProvider;
+        _timestamp = dateTimeProvider.Now;
         _logger = logger;
     }
 
@@ -78,25 +73,19 @@ internal sealed class CreateWorkTypeLevelCommandHandler : ICommandHandler<Create
             if (hierarchy is null)
                 return Result.Failure<int>("The system work type hierarchy does not exist.");
 
-            Instant timestamp = _dateTimeProvider.Now;
-
-            var level = WorkTypeLevel.Create(request.Name, request.Description, WorkTypeTier.Portfolio, Ownership.Owned, request.Order, timestamp);
-
-            var addResult = hierarchy.AddPortfolioWorkTypeLevel(level, timestamp);
+            var addResult = hierarchy.AddPortfolioWorkTypeLevel(request.Name, request.Description, _timestamp);
             if (addResult.IsFailure)
                 return Result.Failure<int>(addResult.Error);
 
             await _workDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(level.Id);
+            return Result.Success(addResult.Value.Id);
         }
         catch (Exception ex)
         {
-            var requestName = request.GetType().Name;
+            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", AppRequestName, request);
 
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-
-            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<int>($"Moda Request: Exception for Request {AppRequestName} {request}");
         }
     }
 }
