@@ -6,6 +6,7 @@ import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import {
   CreateWorkTypeLevelRequest,
+  UpdateWorkTypeLevelRequest,
   WorkTypeLevelDto,
 } from '@/src/services/moda-api'
 import { BaseOptionType, OptionProps } from 'antd/es/select'
@@ -89,6 +90,21 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
         QueryTags.WorkTypeLevelOption,
       ],
     }),
+    updateWorkTypeLevel: builder.mutation<null, UpdateWorkTypeLevelRequest>({
+      queryFn: async (request) => {
+        try {
+          await (await getWorkTypeLevelsClient()).update(request.id, request)
+          return { data: null }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.WorkTypeLevel, id: arg.id },
+        { type: QueryTags.WorkTypeLevelOption, id: arg.id },
+      ],
+    }),
   }),
   overrideExisting: false,
 })
@@ -98,4 +114,5 @@ export const {
   useGetWorkTypeLevelOptionsQuery,
   useGetWorkTypeLevelQuery,
   useCreateWorkTypeLevelMutation,
+  useUpdateWorkTypeLevelMutation,
 } = workTypeLevelApi

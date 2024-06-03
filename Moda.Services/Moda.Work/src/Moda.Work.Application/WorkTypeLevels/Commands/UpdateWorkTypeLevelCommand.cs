@@ -76,7 +76,7 @@ internal sealed class UpdateWorkTypeLevelCommandHandler : ICommandHandler<Update
             if (hierarchy is null)
                 return Result.Failure("The system work type hierarchy does not exist.");
 
-            var updateResult = hierarchy.UpdatePortfolioWorkTypeLevel(request.Id, request.Name, request.Description, _timestamp);
+            var updateResult = hierarchy.UpdateWorkTypeLevel(request.Id, request.Name, request.Description, _timestamp);
 
             if (updateResult.IsFailure)
             {

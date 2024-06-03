@@ -1,5 +1,6 @@
 'use client'
 
+import useAuth from '@/src/app/components/contexts/auth'
 import { UpdateWorkTypeRequest, WorkTypeDto } from '@/src/services/moda-api'
 import {
   useGetWorkTypeQuery,
@@ -50,6 +51,12 @@ const EditWorkTypeForm = (props: EditWorkTypeFormProps) => {
   const { data: workTypeLevelOptions } = useGetWorkTypeLevelOptionsQuery(null)
   const [updateWorkTypeMutation] = useUpdateWorkTypeMutation()
 
+  const { hasClaim } = useAuth()
+  const canUpdateWorkType = hasClaim(
+    'Permission',
+    'Permissions.WorkTypes.Update',
+  )
+
   const mapToFormValues = useCallback(
     (workType: WorkTypeDto) => {
       form.setFieldsValue({
@@ -98,20 +105,27 @@ const EditWorkTypeForm = (props: EditWorkTypeFormProps) => {
 
   useEffect(() => {
     if (!workTypeData) return
-    setIsOpen(props.showForm)
-    if (props.showForm) {
-      try {
-        mapToFormValues(workTypeData)
-        setIsValid(true)
-      } catch (error) {
-        handleCancel()
-        messageApi.error(
-          'An unexpected error occurred while loading form data.',
-        )
-        console.error(error)
+
+    if (canUpdateWorkType) {
+      setIsOpen(props.showForm)
+      if (props.showForm) {
+        try {
+          mapToFormValues(workTypeData)
+          setIsValid(true)
+        } catch (error) {
+          handleCancel()
+          messageApi.error(
+            'An unexpected error occurred while loading form data.',
+          )
+          console.error(error)
+        }
       }
+    } else {
+      handleCancel()
+      messageApi.error(`You do not have permission to update work types.`)
     }
   }, [
+    canUpdateWorkType,
     form,
     handleCancel,
     mapToFormValues,
@@ -135,6 +149,7 @@ const EditWorkTypeForm = (props: EditWorkTypeFormProps) => {
         open={isOpen}
         onOk={handleSave}
         okButtonProps={{ disabled: !isValid }}
+        okText="Save"
         onCancel={handleCancel}
         confirmLoading={isSaving}
         maskClosable={false}

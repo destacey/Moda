@@ -1,59 +1,75 @@
 import useAuth from '@/src/app/components/contexts/auth'
-import { CreateWorkTypeLevelRequest } from '@/src/services/moda-api'
-import { useCreateWorkTypeLevelMutation } from '@/src/store/features/work-management/work-type-level-api'
+import {
+  UpdateWorkTypeLevelRequest,
+  WorkTypeLevelDto,
+} from '@/src/services/moda-api'
+import {
+  useGetWorkTypeLevelQuery,
+  useUpdateWorkTypeLevelMutation,
+} from '@/src/store/features/work-management/work-type-level-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, message } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
 
-export interface CreateWorkTypeLevelFormProps {
+export interface EditWorkTypeLevelFormProps {
+  levelId: number
   showForm: boolean
   onFormSave: () => void
   onFormCancel: () => void
 }
 
-interface CreateWorkTypeLevelFormValues {
+interface EditWorkTypeLevelFormValues {
   name: string
   description?: string
 }
 
 const mapToRequestValues = (
-  values: CreateWorkTypeLevelFormValues,
-): CreateWorkTypeLevelRequest => {
+  levelId: number,
+  values: EditWorkTypeLevelFormValues,
+): UpdateWorkTypeLevelRequest => {
   return {
+    id: levelId,
     name: values.name,
     description: values.description,
   }
 }
 
-const CreateWorkTypeLevelForm = ({
-  showForm,
-  onFormSave,
-  onFormCancel,
-}: CreateWorkTypeLevelFormProps) => {
+const EditWorkTypeLevelForm = (props: EditWorkTypeLevelFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateWorkTypeLevelFormValues>()
+  const [form] = Form.useForm<EditWorkTypeLevelFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const [createWorkTypeLevelMutation] = useCreateWorkTypeLevelMutation()
+  const { data: workTypeLevelData } = useGetWorkTypeLevelQuery(props.levelId)
+  const [updateLevelMutation] = useUpdateWorkTypeLevelMutation()
 
   const { hasClaim } = useAuth()
-  const canCreateWorkTypeLevel = hasClaim(
+  const canUpdateWorkTypeLevel = hasClaim(
     'Permission',
-    'Permissions.WorkTypeLevels.Create',
+    'Permissions.WorkTypeLevels.Update',
   )
 
-  const create = async (
-    values: CreateWorkTypeLevelFormValues,
+  const mapToFormValues = useCallback(
+    (level: WorkTypeLevelDto) => {
+      form.setFieldsValue({
+        name: level.name,
+        description: level.description,
+      })
+    },
+    [form],
+  )
+
+  const update = async (
+    values: EditWorkTypeLevelFormValues,
   ): Promise<boolean> => {
     try {
-      const request = mapToRequestValues(values)
-      const response = await createWorkTypeLevelMutation(request)
+      const request = mapToRequestValues(props.levelId, values)
+      const response = await updateLevelMutation(request)
       if (response.error) {
         throw response.error
       }
@@ -65,7 +81,7 @@ const CreateWorkTypeLevelForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          'An unexpected error occurred while creating the work type level.',
+          'An unexpected error occurred while updating the work type level.',
         )
         console.error(error)
       }
@@ -77,11 +93,11 @@ const CreateWorkTypeLevelForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values)) {
+      if (await update(values)) {
         setIsOpen(false)
         form.resetFields()
-        onFormSave()
-        messageApi.success('Successfully created work type level.')
+        props.onFormSave()
+        messageApi.success('Successfully updated work type level.')
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
@@ -92,18 +108,38 @@ const CreateWorkTypeLevelForm = ({
 
   const handleCancel = () => {
     setIsOpen(false)
-    onFormCancel()
+    props.onFormCancel()
     form.resetFields()
   }
 
   useEffect(() => {
-    if (canCreateWorkTypeLevel) {
-      setIsOpen(showForm)
+    if (!workTypeLevelData) return
+
+    if (canUpdateWorkTypeLevel) {
+      setIsOpen(props.showForm)
+      if (props.showForm) {
+        try {
+          mapToFormValues(workTypeLevelData)
+          setIsValid(true)
+        } catch (error) {
+          props.onFormCancel()
+          messageApi.error(
+            'An unexpected error occurred while loading form data.',
+          )
+          console.error(error)
+        }
+      }
     } else {
-      onFormCancel()
-      messageApi.error('You do not have permission to create work type levels.')
+      props.onFormCancel()
+      messageApi.error('You do not have permission to edit work type levels.')
     }
-  }, [canCreateWorkTypeLevel, onFormCancel, showForm, messageApi])
+  }, [
+    canUpdateWorkTypeLevel,
+    messageApi,
+    workTypeLevelData,
+    props,
+    mapToFormValues,
+  ])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -116,11 +152,11 @@ const CreateWorkTypeLevelForm = ({
     <>
       {contextHolder}
       <Modal
-        title="Create Work Type Level"
+        title="Edit Work Type Level"
         open={isOpen}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
-        okText="Create"
+        okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
@@ -131,7 +167,7 @@ const CreateWorkTypeLevelForm = ({
           form={form}
           size="small"
           layout="vertical"
-          name="create-work-type-level-form"
+          name="edit-work-type-level-form"
         >
           <Item label="Name" name="name" rules={[{ required: true }]}>
             <TextArea
@@ -153,4 +189,4 @@ const CreateWorkTypeLevelForm = ({
   )
 }
 
-export default CreateWorkTypeLevelForm
+export default EditWorkTypeLevelForm

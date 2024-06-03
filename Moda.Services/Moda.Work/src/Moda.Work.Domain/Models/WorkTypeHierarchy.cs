@@ -47,14 +47,14 @@ public class WorkTypeHierarchy : BaseEntity<int>, ISystemAuditable
     }
 
     /// <summary>
-    /// Update an existing work type level.  The work type level tier must be a Portfolio tier.
+    /// Update an existing work type level.
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
     /// <param name="description"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result UpdatePortfolioWorkTypeLevel(int id,
+    public Result UpdateWorkTypeLevel(int id,
             string name,
             string? description,
             Instant timestamp)
@@ -62,9 +62,6 @@ public class WorkTypeHierarchy : BaseEntity<int>, ISystemAuditable
         var workTypeLevel = _levels.FirstOrDefault(x => x.Id == id);
         if (workTypeLevel is null)
             return Result.Failure<int>("Work Type Level not found.");
-
-        if (workTypeLevel.Tier != WorkTypeTier.Portfolio)
-            return Result.Failure("Work type level must be of tier Portfolio.");
 
         if (_levels.Where(l => l.Id != id).Any(l => l.Name == name.Trim()))
             return Result.Failure($"A work type level with the name '{name}' already exists.");

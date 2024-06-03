@@ -62,6 +62,7 @@ const WorkTypeTierCard = (props: WorkTypeTierCardProps) => {
             <WorkTypeLevelCard
               level={level}
               canUpdateWorkTypeLevels={props.canUpdateWorkTypeLevels}
+              refreshLevels={props.refreshLevels}
             />
           )}
         />
