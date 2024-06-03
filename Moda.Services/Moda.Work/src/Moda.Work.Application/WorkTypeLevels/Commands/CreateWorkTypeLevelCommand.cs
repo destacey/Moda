@@ -49,7 +49,6 @@ internal sealed class CreateWorkTypeLevelCommandHandler : ICommandHandler<Create
         try
         {
             var hierarchy = await _workDbContext.WorkTypeHierarchies
-                .Include(s => s.Levels)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (hierarchy is null)

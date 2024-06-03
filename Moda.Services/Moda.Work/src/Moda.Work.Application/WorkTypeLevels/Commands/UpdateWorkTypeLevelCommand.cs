@@ -70,7 +70,6 @@ internal sealed class UpdateWorkTypeLevelCommandHandler : ICommandHandler<Update
         try
         {
             var hierarchy = await _workDbContext.WorkTypeHierarchies
-                .Include(s => s.Levels)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (hierarchy is null)

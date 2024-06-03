@@ -74,6 +74,28 @@ public class WorkTypeHierarchy : BaseEntity<int>, ISystemAuditable
         return Result.Success();
     }
 
+    public Result UpdatePortfolioTierLevelsOrder(Dictionary<int, int> updatedLevels)
+    {
+        foreach (var (id, order) in updatedLevels)
+        {
+            var level = _levels.Where(l => l.Tier == WorkTypeTier.Portfolio).SingleOrDefault(l => l.Id == id);
+            if (level is null)
+                return Result.Failure($"Portfolio tier work type level with id {id} not found.");
+
+            level.UpdateOrder(order);
+        }
+
+        // verify no duplicate orders
+        var duplicateOrders = _levels.GroupBy(l => l.Order)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .ToList();
+
+        return duplicateOrders.Count == 0
+            ? Result.Success()
+            : Result.Failure("Unable to save because it would create duplicate ordering positions. Each work type level must have a unique position within the tier.");
+    }
+
     public Result Reinitialize(Instant timestamp)
     {
         try

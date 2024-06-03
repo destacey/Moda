@@ -1,5 +1,8 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Planning.Application.PlanningIntervals.Commands;
+using Moda.Web.Api.Models.Planning.PlanningIntervals;
 using Moda.Web.Api.Models.Work.WorkTypeLevels;
+using Moda.Work.Application.WorkTypeLevels.Commands;
 using Moda.Work.Application.WorkTypeLevels.Dtos;
 using Moda.Work.Application.WorkTypeLevels.Queries;
 
@@ -54,9 +57,18 @@ public class WorkTypeLevelsController : ControllerBase
     {
         var result = await _sender.Send(request.ToCreateWorkTypeLevelCommand(), cancellationToken);
 
-        return result.IsSuccess
-            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
-            : BadRequest(result.Error);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "WorkTypeLevelsController.Create"
+            };
+            return BadRequest(error);
+        }
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
     }
 
     [HttpPut("{id}")]
@@ -72,9 +84,43 @@ public class WorkTypeLevelsController : ControllerBase
 
         var result = await _sender.Send(request.ToUpdateWorkTypeLevelCommand(), cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : BadRequest(result.Error);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "WorkTypeLevelsController.Update"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
+
+    [HttpPut("/order")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkTypeLevels)]
+    [OpenApiOperation("Update the order of portfolio tier work type levels.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> UpdateOrder([FromBody] UpdateWorkTypeLevelsOrderRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new UpdateWorkTypeLevelsOrderCommand(request.Levels), cancellationToken);
+
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "WorkTypeLevelsController.UpdateOrder"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
     }
 
     //[HttpDelete("{id}")]

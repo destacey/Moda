@@ -77,6 +77,15 @@ public sealed class WorkTypeLevel : BaseEntity<int>, ISystemAuditable
     }
 
     /// <summary>
+    /// Updates the order of the work type level within the tier.
+    /// </summary>
+    /// <param name="order"></param>
+    public void UpdateOrder(int order)
+    {
+        Order = order;
+    }
+
+    /// <summary>
     /// Creates a new work type level.
     /// </summary>
     /// <param name="name"></param>
