@@ -1,24 +1,25 @@
 'use client'
 
-import { ModaEmpty, PageTitle } from '@/src/app/components/common'
+import { PageTitle } from '@/src/app/components/common'
 import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
 import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useDocumentTitle } from '@/src/app/hooks'
-import { WorkTypeLevelDto, WorkTypeTierDto } from '@/src/services/moda-api'
 import { useGetWorkTypeLevelsQuery } from '@/src/store/features/work-management/work-type-level-api'
 import { useGetWorkTypeTiersQuery } from '@/src/store/features/work-management/work-type-tier-api'
-import { Card, List, Space, Spin, TreeDataNode, Typography } from 'antd'
-import { useEffect, useState } from 'react'
-import WorkTypeTierCard from '../components/work-type-tier-card'
+import { Space, Spin } from 'antd'
+import { WorkTypeTierCard } from '../components'
 
 const HierarchyPage = () => {
   useDocumentTitle('Work Management - Work Type Hierarchy')
 
   const { data: workTiers, isLoading: workTiersIsLoading } =
     useGetWorkTypeTiersQuery(null)
-  const { data: workLevels, isLoading: workLevelsIsLoading } =
-    useGetWorkTypeLevelsQuery(null)
+  const {
+    data: workLevels,
+    isLoading: workLevelsIsLoading,
+    refetch: refetchLevels,
+  } = useGetWorkTypeLevelsQuery(null)
 
   const { hasClaim } = useAuth()
   const canCreateWorkTypeLevels = hasClaim(
@@ -54,6 +55,7 @@ const HierarchyPage = () => {
               key={tier.id}
               tier={tier}
               levels={workLevels?.filter((level) => level.tier.id === tier.id)}
+              refreshLevels={refetchLevels}
               canCreateWorkTypeLevels={canCreateWorkTypeLevels}
               canUpdateWorkTypeLevels={canUpdateWorkTypeLevels}
             />

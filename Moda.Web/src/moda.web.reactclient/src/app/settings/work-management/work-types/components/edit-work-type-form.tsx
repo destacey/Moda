@@ -128,7 +128,12 @@ const EditWorkTypeForm = (props: EditWorkTypeFormProps) => {
         keyboard={false} // disable esc key to close modal
         destroyOnClose={true}
       >
-        <Form form={form} layout="vertical">
+        <Form
+          form={form}
+          size="small"
+          layout="vertical"
+          name="edit-work-type-form"
+        >
           <Descriptions size="small" column={1}>
             <DescriptionItem label="Name">{workTypeData?.name}</DescriptionItem>
           </Descriptions>

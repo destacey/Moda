@@ -4,7 +4,10 @@ import {
 } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
-import { WorkTypeLevelDto } from '@/src/services/moda-api'
+import {
+  CreateWorkTypeLevelRequest,
+  WorkTypeLevelDto,
+} from '@/src/services/moda-api'
 import { BaseOptionType, OptionProps } from 'antd/es/select'
 
 export const workTypeLevelApi = apiSlice.injectEndpoints({
@@ -15,7 +18,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
           const data = await (await getWorkTypeLevelsClient()).getList()
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -45,7 +48,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
 
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -63,12 +66,27 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
           const data = await (await getWorkTypeLevelsClient()).getById(id)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
       providesTags: (result, error, arg) => [
         { type: QueryTags.WorkTypeLevel, id: result.id },
+      ],
+    }),
+    createWorkTypeLevel: builder.mutation<number, CreateWorkTypeLevelRequest>({
+      queryFn: async (request) => {
+        try {
+          const data = await (await getWorkTypeLevelsClient()).create(request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        QueryTags.WorkTypeLevel,
+        QueryTags.WorkTypeLevelOption,
       ],
     }),
   }),
@@ -79,4 +97,5 @@ export const {
   useGetWorkTypeLevelsQuery,
   useGetWorkTypeLevelOptionsQuery,
   useGetWorkTypeLevelQuery,
+  useCreateWorkTypeLevelMutation,
 } = workTypeLevelApi
