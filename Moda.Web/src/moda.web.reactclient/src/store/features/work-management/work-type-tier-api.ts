@@ -11,7 +11,7 @@ export const workTypeTierApi = apiSlice.injectEndpoints({
           const data = await (await getWorkTypeTiersClient()).getList()
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },

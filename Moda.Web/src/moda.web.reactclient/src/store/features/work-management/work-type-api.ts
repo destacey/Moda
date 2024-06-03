@@ -6,7 +6,6 @@ import {
   WorkTypeDto,
   WorkTypeLevelDto,
 } from '@/src/services/moda-api'
-import { update } from 'lodash'
 
 export const workTypeApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -18,7 +17,7 @@ export const workTypeApi = apiSlice.injectEndpoints({
           ).getList(includeInactive)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -33,7 +32,7 @@ export const workTypeApi = apiSlice.injectEndpoints({
           const data = await (await getWorkTypesClient()).getById(id)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -49,7 +48,7 @@ export const workTypeApi = apiSlice.injectEndpoints({
           ).update(request.id, request)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },

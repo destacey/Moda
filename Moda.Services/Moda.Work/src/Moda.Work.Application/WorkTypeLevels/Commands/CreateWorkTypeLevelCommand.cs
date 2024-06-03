@@ -1,23 +1,5 @@
-﻿using Moda.Common.Domain.Enums;
-using Moda.Common.Domain.Enums.Work;
-
-namespace Moda.Work.Application.WorkTypeLevels.Commands;
-public sealed record CreateWorkTypeLevelCommand : ICommand<int>
-{
-    public CreateWorkTypeLevelCommand(string name, string? description)
-    {
-        Name = name;
-        Description = description;
-    }
-
-    /// <summary>The name of the work type.  The name cannot be changed.</summary>
-    /// <value>The name.</value>
-    public string Name { get; }
-
-    /// <summary>The description of the work type.</summary>
-    /// <value>The description.</value>
-    public string? Description { get; }
-}
+﻿namespace Moda.Work.Application.WorkTypeLevels.Commands;
+public sealed record CreateWorkTypeLevelCommand(string Name, string? Description) : ICommand<int>;
 
 public sealed class CreateWorkTypeLevelCommandValidator : CustomValidator<CreateWorkTypeLevelCommand>
 {
@@ -43,7 +25,7 @@ public sealed class CreateWorkTypeLevelCommandValidator : CustomValidator<Create
         var levelNames = await _workDbContext.WorkTypeHierarchies
             .SelectMany(s => s.Levels.Select(l => l.Name))
             .ToListAsync(cancellationToken);
-        return levelNames.All(l => l != name);
+        return levelNames.All(l => l != name.Trim());
     }
 }
 

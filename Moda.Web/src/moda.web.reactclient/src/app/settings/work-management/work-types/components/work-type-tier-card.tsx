@@ -2,9 +2,8 @@ import { ModaEmpty } from '@/src/app/components/common'
 import { WorkTypeLevelDto, WorkTypeTierDto } from '@/src/services/moda-api'
 import { Button, Card, List, Typography } from 'antd'
 import { useEffect, useState } from 'react'
-import { WorkTypeLevelCard } from '.'
+import { CreateWorkTypeLevelForm, WorkTypeLevelCard } from '.'
 import { PlusOutlined } from '@ant-design/icons'
-import CreateWorkTypeLevelForm from './create-work-type-level-form'
 
 const { Text } = Typography
 

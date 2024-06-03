@@ -13,7 +13,7 @@ export const workStatusApi = apiSlice.injectEndpoints({
           ).getList(includeInactive)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -28,7 +28,7 @@ export const workStatusApi = apiSlice.injectEndpoints({
           const data = await (await getWorkStatusesClient()).getById(id)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },

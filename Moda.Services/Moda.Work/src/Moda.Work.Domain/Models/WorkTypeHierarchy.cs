@@ -34,7 +34,7 @@ public class WorkTypeHierarchy : BaseEntity<int>, ISystemAuditable
     {
         Guard.Against.NullOrWhiteSpace(name);
 
-        if (_levels.Any(l => l.Name == name))
+        if (_levels.Any(l => l.Name == name.Trim()))
             return Result.Failure<WorkTypeLevel>($"A work type level with the name '{name}' already exists.");
 
         var maxOrder = _levels.Where(l => l.Tier == WorkTypeTier.Portfolio).Max(l => l.Order);
@@ -66,8 +66,8 @@ public class WorkTypeHierarchy : BaseEntity<int>, ISystemAuditable
         if (workTypeLevel.Tier != WorkTypeTier.Portfolio)
             return Result.Failure("Work type level must be of tier Portfolio.");
 
-        if (_levels.Where(l => l.Id != id).Any(l => l.Name == workTypeLevel.Name))
-            return Result.Failure($"A work type level with the name '{workTypeLevel.Name}' already exists.");
+        if (_levels.Where(l => l.Id != id).Any(l => l.Name == name.Trim()))
+            return Result.Failure($"A work type level with the name '{name}' already exists.");
 
         var result = workTypeLevel.Update(name, description, timestamp);
         if (result.IsFailure)

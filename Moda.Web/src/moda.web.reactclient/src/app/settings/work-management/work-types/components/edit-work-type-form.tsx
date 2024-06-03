@@ -6,6 +6,7 @@ import {
   useUpdateWorkTypeMutation,
 } from '@/src/store/features/work-management/work-type-api'
 import { useGetWorkTypeLevelOptionsQuery } from '@/src/store/features/work-management/work-type-level-api'
+import { toFormErrors } from '@/src/utils'
 import { Descriptions, Form, Input, Modal, Select, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -64,16 +65,28 @@ const EditWorkTypeForm = (props: EditWorkTypeFormProps) => {
     try {
       const values = await form.validateFields()
       const request = mapToRequestValues(props.workTypeId, values)
-      await updateWorkTypeMutation(request)
+      var response = await updateWorkTypeMutation(request)
+      if (response.error) {
+        throw response.error
+      }
+
       setIsSaving(false)
       setIsOpen(false)
       form.resetFields()
       props.onFormSave()
       messageApi.success('Successfully updated work type.')
     } catch (error) {
+      if (error.status === 422 && error.errors) {
+        const formErrors = toFormErrors(error.errors)
+        form.setFields(formErrors)
+        messageApi.error('Correct the validation error(s) to continue.')
+      } else {
+        messageApi.error(
+          'An unexpected error occurred while creating the work type.',
+        )
+        console.error('handleSave error', error)
+      }
       setIsSaving(false)
-      messageApi.error('Error updating work type')
-      console.error('handleSave error', error)
     }
   }
 

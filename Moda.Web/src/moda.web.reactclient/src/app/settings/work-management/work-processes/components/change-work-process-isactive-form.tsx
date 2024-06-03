@@ -30,8 +30,7 @@ const ChangeWorkProcessIsActiveForm = (
     'Permissions.WorkProcesses.Update',
   )
 
-  const [changeWorkProcessIsActive, { error }] =
-    useChangeWorkProcessIsActiveMutation()
+  const [changeWorkProcessIsActive] = useChangeWorkProcessIsActiveMutation()
 
   const init = async (): Promise<boolean> => {
     try {
@@ -39,8 +38,10 @@ const ChangeWorkProcessIsActiveForm = (
         id: props.workProcessId,
         isActive: !props.isActive,
       }
-      await changeWorkProcessIsActive(request)
-      messageApi.success('Successfully initialized work process.')
+      const response = await changeWorkProcessIsActive(request)
+      if (response.error) {
+        throw response.error
+      }
       return true
     } catch (error) {
       messageApi.error(

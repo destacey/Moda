@@ -43,7 +43,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
           const data = await (await getWorkspacesClient()).get(idOrKey)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -64,7 +64,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
             request.externalUrlTemplatesRequest,
           )
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -78,7 +78,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
           const data = await (await getWorkspacesClient()).getWorkItems(idOrKey)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -95,7 +95,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
           ).getWorkItem(request.idOrKey, request.workItemKey)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -111,7 +111,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
           ).searchWorkItems(searchTerm, 50)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
