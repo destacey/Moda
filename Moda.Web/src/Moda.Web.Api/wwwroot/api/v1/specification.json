@@ -3053,260 +3053,6 @@
         ]
       }
     },
-    "/api/work/backlog-categories": {
-      "get": {
-        "tags": [
-          "BacklogCategories"
-        ],
-        "summary": "Get a list of all backlog categories.",
-        "operationId": "BacklogCategories_GetList",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BacklogCategoryDto"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      }
-    },
-    "/api/work/backlog-levels": {
-      "get": {
-        "tags": [
-          "BacklogLevels"
-        ],
-        "summary": "Get a list of all backlog levels.",
-        "operationId": "BacklogLevels_GetList",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BacklogLevelDto"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "BacklogLevels"
-        ],
-        "summary": "Create a backlog level.",
-        "operationId": "BacklogLevels_Create",
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateBacklogLevelRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      }
-    },
-    "/api/work/backlog-levels/{id}": {
-      "get": {
-        "tags": [
-          "BacklogLevels"
-        ],
-        "summary": "Get backlog level details using the id.",
-        "operationId": "BacklogLevels_GetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BacklogLevelDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "BacklogLevels"
-        ],
-        "summary": "Update a backlog level.",
-        "operationId": "BacklogLevels_Update",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateBacklogLevelRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      }
-    },
     "/api/work/work-processes": {
       "get": {
         "tags": [
@@ -4165,6 +3911,272 @@
         ]
       }
     },
+    "/api/work/work-type-levels": {
+      "get": {
+        "tags": [
+          "WorkTypeLevels"
+        ],
+        "summary": "Get a list of all work type levels.",
+        "operationId": "WorkTypeLevels_GetList",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkTypeLevelDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "WorkTypeLevels"
+        ],
+        "summary": "Create a work type level.",
+        "operationId": "WorkTypeLevels_Create",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkTypeLevelRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/work/work-type-levels/{id}": {
+      "get": {
+        "tags": [
+          "WorkTypeLevels"
+        ],
+        "summary": "Get work type level details using the id.",
+        "operationId": "WorkTypeLevels_GetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkTypeLevelDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "WorkTypeLevels"
+        ],
+        "summary": "Update a work type level.",
+        "operationId": "WorkTypeLevels_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkTypeLevelRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/order": {
+      "put": {
+        "tags": [
+          "WorkTypeLevels"
+        ],
+        "summary": "Update the order of portfolio tier work type levels.",
+        "operationId": "WorkTypeLevels_UpdateOrder",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkTypeLevelsOrderRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/work/work-types": {
       "get": {
         "tags": [
@@ -4379,6 +4391,45 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/work/work-type-tiers": {
+      "get": {
+        "tags": [
+          "WorkTypeTiers"
+        ],
+        "summary": "Get a list of all work type tiers.",
+        "operationId": "WorkTypeTiers_GetList",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkTypeTierDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
                 }
               }
             }
@@ -9314,127 +9365,6 @@
           }
         }
       },
-      "BacklogCategoryDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "order": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "BacklogLevelDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "category": {
-            "$ref": "#/components/schemas/BacklogCategory"
-          },
-          "rank": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "BacklogCategory": {
-        "type": "integer",
-        "description": "",
-        "x-enumNames": [
-          "Portfolio",
-          "Requirement",
-          "Task",
-          "Other"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          3
-        ]
-      },
-      "CreateBacklogLevelRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "name"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The name of the work type.  The name cannot be changed.",
-            "maxLength": 256,
-            "minLength": 1,
-            "nullable": false
-          },
-          "description": {
-            "type": "string",
-            "description": "The description of the work type.",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          },
-          "rank": {
-            "type": "integer",
-            "description": "The rank of the backlog level. The higher the number, the higher the level.",
-            "format": "int32"
-          }
-        }
-      },
-      "UpdateBacklogLevelRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the work type.  The name cannot be changed.",
-            "maxLength": 256,
-            "minLength": 1,
-            "nullable": false
-          },
-          "description": {
-            "type": "string",
-            "description": "The description of the work type.",
-            "maxLength": 1024,
-            "minLength": 0,
-            "nullable": true
-          },
-          "rank": {
-            "type": "integer",
-            "description": "The rank of the backlog level. The higher the number, the higher the level.",
-            "format": "int32"
-          }
-        }
-      },
       "WorkProcessListDto": {
         "type": "object",
         "additionalProperties": false,
@@ -9530,6 +9460,9 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "level": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "isActive": {
             "type": "boolean"
@@ -9687,6 +9620,9 @@
           "description": {
             "type": "string",
             "nullable": true
+          },
+          "level": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "isActive": {
             "type": "boolean"
@@ -9952,6 +9888,93 @@
           }
         }
       },
+      "WorkTypeLevelDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "tier": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreateWorkTypeLevelRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the work type level.  The name cannot be changed.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the work type level.",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
+      "UpdateWorkTypeLevelRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the work type level.  The name cannot be changed.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the work type level.",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
+      "UpdateWorkTypeLevelsOrderRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "levels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
       "CreateWorkTypeRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -9972,6 +9995,13 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
+          },
+          "levelId": {
+            "type": "integer",
+            "description": "The work type level identifier.",
+            "format": "int32",
+            "minimum": 0.0,
+            "exclusiveMinimum": true
           }
         }
       },
@@ -9989,6 +10019,34 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
+          },
+          "levelId": {
+            "type": "integer",
+            "description": "The work type level identifier.",
+            "format": "int32",
+            "minimum": 0.0,
+            "exclusiveMinimum": true
+          }
+        }
+      },
+      "WorkTypeTierDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

@@ -17,10 +17,11 @@ public sealed class WorkType : BaseAuditableEntity<int>, IActivatable
 
     private WorkType() { }
 
-    private WorkType(string name, string? description)
+    private WorkType(string name, string? description, int levelId)
     {
         Name = name;
         Description = description;
+        LevelId = levelId;
     }
 
     /// <summary>The name of the work type.  The name cannot be changed.</summary>
@@ -39,6 +40,10 @@ public sealed class WorkType : BaseAuditableEntity<int>, IActivatable
         private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
+    public int LevelId { get; private set; }
+
+    public WorkTypeLevel? Level { get; set; }
+
     /// <summary>Indicates whether the work type is active or not.</summary>
     /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; private set; } = true;
@@ -47,11 +52,12 @@ public sealed class WorkType : BaseAuditableEntity<int>, IActivatable
     /// <param name="description">The description.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public Result Update(string? description, Instant timestamp)
+    public Result Update(string? description, int levelId, Instant timestamp)
     {
         try
         {
             Description = description;
+            LevelId = levelId;
 
             AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
@@ -99,11 +105,12 @@ public sealed class WorkType : BaseAuditableEntity<int>, IActivatable
     /// <summary>Creates the a work type.</summary>
     /// <param name="name">The name.</param>
     /// <param name="description">The description.</param>
+    /// <param name="levelId">The level identifier.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public static WorkType Create(string name, string? description, Instant timestamp)
+    public static WorkType Create(string name, string? description, int levelId, Instant timestamp)
     {
-        WorkType workType = new(name, description);
+        WorkType workType = new(name, description, levelId);
 
         workType.AddDomainEvent(EntityCreatedEvent.WithEntity(workType, timestamp));
         return workType;

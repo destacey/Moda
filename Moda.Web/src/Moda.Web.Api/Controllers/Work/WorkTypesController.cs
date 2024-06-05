@@ -52,10 +52,20 @@ public class WorkTypesController : ControllerBase
     {
         var result = await _sender.Send(request.ToCreateWorkTypeCommand(), cancellationToken);
 
-        return result.IsSuccess
-            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
-            : BadRequest(result.Error);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "WorkTypesController.Create"
+            };
+            return BadRequest(error);
+        }
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
     }
+
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkTypes)]
@@ -70,9 +80,18 @@ public class WorkTypesController : ControllerBase
 
         var result = await _sender.Send(request.ToUpdateWorkTypeCommand(), cancellationToken);
 
-        return result.IsSuccess
-            ? NoContent()
-            : BadRequest(result.Error);
+        if (result.IsFailure)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = result.Error,
+                Source = "WorkTypesController.Update"
+            };
+            return BadRequest(error);
+        }
+
+        return NoContent();
     }
 
     //[HttpDelete("{id}")]

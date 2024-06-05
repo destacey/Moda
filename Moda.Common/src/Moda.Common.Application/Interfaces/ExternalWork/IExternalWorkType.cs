@@ -3,6 +3,6 @@ public interface IExternalWorkType
 {
     string Name { get; }
     string? Description { get; }
-    string BacklogLevelId { get; }
+    string WorkTypeLevelId { get; }
     bool IsActive { get; }
 }

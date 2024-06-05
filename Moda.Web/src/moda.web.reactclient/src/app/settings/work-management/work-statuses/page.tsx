@@ -10,18 +10,21 @@ import { WorkStatusDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import { Space, Switch } from 'antd'
 import { useCallback, useEffect, useMemo } from 'react'
-import {
-  fetchWorkStatuses,
-  setIncludeInactive,
-} from '../../../../store/features/work-management/work-status-slice'
+import { setIncludeInactive } from '../../../../store/features/work-management/work-status-slice'
 import { authorizePage } from '@/src/app/components/hoc'
+import { useGetWorkStatusesQuery } from '@/src/store/features/work-management/work-status-api'
 
 const WorkStatusesPage = () => {
   useDocumentTitle('Work Management - Work Statuses')
 
-  const { workStatuses, isLoading, error, includeInactive } = useAppSelector(
-    (state) => state.workStatus,
-  )
+  const { includeInactive } = useAppSelector((state) => state.workStatus)
+
+  const {
+    data: workStatuses,
+    isLoading,
+    error,
+    refetch,
+  } = useGetWorkStatusesQuery(includeInactive)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
@@ -39,12 +42,12 @@ const WorkStatusesPage = () => {
   )
 
   const refresh = useCallback(async () => {
-    dispatch(fetchWorkStatuses(includeInactive))
-  }, [dispatch, includeInactive])
+    refetch()
+  }, [refetch])
 
   const onIncludeInactiveChange = (checked: boolean) => {
     dispatch(setIncludeInactive(checked))
-    dispatch(fetchWorkStatuses(checked))
+    refresh()
   }
 
   const controlItems = [

@@ -85,9 +85,9 @@ public class ProcessServiceTests
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!),
             Times.Once);
 
-        result.Value.BacklogLevels.Should().NotBeNull();
-        result.Value.BacklogLevels.Should().NotBeEmpty();
-        result.Value.BacklogLevels.Count().Should().Be(expectedBacklogLevelsCount);
+        result.Value.WorkTypeLevels.Should().NotBeNull();
+        result.Value.WorkTypeLevels.Should().NotBeEmpty();
+        result.Value.WorkTypeLevels.Count().Should().Be(expectedBacklogLevelsCount);
     }
 
     [Fact]

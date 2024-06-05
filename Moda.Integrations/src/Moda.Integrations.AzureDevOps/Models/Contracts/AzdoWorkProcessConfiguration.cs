@@ -3,7 +3,7 @@
 namespace Moda.Integrations.AzureDevOps.Models.Contracts;
 public sealed record AzdoWorkProcessConfiguration : AzdoWorkProcess, IExternalWorkProcessConfiguration
 {
-    public IList<IExternalBacklogLevel> BacklogLevels { get; set; } = [];
+    public IList<IExternalWorkTypeLevel> WorkTypeLevels { get; set; } = [];
     public IList<IExternalWorkTypeWorkflow> WorkTypes { get; set; } = [];
     public IList<IExternalWorkStatus> WorkStatuses { get; set; } = [];
 }

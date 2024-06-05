@@ -35,7 +35,7 @@ internal static class ProcessWorkItemTypeDtoExtensions
         {
             Name = workItemType.Name,
             Description = workItemType.Description,
-            BacklogLevelId = backlogLevelId,
+            WorkTypeLevelId = backlogLevelId,
             IsActive = !workItemType.IsDisabled,
             WorkflowStates = []
             //WorkflowStates = workItemType.States.Select(workItemState => workItemState.ToAzdoWorkflowState()).ToList<IExternalWorkflowState>()

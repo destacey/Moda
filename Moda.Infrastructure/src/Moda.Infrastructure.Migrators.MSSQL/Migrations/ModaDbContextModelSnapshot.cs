@@ -19,7 +19,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1298,101 +1298,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PlanningHealthChecks", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("Deleted")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<int>("Ownership")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ParentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Rank")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id");
-
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("BacklogLevels", "Work");
-                });
-
-            modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevelScheme", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("Deleted")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id");
-
-                    b.ToTable("BacklogLevelSchemes", "Work");
-                });
-
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1743,6 +1648,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("LevelId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -1752,6 +1660,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasIndex("Id");
 
+                    b.HasIndex("LevelId");
+
                     b.HasIndex("Name")
                         .IsUnique();
 
@@ -1760,6 +1670,85 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "Name" });
 
                     b.ToTable("WorkTypes", "Work");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkTypeHierarchy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    b.ToTable("WorkTypeHierarchies", "Work");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkTypeLevel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Ownership")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Tier")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<int?>("WorkTypeHierarchyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    b.HasIndex("WorkTypeHierarchyId");
+
+                    b.ToTable("WorkTypeLevels", "Work");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.Workflow", b =>
@@ -2168,15 +2157,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevel", b =>
-                {
-                    b.HasOne("Moda.Work.Domain.Models.BacklogLevelScheme", null)
-                        .WithMany("BacklogLevels")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkItem", b =>
                 {
                     b.HasOne("Moda.Common.Domain.Employees.Employee", "AssignedTo")
@@ -2263,6 +2243,24 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("WorkType");
 
                     b.Navigation("Workflow");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkType", b =>
+                {
+                    b.HasOne("Moda.Work.Domain.Models.WorkTypeLevel", "Level")
+                        .WithMany()
+                        .HasForeignKey("LevelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Level");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkTypeLevel", b =>
+                {
+                    b.HasOne("Moda.Work.Domain.Models.WorkTypeHierarchy", null)
+                        .WithMany("Levels")
+                        .HasForeignKey("WorkTypeHierarchyId");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkflowScheme", b =>
@@ -2462,11 +2460,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("PlanningIntervalTeams");
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.BacklogLevelScheme", b =>
-                {
-                    b.Navigation("BacklogLevels");
-                });
-
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkItem", b =>
                 {
                     b.Navigation("Children");
@@ -2477,6 +2470,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Schemes");
 
                     b.Navigation("Workspaces");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkTypeHierarchy", b =>
+                {
+                    b.Navigation("Levels");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.Workflow", b =>

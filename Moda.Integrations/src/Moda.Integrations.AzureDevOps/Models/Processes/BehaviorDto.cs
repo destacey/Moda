@@ -19,43 +19,43 @@ internal static class BehaviorDtoExtensions
 {
 
     /// <summary>
-    /// Returns a list of backlog levels that are requirement level or higher.
+    /// Returns a list of work type levels that are requirement level or higher.
     /// </summary>
     /// <param name="behaviors"></param>
     /// <returns></returns>
-    public static IList<IExternalBacklogLevel> ToIExternalBacklogLevels(this List<BehaviorDto> behaviors)
+    public static IList<IExternalWorkTypeLevel> ToIExternalWorkTypeLevels(this List<BehaviorDto> behaviors)
     {
-        IList<IExternalBacklogLevel> backlogLevels = [];
+        IList<IExternalWorkTypeLevel> levels = [];
         foreach (var behavior in behaviors.Where(b => b.Rank > 0))
         {
             Guard.Against.Null(behavior.Inherits, nameof(behavior.Inherits));
             Guard.Against.NullOrEmpty(behavior.Inherits["behaviorRefName"]?.ToString(), "behaviorRefName");
 
-            BacklogCategory? category = MapBehaviorToBacklogCategory(behavior.ReferenceName)
-                ?? MapBehaviorToBacklogCategory(behavior.Inherits["behaviorRefName"].ToString()!);
+            WorkTypeTier? category = MapBehaviorToWorkTypeTier(behavior.ReferenceName)
+                ?? MapBehaviorToWorkTypeTier(behavior.Inherits["behaviorRefName"].ToString()!);
             Guard.Against.Null(category, nameof(category));
 
-            backlogLevels.Add(new AzdoBacklogLevel
+            levels.Add(new AzdoWorkTypeLevel
             {
                 Id = behavior.ReferenceName,
                 Name = behavior.Name,
                 Description = behavior.Description,
-                Rank = behavior.Rank,
-                BacklogCategory = category.Value
+                Order = behavior.Rank,
+                Tier = category.Value
             });
         }
 
-        return backlogLevels;
+        return levels;
 
-        static BacklogCategory? MapBehaviorToBacklogCategory(string behavior)
+        static WorkTypeTier? MapBehaviorToWorkTypeTier(string behavior)
         {
             Guard.Against.Null(behavior, nameof(behavior));
 
             return behavior switch
             {
-                "System.PortfolioBacklogBehavior" => BacklogCategory.Portfolio,
-                "System.RequirementBacklogBehavior" => BacklogCategory.Requirement,
-                "System.TaskBacklogBehavior" => BacklogCategory.Task,
+                "System.PortfolioBacklogBehavior" => WorkTypeTier.Portfolio,
+                "System.RequirementBacklogBehavior" => WorkTypeTier.Requirement,
+                "System.TaskBacklogBehavior" => WorkTypeTier.Task,
                 _ => null
             };
         }

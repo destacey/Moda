@@ -34,6 +34,7 @@ export const workProcessApi = apiSlice.injectEndpoints({
           ).getList(includeInactive)
           return { data }
         } catch (error) {
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -50,6 +51,7 @@ export const workProcessApi = apiSlice.injectEndpoints({
           const data = await (await getWorkProcessesClient()).get(idOrKey)
           return { data }
         } catch (error) {
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -72,6 +74,7 @@ export const workProcessApi = apiSlice.injectEndpoints({
           }
           return { data }
         } catch (error) {
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -90,6 +93,7 @@ export const workProcessApi = apiSlice.injectEndpoints({
 
           return { data }
         } catch (error) {
+          console.error('API Error:', error)
           return { error }
         }
       },

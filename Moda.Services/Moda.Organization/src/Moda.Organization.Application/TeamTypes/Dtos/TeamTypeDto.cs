@@ -1,4 +1,4 @@
-﻿namespace Moda.Work.Application.BacklogCategories.Dtos;
+﻿namespace Moda.Organization.Application.TeamTypes.Dtos;
 
 public sealed record TeamTypeDto
 {

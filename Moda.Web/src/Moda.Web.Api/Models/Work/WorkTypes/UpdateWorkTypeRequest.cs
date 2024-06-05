@@ -10,9 +10,14 @@ public sealed record UpdateWorkTypeRequest
     /// <value>The description.</value>
     public string? Description { get; set; }
 
+    /// <summary>
+    /// The work type level identifier.
+    /// </summary>
+    public int LevelId { get; set; }
+
     public UpdateWorkTypeCommand ToUpdateWorkTypeCommand()
     {
-        return new UpdateWorkTypeCommand(Id, Description);
+        return new UpdateWorkTypeCommand(Id, Description, LevelId);
     }
 }
 
@@ -24,5 +29,8 @@ public sealed class UpdateWorkTypeRequestValidator : CustomValidator<UpdateWorkT
 
         RuleFor(c => c.Description)
             .MaximumLength(1024);
+
+        RuleFor(c => c.LevelId)
+            .GreaterThan(0);
     }
 }

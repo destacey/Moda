@@ -34,7 +34,9 @@ interface CreatePlanningIntervalFormValues {
   iterationPrefix?: string
 }
 
-const mapToRequestValues = (values: CreatePlanningIntervalFormValues) => {
+const mapToRequestValues = (
+  values: CreatePlanningIntervalFormValues,
+): CreatePlanningIntervalRequest => {
   return {
     name: values.name,
     description: values.description,
@@ -42,7 +44,7 @@ const mapToRequestValues = (values: CreatePlanningIntervalFormValues) => {
     end: (values.end as any)?.format('YYYY-MM-DD'),
     iterationWeeks: values.iterationWeeks,
     iterationPrefix: values.iterationPrefix,
-  } as CreatePlanningIntervalRequest
+  }
 }
 
 const CreatePlanningIntervalForm = ({
