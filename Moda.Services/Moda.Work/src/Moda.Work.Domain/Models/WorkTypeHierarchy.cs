@@ -107,6 +107,39 @@ public class WorkTypeHierarchy : BaseEntity<int>, ISystemAuditable
         scheme.AddDomainEvent(EntityCreatedEvent.WithEntity(scheme, timestamp));
         return scheme;
     }
+    public Result Reinitialize(Instant timestamp)
+    {
+        try
+        {
+            bool hasChanged = false;
+            List<WorkTypeLevel> defaultWorkTypeLevels = GetSystemDefaultWorkTypeLevels(timestamp);
+
+            // Ensure each tier has a system owned work type level
+            foreach (var tier in Enum.GetValues<WorkTypeTier>())
+            {
+                if (!_levels.Any(x => x.Tier == tier && x.Ownership == Ownership.System))
+                {
+                    foreach (var defaultWorkTypeLevel in defaultWorkTypeLevels)
+                    {
+                        if (defaultWorkTypeLevel.Tier == tier && defaultWorkTypeLevel.Ownership == Ownership.System)
+                        {
+                            _levels.Add(defaultWorkTypeLevel);
+                            hasChanged = true;
+                        }
+                    }
+                }
+            }
+
+            if (hasChanged)
+                AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
 
     private static List<WorkTypeLevel> GetSystemDefaultWorkTypeLevels(Instant timestamp)
     {
