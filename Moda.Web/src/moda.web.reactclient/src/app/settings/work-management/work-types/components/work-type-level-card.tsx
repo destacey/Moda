@@ -1,8 +1,10 @@
 import { WorkTypeLevelDto } from '@/src/services/moda-api'
-import { Button, List } from 'antd'
+import { Button, Card, List } from 'antd'
 import { EditWorkTypeLevelForm } from '.'
 import { useState } from 'react'
-import { EditOutlined } from '@ant-design/icons'
+import { EditOutlined, HolderOutlined } from '@ant-design/icons'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const { Item } = List
 const { Meta } = Item
@@ -10,12 +12,16 @@ const { Meta } = Item
 interface WorkTypeLevelCardProps {
   level: WorkTypeLevelDto
   canUpdateWorkTypeLevels: boolean
+  canOrder: boolean
   refreshLevels: () => void
 }
 
 const WorkTypeLevelCard = (props: WorkTypeLevelCardProps) => {
   const [openEditWorkTypeLevelForm, setOpenEditWorkTypeLevelForm] =
     useState<boolean>(false)
+
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: props.level.id })
 
   const onEditObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenEditWorkTypeLevelForm(false)
@@ -24,23 +30,50 @@ const WorkTypeLevelCard = (props: WorkTypeLevelCardProps) => {
     }
   }
 
+  const sortableStyle = {
+    transition: transition,
+    transform: CSS.Transform.toString(transform),
+    touchAction: 'none',
+    marginBottom: 4,
+  }
+
   return (
     <>
-      <Item
-        key={props.level.id}
-        actions={[
-          props.canUpdateWorkTypeLevels && (
-            <Button
-              type="text"
-              title="Edit work type level"
-              icon={<EditOutlined />}
-              onClick={() => setOpenEditWorkTypeLevelForm(true)}
-            />
-          ),
-        ]}
+      <Card
+        size="small"
+        ref={setNodeRef}
+        {...attributes}
+        style={sortableStyle}
+        styles={{ body: { padding: 0 } }}
+        hoverable
       >
-        <Meta title={props.level.name} description={props.level.description} />
-      </Item>
+        <Item
+          key={props.level.id}
+          actions={[
+            props.canUpdateWorkTypeLevels && (
+              <Button
+                type="text"
+                title="Edit work type level"
+                icon={<EditOutlined />}
+                onClick={() => setOpenEditWorkTypeLevelForm(true)}
+              />
+            ),
+          ]}
+        >
+          {props.canOrder && props.canUpdateWorkTypeLevels && (
+            // TODO: add a visual indicator that the item is draggable for the whole row
+            <HolderOutlined
+              {...listeners}
+              rotate={90}
+              style={{ marginRight: 12 }}
+            />
+          )}
+          <Meta
+            title={props.level.name}
+            description={props.level.description}
+          />
+        </Item>
+      </Card>
       {props.canUpdateWorkTypeLevels && (
         <EditWorkTypeLevelForm
           levelId={props.level.id}

@@ -86,7 +86,8 @@ public class WorkTypeHierarchy : BaseEntity<int>, ISystemAuditable
         }
 
         // verify no duplicate orders
-        var duplicateOrders = _levels.GroupBy(l => l.Order)
+        var duplicateOrders = _levels.Where(l => l.Tier == WorkTypeTier.Portfolio)
+            .GroupBy(l => l.Order)
             .Where(g => g.Count() > 1)
             .Select(g => g.Key)
             .ToList();
@@ -94,50 +95,6 @@ public class WorkTypeHierarchy : BaseEntity<int>, ISystemAuditable
         return duplicateOrders.Count == 0
             ? Result.Success()
             : Result.Failure("Unable to save because it would create duplicate ordering positions. Each work type level must have a unique position within the tier.");
-    }
-
-    public Result Reinitialize(Instant timestamp)
-    {
-        try
-        {
-            bool hasChanged = false;
-            List<WorkTypeLevel> defaultWorkTypeLevels = GetSystemDefaultWorkTypeLevels(timestamp);
-
-            foreach (var defaultWorkTypeLevel in defaultWorkTypeLevels)
-            {
-                var existing = _levels.FirstOrDefault(x => x.Name == defaultWorkTypeLevel.Name && x.Ownership == Ownership.System);
-                if (existing is not null)
-                {
-                    // Update existing work type level if it has changed
-                    if (existing.Description != defaultWorkTypeLevel.Description
-                        || existing.Order != defaultWorkTypeLevel.Order)
-                    {
-                        var result = existing.Update(
-                            defaultWorkTypeLevel.Name,
-                            defaultWorkTypeLevel.Description,
-                            timestamp);
-
-                        if (result.IsSuccess)
-                            hasChanged = true;
-                    }
-                }
-                else
-                {
-                    // Add new work type level since it does not exist
-                    _levels.Add(defaultWorkTypeLevel);
-                    hasChanged = true;
-                }
-            }
-
-            if (hasChanged)
-                AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
-
-            return Result.Success();
-        }
-        catch (Exception ex)
-        {
-            return Result.Failure(ex.ToString());
-        }
     }
 
     /// <summary>Initializes the global work type hierarchy.  This should only ever called once.</summary>

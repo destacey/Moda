@@ -14,20 +14,7 @@ public class WorkSeeder : ICustomSeeder
     {
         Instant timestamp = dateTimeProvider.Now;
 
-        if (await dbContext.WorkTypeHierarchies.AnyAsync(cancellationToken))
-        {
-            WorkTypeHierarchy scheme = await dbContext.WorkTypeHierarchies
-                .Include(s => s.Levels)
-                .SingleAsync(cancellationToken);
-            var result = scheme.Reinitialize(timestamp);
-            if (result.IsFailure)
-            {
-                throw new InvalidOperationException(result.Error);
-            }
-
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        else
+        if (!await dbContext.WorkTypeHierarchies.AnyAsync(cancellationToken))
         {
             WorkTypeHierarchy scheme = WorkTypeHierarchy.Initialize(timestamp);
             dbContext.WorkTypeHierarchies.Add(scheme);

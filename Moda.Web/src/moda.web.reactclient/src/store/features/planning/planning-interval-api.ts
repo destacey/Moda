@@ -136,7 +136,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
           ).updateObjectivesOrder(request.planningIntervalId, request)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
