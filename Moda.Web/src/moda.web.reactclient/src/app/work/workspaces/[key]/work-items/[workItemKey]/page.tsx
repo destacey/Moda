@@ -2,7 +2,10 @@
 
 import { useAppDispatch, useDocumentTitle } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
-import { useGetWorkItemQuery } from '@/src/store/features/work-management/workspace-api'
+import {
+  useGetChildWorkItemsQuery,
+  useGetWorkItemQuery,
+} from '@/src/store/features/work-management/workspace-api'
 import { notFound, usePathname } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import WorkItemDetailsLoading from './loading'
@@ -10,12 +13,12 @@ import { PageTitle } from '@/src/app/components/common'
 import { Card } from 'antd'
 import { authorizePage } from '@/src/app/components/hoc'
 import WorkItemDetails from './work-item-details'
-import Link from 'next/link'
-import { ExportOutlined } from '@ant-design/icons'
 import ExternalIconLink from '@/src/app/components/common/external-icon-link'
+import { WorkItemsGrid } from '@/src/app/components/common/work'
 
 enum WorkItemTabs {
   Details = 'details',
+  WorkItems = 'workItems',
 }
 
 const WorkItemDetailsPage = ({ params }) => {
@@ -30,6 +33,11 @@ const WorkItemDetailsPage = ({ params }) => {
     error,
     refetch,
   } = useGetWorkItemQuery({ idOrKey: workspaceKey, workItemKey: workItemKey })
+
+  const childWorkItemsQuery = useGetChildWorkItemsQuery({
+    idOrKey: workspaceKey,
+    workItemKey: workItemKey,
+  })
 
   const dispatch = useAppDispatch()
   const pathname = usePathname()
@@ -78,6 +86,17 @@ const WorkItemDetailsPage = ({ params }) => {
       key: WorkItemTabs.Details,
       tab: 'Details',
       content: <WorkItemDetails workItem={workItemData} />,
+    },
+    {
+      key: WorkItemTabs.WorkItems,
+      tab: 'Work Items',
+      content: (
+        <WorkItemsGrid
+          workItems={childWorkItemsQuery.data}
+          isLoading={childWorkItemsQuery.isLoading}
+          refetch={childWorkItemsQuery.refetch}
+        />
+      ),
     },
   ]
 
