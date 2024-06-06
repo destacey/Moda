@@ -63,7 +63,6 @@ public class WorkItemLinkConfig : IEntityTypeConfiguration<WorkItemLink>
             .HasColumnType("varchar")
             .HasMaxLength(64);
 
-
         // Relationships
     }
 }
@@ -136,7 +135,7 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .HasForeignKey(w => w.LastModifiedById)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany<WorkItemLink>()
+        builder.HasMany<WorkItemLink>(w => w.SystemLinks)
             .WithOne()
             .HasForeignKey(w => w.WorkItemId)
             .OnDelete(DeleteBehavior.Cascade);

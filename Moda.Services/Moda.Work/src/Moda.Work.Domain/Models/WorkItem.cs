@@ -9,6 +9,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
     private WorkItemKey _key = null!;
     private string _title = null!;
     private readonly List<WorkItem> _children = [];
+    private readonly List<WorkItemLink> _systemLinks = [];
 
     //private readonly List<WorkItemRevision> _history = [];
 
@@ -96,6 +97,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
     // TODO: other systems will use different types.  How to handle this?
     public double StackRank { get; private set; }  
 
+    public IReadOnlyCollection<WorkItemLink> SystemLinks => _systemLinks.AsReadOnly();
 
     /// <summary>
     /// The collection of revisions for the life of the work item.
