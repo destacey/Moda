@@ -16,7 +16,8 @@ public partial class AddWorkStatusCategorytoWorkItem : Migration
             table: "WorkItems",
             type: "varchar(32)",
             maxLength: 32,
-            nullable: true);
+            nullable: false,
+            defaultValue: "");
 
         // Update the StatusCategory column with the WorkStatusCategory from the Workflows table
         migrationBuilder.Sql($@"
@@ -27,21 +28,7 @@ public partial class AddWorkStatusCategorytoWorkItem : Migration
                 INNER JOIN [Work].[WorkProcesses] wp ON ws.WorkProcessId = wp.Id
                 INNER JOIN [Work].[WorkProcessSchemes] wps ON wp.Id = wps.WorkProcessId AND wi.TypeId = wps.WorkTypeId
                 INNER JOIN [Work].[Workflows] wf ON wps.WorkflowId = wf.Id
-                INNER JOIN [Work].[WorkflowSchemes] wfs ON wf.Id = wfs.WorkflowId AND wi.StatusId = wfs.WorkStatusId
-            WHERE wi.StatusCategory IS NULL");
-
-        migrationBuilder.AlterColumn<string>(
-            name: "StatusCategory",
-            schema: "Work",
-            table: "WorkItems",
-            type: "varchar(32)",
-            maxLength: 32,
-            nullable: false,
-            defaultValue: "",
-            oldClrType: typeof(string),
-            oldType: "varchar(32)",
-            oldMaxLength: 32,
-            oldNullable: true);
+                INNER JOIN [Work].[WorkflowSchemes] wfs ON wf.Id = wfs.WorkflowId AND wi.StatusId = wfs.WorkStatusId");
     }
 
     /// <inheritdoc />
