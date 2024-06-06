@@ -63,7 +63,6 @@ public class WorkItemLinkConfig : IEntityTypeConfiguration<WorkItemLink>
             .HasColumnType("varchar")
             .HasMaxLength(64);
 
-
         // Relationships
     }
 }
@@ -97,6 +96,10 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .HasColumnType("varchar")
             .HasMaxLength(64);
         builder.Property(w => w.Title).IsRequired().HasMaxLength(256);
+        builder.Property(w => w.StatusCategory).IsRequired()
+            .HasConversion<EnumConverter<WorkStatusCategory>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
         builder.Property(w => w.ExternalId);
         builder.Property(w => w.Priority);
         builder.Property(w => w.StackRank);
@@ -136,7 +139,7 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .HasForeignKey(w => w.LastModifiedById)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany<WorkItemLink>()
+        builder.HasMany<WorkItemLink>(w => w.SystemLinks)
             .WithOne()
             .HasForeignKey(w => w.WorkItemId)
             .OnDelete(DeleteBehavior.Cascade);

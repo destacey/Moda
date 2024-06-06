@@ -136,6 +136,36 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
                 : NotFound();
     }
 
+    [HttpGet("{idOrKey}/work-items/{workItemKey}/children")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
+    [OpenApiOperation("Get a work item's child work items.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<WorkItemListDto>>> GetChildWorkItems(string idOrKey, string workItemKey, CancellationToken cancellationToken)
+    {
+        // TODO: allow work item key or id
+        var key = new WorkItemKey(workItemKey);
+        GetChildWorkItemsQuery query;
+        if (Guid.TryParse(idOrKey, out Guid guidId))
+        {
+            query = new GetChildWorkItemsQuery(guidId, key);
+        }
+        else if (idOrKey.IsValidWorkspaceKeyFormat())
+        {
+            query = new GetChildWorkItemsQuery(new WorkspaceKey(idOrKey), key);
+        }
+        else
+        {
+            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkspacesController.GetChildWorkItems"));
+        }
+
+        var result = await _sender.Send(query, cancellationToken);
+
+        return result.IsFailure
+            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetChildWorkItems"))
+            : Ok(result.Value.OrderBy(w => w.StackRank));
+    }
+
     [HttpGet("work-items/search")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
     [OpenApiOperation("Search for a work item using its key or title.", "")]

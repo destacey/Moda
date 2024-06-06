@@ -55,6 +55,11 @@ const workItemKeyComparator = (key1, key2) => {
   return parseInt(num1) - parseInt(num2)
 }
 
+const workStatusCategoryComparator = (category1, category2) => {
+  const categories = ['Proposed', 'Active', 'Done', 'Removed']
+  return categories.indexOf(category1) - categories.indexOf(category2)
+}
+
 const WorkItemsGrid = (props: WorkItemsGridProps) => {
   const { refetch } = props
 
@@ -68,6 +73,12 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
       { field: 'title', width: 400 },
       { field: 'type', width: 125 },
       { field: 'status', width: 125 },
+      {
+        field: 'statusCategory.name',
+        headerName: 'Status Category',
+        width: 140,
+        comparator: workStatusCategoryComparator,
+      },
       {
         field: 'assignedTo.name',
         headerName: 'Assigned To',

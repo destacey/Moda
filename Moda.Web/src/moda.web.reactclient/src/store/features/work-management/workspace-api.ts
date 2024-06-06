@@ -14,6 +14,11 @@ export interface GetWorkItemRequest {
   workItemKey: string
 }
 
+export interface GetChildWorkItemsRequest {
+  idOrKey: string
+  workItemKey: string
+}
+
 export interface SetWorkspaceExternalUrlTemplatesRequest {
   workspaceId: string
   externalUrlTemplatesRequest: SetExternalUrlTemplatesRequest
@@ -103,6 +108,26 @@ export const workspaceApi = apiSlice.injectEndpoints({
         { type: QueryTags.WorkItem, id: arg.workItemKey }, // typically arg is the key
       ],
     }),
+    getChildWorkItems: builder.query<
+      WorkItemListDto[],
+      GetChildWorkItemsRequest
+    >({
+      queryFn: async (request: GetChildWorkItemsRequest) => {
+        try {
+          const data = await (
+            await getWorkspacesClient()
+          ).getChildWorkItems(request.idOrKey, request.workItemKey)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        QueryTags.WorkItemChildren,
+        ...result.map(({ key }) => ({ type: QueryTags.WorkItemChildren, key })),
+      ],
+    }),
     searchWorkItems: builder.query<WorkItemListDto[], string>({
       queryFn: async (searchTerm: string) => {
         try {
@@ -128,6 +153,7 @@ export const {
   useGetWorkspaceQuery,
   useGetWorkItemsQuery,
   useGetWorkItemQuery,
+  useGetChildWorkItemsQuery,
   useSearchWorkItemsQuery,
   useSetWorkspaceExternalUrlTemplatesMutation,
 } = workspaceApi

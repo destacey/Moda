@@ -13,9 +13,9 @@ import { notFound, usePathname } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import WorkspaceDetailsLoading from './loading'
 import WorkspaceDetails from './workspace-details'
-import WorkItemsGrid from './work-items-grid'
 import useAuth from '@/src/app/components/contexts/auth'
 import SetWorkspaceExternalUrlTemplatesForm from './set-workspace-external-url-templates-form'
+import { WorkItemsGrid } from '@/src/app/components/common/work'
 
 enum WorkspaceTabs {
   Details = 'details',

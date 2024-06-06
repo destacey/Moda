@@ -1,6 +1,6 @@
-﻿using Moda.Common.Application.Interfaces.Work;
-using Moda.Common.Application.Requests.WorkManagement;
+﻿using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.Work;
 
 namespace Moda.Work.Application.WorkItems.Commands;
 
@@ -32,8 +32,50 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
         try
         {
-            var workTypes = (await _workDbContext.WorkTypes.Select(t => new { t.Id, t.Name }).ToListAsync(cancellationToken)).ToHashSet();
-            var workStatuses = (await _workDbContext.WorkStatuses.Select(s => new { s.Id, s.Name }).ToListAsync(cancellationToken)).ToHashSet();
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            var workProcess = await _workDbContext.WorkProcesses
+                .AsNoTracking()
+                .Include(p => p.Schemes)
+                    .ThenInclude(s => s.WorkType)
+                .Include(p => p.Schemes)
+                    .ThenInclude(s => s.Workflow)
+                        .ThenInclude(wf => wf.Schemes)
+                            .ThenInclude(wfs => wfs.WorkStatus)
+                .FirstOrDefaultAsync(wp => wp.Id == workspace.WorkProcessId, cancellationToken);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            if (workProcess is null) {
+                _logger.LogWarning("Unable to sync external work items for workspace {WorkspaceId} because the workspace does not have a work process.", workspace.Id);
+                return Result.Failure($"Unable to sync external work items for workspace {workspace.Id} because the workspace does not have a work process.");
+            }
+
+            HashSet<WorkType> workTypes = [];
+            HashSet<WorkStatusMapping> workStatusMappings = [];
+
+            foreach (var scheme in workProcess.Schemes)
+            {
+                if (scheme.WorkType is null || scheme.Workflow is null || scheme.Workflow.Schemes.Count == 0 || !scheme.Workflow.Schemes.Any(s => s.WorkStatus != null))
+                {
+                    continue;
+                }
+
+                workTypes.Add(scheme.WorkType);
+                foreach (var workflowScheme in scheme.Workflow.Schemes)
+                {
+                    if (workflowScheme.WorkStatus is null)
+                    {
+                        continue;
+                    }
+                    workStatusMappings.Add(new WorkStatusMapping
+                    {
+                        WorkTypeId = scheme.WorkType.Id,
+                        WorkStatus = workflowScheme.WorkStatus,
+                        WorkStatusCategory = workflowScheme.WorkStatusCategory
+                    });
+                }
+            }
+
+            //var workTypes = (await _workDbContext.WorkTypes.Select(t => new { t.Id, t.Name }).ToListAsync(cancellationToken)).ToHashSet();
+            //var workStatuses = (await _workDbContext.WorkStatuses.Select(s => new { s.Id, s.Name }).ToListAsync(cancellationToken)).ToHashSet();
             var employees = (await _workDbContext.Employees.Select(e => new { e.Id, e.Email }).ToListAsync(cancellationToken)).ToHashSet();
             var workItemIds = (await _workDbContext.WorkItems.Where(w => w.WorkspaceId == request.WorkspaceId).Select(w => new { w.Id, w.ExternalId}).ToListAsync(cancellationToken)).ToHashSet();
 
@@ -69,14 +111,19 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                         }
 
                         var workItem = workspace.WorkItems.FirstOrDefault(wi => wi.ExternalId == externalWorkItem.Id);
+
+                        var workTypeId = workTypes.Single(t => t.Name == externalWorkItem.WorkType).Id;
+                        var workFlowSchemeData = workStatusMappings.Single(m => m.WorkTypeId == workTypeId && m.WorkStatus.Name == externalWorkItem.WorkStatus);
+
                         if (workItem is null)
                         {
                             workItem = WorkItem.CreateExternal(
                                 workspace,
                                 externalWorkItem.Id,
                                 externalWorkItem.Title,
-                                workTypes.Single(t => t.Name == externalWorkItem.WorkType).Id,
-                                workStatuses.Single(s => s.Name == externalWorkItem.WorkStatus).Id,
+                                workTypeId,
+                                workFlowSchemeData.WorkStatus.Id,
+                                workFlowSchemeData.WorkStatusCategory,
                                 parentId,
                                 externalWorkItem.Created,
                                 employees.SingleOrDefault(e => e.Email == externalWorkItem.CreatedBy)?.Id,
@@ -94,8 +141,9 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                         {
                             workItem.Update(
                                 externalWorkItem.Title,
-                                workTypes.Single(t => t.Name == externalWorkItem.WorkType).Id,
-                                workStatuses.Single(s => s.Name == externalWorkItem.WorkStatus).Id,
+                                workTypeId,
+                                workFlowSchemeData.WorkStatus.Id,
+                                workFlowSchemeData.WorkStatusCategory,
                                 parentId,
                                 externalWorkItem.LastModified,
                                 employees.SingleOrDefault(e => e.Email == externalWorkItem.LastModifiedBy)?.Id,
@@ -169,6 +217,13 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
         }
 
         await _workDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private sealed class WorkStatusMapping
+    {
+        public int WorkTypeId { get; init; }
+        public required WorkStatus WorkStatus { get; init; }
+        public WorkStatusCategory WorkStatusCategory { get; init; }
     }
 
     private sealed class WorkItemSyncLog(int requested)

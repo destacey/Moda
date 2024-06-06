@@ -12,16 +12,8 @@ internal sealed class GetExternalObjectWorkItemsQueryHandler(IWorkDbContext work
 
     public async Task<IReadOnlyCollection<WorkItemListDto>> Handle(GetExternalObjectWorkItemsQuery request, CancellationToken cancellationToken)
     {
-        var workItemIds = await _workDbContext.WorkItemLinks
-            .Where(e => e.ObjectId == request.ObjectId)
-            .Select(e => e.WorkItemId)
-            .ToArrayAsync(cancellationToken);
-
-        if (workItemIds.Length == 0)
-            return [];
-
         return await _workDbContext.WorkItems
-            .Where(e => workItemIds.Contains(e.Id))
+            .Where(e => e.SystemLinks.Any(sl => sl.ObjectId == request.ObjectId))
             .ProjectToType<WorkItemListDto>()
             .ToListAsync(cancellationToken);
     }
