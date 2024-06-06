@@ -23,6 +23,7 @@ import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import { EditPlanningIntervalObjectiveForm } from '../../../components'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { getObjectiveStatusColor } from '@/src/utils'
 
 const { Item } = List
 const { Meta } = Item
@@ -35,20 +36,6 @@ export interface ObjectiveListItemProps {
   canCreateHealthChecks: boolean
   refreshObjectives: () => void
   onObjectiveClick: (objectiveId: string) => void
-}
-
-const getColorForStatus = (status: string) => {
-  switch (status) {
-    case 'In Progress':
-      return 'processing'
-    case 'Completed':
-      return 'success'
-    case 'Canceled':
-    case 'Missed':
-      return 'error'
-    default:
-      return 'default'
-  }
 }
 
 const ObjectiveListItem = ({
@@ -106,7 +93,7 @@ const ObjectiveListItem = ({
     return (
       <>
         <Space wrap>
-          <Tag color={getColorForStatus(objective.status.name)}>
+          <Tag color={getObjectiveStatusColor(objective.status.name)}>
             {objective.status.name}
           </Tag>
           {objective.isStretch && <Tag>Stretch</Tag>}

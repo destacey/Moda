@@ -2,6 +2,7 @@ import { WorkItemListDto } from '@/src/services/moda-api'
 import { List, Space, Tag } from 'antd'
 import Link from 'next/link'
 import ExternalIconLink from '../external-icon-link'
+import { getWorkStatusCategoryColor } from '@/src/utils'
 
 const { Item } = List
 const { Meta } = Item
@@ -40,7 +41,9 @@ const WorkItemListItemDescription = ({ workItem }: WorkItemListItemProps) => {
   return (
     <Space wrap>
       <Tag>{workItem.type}</Tag>
-      <Tag>{workItem.status}</Tag>
+      <Tag color={getWorkStatusCategoryColor(workItem.statusCategory.name)}>
+        {workItem.status}
+      </Tag>
     </Space>
   )
 }

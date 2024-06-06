@@ -18,6 +18,7 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
         <Item label="Key">{workItem.key}</Item>
         <Item label="Type">{workItem.type}</Item>
         <Item label="Status">{workItem.status}</Item>
+        <Item label="Status Category">{workItem.statusCategory.name}</Item>
         <Item label="Priority">{workItem.priority}</Item>
         <Item label="Assigned To">
           {workItem.assignedTo ? (
