@@ -8895,6 +8895,9 @@
           "status": {
             "type": "string"
           },
+          "statusCategory": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
           "parent": {
             "nullable": true,
             "oneOf": [
@@ -9775,6 +9778,9 @@
           },
           "status": {
             "type": "string"
+          },
+          "statusCategory": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "priority": {
             "type": "integer",

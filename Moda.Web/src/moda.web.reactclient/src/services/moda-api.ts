@@ -9462,6 +9462,7 @@ export interface WorkItemListDto {
     workspace?: WorkspaceNavigationDto;
     type?: string;
     status?: string;
+    statusCategory?: SimpleNavigationDto;
     parent?: WorkItemNavigationDto | undefined;
     assignedTo?: EmployeeNavigationDto | undefined;
     externalViewWorkItemUrl?: string | undefined;
@@ -9712,6 +9713,7 @@ export interface WorkItemDetailsDto {
     workspace?: WorkspaceNavigationDto;
     type?: string;
     status?: string;
+    statusCategory?: SimpleNavigationDto;
     priority?: number | undefined;
     parent?: WorkItemNavigationDto | undefined;
     assignedTo?: EmployeeNavigationDto | undefined;

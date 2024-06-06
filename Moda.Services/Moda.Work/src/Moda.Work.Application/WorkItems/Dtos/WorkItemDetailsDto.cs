@@ -1,4 +1,5 @@
-﻿using Moda.Common.Application.Employees.Dtos;
+﻿using Moda.Common.Application.Dtos;
+using Moda.Common.Application.Employees.Dtos;
 using Moda.Work.Application.Workspaces.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
@@ -11,6 +12,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
     public required WorkspaceNavigationDto Workspace { get; set; }
     public required string Type { get; set; }
     public required string Status { get; set; }
+    public required SimpleNavigationDto StatusCategory { get; set; }
     public int? Priority { get; set; }
     public WorkItemNavigationDto? Parent { get; set; }
     public EmployeeNavigationDto? AssignedTo { get; set; }
@@ -26,6 +28,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
             .Map(dest => dest.Key, src => src.Key.ToString())
             .Map(dest => dest.Type, src => src.Type.Name)
             .Map(dest => dest.Status, src => src.Status.Name)
+            .Map(dest => dest.StatusCategory, src => SimpleNavigationDto.FromEnum(src.StatusCategory))
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))
             .Map(dest => dest.CreatedBy, src => src.CreatedBy == null ? null : EmployeeNavigationDto.From(src.CreatedBy))
             .Map(dest => dest.LastModifiedBy, src => src.LastModifiedBy == null ? null : EmployeeNavigationDto.From(src.LastModifiedBy))
