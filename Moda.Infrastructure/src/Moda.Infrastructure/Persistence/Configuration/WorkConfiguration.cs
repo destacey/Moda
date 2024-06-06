@@ -96,6 +96,10 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .HasColumnType("varchar")
             .HasMaxLength(64);
         builder.Property(w => w.Title).IsRequired().HasMaxLength(256);
+        builder.Property(w => w.StatusCategory).IsRequired()
+            .HasConversion<EnumConverter<WorkStatusCategory>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
         builder.Property(w => w.ExternalId);
         builder.Property(w => w.Priority);
         builder.Property(w => w.StackRank);

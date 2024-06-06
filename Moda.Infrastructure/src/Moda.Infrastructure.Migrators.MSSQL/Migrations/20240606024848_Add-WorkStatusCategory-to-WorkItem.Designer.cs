@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Moda.Infrastructure.Persistence.Context;
 
@@ -12,9 +13,11 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    partial class ModaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240606024848_Add-WorkStatusCategory-to-WorkItem")]
+    partial class AddWorkStatusCategorytoWorkItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2299,7 +2302,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
                 {
-                    b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.Configuration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration", "Configuration", b1 =>
+                    b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration", "Configuration", b1 =>
                         {
                             b1.Property<Guid>("AzureDevOpsBoardsConnectionId")
                                 .HasColumnType("uniqueidentifier");
@@ -2321,7 +2324,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("AzureDevOpsBoardsConnectionId");
 
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.Configuration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration.WorkProcesses#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkProcess", "WorkProcesses", b2 =>
+                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkProcess", "WorkProcesses", b2 =>
                                 {
                                     b2.Property<Guid>("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
                                         .HasColumnType("uniqueidentifier");
@@ -2347,7 +2350,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                     b2.WithOwner()
                                         .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
 
-                                    b2.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.Configuration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration.WorkProcesses#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkProcess.IntegrationState#Moda.Common.Domain.Models.IntegrationState<System.Guid>", "IntegrationState", b3 =>
+                                    b2.OwnsOne("Moda.Common.Domain.Models.IntegrationState<System.Guid>", "IntegrationState", b3 =>
                                         {
                                             b3.Property<Guid>("AzureDevOpsBoardsWorkProcessAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
                                                 .HasColumnType("uniqueidentifier");
@@ -2372,7 +2375,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                     b2.Navigation("IntegrationState");
                                 });
 
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.Configuration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration.Workspaces#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace", "Workspaces", b2 =>
+                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace", "Workspaces", b2 =>
                                 {
                                     b2.Property<Guid>("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
                                         .HasColumnType("uniqueidentifier");
@@ -2401,7 +2404,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                     b2.WithOwner()
                                         .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
 
-                                    b2.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.Configuration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration.Workspaces#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace.IntegrationState#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace.IntegrationState#IntegrationState", "IntegrationState", b3 =>
+                                    b2.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace.IntegrationState#IntegrationState", "IntegrationState", b3 =>
                                         {
                                             b3.Property<Guid>("AzureDevOpsBoardsWorkspaceAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
                                                 .HasColumnType("uniqueidentifier");
