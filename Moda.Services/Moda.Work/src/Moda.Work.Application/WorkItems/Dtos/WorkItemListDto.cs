@@ -14,6 +14,7 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
     public required SimpleNavigationDto StatusCategory { get; set; }
     public WorkItemNavigationDto? Parent { get; set; }
     public EmployeeNavigationDto? AssignedTo { get; set; }
+    public double StackRank { get; set; }
     public string? ExternalViewWorkItemUrl { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)

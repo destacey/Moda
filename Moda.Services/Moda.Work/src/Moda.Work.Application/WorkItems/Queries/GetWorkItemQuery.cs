@@ -31,16 +31,16 @@ internal sealed class GetWorkItemQueryHandler(IWorkDbContext workDbContext, ILog
     public async Task<Result<WorkItemDetailsDto?>> Handle(GetWorkItemQuery request, CancellationToken cancellationToken)
     {
         var query = _workDbContext.WorkItems
-            .Where(e => e.Key == request.WorkItemKey)
+            .Where(w => w.Key == request.WorkItemKey)
             .AsQueryable();
 
         if (request.Id.HasValue)
         {
-            query = query.Where(e => e.WorkspaceId == request.Id);
+            query = query.Where(w => w.WorkspaceId == request.Id);
         }
         else if (request.Key is not null)
         {
-            query = query.Where(e => e.Workspace.Key == request.Key);
+            query = query.Where(w => w.Workspace.Key == request.Key);
         }
         else
         {

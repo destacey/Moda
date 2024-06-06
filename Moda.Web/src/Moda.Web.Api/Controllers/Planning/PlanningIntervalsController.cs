@@ -424,7 +424,7 @@ public class PlanningIntervalsController : ControllerBase
 
         var workItems = await _sender.Send(new GetExternalObjectWorkItemsQuery(objectiveId), cancellationToken);
 
-        return Ok(workItems.OrderByKey(true));
+        return Ok(workItems.OrderBy(w => w.StackRank));
     }
 
     [HttpPost("{id}/objectives/{objectiveId}/work-items")]
