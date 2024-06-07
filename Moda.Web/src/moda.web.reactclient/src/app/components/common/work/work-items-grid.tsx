@@ -16,6 +16,7 @@ const WorkItemLinkCellRenderer = ({ value, data }) => {
   return (
     <Link
       href={`/work/workspaces/${data.workspace.key}/work-items/${data.key}`}
+      prefetch={false}
     >
       {value}
     </Link>
@@ -27,6 +28,7 @@ const ParentWorkItemLinkCellRenderer = ({ value, data }) => {
   return (
     <Link
       href={`/work/workspaces/${data.parent.workspaceKey}/work-items/${data.parent.key}`}
+      prefetch={false}
     >
       {value}
     </Link>
@@ -36,7 +38,10 @@ const ParentWorkItemLinkCellRenderer = ({ value, data }) => {
 const AssignedToLinkCellRenderer = ({ value, data }) => {
   if (!data.assignedTo) return null
   return (
-    <Link href={`/organizations/employees/${data.assignedTo.key}`}>
+    <Link
+      href={`/organizations/employees/${data.assignedTo.key}`}
+      prefetch={false}
+    >
       {value}
     </Link>
   )

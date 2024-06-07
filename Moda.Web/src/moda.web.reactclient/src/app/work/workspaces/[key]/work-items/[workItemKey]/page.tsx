@@ -29,15 +29,19 @@ const WorkItemDetailsPage = ({ params }) => {
 
   const {
     data: workItemData,
-    isLoading,
     error,
+    isLoading,
+    isError,
     refetch,
   } = useGetWorkItemQuery({ idOrKey: workspaceKey, workItemKey: workItemKey })
 
-  const childWorkItemsQuery = useGetChildWorkItemsQuery({
-    idOrKey: workspaceKey,
-    workItemKey: workItemKey,
-  })
+  const childWorkItemsQuery = useGetChildWorkItemsQuery(
+    {
+      idOrKey: workspaceKey,
+      workItemKey: workItemKey,
+    },
+    { skip: !workItemData },
+  )
 
   const dispatch = useAppDispatch()
   const pathname = usePathname()
@@ -65,6 +69,7 @@ const WorkItemDetailsPage = ({ params }) => {
   }, [dispatch, pathname, workItemKey, workspaceKey])
 
   useEffect(() => {
+    // TODO: this isn't getting called on hook error
     error && console.error(error)
   }, [error])
 

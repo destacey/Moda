@@ -12,6 +12,7 @@ export interface WorkItemDetailsProps {
 }
 
 const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
+  if (!workItem) return null
   return (
     <>
       <Descriptions>
@@ -41,7 +42,7 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
           )}
         </Item>
         <Item label="Created By">
-          {workItem.assignedTo ? (
+          {workItem.createdBy ? (
             <Link href={`/organizations/employees/${workItem.createdBy.key}`}>
               {workItem.createdBy.name}
             </Link>
@@ -53,7 +54,7 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
           {dayjs(workItem.created).format('MMM D, YYYY @ h:mm A')}
         </Item>
         <Item label="Last Modified By">
-          {workItem.assignedTo ? (
+          {workItem.lastModifiedBy ? (
             <Link
               href={`/organizations/employees/${workItem.lastModifiedBy.key}`}
             >
