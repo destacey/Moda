@@ -13,4 +13,5 @@ public interface IExternalWorkItem
     string? LastModifiedBy { get; }
     int? Priority { get; }
     double StackRank { get; }
+    string? ExternalTeamIdentifier { get; }
 }
