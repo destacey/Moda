@@ -51,12 +51,12 @@ internal sealed class ProjectClient : BaseClient
     /// <param name="projectName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    internal async Task<RestResponse<ClassificationNodeDto>> GetAreaPaths(string projectName, CancellationToken cancellationToken)
+    internal async Task<RestResponse<ClassificationNodeResponse>> GetAreaPaths(string projectName, CancellationToken cancellationToken)
     {
         var request = new RestRequest($"/{projectName}/_apis/wit/classificationnodes/areas", Method.Get);
         SetupRequest(request);
         request.AddParameter("$depth", 100); // TODO: make this configurable
 
-        return await _client.ExecuteAsync<ClassificationNodeDto>(request, cancellationToken);
+        return await _client.ExecuteAsync<ClassificationNodeResponse>(request, cancellationToken);
     }
 }

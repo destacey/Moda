@@ -91,7 +91,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
         }
     }
 
-    public async Task<Result<List<ClassificationNodeDto>>> GetAreaPaths(string projectName, CancellationToken cancellationToken)
+    public async Task<Result<List<ClassificationNodeResponse>>> GetAreaPaths(string projectName, CancellationToken cancellationToken)
     {
         try
         {
@@ -99,12 +99,12 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
             if (!response.IsSuccessful)
             {
                 _logger.LogError("Error getting areas for project {ProjectId} from Azure DevOps: {ErrorMessage}.", projectName, response.ErrorMessage);
-                return Result.Failure<List<ClassificationNodeDto>>(response.ErrorMessage);
+                return Result.Failure<List<ClassificationNodeResponse>>(response.ErrorMessage);
             }
             if (response.Data is null)
             {
                 _logger.LogWarning("No areas found for project {ProjectId}.", projectName);
-                return Result.Failure<List<ClassificationNodeDto>>($"No areas found for project {projectName}");
+                return Result.Failure<List<ClassificationNodeResponse>>($"No areas found for project {projectName}");
             }
 
             var areaPaths = response.Data.FlattenHierarchy(a => a.Children).ToList();
@@ -116,7 +116,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception thrown getting areas for project {ProjectId} from Azure DevOps", projectName);
-            return Result.Failure<List<ClassificationNodeDto>> (ex.ToString());
+            return Result.Failure<List<ClassificationNodeResponse>> (ex.ToString());
         }
     }
 }

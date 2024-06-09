@@ -113,9 +113,9 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         var workItemService = GetService<WorkItemService>(organizationUrl, token);
 
         var result = await workItemService.GetWorkItems(projectName, lastChangedDate, workItemTypes, cancellationToken);
-        
+
         return result.IsSuccess
-            ? Result.Success(result.Value.ToIExternalWorkItems([.. areasResult.Value]))
+            ? Result.Success(result.Value.ToIExternalWorkItems(areasResult.Value))
             : Result.Failure<List<IExternalWorkItem>>(result.Error);
     }
 
