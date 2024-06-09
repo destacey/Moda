@@ -22,9 +22,9 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
                 return Result.Failure<List<AzdoWorkProcess>>(response.ErrorMessage);
             }
 
-            _logger.LogDebug("{ProcessCount} processes found.", response.Data?.Count ?? 0);
-
             var processes = response.Data?.Items.ToAzdoWorkProcesses() ?? [];
+
+            _logger.LogDebug("{ProcessCount} processes found.", processes.Count);
 
             return Result.Success(processes);
         }

@@ -2,7 +2,7 @@
 
 public static class GenericExtensions
 {
-    public static IEnumerable<T> FlattenHierarchy<T>(this T root, Func<T, IEnumerable<T>> branchSelector)
+    public static IEnumerable<T> FlattenHierarchy<T>(this T root, Func<T, IEnumerable<T>?> branchSelector)
     {
         ArgumentNullException.ThrowIfNull(branchSelector);
 
@@ -17,7 +17,7 @@ public static class GenericExtensions
             if (current is null)
                 continue;
 
-            foreach (var child in branchSelector(current) ?? Enumerable.Empty<T>())
+            foreach (var child in branchSelector(current) ?? [])
             {
                 stack.Push(child);
             }

@@ -18,7 +18,9 @@ internal class WorkItemResponse
 
 internal static class WorkItemResponseExtensions
 {
-    public static AzdoWorkItem ToAzdoWorkItem(this WorkItemResponse workItem)
+    private static readonly double _defaultStackRank = 999_999_999_999D;
+
+    public static AzdoWorkItem ToAzdoWorkItem(this WorkItemResponse workItem, string areaPathId)
     {
         return new AzdoWorkItem()
         {
@@ -33,16 +35,19 @@ internal static class WorkItemResponseExtensions
             LastModified = Instant.FromDateTimeOffset(workItem.Fields.ChangedDate),
             LastModifiedBy = workItem.Fields.ChangedBy?.UniqueName,
             Priority = workItem.Fields.Priority,
-            StackRank = workItem.Fields.StackRank > 0 ? workItem.Fields.StackRank : 999_999_999_999
+            StackRank = workItem.Fields.StackRank > 0 ? workItem.Fields.StackRank : _defaultStackRank,
+            ExternalTeamIdentifier = areaPathId
         };
     }
 
-    public static List<IExternalWorkItem> ToIExternalWorkItems(this List<WorkItemResponse> workItems)
+    public static List<IExternalWorkItem> ToIExternalWorkItems(this List<WorkItemResponse> workItems, List<ClassificationNodeResponse> areaPaths)
     {
+        var areaPathsDictionary = areaPaths.ToDictionary(x => x.Id, x => x.Identifier.ToString());
         var result = new List<IExternalWorkItem>(workItems.Count);
         foreach (var workItem in workItems)
         {
-            result.Add(workItem.ToAzdoWorkItem());
+            var areaPathId = areaPathsDictionary[workItem.Fields.AreaId];
+            result.Add(workItem.ToAzdoWorkItem(areaPathId));
         }
         return result;
     }

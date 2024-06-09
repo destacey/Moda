@@ -1,9 +1,22 @@
 ﻿namespace Moda.Common.Tests.Sut.Extensions;
 public class GenericExtensionsTests
 {
-
     [Fact]
     public void FlattenHierarchy_WhenNoChildren_ReturnsRoot()
+    {
+        // Arrange
+        DepthFirstFlattenTestModelWithNullableChildren root = new() { Name = "root" };
+
+        // Act
+        var result = root.FlattenHierarchy(n => n.Children);
+
+        // Assert
+        result.Should().ContainSingle()
+            .Which.Should().Be(root);
+    }
+
+    [Fact]
+    public void FlattenHierarchy_WhenNullChildren_ReturnsRoot()
     {
         // Arrange
         DepthFirstFlattenTestModel root = new() { Name = "root" };
@@ -62,5 +75,11 @@ public class GenericExtensionsTests
 file class DepthFirstFlattenTestModel
 {
     public required string Name { get; set; }
-    public List<DepthFirstFlattenTestModel> Children { get; set; } = new List<DepthFirstFlattenTestModel>();
+    public List<DepthFirstFlattenTestModel> Children { get; set; } = [];
+}
+
+file class DepthFirstFlattenTestModelWithNullableChildren
+{
+    public required string Name { get; set; }
+    public List<DepthFirstFlattenTestModelWithNullableChildren>? Children { get; set; }
 }

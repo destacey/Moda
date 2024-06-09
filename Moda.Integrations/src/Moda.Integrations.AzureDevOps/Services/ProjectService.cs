@@ -1,7 +1,9 @@
 ﻿using System.Net;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
+using Moda.Common.Extensions;
 using Moda.Integrations.AzureDevOps.Clients;
+using Moda.Integrations.AzureDevOps.Models;
 using Moda.Integrations.AzureDevOps.Models.Projects;
 
 namespace Moda.Integrations.AzureDevOps.Services;
@@ -86,6 +88,35 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
         {
             _logger.LogError(ex, "Exception thrown getting project {ProjectId} from Azure DevOps", projectId);
             return Result.Failure<ProjectDetailsDto>(ex.ToString());
+        }
+    }
+
+    public async Task<Result<List<ClassificationNodeResponse>>> GetAreaPaths(string projectName, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = await _projectClient.GetAreaPaths(projectName, cancellationToken);
+            if (!response.IsSuccessful)
+            {
+                _logger.LogError("Error getting areas for project {ProjectId} from Azure DevOps: {ErrorMessage}.", projectName, response.ErrorMessage);
+                return Result.Failure<List<ClassificationNodeResponse>>(response.ErrorMessage);
+            }
+            if (response.Data is null)
+            {
+                _logger.LogWarning("No areas found for project {ProjectId}.", projectName);
+                return Result.Failure<List<ClassificationNodeResponse>>($"No areas found for project {projectName}");
+            }
+
+            var areaPaths = response.Data.FlattenHierarchy(a => a.Children).ToList();
+
+            _logger.LogDebug("{AreaCount} areas found for project {ProjectId}.", areaPaths.Count, projectName);
+
+            return Result.Success(areaPaths);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception thrown getting areas for project {ProjectId} from Azure DevOps", projectName);
+            return Result.Failure<List<ClassificationNodeResponse>> (ex.ToString());
         }
     }
 }

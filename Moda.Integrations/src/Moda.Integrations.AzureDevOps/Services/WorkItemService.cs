@@ -36,9 +36,9 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
                 "System.WorkItemType",
 
                 "System.Parent",
-                "System.AreaPath",
+                "System.AreaId",
                 "System.AssignedTo",
-                "System.IterationPath",
+                "System.IterationId",
                 "Microsoft.VSTS.Common.Priority",
                 "Microsoft.VSTS.Common.StackRank"
             ];

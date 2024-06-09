@@ -139,10 +139,28 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .HasForeignKey(w => w.LastModifiedById)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany<WorkItemLink>(w => w.SystemLinks)
+        builder.HasMany(w => w.SystemLinks)
             .WithOne()
             .HasForeignKey(w => w.WorkItemId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(w => w.ExtendedProps)
+            .WithOne()
+            .HasForeignKey<WorkItemExtended>(w => w.Id)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class WorkItemExtendedConfig : IEntityTypeConfiguration<WorkItemExtended>
+{
+    public void Configure(EntityTypeBuilder<WorkItemExtended> builder)
+    {
+        builder.ToTable("WorkItemsExtended", SchemaNames.Work);
+
+        builder.HasIndex(w => new { w.Id, w.ExternalTeamIdentifier });
+
+        // Properties
+        builder.Property(w => w.ExternalTeamIdentifier).HasMaxLength(128);
     }
 }
 
