@@ -89,6 +89,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                 await _workDbContext.Entry(workspace)
                     .Collection(w => w.WorkItems)
                     .Query()
+                    .Include(wi => wi.ExtendedProps)
                     .Where(wi => chunk.Select(c => c.Id).Contains(wi.ExternalId!.Value))
                     .LoadAsync(cancellationToken);
 

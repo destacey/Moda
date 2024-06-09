@@ -35,4 +35,7 @@ internal class WorkItemFieldsResponse
 
     [JsonPropertyName("System.AssignedTo")]
     public UserResponse? AssignedTo { get; set; }
+
+    [JsonPropertyName("System.AreaPath")]
+    public required string AreaPath { get; set; }
 }

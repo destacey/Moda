@@ -1,9 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-using Microsoft.VisualStudio.Services.Common;
-using Microsoft.VisualStudio.Services.WebApi;
 using Moda.Common.Application.Interfaces;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Interfaces.Work;
@@ -39,25 +36,25 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         }
     }
 
-    public async Task<Result<List<WorkItemClassificationNode>>> GetAreas(string organizationUrl, string token, Guid projectId, CancellationToken cancellationToken)
-    {
-        var connection = CreateVssConnection(organizationUrl, token);
-        var areaService = GetService<AreaService>(connection);
+    //public async Task<Result<List<ClassificationNodeDto>>> GetAreas(string organizationUrl, string token, Guid projectId, CancellationToken cancellationToken)
+    //{
+    //    var connection = CreateVssConnection(organizationUrl, token);
+    //    var areaService = GetService<AreaService>(connection);
 
-        var areas = await areaService.GetAreas(projectId, cancellationToken);
+    //    var areas = await areaService.GetAreas(projectId, cancellationToken);
 
-        return areas; // map to local type and return interface instead of concrete type
-    }
+    //    return areas; // map to local type and return interface instead of concrete type
+    //}
 
-    public async Task<Result<List<WorkItemClassificationNode>>> GetIterations(string organizationUrl, string token, Guid projectId, CancellationToken cancellationToken)
-    {
-        var connection = CreateVssConnection(organizationUrl, token);
-        var iterationService = GetService<IterationService>(connection);
+    //public async Task<Result<List<ClassificationNodeDto>>> GetIterations(string organizationUrl, string token, Guid projectId, CancellationToken cancellationToken)
+    //{
+    //    var connection = CreateVssConnection(organizationUrl, token);
+    //    var iterationService = GetService<IterationService>(connection);
 
-        var iterations = await iterationService.GetIterations(projectId, cancellationToken);
+    //    var iterations = await iterationService.GetIterations(projectId, cancellationToken);
 
-        return iterations; // map to local type and return interface instead of concrete type
-    }
+    //    return iterations; // map to local type and return interface instead of concrete type
+    //}
 
     public async Task<Result<List<IExternalWorkProcess>>> GetWorkProcesses(string organizationUrl, string token, CancellationToken cancellationToken)
     {
@@ -107,12 +104,18 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
 
     public async Task<Result<List<IExternalWorkItem>>> GetWorkItems(string organizationUrl, string token, string projectName, DateTime lastChangedDate, string[] workItemTypes, CancellationToken cancellationToken)
     {
+        var projectService = GetService<ProjectService>(organizationUrl, token);
+
+        var areasResult = await projectService.GetAreaPaths(projectName, cancellationToken);
+        if (areasResult.IsFailure)
+            return Result.Failure<List<IExternalWorkItem>>(areasResult.Error);
+
         var workItemService = GetService<WorkItemService>(organizationUrl, token);
 
         var result = await workItemService.GetWorkItems(projectName, lastChangedDate, workItemTypes, cancellationToken);
         
         return result.IsSuccess
-            ? Result.Success(result.Value.ToIExternalWorkItems())
+            ? Result.Success(result.Value.ToIExternalWorkItems([.. areasResult.Value]))
             : Result.Failure<List<IExternalWorkItem>>(result.Error);
     }
 
@@ -127,20 +130,6 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
             : Result.Failure<int[]>(result.Error);
     }
 
-    // TODO should these be cached?  any impact on GC if cached?  // should the client be created and cached here rather than in the service constructor?
-    private TService GetService<TService>(VssConnection? connection)
-    {
-        Guard.Against.Null(connection);
-        var logger = _serviceProvider.GetService(typeof(ILogger<TService>)) as ILogger<TService>;
-        Guard.Against.Null(logger);
-
-        return typeof(TService) switch
-        {
-            Type type when type == typeof(AreaService) => (TService)Activator.CreateInstance(typeof(AreaService), connection, logger!)!,
-            Type type when type == typeof(IterationService) => (TService)Activator.CreateInstance(typeof(IterationService), connection, logger!)!,
-            _ => throw new NotImplementedException(),
-        };
-    }
     private TService GetService<TService>(string organizationUrl, string token)
     {
         Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
@@ -155,12 +144,5 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
             Type type when type == typeof(WorkItemService) => (TService)Activator.CreateInstance(typeof(WorkItemService), organizationUrl, token, _apiVersion, logger!)!,
             _ => throw new NotImplementedException(),
         };
-    }
-
-    private static VssConnection CreateVssConnection(string organizationUrl, string token)
-    {
-        // connect to Azure DevOps Services
-        VssBasicCredential credential = new(string.Empty, Guard.Against.NullOrWhiteSpace(token));
-        return new VssConnection(new Uri(Guard.Against.NullOrWhiteSpace(organizationUrl)), credential);
     }
 }

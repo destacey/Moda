@@ -36,4 +36,27 @@ internal sealed class ProjectClient : BaseClient
 
         return await _client.ExecuteAsync<ListResponse<PropertyDto>>(request, cancellationToken);
     }
+
+    internal async Task<RestResponse<ListResponse<PropertyDto>>> GetProjecTeams(Guid projectId, CancellationToken cancellationToken)
+    {
+        var request = new RestRequest($"/_apis/projects/{projectId}/teams", Method.Get);
+        SetupRequest(request);
+
+        return await _client.ExecuteAsync<ListResponse<PropertyDto>>(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// Returns the root area path and all child area paths for the project.
+    /// </summary>
+    /// <param name="projectName"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    internal async Task<RestResponse<ClassificationNodeDto>> GetAreaPaths(string projectName, CancellationToken cancellationToken)
+    {
+        var request = new RestRequest($"/{projectName}/_apis/wit/classificationnodes/areas", Method.Get);
+        SetupRequest(request);
+        request.AddParameter("$depth", 100); // TODO: make this configurable
+
+        return await _client.ExecuteAsync<ClassificationNodeDto>(request, cancellationToken);
+    }
 }

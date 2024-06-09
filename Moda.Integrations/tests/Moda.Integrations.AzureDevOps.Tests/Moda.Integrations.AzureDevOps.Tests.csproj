@@ -21,6 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common.Domain\Moda.Common.Domain.csproj" />
+      <ProjectReference Include="..\..\..\Moda.Common\src\Moda.Common\Moda.Common.csproj" />
       <ProjectReference Include="..\..\src\Moda.Integrations.AzureDevOps\Moda.Integrations.AzureDevOps.csproj" />
     </ItemGroup>
 

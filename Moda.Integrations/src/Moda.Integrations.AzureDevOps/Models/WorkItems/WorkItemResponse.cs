@@ -18,7 +18,7 @@ internal class WorkItemResponse
 
 internal static class WorkItemResponseExtensions
 {
-    public static AzdoWorkItem ToAzdoWorkItem(this WorkItemResponse workItem)
+    public static AzdoWorkItem ToAzdoWorkItem(this WorkItemResponse workItem, Guid areaPathId)
     {
         return new AzdoWorkItem()
         {
@@ -33,16 +33,18 @@ internal static class WorkItemResponseExtensions
             LastModified = Instant.FromDateTimeOffset(workItem.Fields.ChangedDate),
             LastModifiedBy = workItem.Fields.ChangedBy?.UniqueName,
             Priority = workItem.Fields.Priority,
-            StackRank = workItem.Fields.StackRank > 0 ? workItem.Fields.StackRank : 999_999_999_999
+            StackRank = workItem.Fields.StackRank > 0 ? workItem.Fields.StackRank : 999_999_999_999,
+            ExternalTeamIdentifier = areaPathId.ToString()
         };
     }
 
-    public static List<IExternalWorkItem> ToIExternalWorkItems(this List<WorkItemResponse> workItems)
+    public static List<IExternalWorkItem> ToIExternalWorkItems(this List<WorkItemResponse> workItems, HashSet<ClassificationNodeDto> areaPaths)
     {
         var result = new List<IExternalWorkItem>(workItems.Count);
         foreach (var workItem in workItems)
         {
-            result.Add(workItem.ToAzdoWorkItem());
+            var areaPath = areaPaths.Single(x => x.WorkItemPath == workItem.Fields.AreaPath);
+            result.Add(workItem.ToAzdoWorkItem(areaPath.Identifier));
         }
         return result;
     }
