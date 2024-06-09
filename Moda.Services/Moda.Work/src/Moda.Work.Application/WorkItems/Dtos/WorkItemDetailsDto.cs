@@ -16,10 +16,11 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
     public int? Priority { get; set; }
     public WorkItemNavigationDto? Parent { get; set; }
     public EmployeeNavigationDto? AssignedTo { get; set; }
-    public Instant Created { get; private set; }
+    public Instant Created { get; set; }
     public EmployeeNavigationDto? CreatedBy { get; set; }
-    public Instant LastModified { get; private set; }
+    public Instant LastModified { get; set; }
     public EmployeeNavigationDto? LastModifiedBy { get; set; }
+    public Instant? DoneTimestamp { get; set; }
     public string? ExternalViewWorkItemUrl { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)

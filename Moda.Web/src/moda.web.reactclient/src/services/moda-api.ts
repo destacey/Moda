@@ -9786,6 +9786,7 @@ export interface WorkItemDetailsDto {
     createdBy?: EmployeeNavigationDto | undefined;
     lastModified?: Date;
     lastModifiedBy?: EmployeeNavigationDto | undefined;
+    doneTimestamp?: Date | undefined;
     externalViewWorkItemUrl?: string | undefined;
 }
 
