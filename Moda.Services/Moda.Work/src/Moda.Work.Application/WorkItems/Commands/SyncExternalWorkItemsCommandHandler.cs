@@ -133,6 +133,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 employees.SingleOrDefault(e => e.Email == externalWorkItem.AssignedTo)?.Id,
                                 externalWorkItem.Priority,
                                 externalWorkItem.StackRank,
+                                externalWorkItem.DoneTimestamp,
                                 string.IsNullOrWhiteSpace(externalWorkItem.ExternalTeamIdentifier) ? null : WorkItemExtended.Create(externalWorkItem.ExternalTeamIdentifier)
                             );
                             newWorkItems.Add( workItem );
@@ -152,6 +153,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 employees.SingleOrDefault(e => e.Email == externalWorkItem.AssignedTo)?.Id,
                                 externalWorkItem.Priority,
                                 externalWorkItem.StackRank,
+                                externalWorkItem.DoneTimestamp,
                                 string.IsNullOrWhiteSpace(externalWorkItem.ExternalTeamIdentifier) ? null : WorkItemExtended.Create(workItem.Id, externalWorkItem.ExternalTeamIdentifier)
                             );
 

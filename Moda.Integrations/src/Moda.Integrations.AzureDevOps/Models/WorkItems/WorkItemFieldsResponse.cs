@@ -38,4 +38,7 @@ internal class WorkItemFieldsResponse
 
     [JsonPropertyName("System.AreaId")]
     public int AreaId { get; set; }
+
+    [JsonPropertyName("Microsoft.VSTS.Common.ClosedDate")]
+    public DateTime? ClosedDate { get; set; }
 }
