@@ -32,16 +32,18 @@ internal sealed class WorkItemProgessSummaryBuilder(IWorkDbContext workDbContext
             .ToDictionary(l => l, l => new List<Guid>());
 
         var rollupItems = new List<WorkItemProgressStateDto>();
+        var rollupItemIds = new HashSet<Guid>();
         foreach (var item in initialWorkItems)
         {
             if (item.Tier == WorkTypeTier.Portfolio)
             {
                 UpdatePortfolioItems(portfolioItems, item);
-
-                continue;
             }
-
-            rollupItems.Add(item);
+            else if (!rollupItemIds.Contains(item.Id))
+            {
+                rollupItems.Add(item);
+                rollupItemIds.Add(item.Id);
+            }
         }
 
         var startingLevel = portfolioItems.Keys.Min();
@@ -68,11 +70,11 @@ internal sealed class WorkItemProgessSummaryBuilder(IWorkDbContext workDbContext
                             continue;  // skip items that are not in the next level.  This should not happen, but just in case. Work Items shouldn't have parents in a higher level.
 
                         UpdatePortfolioItems(portfolioItems, item);
-
-                        continue;
+                    } else if (!rollupItemIds.Contains(item.Id))
+                    {
+                        rollupItems.Add(item);
+                        rollupItemIds.Add(item.Id);
                     }
-
-                    rollupItems.Add(item);
                 }
             }
         }
