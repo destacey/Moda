@@ -116,8 +116,10 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
   useEffect(() => {
     if (!existingWorkItemsData) return
     setTargetWorkItems(
-      existingWorkItemsData?.map((item) => ({ ...item, disabled: false })) ??
-        [],
+      existingWorkItemsData?.workItems.map((item) => ({
+        ...item,
+        disabled: false,
+      })) ?? [],
     )
   }, [existingWorkItemsData])
 

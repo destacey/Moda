@@ -2146,10 +2146,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WorkItemListDto"
-                  }
+                  "$ref": "#/components/schemas/WorkItemsSummaryDto"
                 }
               }
             }
@@ -8929,6 +8926,43 @@
           }
         }
       },
+      "WorkItemsSummaryDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "progressSummary": {
+            "$ref": "#/components/schemas/WorkItemProgressRollupDto"
+          },
+          "workItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkItemListDto"
+            }
+          }
+        }
+      },
+      "WorkItemProgressRollupDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "proposed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "active": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "done": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "WorkItemListDto": {
         "type": "object",
         "additionalProperties": false,
@@ -9889,6 +9923,11 @@
                 "$ref": "#/components/schemas/EmployeeNavigationDto"
               }
             ]
+          },
+          "doneTimestamp": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           },
           "externalViewWorkItemUrl": {
             "type": "string",

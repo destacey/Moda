@@ -40,7 +40,8 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
                 "System.AssignedTo",
                 "System.IterationId",
                 "Microsoft.VSTS.Common.Priority",
-                "Microsoft.VSTS.Common.StackRank"
+                "Microsoft.VSTS.Common.StackRank",
+                "Microsoft.VSTS.Common.ClosedDate"
             ];
 
             var workitems = await _workItemClient.GetWorkItems(projectName, workItemIds, fields, cancellationToken);

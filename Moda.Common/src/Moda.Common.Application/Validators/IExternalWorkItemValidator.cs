@@ -4,7 +4,7 @@ namespace Moda.Common.Application.Validators;
 public sealed class IExternalWorkItemValidator : CustomValidator<IExternalWorkItem>
 {
     public IExternalWorkItemValidator()
-    {
+    {        
         RuleFor(c => c.Id)
             .NotEmpty();
 
@@ -43,6 +43,10 @@ public sealed class IExternalWorkItemValidator : CustomValidator<IExternalWorkIt
 
         RuleFor(c => c.StackRank)
             .GreaterThanOrEqualTo(0);
+
+        // TODO: add rule to verify that CompletedTimestamp is greater than or equal to Created
+        //RuleFor(c => c.CompletedTimestamp)
+        //    .GreaterThanOrEqualTo();
 
         RuleFor(c => c.ExternalTeamIdentifier)
             .MaximumLength(128);

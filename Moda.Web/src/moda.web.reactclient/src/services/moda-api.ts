@@ -2540,7 +2540,7 @@ export class PlanningIntervalsClient {
     /**
      * Get work items for an objective.
      */
-    getObjectiveWorkItems(id: string, objectiveId: string, cancelToken?: CancelToken): Promise<WorkItemListDto[]> {
+    getObjectiveWorkItems(id: string, objectiveId: string, cancelToken?: CancelToken): Promise<WorkItemsSummaryDto> {
         let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/objectives/{objectiveId}/work-items";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -2570,7 +2570,7 @@ export class PlanningIntervalsClient {
         });
     }
 
-    protected processGetObjectiveWorkItems(response: AxiosResponse): Promise<WorkItemListDto[]> {
+    protected processGetObjectiveWorkItems(response: AxiosResponse): Promise<WorkItemsSummaryDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2585,7 +2585,7 @@ export class PlanningIntervalsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<WorkItemListDto[]>(result200);
+            return Promise.resolve<WorkItemsSummaryDto>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -2605,7 +2605,7 @@ export class PlanningIntervalsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<WorkItemListDto[]>(null as any);
+        return Promise.resolve<WorkItemsSummaryDto>(null as any);
     }
 
     /**
@@ -9519,6 +9519,18 @@ export interface PlanningIntervalObjectiveHealthCheckDto {
     note?: string | undefined;
 }
 
+export interface WorkItemsSummaryDto {
+    progressSummary?: WorkItemProgressRollupDto;
+    workItems?: WorkItemListDto[];
+}
+
+export interface WorkItemProgressRollupDto {
+    proposed?: number;
+    active?: number;
+    done?: number;
+    total?: number;
+}
+
 export interface WorkItemListDto {
     id?: string;
     key?: string;
@@ -9786,6 +9798,7 @@ export interface WorkItemDetailsDto {
     createdBy?: EmployeeNavigationDto | undefined;
     lastModified?: Date;
     lastModifiedBy?: EmployeeNavigationDto | undefined;
+    doneTimestamp?: Date | undefined;
     externalViewWorkItemUrl?: string | undefined;
 }
 

@@ -416,15 +416,21 @@ public class PlanningIntervalsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<WorkItemListDto>>> GetObjectiveWorkItems(Guid id, Guid objectiveId, CancellationToken cancellationToken)
+    public async Task<ActionResult<WorkItemsSummaryDto>> GetObjectiveWorkItems(Guid id, Guid objectiveId, CancellationToken cancellationToken)
     {
         var exists = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(id, objectiveId), cancellationToken);
         if (!exists)
             return NotFound();
 
-        var workItems = await _sender.Send(new GetExternalObjectWorkItemsQuery(objectiveId), cancellationToken);
+        var workItemsSummary = await _sender.Send(new GetExternalObjectWorkItemsQuery(objectiveId), cancellationToken);
 
-        return Ok(workItems.OrderBy(w => w.StackRank));
+        if (workItemsSummary is null)
+            return NotFound();
+
+        if (workItemsSummary.WorkItems.Count > 0)
+            workItemsSummary.WorkItems = [.. workItemsSummary.WorkItems.OrderBy(w => w.StackRank)];
+
+        return Ok(workItemsSummary);
     }
 
     [HttpPost("{id}/objectives/{objectiveId}/work-items")]

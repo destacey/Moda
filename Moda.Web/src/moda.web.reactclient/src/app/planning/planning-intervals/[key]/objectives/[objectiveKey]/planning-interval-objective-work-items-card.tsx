@@ -6,8 +6,7 @@ import { Button, Card, Input } from 'antd'
 import { useState } from 'react'
 import ManagePlanningIntervalObjectiveWorkItemsForm from './manage-planning-interval-objective-work-items-form'
 import { useGetObjectiveWorkItemsQuery } from '@/src/store/features/planning/planning-interval-api'
-
-const { Search } = Input
+import { WorkProgress } from '@/src/app/components/common'
 
 export interface PlanningIntervalObjectiveWorkItemsCardProps {
   planningIntervalId: string
@@ -59,7 +58,15 @@ const PlanningIntervalObjectiveWorkItemsCard = (
           </>
         }
       >
-        <WorkItemsListCard workItems={workItemsData} isLoading={isLoading} />
+        {workItemsData &&
+          workItemsData.progressSummary &&
+          workItemsData.progressSummary.total > 0 && (
+            <WorkProgress progress={workItemsData.progressSummary} />
+          )}
+        <WorkItemsListCard
+          workItems={workItemsData?.workItems}
+          isLoading={isLoading}
+        />
       </Card>
       {openManageWorkItemsForm && (
         <ManagePlanningIntervalObjectiveWorkItemsForm
