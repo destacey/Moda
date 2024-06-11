@@ -74,8 +74,6 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                 }
             }
 
-            //var workTypes = (await _workDbContext.WorkTypes.Select(t => new { t.Id, t.Name }).ToListAsync(cancellationToken)).ToHashSet();
-            //var workStatuses = (await _workDbContext.WorkStatuses.Select(s => new { s.Id, s.Name }).ToListAsync(cancellationToken)).ToHashSet();
             var employees = (await _workDbContext.Employees.Select(e => new { e.Id, e.Email }).ToListAsync(cancellationToken)).ToHashSet();
             var workItemIds = (await _workDbContext.WorkItems.Where(w => w.WorkspaceId == request.WorkspaceId).Select(w => new { w.Id, w.ExternalId}).ToListAsync(cancellationToken)).ToHashSet();
 

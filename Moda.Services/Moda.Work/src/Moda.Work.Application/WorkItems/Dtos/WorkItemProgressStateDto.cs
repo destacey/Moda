@@ -12,7 +12,7 @@ public sealed record WorkItemProgressStateDto : IMapFrom<WorkItem>
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<WorkItem, WorkItemProgressStateDto>()
-            .Map(dest => dest.LevelOrder, src => src.Type.Level.Order)
-            .Map(dest => dest.Tier, src => src.Type.Level.Tier);
+            .Map(dest => dest.LevelOrder, src => src.Type.Level!.Order)
+            .Map(dest => dest.Tier, src => src.Type.Level!.Tier);
     }
 }

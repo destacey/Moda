@@ -20,9 +20,6 @@ internal sealed class WorkItemProgessSummaryBuilder(IWorkDbContext workDbContext
             .ProjectToType<WorkItemProgressStateDto>()
             .ToListAsync(cancellationToken);
 
-        //if (temp.Count == 0)
-        //    return WorkItemProgressRollupDto.Create(0, 0, 0);
-
         if (initialWorkItems.Count == 0 || !initialWorkItems.Any(w => w.Tier == portfolioTier))
             return WorkItemProgressSummary.Create(initialWorkItems);
 
@@ -39,17 +36,7 @@ internal sealed class WorkItemProgessSummaryBuilder(IWorkDbContext workDbContext
         {
             if (item.Tier == WorkTypeTier.Portfolio)
             {
-                if (portfolioItems.TryGetValue(item.LevelOrder, out var values))
-                {
-                    if (!values.Any(w => w == item.Id))
-                    {
-                        values.Add(item.Id);
-                    }
-                }
-                else
-                {
-                    portfolioItems.Add(item.LevelOrder, [item.Id]);
-                }
+                UpdatePortfolioItems(portfolioItems, item);
 
                 continue;
             }
@@ -80,17 +67,7 @@ internal sealed class WorkItemProgessSummaryBuilder(IWorkDbContext workDbContext
                         if (item.LevelOrder <= i)
                             continue;  // skip items that are not in the next level.  This should not happen, but just in case. Work Items shouldn't have parents in a higher level.
 
-                        if (portfolioItems.TryGetValue(item.LevelOrder, out var values))
-                        {
-                            if (!values.Any(w => w == item.Id))
-                            {
-                                values.Add(item.Id);
-                            }
-                        }
-                        else
-                        {
-                            portfolioItems.Add(item.LevelOrder, [item.Id]);
-                        }
+                        UpdatePortfolioItems(portfolioItems, item);
 
                         continue;
                     }
@@ -101,5 +78,20 @@ internal sealed class WorkItemProgessSummaryBuilder(IWorkDbContext workDbContext
         }
 
         return WorkItemProgressSummary.Create(rollupItems);
+
+        static void UpdatePortfolioItems(Dictionary<int, List<Guid>> portfolioItems, WorkItemProgressStateDto item)
+        {
+            if (portfolioItems.TryGetValue(item.LevelOrder, out var values))
+            {
+                if (!values.Any(w => w == item.Id))
+                {
+                    values.Add(item.Id);
+                }
+            }
+            else
+            {
+                portfolioItems.Add(item.LevelOrder, [item.Id]);
+            }
+        }
     }
 }
