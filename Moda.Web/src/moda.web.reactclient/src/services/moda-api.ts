@@ -9559,6 +9559,7 @@ export interface WorkItemNavigationDto {
     key?: string;
     title?: string;
     workspaceKey?: string;
+    externalViewWorkItemUrl?: string | undefined;
 }
 
 export interface EmployeeNavigationDto extends NavigationDto {
