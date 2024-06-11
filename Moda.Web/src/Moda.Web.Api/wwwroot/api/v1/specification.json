@@ -9065,6 +9065,10 @@
           },
           "workspaceKey": {
             "type": "string"
+          },
+          "externalViewWorkItemUrl": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
