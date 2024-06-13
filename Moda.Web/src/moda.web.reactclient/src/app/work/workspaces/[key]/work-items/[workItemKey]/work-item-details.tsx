@@ -1,7 +1,8 @@
 'use client'
 
+import { WorkItemsCumulativeFlowChart } from '@/src/app/components/common/work'
 import { WorkItemDetailsDto } from '@/src/services/moda-api'
-import { Descriptions } from 'antd'
+import { Descriptions, Divider } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 
@@ -74,6 +75,8 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
           </Item>
         )}
       </Descriptions>
+      <Divider />
+      <WorkItemsCumulativeFlowChart isLoading={false} />
     </>
   )
 }
