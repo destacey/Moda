@@ -1,7 +1,10 @@
 'use client'
 
-import { WorkItemsListCard } from '@/src/app/components/common/work'
-import { FormOutlined } from '@ant-design/icons'
+import {
+  WorkItemsDashboardModal,
+  WorkItemsListCard,
+} from '@/src/app/components/common/work'
+import { DashboardOutlined, FormOutlined } from '@ant-design/icons'
 import { Button, Card, Input } from 'antd'
 import { useState } from 'react'
 import ManagePlanningIntervalObjectiveWorkItemsForm from './manage-planning-interval-objective-work-items-form'
@@ -18,6 +21,8 @@ export interface PlanningIntervalObjectiveWorkItemsCardProps {
 const PlanningIntervalObjectiveWorkItemsCard = (
   props: PlanningIntervalObjectiveWorkItemsCardProps,
 ) => {
+  const [openWorkItemsDashboard, setOpenWorkItemsDashboard] =
+    useState<boolean>(false)
   const [openManageWorkItemsForm, setOpenManageWorkItemsForm] =
     useState<boolean>(false)
 
@@ -31,12 +36,19 @@ const PlanningIntervalObjectiveWorkItemsCard = (
     objectiveId: props.objectiveId,
   })
 
+  const onWorkItemsDashboardClosed = () => {
+    setOpenWorkItemsDashboard(false)
+  }
+
   const onManageWorkItemsFormClosed = (wasSaved: boolean) => {
     setOpenManageWorkItemsForm(false)
     if (wasSaved) {
       refetch()
     }
   }
+
+  const enableWorkItemsDashboard =
+    workItemsData && workItemsData.workItems.length > 0
 
   return (
     <>
@@ -47,6 +59,14 @@ const PlanningIntervalObjectiveWorkItemsCard = (
         // add search from api input
         extra={
           <>
+            {enableWorkItemsDashboard && (
+              <Button
+                type="text"
+                icon={<DashboardOutlined />}
+                title="Work items dashboard"
+                onClick={() => setOpenWorkItemsDashboard(true)}
+              />
+            )}
             {props.canLinkWorkItems && (
               <Button
                 type="text"
@@ -68,6 +88,14 @@ const PlanningIntervalObjectiveWorkItemsCard = (
           isLoading={isLoading}
         />
       </Card>
+      {openWorkItemsDashboard && (
+        <WorkItemsDashboardModal
+          showDashboard={openWorkItemsDashboard}
+          planningIntervalId={props.planningIntervalId}
+          objectiveId={props.objectiveId}
+          onModalClose={() => onWorkItemsDashboardClosed()}
+        />
+      )}
       {openManageWorkItemsForm && (
         <ManagePlanningIntervalObjectiveWorkItemsForm
           planningIntervalId={props.planningIntervalId}

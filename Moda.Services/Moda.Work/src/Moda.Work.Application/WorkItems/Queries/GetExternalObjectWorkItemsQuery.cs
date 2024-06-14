@@ -22,8 +22,9 @@ internal sealed class GetExternalObjectWorkItemsQueryHandler(IWorkDbContext work
         if (workItems.Count == 0)
             return WorkItemsSummaryDto.Create(WorkItemProgressRollupDto.CreateEmpty(), workItems);
 
-        var progressRollup = await new WorkItemProgessSummaryBuilder(_workDbContext, query).Build(cancellationToken);
+        var progress = await new WorkItemProgressStateBuilder(_workDbContext, query).Build(cancellationToken);
 
-        return WorkItemsSummaryDto.Create(progressRollup.RootRollup, workItems);
+        var summary = WorkItemProgressSummary.Create(progress);
+        return WorkItemsSummaryDto.Create(summary.RootRollup, workItems);
     }    
 }

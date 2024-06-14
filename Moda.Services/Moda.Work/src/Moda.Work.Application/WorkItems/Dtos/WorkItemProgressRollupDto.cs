@@ -5,11 +5,11 @@ namespace Moda.Work.Application.WorkItems.Dtos;
 /// <summary>
 /// Progress data for a collection of work items.  Work items with a status category of Proposed, Active, and Done are counted.  Work items with a status category of Removed are not included
 /// </summary>
-public sealed record WorkItemProgressRollupDto
+public record WorkItemProgressRollupDto
 {
-    public int Proposed { get; init; }
-    public int Active { get; init; }
-    public int Done { get; init; }
+    public int Proposed { get; protected set; }
+    public int Active { get; protected set; }
+    public int Done { get; protected set; }
     public int Total => Proposed + Active + Done;
 
     public static WorkItemProgressRollupDto Create(int proposed, int active, int done)
@@ -47,12 +47,7 @@ public sealed record WorkItemProgressRollupDto
             }
         }
 
-        return new WorkItemProgressRollupDto
-        {
-            Proposed = proposed,
-            Active = active,
-            Done = done
-        };
+        return Create(proposed, active, done);
     }
 
     public static WorkItemProgressRollupDto Create(List<WorkItemProgressRollupDto> rollups)

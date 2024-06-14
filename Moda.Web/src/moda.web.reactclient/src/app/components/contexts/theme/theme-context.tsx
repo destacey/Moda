@@ -14,6 +14,7 @@ export const ThemeProvider = ({ children }) => {
   const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(lightTheme)
   const [agGridTheme, setAgGridTheme] = useState('ag-theme-balham')
   const [badgeColor, setBadgeColor] = useState<string>(null)
+  const [antDesignChartsTheme, setAntDesignChartsTheme] = useState('classic')
 
   useEffect(() => {
     setCurrentTheme(currentThemeName === 'light' ? lightTheme : darkTheme)
@@ -22,6 +23,9 @@ export const ThemeProvider = ({ children }) => {
     )
     setBadgeColor(
       currentThemeName === 'light' ? token.colorPrimary : token.colorBorderBg,
+    )
+    setAntDesignChartsTheme(
+      currentThemeName === 'light' ? 'classic' : 'classicDark',
     )
   }, [currentThemeName, token.colorBorderBg, token.colorPrimary])
 
@@ -33,6 +37,7 @@ export const ThemeProvider = ({ children }) => {
         agGridTheme,
         token,
         badgeColor,
+        antDesignChartsTheme,
       }}
     >
       <ConfigProvider theme={currentTheme}>{children}</ConfigProvider>

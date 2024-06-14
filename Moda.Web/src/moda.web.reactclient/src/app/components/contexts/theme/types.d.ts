@@ -8,4 +8,5 @@ export interface ThemeContextType {
   agGridTheme: string
   token: GlobalToken
   badgeColor: string
+  antDesignChartsTheme: string
 }

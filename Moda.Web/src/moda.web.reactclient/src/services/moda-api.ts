@@ -2687,6 +2687,77 @@ export class PlanningIntervalsClient {
     }
 
     /**
+     * Get metrics for the work items linked to an objective.
+     */
+    getObjectiveWorkItemMetrics(id: string, objectiveId: string, cancelToken?: CancelToken): Promise<WorkItemProgressDailyRollupDto[]> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{id}/objectives/{objectiveId}/work-items/metrics";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (objectiveId === undefined || objectiveId === null)
+            throw new Error("The parameter 'objectiveId' must be defined.");
+        url_ = url_.replace("{objectiveId}", encodeURIComponent("" + objectiveId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetObjectiveWorkItemMetrics(_response);
+        });
+    }
+
+    protected processGetObjectiveWorkItemMetrics(response: AxiosResponse): Promise<WorkItemProgressDailyRollupDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<WorkItemProgressDailyRollupDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<WorkItemProgressDailyRollupDto[]>(null as any);
+    }
+
+    /**
      * Import objectives for a planning interval from a csv file.
      * @param contentType (optional) 
      * @param contentDisposition (optional) 
@@ -9563,6 +9634,10 @@ export interface WorkItemNavigationDto {
 }
 
 export interface EmployeeNavigationDto extends NavigationDto {
+}
+
+export interface WorkItemProgressDailyRollupDto extends WorkItemProgressRollupDto {
+    date?: Date;
 }
 
 export interface ManagePlanningIntervalObjectiveWorkItemsRequest {
