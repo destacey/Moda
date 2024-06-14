@@ -8,141 +8,35 @@ const Area = dynamic(
 import { AreaConfig } from '@ant-design/charts'
 import useTheme from '../../contexts/theme'
 import { useMemo, useState } from 'react'
+import { WorkItemProgressDailyRollupDto } from '@/src/services/moda-api'
 
 export interface WorkItemsCumulativeFlowChartProps {
-  isLoading: boolean
-  // minDate?: Date | null
-  // maxDate?: Date | null
+  workItems: WorkItemProgressDailyRollupDto[]
 }
-
-var workItemsData = [
-  {
-    date: '2024-06-01 00:00:00',
-    total: 0,
-    category: 'Scope',
-  },
-  {
-    date: '2024-06-02 00:00:00',
-    total: 0,
-    category: 'Scope',
-  },
-  {
-    date: '2024-06-03 00:00:00',
-    total: 0,
-    category: 'Scope',
-  },
-  {
-    date: '2024-06-04 00:00:00',
-    total: 0,
-    category: 'Scope',
-  },
-  {
-    date: '2024-06-05 00:00:00',
-    total: 4,
-    category: 'Scope',
-  },
-  {
-    date: '2024-06-06 00:00:00',
-    total: 4,
-    category: 'Scope',
-  },
-  {
-    date: '2024-06-07 00:00:00',
-    total: 4,
-    category: 'Scope',
-  },
-  {
-    date: '2024-06-08 00:00:00',
-    total: 5,
-    category: 'Scope',
-  },
-  {
-    date: '2024-06-09 00:00:00',
-    total: 6,
-    category: 'Scope',
-  },
-  {
-    date: '2024-06-10 00:00:00',
-    total: 6,
-    category: 'Scope',
-  },
-  {
-    date: '2024-06-11 00:00:00',
-    total: 7,
-    category: 'Scope',
-  },
-  {
-    date: '2024-06-12 00:00:00',
-    total: 7,
-    category: 'Scope',
-  },
-  {
-    date: '2024-06-01 00:00:00',
-    total: 0,
-    category: 'Done',
-  },
-  {
-    date: '2024-06-02 00:00:00',
-    total: 0,
-    category: 'Done',
-  },
-  {
-    date: '2024-06-03 00:00:00',
-    total: 0,
-    category: 'Done',
-  },
-  {
-    date: '2024-06-04 00:00:00',
-    total: 0,
-    category: 'Done',
-  },
-  {
-    date: '2024-06-05 00:00:00',
-    total: 0,
-    category: 'Done',
-  },
-  {
-    date: '2024-06-06 00:00:00',
-    total: 0,
-    category: 'Done',
-  },
-  {
-    date: '2024-06-07 00:00:00',
-    total: 2,
-    category: 'Done',
-  },
-  {
-    date: '2024-06-08 00:00:00',
-    total: 2,
-    category: 'Done',
-  },
-  {
-    date: '2024-06-09 00:00:00',
-    total: 2,
-    category: 'Done',
-  },
-  {
-    date: '2024-06-10 00:00:00',
-    total: 4,
-    category: 'Done',
-  },
-  {
-    date: '2024-06-11 00:00:00',
-    total: 4,
-    category: 'Done',
-  },
-  {
-    date: '2024-06-12 00:00:00',
-    total: 4,
-    category: 'Done',
-  },
-]
 
 const WorkItemsCumulativeFlowChart = (
   props: WorkItemsCumulativeFlowChartProps,
 ) => {
-  const [data, setData] = useState<any[]>(workItemsData)
+  const [data, setData] = useState<any[]>()
   const { antDesignChartsTheme } = useTheme()
+
+  useMemo(() => {
+    if (props.workItems) {
+      const workItems = props.workItems
+      const scopeData = workItems.map((item) => ({
+        date: item.date,
+        category: 'Scope',
+        total: item.total,
+      }))
+
+      const doneData = workItems.map((item) => ({
+        date: item.date,
+        category: 'Done',
+        total: item.done,
+      }))
+      setData([...scopeData, ...doneData])
+    }
+  }, [props.workItems])
 
   const config = useMemo(() => {
     return {
@@ -165,6 +59,9 @@ const WorkItemsCumulativeFlowChart = (
       // update the tooltip to show the date with this format 'MMM D, YYYY'
     } as AreaConfig
   }, [antDesignChartsTheme, data])
+
+  if (!props.workItems || props.workItems?.length === 0)
+    return <div>No data to display</div>
 
   return <Area {...config} />
 }

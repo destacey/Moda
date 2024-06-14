@@ -91,7 +91,8 @@ const PlanningIntervalObjectiveWorkItemsCard = (
       {openWorkItemsDashboard && (
         <WorkItemsDashboardModal
           showDashboard={openWorkItemsDashboard}
-          isLoading={isLoading}
+          planningIntervalId={props.planningIntervalId}
+          objectiveId={props.objectiveId}
           onModalClose={() => onWorkItemsDashboardClosed()}
         />
       )}
