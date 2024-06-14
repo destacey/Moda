@@ -24,12 +24,14 @@ public class PlanningIntervalsController : ControllerBase
 {
     private readonly ILogger<PlanningIntervalsController> _logger;
     private readonly ISender _sender;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ICsvService _csvService;
 
-    public PlanningIntervalsController(ILogger<PlanningIntervalsController> logger, ISender sender, ICsvService csvService)
+    public PlanningIntervalsController(ILogger<PlanningIntervalsController> logger, ISender sender, IDateTimeProvider dateTimeProvider, ICsvService csvService)
     {
         _logger = logger;
         _sender = sender;
+        _dateTimeProvider = dateTimeProvider;
         _csvService = csvService;
     }
 
@@ -431,6 +433,33 @@ public class PlanningIntervalsController : ControllerBase
             workItemsSummary.WorkItems = [.. workItemsSummary.WorkItems.OrderBy(w => w.StackRank)];
 
         return Ok(workItemsSummary);
+    }
+
+    [HttpGet("{id}/objectives/{objectiveId}/work-items/metrics")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
+    [OpenApiOperation("Get metrics for the work items linked to an objective.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<List<WorkItemProgressDailyRollupDto>>> GetObjectiveWorkItemMetrics(Guid id, Guid objectiveId, CancellationToken cancellationToken)
+    {
+        var exists = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(id, objectiveId), cancellationToken);
+        if (!exists)
+            return NotFound();
+
+        var planningInterval = await _sender.Send(new GetPlanningIntervalQuery(id), cancellationToken);
+
+        var today = DateOnly.FromDateTime(_dateTimeProvider.Now.ToDateTimeUtc());
+        var piEnd = planningInterval!.End.ToDateOnly();
+        // get the min of today and the end of the PI
+        var end = today < piEnd ? today : piEnd;
+
+        var dailyRollup = await _sender.Send(new GetExternalObjectWorkItemMetricsQuery(objectiveId, planningInterval!.Start.ToDateOnly(), end), cancellationToken);
+
+        if (dailyRollup is null)
+            return NotFound();
+
+        return Ok(dailyRollup);
     }
 
     [HttpPost("{id}/objectives/{objectiveId}/work-items")]

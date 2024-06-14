@@ -2,14 +2,14 @@
 using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems;
-internal sealed class WorkItemProgessSummaryBuilder(IWorkDbContext workDbContext, IQueryable<WorkItem> workItemsQuery)
+internal sealed class WorkItemProgressStateBuilder(IWorkDbContext workDbContext, IQueryable<WorkItem> workItemsQuery)
 {
     private readonly IWorkDbContext _workDbContext = workDbContext;
     private readonly IQueryable<WorkItem> _workItemsQuery = workItemsQuery;
 
-    public async Task<WorkItemProgressSummary> Build(CancellationToken cancellationToken)
+    public async Task<List<WorkItemProgressStateDto>> Build(CancellationToken cancellationToken)
     {
-        var removedCategory = WorkStatusCategory.Removed;
+        var removedCategory = WorkStatusCategory.Removed; // temporary filter until we get the date from history
         var requirementTier = WorkTypeTier.Requirement;
         var portfolioTier = WorkTypeTier.Portfolio;
 
@@ -21,7 +21,7 @@ internal sealed class WorkItemProgessSummaryBuilder(IWorkDbContext workDbContext
             .ToListAsync(cancellationToken);
 
         if (initialWorkItems.Count == 0 || !initialWorkItems.Any(w => w.Tier == portfolioTier))
-            return WorkItemProgressSummary.Create(initialWorkItems);
+            return initialWorkItems;
 
         var portfolioItems = (await _workDbContext.WorkTypeHierarchies
             .SelectMany(h => h.Levels.Where(l => l.Tier == WorkTypeTier.Portfolio))
@@ -58,6 +58,7 @@ internal sealed class WorkItemProgessSummaryBuilder(IWorkDbContext workDbContext
                     continue;
 
                 var levelItems = await _workDbContext.WorkItems
+                    .Where(w => w.StatusCategory != removedCategory)  // temporary filter until we get the date from history
                     .Where(w => w.ParentId.HasValue && portfolioItems[i].Contains(w.ParentId.Value))
                     .ProjectToType<WorkItemProgressStateDto>()
                     .ToListAsync(cancellationToken);
@@ -70,7 +71,8 @@ internal sealed class WorkItemProgessSummaryBuilder(IWorkDbContext workDbContext
                             continue;  // skip items that are not in the next level.  This should not happen, but just in case. Work Items shouldn't have parents in a higher level.
 
                         UpdatePortfolioItems(portfolioItems, item);
-                    } else if (!rollupItemIds.Contains(item.Id))
+                    }
+                    else if (!rollupItemIds.Contains(item.Id))
                     {
                         rollupItems.Add(item);
                         rollupItemIds.Add(item.Id);
@@ -79,7 +81,7 @@ internal sealed class WorkItemProgessSummaryBuilder(IWorkDbContext workDbContext
             }
         }
 
-        return WorkItemProgressSummary.Create(rollupItems);
+        return rollupItems;
 
         static void UpdatePortfolioItems(Dictionary<int, List<Guid>> portfolioItems, WorkItemProgressStateDto item)
         {
