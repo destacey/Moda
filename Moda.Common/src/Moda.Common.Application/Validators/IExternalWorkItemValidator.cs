@@ -44,9 +44,17 @@ public sealed class IExternalWorkItemValidator : CustomValidator<IExternalWorkIt
         RuleFor(c => c.StackRank)
             .GreaterThanOrEqualTo(0);
 
-        // TODO: add rule to verify that CompletedTimestamp is greater than or equal to Created
-        //RuleFor(c => c.CompletedTimestamp)
-        //    .GreaterThanOrEqualTo();
+        When(c => c.ActivatedTimestamp.HasValue, () =>
+        {
+            RuleFor(c => c.ActivatedTimestamp)
+                .GreaterThanOrEqualTo(c => c.Created);
+        });
+
+        When(c => c.DoneTimestamp.HasValue, () =>
+        {
+            RuleFor(c => c.DoneTimestamp)
+                .GreaterThanOrEqualTo(c => c.Created);
+        });
 
         RuleFor(c => c.ExternalTeamIdentifier)
             .MaximumLength(128);

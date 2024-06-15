@@ -16,6 +16,7 @@ public sealed record AzdoWorkItem : IExternalWorkItem
     public string? LastModifiedBy { get; set; }
     public int? Priority { get; set; }
     public double StackRank { get; set; }
+    public Instant? ActivatedTimestamp { get; set; }
     public Instant? DoneTimestamp { get; set; }
     public string? ExternalTeamIdentifier { get; set; }
 }

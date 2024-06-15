@@ -13,6 +13,7 @@ public interface IExternalWorkItem
     string? LastModifiedBy { get; }
     int? Priority { get; }
     double StackRank { get; }
+    Instant? ActivatedTimestamp { get; }
     Instant? DoneTimestamp { get; }
     string? ExternalTeamIdentifier { get; }
 }

@@ -36,7 +36,8 @@ internal static class WorkItemResponseExtensions
             LastModifiedBy = workItem.Fields.ChangedBy?.UniqueName,
             Priority = workItem.Fields.Priority,
             StackRank = workItem.Fields.StackRank > 0 ? workItem.Fields.StackRank : _defaultStackRank,
-            DoneTimestamp = workItem.Fields.ClosedDate.HasValue ? Instant.FromDateTimeOffset(workItem.Fields.ChangedDate) : null,
+            ActivatedTimestamp = workItem.Fields.ActivatedDate.HasValue ? Instant.FromDateTimeUtc(workItem.Fields.ActivatedDate.Value) : null,
+            DoneTimestamp = workItem.Fields.ClosedDate.HasValue ? Instant.FromDateTimeUtc(workItem.Fields.ClosedDate.Value) : null,
             ExternalTeamIdentifier = areaPathId
         };
     }
