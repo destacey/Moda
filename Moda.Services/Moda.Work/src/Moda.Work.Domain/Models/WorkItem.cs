@@ -16,7 +16,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
 
     private WorkItem() { }
 
-    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, int typeId, int statusId, WorkStatusCategory statusCategory, Guid? parentId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, int typeId, int statusId, WorkStatusCategory statusCategory, Guid? parentId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         Key = key;
         Title = title;
@@ -33,6 +33,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         AssignedToId = assignedToId;
         Priority = priority;
         StackRank = stackRank;
+        ActivatedTimestamp = activatedTimestamp;
         DoneTimestamp = doneTimestamp;
         ExtendedProps = extendedProps;
     }
@@ -95,6 +96,8 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
     // TODO: other systems will use different types.  How to handle this?
     public double StackRank { get; private set; }
 
+    public Instant? ActivatedTimestamp { get; private set; }
+
     public Instant? DoneTimestamp { get; private set; }
 
     public WorkItemExtended? ExtendedProps { get; private set; }
@@ -106,17 +109,15 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
     /// </summary>
     //public IReadOnlyCollection<WorkItemRevision> History => _history.AsReadOnly();
 
-    public void Update(string title, int typeId, int statusId, WorkStatusCategory statusCategory, Guid? parentId, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    public void Update(string title, int typeId, int statusId, WorkStatusCategory statusCategory, Guid? parentId, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         if (extendedProps != null && Id != extendedProps.Id)
         {
             throw new InvalidOperationException("The extended properties must match the work item.");
         }
 
-        if (doneTimestamp.HasValue && doneTimestamp < Created)
-        {
-            throw new InvalidOperationException("The completed timestamp cannot be before the created timestamp.");
-        }
+        SetActivatedTimestamp(activatedTimestamp, Created, doneTimestamp);
+        SetDoneTimestamp(doneTimestamp, Created, statusCategory);
 
         Title = title;
         TypeId = typeId;
@@ -128,7 +129,6 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         AssignedToId = assignedToId;
         Priority = priority;
         StackRank = stackRank;
-        DoneTimestamp = doneTimestamp.HasValue && statusCategory != WorkStatusCategory.Done ? null : doneTimestamp;
 
         if (extendedProps != null)
         {
@@ -146,7 +146,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         ParentId = parentId;
     }
 
-    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, int typeId, int statusId, WorkStatusCategory statusCategory, Guid? parentId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, int typeId, int statusId, WorkStatusCategory statusCategory, Guid? parentId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         Guard.Against.Null(workspace, nameof(workspace));
         if (workspace.Ownership != Ownership.Managed)
@@ -155,8 +155,41 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         }
         
         var key = new WorkItemKey(workspace.Key, externalId);
-        return new WorkItem(key, title, workspace.Id, externalId, typeId, statusId, statusCategory, parentId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, doneTimestamp, extendedProps);
+        return new WorkItem(key, title, workspace.Id, externalId, typeId, statusId, statusCategory, parentId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, activatedTimestamp, doneTimestamp, extendedProps);
 
         //var result = workspace.AddWorkItem(workItem);  // this is handled in the handler for performance reasons
+    }
+
+    private void SetActivatedTimestamp(Instant? activatedTimestamp, Instant created, Instant? doneTimestamp)
+    {
+        if (activatedTimestamp.HasValue && activatedTimestamp.Value < created)
+        {
+            throw new InvalidOperationException("The activated timestamp cannot be before the created timestamp.");
+        }
+
+        if (activatedTimestamp is null && doneTimestamp.HasValue)
+        {
+            ActivatedTimestamp = doneTimestamp;
+            return;
+        }
+
+        // If the activated timestamp is after the done timestamp, set the activated timestamp to the done timestamp
+        if (activatedTimestamp.HasValue && doneTimestamp.HasValue && doneTimestamp < activatedTimestamp)
+        {
+            ActivatedTimestamp = doneTimestamp;
+            return;
+        }
+
+        ActivatedTimestamp = activatedTimestamp;
+    }
+
+    private void SetDoneTimestamp(Instant? doneTimestamp, Instant created, WorkStatusCategory statusCategory)
+    {
+        if (doneTimestamp.HasValue && doneTimestamp < created)
+        {
+            throw new InvalidOperationException("The completed timestamp cannot be before the created timestamp.");
+        }
+
+        DoneTimestamp = doneTimestamp.HasValue && (statusCategory is WorkStatusCategory.Done or WorkStatusCategory.Removed) ? doneTimestamp : null;
     }
 }
