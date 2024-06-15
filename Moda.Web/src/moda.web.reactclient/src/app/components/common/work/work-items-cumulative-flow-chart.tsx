@@ -23,6 +23,7 @@ const WorkItemsCumulativeFlowChart = (
   props: WorkItemsCumulativeFlowChartProps,
 ) => {
   const [data, setData] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const { antDesignChartsTheme } = useTheme()
 
   useMemo(() => {
@@ -49,6 +50,7 @@ const WorkItemsCumulativeFlowChart = (
 
       setData([...doneData, ...activeData, ...proposedData])
     }
+    setIsLoading(false)
   }, [props.workItems])
 
   const config = useMemo(() => {
@@ -56,14 +58,30 @@ const WorkItemsCumulativeFlowChart = (
       title: 'Cumulative Flow',
       theme: antDesignChartsTheme,
       data: data,
+      isLoading: true,
       xField: 'date',
       yField: 'value',
-      seriesField: 'category',
+      //seriesField: 'category', // not sure when to use seriesField vs colorField
       colorField: 'category',
       legend: {
         color: { layout: { justifyContent: 'center' }, itemMarker: 'square' },
       },
       stack: true,
+      // style: {
+      //   fill: (data) => {
+      //     if (data[0].category === 'Done') {
+      //       return '#49aa19' // 52c41a
+      //     }
+      //     if (data[0].category === 'Active') {
+      //       return '#1668dc' // 1677ff
+      //     }
+      //     if (data[0].category === 'Proposed') {
+      //       return '#f5f5f5'
+      //     }
+      //     return '#FFC107'
+      //   },
+      // },
+      //stackField: 'category',
       // stack: {
       //   field: 'order',
       //   reverse: false,
@@ -82,7 +100,7 @@ const WorkItemsCumulativeFlowChart = (
     } as AreaConfig
   }, [antDesignChartsTheme, data])
 
-  if (data.length === 0)
+  if (!isLoading && data.length === 0)
     return (
       <>
         <Title level={5}>Cumulative Flow</Title>
