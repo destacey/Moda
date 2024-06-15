@@ -23,18 +23,29 @@ const WorkItemsCumulativeFlowChart = (
   useMemo(() => {
     if (props.workItems) {
       const workItems = props.workItems
-      const scopeData = workItems.map((item) => ({
+
+      const proposedData = workItems.map((item) => ({
         date: item.date,
-        category: 'Scope',
-        total: item.total,
+        category: 'Proposed',
+        total: item.proposed,
+        color: 'gray',
+      }))
+
+      const activeData = workItems.map((item) => ({
+        date: item.date,
+        category: 'Active',
+        total: item.active,
+        color: 'blue',
       }))
 
       const doneData = workItems.map((item) => ({
         date: item.date,
         category: 'Done',
         total: item.done,
+        color: 'green',
       }))
-      setData([...scopeData, ...doneData])
+      //setData([...proposedData, ...activeData, ...doneData])
+      setData([...doneData, ...activeData, ...proposedData])
     }
   }, [props.workItems])
 
@@ -50,6 +61,7 @@ const WorkItemsCumulativeFlowChart = (
       legend: {
         color: { layout: { justifyContent: 'center' }, itemMarker: 'square' },
       },
+      stack: true,
       //shapeField: 'smooth',
       // stack: {
       //   orderBy: 'total',
