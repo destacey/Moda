@@ -11,6 +11,7 @@ import { useMemo, useState } from 'react'
 import { WorkItemProgressDailyRollupDto } from '@/src/services/moda-api'
 import ModaEmpty from '../moda-empty'
 import { Typography } from 'antd'
+import dayjs from 'dayjs'
 
 const { Title } = Typography
 
@@ -29,25 +30,23 @@ const WorkItemsCumulativeFlowChart = (
       const workItems = props.workItems
 
       const proposedData = workItems.map((item) => ({
-        date: item.date,
+        date: dayjs(item.date).toDate(),
         category: 'Proposed',
-        total: item.proposed,
-        color: 'gray',
+        value: item.proposed,
       }))
 
       const activeData = workItems.map((item) => ({
-        date: item.date,
+        date: dayjs(item.date).toDate(),
         category: 'Active',
-        total: item.active,
-        color: 'blue',
+        value: item.active,
       }))
 
       const doneData = workItems.map((item) => ({
-        date: item.date,
+        date: dayjs(item.date).toDate(),
         category: 'Done',
-        total: item.done,
-        color: 'green',
+        value: item.done,
       }))
+
       setData([...doneData, ...activeData, ...proposedData])
     }
   }, [props.workItems])
@@ -57,14 +56,22 @@ const WorkItemsCumulativeFlowChart = (
       title: 'Cumulative Flow',
       theme: antDesignChartsTheme,
       data: data,
-      xField: (d) => new Date(d.date),
-      yField: 'total',
+      xField: 'date',
+      yField: 'value',
       seriesField: 'category',
       colorField: 'category',
       legend: {
         color: { layout: { justifyContent: 'center' }, itemMarker: 'square' },
       },
       stack: true,
+      // stack: {
+      //   field: 'order',
+      //   reverse: false,
+      //   // orderBy: (a, b) => {
+      //   //   const order = ['Done', 'Active', 'Proposed']
+      //   //   return order.indexOf(a) - order.indexOf(b)
+      //   // },
+      // },
       //shapeField: 'smooth',
       // stack: {
       //   orderBy: 'total',
