@@ -9,6 +9,11 @@ import { AreaConfig } from '@ant-design/charts'
 import useTheme from '../../contexts/theme'
 import { useMemo, useState } from 'react'
 import { WorkItemProgressDailyRollupDto } from '@/src/services/moda-api'
+import ModaEmpty from '../moda-empty'
+import { Typography } from 'antd'
+import dayjs from 'dayjs'
+
+const { Title } = Typography
 
 export interface WorkItemsCumulativeFlowChartProps {
   workItems: WorkItemProgressDailyRollupDto[]
@@ -17,25 +22,35 @@ export interface WorkItemsCumulativeFlowChartProps {
 const WorkItemsCumulativeFlowChart = (
   props: WorkItemsCumulativeFlowChartProps,
 ) => {
-  const [data, setData] = useState<any[]>()
+  const [data, setData] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const { antDesignChartsTheme } = useTheme()
 
   useMemo(() => {
     if (props.workItems) {
       const workItems = props.workItems
-      const scopeData = workItems.map((item) => ({
-        date: item.date,
-        category: 'Scope',
-        total: item.total,
+
+      const proposedData = workItems.map((item) => ({
+        date: dayjs(item.date).toDate(),
+        category: 'Proposed',
+        value: item.proposed,
+      }))
+
+      const activeData = workItems.map((item) => ({
+        date: dayjs(item.date).toDate(),
+        category: 'Active',
+        value: item.active,
       }))
 
       const doneData = workItems.map((item) => ({
-        date: item.date,
+        date: dayjs(item.date).toDate(),
         category: 'Done',
-        total: item.done,
+        value: item.done,
       }))
-      setData([...scopeData, ...doneData])
+
+      setData([...doneData, ...activeData, ...proposedData])
     }
+    setIsLoading(false)
   }, [props.workItems])
 
   const config = useMemo(() => {
@@ -43,13 +58,38 @@ const WorkItemsCumulativeFlowChart = (
       title: 'Cumulative Flow',
       theme: antDesignChartsTheme,
       data: data,
-      xField: (d) => new Date(d.date),
-      yField: 'total',
-      seriesField: 'category',
+      isLoading: true,
+      xField: 'date',
+      yField: 'value',
+      //seriesField: 'category', // not sure when to use seriesField vs colorField
       colorField: 'category',
       legend: {
         color: { layout: { justifyContent: 'center' }, itemMarker: 'square' },
       },
+      stack: true,
+      // style: {
+      //   fill: (data) => {
+      //     if (data[0].category === 'Done') {
+      //       return '#49aa19' // 52c41a
+      //     }
+      //     if (data[0].category === 'Active') {
+      //       return '#1668dc' // 1677ff
+      //     }
+      //     if (data[0].category === 'Proposed') {
+      //       return '#f5f5f5'
+      //     }
+      //     return '#FFC107'
+      //   },
+      // },
+      //stackField: 'category',
+      // stack: {
+      //   field: 'order',
+      //   reverse: false,
+      //   // orderBy: (a, b) => {
+      //   //   const order = ['Done', 'Active', 'Proposed']
+      //   //   return order.indexOf(a) - order.indexOf(b)
+      //   // },
+      // },
       //shapeField: 'smooth',
       // stack: {
       //   orderBy: 'total',
@@ -60,8 +100,13 @@ const WorkItemsCumulativeFlowChart = (
     } as AreaConfig
   }, [antDesignChartsTheme, data])
 
-  if (!props.workItems || props.workItems?.length === 0)
-    return <div>No data to display</div>
+  if (!isLoading && data.length === 0)
+    return (
+      <>
+        <Title level={5}>Cumulative Flow</Title>
+        <ModaEmpty message="No work item data to display" />
+      </>
+    )
 
   return <Area {...config} />
 }

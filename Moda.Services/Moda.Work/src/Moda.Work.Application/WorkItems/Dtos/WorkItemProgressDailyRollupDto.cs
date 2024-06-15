@@ -36,18 +36,21 @@ public sealed record WorkItemProgressDailyRollupDto : WorkItemProgressRollupDto
         }
 
         var filteredWorkItems = workItems
-            .Where(w => w.Tier == WorkTypeTier.Requirement 
+            .Where(w => w.Tier == WorkTypeTier.Requirement
                 && w.StatusCategory != WorkStatusCategory.Removed) // temporary filter until we get the date from history
             .ToArray();
 
         foreach (var workItem in filteredWorkItems)
         {
-            if ((workItem.StatusCategory is WorkStatusCategory.Done or WorkStatusCategory.Removed ) && !workItem.DoneTimestamp.HasValue)
+            if ((workItem.StatusCategory is WorkStatusCategory.Done or WorkStatusCategory.Removed) && !workItem.DoneTimestamp.HasValue)
                 throw new ArgumentException("Work item is in a terminal state but does not have a done timestamp");
 
             var created = DateOnly.FromDateTime(workItem.Created.ToDateTimeUtc());
-            DateOnly? doneTimestamp = workItem.DoneTimestamp.HasValue 
-                ? DateOnly.FromDateTime(workItem.DoneTimestamp.Value.ToDateTimeUtc()) 
+            DateOnly? activatedTimestamp = workItem.ActivatedTimestamp.HasValue
+                ? DateOnly.FromDateTime(workItem.ActivatedTimestamp.Value.ToDateTimeUtc())
+                : null;
+            DateOnly? doneTimestamp = workItem.DoneTimestamp.HasValue
+                ? DateOnly.FromDateTime(workItem.DoneTimestamp.Value.ToDateTimeUtc())
                 : null;
 
             int startIndex = Math.Max(0, created.DayNumber - startDate.DayNumber);
@@ -64,6 +67,11 @@ public sealed record WorkItemProgressDailyRollupDto : WorkItemProgressRollupDto
                 //    // If the work item is removed before the end date, stop incrementing
                 //    break;
                 //}
+                else if (activatedTimestamp.HasValue && activatedTimestamp <= data[i].Date)
+                {
+                    data[i].Active++;
+                    continue;
+                }
                 data[i].Proposed++;
             }
         }

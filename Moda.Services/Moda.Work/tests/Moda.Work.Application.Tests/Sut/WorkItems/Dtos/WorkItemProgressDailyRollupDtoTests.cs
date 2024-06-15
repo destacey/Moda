@@ -50,6 +50,7 @@ public sealed class WorkItemProgressDailyRollupDtoTests
                 StatusCategory = WorkStatusCategory.Done,
                 ParentId = null,
                 Created = Instant.FromUtc(2023, 1, 2, 12, 15),
+                ActivatedTimestamp = Instant.FromUtc(2023, 1, 4, 12, 15),
                 DoneTimestamp = Instant.FromUtc(2023, 1, 7, 12, 15)
             },
         ];
@@ -59,9 +60,9 @@ public sealed class WorkItemProgressDailyRollupDtoTests
             WorkItemProgressDailyRollupDto.CreateEmpty(new DateOnly(2023, 1, 1)),
             WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 2), 1, 0, 0),
             WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 3), 1, 0, 0),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 4), 1, 0, 0),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 5), 1, 0, 0),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 6), 1, 0, 0),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 4), 0, 1, 0),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 5), 0, 1, 0),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 6), 0, 1, 0),
             WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 7), 0, 0, 1),
             WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 8), 0, 0, 1),
             WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 9), 0, 0, 1),
@@ -103,6 +104,7 @@ public sealed class WorkItemProgressDailyRollupDtoTests
                 StatusCategory = WorkStatusCategory.Done,
                 ParentId = null,
                 Created = Instant.FromUtc(2022, 11, 2, 12, 15),
+                ActivatedTimestamp = Instant.FromUtc(2022, 11, 28, 12, 15),
                 DoneTimestamp = Instant.FromUtc(2022, 12, 7, 12, 15)
             },
             new() {
@@ -112,6 +114,7 @@ public sealed class WorkItemProgressDailyRollupDtoTests
                 StatusCategory = WorkStatusCategory.Done,
                 ParentId = null,
                 Created = Instant.FromUtc(2023, 1, 2, 12, 15),
+                ActivatedTimestamp = Instant.FromUtc(2023, 1, 4, 12, 15),
                 DoneTimestamp = Instant.FromUtc(2023, 1, 7, 12, 15)
             },
             new WorkItemProgressStateDto
@@ -122,6 +125,7 @@ public sealed class WorkItemProgressDailyRollupDtoTests
                 StatusCategory = WorkStatusCategory.Done,
                 ParentId = null,
                 Created = Instant.FromUtc(2023, 1, 3, 12, 15),
+                ActivatedTimestamp = Instant.FromUtc(2023, 1, 6, 12, 15),
                 DoneTimestamp = Instant.FromUtc(2023, 1, 8, 12, 15)
             },
             new WorkItemProgressStateDto
@@ -152,6 +156,7 @@ public sealed class WorkItemProgressDailyRollupDtoTests
                 StatusCategory = WorkStatusCategory.Active,
                 ParentId = null,
                 Created = Instant.FromUtc(2023, 1, 9, 12, 15),
+                ActivatedTimestamp = Instant.FromUtc(2023, 1, 10, 12, 15),
                 DoneTimestamp = null
             },
             new WorkItemProgressStateDto
@@ -162,6 +167,7 @@ public sealed class WorkItemProgressDailyRollupDtoTests
                 StatusCategory = WorkStatusCategory.Done,
                 ParentId = null,
                 Created = Instant.FromUtc(2023, 1, 10, 12, 15),
+                ActivatedTimestamp = Instant.FromUtc(2023, 1, 14, 12, 15), // activated and completed on the same day
                 DoneTimestamp = Instant.FromUtc(2023, 1, 14, 12, 15)
             }
         ];
@@ -170,19 +176,19 @@ public sealed class WorkItemProgressDailyRollupDtoTests
         [
             WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 1), 0, 0, 1),
             WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 2), 1, 0, 1),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 3), 3, 0, 1),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 4), 4, 0, 1),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 5), 4, 0, 1),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 6), 4, 0, 1),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 7), 2, 0, 2),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 3), 2, 0, 1),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 4), 2, 1, 1),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 5), 2, 1, 1),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 6), 1, 2, 1),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 7), 1, 1, 2),
             WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 8), 1, 0, 3),
             WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 9), 2, 0, 3),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 10), 3, 0, 3),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 11), 3, 0, 3),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 12), 3, 0, 3),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 13), 3, 0, 3),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 14), 2, 0, 4),
-            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 15), 2, 0, 4)
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 10), 2, 1, 3),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 11), 2, 1, 3),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 12), 2, 1, 3),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 13), 2, 1, 3),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 14), 1, 1, 4),
+            WorkItemProgressDailyRollupDto.Create(new DateOnly(2023, 1, 15), 1, 1, 4)
         ];
 
         // Act
