@@ -100,7 +100,7 @@ internal sealed class UpdateExternalWorkflowCommandHandler(IWorkDbContext workDb
 
         await _workDbContext.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation("{AppRequestName}: updated workflow {WorkflowName}.", AppRequestName, workflow.Name);
+        _logger.LogDebug("{AppRequestName}: updated workflow {WorkflowName}.", AppRequestName, workflow.Name);
 
         return Result.Success(workflow.Id);
     }
