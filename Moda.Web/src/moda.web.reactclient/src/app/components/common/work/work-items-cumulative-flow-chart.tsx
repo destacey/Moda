@@ -9,6 +9,10 @@ import { AreaConfig } from '@ant-design/charts'
 import useTheme from '../../contexts/theme'
 import { useMemo, useState } from 'react'
 import { WorkItemProgressDailyRollupDto } from '@/src/services/moda-api'
+import ModaEmpty from '../moda-empty'
+import { Typography } from 'antd'
+
+const { Title } = Typography
 
 export interface WorkItemsCumulativeFlowChartProps {
   workItems: WorkItemProgressDailyRollupDto[]
@@ -17,7 +21,7 @@ export interface WorkItemsCumulativeFlowChartProps {
 const WorkItemsCumulativeFlowChart = (
   props: WorkItemsCumulativeFlowChartProps,
 ) => {
-  const [data, setData] = useState<any[]>()
+  const [data, setData] = useState<any[]>([])
   const { antDesignChartsTheme } = useTheme()
 
   useMemo(() => {
@@ -44,7 +48,6 @@ const WorkItemsCumulativeFlowChart = (
         total: item.done,
         color: 'green',
       }))
-      //setData([...proposedData, ...activeData, ...doneData])
       setData([...doneData, ...activeData, ...proposedData])
     }
   }, [props.workItems])
@@ -72,8 +75,13 @@ const WorkItemsCumulativeFlowChart = (
     } as AreaConfig
   }, [antDesignChartsTheme, data])
 
-  if (!props.workItems || props.workItems?.length === 0)
-    return <div>No data to display</div>
+  if (data.length === 0)
+    return (
+      <>
+        <Title level={5}>Cumulative Flow</Title>
+        <ModaEmpty message="No work item data to display" />
+      </>
+    )
 
   return <Area {...config} />
 }
