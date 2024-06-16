@@ -1,5 +1,5 @@
 {
-  "x-generator": "NSwag v14.0.7.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))",
+  "x-generator": "NSwag v14.0.8.0 (NJsonSchema v11.0.1.0 (Newtonsoft.Json v13.0.0.0))",
   "openapi": "3.0.0",
   "info": {
     "title": "Moda API",
@@ -9633,12 +9633,6 @@
           },
           "isActive": {
             "type": "boolean"
-          },
-          "moda.Common.Application.Requests.WorkManagement.Interfaces.IWorkProcessSchemeDto.WorkType": {
-            "$ref": "#/components/schemas/IWorkTypeDto"
-          },
-          "moda.Common.Application.Requests.WorkManagement.Interfaces.IWorkProcessSchemeDto.Workflow": {
-            "$ref": "#/components/schemas/IWorkflowDto"
           }
         }
       },
@@ -9697,12 +9691,6 @@
             "items": {
               "$ref": "#/components/schemas/WorkflowSchemeDto"
             }
-          },
-          "moda.Common.Application.Requests.WorkManagement.Interfaces.IWorkflowDto.Schemes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/IWorkflowSchemeDto"
-            }
           }
         }
       },
@@ -9728,9 +9716,6 @@
           },
           "isActive": {
             "type": "boolean"
-          },
-          "moda.Common.Application.Requests.WorkManagement.Interfaces.IWorkflowSchemeDto.WorkStatus": {
-            "$ref": "#/components/schemas/IWorkStatusDto"
           }
         }
       },
@@ -9751,113 +9736,6 @@
           },
           "isActive": {
             "type": "boolean"
-          }
-        }
-      },
-      "IWorkStatusDto": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "isActive": {
-            "type": "boolean"
-          }
-        }
-      },
-      "IWorkflowSchemeDto": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "workStatus": {
-            "$ref": "#/components/schemas/IWorkStatusDto"
-          },
-          "workStatusCategory": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "order": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "isActive": {
-            "type": "boolean"
-          }
-        }
-      },
-      "IWorkTypeDto": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "level": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "isActive": {
-            "type": "boolean"
-          }
-        }
-      },
-      "IWorkflowDto": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "key": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "ownership": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "schemes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/IWorkflowSchemeDto"
-            }
           }
         }
       },
