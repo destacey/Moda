@@ -17,18 +17,19 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
         builder.HasKey(o => o.Id);
         builder.HasAlternateKey(o => o.Key);
 
-        builder.HasIndex(o => o.Id)
-            .IncludeProperties(o => new { o.Key, o.Name, o.Code, o.IsActive, o.IsDeleted });
-        builder.HasIndex(o => o.Key)
-            .IncludeProperties(o => new { o.Id, o.Name, o.Code, o.IsActive, o.IsDeleted });
+        builder.HasIndex(o => new { o.Id, o.IsDeleted })
+            .IncludeProperties(o => new { o.Key, o.Name, o.Code, o.IsActive })
+            .HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(o => new { o.Key, o.IsDeleted })
+            .IncludeProperties(o => new { o.Id, o.Name, o.Code, o.IsActive })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(o => o.Name)
             .IsUnique();
         builder.HasIndex(o => o.Code)
             .IsUnique()
             .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.IsActive, o.IsDeleted });
-        builder.HasIndex(o => o.IsActive);
-        builder.HasIndex(o => o.IsDeleted)
-            .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.Code, o.Type, o.IsActive });
+        builder.HasIndex(o => new { o.IsActive, o.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
 
         builder.Property(o => o.Key).ValueGeneratedOnAdd();
 
@@ -69,8 +70,9 @@ public class TeamMembershipConfig : IEntityTypeConfiguration<TeamMembership>
 
         builder.HasKey(m => m.Id);
 
-        builder.HasIndex(m => m.Id)
-            .IncludeProperties(m => new { m.SourceId, m.TargetId, m.IsDeleted });
+        builder.HasIndex(m => new { m.Id, m.IsDeleted })
+            .IncludeProperties(m => new { m.SourceId, m.TargetId })
+            .HasFilter("[IsDeleted] = 0");
 
         // Value Objects
         builder.ComplexProperty(m => m.DateRange, options =>

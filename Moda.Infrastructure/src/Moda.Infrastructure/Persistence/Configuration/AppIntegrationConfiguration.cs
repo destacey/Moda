@@ -14,11 +14,13 @@ public class ConnectionConfig : IEntityTypeConfiguration<Connection>
         builder.HasDiscriminator(c => c.Connector)
             .HasValue<AzureDevOpsBoardsConnection>(Connector.AzureDevOpsBoards);
 
-        builder.HasIndex(c => c.Id);
-        builder.HasIndex(e => new { e.Connector, e.IsActive })
-            .IncludeProperties(e => new { e.Id, e.Name });
-        builder.HasIndex(c => c.IsActive);
-        builder.HasIndex(c => c.IsDeleted);
+        builder.HasIndex(c => new { c.Id, c.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(c => new { c.Connector, c.IsActive, c.IsDeleted })
+            .IncludeProperties(c => new { c.Id, c.Name })
+            .HasFilter("[IsDeleted] = 0"); ;
+        builder.HasIndex(c => new { c.IsActive, c.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
 
         builder.Property(c => c.Name).IsRequired().HasMaxLength(128);
         builder.Property(c => c.Description).HasMaxLength(1024);

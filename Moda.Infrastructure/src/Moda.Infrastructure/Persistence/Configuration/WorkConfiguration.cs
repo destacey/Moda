@@ -18,6 +18,10 @@ public class WorkTypeHierarchyConfig : IEntityTypeConfiguration<WorkTypeHierarch
         builder.HasIndex(w => w.Id);
 
         // Relationships
+        builder.HasMany(builder => builder.Levels)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.Navigation(w => w.Levels)
             .AutoInclude();
     }
@@ -81,6 +85,9 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
 
         builder.HasIndex(w => w.Key)
             .IncludeProperties(w => new { w.Id, w.Title, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp });
+
+        builder.HasIndex(w => w.WorkspaceId)
+            .IncludeProperties(w => new { w.Id, w.Key, w.Title, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp });
 
         builder.HasIndex(w => new { w.Key, w.Title })
             .IncludeProperties(w => new { w.Id, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp });
@@ -179,12 +186,14 @@ public class WorkProcessConfig : IEntityTypeConfiguration<WorkProcess>
         builder.HasAlternateKey(w => w.Key);
 
         builder.HasIndex(i => new { i.Id, i.IsDeleted })
-            .IncludeProperties(i => new { i.Key, i.Name, i.ExternalId, i.Ownership, i.IsActive });
+            .IncludeProperties(i => new { i.Key, i.Name, i.ExternalId, i.Ownership, i.IsActive })
+            .HasFilter("[IsDeleted] = 0");
 
         builder.HasIndex(i => new { i.Key, i.IsDeleted })
-            .IncludeProperties(i => new { i.Id, i.Name, i.ExternalId, i.Ownership, i.IsActive });
+            .IncludeProperties(i => new { i.Id, i.Name, i.ExternalId, i.Ownership, i.IsActive })
+            .HasFilter("[IsDeleted] = 0");
 
-        builder.Property(p => p.Key).ValueGeneratedOnAdd();
+        builder.Property(w => w.Key).ValueGeneratedOnAdd();
 
         // Properties
         builder.Property(w => w.Name).HasMaxLength(128).IsRequired();
@@ -222,7 +231,12 @@ public class WorkProcessSchemeConfig : IEntityTypeConfiguration<WorkProcessSchem
 
         builder.HasKey(w => w.Id);
 
-        builder.HasIndex(w => w.Id);
+        builder.HasIndex(w => new { w.Id, w.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
+
+        builder.HasIndex(w => new { w.WorkProcessId, w.IsDeleted })
+            .IncludeProperties(w => new { w.Id, w.WorkTypeId, w.WorkflowId, w.IsActive })
+            .HasFilter("[IsDeleted] = 0");
 
         // Properties
         builder.Property(w => w.WorkProcessId);
@@ -262,12 +276,15 @@ public class WorkspaceConfig : IEntityTypeConfiguration<Workspace>
         builder.HasAlternateKey(w => w.Key);
 
         builder.HasIndex(w => new { w.Id, w.IsDeleted })
-            .IncludeProperties(w => new { w.Key, w.Name, w.Ownership, w.IsActive });
+            .IncludeProperties(w => new { w.Key, w.Name, w.Ownership, w.IsActive })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(w => new { w.Key, w.IsDeleted })
-            .IncludeProperties(w => new { w.Id, w.Name, w.Ownership, w.IsActive });
+            .IncludeProperties(w => new { w.Id, w.Name, w.Ownership, w.IsActive })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(w => w.Name).IsUnique();
         builder.HasIndex(w => new { w.IsActive, w.IsDeleted })
-            .IncludeProperties(w => new { w.Id, w.Key, w.Name, w.Ownership });
+            .IncludeProperties(w => new { w.Id, w.Key, w.Name, w.Ownership })
+            .HasFilter("[IsDeleted] = 0");
 
         // Properties
         builder.Property(w => w.Key).IsRequired()
@@ -316,10 +333,12 @@ public class WorkStatusConfig : IEntityTypeConfiguration<WorkStatus>
 
         builder.HasKey(w => w.Id);
 
-        builder.HasIndex(w => w.Id);
+        builder.HasIndex(w => new { w.Id, w.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(w => w.Name).IsUnique();
         builder.HasIndex(w => new { w.IsActive, w.IsDeleted })
-            .IncludeProperties(w => new { w.Id, w.Name });
+            .IncludeProperties(w => new { w.Id, w.Name })
+            .HasFilter("[IsDeleted] = 0");
 
         // Properties
         builder.Property(w => w.Name).IsRequired().HasMaxLength(64);
@@ -345,10 +364,13 @@ public class WorkTypeConfig : IEntityTypeConfiguration<WorkType>
 
         builder.HasKey(w => w.Id);
 
-        builder.HasIndex(w => w.Id);
+        builder.HasIndex(w => new { w.Id, w.IsDeleted })
+            .IncludeProperties(w => new { w.Name, w.LevelId, w.IsActive })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(w => w.Name).IsUnique();
         builder.HasIndex(w => new { w.IsActive, w.IsDeleted })
-            .IncludeProperties(w => new { w.Id, w.Name });
+            .IncludeProperties(w => new { w.Id, w.LevelId, w.Name })
+            .HasFilter("[IsDeleted] = 0");
 
         // Properties
         builder.Property(w => w.Name).IsRequired().HasMaxLength(64);
@@ -382,10 +404,13 @@ public class WorkflowConfig : IEntityTypeConfiguration<Workflow>
         builder.HasAlternateKey(w => w.Key);
 
 
-        builder.HasIndex(w => w.Id);
-        builder.HasIndex(w => w.Key);
+        builder.HasIndex(w => new { w.Id, w.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(w => new { w.Key, w.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(w => new { w.IsActive, w.IsDeleted })
-            .IncludeProperties(w => new { w.Id, w.Key, w.Name });
+            .IncludeProperties(w => new { w.Id, w.Key, w.Name })
+            .HasFilter("[IsDeleted] = 0");
 
         // Properties
         builder.Property(p => p.Key).ValueGeneratedOnAdd();
@@ -425,9 +450,11 @@ public class WorkflowSchemeConfig : IEntityTypeConfiguration<WorkflowScheme>
 
         builder.HasKey(w => w.Id);
 
-        builder.HasIndex(w => w.Id);
-        builder.HasIndex(w => new { w.IsActive, w.IsDeleted })
-            .IncludeProperties(w => new { w.Id });
+        builder.HasIndex(w => new { w.Id, w.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(w => new { w.WorkflowId, w.IsDeleted })
+            .IncludeProperties(w => new { w.Id, w.WorkStatusId, w.WorkStatusCategory })
+            .HasFilter("[IsDeleted] = 0");
 
         // Properties
         builder.Property(w => w.WorkStatusCategory).IsRequired()
