@@ -15,15 +15,17 @@ public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
         builder.HasAlternateKey(o => o.Key);
 
         builder.HasIndex(o => new { o.Id, o.IsDeleted })
-            .IncludeProperties(o => new { o.Key, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId, o.Order });
+            .IncludeProperties(o => new { o.Key, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId, o.Order })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(o => new { o.Key, o.IsDeleted })
-            .IncludeProperties(o => new { o.Id, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId, o.Order });
+            .IncludeProperties(o => new { o.Id, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId, o.Order })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(o => new { o.OwnerId, o.IsDeleted })
-            .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.Type, o.Status, o.PlanId, o.Order });
+            .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.Type, o.Status, o.PlanId, o.Order })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(o => new { o.PlanId, o.IsDeleted })
-            .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.Type, o.Status, o.OwnerId, o.Order });
-        builder.HasIndex(o => o.IsDeleted)
-            .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.Type, o.Status, o.OwnerId, o.PlanId, o.Order });
+            .IncludeProperties(o => new { o.Id, o.Key, o.Name, o.Type, o.Status, o.OwnerId, o.Order })
+            .HasFilter("[IsDeleted] = 0");
 
         builder.Property(o => o.Key).ValueGeneratedOnAdd();
 

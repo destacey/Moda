@@ -17,16 +17,17 @@ public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
         builder.HasAlternateKey(t => t.Key);
 
         builder.HasIndex(t => new { t.Id, t.IsDeleted })
-            .IncludeProperties(t => new { t.Key, t.Name, t.Code, t.Type, t.IsActive });
+            .IncludeProperties(t => new { t.Key, t.Name, t.Code, t.Type, t.IsActive })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(t => new { t.Key, t.IsDeleted })
-            .IncludeProperties(t => new { t.Id, t.Name, t.Code, t.Type, t.IsActive });
+            .IncludeProperties(t => new { t.Id, t.Name, t.Code, t.Type, t.IsActive })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(t => t.Code)
             .IsUnique()
             .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Type, t.IsActive });
         builder.HasIndex(t => new { t.IsActive, t.IsDeleted })
-            .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Code, t.Type });
-        builder.HasIndex(t => t.IsDeleted)
-            .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Code, t.Type, t.IsActive });
+            .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Code, t.Type })
+            .HasFilter("[IsDeleted] = 0");
 
         builder.Property(t => t.Id).ValueGeneratedNever();
         builder.Property(t => t.Key).ValueGeneratedNever();
@@ -65,11 +66,11 @@ public class PlanningIntervalConfig : IEntityTypeConfiguration<PlanningInterval>
         builder.HasKey(p => p.Id);
         builder.HasAlternateKey(p => p.Key);
 
-        builder.HasIndex(p => p.Id)
-            .IncludeProperties(p => new { p.Name, p.Description });
+        builder.HasIndex(p => new { p.Id, p.IsDeleted })
+            .IncludeProperties(p => new { p.Name, p.Description })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(p => p.Name)
             .IsUnique();
-        builder.HasIndex(p => p.IsDeleted);
 
         builder.Property(p => p.Key).ValueGeneratedOnAdd();
 
@@ -104,13 +105,14 @@ public class PlanningIntervalIterationConfig : IEntityTypeConfiguration<Planning
         builder.HasAlternateKey(i => i.Key);
 
         builder.HasIndex(i => new { i.Id, i.IsDeleted })
-            .IncludeProperties(i => new { i.Key, i.PlanningIntervalId, i.Name, i.Type });
+            .IncludeProperties(i => new { i.Key, i.PlanningIntervalId, i.Name, i.Type })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(i => new { i.Key, i.IsDeleted })
-            .IncludeProperties(i => new { i.Id, i.PlanningIntervalId, i.Name, i.Type });
+            .IncludeProperties(i => new { i.Id, i.PlanningIntervalId, i.Name, i.Type })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(i => new { i.PlanningIntervalId, i.IsDeleted })
-            .IncludeProperties(i => new { i.Id, i.Key, i.Name, i.Type });
-        builder.HasIndex(i => i.IsDeleted)
-            .IncludeProperties(i => new { i.Id, i.Key, i.PlanningIntervalId, i.Name, i.Type });
+            .IncludeProperties(i => new { i.Id, i.Key, i.Name, i.Type })
+            .HasFilter("[IsDeleted] = 0");
 
         builder.Property(i => i.Key).ValueGeneratedOnAdd();
 
@@ -154,15 +156,17 @@ public class PlanningIntervalObjectiveConfig : IEntityTypeConfiguration<Planning
         builder.HasAlternateKey(o => o.Key);
 
         builder.HasIndex(o => new { o.Id, o.IsDeleted })
-            .IncludeProperties(o => new { o.Key, o.PlanningIntervalId, o.ObjectiveId, o.Type, o.IsStretch });
+            .IncludeProperties(o => new { o.Key, o.PlanningIntervalId, o.ObjectiveId, o.Type, o.IsStretch })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(o => new { o.Key, o.IsDeleted })
-            .IncludeProperties(o => new { o.Id, o.PlanningIntervalId, o.ObjectiveId, o.Type, o.IsStretch });
+            .IncludeProperties(o => new { o.Id, o.PlanningIntervalId, o.ObjectiveId, o.Type, o.IsStretch })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(o => new { o.PlanningIntervalId, o.IsDeleted })
-            .IncludeProperties(o => new { o.Id, o.Key, o.ObjectiveId, o.Type, o.IsStretch });
+            .IncludeProperties(o => new { o.Id, o.Key, o.ObjectiveId, o.Type, o.IsStretch })
+            .HasFilter("[IsDeleted] = 0");
         builder.HasIndex(o => new { o.ObjectiveId, o.IsDeleted })
-            .IncludeProperties(o => new { o.Id, o.Key, o.PlanningIntervalId, o.Type, o.IsStretch });
-        builder.HasIndex(o => o.IsDeleted)
-            .IncludeProperties(o => new { o.Id, o.Key, o.PlanningIntervalId, o.ObjectiveId, o.Type, o.IsStretch });
+            .IncludeProperties(o => new { o.Id, o.Key, o.PlanningIntervalId, o.Type, o.IsStretch })
+            .HasFilter("[IsDeleted] = 0");
 
         builder.Property(o => o.Key).ValueGeneratedOnAdd();
 
@@ -241,8 +245,14 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
         builder.HasKey(r => r.Id);
         builder.HasAlternateKey(r => r.Key);
 
-        builder.HasIndex(r => r.Id);
-        builder.HasIndex(r => r.IsDeleted);
+        builder.HasIndex(r => new { r.Id, r.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(r => new { r.Key, r.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(r => new {r.AssigneeId, r.IsDeleted})
+            .HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(r => new { r.TeamId, r.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
 
         builder.Property(r => r.Key).ValueGeneratedOnAdd();
 
