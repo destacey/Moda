@@ -6797,7 +6797,7 @@
         "tags": [
           "HealthChecks"
         ],
-        "summary": "Update a healt report.",
+        "summary": "Update a health report.",
         "operationId": "HealthChecks_Update",
         "parameters": [
           {
@@ -6869,7 +6869,7 @@
         "tags": [
           "HealthChecks"
         ],
-        "summary": "Get the healt report for a specific objectId.",
+        "summary": "Get the health report for a specific objectId.",
         "operationId": "HealthChecks_GetHealthReport",
         "parameters": [
           {
@@ -6922,7 +6922,7 @@
         "tags": [
           "HealthChecks"
         ],
-        "summary": "Create a healt report.",
+        "summary": "Create a health report.",
         "operationId": "HealthChecks_Create",
         "requestBody": {
           "x-name": "request",

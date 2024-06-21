@@ -34,7 +34,7 @@ public class HealthChecksController : ControllerBase
 
     [HttpGet("health-report/{objectId}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.HealthChecks)]
-    [OpenApiOperation("Get the healt report for a specific objectId.", "")]
+    [OpenApiOperation("Get the health report for a specific objectId.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<HealthCheckDto>>> GetHealthReport(Guid objectId, CancellationToken cancellationToken)
@@ -45,7 +45,7 @@ public class HealthChecksController : ControllerBase
 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.HealthChecks)]
-    [OpenApiOperation("Create a healt report.", "")]
+    [OpenApiOperation("Create a health report.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Guid))]
     public async Task<ActionResult> Create([FromBody] CreateHealthCheckRequest request, CancellationToken cancellationToken)
     {
@@ -58,7 +58,7 @@ public class HealthChecksController : ControllerBase
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.HealthChecks)]
-    [OpenApiOperation("Update a healt report.", "")]
+    [OpenApiOperation("Update a health report.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
