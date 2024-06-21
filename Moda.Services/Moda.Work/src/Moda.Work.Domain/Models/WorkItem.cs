@@ -1,6 +1,8 @@
 ﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Enums.Work;
+using Moda.Work.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Work.Domain.Models;
@@ -16,16 +18,15 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
 
     private WorkItem() { }
 
-    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, int typeId, int statusId, WorkStatusCategory statusCategory, Guid? parentId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         Key = key;
         Title = title;
         WorkspaceId = workspaceId;
         ExternalId = externalId;
-        TypeId = typeId;
+        TypeId = workType.Id;
         StatusId = statusId;
         StatusCategory = statusCategory;
-        ParentId = parentId;
         Created = created;
         CreatedById = createdById;
         LastModified = lastModified;
@@ -36,6 +37,12 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         ActivatedTimestamp = activatedTimestamp;
         DoneTimestamp = doneTimestamp;
         ExtendedProps = extendedProps;
+
+        var result = UpdateParent(parentInfo, workType);
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error);
+        }
     }
 
     /// <summary>A unique key to identify the work item.</summary>
@@ -109,7 +116,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
     /// </summary>
     //public IReadOnlyCollection<WorkItemRevision> History => _history.AsReadOnly();
 
-    public void Update(string title, int typeId, int statusId, WorkStatusCategory statusCategory, Guid? parentId, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    public void Update(string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         if (extendedProps != null && Id != extendedProps.Id)
         {
@@ -120,15 +127,20 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         SetDoneTimestamp(doneTimestamp, Created, statusCategory);
 
         Title = title;
-        TypeId = typeId;
+        TypeId = workType.Id;
         StatusId = statusId;
         StatusCategory = statusCategory;
-        ParentId = parentId;
         LastModified = lastModified;
         LastModifiedById = lastModifiedById;
         AssignedToId = assignedToId;
         Priority = priority;
         StackRank = stackRank;
+
+        var result = UpdateParent(parentInfo, workType);
+        if (result.IsFailure)
+        {
+            throw new InvalidOperationException(result.Error);
+        }
 
         if (extendedProps != null)
         {
@@ -141,23 +153,43 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         }
     }
 
-    public void UpdateParent(Guid? parentId)
-    {
-        ParentId = parentId;
-    }
-
-    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, int typeId, int statusId, WorkStatusCategory statusCategory, Guid? parentId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         Guard.Against.Null(workspace, nameof(workspace));
+        Guard.Against.Null(workType, nameof(workType));
+
         if (workspace.Ownership != Ownership.Managed)
         {
             throw new InvalidOperationException("Only managed workspaces can have external work items.");
         }
         
         var key = new WorkItemKey(workspace.Key, externalId);
-        return new WorkItem(key, title, workspace.Id, externalId, typeId, statusId, statusCategory, parentId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, activatedTimestamp, doneTimestamp, extendedProps);
+        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, activatedTimestamp, doneTimestamp, extendedProps);
 
         //var result = workspace.AddWorkItem(workItem);  // this is handled in the handler for performance reasons
+    }
+
+    // TODO: Running into EF issues when set the WorkType directly. So adding it for the check.
+    public Result UpdateParent(IWorkItemParentInfo? parentInfo, WorkType currentWorkType)
+    {
+        if (parentInfo is not null && parentInfo.Tier == WorkTypeTier.Portfolio)
+        {
+            if (currentWorkType?.Level?.Tier is null)
+            {
+                return Result.Failure("Unable to set the work item parent without the type and level.");
+            }
+            else if (currentWorkType!.Level!.Tier == WorkTypeTier.Portfolio && currentWorkType.Level.Order <= parentInfo.LevelOrder)
+            {
+                return Result.Failure("The parent must be a higher level than the work item.");
+            }
+        }
+        else if (parentInfo is not null)
+        {
+            return Result.Failure("Only portfolio tier work items can be parents.");
+        }
+
+        ParentId = parentInfo?.Id;
+        return Result.Success();
     }
 
     private void SetActivatedTimestamp(Instant? activatedTimestamp, Instant created, Instant? doneTimestamp)

@@ -9,7 +9,7 @@ public class PlanningIntervalIterationFaker : PrivateConstructorFaker<PlanningIn
 {
     public PlanningIntervalIterationFaker(Guid? planningIntervalId = null)
     {
-        var piId = planningIntervalId ?? Guid.NewGuid();
+        var piId = planningIntervalId ?? FakerHub.Random.Guid();
         RuleFor(x => x.Id, f => f.Random.Guid());
         RuleFor(x => x.Key, f => f.Random.Int());
         RuleFor(x => x.PlanningIntervalId, piId);
