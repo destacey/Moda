@@ -8005,7 +8005,7 @@ export class HealthChecksClient {
     }
 
     /**
-     * Update a healt report.
+     * Update a health report.
      */
     update(id: string, request: UpdateHealthCheckRequest, cancelToken?: CancelToken): Promise<HealthCheckDto> {
         let url_ = this.baseUrl + "/api/healthchecks/{id}";
@@ -8077,7 +8077,7 @@ export class HealthChecksClient {
     }
 
     /**
-     * Get the healt report for a specific objectId.
+     * Get the health report for a specific objectId.
      */
     getHealthReport(objectId: string, cancelToken?: CancelToken): Promise<HealthCheckDto[]> {
         let url_ = this.baseUrl + "/api/healthchecks/health-report/{objectId}";
@@ -8138,7 +8138,7 @@ export class HealthChecksClient {
     }
 
     /**
-     * Create a healt report.
+     * Create a health report.
      */
     create(request: CreateHealthCheckRequest, cancelToken?: CancelToken): Promise<string> {
         let url_ = this.baseUrl + "/api/healthchecks";
