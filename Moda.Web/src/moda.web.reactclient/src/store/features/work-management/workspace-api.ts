@@ -5,6 +5,7 @@ import {
   SetExternalUrlTemplatesRequest,
   WorkItemDetailsDto,
   WorkItemListDto,
+  WorkItemProgressDailyRollupDto,
   WorkspaceDto,
   WorkspaceListDto,
 } from '@/src/services/moda-api'
@@ -15,6 +16,11 @@ export interface GetWorkItemRequest {
 }
 
 export interface GetChildWorkItemsRequest {
+  idOrKey: string
+  workItemKey: string
+}
+
+export interface GetMetricsRequest {
   idOrKey: string
   workItemKey: string
 }
@@ -128,6 +134,25 @@ export const workspaceApi = apiSlice.injectEndpoints({
         ...result.map(({ key }) => ({ type: QueryTags.WorkItemChildren, key })),
       ],
     }),
+    getWorkItemMetrics: builder.query<
+      WorkItemProgressDailyRollupDto[],
+      GetMetricsRequest
+    >({
+      queryFn: async (request: GetMetricsRequest) => {
+        try {
+          const data = await (
+            await getWorkspacesClient()
+          ).getMetrics(request.idOrKey, request.workItemKey)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.WorkItemMetrics, id: arg.workItemKey },
+      ],
+    }),
     searchWorkItems: builder.query<WorkItemListDto[], string>({
       queryFn: async (searchTerm: string) => {
         try {
@@ -154,6 +179,7 @@ export const {
   useGetWorkItemsQuery,
   useGetWorkItemQuery,
   useGetChildWorkItemsQuery,
+  useGetWorkItemMetricsQuery,
   useSearchWorkItemsQuery,
   useSetWorkspaceExternalUrlTemplatesMutation,
 } = workspaceApi

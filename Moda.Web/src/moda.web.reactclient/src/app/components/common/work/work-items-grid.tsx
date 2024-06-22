@@ -117,9 +117,14 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
       },
       {
         field: 'parent.key',
-        headerName: 'Parent',
+        headerName: 'Parent Key',
         comparator: workItemKeyComparator,
         cellRenderer: ParentWorkItemLinkCellRenderer,
+      },
+      {
+        field: 'parent.title',
+        headerName: 'Parent',
+        width: 400,
       },
     ],
     [],

@@ -27,13 +27,9 @@ public sealed record WorkItemProgressDailyRollupDto : WorkItemProgressRollupDto
             throw new ArgumentException("Start date must be less than or equal to end date");
 
         var days = endDate.DayNumber - startDate.DayNumber + 1; // inclusive
-        var data = new List<WorkItemProgressDailyRollupDto>(days);
-
-        DateOnly date = startDate;
-        for (var i = 0; i < days; i++, date = date.AddDays(1))
-        {
-            data.Add(CreateEmpty(date));
-        }
+        var data = Enumerable.Range(0, days)
+            .Select(offset => CreateEmpty(startDate.AddDays(offset)))
+            .ToList();
 
         var filteredWorkItems = workItems
             .Where(w => w.Tier == WorkTypeTier.Requirement
@@ -45,12 +41,12 @@ public sealed record WorkItemProgressDailyRollupDto : WorkItemProgressRollupDto
             if ((workItem.StatusCategory is WorkStatusCategory.Done or WorkStatusCategory.Removed) && !workItem.DoneTimestamp.HasValue)
                 throw new ArgumentException("Work item is in a terminal state but does not have a done timestamp");
 
-            var created = DateOnly.FromDateTime(workItem.Created.ToDateTimeUtc());
+            var created = workItem.Created.ToDateOnly();
             DateOnly? activatedTimestamp = workItem.ActivatedTimestamp.HasValue
-                ? DateOnly.FromDateTime(workItem.ActivatedTimestamp.Value.ToDateTimeUtc())
+                ? workItem.ActivatedTimestamp.Value.ToDateOnly()
                 : null;
             DateOnly? doneTimestamp = workItem.DoneTimestamp.HasValue
-                ? DateOnly.FromDateTime(workItem.DoneTimestamp.Value.ToDateTimeUtc())
+                ? workItem.DoneTimestamp.Value.ToDateOnly()
                 : null;
 
             int startIndex = Math.Max(0, created.DayNumber - startDate.DayNumber);

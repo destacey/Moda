@@ -1,5 +1,7 @@
-import { Modal, Spin } from 'antd'
-import { useState } from 'react'
+'use client'
+
+import { Modal } from 'antd'
+import { useEffect, useState } from 'react'
 import WorkItemsCumulativeFlowChart from './work-items-cumulative-flow-chart'
 import { useGetObjectiveWorkItemMetricsQuery } from '@/src/store/features/planning/planning-interval-api'
 
@@ -22,6 +24,12 @@ const WorkItemsDashboardModal = (props: WorkItemsDashboardModalProps) => {
     objectiveId: props.objectiveId,
   })
 
+  useEffect(() => {
+    if (isError) {
+      console.error('Error fetching objective work item metrics', isError)
+    }
+  }, [isError])
+
   const handleClose = () => {
     setOpen(false)
     props.onModalClose()
@@ -40,9 +48,10 @@ const WorkItemsDashboardModal = (props: WorkItemsDashboardModalProps) => {
         maskClosable={false}
         destroyOnClose={true}
       >
-        <Spin spinning={isLoading}>
-          <WorkItemsCumulativeFlowChart workItems={workItemsData} />
-        </Spin>
+        <WorkItemsCumulativeFlowChart
+          workItems={workItemsData}
+          isLoading={isLoading}
+        />
       </Modal>
     </>
   )

@@ -3718,6 +3718,65 @@
         ]
       }
     },
+    "/api/work/workspaces/{idOrKey}/work-items/{workItemKey}/metrics": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get metrics for a work item's.",
+        "operationId": "Workspaces_GetMetrics",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "workItemKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkItemProgressDailyRollupDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/work/workspaces/work-items/search": {
       "get": {
         "tags": [
@@ -9847,6 +9906,9 @@
           "type": {
             "type": "string"
           },
+          "tier": {
+            "type": "string"
+          },
           "status": {
             "type": "string"
           },
@@ -9897,6 +9959,11 @@
                 "$ref": "#/components/schemas/EmployeeNavigationDto"
               }
             ]
+          },
+          "activatedTimestamp": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           },
           "doneTimestamp": {
             "type": "string",
