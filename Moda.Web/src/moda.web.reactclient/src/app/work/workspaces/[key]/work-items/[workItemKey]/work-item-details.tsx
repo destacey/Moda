@@ -68,6 +68,11 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
           {dayjs(workItem.lastModified).format('MMM D, YYYY @ h:mm A')}
         </Item>
         {/* TODO: convert this to a timeline with other status milestones */}
+        {workItem.activatedTimestamp && (
+          <Item label="Activated">
+            {dayjs(workItem.activatedTimestamp).format('MMM D, YYYY @ h:mm A')}
+          </Item>
+        )}
         {workItem.doneTimestamp && (
           <Item label="Done">
             {dayjs(workItem.doneTimestamp).format('MMM D, YYYY @ h:mm A')}

@@ -15,10 +15,12 @@ import { authorizePage } from '@/src/app/components/hoc'
 import WorkItemDetails from './work-item-details'
 import ExternalIconLink from '@/src/app/components/common/external-icon-link'
 import { WorkItemsGrid } from '@/src/app/components/common/work'
+import WorkItemDashboard from './work-item-dashboard'
 
 enum WorkItemTabs {
   Details = 'details',
   WorkItems = 'workItems',
+  Dashboard = 'dashboard',
 }
 
 const WorkItemDetailsPage = ({ params }) => {
@@ -92,17 +94,30 @@ const WorkItemDetailsPage = ({ params }) => {
       tab: 'Details',
       content: <WorkItemDetails workItem={workItemData} />,
     },
-    {
-      key: WorkItemTabs.WorkItems,
-      tab: 'Work Items',
-      content: (
-        <WorkItemsGrid
-          workItems={childWorkItemsQuery.data}
-          isLoading={childWorkItemsQuery.isLoading}
-          refetch={childWorkItemsQuery.refetch}
-        />
-      ),
-    },
+    ...(workItemData?.statusCategory.name !== 'Removed'
+      ? [
+          {
+            key: WorkItemTabs.Dashboard,
+            tab: 'Dashboard',
+            content: <WorkItemDashboard workItem={workItemData} />,
+          },
+        ]
+      : []),
+    ...(workItemData?.tier === 'Portfolio'
+      ? [
+          {
+            key: WorkItemTabs.WorkItems,
+            tab: 'Work Items',
+            content: (
+              <WorkItemsGrid
+                workItems={childWorkItemsQuery.data}
+                isLoading={childWorkItemsQuery.isLoading}
+                refetch={childWorkItemsQuery.refetch}
+              />
+            ),
+          },
+        ]
+      : []),
   ]
 
   return (

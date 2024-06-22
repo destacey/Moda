@@ -10,20 +10,20 @@ import useTheme from '../../contexts/theme'
 import { useMemo, useState } from 'react'
 import { WorkItemProgressDailyRollupDto } from '@/src/services/moda-api'
 import ModaEmpty from '../moda-empty'
-import { Typography } from 'antd'
+import { Spin, Typography } from 'antd'
 import dayjs from 'dayjs'
 
 const { Title } = Typography
 
 export interface WorkItemsCumulativeFlowChartProps {
   workItems: WorkItemProgressDailyRollupDto[]
+  isLoading: boolean
 }
 
 const WorkItemsCumulativeFlowChart = (
   props: WorkItemsCumulativeFlowChartProps,
 ) => {
   const [data, setData] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const { antDesignChartsTheme } = useTheme()
 
   useMemo(() => {
@@ -50,7 +50,6 @@ const WorkItemsCumulativeFlowChart = (
 
       setData([...doneData, ...activeData, ...proposedData])
     }
-    setIsLoading(false)
   }, [props.workItems])
 
   const config = useMemo(() => {
@@ -58,7 +57,6 @@ const WorkItemsCumulativeFlowChart = (
       title: 'Cumulative Flow',
       theme: antDesignChartsTheme,
       data: data,
-      isLoading: true,
       xField: 'date',
       yField: 'value',
       //seriesField: 'category', // not sure when to use seriesField vs colorField
@@ -100,7 +98,9 @@ const WorkItemsCumulativeFlowChart = (
     } as AreaConfig
   }, [antDesignChartsTheme, data])
 
-  if (!isLoading && data.length === 0)
+  if (props.isLoading) return <Spin />
+
+  if (data.length === 0)
     return (
       <>
         <Title level={5}>Cumulative Flow</Title>
