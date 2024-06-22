@@ -11,6 +11,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
     public required string Title { get; set; }
     public required WorkspaceNavigationDto Workspace { get; set; }
     public required string Type { get; set; }
+    public required string Tier { get; set; }
     public required string Status { get; set; }
     public required SimpleNavigationDto StatusCategory { get; set; }
     public int? Priority { get; set; }
@@ -20,6 +21,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
     public EmployeeNavigationDto? CreatedBy { get; set; }
     public Instant LastModified { get; set; }
     public EmployeeNavigationDto? LastModifiedBy { get; set; }
+    public Instant? ActivatedTimestamp { get; set; }
     public Instant? DoneTimestamp { get; set; }
     public string? ExternalViewWorkItemUrl { get; set; }
 
@@ -28,6 +30,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
         config.NewConfig<WorkItem, WorkItemDetailsDto>()
             .Map(dest => dest.Key, src => src.Key.ToString())
             .Map(dest => dest.Type, src => src.Type.Name)
+            .Map(dest => dest.Tier, src => src.Type.Level!.Tier.GetDisplayName())
             .Map(dest => dest.Status, src => src.Status.Name)
             .Map(dest => dest.StatusCategory, src => SimpleNavigationDto.FromEnum(src.StatusCategory))
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))

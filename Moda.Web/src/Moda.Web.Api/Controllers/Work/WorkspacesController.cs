@@ -166,6 +166,38 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
             : Ok(result.Value.OrderBy(w => w.StackRank));
     }
 
+    [HttpGet("{idOrKey}/work-items/{workItemKey}/metrics")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
+    [OpenApiOperation("Get metrics for a work item's.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<WorkItemProgressDailyRollupDto>>> GetMetrics(string idOrKey, string workItemKey, CancellationToken cancellationToken)
+    {
+        // TODO: allow work item key or id
+        var key = new WorkItemKey(workItemKey);
+        GetWorkItemMetricsQuery query;
+        if (Guid.TryParse(idOrKey, out Guid guidId))
+        {
+            query = new GetWorkItemMetricsQuery(guidId, key);
+        }
+        else if (idOrKey.IsValidWorkspaceKeyFormat())
+        {
+            query = new GetWorkItemMetricsQuery(new WorkspaceKey(idOrKey), key);
+        }
+        else
+        {
+            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkspacesController.GetMetrics"));
+        }
+
+        var result = await _sender.Send(query, cancellationToken);
+
+        return result.IsFailure
+            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetMetrics"))
+            : Ok(result.Value);
+    }
+
+
+
     [HttpGet("work-items/search")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
     [OpenApiOperation("Search for a work item using its key or title.", "")]

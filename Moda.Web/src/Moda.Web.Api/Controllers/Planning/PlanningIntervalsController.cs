@@ -2,6 +2,7 @@
 using CsvHelper;
 using Mapster;
 using Moda.Common.Application.Interfaces;
+using Moda.Common.Extensions;
 using Moda.Health.Queries;
 using Moda.Organization.Application.Teams.Queries;
 using Moda.Organization.Application.TeamsOfTeams.Queries;
@@ -449,7 +450,7 @@ public class PlanningIntervalsController : ControllerBase
 
         var planningInterval = await _sender.Send(new GetPlanningIntervalQuery(id), cancellationToken);
 
-        var today = DateOnly.FromDateTime(_dateTimeProvider.Now.ToDateTimeUtc());
+        var today = _dateTimeProvider.Now.ToDateOnly();
         var piEnd = planningInterval!.End.ToDateOnly();
         // get the min of today and the end of the PI
         var end = today < piEnd ? today : piEnd;
