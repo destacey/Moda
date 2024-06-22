@@ -1,9 +1,10 @@
 'use client'
 
 import { WorkItemDetailsDto } from '@/src/services/moda-api'
-import { Descriptions } from 'antd'
+import { Descriptions, Steps } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import WorkItemSteps from './work-item-steps'
 
 const { Item } = Descriptions
 
@@ -13,6 +14,7 @@ export interface WorkItemDetailsProps {
 
 const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
   if (!workItem) return null
+
   return (
     <>
       <Descriptions>
@@ -67,18 +69,9 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
         <Item label="Updated">
           {dayjs(workItem.lastModified).format('MMM D, YYYY @ h:mm A')}
         </Item>
-        {/* TODO: convert this to a timeline with other status milestones */}
-        {workItem.activatedTimestamp && (
-          <Item label="Activated">
-            {dayjs(workItem.activatedTimestamp).format('MMM D, YYYY @ h:mm A')}
-          </Item>
-        )}
-        {workItem.doneTimestamp && (
-          <Item label="Done">
-            {dayjs(workItem.doneTimestamp).format('MMM D, YYYY @ h:mm A')}
-          </Item>
-        )}
       </Descriptions>
+      <br />
+      <WorkItemSteps workItem={workItem} />
     </>
   )
 }
