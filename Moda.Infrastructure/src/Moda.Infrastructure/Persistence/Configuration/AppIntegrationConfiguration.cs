@@ -62,5 +62,11 @@ public class AzureDevOpsBoardsConnectionConfig : IEntityTypeConfiguration<AzureD
                 wb.OwnsOne(w => w.IntegrationState);
             });
         });
+
+        builder.OwnsOne(c => c.TeamConfiguration, ownedBuilder =>
+        {
+            ownedBuilder.ToJson();
+            ownedBuilder.OwnsMany(conf => conf.WorkspaceTeams);
+        });
     }
 }

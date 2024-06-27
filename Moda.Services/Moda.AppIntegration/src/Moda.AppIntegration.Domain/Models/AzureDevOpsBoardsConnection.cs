@@ -1,22 +1,26 @@
-﻿using Moda.Common.Domain.Models;
+﻿using Moda.Common.Application.Interfaces.ExternalWork;
+using Moda.Common.Domain.Models;
 
 namespace Moda.AppIntegration.Domain.Models;
-public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsConnectionConfiguration>
+public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsConnectionConfiguration, AzureDevOpsBoardsTeamConfiguration>
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     private AzureDevOpsBoardsConnection() { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-    private AzureDevOpsBoardsConnection(string name, string? description, AzureDevOpsBoardsConnectionConfiguration configuration, bool configurationIsValid)
+    private AzureDevOpsBoardsConnection(string name, string? description, AzureDevOpsBoardsConnectionConfiguration configuration, bool configurationIsValid, AzureDevOpsBoardsTeamConfiguration? teamConfiguration)
     {
         Name = name;
         Description = description;
         Connector = Connector.AzureDevOpsBoards;
         Configuration = Guard.Against.Null(configuration, nameof(Configuration));
         IsValidConfiguration = configurationIsValid;
+        TeamConfiguration = teamConfiguration ?? AzureDevOpsBoardsTeamConfiguration.CreateEmpty();
     }
 
     public override AzureDevOpsBoardsConnectionConfiguration Configuration { get; protected set; }
+
+    public override AzureDevOpsBoardsTeamConfiguration TeamConfiguration { get; protected set; }
 
     public override bool HasActiveIntegrationObjects => IsValidConfiguration
         && (Configuration.WorkProcesses.Any(p => p.IntegrationIsActive)
@@ -27,8 +31,8 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         try
         {
             Guard.Against.Null(Configuration, nameof(Configuration));
-            Guard.Against.Null(organization, nameof(organization));
-            Guard.Against.Null(personalAccessToken, nameof(personalAccessToken));
+            Guard.Against.NullOrWhiteSpace(organization, nameof(organization));
+            Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
 
             Name = name;
             Description = description;
@@ -153,6 +157,27 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         }
     }
 
+    public Result SyncTeams(List<IExternalTeam> teams)
+    {
+        try
+        {
+            TeamConfiguration ??= AzureDevOpsBoardsTeamConfiguration.CreateEmpty();
+
+            foreach (var team in teams)
+            {
+                var result = TeamConfiguration.UpsertWorkspaceTeam(team.WorkspaceId, team.Id, team.Name);
+                if (result.IsFailure)
+                    return result;
+            }
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
     public Result UpdateWorkProcessIntegrationState(IntegrationRegistration<Guid, Guid> registration, Instant timestamp)
     {
         try
@@ -207,9 +232,9 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         }
     }
 
-    public static AzureDevOpsBoardsConnection Create(string name, string? description, AzureDevOpsBoardsConnectionConfiguration configuration, bool configurationIsValid, Instant timestamp)
+    public static AzureDevOpsBoardsConnection Create(string name, string? description, AzureDevOpsBoardsConnectionConfiguration configuration, bool configurationIsValid, AzureDevOpsBoardsTeamConfiguration? teamConfiguration, Instant timestamp)
     {
-        var connector = new AzureDevOpsBoardsConnection(name, description, configuration, configurationIsValid);
+        var connector = new AzureDevOpsBoardsConnection(name, description, configuration, configurationIsValid, teamConfiguration);
         connector.AddDomainEvent(EntityCreatedEvent.WithEntity(connector, timestamp));
         return connector;
     }

@@ -102,6 +102,19 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         return Result.Success(result.Value.ToAzdoWorkspaces().ToList<IExternalWorkspace>());
     }
 
+    public async Task<Result<List<IExternalTeam>>> GetTeams(string organizationUrl, string token, Guid[] projectIds, CancellationToken cancellationToken)
+    {
+        var projectService = GetService<ProjectService>(organizationUrl, token);
+
+        var result = await projectService.GetTeams(projectIds, cancellationToken);
+        if (result.IsFailure)
+            return Result.Failure<List<IExternalTeam>>(result.Error);
+
+        _logger.LogDebug("{TeamCount} teams found for organization {organizationUrl}.", result.Value.Count, organizationUrl);
+
+        return Result.Success(result.Value);
+    }
+
     public async Task<Result<List<IExternalWorkItem>>> GetWorkItems(string organizationUrl, string token, string projectName, DateTime lastChangedDate, string[] workItemTypes, CancellationToken cancellationToken)
     {
         var projectService = GetService<ProjectService>(organizationUrl, token);

@@ -3,38 +3,39 @@
 namespace Moda.AppIntegration.Application.Connections.Dtos;
 public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<AzureDevOpsBoardsConnection>
 {
-    /// <summary>Gets the identifier.</summary>
-    /// <value>The identifier.</value>
+    /// <summary>
+    /// The unique identifier for the connection.
+    /// </summary>
     public Guid Id { get; set; }
 
-    /// <summary>Gets or sets the name of the connection.</summary>
-    /// <value>The name of the connection.</value>
+    /// <summary>
+    /// The name of the connection.
+    /// </summary>
     public required string Name { get; set; }
 
-    /// <summary>Gets or sets the description.</summary>
-    /// <value>The connection description.</value>
+    /// <summary>
+    /// The connection description.
+    /// </summary>
     public string? Description { get; set; }
 
-    /// <summary>Gets the type of connector.  This value cannot change.</summary>
-    /// <value>The type of connector.</value>
+    /// <summary>
+    /// The type of connector for the connection.  This value cannot be changed once set.
+    /// </summary>
     public required string Connector { get; set; }
 
-    /// <summary>Gets the configuration.</summary>
-    /// <value>The configuration.</value>
+    /// <summary>
+    /// The configuration for the connection.
+    /// </summary>
     public required AzureDevOpsBoardsConnectionConfigurationDto Configuration { get; set; }
 
     /// <summary>
     /// Indicates whether the connection is active or not.  Inactive connections are not included in the synchronization process.
     /// </summary>
-    /// <value><c>true</c> if this instance is active; otherwise, <c>false</c>.</value>
     public bool IsActive { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether this instance has a valid configuration.
+    /// A flag indicating whether the connection configuration is valid.
     /// </summary>
-    /// <value>
-    ///   <c>true</c> if this instance is valid configuration; otherwise, <c>false</c>.
-    /// </value>
     public bool IsValidConfiguration { get; set; }
 
     /// <summary>
