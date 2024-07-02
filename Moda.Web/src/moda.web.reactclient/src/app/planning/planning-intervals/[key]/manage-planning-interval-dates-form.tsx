@@ -8,9 +8,7 @@ import {
   Form,
   Input,
   Modal,
-  Radio,
   Select,
-  Space,
   message,
 } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
@@ -30,7 +28,7 @@ import {
 import dayjs from 'dayjs'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 
-const { Item } = Form
+const { Item, List } = Form
 
 export interface ManagePlanningIntervalDatesFormProps {
   showForm: boolean
@@ -235,7 +233,7 @@ const ManagePlanningIntervalDatesForm = ({
           </Item>
 
           <Divider orientation="left">Iterations</Divider>
-          <Form.List name="iterations">
+          <List name="iterations">
             {(fields, { add, remove }) => (
               <>
                 {fields.map(({ key, name, ...restField }) => (
@@ -315,7 +313,7 @@ const ManagePlanningIntervalDatesForm = ({
                 </Item>
               </>
             )}
-          </Form.List>
+          </List>
         </Form>
       </Modal>
     </>
