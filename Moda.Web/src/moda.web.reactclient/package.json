@@ -39,7 +39,7 @@
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@reduxjs/toolkit": "2.2.5",
-    "ag-grid-community": "31.3.2",
+    "ag-grid-community": "32.0.1",
     "ag-grid-react": "31.3.2",
     "antd": "5.18.1",
     "apexcharts": "3.49.1",
