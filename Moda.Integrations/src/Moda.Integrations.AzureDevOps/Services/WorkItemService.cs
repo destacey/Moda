@@ -58,15 +58,24 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
         }
     }
 
-    public async Task<Result<int[]>> GetDeletedWorkItemIds(string projectName, CancellationToken cancellationToken)
+    public async Task<Result<int[]>> GetDeletedWorkItemIds(string projectName, DateTime lastChangedDate, CancellationToken cancellationToken)
     {
         try
         {
             int[] workItemIds = await _workItemClient.GetDeletedWorkItemIds(projectName, cancellationToken);
 
-            _logger.LogDebug("{WorkItemIdCount} deleted work item ids found for project {Project}", workItemIds.Length, projectName);
+            // TODO: make this configurable and better.
+            // We are trying to solve for the scenario where a work item is synced, but then later
+            // changes to a work item type that is not being synced.
+            int[] noneSyncedIds = await _workItemClient.GetWorkItemIds(projectName, lastChangedDate, ["Task", "Issue"], cancellationToken);
 
-            return Result.Success(workItemIds);
+            int[] deletedWorkItemIds = new int[workItemIds.Length + noneSyncedIds.Length];
+            Array.Copy(workItemIds, 0, deletedWorkItemIds, 0, workItemIds.Length);
+            Array.Copy(noneSyncedIds, 0, deletedWorkItemIds, workItemIds.Length, noneSyncedIds.Length);
+
+            _logger.LogDebug("{WorkItemIdCount} deleted work item ids found for project {Project}", deletedWorkItemIds.Length, projectName);
+
+            return Result.Success(deletedWorkItemIds);
         }
         catch (Exception ex)
         {
