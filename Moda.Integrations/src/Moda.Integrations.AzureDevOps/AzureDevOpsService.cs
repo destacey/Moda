@@ -132,11 +132,11 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
             : Result.Failure<List<IExternalWorkItem>>(result.Error);
     }
 
-    public async Task<Result<int[]>> GetDeletedWorkItemIds(string organizationUrl, string token, string projectName, CancellationToken cancellationToken)
+    public async Task<Result<int[]>> GetDeletedWorkItemIds(string organizationUrl, string token, string projectName, DateTime lastChangedDate, CancellationToken cancellationToken)
     {
         var workItemService = GetService<WorkItemService>(organizationUrl, token);
 
-        var result = await workItemService.GetDeletedWorkItemIds(projectName, cancellationToken);
+        var result = await workItemService.GetDeletedWorkItemIds(projectName, lastChangedDate, cancellationToken);
 
         return result.IsSuccess
             ? Result.Success(result.Value)
