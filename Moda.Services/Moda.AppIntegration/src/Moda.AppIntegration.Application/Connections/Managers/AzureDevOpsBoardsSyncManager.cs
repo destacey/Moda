@@ -8,6 +8,7 @@ using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.Workflows.Dtos;
 using Moda.Work.Application.WorkStatuses.Commands;
 using Moda.Work.Application.WorkTypes.Commands;
+using Moda.Work.Domain.Models;
 using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
@@ -122,14 +123,21 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
                         try
                         {
-                            var syncWorkItemsResult = await SyncWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, syncType, workspace.IntegrationState!.InternalId, workspace.Name, cancellationToken);
+                            var lastChangedDate = syncType switch
+                            {
+                                SyncType.Full => new DateTime(1900, 01, 01),
+                                SyncType.Differential => await GetWorkspaceMostRecentChangeDate(_sender, workspace.IntegrationState!.InternalId, cancellationToken),
+                                _ => new DateTime(1900, 01, 01)
+                            };
+
+                            var syncWorkItemsResult = await SyncWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, lastChangedDate, workspace.IntegrationState!.InternalId, workspace.Name, cancellationToken);
                             if (syncWorkItemsResult.IsFailure)
                             {
                                 _logger.LogError("An error occurred while syncing Azure DevOps Boards workspace {WorkspaceId} work items. Error: {Error}", workspace.IntegrationState!.InternalId, syncWorkItemsResult.Error);
                                 continue;
                             }
 
-                            var syncDeletedWorkItemsResult = await SyncDeletedWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workspace.IntegrationState!.InternalId, workspace.Name, cancellationToken);
+                            var syncDeletedWorkItemsResult = await SyncDeletedWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workspace.IntegrationState!.InternalId, workspace.Name, lastChangedDate, cancellationToken);
                             if (syncDeletedWorkItemsResult.IsFailure)
                             {
                                 _logger.LogError("An error occurred while syncing Azure DevOps Boards workspace {WorkspaceId} deleted work items. Error: {Error}", workspace.IntegrationState!.InternalId, syncDeletedWorkItemsResult.Error);
@@ -150,6 +158,14 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
             _logger.LogInformation("Synced {ActiveWorkProcessesSyncedCount} of {ActiveWorkProcessesCount} active work processes and {ActiveWorkspacesSyncedCount} of {ActiveWorkspacesCount} active workspaces for {ActiveConnectionsCount} active Azure DevOps Boards connections.", activeWorkProcessesSyncedCount, activeWorkProcessesCount, activeWorkspacesSyncedCount, activeWorkspacesCount, activeConnectionsCount);
 
             return Result.Success();
+
+            static async Task<DateTime> GetWorkspaceMostRecentChangeDate(ISender sender, Guid workspaceId, CancellationToken cancellationToken)
+            {
+                var result = await sender.Send(new GetWorkspaceMostRecentChangeDateQuery(workspaceId), cancellationToken);
+                return result.IsSuccess && result.Value != null
+                    ? ((Instant)result.Value).ToDateTimeUtc()
+                    : new DateTime(1900, 01, 01);
+            }
         }
         catch (Exception ex)
         {
@@ -249,7 +265,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
             : updateResult;
     }
 
-    private async Task<Result> SyncWorkItems(string organizationUrl, string personalAccessToken, SyncType syncType, Guid workspaceId, string azdoWorkspaceName, CancellationToken cancellationToken)
+    private async Task<Result> SyncWorkItems(string organizationUrl, string personalAccessToken, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
         Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
@@ -258,13 +274,6 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         var workTypesResult = await _sender.Send(new GetWorkspaceWorkTypesQuery(workspaceId), cancellationToken);
         if (workTypesResult.IsFailure)
             return workTypesResult.ConvertFailure();
-
-        var lastChangedDate = syncType switch
-        {
-            SyncType.Full => new DateTime(1900, 01, 01),
-            SyncType.Differential => await GetWorkspaceMostRecentChangeDate(_sender, workspaceId, cancellationToken),
-            _ => new DateTime(1900, 01, 01)
-        };        
 
         var workItemsResult = await _azureDevOpsService.GetWorkItems(organizationUrl, personalAccessToken, azdoWorkspaceName, lastChangedDate, workTypesResult.Value.Select(t => t.Name).ToArray(), cancellationToken);
         if (workItemsResult.IsFailure)
@@ -280,23 +289,15 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         return syncWorkItemsResult.IsSuccess
             ? Result.Success()
             : syncWorkItemsResult;
-        
-        static async Task<DateTime> GetWorkspaceMostRecentChangeDate(ISender sender, Guid workspaceId, CancellationToken cancellationToken)
-        {
-            var result = await sender.Send(new GetWorkspaceMostRecentChangeDateQuery(workspaceId), cancellationToken);
-            return result.IsSuccess && result.Value != null
-                ? ((Instant)result.Value).ToDateTimeUtc()
-                : new DateTime(1900, 01, 01);
-        }
     }
 
-    private async Task<Result> SyncDeletedWorkItems(string organizationUrl, string personalAccessToken, Guid workspaceId, string azdoWorkspaceName, CancellationToken cancellationToken)
+    private async Task<Result> SyncDeletedWorkItems(string organizationUrl, string personalAccessToken, Guid workspaceId, string azdoWorkspaceName, DateTime lastChangedDate, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
         Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
         Guard.Against.Default(workspaceId, nameof(workspaceId));
 
-        var getDeletedWorkItemIdsResult = await _azureDevOpsService.GetDeletedWorkItemIds(organizationUrl, personalAccessToken, azdoWorkspaceName, cancellationToken);
+        var getDeletedWorkItemIdsResult = await _azureDevOpsService.GetDeletedWorkItemIds(organizationUrl, personalAccessToken, azdoWorkspaceName, lastChangedDate, cancellationToken);
         if (getDeletedWorkItemIdsResult.IsFailure)
             return getDeletedWorkItemIdsResult.ConvertFailure();
 
