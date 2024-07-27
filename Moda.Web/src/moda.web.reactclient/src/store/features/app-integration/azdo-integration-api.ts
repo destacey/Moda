@@ -1,11 +1,16 @@
 import {
   AzureDevOpsBoardsConnectionDetailsDto,
-  AzureDevOpsBoardsTeamConfigurationDto,
+  AzureDevOpsBoardsWorkspaceTeamDto,
   ConnectionListDto,
 } from '@/src/services/moda-api'
 import { apiSlice } from '../apiSlice'
 import { getAzureDevOpsBoardsConnectionsClient } from '@/src/services/clients'
 import { QueryTags } from '../query-tags'
+
+export interface GetAzdoConnectionTeamsRequest {
+  connectionId: string
+  workspaceId: string | null
+}
 
 export const azdoIntegrationApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -46,14 +51,14 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
       ],
     }),
     getAzdoConnectionTeams: builder.query<
-      AzureDevOpsBoardsTeamConfigurationDto,
-      string
+      AzureDevOpsBoardsWorkspaceTeamDto[],
+      GetAzdoConnectionTeamsRequest
     >({
-      queryFn: async (connectionId: string) => {
+      queryFn: async (request: GetAzdoConnectionTeamsRequest) => {
         try {
           const data = await (
             await getAzureDevOpsBoardsConnectionsClient()
-          ).getTeams(connectionId)
+          ).getConnectionTeams(request.connectionId, request.workspaceId)
           return { data }
         } catch (error) {
           console.error('Error:', error)
@@ -61,7 +66,11 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result, error, arg) => [
-        { type: QueryTags.AzdoConnectionTeams, id: arg }, // typically arg is the key
+        QueryTags.AzdoConnectionTeams,
+        ...result.map(({ teamId }) => ({
+          type: QueryTags.AzdoConnectionTeams,
+          teamId,
+        })),
       ],
     }),
   }),

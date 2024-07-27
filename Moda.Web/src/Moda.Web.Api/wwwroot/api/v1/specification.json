@@ -7416,7 +7416,7 @@
           "AzureDevOpsBoardsConnections"
         ],
         "summary": "Get Azure DevOps Boards connection teams based on id.",
-        "operationId": "AzureDevOpsBoardsConnections_GetTeams",
+        "operationId": "AzureDevOpsBoardsConnections_GetConnectionTeams",
         "parameters": [
           {
             "name": "id",
@@ -7429,6 +7429,17 @@
               "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 1
+          },
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
           }
         ],
         "responses": {
@@ -7437,7 +7448,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AzureDevOpsBoardsTeamConfigurationDto"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AzureDevOpsBoardsWorkspaceTeamDto"
+                  }
                 }
               }
             }
@@ -7448,16 +7462,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -11452,18 +11456,6 @@
             "maxLength": 128,
             "minLength": 1,
             "nullable": false
-          }
-        }
-      },
-      "AzureDevOpsBoardsTeamConfigurationDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "workspaceTeams": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AzureDevOpsBoardsWorkspaceTeamDto"
-            }
           }
         }
       },

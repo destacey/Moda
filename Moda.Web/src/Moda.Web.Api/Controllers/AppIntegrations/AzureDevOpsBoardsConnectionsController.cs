@@ -149,14 +149,11 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [OpenApiOperation("Get Azure DevOps Boards connection teams based on id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<AzureDevOpsBoardsTeamConfigurationDto>> GetTeams(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<List<AzureDevOpsBoardsWorkspaceTeamDto>>> GetConnectionTeams(Guid id, Guid? workspaceId, CancellationToken cancellationToken)
     {
-        var teamConfiguration = await _sender.Send(new GetAzureDevOpsBoardsConnectionTeamsQuery(id), cancellationToken);
+        var teams = await _sender.Send(new GetAzureDevOpsBoardsConnectionTeamsQuery(id, workspaceId), cancellationToken);
 
-        return teamConfiguration is not null
-            ? Ok(teamConfiguration)
-            : NotFound();
+        return teams;
     }
 
     [HttpPost("test")]

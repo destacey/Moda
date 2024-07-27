@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace Moda.AppIntegration.Application.Connections.Queries;
-public sealed record GetAzureDevOpsBoardsConnectionTeamsQuery(Guid ConnectionId) : IQuery<AzureDevOpsBoardsTeamConfigurationDto?>;
+public sealed record GetAzureDevOpsBoardsConnectionTeamsQuery(Guid ConnectionId, Guid? WorkspaceId = null) : IQuery<List<AzureDevOpsBoardsWorkspaceTeamDto>>;
 
-internal sealed class GetAzureDevOpsBoardsConnectionTeamsQueryHandler : IQueryHandler<GetAzureDevOpsBoardsConnectionTeamsQuery, AzureDevOpsBoardsTeamConfigurationDto?>
+internal sealed class GetAzureDevOpsBoardsConnectionTeamsQueryHandler : IQueryHandler<GetAzureDevOpsBoardsConnectionTeamsQuery, List<AzureDevOpsBoardsWorkspaceTeamDto>>
 {
     private readonly IAppIntegrationDbContext _appIntegrationDbContext;
     private readonly ILogger<GetAzureDevOpsBoardsConnectionTeamsQueryHandler> _logger;
@@ -15,19 +15,21 @@ internal sealed class GetAzureDevOpsBoardsConnectionTeamsQueryHandler : IQueryHa
         _logger = logger;
     }
 
-    public async Task<AzureDevOpsBoardsTeamConfigurationDto?> Handle(GetAzureDevOpsBoardsConnectionTeamsQuery request, CancellationToken cancellationToken)
+    public async Task<List<AzureDevOpsBoardsWorkspaceTeamDto>> Handle(GetAzureDevOpsBoardsConnectionTeamsQuery request, CancellationToken cancellationToken)
     {
-        var teamConfiguration = await _appIntegrationDbContext.AzureDevOpsBoardsConnections
-            .AsNoTracking()
+        var query = _appIntegrationDbContext.AzureDevOpsBoardsConnections
             .Where(c => c.Id == request.ConnectionId)
-            .Select(c => c.TeamConfiguration)
-            .ProjectToType<AzureDevOpsBoardsTeamConfigurationDto>()
-            .FirstOrDefaultAsync(cancellationToken);
+            .SelectMany(c => c.TeamConfiguration.WorkspaceTeams);
 
-        return teamConfiguration;
+        if (request.WorkspaceId.HasValue)
+        {
+            query = query.Where(t => t.WorkspaceId == request.WorkspaceId);
+        }
 
-        //return connection?.Adapt<AzureDevOpsBoardsConnectionDetailsDto>();
+        var teams = await query
+            .ProjectToType<AzureDevOpsBoardsWorkspaceTeamDto>()
+            .ToListAsync(cancellationToken);
 
-        // TODO: using ProjectTo is not working with the JSON Column - .ProjectToType<AzureDevOpsBoardsConnectionDetailsDto>()
+        return teams;
     }
 }
