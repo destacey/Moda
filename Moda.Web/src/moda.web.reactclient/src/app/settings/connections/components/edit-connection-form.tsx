@@ -1,3 +1,5 @@
+'use client'
+
 import useAuth from '@/src/app/components/contexts/auth'
 import {
   AzureDevOpsBoardsConnectionDetailsDto,
@@ -6,9 +8,9 @@ import {
 } from '@/src/services/moda-api'
 import {
   testAzdoBoardsConfiguration,
-  useGetAzdoBoardsConnectionById,
   useUpdateAzdoBoardsConnectionMutation,
 } from '@/src/services/queries/app-integration-queries'
+import { useGetAzdoConnectionByIdQuery } from '@/src/store/features/app-integration/azdo-integration-api'
 import { toFormErrors } from '@/src/utils'
 import { Button, Divider, Form, Input, Modal, Typography, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
@@ -58,7 +60,7 @@ const EditConnectionForm = ({
     useState<string>()
   const [isTestingConfiguration, setTestingConfiguration] = useState(false)
 
-  const { data: connectionData } = useGetAzdoBoardsConnectionById(id)
+  const { data: connectionData } = useGetAzdoConnectionByIdQuery(id)
   const updateConnection = useUpdateAzdoBoardsConnectionMutation()
 
   const { hasClaim } = useAuth()

@@ -12,26 +12,6 @@ import {
 } from '../moda-api'
 
 // AzDO BOARDS CONNECTIONS
-export const useGetAzdoBoardsConnections = (
-  includeDisabled: boolean = false,
-) => {
-  return useQuery({
-    queryKey: [QK.AZDO_BOARDS_CONNECTIONS, includeDisabled],
-    queryFn: async () =>
-      (await getAzureDevOpsBoardsConnectionsClient()).getList(includeDisabled),
-    staleTime: 60000,
-  })
-}
-
-export const useGetAzdoBoardsConnectionById = (id: string) => {
-  return useQuery({
-    queryKey: [QK.AZDO_BOARDS_CONNECTIONS, id],
-    queryFn: async () =>
-      (await getAzureDevOpsBoardsConnectionsClient()).getById(id),
-    staleTime: 60000,
-    enabled: !!id,
-  })
-}
 
 export const useCreateAzdoBoardsConnectionMutation = () => {
   const queryClient = useQueryClient()

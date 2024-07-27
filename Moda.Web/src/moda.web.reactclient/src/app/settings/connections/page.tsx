@@ -5,13 +5,13 @@ import { ModaGrid, PageActions, PageTitle } from '../../components/common'
 import { authorizePage } from '../../components/hoc'
 import { useDocumentTitle } from '../../hooks'
 import useAuth from '../../components/contexts/auth'
-import { useGetAzdoBoardsConnections } from '@/src/services/queries/app-integration-queries'
 import { Space, Switch } from 'antd'
 import CreateConnectionForm from './components/create-connection-form'
 import Link from 'next/link'
 import { ConnectionListDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import { ItemType } from 'antd/es/menu/interface'
+import { useGetAzdoConnectionsQuery } from '@/src/store/features/app-integration/azdo-integration-api'
 
 const ConnectionLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/settings/connections/${data.id}`}>{value}</Link>
@@ -22,11 +22,13 @@ const ConnectionsPage = () => {
   const [openCreateConnectionForm, setOpenCreateConnectionForm] =
     useState(false)
   const [includeDisabled, setIncludeDisabled] = useState(false)
+
   const {
     data: connectionsData,
     isLoading,
+    error,
     refetch,
-  } = useGetAzdoBoardsConnections(includeDisabled)
+  } = useGetAzdoConnectionsQuery(includeDisabled)
 
   const { hasClaim } = useAuth()
   const canCreateConnection = hasClaim(

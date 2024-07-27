@@ -41,6 +41,7 @@ const AzdoBoardsOrganization = (props: AzdoBoardsOrganizationProps) => {
             <Tabs
               tabPosition="left"
               items={props.workProcesses
+                .slice() // array is likely in strict mode. clone the array to avoid sorting the original
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((p) => {
                   return {
