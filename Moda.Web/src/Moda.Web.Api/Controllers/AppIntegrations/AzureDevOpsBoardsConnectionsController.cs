@@ -144,6 +144,21 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet("{id}/teams")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
+    [OpenApiOperation("Get Azure DevOps Boards connection teams based on id.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<AzureDevOpsBoardsTeamConfigurationDto>> GetTeams(Guid id, CancellationToken cancellationToken)
+    {
+        var teamConfiguration = await _sender.Send(new GetAzureDevOpsBoardsConnectionTeamsQuery(id), cancellationToken);
+
+        return teamConfiguration is not null
+            ? Ok(teamConfiguration)
+            : NotFound();
+    }
+
     [HttpPost("test")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
     [OpenApiOperation("Test Azure DevOps Boards connection configuration.", "")]

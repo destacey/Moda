@@ -7410,6 +7410,66 @@
         ]
       }
     },
+    "/api/app-integrations/azure-devops-boards-connections/{id}/teams": {
+      "get": {
+        "tags": [
+          "AzureDevOpsBoardsConnections"
+        ],
+        "summary": "Get Azure DevOps Boards connection teams based on id.",
+        "operationId": "AzureDevOpsBoardsConnections_GetTeams",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AzureDevOpsBoardsTeamConfigurationDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/app-integrations/azure-devops-boards-connections/test": {
       "post": {
         "tags": [
@@ -11392,6 +11452,45 @@
             "maxLength": 128,
             "minLength": 1,
             "nullable": false
+          }
+        }
+      },
+      "AzureDevOpsBoardsTeamConfigurationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceTeams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AzureDevOpsBoardsWorkspaceTeamDto"
+            }
+          }
+        }
+      },
+      "AzureDevOpsBoardsWorkspaceTeamDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamName": {
+            "type": "string"
+          },
+          "internalTeamId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           }
         }
       },

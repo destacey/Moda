@@ -2,6 +2,9 @@ export enum QueryTags {
   // ADMIN
   BackgroundJob = 'Admin.BackgroundJob',
   BackgroundJobType = 'Admin.BackgroundJobType',
+  // APP INTEGRATION
+  AzdoConnectionTeams = 'AppIntegration.AzdoConnectionTeams',
+  Connections = 'AppIntegration.Connections',
   // PLANNING
   PlanningInterval = 'Planning.PlanningInterval',
   PlanningIntervalObjective = 'Planning.PlanningIntervalObjective',
