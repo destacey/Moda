@@ -1,4 +1,5 @@
-﻿using Moda.AppIntegration.Application.Interfaces;
+﻿using CSharpFunctionalExtensions;
+using Moda.AppIntegration.Application.Interfaces;
 using Moda.AppIntegration.Domain.Models;
 using Moda.Common.Application.Interfaces;
 using Moda.Web.Api.Models.AppIntegrations.Connections;
@@ -161,14 +162,16 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [OpenApiOperation("Update Azure DevOps connection team mappings.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<List<AzureDevOpsBoardsWorkspaceTeamDto>>> MapConnectionTeams(Guid id, [FromBody] AzdoConnectionTeamMappingRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> MapConnectionTeams(Guid id, [FromBody] AzdoConnectionTeamMappingsRequest request, CancellationToken cancellationToken)
     {
         if (id != request.ConnectionId)
             return BadRequest();
 
-        //var teams = await _sender.Send(new GetAzureDevOpsBoardsConnectionTeamsQuery(id, workspaceId), cancellationToken);
+        var result = await _sender.Send(request.ToUpdateAzureDevOpsConnectionTeamMappingsCommand(), cancellationToken);
 
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "AzureDevOpsBoardsConnectionsController.MapConnectionTeams"));
     }
 
     [HttpPost("test")]

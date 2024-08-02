@@ -8795,7 +8795,7 @@ export class AzureDevOpsBoardsConnectionsClient {
     /**
      * Update Azure DevOps connection team mappings.
      */
-    mapConnectionTeams(id: string, request: AzdoConnectionTeamMappingRequest, cancelToken?: CancelToken): Promise<void> {
+    mapConnectionTeams(id: string, request: AzdoConnectionTeamMappingsRequest, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/teams";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -10433,7 +10433,7 @@ export interface AzureDevOpsBoardsWorkspaceTeamDto {
     internalTeamId?: string | undefined;
 }
 
-export interface AzdoConnectionTeamMappingRequest {
+export interface AzdoConnectionTeamMappingsRequest {
     /** The unique identifer for the connection. */
     connectionId: string;
     /** List of team mappings. */

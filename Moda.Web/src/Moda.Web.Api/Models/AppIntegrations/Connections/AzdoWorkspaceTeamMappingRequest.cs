@@ -16,6 +16,11 @@ public sealed record AzdoWorkspaceTeamMappingRequest
     /// The unique identifier for the team within Moda.
     /// </summary>
     public Guid? InternalTeamId { get; set; }
+
+    public AzureDevOpsWorkspaceTeamMappingDto ToAzureDevOpsWorkspaceTeamMappingDto()
+    {
+        return new AzureDevOpsWorkspaceTeamMappingDto(WorkspaceId, TeamId, InternalTeamId);
+    }
 }
 
 public sealed class AzdoWorkspaceTeamMappingRequestValidator : CustomValidator<AzdoWorkspaceTeamMappingRequest>
@@ -29,5 +34,9 @@ public sealed class AzdoWorkspaceTeamMappingRequestValidator : CustomValidator<A
 
         RuleFor(t => t.TeamId)
             .NotEmpty();
+
+        When(t => t.InternalTeamId.HasValue, 
+            () => RuleFor(t => t.InternalTeamId)
+                .NotEmpty());
     }
 }

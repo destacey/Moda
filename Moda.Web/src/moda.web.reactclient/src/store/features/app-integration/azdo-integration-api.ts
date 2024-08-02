@@ -1,5 +1,5 @@
 import {
-  AzdoConnectionTeamMappingRequest,
+  AzdoConnectionTeamMappingsRequest,
   AzureDevOpsBoardsConnectionDetailsDto,
   AzureDevOpsBoardsWorkspaceTeamDto,
   ConnectionListDto,
@@ -68,15 +68,15 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         QueryTags.AzdoConnectionTeams,
-        ...result.map(({ teamId }) => ({
+        ...result.map(() => ({
           type: QueryTags.AzdoConnectionTeams,
-          teamId,
+          id: arg.connectionId,
         })),
       ],
     }),
     mapAzdoConnectionTeams: builder.mutation<
       void,
-      AzdoConnectionTeamMappingRequest
+      AzdoConnectionTeamMappingsRequest
     >({
       queryFn: async (request) => {
         try {
