@@ -146,7 +146,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
 
     [HttpGet("{id}/teams")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
-    [OpenApiOperation("Get Azure DevOps Boards connection teams based on id.", "")]
+    [OpenApiOperation("Get Azure DevOps connection teams based on id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<List<AzureDevOpsBoardsWorkspaceTeamDto>>> GetConnectionTeams(Guid id, Guid? workspaceId, CancellationToken cancellationToken)
@@ -154,6 +154,21 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
         var teams = await _sender.Send(new GetAzureDevOpsBoardsConnectionTeamsQuery(id, workspaceId), cancellationToken);
 
         return teams;
+    }
+
+    [HttpPost("{id}/teams")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
+    [OpenApiOperation("Update Azure DevOps connection team mappings.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<List<AzureDevOpsBoardsWorkspaceTeamDto>>> MapConnectionTeams(Guid id, [FromBody] AzdoConnectionTeamMappingRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.ConnectionId)
+            return BadRequest();
+
+        //var teams = await _sender.Send(new GetAzureDevOpsBoardsConnectionTeamsQuery(id, workspaceId), cancellationToken);
+
+        return NoContent();
     }
 
     [HttpPost("test")]

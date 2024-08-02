@@ -72,7 +72,7 @@ const SetWorkspaceExternalUrlTemplatesForm = (
   ): Promise<boolean> => {
     try {
       const request = mapToRequestValues(props.workspaceId, values)
-      var response = await setWorkspaceExternalUrlTemplatesMutation(request)
+      const response = await setWorkspaceExternalUrlTemplatesMutation(request)
       if (response.error) {
         throw response.error
       }

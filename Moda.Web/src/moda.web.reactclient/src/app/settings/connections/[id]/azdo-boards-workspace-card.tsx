@@ -2,7 +2,7 @@
 
 import { AzureDevOpsBoardsWorkspaceDto } from '@/src/services/moda-api'
 import { AppstoreAddOutlined, ExportOutlined } from '@ant-design/icons'
-import { Button, Card, Descriptions, Typography } from 'antd'
+import { Button, Card, Descriptions, message, Typography } from 'antd'
 import Link from 'next/link'
 import { useContext, useState } from 'react'
 import InitWorkspaceIntegrationForm from '../components/init-workspace-integration-form'
@@ -24,6 +24,7 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
   ] = useState<boolean>(false)
   const [openMapAzdoWorkspaceTeamsForm, setOpenMapAzdoWorkspaceTeamsForm] =
     useState<boolean>(false)
+  const [messageApi, contextHolder] = message.useMessage()
 
   const onInitWorkspaceFormClosed = (wasSaved: boolean) => {
     setOpenInitWorkspaceIntegrationForm(false)
@@ -37,6 +38,7 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
 
   return (
     <>
+      {contextHolder}
       <Card
         data-testid={props.workspace.externalId}
         size="small"
@@ -99,6 +101,7 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
           workspaceName={props.workspace.name}
           onFormSave={() => onOpenMapAzdoWorkspaceTeamsForm(false)}
           onFormCancel={() => onOpenMapAzdoWorkspaceTeamsForm(false)}
+          messageApi={messageApi}
         />
       )}
     </>

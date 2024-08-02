@@ -1,4 +1,5 @@
 import {
+  AzdoConnectionTeamMappingRequest,
   AzureDevOpsBoardsConnectionDetailsDto,
   AzureDevOpsBoardsWorkspaceTeamDto,
   ConnectionListDto,
@@ -22,7 +23,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
           ).getList(includeDisabled)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -42,7 +43,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
           ).getById(id)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -61,7 +62,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
           ).getConnectionTeams(request.connectionId, request.workspaceId)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -73,6 +74,25 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         })),
       ],
     }),
+    mapAzdoConnectionTeams: builder.mutation<
+      void,
+      AzdoConnectionTeamMappingRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await (
+            await getAzureDevOpsBoardsConnectionsClient()
+          ).mapConnectionTeams(request.connectionId, request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [{ type: QueryTags.AzdoConnectionTeams, id: arg.connectionId }]
+      },
+    }),
   }),
 })
 
@@ -80,4 +100,5 @@ export const {
   useGetAzdoConnectionsQuery,
   useGetAzdoConnectionByIdQuery,
   useGetAzdoConnectionTeamsQuery,
+  useMapAzdoConnectionTeamsMutation,
 } = azdoIntegrationApi

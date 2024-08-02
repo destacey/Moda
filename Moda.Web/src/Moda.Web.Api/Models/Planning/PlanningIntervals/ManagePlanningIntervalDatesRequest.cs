@@ -17,7 +17,7 @@ public sealed record ManagePlanningIntervalDatesRequest
     /// <summary>
     /// The iterations for the Planning Interval.
     /// </summary>
-    public List<PlanningIntervalIterationUpsertRequest> Iterations { get; set; } = new();
+    public List<PlanningIntervalIterationUpsertRequest> Iterations { get; set; } = [];
 
     public ManagePlanningIntervalDatesCommand ToManagePlanningIntervalDatesCommand()
     {
