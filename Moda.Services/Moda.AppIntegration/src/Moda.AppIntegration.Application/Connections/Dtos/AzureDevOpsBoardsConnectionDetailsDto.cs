@@ -29,6 +29,11 @@ public sealed record AzureDevOpsBoardsConnectionDetailsDto : IMapFrom<AzureDevOp
     public required AzureDevOpsBoardsConnectionConfigurationDto Configuration { get; set; }
 
     /// <summary>
+    /// The configuration for the teams associated with the connection.
+    /// </summary>
+    public required AzureDevOpsBoardsTeamConfigurationDto TeamConfiguration { get; set; }
+
+    /// <summary>
     /// Indicates whether the connection is active or not.  Inactive connections are not included in the synchronization process.
     /// </summary>
     public bool IsActive { get; set; }

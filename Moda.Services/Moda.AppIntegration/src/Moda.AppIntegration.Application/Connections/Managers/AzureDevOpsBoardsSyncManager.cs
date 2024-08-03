@@ -8,16 +8,16 @@ using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.Workflows.Dtos;
 using Moda.Work.Application.WorkStatuses.Commands;
 using Moda.Work.Application.WorkTypes.Commands;
-using Moda.Work.Domain.Models;
 using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
 
-public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender) : IAzureDevOpsBoardsSyncManager
+public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IAzureDevOpsBoardsInitManager initManager) : IAzureDevOpsBoardsSyncManager
 {
     private readonly ILogger<AzureDevOpsBoardsSyncManager> _logger = logger;
     private readonly IAzureDevOpsService _azureDevOpsService = azureDevOpsService;
     private readonly ISender _sender = sender;
+    private readonly IAzureDevOpsBoardsInitManager _initManager = initManager;
 
     public async Task<Result> Sync(SyncType syncType, CancellationToken cancellationToken)
     {
@@ -49,6 +49,14 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                     var message = "Cancellation requested. Stopping sync.";
                     _logger.LogInformation(message);
                     return Result.Success();
+                }
+
+                // Do we need to sync the organization configuration or do we just need to sync teams?
+                var syncOrganizationResult = await _initManager.SyncOrganizationConfiguration(connection.Id, cancellationToken);
+                if (syncOrganizationResult.IsFailure)
+                {
+                    _logger.LogError("An error occurred while syncing Azure DevOps Boards organization configuration for connection with ID {ConnectionId}. Error: {Error}", connection.Id, syncOrganizationResult.Error);
+                    continue;
                 }
 
                 var connectionDetails = await _sender.Send(new GetAzureDevOpsBoardsConnectionQuery(connection.Id), cancellationToken);
