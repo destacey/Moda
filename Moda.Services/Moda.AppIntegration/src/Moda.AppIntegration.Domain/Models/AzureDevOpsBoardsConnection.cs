@@ -65,6 +65,9 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 var result = Configuration.RemoveWorkspace(workspace);
                 if (result.IsFailure)
                     return result;
+
+                // remove any teams associated with the workspace
+                var removeTeamsResult = TeamConfiguration.RemoveTeamsForWorkspace(workspace.ExternalId);
             }
 
             // update existing or add new workspaces
@@ -163,12 +166,20 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         {
             TeamConfiguration ??= AzureDevOpsBoardsTeamConfiguration.CreateEmpty();
 
+            var teamsToRemove = TeamConfiguration.WorkspaceTeams
+                .Where(t => !teams.Any(nw => nw.Id == t.TeamId))
+                .Select(t => t.TeamId)
+                .ToArray();
+            var removeResult = TeamConfiguration.RemoveTeams(teamsToRemove);
+            if (removeResult.IsFailure)
+                return removeResult;
+
             foreach (var team in teams)
             {
                 var result = TeamConfiguration.UpsertWorkspaceTeam(team.WorkspaceId, team.Id, team.Name);
                 if (result.IsFailure)
                     return result;
-            }
+            }           
 
             return Result.Success();
         }

@@ -39,8 +39,46 @@ public sealed class AzureDevOpsBoardsTeamConfiguration
         }
     }
 
-    // TODO: Add method to remove workspace team
-    // TODO: Add method to remove workspace
+    /// <summary>
+    /// Removes teams from the configuration.
+    /// </summary>
+    /// <param name="teamIds"></param>
+    /// <returns></returns>
+    public Result RemoveTeams(IEnumerable<Guid> teamIds)
+    {
+        try
+        {
+            if (teamIds is null || !teamIds.Any())
+                return Result.Success();
+
+            WorkspaceTeams.RemoveAll(w => teamIds.Contains(w.TeamId));
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
+    /// <summary>
+    /// Removes teams from the configuration for a specific workspace.
+    /// </summary>
+    /// <param name="workspaceId"></param>
+    /// <returns></returns>
+    public Result RemoveTeamsForWorkspace(Guid workspaceId)
+    {
+        try
+        {
+            WorkspaceTeams.RemoveAll(w => w.WorkspaceId == workspaceId);
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
 
     public static AzureDevOpsBoardsTeamConfiguration CreateEmpty()
     {
