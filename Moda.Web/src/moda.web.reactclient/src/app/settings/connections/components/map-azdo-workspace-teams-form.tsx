@@ -2,7 +2,7 @@
 
 import useAuth from '@/src/app/components/contexts/auth'
 import {
-  AzdoConnectionTeamMappingRequest,
+  AzdoConnectionTeamMappingsRequest,
   AzdoWorkspaceTeamMappingRequest,
   AzureDevOpsBoardsWorkspaceTeamDto,
 } from '@/src/services/moda-api'
@@ -43,7 +43,7 @@ const mapToRequestValues = (
   connectionId: string,
   workspaceId: string,
   values: MapAzdoWorkspaceTeamsFormValues,
-): AzdoConnectionTeamMappingRequest => {
+): AzdoConnectionTeamMappingsRequest => {
   return {
     connectionId: connectionId,
     teamMappings: values.teamMappings.map(
@@ -54,7 +54,7 @@ const mapToRequestValues = (
           internalTeamId: team.internalTeamId,
         }) as AzdoWorkspaceTeamMappingRequest,
     ),
-  } as AzdoConnectionTeamMappingRequest
+  } as AzdoConnectionTeamMappingsRequest
 }
 
 const MapAzdoWorkspaceTeamsForm = (props: MapAzdoWorkspaceTeamsFormProps) => {
