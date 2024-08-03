@@ -62,6 +62,30 @@ public sealed class AzureDevOpsBoardsTeamConfiguration
     }
 
     /// <summary>
+    /// Resets the team configuration for a specific team.  This is a hack because EF/SQL is throwing an exception when we set the InternalTeamId to null.  This seems to happen because the stored procedure paramater value is NULL.  It works when the paramater is bypassed. 
+    /// </summary>
+    /// <param name="teamId"></param>
+    /// <returns></returns>
+    public Result ResetTeam(Guid teamId)
+    {
+        Guard.Against.Default(teamId, nameof(teamId));
+
+        try
+        {
+            var team = WorkspaceTeams.Single(w => w.TeamId == teamId);
+            WorkspaceTeams.Remove(team);
+
+            WorkspaceTeams.Add(new AzureDevOpsBoardsWorkspaceTeam(team.WorkspaceId, team.TeamId, team.TeamName));
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
+    /// <summary>
     /// Removes teams from the configuration for a specific workspace.
     /// </summary>
     /// <param name="workspaceId"></param>
