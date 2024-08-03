@@ -14,5 +14,12 @@ public sealed class AzureDevOpsWorkspaceTeamMappingDtoValidator : CustomValidato
 
         RuleFor(t => t.ExternalTeamId)
             .NotEmpty();
+
+        When(t => t.InternalTeamId.HasValue, () =>
+        {
+            RuleFor(t => t.InternalTeamId)
+                .NotEmpty();
+        });
+        // TODO: Add verification for InternalTeamId.  Example: .MustAsync(BeValidTeamId).WithErrorCode("Invalid InternalTeamId");
     }
 }

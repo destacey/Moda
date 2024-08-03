@@ -2,6 +2,7 @@
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.AppIntegration.Domain.Models;
 using Moda.Common.Application.Interfaces;
+using Moda.Organization.Application.BaseTeams.Queries;
 using Moda.Web.Api.Models.AppIntegrations.Connections;
 
 namespace Moda.Web.Api.Controllers.AppIntegrations;
@@ -167,7 +168,9 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
         if (id != request.ConnectionId)
             return BadRequest();
 
-        var result = await _sender.Send(request.ToUpdateAzureDevOpsConnectionTeamMappingsCommand(), cancellationToken);
+        var teamIds = await _sender.Send(new GetValidBaseTeamIdsQuery(), cancellationToken);
+
+        var result = await _sender.Send(request.ToUpdateAzureDevOpsConnectionTeamMappingsCommand(teamIds), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

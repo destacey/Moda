@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace Moda.AppIntegration.Application.Connections.Commands;
-public sealed record UpdateAzureDevOpsConnectionTeamMappingsCommand(Guid ConnectionId, List<AzureDevOpsWorkspaceTeamMappingDto> TeamMappings) : ICommand;
+public sealed record UpdateAzureDevOpsConnectionTeamMappingsCommand(Guid ConnectionId, List<AzureDevOpsWorkspaceTeamMappingDto> TeamMappings, Guid[] ValidTeamIds) : ICommand;
 
 public sealed class AzdoConnectionTeamMappingsRequestValidator : CustomValidator<UpdateAzureDevOpsConnectionTeamMappingsCommand>
 {
@@ -45,6 +45,12 @@ internal sealed class UpdateAzureDevOpsConnectionTeamMappingsCommandHandler : IC
             var teamConfig = connection.TeamConfiguration;
             foreach (var team in request.TeamMappings)
             {
+                if (team.InternalTeamId.HasValue && !request.ValidTeamIds.Contains(team.InternalTeamId.Value))
+                {
+                    _logger.LogError("{AppRequestName}: Invalid internal team {TeamId} for connection {ConnectionId} workspace {WorkspaceId} and team {ExternalTeamId}.", AppRequestName, team.InternalTeamId, request.ConnectionId, team.WorkspaceId, team.ExternalTeamId);
+                    continue;
+                }
+
                 var existingTeam = teamConfig.WorkspaceTeams.SingleOrDefault(w => w.WorkspaceId == team.WorkspaceId && w.TeamId == team.ExternalTeamId);
                 if (existingTeam is not null)
                 {
@@ -63,6 +69,20 @@ internal sealed class UpdateAzureDevOpsConnectionTeamMappingsCommandHandler : IC
                             existingTeam.MapInternalTeam(team.InternalTeamId);
                         }
                         _logger.LogDebug("{AppRequestName}: Team mapping removed for connection {ConnectionId} workspace {WorkspaceId}. External team {ExternalTeamId}.", AppRequestName, request.ConnectionId, team.WorkspaceId, team.ExternalTeamId);
+                    }
+                    else
+                    {
+                        // reset the InternalTeamId if it is no longer valid.
+                        if (existingTeam.InternalTeamId.HasValue && !request.ValidTeamIds.Contains(existingTeam.InternalTeamId.Value))
+                        {
+                            _logger.LogError("{AppRequestName}: Invalid current internal team {TeamId} for connection {ConnectionId} workspace {WorkspaceId} and team {ExternalTeamId}.", AppRequestName, existingTeam.InternalTeamId, request.ConnectionId, team.WorkspaceId, team.ExternalTeamId);
+
+                            // TODO: this is a hack because EF/SQL is throwing an exception when we set the InternalTeamId to null.  This seems to happen
+                            // because the stored procedure paramater value is NULL.  It works when the paramater is bypassed.
+                            var resetTeamResult = teamConfig.ResetTeam(team.ExternalTeamId);
+                            if (resetTeamResult.IsFailure)
+                                return resetTeamResult;
+                        }
                     }
                 }
                 else
