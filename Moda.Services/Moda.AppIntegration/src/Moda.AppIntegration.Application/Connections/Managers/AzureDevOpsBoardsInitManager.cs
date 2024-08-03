@@ -48,7 +48,7 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
                 processes.Add(process);
             }
 
-            // Load workspaces
+            // Load Workspaces
             var workspacesResult = await _azureDevOpsService.GetWorkspaces(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, cancellationToken);
             if (workspacesResult.IsFailure)
                 return workspacesResult;
@@ -63,8 +63,19 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
 
             var existingWorkProcessIntegrationStates = await _sender.Send(new GetIntegrationRegistrationsForWorkProcessesQuery(), cancellationToken);
 
+            // Load Teams
+            List<IExternalTeam> teams = [];
+            if (workspaces.Count != 0)
+            {
+                var teamsResult = await _azureDevOpsService.GetTeams(connection.Configuration.OrganizationUrl, connection.Configuration.PersonalAccessToken, workspaces.Select(w => w.ExternalId).ToArray(), cancellationToken);
+                if (teamsResult.IsFailure)
+                    return teamsResult;
 
-            var bulkUpsertResult = await _sender.Send(new SyncAzureDevOpsBoardsConnectionConfigurationCommand(connectionId, processes, workspaces, existingWorkProcessIntegrationStates), cancellationToken);
+                teams = teamsResult.Value;
+            }
+
+
+            var bulkUpsertResult = await _sender.Send(new SyncAzureDevOpsBoardsConnectionConfigurationCommand(connectionId, processes, workspaces, existingWorkProcessIntegrationStates, teams), cancellationToken);
 
             return Result.Success();
         }

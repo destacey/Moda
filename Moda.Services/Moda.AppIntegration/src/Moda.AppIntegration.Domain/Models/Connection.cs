@@ -110,9 +110,14 @@ public abstract class Connection : BaseAuditableEntity<Guid>, IActivatable
     }
 }
 
-public abstract class Connection<T> : Connection
+public abstract class Connection<TC,TT> : Connection
 {
     /// <summary>Gets the configuration.</summary>
     /// <value>The configuration.</value>
-    public abstract T Configuration { get; protected set; }
+    public abstract TC Configuration { get; protected set; }
+    
+    /// <summary>
+    /// Gets the team configuration.
+    /// </summary>
+    public abstract TT TeamConfiguration { get; protected set; }
 }

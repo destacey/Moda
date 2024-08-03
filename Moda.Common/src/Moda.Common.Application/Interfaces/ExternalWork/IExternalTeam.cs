@@ -3,4 +3,5 @@ public interface IExternalTeam
 {
     Guid Id { get; }
     string Name { get; }
+    Guid WorkspaceId { get; }
 }

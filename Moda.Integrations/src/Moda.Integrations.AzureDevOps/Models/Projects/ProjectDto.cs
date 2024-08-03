@@ -22,6 +22,11 @@ internal static class ProjectDtoExtensions
 
     public static List<AzdoWorkspace> ToAzdoWorkspaces(this List<ProjectDto> projects)
     {
-        return projects.Select(p => p.ToAzdoWorkspace()).ToList();
+        var azdoProjects = new List<AzdoWorkspace>(projects.Count);
+        foreach (var project in projects)
+        {
+            azdoProjects.Add(project.ToAzdoWorkspace());
+        }
+        return azdoProjects;
     }
 }

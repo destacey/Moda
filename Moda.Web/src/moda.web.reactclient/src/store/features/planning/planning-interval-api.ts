@@ -5,7 +5,6 @@ import {
   PlanningIntervalObjectiveDetailsDto,
   PlanningIntervalObjectiveListDto,
   UpdatePlanningIntervalObjectivesOrderRequest,
-  WorkItemListDto,
   WorkItemProgressDailyRollupDto,
   WorkItemsSummaryDto,
 } from '@/src/services/moda-api'
@@ -36,7 +35,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
           const data = await (await getPlanningIntervalsClient()).getList()
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -51,7 +50,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
           const data = await (await getPlanningIntervalsClient()).getById(id)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -70,7 +69,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
           ).getObjectives(request.planningIntervalId, request.teamId)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -93,7 +92,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
           ).getObjectiveById(request.planningIntervalId, request.objectiveId)
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -115,7 +114,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
           )
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -140,7 +139,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
           )
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -185,7 +184,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
           )
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },

@@ -1,15 +1,18 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
+using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Extensions;
 using Moda.Integrations.AzureDevOps.Clients;
 using Moda.Integrations.AzureDevOps.Models;
+using Moda.Integrations.AzureDevOps.Models.Contracts;
 using Moda.Integrations.AzureDevOps.Models.Projects;
 
 namespace Moda.Integrations.AzureDevOps.Services;
 internal sealed class ProjectService(string organizationUrl, string token, string apiVersion, ILogger<ProjectService> logger)
 {
-    private readonly ProjectClient _projectClient = new ProjectClient(organizationUrl, token, apiVersion);
+    private readonly ProjectClient _projectClient = new(organizationUrl, token, apiVersion);
     private readonly ILogger<ProjectService> _logger = logger;
     private readonly int _maxBatchSize = 100;
 
@@ -39,7 +42,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
 
             _logger.LogDebug("{ProjectCount} projects found ", projects.Count);
 
-            return Result.Success(projects);
+            return projects;
         }
         catch (Exception ex)
         {
@@ -82,12 +85,54 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
                 return Result.Failure<ProjectDetailsDto>(errorMesssage);
             }
 
-            return Result.Success(ProjectDetailsDto.Create(projectResponse.Data, [.. propertiesResponse.Data.Value]));
+            return ProjectDetailsDto.Create(projectResponse.Data, [.. propertiesResponse.Data.Value]);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception thrown getting project {ProjectId} from Azure DevOps", projectId);
             return Result.Failure<ProjectDetailsDto>(ex.ToString());
+        }
+    }
+
+    public async Task<Result<List<IExternalTeam>>> GetTeams(Guid[] projectIds, CancellationToken cancellationToken)
+    {
+        List<IExternalTeam> teams = [];
+
+        if (projectIds is null || projectIds.Length == 0)
+        {
+            _logger.LogWarning("No project ids provided to get teams from Azure DevOps.");
+            return teams;
+        }
+
+        Guid currentProjectId = Guid.Empty;
+
+        try
+        {
+            foreach (var id in projectIds)
+            {
+                currentProjectId = id;
+                var response = await _projectClient.GetProjectTeams(id, cancellationToken);
+                if (!response.IsSuccessful)
+                {
+                    _logger.LogError("Error getting teams for project {ProjectId} from Azure DevOps: {ErrorMessage}.", id, response.ErrorMessage);
+                    continue;
+                }
+                if (response.Data is null)
+                {
+                    _logger.LogDebug("No teams found for project {ProjectId}.", id);
+                    continue;
+                }
+
+                teams.AddRange(response.Data.Value.ToIExternalTeams(id));
+                _logger.LogDebug("{TeamCount} teams found for project {ProjectId}.", response.Data.Value.Count, id);
+            }
+
+            return teams;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception thrown getting teams for project {ProjectId} from Azure DevOps", currentProjectId);
+            return Result.Failure<List<IExternalTeam>>(ex.ToString());
         }
     }
 
@@ -111,7 +156,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
 
             _logger.LogDebug("{AreaCount} areas found for project {ProjectId}.", areaPaths.Count, projectName);
 
-            return Result.Success(areaPaths);
+            return areaPaths;
         }
         catch (Exception ex)
         {

@@ -8,7 +8,6 @@ import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
 import {
-  useGetAzdoBoardsConnectionById,
   useSyncAzdoBoardsConnectionOrganizationMutation,
   useUpdateAzdoBoardsConnectionSyncStateMutation,
 } from '@/src/services/queries/app-integration-queries'
@@ -24,6 +23,7 @@ import DeleteAzdoBoardsConnectionForm from '../components/delete-azdo-boards-con
 import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
 import { PageActions } from '@/src/app/components/common'
 import { ItemType } from 'antd/es/menu/interface'
+import { useGetAzdoConnectionByIdQuery } from '@/src/store/features/app-integration/azdo-integration-api'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -56,9 +56,9 @@ const ConnectionDetailsPage = ({ params }) => {
   const {
     data: connectionData,
     isLoading,
-    isFetching,
+    error,
     refetch,
-  } = useGetAzdoBoardsConnectionById(params.id)
+  } = useGetAzdoConnectionByIdQuery(params.id)
   const azdoOrgUrl = connectionData?.configuration?.organizationUrl
 
   const updateSyncStateMutation =
@@ -204,7 +204,7 @@ const ConnectionDetailsPage = ({ params }) => {
     updateSyncState,
   ])
 
-  if (!isLoading && !isFetching && !connectionData) {
+  if (!isLoading && !connectionData) {
     notFound()
   }
 

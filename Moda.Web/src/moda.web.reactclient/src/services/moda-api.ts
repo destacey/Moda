@@ -8729,6 +8729,131 @@ export class AzureDevOpsBoardsConnectionsClient {
     }
 
     /**
+     * Get Azure DevOps connection teams based on id.
+     * @param workspaceId (optional) 
+     */
+    getConnectionTeams(id: string, workspaceId: string | null | undefined, cancelToken?: CancelToken): Promise<AzureDevOpsBoardsWorkspaceTeamDto[]> {
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/teams?";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (workspaceId !== undefined && workspaceId !== null)
+            url_ += "workspaceId=" + encodeURIComponent("" + workspaceId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetConnectionTeams(_response);
+        });
+    }
+
+    protected processGetConnectionTeams(response: AxiosResponse): Promise<AzureDevOpsBoardsWorkspaceTeamDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<AzureDevOpsBoardsWorkspaceTeamDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<AzureDevOpsBoardsWorkspaceTeamDto[]>(null as any);
+    }
+
+    /**
+     * Update Azure DevOps connection team mappings.
+     */
+    mapConnectionTeams(id: string, request: AzdoConnectionTeamMappingsRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/app-integrations/azure-devops-boards-connections/{id}/teams";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processMapConnectionTeams(_response);
+        });
+    }
+
+    protected processMapConnectionTeams(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Test Azure DevOps Boards connection configuration.
      */
     testConfig(request: TestAzureDevOpsBoardConnectionRequest, cancelToken?: CancelToken): Promise<void> {
@@ -10299,6 +10424,29 @@ export interface UpdateAzureDevOpsBoardConnectionRequest {
     organization: string;
     /** Gets the personal access token. */
     personalAccessToken: string;
+}
+
+export interface AzureDevOpsBoardsWorkspaceTeamDto {
+    workspaceId?: string;
+    teamId?: string;
+    teamName?: string;
+    internalTeamId?: string | undefined;
+}
+
+export interface AzdoConnectionTeamMappingsRequest {
+    /** The unique identifer for the connection. */
+    connectionId: string;
+    /** List of team mappings. */
+    teamMappings?: AzdoWorkspaceTeamMappingRequest[];
+}
+
+export interface AzdoWorkspaceTeamMappingRequest {
+    /** The unique identifier for the workspace in the Azure DevOps Boards system. */
+    workspaceId: string;
+    /** The unique identifier for the team in the Azure DevOps Boards system. */
+    teamId: string;
+    /** The unique identifier for the team within Moda. */
+    internalTeamId?: string | undefined;
 }
 
 export interface TestAzureDevOpsBoardConnectionRequest {

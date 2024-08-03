@@ -1,12 +1,22 @@
 import { AzureDevOpsBoardsConnectionDetailsDto } from '@/src/services/moda-api'
+import { QueryTags } from '@/src/store/features/query-tags'
+import {
+  QueryActionCreatorResult,
+  QueryDefinition,
+} from '@reduxjs/toolkit/query'
 import { createContext } from 'react'
-import { QueryObserverResult } from 'react-query'
 
 export interface AzdoBoardsConnectionContextInterface {
   connectionId: string
   organizationUrl: string
-  reloadConnectionData: () => Promise<
-    QueryObserverResult<AzureDevOpsBoardsConnectionDetailsDto, unknown>
+  reloadConnectionData: () => QueryActionCreatorResult<
+    QueryDefinition<
+      string,
+      any,
+      QueryTags,
+      AzureDevOpsBoardsConnectionDetailsDto,
+      'api'
+    >
   >
 }
 

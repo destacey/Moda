@@ -57,7 +57,6 @@ export const workProcessApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         { type: QueryTags.WorkProcess, id: arg }, // typically arg is the key
-        { type: QueryTags.WorkProcess, id: result.id },
       ],
     }),
     changeWorkProcessIsActive: builder.mutation<

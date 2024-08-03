@@ -7410,6 +7410,123 @@
         ]
       }
     },
+    "/api/app-integrations/azure-devops-boards-connections/{id}/teams": {
+      "get": {
+        "tags": [
+          "AzureDevOpsBoardsConnections"
+        ],
+        "summary": "Get Azure DevOps connection teams based on id.",
+        "operationId": "AzureDevOpsBoardsConnections_GetConnectionTeams",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": true,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AzureDevOpsBoardsWorkspaceTeamDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "AzureDevOpsBoardsConnections"
+        ],
+        "summary": "Update Azure DevOps connection team mappings.",
+        "operationId": "AzureDevOpsBoardsConnections_MapConnectionTeams",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AzdoConnectionTeamMappingsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/app-integrations/azure-devops-boards-connections/test": {
       "post": {
         "tags": [
@@ -11392,6 +11509,90 @@
             "maxLength": 128,
             "minLength": 1,
             "nullable": false
+          }
+        }
+      },
+      "AzureDevOpsBoardsWorkspaceTeamDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamName": {
+            "type": "string"
+          },
+          "internalTeamId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          }
+        }
+      },
+      "AzdoConnectionTeamMappingsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "connectionId"
+        ],
+        "properties": {
+          "connectionId": {
+            "type": "string",
+            "description": "The unique identifer for the connection.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamMappings": {
+            "type": "array",
+            "description": "List of team mappings.",
+            "items": {
+              "$ref": "#/components/schemas/AzdoWorkspaceTeamMappingRequest"
+            }
+          }
+        }
+      },
+      "AzdoWorkspaceTeamMappingRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "teamId"
+        ],
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "description": "The unique identifier for the workspace in the Azure DevOps Boards system.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamId": {
+            "type": "string",
+            "description": "The unique identifier for the team in the Azure DevOps Boards system.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "internalTeamId": {
+            "type": "string",
+            "description": "The unique identifier for the team within Moda.",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           }
         }
       },

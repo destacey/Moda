@@ -37,12 +37,12 @@ internal sealed class ProjectClient : BaseClient
         return await _client.ExecuteAsync<ListResponse<PropertyDto>>(request, cancellationToken);
     }
 
-    internal async Task<RestResponse<ListResponse<PropertyDto>>> GetProjecTeams(Guid projectId, CancellationToken cancellationToken)
+    internal async Task<RestResponse<ListResponse<TeamDto>>> GetProjectTeams(Guid projectId, CancellationToken cancellationToken)
     {
         var request = new RestRequest($"/_apis/projects/{projectId}/teams", Method.Get);
         SetupRequest(request);
 
-        return await _client.ExecuteAsync<ListResponse<PropertyDto>>(request, cancellationToken);
+        return await _client.ExecuteAsync<ListResponse<TeamDto>>(request, cancellationToken);
     }
 
     /// <summary>

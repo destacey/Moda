@@ -2,11 +2,12 @@
 
 import { AzureDevOpsBoardsWorkspaceDto } from '@/src/services/moda-api'
 import { AppstoreAddOutlined, ExportOutlined } from '@ant-design/icons'
-import { Button, Card, Descriptions, Typography } from 'antd'
+import { Button, Card, Descriptions, message, Typography } from 'antd'
 import Link from 'next/link'
 import { useContext, useState } from 'react'
 import InitWorkspaceIntegrationForm from '../components/init-workspace-integration-form'
 import { AzdoBoardsConnectionContext } from './azdo-boards-connection-context'
+import MapAzdoWorkspaceTeamsForm from '../components/map-azdo-workspace-teams-form'
 
 const { Item } = Descriptions
 const { Text } = Typography
@@ -21,15 +22,23 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
     openInitWorkspaceIntegrationForm,
     setOpenInitWorkspaceIntegrationForm,
   ] = useState<boolean>(false)
+  const [openMapAzdoWorkspaceTeamsForm, setOpenMapAzdoWorkspaceTeamsForm] =
+    useState<boolean>(false)
+  const [messageApi, contextHolder] = message.useMessage()
 
   const onInitWorkspaceFormClosed = (wasSaved: boolean) => {
     setOpenInitWorkspaceIntegrationForm(false)
+  }
+
+  const onOpenMapAzdoWorkspaceTeamsForm = (wasSaved: boolean) => {
+    setOpenMapAzdoWorkspaceTeamsForm(false)
   }
 
   const azdoBoardsConnection = useContext(AzdoBoardsConnectionContext)
 
   return (
     <>
+      {contextHolder}
       <Card
         data-testid={props.workspace.externalId}
         size="small"
@@ -65,6 +74,14 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
             )}
           </Item>
         </Descriptions>
+        {!props.enableInit && (
+          <Button
+            size="small"
+            onClick={() => setOpenMapAzdoWorkspaceTeamsForm(true)}
+          >
+            Team Mappings
+          </Button>
+        )}
       </Card>
       {openInitWorkspaceIntegrationForm && (
         <InitWorkspaceIntegrationForm
@@ -74,6 +91,17 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
           workspaceName={props.workspace.name}
           onFormSave={() => onInitWorkspaceFormClosed(false)}
           onFormCancel={() => onInitWorkspaceFormClosed(false)}
+        />
+      )}
+      {openMapAzdoWorkspaceTeamsForm && (
+        <MapAzdoWorkspaceTeamsForm
+          showForm={openMapAzdoWorkspaceTeamsForm}
+          connectionId={azdoBoardsConnection.connectionId}
+          workspaceId={props.workspace.externalId}
+          workspaceName={props.workspace.name}
+          onFormSave={() => onOpenMapAzdoWorkspaceTeamsForm(false)}
+          onFormCancel={() => onOpenMapAzdoWorkspaceTeamsForm(false)}
+          messageApi={messageApi}
         />
       )}
     </>
