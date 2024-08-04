@@ -55,7 +55,7 @@ internal sealed class SyncAzureDevOpsBoardsConnectionConfigurationCommandHandler
             return LogAndReturnFailure(importWorkspacesResult);
         }
 
-        var syncTeamsResult = connection.SyncTeams(request.Teams);
+        var syncTeamsResult = connection.SyncTeams(request.Teams, _timestamp);
         if (syncTeamsResult.IsFailure)
         {
             return LogAndReturnFailure(syncTeamsResult);

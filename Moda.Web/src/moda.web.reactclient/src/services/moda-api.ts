@@ -10367,6 +10367,7 @@ export interface AzureDevOpsBoardsConnectionDetailsDto {
     description?: string | undefined;
     connector?: string;
     configuration?: AzureDevOpsBoardsConnectionConfigurationDto;
+    teamConfiguration?: AzureDevOpsBoardsTeamConfigurationDto;
     isActive?: boolean;
     isValidConfiguration?: boolean;
     isSyncEnabled?: boolean;
@@ -10402,6 +10403,17 @@ export interface AzureDevOpsBoardsWorkspaceDto {
     integrationState?: IntegrationStateDto | undefined;
 }
 
+export interface AzureDevOpsBoardsTeamConfigurationDto {
+    workspaceTeams?: AzureDevOpsBoardsWorkspaceTeamDto[];
+}
+
+export interface AzureDevOpsBoardsWorkspaceTeamDto {
+    workspaceId?: string;
+    teamId?: string;
+    teamName?: string;
+    internalTeamId?: string | undefined;
+}
+
 export interface CreateAzureDevOpsBoardConnectionRequest {
     /** Gets or sets the name of the connection. */
     name: string;
@@ -10424,13 +10436,6 @@ export interface UpdateAzureDevOpsBoardConnectionRequest {
     organization: string;
     /** Gets the personal access token. */
     personalAccessToken: string;
-}
-
-export interface AzureDevOpsBoardsWorkspaceTeamDto {
-    workspaceId?: string;
-    teamId?: string;
-    teamName?: string;
-    internalTeamId?: string | undefined;
 }
 
 export interface AzdoConnectionTeamMappingsRequest {

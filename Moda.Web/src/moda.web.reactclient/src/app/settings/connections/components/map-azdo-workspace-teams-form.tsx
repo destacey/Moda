@@ -87,11 +87,14 @@ const MapAzdoWorkspaceTeamsForm = (props: MapAzdoWorkspaceTeamsFormProps) => {
   const mapToFormValues = useCallback(
     (teams: AzureDevOpsBoardsWorkspaceTeamDto[]) => {
       form.setFieldsValue({
-        teamMappings: teams.map((team) => ({
-          teamId: team.teamId,
-          teamName: team.teamName,
-          internalTeamId: team.internalTeamId,
-        })),
+        teamMappings: teams
+          .slice() // array is likely in strict mode. clone the array to avoid sorting the original
+          .sort((a, b) => a.teamName.localeCompare(b.teamName))
+          .map((team) => ({
+            teamId: team.teamId,
+            teamName: team.teamName,
+            internalTeamId: team.internalTeamId,
+          })),
       })
     },
     [form],

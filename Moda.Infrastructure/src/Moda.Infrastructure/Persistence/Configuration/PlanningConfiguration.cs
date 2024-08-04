@@ -16,18 +16,15 @@ public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
         builder.HasKey(t => t.Id);
         builder.HasAlternateKey(t => t.Key);
 
-        builder.HasIndex(t => new { t.Id, t.IsDeleted })
-            .IncludeProperties(t => new { t.Key, t.Name, t.Code, t.Type, t.IsActive })
-            .HasFilter("[IsDeleted] = 0");
-        builder.HasIndex(t => new { t.Key, t.IsDeleted })
-            .IncludeProperties(t => new { t.Id, t.Name, t.Code, t.Type, t.IsActive })
-            .HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(t => t.Id )
+            .IncludeProperties(t => new { t.Key, t.Name, t.Code, t.Type, t.IsActive });
+        builder.HasIndex(t => t.Key)
+            .IncludeProperties(t => new { t.Id, t.Name, t.Code, t.Type, t.IsActive });
         builder.HasIndex(t => t.Code)
             .IsUnique()
             .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Type, t.IsActive });
-        builder.HasIndex(t => new { t.IsActive, t.IsDeleted })
-            .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Code, t.Type })
-            .HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(t => t.IsActive)
+            .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Code, t.Type });
 
         builder.Property(t => t.Id).ValueGeneratedNever();
         builder.Property(t => t.Key).ValueGeneratedNever();
@@ -41,11 +38,6 @@ public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
             .HasColumnType("varchar")
             .HasMaxLength(32);
         builder.Property(t => t.IsActive);
-
-        // Audit
-        builder.Property(t => t.Deleted);
-        builder.Property(t => t.DeletedBy);
-        builder.Property(t => t.IsDeleted);
 
         // Relationships
         builder.HasMany<Risk>()

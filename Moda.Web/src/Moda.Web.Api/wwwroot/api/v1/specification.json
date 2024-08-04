@@ -11302,6 +11302,9 @@
           "configuration": {
             "$ref": "#/components/schemas/AzureDevOpsBoardsConnectionConfigurationDto"
           },
+          "teamConfiguration": {
+            "$ref": "#/components/schemas/AzureDevOpsBoardsTeamConfigurationDto"
+          },
           "isActive": {
             "type": "boolean"
           },
@@ -11427,6 +11430,45 @@
           }
         }
       },
+      "AzureDevOpsBoardsTeamConfigurationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceTeams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AzureDevOpsBoardsWorkspaceTeamDto"
+            }
+          }
+        }
+      },
+      "AzureDevOpsBoardsWorkspaceTeamDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workspaceId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "teamName": {
+            "type": "string"
+          },
+          "internalTeamId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          }
+        }
+      },
       "CreateAzureDevOpsBoardConnectionRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -11509,33 +11551,6 @@
             "maxLength": 128,
             "minLength": 1,
             "nullable": false
-          }
-        }
-      },
-      "AzureDevOpsBoardsWorkspaceTeamDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "workspaceId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "teamId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "teamName": {
-            "type": "string"
-          },
-          "internalTeamId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": true,
-            "example": "00000000-0000-0000-0000-000000000000"
           }
         }
       },

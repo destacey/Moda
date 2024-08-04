@@ -160,7 +160,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
         }
     }
 
-    public Result SyncTeams(List<IExternalTeam> teams)
+    public Result SyncTeams(List<IExternalTeam> teams, Instant timestamp)
     {
         try
         {
@@ -179,7 +179,10 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
                 var result = TeamConfiguration.UpsertWorkspaceTeam(team.WorkspaceId, team.Id, team.Name);
                 if (result.IsFailure)
                     return result;
-            }           
+            }
+
+            // TODO this will generate duplicate events in some cases
+            AddDomainEvent(EntityUpdatedEvent.WithEntity(this, timestamp));
 
             return Result.Success();
         }

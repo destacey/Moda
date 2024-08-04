@@ -12,12 +12,12 @@ public sealed record AzdoConnectionTeamMappingsRequest
     /// </summary>
     public List<AzdoWorkspaceTeamMappingRequest> TeamMappings { get; set; } = [];
 
-    public UpdateAzureDevOpsConnectionTeamMappingsCommand ToUpdateAzureDevOpsConnectionTeamMappingsCommand()
+    public UpdateAzureDevOpsConnectionTeamMappingsCommand ToUpdateAzureDevOpsConnectionTeamMappingsCommand(Guid[] validInternalTeamIds)
     {
         var teamMappings = TeamMappings
             .Select(t => t.ToAzureDevOpsWorkspaceTeamMappingDto())
             .ToList();
-        return new UpdateAzureDevOpsConnectionTeamMappingsCommand(ConnectionId, teamMappings);
+        return new UpdateAzureDevOpsConnectionTeamMappingsCommand(ConnectionId, teamMappings, validInternalTeamIds);
     }
 }
 
