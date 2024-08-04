@@ -18,7 +18,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
 
     private WorkItem() { }
 
-    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         Key = key;
         Title = title;
@@ -27,6 +27,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         TypeId = workType.Id;
         StatusId = statusId;
         StatusCategory = statusCategory;
+        TeamId = teamId;
         Created = created;
         CreatedById = createdById;
         LastModified = lastModified;
@@ -82,6 +83,10 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
 
     public IReadOnlyCollection<WorkItem> Children => _children.AsReadOnly();
 
+    public Guid? TeamId { get; private set; }
+
+    public WorkTeam? Team { get; private set; }
+
     public Guid? AssignedToId { get; private set; }
 
     public Employee? AssignedTo { get; private set; }
@@ -116,7 +121,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
     /// </summary>
     //public IReadOnlyCollection<WorkItemRevision> History => _history.AsReadOnly();
 
-    public void Update(string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    public void Update(string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         if (extendedProps != null && Id != extendedProps.Id)
         {
@@ -130,6 +135,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         TypeId = workType.Id;
         StatusId = statusId;
         StatusCategory = statusCategory;
+        TeamId = teamId;
         LastModified = lastModified;
         LastModifiedById = lastModifiedById;
         AssignedToId = assignedToId;
@@ -153,7 +159,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         }
     }
 
-    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
     {
         Guard.Against.Null(workspace, nameof(workspace));
         Guard.Against.Null(workType, nameof(workType));
@@ -164,7 +170,7 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         }
         
         var key = new WorkItemKey(workspace.Key, externalId);
-        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, activatedTimestamp, doneTimestamp, extendedProps);
+        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, teamId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, activatedTimestamp, doneTimestamp, extendedProps);
 
         //var result = workspace.AddWorkItem(workItem);  // this is handled in the handler for performance reasons
     }

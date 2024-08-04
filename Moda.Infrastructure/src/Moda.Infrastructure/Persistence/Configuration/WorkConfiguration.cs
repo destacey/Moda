@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Models;
 using Moda.Work.Domain.Models;
@@ -134,6 +135,11 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
         builder.HasOne(w => w.Parent)
             .WithMany(p => p.Children)
             .HasForeignKey(w => w.ParentId)
+            .OnDelete(DeleteBehavior.ClientSetNull);
+
+        builder.HasOne(w => w.Team)
+            .WithMany()
+            .HasForeignKey(w => w.TeamId)
             .OnDelete(DeleteBehavior.ClientSetNull);
 
         builder.HasOne(w => w.AssignedTo)
@@ -353,6 +359,44 @@ public class WorkStatusConfig : IEntityTypeConfiguration<WorkStatus>
         builder.Property(w => w.Deleted);
         builder.Property(w => w.DeletedBy);
         builder.Property(w => w.IsDeleted);
+    }
+}
+public class WorkTeamConfig : IEntityTypeConfiguration<WorkTeam>
+{
+    public void Configure(EntityTypeBuilder<WorkTeam> builder)
+    {
+        builder.ToTable("WorkTeams", SchemaNames.Work);
+
+        builder.HasKey(t => t.Id);
+        builder.HasAlternateKey(t => t.Key);
+
+        builder.HasIndex(t => t.Id)
+            .IncludeProperties(t => new { t.Key, t.Name, t.Code, t.Type, t.IsActive });
+        builder.HasIndex(t => t.Key)
+            .IncludeProperties(t => new { t.Id, t.Name, t.Code, t.Type, t.IsActive });
+        builder.HasIndex(t => t.Code)
+            .IsUnique()
+            .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Type, t.IsActive });
+        builder.HasIndex(t => t.IsActive)
+            .IncludeProperties(t => new { t.Id, t.Key, t.Name, t.Code, t.Type });
+
+        builder.Property(t => t.Id).ValueGeneratedNever();
+        builder.Property(t => t.Key).ValueGeneratedNever();
+
+        builder.Property(t => t.Name).IsRequired().HasMaxLength(128);
+        builder.Property(t => t.Code).IsRequired()
+            .HasColumnType("varchar")
+            .HasMaxLength(10);
+        builder.Property(t => t.Type).IsRequired()
+            .HasConversion<EnumConverter<TeamType>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+        builder.Property(t => t.IsActive);
+
+        // Relationships
+
+
+        // Ignore
     }
 }
 

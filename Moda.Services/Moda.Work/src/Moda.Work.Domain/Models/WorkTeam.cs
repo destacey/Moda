@@ -1,18 +1,16 @@
 ﻿using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Interfaces.Organization;
 
-namespace Moda.Planning.Domain.Models;
+namespace Moda.Work.Domain.Models;
 
 /// <summary>
-/// A copy of the Moda.Common.Domain.Interfaces.Organization.ISimpleTeam interface.  Used to hold basic team information for the planning service and db context.
+/// A copy of the Moda.Common.Domain.Interfaces.Organization.ISimpleTeam interface.  Used to hold basic team information for the work service and db context.
 /// </summary>
-public class PlanningTeam : ISimpleTeam
+public class WorkTeam : ISimpleTeam
 {
-    protected readonly List<PlanningIntervalTeam> _planningIntervalTeams = [];
+    private WorkTeam() { }
 
-    private PlanningTeam() { }
-
-    public PlanningTeam(ISimpleTeam team)
+    public WorkTeam(ISimpleTeam team)
     {
         Id = team.Id;
         Key = team.Key;
@@ -28,7 +26,6 @@ public class PlanningTeam : ISimpleTeam
     public string Code { get; private set; } = default!;
     public TeamType Type { get; private set; } = default!;
     public bool IsActive { get; private set; }
-    public IReadOnlyCollection<PlanningIntervalTeam> PlanningIntervalTeams => _planningIntervalTeams.AsReadOnly();
 
     /// <summary>Updates the specified team from an Organization ISimpleTeam.</summary>
     /// <param name="team">The team or team of teams.</param>
