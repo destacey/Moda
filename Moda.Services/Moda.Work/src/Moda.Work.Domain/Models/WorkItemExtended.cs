@@ -5,14 +5,14 @@ public sealed class WorkItemExtended
 {
     private WorkItemExtended() { }
 
-    private WorkItemExtended(Guid id, string? areaPath)
+    private WorkItemExtended(Guid id, string? iterationPath)
     {
         Id = id;
-        ExternalTeamIdentifier = areaPath;
+        ExternalTeamIdentifier = iterationPath;
     }
 
-    private WorkItemExtended(string? areaPath)
-        : this(Guid.Empty, areaPath) // the guid is empty when the work item is not yet created. EF will fill it in.
+    private WorkItemExtended(string? iterationPath)
+        : this(Guid.Empty, iterationPath) // the guid is empty when the work item is not yet created. EF will fill it in.
     { }
 
     /// <summary>

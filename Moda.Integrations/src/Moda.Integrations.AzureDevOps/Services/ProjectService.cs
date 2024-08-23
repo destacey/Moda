@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Extensions;
 using Moda.Integrations.AzureDevOps.Clients;
 using Moda.Integrations.AzureDevOps.Models;
-using Moda.Integrations.AzureDevOps.Models.Contracts;
 using Moda.Integrations.AzureDevOps.Models.Projects;
 
 namespace Moda.Integrations.AzureDevOps.Services;
@@ -162,6 +160,35 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
         {
             _logger.LogError(ex, "Exception thrown getting areas for project {ProjectId} from Azure DevOps", projectName);
             return Result.Failure<List<ClassificationNodeResponse>> (ex.ToString());
+        }
+    }
+
+    public async Task<Result<List<ClassificationNodeResponse>>> GetIterationPaths(string projectName, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = await _projectClient.GetIterationPaths(projectName, cancellationToken);
+            if (!response.IsSuccessful)
+            {
+                _logger.LogError("Error getting iterations for project {ProjectId} from Azure DevOps: {ErrorMessage}.", projectName, response.ErrorMessage);
+                return Result.Failure<List<ClassificationNodeResponse>>(response.ErrorMessage);
+            }
+            if (response.Data is null)
+            {
+                _logger.LogWarning("No iterations found for project {ProjectId}.", projectName);
+                return Result.Failure<List<ClassificationNodeResponse>>($"No iterations found for project {projectName}");
+            }
+
+            var iterationPaths = response.Data.FlattenHierarchy(a => a.Children).ToList();
+
+            _logger.LogDebug("{IterationCount} iterations found for project {ProjectId}.", iterationPaths.Count, projectName);
+
+            return iterationPaths;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception thrown getting iterations for project {ProjectId} from Azure DevOps", projectName);
+            return Result.Failure<List<ClassificationNodeResponse>>(ex.ToString());
         }
     }
 }

@@ -119,16 +119,16 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
     {
         var projectService = GetService<ProjectService>(organizationUrl, token);
 
-        var areasResult = await projectService.GetAreaPaths(projectName, cancellationToken);
-        if (areasResult.IsFailure)
-            return Result.Failure<List<IExternalWorkItem>>(areasResult.Error);
+        var iterationsResult = await projectService.GetIterationPaths(projectName, cancellationToken);
+        if (iterationsResult.IsFailure)
+            return Result.Failure<List<IExternalWorkItem>>(iterationsResult.Error);
 
         var workItemService = GetService<WorkItemService>(organizationUrl, token);
 
         var result = await workItemService.GetWorkItems(projectName, lastChangedDate, workItemTypes, cancellationToken);
 
         return result.IsSuccess
-            ? Result.Success(result.Value.ToIExternalWorkItems(areasResult.Value))
+            ? Result.Success(result.Value.ToIExternalWorkItems(iterationsResult.Value))
             : Result.Failure<List<IExternalWorkItem>>(result.Error);
     }
 

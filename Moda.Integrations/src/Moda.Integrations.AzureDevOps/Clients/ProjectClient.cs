@@ -45,6 +45,27 @@ internal sealed class ProjectClient : BaseClient
         return await _client.ExecuteAsync<ListResponse<TeamDto>>(request, cancellationToken);
     }
 
+    internal async Task<Dictionary<Guid, TeamSettingsResponse?>> GetProjectTeamsSettings(Guid projectId, Guid[] teamIds, CancellationToken cancellationToken)
+    {
+        Dictionary<Guid,TeamSettingsResponse?> teamSettings = [];
+        foreach (var teamId in teamIds)
+        {
+            var request = new RestRequest();
+            SetupRequest(request);
+
+            // TODO: should this be in a different client?  WorkClient?
+            request.Resource = $"/{projectId}/{teamId}/_apis/work/teamsettings";
+
+            var response = await _client.ExecuteAsync<TeamSettingsResponse>(request, cancellationToken);
+            if (response.IsSuccessful)
+            {
+                teamSettings.Add(teamId, response.Data);
+            }
+        }
+
+        return teamSettings;
+    }
+
     /// <summary>
     /// Returns the root area path and all child area paths for the project.
     /// </summary>
@@ -54,6 +75,21 @@ internal sealed class ProjectClient : BaseClient
     internal async Task<RestResponse<ClassificationNodeResponse>> GetAreaPaths(string projectName, CancellationToken cancellationToken)
     {
         var request = new RestRequest($"/{projectName}/_apis/wit/classificationnodes/areas", Method.Get);
+        SetupRequest(request);
+        request.AddParameter("$depth", 100); // TODO: make this configurable
+
+        return await _client.ExecuteAsync<ClassificationNodeResponse>(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// Returns the root iteration path and all child iteration paths for the project.
+    /// </summary>
+    /// <param name="projectName"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    internal async Task<RestResponse<ClassificationNodeResponse>> GetIterationPaths(string projectName, CancellationToken cancellationToken)
+    {
+        var request = new RestRequest($"/{projectName}/_apis/wit/classificationnodes/iterations", Method.Get);
         SetupRequest(request);
         request.AddParameter("$depth", 100); // TODO: make this configurable
 
