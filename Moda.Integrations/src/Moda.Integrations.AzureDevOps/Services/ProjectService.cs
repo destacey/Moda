@@ -121,7 +121,24 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
                     continue;
                 }
 
-                teams.AddRange(response.Data.Value.ToIExternalTeams(id));
+                // set team settings: boardId
+                foreach (var team in response.Data.Value)
+                {
+                    var teamSettingsResponse = await _projectClient.GetProjectTeamsSettings(id, team.Id, cancellationToken);
+                    if (!teamSettingsResponse.IsSuccessful)
+                    {
+                        _logger.LogError("Error getting team settings for team {TeamId} in project {ProjectId} from Azure DevOps: {ErrorMessage}.", team.Id, id, teamSettingsResponse.ErrorMessage);
+                        continue;
+                    }
+                    if (teamSettingsResponse.Data is null)
+                    {
+                        _logger.LogWarning("No team settings found for team {TeamId} in project {ProjectId}.", team.Id, id);
+                        continue;
+                    }
+
+                    teams.Add(team.ToAzdoTeam(id, teamSettingsResponse.Data.BacklogIteration?.Id));
+                }
+
                 _logger.LogDebug("{TeamCount} teams found for project {ProjectId}.", response.Data.Value.Count, id);
             }
 

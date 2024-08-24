@@ -6,27 +6,19 @@ internal record TeamDto
 {
     public Guid Id { get; set; }
     public required string Name { get; set; }
+
 }
 
 internal static class TeamDtoExtensions
 {
-    public static AzdoTeam ToAzdoTeam(this TeamDto team, Guid workspaceId)
+    public static AzdoTeam ToAzdoTeam(this TeamDto team, Guid workspaceId, Guid? boardId)
     {
         return new AzdoTeam
         {
             Id = team.Id,
             Name = team.Name,
-            WorkspaceId = workspaceId
+            WorkspaceId = workspaceId,
+            BoardId = boardId
         };
-    }
-
-    public static List<IExternalTeam> ToIExternalTeams(this List<TeamDto> teams, Guid workspaceId)
-    {
-        var azdoTeams = new List<IExternalTeam>(teams.Count);
-        foreach (var team in teams)
-        {
-            azdoTeams.Add(team.ToAzdoTeam(workspaceId));
-        }
-        return azdoTeams;
     }
 }

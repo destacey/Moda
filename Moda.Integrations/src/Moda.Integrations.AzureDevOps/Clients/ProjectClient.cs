@@ -45,25 +45,19 @@ internal sealed class ProjectClient : BaseClient
         return await _client.ExecuteAsync<ListResponse<TeamDto>>(request, cancellationToken);
     }
 
-    internal async Task<Dictionary<Guid, TeamSettingsResponse?>> GetProjectTeamsSettings(Guid projectId, Guid[] teamIds, CancellationToken cancellationToken)
+    /// <summary>
+    /// Returns the team settings for the specified team.
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <param name="teamId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    internal async Task<RestResponse<TeamSettingsResponse>> GetProjectTeamsSettings(Guid projectId, Guid teamId, CancellationToken cancellationToken)
     {
-        Dictionary<Guid,TeamSettingsResponse?> teamSettings = [];
-        foreach (var teamId in teamIds)
-        {
-            var request = new RestRequest();
-            SetupRequest(request);
+        var request = new RestRequest($"/{projectId}/{teamId}/_apis/work/teamsettings", Method.Get);
+        SetupRequest(request);
 
-            // TODO: should this be in a different client?  WorkClient?
-            request.Resource = $"/{projectId}/{teamId}/_apis/work/teamsettings";
-
-            var response = await _client.ExecuteAsync<TeamSettingsResponse>(request, cancellationToken);
-            if (response.IsSuccessful)
-            {
-                teamSettings.Add(teamId, response.Data);
-            }
-        }
-
-        return teamSettings;
+        return await _client.ExecuteAsync<TeamSettingsResponse>(request, cancellationToken);
     }
 
     /// <summary>

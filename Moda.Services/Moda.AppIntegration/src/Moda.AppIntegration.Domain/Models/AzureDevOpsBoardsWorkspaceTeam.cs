@@ -5,11 +5,12 @@ public sealed class AzureDevOpsBoardsWorkspaceTeam
 
     private AzureDevOpsBoardsWorkspaceTeam() { }
 
-    public AzureDevOpsBoardsWorkspaceTeam(Guid workspaceId, Guid teamId, string teamName)
+    public AzureDevOpsBoardsWorkspaceTeam(Guid workspaceId, Guid teamId, string teamName, Guid? boardId)
     {
         WorkspaceId = workspaceId;
         TeamId = teamId;
         TeamName = teamName;
+        BoardId = boardId;
     }
 
     /// <summary>
@@ -31,14 +32,17 @@ public sealed class AzureDevOpsBoardsWorkspaceTeam
         private set => _teamName = Guard.Against.NullOrWhiteSpace(value, nameof(TeamName)); 
     }
 
+    public Guid? BoardId { get; private set; }
+
     /// <summary>
     /// InternalTeamId is the unique identifier for the team in the Moda system.
     /// </summary>
     public Guid? InternalTeamId { get; private set; }
 
-    public void Update(string teamName)
+    public void Update(string teamName, Guid? boardId)
     {
         TeamName = teamName;
+        BoardId = boardId;
     }
 
     public void MapInternalTeam(Guid? internalTeamId)
