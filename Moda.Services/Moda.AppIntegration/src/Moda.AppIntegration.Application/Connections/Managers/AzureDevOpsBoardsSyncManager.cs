@@ -296,6 +296,10 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
             foreach (var team in workspaceTeams)
             {
+                // Only add teams that have an internal team id.  This will allow mapped parent teams to be set for items that are assigned to teams that haven't been mapped.
+                if (team.InternalTeamId is null)
+                    continue;
+
                 teamSettings[team.TeamId] = team.BoardId;
                 teamMappings[team.TeamId] = team.InternalTeamId;
             }
