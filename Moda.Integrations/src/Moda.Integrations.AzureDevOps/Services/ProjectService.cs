@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Extensions;
 using Moda.Integrations.AzureDevOps.Clients;
+using Moda.Integrations.AzureDevOps.Extensions;
 using Moda.Integrations.AzureDevOps.Models;
 using Moda.Integrations.AzureDevOps.Models.Projects;
 
@@ -180,7 +181,7 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
         }
     }
 
-    public async Task<Result<List<ClassificationNodeResponse>>> GetIterationPaths(string projectName, CancellationToken cancellationToken)
+    public async Task<Result<List<IterationDto>>> GetIterations(string projectName, Dictionary<Guid, Guid?>? teamSettings, CancellationToken cancellationToken)
     {
         try
         {
@@ -188,15 +189,20 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
             if (!response.IsSuccessful)
             {
                 _logger.LogError("Error getting iterations for project {ProjectId} from Azure DevOps: {ErrorMessage}.", projectName, response.ErrorMessage);
-                return Result.Failure<List<ClassificationNodeResponse>>(response.ErrorMessage);
+                return Result.Failure<List<IterationDto>>(response.ErrorMessage);
             }
             if (response.Data is null)
             {
                 _logger.LogWarning("No iterations found for project {ProjectId}.", projectName);
-                return Result.Failure<List<ClassificationNodeResponse>>($"No iterations found for project {projectName}");
+                return Result.Failure<List<IterationDto>>($"No iterations found for project {projectName}");
             }
 
-            var iterationPaths = response.Data.FlattenHierarchy(a => a.Children).ToList();
+            Dictionary<Guid, Guid> iterationTeamMapping = ConvertTeamSettingsToIterationTeamMapping(teamSettings);
+
+            var iterationPaths = ((IterationNodeDto)response.Data)
+                .SetTeamIds(iterationTeamMapping)
+                .FlattenHierarchy(a => a.Children, IterationDto.FromIterationNodeDto)
+                .ToList();
 
             _logger.LogDebug("{IterationCount} iterations found for project {ProjectId}.", iterationPaths.Count, projectName);
 
@@ -205,7 +211,30 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception thrown getting iterations for project {ProjectId} from Azure DevOps", projectName);
-            return Result.Failure<List<ClassificationNodeResponse>>(ex.ToString());
+            return Result.Failure<List<IterationDto>>(ex.ToString());
         }
+    }
+
+    private Dictionary<Guid, Guid> ConvertTeamSettingsToIterationTeamMapping(Dictionary<Guid, Guid?>? teamSettings)
+    {
+        Dictionary<Guid, Guid> iterationTeamMapping = [];
+        if (teamSettings is not null)
+        {
+            foreach (var team in teamSettings)
+            {
+                if (team.Value is null)
+                    continue;
+
+                if (iterationTeamMapping.ContainsKey(team.Value.Value))
+                {
+                    _logger.LogWarning("Iteration {IterationId} is already mapped to team {TeamId}.", team.Value.Value, team.Key);
+                    continue;
+                }
+
+                iterationTeamMapping.Add(team.Value.Value, team.Key);
+            }
+        }
+
+        return iterationTeamMapping;
     }
 }

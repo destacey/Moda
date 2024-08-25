@@ -10411,6 +10411,7 @@ export interface AzureDevOpsBoardsWorkspaceTeamDto {
     workspaceId?: string;
     teamId?: string;
     teamName?: string;
+    boardId?: string | undefined;
     internalTeamId?: string | undefined;
 }
 

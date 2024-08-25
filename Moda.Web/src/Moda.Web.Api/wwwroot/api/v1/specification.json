@@ -11461,6 +11461,12 @@
           "teamName": {
             "type": "string"
           },
+          "boardId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
           "internalTeamId": {
             "type": "string",
             "format": "guid",

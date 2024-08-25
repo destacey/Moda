@@ -12,14 +12,14 @@ internal record ClassificationNodeResponse
     [JsonPropertyName("name")]
     public required string Name { get; set; }
 
-    [JsonPropertyName("hasChildren")]
-    public bool? HasChildren { get; set; }
+    //[JsonPropertyName("hasChildren")]
+    //public bool? HasChildren { get; set; }
 
     [JsonPropertyName("children")]
     public List<ClassificationNodeResponse>? Children { get; set; }
 
-    [JsonPropertyName("path")]
-    public required string Path { get; set; }
+    //[JsonPropertyName("path")]
+    //public required string Path { get; set; }
 
     //[JsonIgnore]
     //public string WorkItemPath => Path[1..].Replace("\\Area", "");

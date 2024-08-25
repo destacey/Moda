@@ -36,26 +36,6 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         }
     }
 
-    //public async Task<Result<List<ClassificationNodeDto>>> GetAreas(string organizationUrl, string token, Guid projectId, CancellationToken cancellationToken)
-    //{
-    //    var connection = CreateVssConnection(organizationUrl, token);
-    //    var areaService = GetService<AreaService>(connection);
-
-    //    var areas = await areaService.GetAreas(projectId, cancellationToken);
-
-    //    return areas; // map to local type and return interface instead of concrete type
-    //}
-
-    //public async Task<Result<List<ClassificationNodeDto>>> GetIterations(string organizationUrl, string token, Guid projectId, CancellationToken cancellationToken)
-    //{
-    //    var connection = CreateVssConnection(organizationUrl, token);
-    //    var iterationService = GetService<IterationService>(connection);
-
-    //    var iterations = await iterationService.GetIterations(projectId, cancellationToken);
-
-    //    return iterations; // map to local type and return interface instead of concrete type
-    //}
-
     public async Task<Result<List<IExternalWorkProcess>>> GetWorkProcesses(string organizationUrl, string token, CancellationToken cancellationToken)
     {
         var processService = GetService<ProcessService>(organizationUrl, token);
@@ -115,11 +95,11 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
         return Result.Success(result.Value);
     }
 
-    public async Task<Result<List<IExternalWorkItem>>> GetWorkItems(string organizationUrl, string token, string projectName, DateTime lastChangedDate, string[] workItemTypes, CancellationToken cancellationToken)
+    public async Task<Result<List<IExternalWorkItem>>> GetWorkItems(string organizationUrl, string token, string projectName, DateTime lastChangedDate, string[] workItemTypes, Dictionary<Guid,Guid?> teamSettings, CancellationToken cancellationToken)
     {
         var projectService = GetService<ProjectService>(organizationUrl, token);
 
-        var iterationsResult = await projectService.GetIterationPaths(projectName, cancellationToken);
+        var iterationsResult = await projectService.GetIterations(projectName, teamSettings, cancellationToken);
         if (iterationsResult.IsFailure)
             return Result.Failure<List<IExternalWorkItem>>(iterationsResult.Error);
 

@@ -83,7 +83,6 @@ public sealed class AzureDevOpsBoardsInitManager(ILogger<AzureDevOpsBoardsInitMa
             _logger.LogError(ex, "An error occurred while trying to import projects from Azure DevOps for connection {ConnectionId}.", connectionId);
             return Result.Failure($"An error occurred while trying to import projects from Azure DevOps for connection {connectionId}.");
         }
-
     }
 
     public async Task<Result<Guid>> InitWorkProcessIntegration(Guid connectionId, Guid workProcessExternalId, CancellationToken cancellationToken)

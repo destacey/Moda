@@ -15,5 +15,6 @@ public interface IExternalWorkItem
     double StackRank { get; }
     Instant? ActivatedTimestamp { get; }
     Instant? DoneTimestamp { get; }
+    public Guid? TeamId { get; set; }
     string? ExternalTeamIdentifier { get; }
 }

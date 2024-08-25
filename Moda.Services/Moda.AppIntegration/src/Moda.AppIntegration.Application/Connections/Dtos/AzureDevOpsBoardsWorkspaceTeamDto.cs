@@ -19,6 +19,11 @@ public sealed record AzureDevOpsBoardsWorkspaceTeamDto : IMapFrom<AzureDevOpsBoa
     public required string TeamName { get; set; }
 
     /// <summary>
+    /// The unique identifier for the board in the Azure DevOps Boards system.
+    /// </summary>
+    public Guid? BoardId { get; set; }
+
+    /// <summary>
     /// The unique identifier for the team within Moda.
     /// </summary>
     public Guid? InternalTeamId { get; set; }

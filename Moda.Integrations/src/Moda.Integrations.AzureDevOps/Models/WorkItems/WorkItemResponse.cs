@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Moda.Common.Application.Interfaces.Work;
 using Moda.Integrations.AzureDevOps.Models.Contracts;
+using Moda.Integrations.AzureDevOps.Models.Projects;
 using NodaTime;
 
 namespace Moda.Integrations.AzureDevOps.Models.WorkItems;
@@ -20,7 +21,7 @@ internal static class WorkItemResponseExtensions
 {
     private static readonly double _defaultStackRank = 999_999_999_999D;
 
-    public static AzdoWorkItem ToAzdoWorkItem(this WorkItemResponse workItem, string iterationPathId)
+    public static AzdoWorkItem ToAzdoWorkItem(this WorkItemResponse workItem, IterationDto iteration)
     {
         return new AzdoWorkItem()
         {
@@ -38,18 +39,19 @@ internal static class WorkItemResponseExtensions
             StackRank = workItem.Fields.StackRank > 0 ? workItem.Fields.StackRank : _defaultStackRank,
             ActivatedTimestamp = workItem.Fields.ActivatedDate.HasValue ? Instant.FromDateTimeUtc(workItem.Fields.ActivatedDate.Value) : null,
             DoneTimestamp = workItem.Fields.ClosedDate.HasValue ? Instant.FromDateTimeUtc(workItem.Fields.ClosedDate.Value) : null,
-            ExternalTeamIdentifier = iterationPathId
+            TeamId = iteration.TeamId,
+            ExternalTeamIdentifier = iteration.Identifier.ToString()
         };
     }
 
-    public static List<IExternalWorkItem> ToIExternalWorkItems(this List<WorkItemResponse> workItems, List<ClassificationNodeResponse> iterationPaths)
+    public static List<IExternalWorkItem> ToIExternalWorkItems(this List<WorkItemResponse> workItems, List<IterationDto> iterations)
     {
-        var iterationPathsDictionary = iterationPaths.ToDictionary(x => x.Id, x => x.Identifier.ToString());
+        var iterationsDictionary = iterations.ToDictionary(x => x.Id, x => x);
         var result = new List<IExternalWorkItem>(workItems.Count);
         foreach (var workItem in workItems)
         {
-            var iterationPathId = iterationPathsDictionary[workItem.Fields.IterationId];
-            result.Add(workItem.ToAzdoWorkItem(iterationPathId));
+            var iteration = iterationsDictionary[workItem.Fields.IterationId];
+            result.Add(workItem.ToAzdoWorkItem(iteration));
         }
         return result;
     }
