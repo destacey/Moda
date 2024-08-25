@@ -36,8 +36,8 @@ internal class WorkItemFieldsResponse
     [JsonPropertyName("System.AssignedTo")]
     public UserResponse? AssignedTo { get; set; }
 
-    [JsonPropertyName("System.AreaId")]
-    public int AreaId { get; set; }
+    [JsonPropertyName("System.IterationId")]
+    public int IterationId { get; set; }
 
     [JsonPropertyName("Microsoft.VSTS.Common.ActivatedDate")]
     public DateTime? ActivatedDate { get; set; }

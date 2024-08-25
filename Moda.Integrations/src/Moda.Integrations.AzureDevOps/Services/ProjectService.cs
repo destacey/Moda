@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Extensions;
 using Moda.Integrations.AzureDevOps.Clients;
+using Moda.Integrations.AzureDevOps.Extensions;
 using Moda.Integrations.AzureDevOps.Models;
-using Moda.Integrations.AzureDevOps.Models.Contracts;
 using Moda.Integrations.AzureDevOps.Models.Projects;
 
 namespace Moda.Integrations.AzureDevOps.Services;
@@ -123,7 +122,24 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
                     continue;
                 }
 
-                teams.AddRange(response.Data.Value.ToIExternalTeams(id));
+                // set team settings: boardId
+                foreach (var team in response.Data.Value)
+                {
+                    var teamSettingsResponse = await _projectClient.GetProjectTeamsSettings(id, team.Id, cancellationToken);
+                    if (!teamSettingsResponse.IsSuccessful)
+                    {
+                        _logger.LogError("Error getting team settings for team {TeamId} in project {ProjectId} from Azure DevOps: {ErrorMessage}.", team.Id, id, teamSettingsResponse.ErrorMessage);
+                        continue;
+                    }
+                    if (teamSettingsResponse.Data is null)
+                    {
+                        _logger.LogWarning("No team settings found for team {TeamId} in project {ProjectId}.", team.Id, id);
+                        continue;
+                    }
+
+                    teams.Add(team.ToAzdoTeam(id, teamSettingsResponse.Data.BacklogIteration?.Id));
+                }
+
                 _logger.LogDebug("{TeamCount} teams found for project {ProjectId}.", response.Data.Value.Count, id);
             }
 
@@ -163,5 +179,62 @@ internal sealed class ProjectService(string organizationUrl, string token, strin
             _logger.LogError(ex, "Exception thrown getting areas for project {ProjectId} from Azure DevOps", projectName);
             return Result.Failure<List<ClassificationNodeResponse>> (ex.ToString());
         }
+    }
+
+    public async Task<Result<List<IterationDto>>> GetIterations(string projectName, Dictionary<Guid, Guid?>? teamSettings, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = await _projectClient.GetIterationPaths(projectName, cancellationToken);
+            if (!response.IsSuccessful)
+            {
+                _logger.LogError("Error getting iterations for project {ProjectId} from Azure DevOps: {ErrorMessage}.", projectName, response.ErrorMessage);
+                return Result.Failure<List<IterationDto>>(response.ErrorMessage);
+            }
+            if (response.Data is null)
+            {
+                _logger.LogWarning("No iterations found for project {ProjectId}.", projectName);
+                return Result.Failure<List<IterationDto>>($"No iterations found for project {projectName}");
+            }
+
+            Dictionary<Guid, Guid> iterationTeamMapping = ConvertTeamSettingsToIterationTeamMapping(teamSettings);
+
+            var iterationPaths = ((IterationNodeDto)response.Data)
+                .SetTeamIds(iterationTeamMapping)
+                .FlattenHierarchy(a => a.Children, IterationDto.FromIterationNodeDto)
+                .ToList();
+
+            _logger.LogDebug("{IterationCount} iterations found for project {ProjectId}.", iterationPaths.Count, projectName);
+
+            return iterationPaths;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception thrown getting iterations for project {ProjectId} from Azure DevOps", projectName);
+            return Result.Failure<List<IterationDto>>(ex.ToString());
+        }
+    }
+
+    private Dictionary<Guid, Guid> ConvertTeamSettingsToIterationTeamMapping(Dictionary<Guid, Guid?>? teamSettings)
+    {
+        Dictionary<Guid, Guid> iterationTeamMapping = [];
+        if (teamSettings is not null)
+        {
+            foreach (var team in teamSettings)
+            {
+                if (team.Value is null)
+                    continue;
+
+                if (iterationTeamMapping.ContainsKey(team.Value.Value))
+                {
+                    _logger.LogWarning("Iteration {IterationId} is already mapped to team {TeamId}.", team.Value.Value, team.Key);
+                    continue;
+                }
+
+                iterationTeamMapping.Add(team.Value.Value, team.Key);
+            }
+        }
+
+        return iterationTeamMapping;
     }
 }

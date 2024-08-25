@@ -18,5 +18,6 @@ public sealed record AzdoWorkItem : IExternalWorkItem
     public double StackRank { get; set; }
     public Instant? ActivatedTimestamp { get; set; }
     public Instant? DoneTimestamp { get; set; }
+    public Guid? TeamId { get; set; }
     public string? ExternalTeamIdentifier { get; set; }
 }

@@ -9800,6 +9800,7 @@ export interface WorkItemListDto {
     status?: string;
     statusCategory?: SimpleNavigationDto;
     parent?: WorkItemNavigationDto | undefined;
+    team?: WorkTeamNavigationDto | undefined;
     assignedTo?: EmployeeNavigationDto | undefined;
     stackRank?: number;
     externalViewWorkItemUrl?: string | undefined;
@@ -9820,6 +9821,10 @@ export interface WorkItemNavigationDto {
     title?: string;
     workspaceKey?: string;
     externalViewWorkItemUrl?: string | undefined;
+}
+
+export interface WorkTeamNavigationDto extends NavigationDto {
+    type?: string;
 }
 
 export interface EmployeeNavigationDto extends NavigationDto {
@@ -10022,6 +10027,7 @@ export interface WorkItemDetailsDto {
     statusCategory?: SimpleNavigationDto;
     priority?: number | undefined;
     parent?: WorkItemNavigationDto | undefined;
+    team?: WorkTeamNavigationDto | undefined;
     assignedTo?: EmployeeNavigationDto | undefined;
     created?: Date;
     createdBy?: EmployeeNavigationDto | undefined;
@@ -10411,6 +10417,7 @@ export interface AzureDevOpsBoardsWorkspaceTeamDto {
     workspaceId?: string;
     teamId?: string;
     teamName?: string;
+    boardId?: string | undefined;
     internalTeamId?: string | undefined;
 }
 

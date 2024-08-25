@@ -116,7 +116,7 @@ export const AgGridTransfer = <TData extends object>(
 
   const getGrid = useCallback(
     (isLeft: boolean) => (
-      <div className={agGridTheme} style={{ minHeight: 250, width: '100%' }}>
+      <div className={agGridTheme} style={{ minHeight: 400, width: '100%' }}>
         <AgGridReact
           ref={isLeft ? leftGridRef : rightGridRef}
           getRowId={props.getRowId}

@@ -40,10 +40,14 @@ export default WorkItemListItem
 const WorkItemListItemDescription = ({ workItem }: WorkItemListItemProps) => {
   return (
     <Space wrap>
-      <Tag>{workItem.type}</Tag>
-      <Tag color={getWorkStatusCategoryColor(workItem.statusCategory.name)}>
+      <Tag title="Work Item Type">{workItem.type}</Tag>
+      <Tag
+        title="Work Item Status"
+        color={getWorkStatusCategoryColor(workItem.statusCategory.name)}
+      >
         {workItem.status}
       </Tag>
+      {workItem.team && <Tag title="Work Item Team">{workItem.team.name}</Tag>}
     </Space>
   )
 }

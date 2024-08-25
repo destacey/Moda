@@ -46,6 +46,21 @@ internal sealed class ProjectClient : BaseClient
     }
 
     /// <summary>
+    /// Returns the team settings for the specified team.
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <param name="teamId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    internal async Task<RestResponse<TeamSettingsResponse>> GetProjectTeamsSettings(Guid projectId, Guid teamId, CancellationToken cancellationToken)
+    {
+        var request = new RestRequest($"/{projectId}/{teamId}/_apis/work/teamsettings", Method.Get);
+        SetupRequest(request);
+
+        return await _client.ExecuteAsync<TeamSettingsResponse>(request, cancellationToken);
+    }
+
+    /// <summary>
     /// Returns the root area path and all child area paths for the project.
     /// </summary>
     /// <param name="projectName"></param>
@@ -54,6 +69,21 @@ internal sealed class ProjectClient : BaseClient
     internal async Task<RestResponse<ClassificationNodeResponse>> GetAreaPaths(string projectName, CancellationToken cancellationToken)
     {
         var request = new RestRequest($"/{projectName}/_apis/wit/classificationnodes/areas", Method.Get);
+        SetupRequest(request);
+        request.AddParameter("$depth", 100); // TODO: make this configurable
+
+        return await _client.ExecuteAsync<ClassificationNodeResponse>(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// Returns the root iteration path and all child iteration paths for the project.
+    /// </summary>
+    /// <param name="projectName"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    internal async Task<RestResponse<ClassificationNodeResponse>> GetIterationPaths(string projectName, CancellationToken cancellationToken)
+    {
+        var request = new RestRequest($"/{projectName}/_apis/wit/classificationnodes/iterations", Method.Get);
         SetupRequest(request);
         request.AddParameter("$depth", 100); // TODO: make this configurable
 

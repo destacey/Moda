@@ -1,7 +1,7 @@
 'use client'
 
 import { WorkItemDetailsDto } from '@/src/services/moda-api'
-import { Descriptions, Steps } from 'antd'
+import { Descriptions } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import WorkItemSteps from './work-item-steps'
@@ -15,6 +15,11 @@ export interface WorkItemDetailsProps {
 const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
   if (!workItem) return null
 
+  const teamLink =
+    workItem.team?.type === 'Team'
+      ? `/organizations/teams/${workItem.team?.key}`
+      : `/organizations/team-of-teams/${workItem.team?.key}`
+
   return (
     <>
       <Descriptions>
@@ -23,14 +28,8 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
         <Item label="Status">{workItem.status}</Item>
         <Item label="Status Category">{workItem.statusCategory.name}</Item>
         <Item label="Priority">{workItem.priority}</Item>
-        <Item label="Assigned To">
-          {workItem.assignedTo ? (
-            <Link href={`/organizations/employees/${workItem.assignedTo.key}`}>
-              {workItem.assignedTo.name}
-            </Link>
-          ) : (
-            'Unassigned'
-          )}
+        <Item label="Team">
+          <Link href={teamLink}>{workItem.team?.name}</Link>
         </Item>
         <Item label="Parent">
           {workItem.parent ? (
@@ -41,6 +40,15 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
             </Link>
           ) : (
             'No Parent'
+          )}
+        </Item>
+        <Item label="Assigned To">
+          {workItem.assignedTo ? (
+            <Link href={`/organizations/employees/${workItem.assignedTo.key}`}>
+              {workItem.assignedTo.name}
+            </Link>
+          ) : (
+            'Unassigned'
           )}
         </Item>
         <Item label="Created By">

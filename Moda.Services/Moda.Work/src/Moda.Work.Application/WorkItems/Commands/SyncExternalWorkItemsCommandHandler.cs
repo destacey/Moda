@@ -129,6 +129,11 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                     var workItem = workspace.WorkItems.FirstOrDefault(wi => wi.ExternalId == externalWorkItem.Id);
                     try
                     {
+                        Guid? teamId = null;
+                        if (externalWorkItem.TeamId.HasValue)
+                        {
+                            request.teamMappings.TryGetValue(externalWorkItem.TeamId.Value, out teamId);
+                        }
 
                         if (workItem is null)
                         {
@@ -140,7 +145,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 workFlowSchemeData.WorkStatus.Id,
                                 workFlowSchemeData.WorkStatusCategory,
                                 parentWorkItemInfo,
-                                null,
+                                teamId,
                                 externalWorkItem.Created,
                                 employees.SingleOrDefault(e => e.Email == externalWorkItem.CreatedBy)?.Id,
                                 externalWorkItem.LastModified,
@@ -164,7 +169,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 workFlowSchemeData.WorkStatus.Id,
                                 workFlowSchemeData.WorkStatusCategory,
                                 parentWorkItemInfo,
-                                null,
+                                teamId,
                                 externalWorkItem.LastModified,
                                 employees.SingleOrDefault(e => e.Email == externalWorkItem.LastModifiedBy)?.Id,
                                 employees.SingleOrDefault(e => e.Email == externalWorkItem.AssignedTo)?.Id,

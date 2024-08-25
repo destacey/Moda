@@ -8,4 +8,6 @@ public sealed record AzdoTeam : IExternalTeam
     public required string Name { get; set; }
 
     public Guid WorkspaceId { get; set; }
+
+    public Guid? BoardId { get; set; }
 }

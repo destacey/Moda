@@ -57,6 +57,11 @@ const workItemColDefs: ColDef<WorkItemModel>[] = [
     minWidth: 100,
   },
   {
+    field: 'team.name',
+    headerName: 'Team',
+    minWidth: 100,
+  },
+  {
     field: 'parent.key',
     headerName: 'Parent Key',
     minWidth: 100,

@@ -138,7 +138,11 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                                 _ => new DateTime(1900, 01, 01)
                             };
 
-                            var syncWorkItemsResult = await SyncWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, lastChangedDate, workspace.IntegrationState!.InternalId, workspace.Name, cancellationToken);
+                            var workspaceTeams = connectionDetails.TeamConfiguration.WorkspaceTeams
+                                .Where(t => t.WorkspaceId == workspace.ExternalId)
+                                .ToArray();
+
+                            var syncWorkItemsResult = await SyncWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, lastChangedDate, workspace.IntegrationState!.InternalId, workspace.Name, workspaceTeams, cancellationToken);
                             if (syncWorkItemsResult.IsFailure)
                             {
                                 _logger.LogError("An error occurred while syncing Azure DevOps Boards workspace {WorkspaceId} work items. Error: {Error}", workspace.IntegrationState!.InternalId, syncWorkItemsResult.Error);
@@ -273,7 +277,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
             : updateResult;
     }
 
-    private async Task<Result> SyncWorkItems(string organizationUrl, string personalAccessToken, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, CancellationToken cancellationToken)
+    private async Task<Result> SyncWorkItems(string organizationUrl, string personalAccessToken, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, AzureDevOpsBoardsWorkspaceTeamDto[] workspaceTeams, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
         Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
@@ -283,7 +287,30 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         if (workTypesResult.IsFailure)
             return workTypesResult.ConvertFailure();
 
-        var workItemsResult = await _azureDevOpsService.GetWorkItems(organizationUrl, personalAccessToken, azdoWorkspaceName, lastChangedDate, workTypesResult.Value.Select(t => t.Name).ToArray(), cancellationToken);
+        Dictionary<Guid, Guid?> teamSettings;
+        Dictionary<Guid, Guid?> teamMappings;
+        if (workspaceTeams.Length > 0)
+        {
+            teamSettings = new Dictionary<Guid, Guid?>(workspaceTeams.Length);
+            teamMappings = new Dictionary<Guid, Guid?>(workspaceTeams.Length);
+
+            foreach (var team in workspaceTeams)
+            {
+                // Only add teams that have an internal team id.  This will allow mapped parent teams to be set for items that are assigned to teams that haven't been mapped.
+                if (team.InternalTeamId is null)
+                    continue;
+
+                teamSettings[team.TeamId] = team.BoardId;
+                teamMappings[team.TeamId] = team.InternalTeamId;
+            }
+        }
+        else
+        {
+            teamSettings = [];
+            teamMappings = [];
+        }
+
+        var workItemsResult = await _azureDevOpsService.GetWorkItems(organizationUrl, personalAccessToken, azdoWorkspaceName, lastChangedDate, workTypesResult.Value.Select(t => t.Name).ToArray(), teamSettings, cancellationToken);
         if (workItemsResult.IsFailure)
             return workItemsResult.ConvertFailure();
 
@@ -292,7 +319,7 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         if (workItemsResult.Value.Count == 0)
             return Result.Success();
 
-        var syncWorkItemsResult = await _sender.Send(new SyncExternalWorkItemsCommand(workspaceId, workItemsResult.Value), cancellationToken);
+        var syncWorkItemsResult = await _sender.Send(new SyncExternalWorkItemsCommand(workspaceId, workItemsResult.Value, teamMappings), cancellationToken);
 
         return syncWorkItemsResult.IsSuccess
             ? Result.Success()

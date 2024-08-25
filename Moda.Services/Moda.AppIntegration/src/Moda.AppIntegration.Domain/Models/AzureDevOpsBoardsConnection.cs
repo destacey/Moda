@@ -176,7 +176,7 @@ public sealed class AzureDevOpsBoardsConnection : Connection<AzureDevOpsBoardsCo
 
             foreach (var team in teams)
             {
-                var result = TeamConfiguration.UpsertWorkspaceTeam(team.WorkspaceId, team.Id, team.Name);
+                var result = TeamConfiguration.UpsertWorkspaceTeam(team.WorkspaceId, team.Id, team.Name, team.BoardId);
                 if (result.IsFailure)
                     return result;
             }
