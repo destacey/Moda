@@ -7,6 +7,7 @@ export enum QueryTags {
   Connections = 'AppIntegration.Connections',
   // ORGANIZATIONS
   Team = 'Organizations.Team',
+  TeamBacklog = 'Organizations.TeamBacklog',
   // PLANNING
   PlanningInterval = 'Planning.PlanningInterval',
   PlanningIntervalObjective = 'Planning.PlanningIntervalObjective',

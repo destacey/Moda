@@ -6533,6 +6533,67 @@ export class TeamsClient {
     }
 
     /**
+     * Get the backlog for a team.
+     */
+    getTeamBacklog(idOrCode: string, cancelToken?: CancelToken): Promise<WorkItemBacklogItemDto[]> {
+        let url_ = this.baseUrl + "/api/organization/teams/{idOrCode}/backlog";
+        if (idOrCode === undefined || idOrCode === null)
+            throw new Error("The parameter 'idOrCode' must be defined.");
+        url_ = url_.replace("{idOrCode}", encodeURIComponent("" + idOrCode));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetTeamBacklog(_response);
+        });
+    }
+
+    protected processGetTeamBacklog(response: AxiosResponse): Promise<WorkItemBacklogItemDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<WorkItemBacklogItemDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<WorkItemBacklogItemDto[]>(null as any);
+    }
+
+    /**
      * Get team risks.
      * @param includeClosed (optional) 
      */
@@ -10264,6 +10325,24 @@ export interface UpdateTeamMembershipRequest {
     teamMembershipId: string;
     start: Date;
     end?: Date | undefined;
+}
+
+export interface WorkItemBacklogItemDto {
+    id?: string;
+    key?: string;
+    title?: string;
+    workspace?: WorkspaceNavigationDto;
+    type?: string;
+    status?: string;
+    statusCategory?: SimpleNavigationDto;
+    parent?: WorkItemNavigationDto | undefined;
+    team?: WorkTeamNavigationDto | undefined;
+    assignedTo?: EmployeeNavigationDto | undefined;
+    created?: Date;
+    rank?: number;
+    parentRank?: number | undefined;
+    externalViewWorkItemUrl?: string | undefined;
+    stackRank?: number;
 }
 
 export interface TeamOfTeamsListDto {

@@ -2,11 +2,15 @@
 using Moda.Organization.Application.Teams.Commands;
 using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
+using Moda.Organization.Domain.Extensions;
+using Moda.Organization.Domain.Models;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
 using Moda.Web.Api.Models.Organizations;
 using Moda.Web.Api.Models.Organizations.Teams;
 using Moda.Web.Api.Models.Planning.Risks;
+using Moda.Work.Application.WorkItems.Dtos;
+using Moda.Work.Application.WorkItems.Queries;
 
 namespace Moda.Web.Api.Controllers.Organizations;
 
@@ -180,6 +184,39 @@ public class TeamsController : ControllerBase
     }
 
     #endregion Team Memberships
+
+    #region Backlog
+
+    [HttpGet("{idOrCode}/backlog")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
+    [OpenApiOperation("Get the backlog for a team.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<WorkItemBacklogItemDto>>> GetTeamBacklog(string idOrCode, CancellationToken cancellationToken)
+    {
+        GetTeamBacklogQuery query;
+        if (Guid.TryParse(idOrCode, out Guid guidId))
+        {
+            query = new GetTeamBacklogQuery(guidId);
+        }
+        else if (idOrCode.IsValidTeamCodeFormat())
+        {
+            query = new GetTeamBacklogQuery(new TeamCode(idOrCode));
+        }
+        else
+        {
+            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("TeamsController.GetTeamBacklog"));
+        }
+
+        var result = await _sender.Send(query, cancellationToken);
+
+        return result.IsFailure
+            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "TeamsController.GetTeamBacklog"))
+            : Ok(result.Value);
+    }
+
+    #endregion Backlog
+
 
     #region Risks
 
