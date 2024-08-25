@@ -6,6 +6,7 @@ import { ColDef } from 'ag-grid-community'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import { ExportOutlined } from '@ant-design/icons'
+import { NestedTeamNameLinkCellRenderer } from '../moda-grid-cell-renderers'
 
 export interface WorkItemsGridProps {
   workItems: WorkItemListDto[]
@@ -111,9 +112,9 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         comparator: workStatusCategoryComparator,
       },
       {
-        field: 'assignedTo.name',
-        headerName: 'Assigned To',
-        cellRenderer: AssignedToLinkCellRenderer,
+        field: 'team.name',
+        headerName: 'Team',
+        cellRenderer: NestedTeamNameLinkCellRenderer,
       },
       {
         field: 'parent.key',
@@ -125,6 +126,11 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         field: 'parent.title',
         headerName: 'Parent',
         width: 400,
+      },
+      {
+        field: 'assignedTo.name',
+        headerName: 'Assigned To',
+        cellRenderer: AssignedToLinkCellRenderer,
       },
     ],
     [],

@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
 using Moda.Work.Application.Workspaces.Dtos;
+using Moda.Work.Application.WorkTeams.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
 public sealed record WorkItemListDto : IMapFrom<WorkItem>
@@ -13,6 +14,7 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
     public required string Status { get; set; }
     public required SimpleNavigationDto StatusCategory { get; set; }
     public WorkItemNavigationDto? Parent { get; set; }
+    public WorkTeamNavigationDto? Team { get; set; }
     public EmployeeNavigationDto? AssignedTo { get; set; }
     public double StackRank { get; set; }
     public string? ExternalViewWorkItemUrl { get; set; }

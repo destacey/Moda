@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
 using Moda.Work.Application.Workspaces.Dtos;
+using Moda.Work.Application.WorkTeams.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
 public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
@@ -16,6 +17,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
     public required SimpleNavigationDto StatusCategory { get; set; }
     public int? Priority { get; set; }
     public WorkItemNavigationDto? Parent { get; set; }
+    public WorkTeamNavigationDto? Team { get; set; }
     public EmployeeNavigationDto? AssignedTo { get; set; }
     public Instant Created { get; set; }
     public EmployeeNavigationDto? CreatedBy { get; set; }

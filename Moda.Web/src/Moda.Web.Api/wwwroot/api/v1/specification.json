@@ -9250,6 +9250,14 @@
               }
             ]
           },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkTeamNavigationDto"
+              }
+            ]
+          },
           "assignedTo": {
             "nullable": true,
             "oneOf": [
@@ -9322,6 +9330,22 @@
             "nullable": true
           }
         }
+      },
+      "WorkTeamNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        ]
       },
       "EmployeeNavigationDto": {
         "allOf": [
@@ -10042,6 +10066,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/WorkItemNavigationDto"
+              }
+            ]
+          },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkTeamNavigationDto"
               }
             ]
           },
