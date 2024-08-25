@@ -1,7 +1,7 @@
 'use client'
 
 import { ModaGrid } from '@/src/app/components/common'
-import { WorkItemListDto } from '@/src/services/moda-api'
+import { WorkItemBacklogItemDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
@@ -12,8 +12,9 @@ import {
   workStatusCategoryComparator,
 } from './work-item-utils'
 
-export interface WorkItemsGridProps {
-  workItems: WorkItemListDto[]
+export interface WorkItemsBacklogGridProps {
+  workItems: WorkItemBacklogItemDto[]
+  hideTeamColumn: boolean
   isLoading: boolean
   refetch: () => void
 }
@@ -78,11 +79,12 @@ const AssignedToLinkCellRenderer = ({ value, data }) => {
   )
 }
 
-const WorkItemsGrid = (props: WorkItemsGridProps) => {
+const WorkItemsBacklogGrid = (props: WorkItemsBacklogGridProps) => {
   const { refetch } = props
 
-  const columnDefs = useMemo<ColDef<WorkItemListDto>[]>(
+  const columnDefs = useMemo<ColDef<WorkItemBacklogItemDto>[]>(
     () => [
+      { field: 'rank', width: 125 },
       {
         field: 'key',
         comparator: workItemKeyComparator,
@@ -101,6 +103,7 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         field: 'team.name',
         headerName: 'Team',
         cellRenderer: NestedTeamNameLinkCellRenderer,
+        hide: props.hideTeamColumn,
       },
       {
         field: 'parent.key',
@@ -119,7 +122,7 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         cellRenderer: AssignedToLinkCellRenderer,
       },
     ],
-    [],
+    [props.hideTeamColumn],
   )
 
   const refresh = useCallback(async () => {
@@ -139,4 +142,4 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
   )
 }
 
-export default WorkItemsGrid
+export default WorkItemsBacklogGrid

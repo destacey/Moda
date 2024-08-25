@@ -3,6 +3,7 @@ import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
 import { BaseOptionType } from 'antd/es/select'
+import { WorkItemBacklogItemDto } from '@/src/services/moda-api'
 
 export const teamApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -56,7 +57,26 @@ export const teamApi = apiSlice.injectEndpoints({
         ...result.map(({ key }) => ({ type: QueryTags.Team, key })),
       ],
     }),
+    getTeamBacklog: builder.query<WorkItemBacklogItemDto[], string>({
+      queryFn: async (idOrCode: string) => {
+        try {
+          const data = await (await getTeamsClient()).getTeamBacklog(idOrCode)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        QueryTags.TeamBacklog,
+        ...result.map(({ key }) => ({ type: QueryTags.TeamBacklog, key })),
+      ],
+    }),
   }),
 })
 
-export const { useGetTeamsQuery, useGetTeamOptionsQuery } = teamApi
+export const {
+  useGetTeamsQuery,
+  useGetTeamOptionsQuery,
+  useGetTeamBacklogQuery,
+} = teamApi

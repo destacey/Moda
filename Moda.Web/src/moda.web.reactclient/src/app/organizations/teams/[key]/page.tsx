@@ -27,9 +27,13 @@ import {
 } from '../../../../store/features/organizations/team-slice'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
+import { WorkItemsBacklogGrid } from '@/src/app/components/common/work'
+import { useGetTeamBacklogQuery } from '@/src/store/features/organizations/team-api'
+import { WorkItemsBacklogGridProps } from '@/src/app/components/common/work/work-items-backlog-grid'
 
 enum TeamTabs {
   Details = 'details',
+  Backlog = 'backlog',
   RiskManagement = 'risk-management',
   TeamMemberships = 'team-memberships',
 }
@@ -67,6 +71,8 @@ const TeamDetailsPage = ({ params }) => {
     teamMembershipsQueryEnabled,
   )
 
+  const backlogQuery = useGetTeamBacklogQuery(team?.id, { skip: !team?.id })
+
   const risksQuery = useGetTeamRisks(
     team?.id,
     includeClosedRisks,
@@ -97,6 +103,16 @@ const TeamDetailsPage = ({ params }) => {
       key: TeamTabs.Details,
       tab: 'Details',
       content: <TeamDetails team={team} />,
+    },
+    {
+      key: TeamTabs.Backlog,
+      tab: 'Backlog',
+      content: createElement(WorkItemsBacklogGrid, {
+        workItems: backlogQuery.data,
+        hideTeamColumn: true,
+        isLoading: backlogQuery.isLoading,
+        refetch: backlogQuery.refetch,
+      } as WorkItemsBacklogGridProps),
     },
     {
       key: TeamTabs.RiskManagement,

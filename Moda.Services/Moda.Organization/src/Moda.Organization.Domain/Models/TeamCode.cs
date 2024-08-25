@@ -3,6 +3,8 @@ using CSharpFunctionalExtensions;
 using Moda.Organization.Domain.Extensions;
 
 namespace Moda.Organization.Domain.Models;
+
+// TODO: move to Moda.Common.Domain
 public class TeamCode : ValueObject
 {
     public static string Regex = "^([A-Z0-9]){2,10}$";
