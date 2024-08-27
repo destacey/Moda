@@ -14,7 +14,7 @@ import {
 } from '@reduxjs/toolkit'
 import { FieldData } from 'rc-field-form/lib/interface'
 import { toFormErrors } from '../utils'
-import { TypedActionCreator } from '@reduxjs/toolkit/dist/mapBuilders'
+import { TypedActionCreator } from '@reduxjs/toolkit/src/mapBuilders'
 import { NoInfer } from 'react-redux'
 
 type CrudThunkAction = {
