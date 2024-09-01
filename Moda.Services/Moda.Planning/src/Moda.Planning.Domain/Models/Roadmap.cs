@@ -77,9 +77,15 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule
     /// <param name="description"></param>
     /// <param name="dateRange"></param>
     /// <param name="isPublic"></param>
+    /// <param name="currentUserId"
     /// <returns></returns>
-    public Result Update(string name, string? description, LocalDateRange dateRange, bool isPublic)
+    public Result Update(string name, string? description, LocalDateRange dateRange, bool isPublic, Guid currentUserId)
     {
+        if (!_managers.Any(x => x.ManagerId == currentUserId))
+        {
+            return Result.Failure("User is not a manager of this roadmap.");
+        }
+
         Name = name;
         Description = description;
         DateRange = dateRange;

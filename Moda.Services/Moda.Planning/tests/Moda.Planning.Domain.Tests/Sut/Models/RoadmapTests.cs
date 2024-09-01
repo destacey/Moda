@@ -59,14 +59,15 @@ public class RoadmapTests
     public void Update_ValidParameters_ShouldReturnSuccess()
     {
         // Arrange
-        var roadmap = Roadmap.Create("Initial Name", "Initial Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), false, [Guid.NewGuid()]).Value;
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create("Initial Name", "Initial Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), false, [managerId]).Value;
         var newName = "Updated Name";
         var newDescription = "Updated Description";
         var newDateRange = new LocalDateRange(_dateTimeProvider.Today.PlusDays(1), _dateTimeProvider.Today.PlusDays(11));
         var newIsPublic = true;
 
         // Act
-        var result = roadmap.Update(newName, newDescription, newDateRange, newIsPublic);
+        var result = roadmap.Update(newName, newDescription, newDateRange, newIsPublic, managerId);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -75,6 +76,22 @@ public class RoadmapTests
         roadmap.DateRange.Should().Be(newDateRange);
         roadmap.IsPublic.Should().Be(newIsPublic);
     }
+
+    [Fact]
+    public void Update_InvalidManagerId_ShouldReturnFailure()
+    {
+        // Arrange
+        var managerId = Guid.NewGuid();
+        var roadmap = Roadmap.Create("Initial Name", "Initial Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), false, [managerId]).Value;
+
+        // Act
+        var result = roadmap.Update("Updated Name", "Updated Description", new LocalDateRange(_dateTimeProvider.Today.PlusDays(1), _dateTimeProvider.Today.PlusDays(11)), true, Guid.NewGuid());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("User is not a manager of this roadmap.");
+    }
+
 
     [Fact]
     public void AddManager_ValidManagerId_ShouldReturnSuccess()
