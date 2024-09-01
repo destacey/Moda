@@ -1,20 +1,19 @@
-﻿
+﻿using System.Linq.Expressions;
 using Moda.Planning.Application.PlanningIntervals.Dtos;
+using OneOf;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;
 public sealed record GetPlanningIntervalQuery : IQuery<PlanningIntervalDetailsDto?>
 {
-    public GetPlanningIntervalQuery(Guid planningIntervalId)
+    public GetPlanningIntervalQuery(OneOf<Guid, int> idOrKey)
     {
-        PlanningIntervalId = planningIntervalId;
-    }
-    public GetPlanningIntervalQuery(int planningIntervalKey)
-    {
-        PlanningIntervalKey = planningIntervalKey;
+        IdOrKeyFilter = idOrKey.Match(
+            id => (Expression<Func<PlanningInterval, bool>>)(r => r.Id == id),
+            key => (Expression<Func<PlanningInterval, bool>>)(r => r.Key == key)
+        );
     }
 
-    public Guid? PlanningIntervalId { get; }
-    public int? PlanningIntervalKey { get; }
+    public Expression<Func<PlanningInterval, bool>> IdOrKeyFilter { get; }
 }
 
 internal sealed class GetPlanningIntervalQueryHandler : IQueryHandler<GetPlanningIntervalQuery, PlanningIntervalDetailsDto?>
@@ -32,28 +31,9 @@ internal sealed class GetPlanningIntervalQueryHandler : IQueryHandler<GetPlannin
 
     public async Task<PlanningIntervalDetailsDto?> Handle(GetPlanningIntervalQuery request, CancellationToken cancellationToken)
     {
-        var query = _planningDbContext.PlanningIntervals
+        return await _planningDbContext.PlanningIntervals
             .Include(p => p.Objectives)
-            .AsQueryable();
-
-        if (request.PlanningIntervalId.HasValue)
-        {
-            query = query.Where(e => e.Id == request.PlanningIntervalId.Value);
-        }
-        else if (request.PlanningIntervalKey.HasValue)
-        {
-            query = query.Where(e => e.Key == request.PlanningIntervalKey.Value);
-        }
-        else
-        {
-            var requestName = request.GetType().Name;
-            var exception = new InternalServerException("No planning interval id or local id provided.");
-
-            _logger.LogError(exception, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-            throw exception;
-        }
-
-        return await query
+            .Where(request.IdOrKeyFilter)
             .Select(p => PlanningIntervalDetailsDto.Create(p, _dateTimeProvider))
             .FirstOrDefaultAsync(cancellationToken);
     }
