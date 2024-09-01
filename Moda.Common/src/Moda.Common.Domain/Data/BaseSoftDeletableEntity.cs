@@ -2,7 +2,7 @@
 
 namespace Moda.Common.Domain.Data;
 
-public abstract class BaseAuditableEntity<TId> : BaseEntity<TId>, IAuditable, ISoftDelete
+public abstract class BaseSoftDeletableEntity<TId> : BaseEntity<TId>, IAuditable, ISoftDelete
 {
     public Instant Created { get; set; }
 

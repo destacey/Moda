@@ -10,9 +10,9 @@ namespace Moda.Work.Domain.Models;
 /// <summary>
 /// A workflow is a sequence of work statuses that a work item can move through.  It is used to define the process for a work item.
 /// </summary>
-/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
-public sealed class Workflow : BaseAuditableEntity<Guid>, IActivatable
+public sealed class Workflow : BaseSoftDeletableEntity<Guid>, IActivatable
 {
     private readonly List<WorkflowScheme> _schemes = [];
     private string _name = null!;

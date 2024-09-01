@@ -2,7 +2,7 @@
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Domain.Models;
-public class PlanningIntervalObjective : BaseAuditableEntity<Guid>
+public class PlanningIntervalObjective : BaseSoftDeletableEntity<Guid>
 {
     private PlanningIntervalObjective() { }
 

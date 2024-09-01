@@ -5,7 +5,7 @@ using Moda.Planning.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public sealed class PlanningIntervalIteration : BaseAuditableEntity<Guid>, ILocalSchedule
+public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, ILocalSchedule
 {
     private string _name = default!;
     private LocalDateRange _dateRange = default!;

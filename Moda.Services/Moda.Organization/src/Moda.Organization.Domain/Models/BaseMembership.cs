@@ -3,7 +3,7 @@ using Moda.Organization.Domain.Enums;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
-public abstract class BaseMembership : BaseAuditableEntity<Guid>
+public abstract class BaseMembership : BaseSoftDeletableEntity<Guid>
 {
     private MembershipDateRange _dateRange = default!;
 

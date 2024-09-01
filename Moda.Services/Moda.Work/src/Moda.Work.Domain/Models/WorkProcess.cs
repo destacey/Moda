@@ -9,9 +9,9 @@ namespace Moda.Work.Domain.Models;
 /// The work process defines a set of work process configurations that can be used
 /// within a workspace. A work process can be used in many workspaces.
 /// </summary>
-/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
-public sealed class WorkProcess : BaseAuditableEntity<Guid>, IActivatable
+public sealed class WorkProcess : BaseSoftDeletableEntity<Guid>, IActivatable
 {
     private string _name = null!;
     private string? _description;

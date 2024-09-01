@@ -5,7 +5,7 @@ using Moda.Planning.Domain.Enums;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public class Risk : BaseAuditableEntity<Guid>
+public class Risk : BaseSoftDeletableEntity<Guid>
 {
     private string _summary = default!;
     private string? _description;
