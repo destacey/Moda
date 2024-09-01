@@ -1,11 +1,11 @@
 ﻿using Moda.Common.Domain.Employees;
 
 namespace Moda.Planning.Domain.Models;
-public sealed class RoadmapManagers
+public sealed class RoadmapManager
 {
-    private RoadmapManagers() { }
+    private RoadmapManager() { }
 
-    internal RoadmapManagers(Roadmap roadmap, Guid managerId)
+    internal RoadmapManager(Roadmap roadmap, Guid managerId)
     {
         RoadmapId = roadmap.Id;
         ManagerId = managerId;

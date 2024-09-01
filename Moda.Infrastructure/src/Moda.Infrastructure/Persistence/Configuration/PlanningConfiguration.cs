@@ -298,6 +298,70 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
     }
 }
 
+public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
+{
+    public void Configure(EntityTypeBuilder<Roadmap> builder)
+    {
+        builder.ToTable("Roadmaps", SchemaNames.Planning);
+
+        builder.HasKey(p => p.Id);
+        builder.HasAlternateKey(p => p.Key);
+
+        builder.HasIndex(p => p.Id)
+            .IncludeProperties(p => new { p.Key, p.Name, p.IsPublic });
+
+        builder.HasIndex(p => p.Key)
+            .IncludeProperties(p => new { p.Id, p.Name, p.IsPublic });
+
+        builder.Property(p => p.Key).ValueGeneratedOnAdd();
+
+        builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
+        builder.Property(p => p.Description).HasMaxLength(2048);
+
+        // Value Objects
+        builder.ComplexProperty(p => p.DateRange, options =>
+        {
+            options.Property(d => d.Start).HasColumnName("Start").IsRequired();
+            options.Property(d => d.End).HasColumnName("End").IsRequired();
+        });
+
+        // Audit
+        builder.Property(p => p.Created);
+        builder.Property(p => p.CreatedBy);
+        builder.Property(p => p.LastModified);
+        builder.Property(p => p.LastModifiedBy);
+
+        // Relationships
+        builder.HasMany(p => p.Managers)
+            .WithOne()
+            .HasForeignKey(rm => rm.RoadmapId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class RoadmapManagerConfiguration : IEntityTypeConfiguration<RoadmapManager>
+{
+    public void Configure(EntityTypeBuilder<RoadmapManager> builder)
+    {
+        builder.ToTable("RoadmapManagers", SchemaNames.Planning);
+
+        builder.HasKey(rm => new { rm.RoadmapId, rm.ManagerId });
+
+        builder.Property(rm => rm.RoadmapId)
+            .IsRequired();
+
+        builder.Property(rm => rm.ManagerId)
+            .IsRequired();
+
+        builder.HasOne(rm => rm.Manager)
+            .WithMany()
+            .HasForeignKey(rm => rm.ManagerId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+
+
 public class SimpleHealthCheckConfig : IEntityTypeConfiguration<SimpleHealthCheck>
 {
     public void Configure(EntityTypeBuilder<SimpleHealthCheck> builder)

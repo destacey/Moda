@@ -9,7 +9,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule
     private string? _description;
     private LocalDateRange _dateRange = default!;
 
-    private readonly List<RoadmapManagers> _managers = [];
+    private readonly List<RoadmapManager> _managers = [];
 
     private Roadmap() { }
 
@@ -68,7 +68,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule
     /// <summary>
     /// The managers of the Roadmap. Managers have full control over the Roadmap.
     /// </summary>
-    public IReadOnlyCollection<RoadmapManagers> Managers => _managers.AsReadOnly();
+    public IReadOnlyCollection<RoadmapManager> Managers => _managers.AsReadOnly();
 
     /// <summary>
     /// Updates the Roadmap.
@@ -106,7 +106,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule
             return Result.Failure("Roadmap manager already exists on this roadmap.");
         }
 
-        _managers.Add(new RoadmapManagers(this, managerId));
+        _managers.Add(new RoadmapManager(this, managerId));
         return Result.Success();
     }
 
