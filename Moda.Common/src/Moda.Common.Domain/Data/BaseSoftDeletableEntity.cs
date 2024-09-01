@@ -2,16 +2,8 @@
 
 namespace Moda.Common.Domain.Data;
 
-public abstract class BaseSoftDeletableEntity<TId> : BaseEntity<TId>, IAuditable, ISoftDelete
+public abstract class BaseSoftDeletableEntity<TId> : BaseAuditableEntity<TId>, ISoftDelete
 {
-    public Instant Created { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public Instant LastModified { get; set; }
-
-    public Guid? LastModifiedBy { get; set; }
-
     /// <summary>
     /// The date and time the record was deleted.
     /// </summary>
