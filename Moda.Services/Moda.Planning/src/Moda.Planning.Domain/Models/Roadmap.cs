@@ -1,10 +1,151 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
+using Moda.Planning.Domain.Interfaces;
 
 namespace Moda.Planning.Domain.Models;
-public class Roadmap : BaseSoftDeletableEntity<int>
+public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule
 {
+    private string _name = default!;
+    private string? _description;
+    private LocalDateRange _dateRange = default!;
+
+    private readonly List<RoadmapManagers> _managers = [];
+
+    private Roadmap() { }
+
+    private Roadmap(string name, string? description, LocalDateRange dateRange, bool isPublic, Guid[] managers)
+    {
+        Guard.Against.NullOrEmpty(managers, nameof(managers));
+
+        Name = name;
+        Description = description;
+        DateRange = dateRange;
+        IsPublic = isPublic;
+
+        foreach (var managerId in managers)
+        {
+            AddManager(managerId);
+        }
+    }
+
+    /// <summary>
+    /// The unique key of the Roadmap.  This is an alternate key to the Id.
+    /// </summary>
+    public int Key { get; private init; }
+
+    /// <summary>
+    /// The name of the Roadmap.
+    /// </summary>
+    public string Name
+    {
+        get => _name;
+        private set => _name = Guard.Against.NullOrWhiteSpace(value, nameof(Name)).Trim();
+    }
+
+    /// <summary>
+    /// The description of the Roadmap.
+    /// </summary>
+    public string? Description
+    {
+        get => _description;
+        private set => _description = value.NullIfWhiteSpacePlusTrim();
+    }
+
+    /// <summary>
+    /// The date range of the Roadmap.
+    /// </summary>
+    public LocalDateRange DateRange
+    {
+        get => _dateRange;
+        private set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
+    }
+
+    /// <summary>
+    /// Indicates if the Roadmap is public.  If true, the Roadmap is visible to all users. If false, the Roadmap is only visible to the managers.
+    /// </summary>
+    public bool IsPublic { get; private set; } = false;
+
+    /// <summary>
+    /// The managers of the Roadmap. Managers have full control over the Roadmap.
+    /// </summary>
+    public IReadOnlyCollection<RoadmapManagers> Managers => _managers.AsReadOnly();
+
+    /// <summary>
+    /// Updates the Roadmap.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="description"></param>
+    /// <param name="dateRange"></param>
+    /// <param name="isPublic"></param>
+    /// <returns></returns>
+    public Result Update(string name, string? description, LocalDateRange dateRange, bool isPublic)
+    {
+        Name = name;
+        Description = description;
+        DateRange = dateRange;
+        IsPublic = isPublic;
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Adds a manager to the Roadmap.
+    /// </summary>
+    /// <param name="managerId"></param>
+    /// <returns></returns>
+    public Result AddManager(Guid managerId)
+    {
+        if (_managers.Any(x => x.ManagerId == managerId))
+        {
+            return Result.Failure("Roadmap manager already exists on this roadmap.");
+        }
+
+        _managers.Add(new RoadmapManagers(this, managerId));
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Removes a manager from the Roadmap.
+    /// </summary>
+    /// <param name="managerId"></param>
+    /// <returns></returns>
+    public Result RemoveManager(Guid managerId)
+    {
+        var manager = _managers.FirstOrDefault(x => x.ManagerId == managerId);
+        if (manager is null)
+        {
+            return Result.Failure("Roadmap manager does not exist on this roadmap.");
+        }
+
+        if (_managers.Count == 1)
+        {
+            return Result.Failure("Roadmap must have at least one manager.");
+        }
+
+        _managers.Remove(manager);
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Creates a new Roadmap.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="description"></param>
+    /// <param name="dateRange"></param>
+    /// <param name="isPublic"></param>
+    /// <param name="managers"></param>
+    /// <returns></returns>
+    public static Result<Roadmap> Create(string name, string? description, LocalDateRange dateRange, bool isPublic, Guid[] managers)
+    {
+        try
+        {
+            var roadmap = new Roadmap(name, description, dateRange, isPublic, managers);
+
+            return roadmap;
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<Roadmap>(ex.Message);
+        }
+    }
 }

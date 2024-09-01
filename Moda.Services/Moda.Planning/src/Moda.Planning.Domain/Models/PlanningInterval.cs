@@ -12,9 +12,9 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule
     private string? _description;
     private LocalDateRange _dateRange = default!;
 
-    private readonly List<PlanningIntervalTeam> _teams = new();
-    private readonly List<PlanningIntervalIteration> _iterations = new();
-    private readonly List<PlanningIntervalObjective> _objectives = new();
+    private readonly List<PlanningIntervalTeam> _teams = [];
+    private readonly List<PlanningIntervalIteration> _iterations = [];
+    private readonly List<PlanningIntervalObjective> _objectives = [];
 
     private PlanningInterval() { }
 
@@ -28,9 +28,10 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule
         ObjectivesLocked = false;
     }
 
-    /// <summary>Gets the key.</summary>
-    /// <value>The key.</value>
-    public int Key { get; private set; }
+    /// <summary>
+    /// The unique key of the Planning Interval.  This is an alternate key to the Id.
+    /// </summary>
+    public int Key { get; private init; }
 
     /// <summary>
     /// The name of the Planning Interval.
