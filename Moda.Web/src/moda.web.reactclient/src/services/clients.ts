@@ -19,6 +19,7 @@ import {
   WorkspacesClient,
   WorkTypeLevelsClient,
   WorkTypeTiersClient,
+  RoadmapsClient,
 } from './moda-api'
 import auth from './auth'
 
@@ -59,6 +60,8 @@ export const getPlanningIntervalsClient = async (accessToken?: string) =>
   new PlanningIntervalsClient('', await createDefaultAxiosInstance(accessToken))
 export const getRisksClient = async (accessToken?: string) =>
   new RisksClient('', await createDefaultAxiosInstance(accessToken))
+export const getRoadmapsClient = async (accessToken?: string) =>
+  new RoadmapsClient('', await createDefaultAxiosInstance(accessToken))
 export const getRolesClient = async (accessToken?: string) =>
   new RolesClient('', await createDefaultAxiosInstance(accessToken))
 export const getTeamsClient = async (accessToken?: string) =>

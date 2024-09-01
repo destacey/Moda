@@ -46,6 +46,21 @@ export const restrictedMenuItem = (
   }
 }
 
+export const restrictedPermissionMenuItem = (
+  authClaimValue: string,
+  display: string,
+  key: string,
+  route?: string,
+  icon?: React.ReactNode,
+  children?: Item[],
+) => {
+  return {
+    ...menuItem(display, key, route, icon, children),
+    authClaimValue,
+    authClaimType: 'Permission',
+  }
+}
+
 function getItem(
   label: string,
   key: React.Key,

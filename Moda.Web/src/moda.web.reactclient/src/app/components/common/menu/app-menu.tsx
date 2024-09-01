@@ -13,6 +13,7 @@ import {
   MenuItem,
   filterAndTransformMenuItem,
   menuItem,
+  restrictedPermissionMenuItem,
 } from './menu-helper'
 import useMenuToggle from '../../contexts/menu-toggle'
 import useTheme from '../../contexts/theme'
@@ -27,16 +28,28 @@ const menu: (Item | MenuItem)[] = [
     menuItem('Employees', 'org.employees', '/organizations/employees'),
   ]),
   menuItem('Planning', 'plan', null, <ScheduleOutlined />, [
-    menuItem(
+    restrictedPermissionMenuItem(
+      'Permissions.PlanningIntervals.View',
       'Planning Intervals',
       'plan.planning-intervals',
       '/planning/planning-intervals',
+    ),
+    restrictedPermissionMenuItem(
+      'Permissions.Roadmaps.View',
+      'Roadmaps',
+      'plan.roadmaps',
+      '/planning/roadmaps',
     ),
     // menuItem('Increments', 'plan.increments'),
     // menuItem('Sprints', 'plan.sprints'),
   ]),
   menuItem('Work Management', 'work', null, <CarryOutOutlined />, [
-    menuItem('Workspaces', 'work.workspaces', '/work/workspaces'),
+    restrictedPermissionMenuItem(
+      'Permissions.Workspaces.View',
+      'Workspaces',
+      'work.workspaces',
+      '/work/workspaces',
+    ),
   ]),
   // menuItem('Products', 'pdc', null, <DesktopOutlined />, [
   //     menuItem('Product Lines', 'pdc.product-lines'),

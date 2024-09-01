@@ -13,6 +13,7 @@ export enum QueryTags {
   PlanningIntervalObjective = 'Planning.PlanningIntervalObjective',
   PlanningIntervalObjectiveWorkItemsSummary = 'Planning.PlanningIntervalObjective.WorkItemsSummary',
   PlanningIntervalObjectiveWorkItemMetrics = 'Planning.PlanningIntervalObjective.WorkItemMetrics',
+  Roadmap = 'Planning.Roadmap',
   // WORK MANAGEMENT
   WorkItem = 'Work.WorkItem',
   WorkItemChildren = 'Work.WorkItem.Children',

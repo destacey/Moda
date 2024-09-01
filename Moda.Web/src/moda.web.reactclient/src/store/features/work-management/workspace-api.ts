@@ -40,7 +40,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
           ).getList(includeInactive)
           return { data }
         } catch (error) {
-          return { error }
+          console.error('API Error:', error)
         }
       },
       providesTags: (result, error, arg) => [
