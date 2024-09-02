@@ -1,4 +1,5 @@
-﻿using Moda.Planning.Application.Roadmaps.Dtos;
+﻿using Ardalis.GuardClauses;
+using Moda.Planning.Application.Roadmaps.Dtos;
 
 namespace Moda.Planning.Application.Roadmaps.Queries;
 
@@ -8,12 +9,12 @@ internal sealed class GetRoadmapsQueryHandler(IPlanningDbContext planningDbConte
     : IQueryHandler<GetRoadmapsQuery, List<RoadmapListDto>>
 {
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
-    private readonly Guid _currentUserId = currentUser.GetUserId();
+    private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
 
     public async Task<List<RoadmapListDto>> Handle(GetRoadmapsQuery request, CancellationToken cancellationToken)
     {
         return await _planningDbContext.Roadmaps
-            .Where(r => r.IsPublic || r.Managers.Any(m => m.ManagerId == _currentUserId))
+            .Where(r => r.IsPublic || r.Managers.Any(m => m.ManagerId == _currentUserEmployeeId))
             .ProjectToType<RoadmapListDto>()
             .ToListAsync(cancellationToken);
     }

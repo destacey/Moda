@@ -4,16 +4,18 @@ import PageTitle from '@/src/app/components/common/page-title'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDocumentTitle } from '../../hooks/use-document-title'
 import useAuth from '../../components/contexts/auth'
-import { Button } from 'antd'
+import { Button, message } from 'antd'
 import { authorizePage } from '../../components/hoc'
 import { useGetRoadmapsQuery } from '@/src/store/features/planning/roadmaps-api'
 import RoadmapsGrid from './components/roadmaps-grid'
+import CreateRoadmapForm from './components/create-roadmap-form'
 
 const RoadmapsPage: React.FC = () => {
   useDocumentTitle('Roadmaps')
 
   const [openCreateRoadmapForm, setOpenCreateRoadmapForm] =
     useState<boolean>(false)
+  const [messageApi, contextHolder] = message.useMessage()
 
   const {
     data: roadmapData,
@@ -22,8 +24,8 @@ const RoadmapsPage: React.FC = () => {
     refetch,
   } = useGetRoadmapsQuery(null)
 
-  const { hasClaim } = useAuth()
-  const canCreateRoadmap = hasClaim('Permission', 'Permissions.Roadmaps.Create')
+  const { hasPermissionClaim } = useAuth()
+  const canCreateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Create')
   const showActions = canCreateRoadmap
 
   useEffect(() => {
@@ -31,7 +33,7 @@ const RoadmapsPage: React.FC = () => {
   }, [error])
 
   const refresh = useCallback(async () => {
-    refetch
+    refetch()
   }, [refetch])
 
   const onCreateRoadmapFormClosed = (wasCreated: boolean) => {
@@ -55,20 +57,21 @@ const RoadmapsPage: React.FC = () => {
 
   return (
     <>
-      <br />
+      {contextHolder}
       <PageTitle title="Roadmaps" actions={showActions && actions()} />
       <RoadmapsGrid
         roadmapsData={roadmapData || []}
         roadmapsLoading={isLoading}
         refreshRoadmaps={refresh}
       />
-      {/* {openCreatePlanningIntervalForm && (
-        <CreatePlanningIntervalForm
-          showForm={openCreatePlanningIntervalForm}
-          onFormCreate={() => onCreatePlanningIntervalFormClosed(true)}
-          onFormCancel={() => onCreatePlanningIntervalFormClosed(false)}
+      {openCreateRoadmapForm && (
+        <CreateRoadmapForm
+          showForm={openCreateRoadmapForm}
+          onFormComplete={() => onCreateRoadmapFormClosed(true)}
+          onFormCancel={() => onCreateRoadmapFormClosed(false)}
+          messageApi={messageApi}
         />
-      )} */}
+      )}
     </>
   )
 }

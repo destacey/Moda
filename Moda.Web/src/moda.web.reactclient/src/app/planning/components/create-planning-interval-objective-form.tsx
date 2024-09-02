@@ -241,6 +241,7 @@ const CreatePlanningIntervalObjectiveForm = ({
           size="small"
           layout="vertical"
           name="create-objective-form"
+          initialValues={{ isStretch: false }} // used to set default value for switch
         >
           <Item name="planningIntervalId" hidden={true}>
             <Input />

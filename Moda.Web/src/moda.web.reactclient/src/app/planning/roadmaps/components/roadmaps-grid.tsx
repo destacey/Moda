@@ -2,6 +2,7 @@
 
 import { ModaGrid } from '@/src/app/components/common'
 import { RoadmapListDto } from '@/src/services/moda-api'
+import { ColDef } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo } from 'react'
@@ -20,19 +21,26 @@ const RoadmapsGrid: React.FC<RoadmapsGridProps> = (
   props: RoadmapsGridProps,
 ) => {
   // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
-  const columnDefs = useMemo(
+  const columnDefs = useMemo<ColDef<RoadmapListDto>[]>(
     () => [
       { field: 'key', width: 90 },
-      { field: 'name', cellRenderer: RoadmapLinkCellRenderer },
+      { field: 'name', width: 350, cellRenderer: RoadmapLinkCellRenderer },
       {
         field: 'start',
+        width: 120,
         valueGetter: (params) => dayjs(params.data.start).format('M/D/YYYY'),
       },
       {
         field: 'end',
+        width: 120,
         valueGetter: (params) => dayjs(params.data.end).format('M/D/YYYY'),
       },
-      { field: 'isPublic' },
+      {
+        field: 'isPublic',
+        headerName: 'Access Level',
+        width: 120,
+        valueGetter: (params) => (params.data.isPublic ? 'Public' : 'Private'),
+      },
     ],
     [],
   )

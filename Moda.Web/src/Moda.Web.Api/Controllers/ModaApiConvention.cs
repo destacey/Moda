@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Moda.Common.Application.Models;
 
 namespace Moda.Web.Api.Controllers;
 
@@ -125,6 +126,17 @@ public static class ModaApiConventions
     [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void CreateReturn201Guid(
+        [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
+        [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+        object request)
+    {
+    }
+
+    [ProducesResponseType(typeof(ObjectIdAndKey), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+    public static void CreateReturn201IdAndKey(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
         [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
         object request)

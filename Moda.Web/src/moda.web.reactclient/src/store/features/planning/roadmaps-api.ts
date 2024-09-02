@@ -1,7 +1,13 @@
-import { RoadmapDetailsDto, RoadmapListDto } from '@/src/services/moda-api'
+import {
+  CreateRoadmapRequest,
+  ObjectIdAndKey,
+  RoadmapDetailsDto,
+  RoadmapListDto,
+} from '@/src/services/moda-api'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getRoadmapsClient } from '@/src/services/clients'
+import { create } from 'lodash'
 
 export const roadmapApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -34,7 +40,22 @@ export const roadmapApi = apiSlice.injectEndpoints({
         { type: QueryTags.Roadmap, id: arg }, // typically arg is the key
       ],
     }),
+    createRoadmap: builder.mutation<ObjectIdAndKey, CreateRoadmapRequest>({
+      queryFn: async (request) => {
+        try {
+          const data = await (await getRoadmapsClient()).createRoadmap(request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+    }),
   }),
 })
 
-export const { useGetRoadmapsQuery, useGetRoadmapQuery } = roadmapApi
+export const {
+  useGetRoadmapsQuery,
+  useGetRoadmapQuery,
+  useCreateRoadmapMutation,
+} = roadmapApi

@@ -3123,6 +3123,62 @@
             "Bearer": []
           }
         ]
+      },
+      "post": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Create a roadmap.",
+        "operationId": "Roadmaps_CreateRoadmap",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoadmapRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectIdAndKey"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/planning/roadmaps/{idOrKey}": {
@@ -9953,6 +10009,63 @@
             "items": {
               "$ref": "#/components/schemas/EmployeeNavigationDto"
             }
+          }
+        }
+      },
+      "ObjectIdAndKey": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreateRoadmapRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "start",
+          "end"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the Roadmap.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the Roadmap.",
+            "maxLength": 2048,
+            "minLength": 0,
+            "nullable": true
+          },
+          "start": {
+            "type": "string",
+            "description": "The Roadmap start date.",
+            "format": "date",
+            "nullable": false
+          },
+          "end": {
+            "type": "string",
+            "description": "The Roadmap end date.",
+            "format": "date",
+            "nullable": false
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Indicates if the Roadmap is public.  If true, the Roadmap is visible to all users. If false, the Roadmap is only visible to the managers."
           }
         }
       },

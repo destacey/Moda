@@ -3715,6 +3715,71 @@ export class RoadmapsClient {
     }
 
     /**
+     * Create a roadmap.
+     */
+    createRoadmap(request: CreateRoadmapRequest, cancelToken?: CancelToken): Promise<ObjectIdAndKey> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateRoadmap(_response);
+        });
+    }
+
+    protected processCreateRoadmap(response: AxiosResponse): Promise<ObjectIdAndKey> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 201) {
+            const _responseText = response.data;
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<ObjectIdAndKey>(result201);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else {
+            const _responseText = response.data;
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = JSON.parse(resultDatadefault);
+            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
+
+        }
+    }
+
+    /**
      * Get roadmap details.
      */
     getRoadmap(idOrKey: string, cancelToken?: CancelToken): Promise<RoadmapDetailsDto> {
@@ -10141,6 +10206,24 @@ export interface RoadmapDetailsDto {
     end?: Date;
     isPublic?: boolean;
     managers?: EmployeeNavigationDto[];
+}
+
+export interface ObjectIdAndKey {
+    id?: string;
+    key?: number;
+}
+
+export interface CreateRoadmapRequest {
+    /** The name of the Roadmap. */
+    name: string;
+    /** The description of the Roadmap. */
+    description?: string | undefined;
+    /** The Roadmap start date. */
+    start: Date;
+    /** The Roadmap end date. */
+    end: Date;
+    /** Indicates if the Roadmap is public.  If true, the Roadmap is visible to all users. If false, the Roadmap is only visible to the managers. */
+    isPublic?: boolean;
 }
 
 export interface TeamTypeDto {

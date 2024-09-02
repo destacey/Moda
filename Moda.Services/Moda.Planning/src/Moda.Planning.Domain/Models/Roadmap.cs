@@ -77,11 +77,11 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule
     /// <param name="description"></param>
     /// <param name="dateRange"></param>
     /// <param name="isPublic"></param>
-    /// <param name="currentUserId"
+    /// <param name="currentUserEmployeeId"
     /// <returns></returns>
-    public Result Update(string name, string? description, LocalDateRange dateRange, bool isPublic, Guid currentUserId)
+    public Result Update(string name, string? description, LocalDateRange dateRange, bool isPublic, Guid currentUserEmployeeId)
     {
-        if (!_managers.Any(x => x.ManagerId == currentUserId))
+        if (!_managers.Any(x => x.ManagerId == currentUserEmployeeId))
         {
             return Result.Failure("User is not a manager of this roadmap.");
         }
