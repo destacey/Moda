@@ -20,7 +20,7 @@ public partial class AddRoadmap : Migration
                     .Annotation("SqlServer:Identity", "1, 1"),
                 Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                 Description = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
-                IsPublic = table.Column<bool>(type: "bit", nullable: false),
+                Visibility = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
                 End = table.Column<DateTime>(type: "date", nullable: false),
                 Start = table.Column<DateTime>(type: "date", nullable: false),
                 Created = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -72,14 +72,14 @@ public partial class AddRoadmap : Migration
             schema: "Planning",
             table: "Roadmaps",
             column: "Id")
-            .Annotation("SqlServer:Include", new[] { "Key", "Name", "IsPublic" });
+            .Annotation("SqlServer:Include", new[] { "Key", "Name", "Visibility" });
 
         migrationBuilder.CreateIndex(
             name: "IX_Roadmaps_Key",
             schema: "Planning",
             table: "Roadmaps",
             column: "Key")
-            .Annotation("SqlServer:Include", new[] { "Id", "Name", "IsPublic" });
+            .Annotation("SqlServer:Include", new[] { "Id", "Name", "Visibility" });
     }
 
     /// <inheritdoc />

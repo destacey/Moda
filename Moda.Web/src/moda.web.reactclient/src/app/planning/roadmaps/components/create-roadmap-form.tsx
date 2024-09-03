@@ -1,13 +1,17 @@
 import useAuth from '@/src/app/components/contexts/auth'
-import { CreateRoadmapRequest } from '@/src/services/moda-api'
-import { useCreateRoadmapMutation } from '@/src/store/features/planning/roadmaps-api'
+import { CreateRoadmapRequest, VisibilityDto } from '@/src/services/moda-api'
+import {
+  useCreateRoadmapMutation,
+  useGetVisibilityOptionsQuery,
+} from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Input, message, Modal, Switch } from 'antd'
+import { DatePicker, Form, Input, Modal, Radio } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
+const { Group: RadioGroup } = Radio
 
 export interface CreateRoadmapFormProps {
   showForm: boolean
@@ -21,18 +25,22 @@ interface CreateRoadmapFormValues {
   description?: string
   start: Date
   end: Date
-  isPublic: boolean
+  visibilityId: number
 }
 
 const mapToRequestValues = (
   values: CreateRoadmapFormValues,
 ): CreateRoadmapRequest => {
+  console.log('values', values)
   return {
     name: values.name,
     description: values.description,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
-    isPublic: values.isPublic,
+    visibilityId: values.visibilityId,
+    // visibilityId: values.isPublic
+    //   ? visibilityOptions.find((v) => v.name === 'Public')?.id
+    //   : visibilityOptions.find((v) => v.name === 'Private')?.id,
   } as CreateRoadmapRequest
 }
 
@@ -43,6 +51,11 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
   const [form] = Form.useForm<CreateRoadmapFormValues>()
   const formValues = Form.useWatch([], form)
 
+  const {
+    data: visibilityData,
+    isLoading,
+    error,
+  } = useGetVisibilityOptionsQuery()
   const [createRoadmap, { error: mutationError }] = useCreateRoadmapMutation()
 
   const { hasPermissionClaim } = useAuth()
@@ -118,6 +131,15 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
     )
   }, [form, formValues])
 
+  useEffect(() => {
+    if (error) {
+      props.messageApi.error(
+        error.supportMessage ??
+          'An error occurred while loading visibility options. Please try again.',
+      )
+    }
+  }, [error, props])
+
   return (
     <>
       <Modal
@@ -153,14 +175,25 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
               maxLength={2048}
             />
           </Item>
-          <Item label="Start" name="start" rules={[{ required: true }]}>
+          <Item name="start" label="Start" rules={[{ required: true }]}>
             <DatePicker />
           </Item>
-          <Item label="End" name="end" rules={[{ required: true }]}>
+          <Item name="end" label="End" rules={[{ required: true }]}>
             <DatePicker />
           </Item>
-          <Item name="isPublic" label="Access Level" valuePropName="checked">
+          {/* <Item name="visibility" label="visibility" valuePropName="checked">
             <Switch checkedChildren="Public" unCheckedChildren="Private" />
+          </Item> */}
+          <Item
+            name="visibilityId"
+            label="Visibility"
+            rules={[{ required: true }]}
+          >
+            <RadioGroup
+              options={visibilityData}
+              optionType="button"
+              buttonStyle="solid"
+            />
           </Item>
         </Form>
       </Modal>

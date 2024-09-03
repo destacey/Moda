@@ -1,4 +1,5 @@
-﻿using Moda.Common.Models;
+﻿using Moda.Common.Domain.Enums;
+using Moda.Common.Models;
 using Moda.Planning.Domain.Models;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
@@ -21,18 +22,18 @@ public class RoadmapTests
         var name = "Test Roadmap";
         var description = "Test Description";
         var dateRange = new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10));
-        var isPublic = true;
+        var visibility = Visibility.Public;
         var managers = new Guid[] { Guid.NewGuid() };
 
         // Act
-        var result = Roadmap.Create(name, description, dateRange, isPublic, managers);
+        var result = Roadmap.Create(name, description, dateRange, visibility, managers);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Name.Should().Be(name);
         result.Value.Description.Should().Be(description);
         result.Value.DateRange.Should().Be(dateRange);
-        result.Value.IsPublic.Should().Be(isPublic);
+        result.Value.Visibility.Should().Be(visibility);
         result.Value.Managers.Should().HaveCount(1);
         result.Value.Managers.First().ManagerId.Should().Be(managers.First());
     }
@@ -44,11 +45,11 @@ public class RoadmapTests
         var name = "Test Roadmap";
         var description = "Test Description";
         var dateRange = new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10));
-        var isPublic = true;
+        var visibility = Visibility.Public;
         var managers = Array.Empty<Guid>();
 
         // Act
-        var result = Roadmap.Create(name, description, dateRange, isPublic, managers);
+        var result = Roadmap.Create(name, description, dateRange, visibility, managers);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -60,21 +61,21 @@ public class RoadmapTests
     {
         // Arrange
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.Create("Initial Name", "Initial Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), false, [managerId]).Value;
+        var roadmap = Roadmap.Create("Initial Name", "Initial Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [managerId]).Value;
         var newName = "Updated Name";
         var newDescription = "Updated Description";
         var newDateRange = new LocalDateRange(_dateTimeProvider.Today.PlusDays(1), _dateTimeProvider.Today.PlusDays(11));
-        var newIsPublic = true;
+        var newVisibility = Visibility.Private;
 
         // Act
-        var result = roadmap.Update(newName, newDescription, newDateRange, newIsPublic, managerId);
+        var result = roadmap.Update(newName, newDescription, newDateRange, newVisibility, managerId);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
         roadmap.Name.Should().Be(newName);
         roadmap.Description.Should().Be(newDescription);
         roadmap.DateRange.Should().Be(newDateRange);
-        roadmap.IsPublic.Should().Be(newIsPublic);
+        roadmap.Visibility.Should().Be(newVisibility);
     }
 
     [Fact]
@@ -82,10 +83,10 @@ public class RoadmapTests
     {
         // Arrange
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.Create("Initial Name", "Initial Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), false, [managerId]).Value;
+        var roadmap = Roadmap.Create("Initial Name", "Initial Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Private, [managerId]).Value;
 
         // Act
-        var result = roadmap.Update("Updated Name", "Updated Description", new LocalDateRange(_dateTimeProvider.Today.PlusDays(1), _dateTimeProvider.Today.PlusDays(11)), true, Guid.NewGuid());
+        var result = roadmap.Update("Updated Name", "Updated Description", new LocalDateRange(_dateTimeProvider.Today.PlusDays(1), _dateTimeProvider.Today.PlusDays(11)), Visibility.Private, Guid.NewGuid());
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -98,7 +99,7 @@ public class RoadmapTests
     {
         // Arrange
         var initialManagers = new Guid[] { Guid.NewGuid() };
-        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), true, initialManagers).Value;
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, initialManagers).Value;
         var managerId = Guid.NewGuid();
         var expectedManagers = initialManagers.Append(managerId);
 
@@ -116,7 +117,7 @@ public class RoadmapTests
     {
         // Arrange
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), true, [managerId]).Value;
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [managerId]).Value;
 
         // Act
         var result = roadmap.AddManager(managerId);
@@ -133,7 +134,7 @@ public class RoadmapTests
         // Arrange
         var managerId1 = Guid.NewGuid();
         var managerId2 = Guid.NewGuid();
-        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), true, [managerId1, managerId2]).Value;
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [managerId1, managerId2]).Value;
 
         // Act
         var result = roadmap.RemoveManager(managerId2);
@@ -148,7 +149,7 @@ public class RoadmapTests
     public void RemoveManager_InvalidManagerId_ShouldReturnFailure()
     {
         // Arrange
-        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), true, [Guid.NewGuid()]).Value;
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
 
         // Act
         var result = roadmap.RemoveManager(Guid.NewGuid());
@@ -163,7 +164,7 @@ public class RoadmapTests
     {
         // Arrange
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), true, [managerId]).Value;
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [managerId]).Value;
 
         // Act
         var result = roadmap.RemoveManager(managerId);

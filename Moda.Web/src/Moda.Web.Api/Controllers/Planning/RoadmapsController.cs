@@ -1,7 +1,9 @@
 ﻿using Moda.Common.Application.Models;
+using Moda.Common.Application.Requests;
+using Moda.Planning.Application.Risks.Dtos;
+using Moda.Planning.Application.Risks.Queries;
 using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Application.Roadmaps.Queries;
-using Moda.Web.Api.Models.Planning.PlanningIntervals;
 using Moda.Web.Api.Models.Planning.Roadmaps;
 
 namespace Moda.Web.Api.Controllers.Planning;
@@ -75,5 +77,16 @@ public class RoadmapsController : ControllerBase
         return result.IsSuccess
             ? NoContent()
             : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Update"));
+    }
+
+    [HttpGet("visibility-options")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
+    [OpenApiOperation("Get a list of all visibility.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<VisibilityDto>>> GetVisibilityOptions(CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetVisibilitiesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
     }
 }

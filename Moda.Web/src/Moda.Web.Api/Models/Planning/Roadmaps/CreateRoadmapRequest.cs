@@ -1,4 +1,5 @@
-﻿using Moda.Planning.Application.Roadmaps.Commands;
+﻿using Moda.Common.Domain.Enums;
+using Moda.Planning.Application.Roadmaps.Commands;
 
 namespace Moda.Web.Api.Models.Planning.Roadmaps;
 
@@ -25,13 +26,13 @@ public sealed record CreateRoadmapRequest
     public LocalDate End { get; set; }
 
     /// <summary>
-    /// Indicates if the Roadmap is public.  If true, the Roadmap is visible to all users. If false, the Roadmap is only visible to the managers.
+    /// The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap.
     /// </summary>
-    public bool IsPublic { get; set; }
+    public int VisibilityId { get; set; }
 
     public CreateRoadmapCommand ToCreateRoadmapCommand()
     {
-        return new CreateRoadmapCommand(Name, Description, new LocalDateRange(Start, End), IsPublic);
+        return new CreateRoadmapCommand(Name, Description, new LocalDateRange(Start, End), (Visibility)VisibilityId);
     }
 }
 
@@ -55,5 +56,9 @@ public sealed class CreateRoadmapRequestValidator : CustomValidator<CreateRoadma
             .NotNull()
             .Must((membership, end) => membership.Start <= end)
                 .WithMessage("End date must be greater than or equal to start date");
+
+        RuleFor(t => (Visibility)t.VisibilityId)
+            .IsInEnum()
+            .WithMessage("A valid visibility must be selected.");
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Moda.Planning.Application.Roadmaps.Dtos;
+﻿using Moda.Common.Application.Dtos;
+
+namespace Moda.Planning.Application.Roadmaps.Dtos;
 public sealed record RoadmapListDto : IMapFrom<Roadmap>
 {
     /// <summary>Gets or sets the identifier.</summary>
@@ -25,14 +27,15 @@ public sealed record RoadmapListDto : IMapFrom<Roadmap>
     public required LocalDate End { get; set; }
 
     /// <summary>
-    /// Indicates if the Roadmap is public.  If true, the Roadmap is visible to all users. If false, the Roadmap is only visible to the managers.
+    /// The visibility of the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap.
     /// </summary>
-    public bool IsPublic { get; set; }
+    public required SimpleNavigationDto Visibility { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Roadmap, RoadmapListDto>()
             .Map(dest => dest.Start, src => src.DateRange.Start)
-            .Map(dest => dest.End, src => src.DateRange.End);
+            .Map(dest => dest.End, src => src.DateRange.End)
+            .Map(dest => dest.Visibility, src => SimpleNavigationDto.FromEnum(src.Visibility));
     }
 }

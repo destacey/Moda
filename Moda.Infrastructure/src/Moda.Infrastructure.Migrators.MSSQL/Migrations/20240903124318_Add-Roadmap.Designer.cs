@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20240901152630_Add-Roadmap")]
+    [Migration("20240903124318_Add-Roadmap")]
     partial class AddRoadmap
     {
         /// <inheritdoc />
@@ -1281,9 +1281,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
 
-                    b.Property<bool>("IsPublic")
-                        .HasColumnType("bit");
-
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
@@ -1300,6 +1297,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("Visibility")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
 
                     b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.Roadmap.DateRange#LocalDateRange", b1 =>
                         {
@@ -1320,11 +1322,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasIndex("Id");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Key", "Name", "IsPublic" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Key", "Name", "Visibility" });
 
                     b.HasIndex("Key");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id", "Name", "IsPublic" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id", "Name", "Visibility" });
 
                     b.ToTable("Roadmaps", "Planning");
                 });

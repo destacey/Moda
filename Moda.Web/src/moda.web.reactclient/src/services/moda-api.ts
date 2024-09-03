@@ -3910,6 +3910,64 @@ export class RoadmapsClient {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    /**
+     * Get a list of all visibility.
+     */
+    getVisibilityOptions( cancelToken?: CancelToken): Promise<VisibilityDto[]> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/visibility-options";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetVisibilityOptions(_response);
+        });
+    }
+
+    protected processGetVisibilityOptions(response: AxiosResponse): Promise<VisibilityDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<VisibilityDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<VisibilityDto[]>(null as any);
+    }
 }
 
 export class TeamTypesClient {
@@ -10262,7 +10320,7 @@ export interface RoadmapListDto {
     name?: string;
     start?: Date;
     end?: Date;
-    isPublic?: boolean;
+    visibility?: SimpleNavigationDto;
 }
 
 export interface RoadmapDetailsDto {
@@ -10272,7 +10330,7 @@ export interface RoadmapDetailsDto {
     description?: string | undefined;
     start?: Date;
     end?: Date;
-    isPublic?: boolean;
+    visibility?: SimpleNavigationDto;
     managers?: EmployeeNavigationDto[];
 }
 
@@ -10290,8 +10348,8 @@ export interface CreateRoadmapRequest {
     start: Date;
     /** The Roadmap end date. */
     end: Date;
-    /** Indicates if the Roadmap is public.  If true, the Roadmap is visible to all users. If false, the Roadmap is only visible to the managers. */
-    isPublic?: boolean;
+    /** The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap. */
+    visibilityId?: number;
 }
 
 export interface UpdateRoadmapRequest {
@@ -10305,8 +10363,18 @@ export interface UpdateRoadmapRequest {
     start: Date;
     /** The Roadmap end date. */
     end: Date;
-    /** Indicates if the Roadmap is public.  If true, the Roadmap is visible to all users. If false, the Roadmap is only visible to the managers. */
-    isPublic?: boolean;
+    /** The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap. */
+    visibilityId?: number;
+}
+
+export interface CommonEnumDto {
+    id?: number;
+    name?: string;
+    description?: string | undefined;
+    order?: number;
+}
+
+export interface VisibilityDto extends CommonEnumDto {
 }
 
 export interface TeamTypeDto {

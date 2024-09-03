@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Enums;
 using Moda.Planning.Domain.Interfaces;
 
 namespace Moda.Planning.Domain.Models;
@@ -13,14 +14,14 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule
 
     private Roadmap() { }
 
-    private Roadmap(string name, string? description, LocalDateRange dateRange, bool isPublic, Guid[] managers)
+    private Roadmap(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers)
     {
         Guard.Against.NullOrEmpty(managers, nameof(managers));
 
         Name = name;
         Description = description;
         DateRange = dateRange;
-        IsPublic = isPublic;
+        Visibility = visibility;
 
         foreach (var managerId in managers)
         {
@@ -61,9 +62,9 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule
     }
 
     /// <summary>
-    /// Indicates if the Roadmap is public.  If true, the Roadmap is visible to all users. If false, the Roadmap is only visible to the managers.
+    /// The visibility of the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap.
     /// </summary>
-    public bool IsPublic { get; private set; } = false;
+    public Visibility Visibility { get; private set; }
 
     /// <summary>
     /// The managers of the Roadmap. Managers have full control over the Roadmap.
@@ -76,10 +77,10 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule
     /// <param name="name"></param>
     /// <param name="description"></param>
     /// <param name="dateRange"></param>
-    /// <param name="isPublic"></param>
+    /// <param name="visibility"></param>
     /// <param name="currentUserEmployeeId"
     /// <returns></returns>
-    public Result Update(string name, string? description, LocalDateRange dateRange, bool isPublic, Guid currentUserEmployeeId)
+    public Result Update(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid currentUserEmployeeId)
     {
         if (!_managers.Any(x => x.ManagerId == currentUserEmployeeId))
         {
@@ -89,7 +90,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule
         Name = name;
         Description = description;
         DateRange = dateRange;
-        IsPublic = isPublic;
+        Visibility = visibility;
 
         return Result.Success();
     }
@@ -138,14 +139,14 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule
     /// <param name="name"></param>
     /// <param name="description"></param>
     /// <param name="dateRange"></param>
-    /// <param name="isPublic"></param>
+    /// <param name="visibility"></param>
     /// <param name="managers"></param>
     /// <returns></returns>
-    public static Result<Roadmap> Create(string name, string? description, LocalDateRange dateRange, bool isPublic, Guid[] managers)
+    public static Result<Roadmap> Create(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers)
     {
         try
         {
-            var roadmap = new Roadmap(name, description, dateRange, isPublic, managers);
+            var roadmap = new Roadmap(name, description, dateRange, visibility, managers);
 
             return roadmap;
         }

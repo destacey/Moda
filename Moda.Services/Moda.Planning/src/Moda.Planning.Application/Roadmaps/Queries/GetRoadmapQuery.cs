@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Ardalis.GuardClauses;
 using Moda.Common.Application.Models;
+using Moda.Common.Domain.Enums;
 using Moda.Planning.Application.Roadmaps.Dtos;
 
 namespace Moda.Planning.Application.Roadmaps.Queries;
@@ -22,9 +23,11 @@ internal sealed class GetRoadmapQueryHandler(IPlanningDbContext planningDbContex
 
     public async Task<RoadmapDetailsDto?> Handle(GetRoadmapQuery request, CancellationToken cancellationToken)
     {
+        var publicVisibility = Visibility.Public;
+
         return await _planningDbContext.Roadmaps
             .Where(request.IdOrKeyFilter)
-            .Where(r => r.IsPublic || r.Managers.Any(m => m.ManagerId == _currentUserEmployeeId))
+            .Where(r => r.Visibility == publicVisibility || r.Managers.Any(m => m.ManagerId == _currentUserEmployeeId))
             .ProjectToType<RoadmapDetailsDto>()
             .FirstOrDefaultAsync(cancellationToken);
     }

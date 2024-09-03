@@ -1,7 +1,8 @@
 ﻿using Ardalis.GuardClauses;
+using Moda.Common.Domain.Enums;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
-public sealed record UpdateRoadmapCommand(Guid Id, string Name, string? Description, LocalDateRange DateRange, bool IsPublic) : ICommand;
+public sealed record UpdateRoadmapCommand(Guid Id, string Name, string? Description, LocalDateRange DateRange, Visibility Visibility) : ICommand;
 
 public sealed class UpdateRoadmapCommandValidator : AbstractValidator<UpdateRoadmapCommand>
 {
@@ -19,6 +20,9 @@ public sealed class UpdateRoadmapCommandValidator : AbstractValidator<UpdateRoad
 
         RuleFor(x => x.DateRange)
             .NotNull();
+
+        RuleFor(x => x.Visibility)
+            .IsInEnum();
     }
 }
 
@@ -43,7 +47,7 @@ internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbC
                 request.Name,
                 request.Description,
                 request.DateRange,
-                request.IsPublic,
+                request.Visibility,
                 _currentUserEmployeeId
                 );
 

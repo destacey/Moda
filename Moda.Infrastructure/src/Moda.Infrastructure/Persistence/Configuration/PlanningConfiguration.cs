@@ -308,15 +308,20 @@ public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
         builder.HasAlternateKey(p => p.Key);
 
         builder.HasIndex(p => p.Id)
-            .IncludeProperties(p => new { p.Key, p.Name, p.IsPublic });
+            .IncludeProperties(p => new { p.Key, p.Name, p.Visibility });
 
         builder.HasIndex(p => p.Key)
-            .IncludeProperties(p => new { p.Id, p.Name, p.IsPublic });
+            .IncludeProperties(p => new { p.Id, p.Name, p.Visibility });
 
         builder.Property(p => p.Key).ValueGeneratedOnAdd();
 
         builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
         builder.Property(p => p.Description).HasMaxLength(2048);
+
+        builder.Property(p => p.Visibility).IsRequired()
+            .HasConversion<EnumConverter<Visibility>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
 
         // Value Objects
         builder.ComplexProperty(p => p.DateRange, options =>
