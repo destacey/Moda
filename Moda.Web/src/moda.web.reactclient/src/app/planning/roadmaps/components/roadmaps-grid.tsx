@@ -11,6 +11,7 @@ export interface RoadmapsGridProps {
   roadmapsData: RoadmapListDto[]
   roadmapsLoading: boolean
   refreshRoadmaps: () => void
+  gridHeight?: number
 }
 
 const RoadmapLinkCellRenderer = ({ value, data }) => {
@@ -46,6 +47,7 @@ const RoadmapsGrid: React.FC<RoadmapsGridProps> = (
   )
   return (
     <ModaGrid
+      height={props.gridHeight ?? 650}
       columnDefs={columnDefs}
       rowData={props.roadmapsData}
       loadData={props.refreshRoadmaps}

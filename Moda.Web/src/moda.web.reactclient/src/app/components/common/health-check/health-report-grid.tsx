@@ -25,14 +25,6 @@ const ReportedByLinkCellRenderer = ({ value, data }) => {
 }
 
 const HealthReportGrid = (props: HealthReportGridProps) => {
-  // TODO: redux is returning data for the previous objective
-  //   const dispatch = useAppDispatch()
-  //   const {
-  //     data: healthReport,
-  //     isLoading,
-  //     error,
-  //   } = useAppSelector(selectHealthReportContext)
-
   const {
     data: healthReport,
     isLoading,
@@ -77,15 +69,6 @@ const HealthReportGrid = (props: HealthReportGridProps) => {
   const refresh = useCallback(async () => {
     refetch()
   }, [refetch])
-
-  //   const refresh = useCallback(async () => {
-  //     dispatch(getHealthReport())
-  //   }, [dispatch])
-
-  //   useEffect(() => {
-  //     dispatch(setHealthReportId(props.objectId))
-  //     dispatch(getHealthReport())
-  //   }, [dispatch, props.objectId])
 
   return (
     <>

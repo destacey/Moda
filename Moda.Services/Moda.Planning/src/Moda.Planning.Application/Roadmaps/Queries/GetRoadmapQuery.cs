@@ -22,18 +22,10 @@ internal sealed class GetRoadmapQueryHandler(IPlanningDbContext planningDbContex
 
     public async Task<RoadmapDetailsDto?> Handle(GetRoadmapQuery request, CancellationToken cancellationToken)
     {
-        //var query = _planningDbContext.Roadmaps
-        //    //.Include(r => r.Managers)
-        //    .Where(r => r.IsPublic || r.Managers.Any(m => m.ManagerId == _currentUser.GetUserId()))
-        //    .AsQueryable();
-
-
-        var roadmap = await _planningDbContext.Roadmaps
+        return await _planningDbContext.Roadmaps
             .Where(request.IdOrKeyFilter)
             .Where(r => r.IsPublic || r.Managers.Any(m => m.ManagerId == _currentUserEmployeeId))
             .ProjectToType<RoadmapDetailsDto>()
             .FirstOrDefaultAsync(cancellationToken);
-
-        return roadmap;
     }
 }
