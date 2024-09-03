@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Models;
 using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Application.Roadmaps.Queries;
+using Moda.Web.Api.Models.Planning.PlanningIntervals;
 using Moda.Web.Api.Models.Planning.Roadmaps;
 
 namespace Moda.Web.Api.Controllers.Planning;
@@ -49,12 +50,30 @@ public class RoadmapsController : ControllerBase
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roadmaps)]
     [OpenApiOperation("Create a roadmap.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
-    public async Task<ActionResult<ObjectIdAndKey>> CreateRoadmap([FromBody] CreateRoadmapRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateRoadmapRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateRoadmapCommand(), cancellationToken);
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetRoadmap), new { idOrKey = result.Value.Id.ToString() }, result.Value)
             : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Create"));
+    }
+
+    [HttpPut("{id}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Update a roadmap.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> Update(Guid id, [FromBody] UpdateRoadmapRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToUpdateRoadmapCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Update"));
     }
 }

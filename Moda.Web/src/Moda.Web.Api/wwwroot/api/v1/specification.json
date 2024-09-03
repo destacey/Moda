@@ -3129,7 +3129,7 @@
           "Roadmaps"
         ],
         "summary": "Create a roadmap.",
-        "operationId": "Roadmaps_CreateRoadmap",
+        "operationId": "Roadmaps_Create",
         "requestBody": {
           "x-name": "request",
           "content": {
@@ -3226,6 +3226,71 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/roadmaps/{id}": {
+      "put": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Update a roadmap.",
+        "operationId": "Roadmaps_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoadmapRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -10037,6 +10102,56 @@
           "end"
         ],
         "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the Roadmap.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the Roadmap.",
+            "maxLength": 2048,
+            "minLength": 0,
+            "nullable": true
+          },
+          "start": {
+            "type": "string",
+            "description": "The Roadmap start date.",
+            "format": "date",
+            "nullable": false
+          },
+          "end": {
+            "type": "string",
+            "description": "The Roadmap end date.",
+            "format": "date",
+            "nullable": false
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Indicates if the Roadmap is public.  If true, the Roadmap is visible to all users. If false, the Roadmap is only visible to the managers."
+          }
+        }
+      },
+      "UpdateRoadmapRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "start",
+          "end"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier of the Roadmap.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
           "name": {
             "type": "string",
             "description": "The name of the Roadmap.",

@@ -3717,7 +3717,7 @@ export class RoadmapsClient {
     /**
      * Create a roadmap.
      */
-    createRoadmap(request: CreateRoadmapRequest, cancelToken?: CancelToken): Promise<ObjectIdAndKey> {
+    create(request: CreateRoadmapRequest, cancelToken?: CancelToken): Promise<ObjectIdAndKey> {
         let url_ = this.baseUrl + "/api/planning/roadmaps";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3741,11 +3741,11 @@ export class RoadmapsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processCreateRoadmap(_response);
+            return this.processCreate(_response);
         });
     }
 
-    protected processCreateRoadmap(response: AxiosResponse): Promise<ObjectIdAndKey> {
+    protected processCreate(response: AxiosResponse): Promise<ObjectIdAndKey> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -3841,6 +3841,74 @@ export class RoadmapsClient {
             return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
 
         }
+    }
+
+    /**
+     * Update a roadmap.
+     */
+    update(id: string, request: UpdateRoadmapRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdate(_response);
+        });
+    }
+
+    protected processUpdate(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
     }
 }
 
@@ -10214,6 +10282,21 @@ export interface ObjectIdAndKey {
 }
 
 export interface CreateRoadmapRequest {
+    /** The name of the Roadmap. */
+    name: string;
+    /** The description of the Roadmap. */
+    description?: string | undefined;
+    /** The Roadmap start date. */
+    start: Date;
+    /** The Roadmap end date. */
+    end: Date;
+    /** Indicates if the Roadmap is public.  If true, the Roadmap is visible to all users. If false, the Roadmap is only visible to the managers. */
+    isPublic?: boolean;
+}
+
+export interface UpdateRoadmapRequest {
+    /** The unique identifier of the Roadmap. */
+    id: string;
     /** The name of the Roadmap. */
     name: string;
     /** The description of the Roadmap. */
