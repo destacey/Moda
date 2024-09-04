@@ -11,11 +11,6 @@ import { getRoadmapsClient } from '@/src/services/clients'
 import _ from 'lodash'
 import { OptionModel } from '@/src/app/components/types'
 
-// export interface StoreUpdateRoadmapRequest {
-//   roadmapKey: number // this is the cache key for the roadmap
-//   request: UpdateRoadmapRequest
-// }
-
 export const roadmapApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getRoadmaps: builder.query<RoadmapListDto[], null>({
@@ -57,10 +52,11 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
+      invalidatesTags: (result, error, arg) => [QueryTags.Roadmap],
     }),
     updateRoadmap: builder.mutation<
       void,
-      { roadmapKey: number; request: UpdateRoadmapRequest }
+      { request: UpdateRoadmapRequest; cacheKey: number }
     >({
       queryFn: async (mutationRequest) => {
         try {
@@ -74,7 +70,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => [
-        { type: QueryTags.Roadmap, id: arg.roadmapKey },
+        { type: QueryTags.Roadmap, id: arg.cacheKey },
       ],
     }),
     getVisibilityOptions: builder.query<OptionModel<number>[], void>({
