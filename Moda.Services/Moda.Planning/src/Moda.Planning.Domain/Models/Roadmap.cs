@@ -1,10 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Enums;
+using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Interfaces;
 
 namespace Moda.Planning.Domain.Models;
-public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule
+public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
 {
     private string _name = default!;
     private string? _description;

@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Moda.Common.Domain.Interfaces;
 using OneOf;
 
 namespace Moda.Common.Application.Models;
@@ -18,13 +19,21 @@ public class IdOrKey : OneOfBase<Guid, int>
 public static class IdOrKeyExtensions
 {
     /// <summary>
-    /// Creates an expression based on the values from the IdOrKey and selectors.  This should only be used to create a single expression.  If you are looping through IdOrKey values then do it locally be faster (2-3x) and less memory allocation (35-45% of current usage).
-    /// 
-    /// Manual example:
-    ///   var expression = idOrKey.Match(
-    ///     id => (Expression<Func<T, bool>>)(x => x.Id == id),
-    ///     key => (Expression<Func<T, bool>>)(x => x.Key == key)
-    ///   );
+    /// Creates an expression based on the values from the IdOrKey for objects that implement HasIdAndKey.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="idOrKey"></param>
+    /// <returns></returns>
+    public static Expression<Func<T, bool>> CreateFilter<T>(this IdOrKey idOrKey) where T : HasIdAndKey
+    {
+        return idOrKey.Match<Expression<Func<T,bool>>>(
+            id => (x => x.Id == id),
+            key => (x => x.Key == key)
+        );
+    }
+
+    /// <summary>
+    /// Creates an expression based on the values from the IdOrKey and selectors.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="idOrKey"></param>

@@ -10,7 +10,7 @@ public sealed record GetRoadmapQuery : IQuery<RoadmapDetailsDto?>
 {
     public GetRoadmapQuery(IdOrKey idOrKey)
     {
-        IdOrKeyFilter = idOrKey.CreateFilter<Roadmap>(r => r.Id, r => r.Key);
+        IdOrKeyFilter = idOrKey.CreateFilter<Roadmap>();
     }
 
     public Expression<Func<Roadmap, bool>> IdOrKeyFilter { get; }
