@@ -4,14 +4,17 @@ import {
   RoadmapDetailsDto,
   RoadmapListDto,
   UpdateRoadmapRequest,
-  VisibilityDto,
 } from '@/src/services/moda-api'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getRoadmapsClient } from '@/src/services/clients'
-import { create } from 'lodash'
 import _ from 'lodash'
 import { OptionModel } from '@/src/app/components/types'
+
+// export interface StoreUpdateRoadmapRequest {
+//   roadmapKey: number // this is the cache key for the roadmap
+//   request: UpdateRoadmapRequest
+// }
 
 export const roadmapApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -41,7 +44,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result, error, arg) => [
-        { type: QueryTags.Roadmap, id: arg }, // typically arg is the key
+        { type: QueryTags.Roadmap, id: result.key },
       ],
     }),
     createRoadmap: builder.mutation<ObjectIdAndKey, CreateRoadmapRequest>({
@@ -55,18 +58,24 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
     }),
-    updateRoadmap: builder.mutation<void, UpdateRoadmapRequest>({
-      queryFn: async (request) => {
+    updateRoadmap: builder.mutation<
+      void,
+      { roadmapKey: number; request: UpdateRoadmapRequest }
+    >({
+      queryFn: async (mutationRequest) => {
         try {
           const data = await (
             await getRoadmapsClient()
-          ).update(request.id, request)
+          ).update(mutationRequest.request.id, mutationRequest.request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.Roadmap, id: arg.roadmapKey },
+      ],
     }),
     getVisibilityOptions: builder.query<OptionModel<number>[], void>({
       queryFn: async () => {

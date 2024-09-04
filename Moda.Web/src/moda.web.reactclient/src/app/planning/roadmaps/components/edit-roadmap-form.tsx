@@ -1,26 +1,32 @@
 import useAuth from '@/src/app/components/contexts/auth'
-import { CreateRoadmapRequest } from '@/src/services/moda-api'
 import {
-  useCreateRoadmapMutation,
+  RoadmapDetailsDto,
+  UpdateRoadmapRequest,
+} from '@/src/services/moda-api'
+import {
+  useUpdateRoadmapMutation,
   useGetVisibilityOptionsQuery,
+  useGetRoadmapQuery,
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, Radio } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
+import dayjs from 'dayjs'
 
 const { Item } = Form
 const { TextArea } = Input
 const { Group: RadioGroup } = Radio
 
-export interface CreateRoadmapFormProps {
+export interface EditRoadmapFormProps {
+  roadmapId: string
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
   messageApi: MessageInstance
 }
 
-interface CreateRoadmapFormValues {
+interface EditRoadmapFormValues {
   name: string
   description?: string
   start: Date
@@ -29,43 +35,69 @@ interface CreateRoadmapFormValues {
 }
 
 const mapToRequestValues = (
-  values: CreateRoadmapFormValues,
-): CreateRoadmapRequest => {
+  values: EditRoadmapFormValues,
+  objectiveId: string,
+): UpdateRoadmapRequest => {
+  console.log('values', values)
   return {
+    id: objectiveId,
     name: values.name,
     description: values.description,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
     visibilityId: values.visibilityId,
-  } as CreateRoadmapRequest
+  } as UpdateRoadmapRequest
 }
 
-const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
+const EditRoadmapForm = (props: EditRoadmapFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateRoadmapFormValues>()
+  const [form] = Form.useForm<EditRoadmapFormValues>()
   const formValues = Form.useWatch([], form)
 
   const {
-    data: visibilityData,
+    data: roadmapData,
     isLoading,
     error,
+    refetch,
+  } = useGetRoadmapQuery(props.roadmapId)
+  const {
+    data: visibilityData,
+    isLoading: visibilityLoading,
+    error: visibilityError,
   } = useGetVisibilityOptionsQuery()
-  const [createRoadmap, { error: mutationError }] = useCreateRoadmapMutation()
+  const [updateRoadmap, { error: mutationError }] = useUpdateRoadmapMutation()
 
   const { hasPermissionClaim } = useAuth()
-  const canCreateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Create')
+  const canUpdateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Update')
 
-  const create = async (values: CreateRoadmapFormValues) => {
+  const mapToFormValues = useCallback(
+    (roadmap: RoadmapDetailsDto) => {
+      if (!roadmap) {
+        throw new Error('Roadmap not found.')
+      }
+      form.setFieldsValue({
+        name: roadmap.name,
+        description: roadmap.description,
+        start: dayjs(roadmap.start),
+        end: dayjs(roadmap.end),
+        visibilityId: roadmap.visibility.id,
+      })
+    },
+    [form],
+  )
+
+  const create = async (
+    values: EditRoadmapFormValues,
+    roadmap: RoadmapDetailsDto,
+  ) => {
     try {
-      const request = mapToRequestValues(values)
-      await createRoadmap(request)
+      const request = mapToRequestValues(values, roadmap.id)
+      await updateRoadmap({ roadmapKey: roadmap.key, request })
         .unwrap()
         .then((response) => {
-          props.messageApi.success(
-            `Roadmap created successfully. Roadmap Key ${response.key}`,
-          )
+          props.messageApi.success(`Roadmap updated successfully.`)
         })
         .catch((error) => {
           throw error
@@ -79,7 +111,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
       } else {
         props.messageApi.error(
           error.supportMessage ??
-            'An error occurred while creating the roadmap. Please try again.',
+            'An error occurred while updating the roadmap. Please try again.',
         )
       }
       return false
@@ -90,7 +122,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values)) {
+      if (await create(values, roadmapData)) {
         setIsOpen(false)
         form.resetFields()
         props.onFormComplete()
@@ -98,7 +130,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
     } catch (error) {
       console.error('handleOk error', error)
       props.messageApi.error(
-        'An error occurred while creating the roadmap. Please try again.',
+        'An error occurred while updating the roadmap. Please try again.',
       )
     } finally {
       setIsSaving(false)
@@ -112,13 +144,17 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
   }, [form, props])
 
   useEffect(() => {
-    if (canCreateRoadmap) {
+    if (!roadmapData || !visibilityData) return
+    if (canUpdateRoadmap) {
       setIsOpen(props.showForm)
+      if (props.showForm) {
+        mapToFormValues(roadmapData)
+      }
     } else {
       props.onFormCancel()
-      props.messageApi.error('You do not have permission to create roadmaps.')
+      props.messageApi.error('You do not have permission to update roadmaps.')
     }
-  }, [canCreateRoadmap, props])
+  }, [canUpdateRoadmap, mapToFormValues, props, roadmapData, visibilityData])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -131,19 +167,25 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
     if (error) {
       props.messageApi.error(
         error.supportMessage ??
+          'An error occurred while loading the roadmap. Please try again.',
+      )
+    }
+    if (visibilityError) {
+      props.messageApi.error(
+        visibilityError.supportMessage ??
           'An error occurred while loading visibility options. Please try again.',
       )
     }
-  }, [error, props])
+  }, [error, props, visibilityError])
 
   return (
     <>
       <Modal
-        title="Create Roadmap"
+        title="Edit Roadmap"
         open={isOpen}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
-        okText="Create"
+        okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
@@ -154,7 +196,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
           form={form}
           size="small"
           layout="vertical"
-          name="create-roadmap-form"
+          name="update-roadmap-form"
         >
           <Item label="Name" name="name" rules={[{ required: true }]}>
             <TextArea
@@ -193,4 +235,4 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
   )
 }
 
-export default CreateRoadmapForm
+export default EditRoadmapForm

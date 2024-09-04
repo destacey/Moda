@@ -101,9 +101,8 @@ const EditPlanningIntervalObjectiveForm = ({
   const { data: statusOptions } = useGetPlanningIntervalObjectiveStatusOptions()
   const updateObjective = useUpdatePlanningIntervalObjectiveMutation()
 
-  const { hasClaim } = useAuth()
-  const canManageObjectives = hasClaim(
-    'Permission',
+  const { hasPermissionClaim } = useAuth()
+  const canManageObjectives = hasPermissionClaim(
     'Permissions.PlanningIntervalObjectives.Manage',
   )
 

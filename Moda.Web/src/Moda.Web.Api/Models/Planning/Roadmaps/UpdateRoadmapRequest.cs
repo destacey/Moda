@@ -33,7 +33,7 @@ public sealed record UpdateRoadmapRequest
     /// <summary>
     /// The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap.
     /// </summary>
-    public int VisibilityId { get; private set; }
+    public int VisibilityId { get; set; }
 
     public UpdateRoadmapCommand ToUpdateRoadmapCommand()
     {
