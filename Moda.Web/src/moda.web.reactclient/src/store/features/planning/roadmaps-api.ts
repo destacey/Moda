@@ -38,9 +38,13 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
-        { type: QueryTags.Roadmap, id: result.key },
-      ],
+      // need to check result for null when 404 or after delete
+      providesTags: (result, error, arg) => {
+        if (result) {
+          return [{ type: QueryTags.Roadmap, id: result.key }]
+        }
+        return []
+      },
     }),
     createRoadmap: builder.mutation<ObjectIdAndKey, CreateRoadmapRequest>({
       queryFn: async (request) => {
@@ -84,7 +88,9 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => [
-        { type: QueryTags.Roadmap, id: arg.cacheKey },
+        // TODO: this is triggering a refetch on removed roadmap which is causing a 404
+        QueryTags.Roadmap,
+        //{ type: QueryTags.Roadmap, id: arg.cacheKey },
       ],
     }),
     getVisibilityOptions: builder.query<OptionModel<number>[], void>({

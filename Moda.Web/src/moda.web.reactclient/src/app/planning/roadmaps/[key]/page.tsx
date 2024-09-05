@@ -5,7 +5,7 @@ import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/app/hooks'
 import { useGetRoadmapQuery } from '@/src/store/features/planning/roadmaps-api'
-import { notFound, usePathname } from 'next/navigation'
+import { notFound, usePathname, useRouter } from 'next/navigation'
 import RoadmapDetailsLoading from './loading'
 import { useEffect, useMemo, useState } from 'react'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
@@ -13,10 +13,8 @@ import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
 import { Descriptions, MenuProps, message } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import EditRoadmapForm from '../components/edit-roadmap-form'
-import ReactMarkdown from 'react-markdown'
 import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
 import DeleteRoadmapForm from '../components/delete-roadmap-form'
-import router from 'next/router'
 
 const { Item } = Descriptions
 
@@ -29,6 +27,8 @@ const RoadmapDetailsPage = ({ params }) => {
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
+
+  const router = useRouter()
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Update')
@@ -48,21 +48,6 @@ const RoadmapDetailsPage = ({ params }) => {
   useEffect(() => {
     error && console.error(error)
   }, [error])
-
-  const onEditRoadmapFormClosed = (wasSaved: boolean) => {
-    setOpenEditRoadmapForm(false)
-    if (wasSaved) {
-      refetchRoadmap()
-    }
-  }
-
-  const onDeleteRoadmapFormClosed = (wasSaved: boolean) => {
-    setOpenDeleteRoadmapForm(false)
-    if (wasSaved) {
-      // redirect to the roadmap list page
-      router.push('/planning/roadmaps/')
-    }
-  }
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
@@ -90,6 +75,13 @@ const RoadmapDetailsPage = ({ params }) => {
 
   if (!isLoading && !roadmapData) {
     notFound()
+  }
+
+  const onEditRoadmapFormClosed = (wasSaved: boolean) => {
+    setOpenEditRoadmapForm(false)
+    if (wasSaved) {
+      refetchRoadmap()
+    }
   }
 
   const visibilityTag =
@@ -128,8 +120,8 @@ const RoadmapDetailsPage = ({ params }) => {
         <DeleteRoadmapForm
           roadmap={roadmapData}
           showForm={openDeleteRoadmapForm}
-          onFormComplete={() => onDeleteRoadmapFormClosed(true)}
-          onFormCancel={() => onDeleteRoadmapFormClosed(false)}
+          onFormComplete={() => router.push('/planning/roadmaps/')}
+          onFormCancel={() => setOpenDeleteRoadmapForm(false)}
           messageApi={messageApi}
         />
       )}

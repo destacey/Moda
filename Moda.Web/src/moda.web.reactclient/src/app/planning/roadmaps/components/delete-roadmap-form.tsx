@@ -40,9 +40,10 @@ const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
     setIsSaving(true)
     try {
       if (await deleteRoadmap(props.roadmap)) {
+        // TODO: not working because the parent page is gone
         props.messageApi.success('Successfully deleted Roadmap.')
-        setIsOpen(false)
         props.onFormComplete()
+        setIsOpen(false)
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)

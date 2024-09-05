@@ -38,7 +38,6 @@ const mapToRequestValues = (
   values: EditRoadmapFormValues,
   objectiveId: string,
 ): UpdateRoadmapRequest => {
-  console.log('values', values)
   return {
     id: objectiveId,
     name: values.name,
