@@ -7,6 +7,7 @@ using Moda.Planning.Domain.Interfaces;
 namespace Moda.Planning.Domain.Models;
 public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
 {
+    private readonly bool _objectConstruction = false;
     private string _name = default!;
     private string? _description;
     private LocalDateRange _dateRange = default!;
@@ -17,6 +18,8 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
 
     private Roadmap(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers)
     {
+        _objectConstruction = true;
+
         Guard.Against.NullOrEmpty(managers, nameof(managers));
 
         Name = name;
@@ -24,10 +27,13 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         DateRange = dateRange;
         Visibility = visibility;
 
+
         foreach (var managerId in managers)
         {
-            AddManager(managerId);
+            AddManager(managerId, managerId);
         }
+
+        _objectConstruction = false;
     }
 
     /// <summary>
@@ -83,9 +89,10 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <returns></returns>
     public Result Update(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid currentUserEmployeeId)
     {
-        if (!_managers.Any(x => x.ManagerId == currentUserEmployeeId))
+        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        if (isManagerResult.IsFailure)
         {
-            return Result.Failure("User is not a manager of this roadmap.");
+            return isManagerResult;
         }
 
         Name = name;
@@ -101,8 +108,18 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// </summary>
     /// <param name="managerId"></param>
     /// <returns></returns>
-    public Result AddManager(Guid managerId)
+    public Result AddManager(Guid managerId, Guid currentUserEmployeeId)
     {
+        // bypass manager check if no managers exist on initial creation
+        if (!_objectConstruction)
+        {
+            var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+            if (isManagerResult.IsFailure)
+            {
+                return isManagerResult;
+            }
+        }
+
         if (_managers.Any(x => x.ManagerId == managerId))
         {
             return Result.Failure("Roadmap manager already exists on this roadmap.");
@@ -117,8 +134,14 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// </summary>
     /// <param name="managerId"></param>
     /// <returns></returns>
-    public Result RemoveManager(Guid managerId)
+    public Result RemoveManager(Guid managerId, Guid currentUserEmployeeId)
     {
+        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        if (isManagerResult.IsFailure)
+        {
+            return isManagerResult;
+        }
+
         var manager = _managers.FirstOrDefault(x => x.ManagerId == managerId);
         if (manager is null)
         {
@@ -131,6 +154,31 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         }
 
         _managers.Remove(manager);
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Can the Roadmap be deleted.
+    /// </summary>
+    /// <param name="currentUserEmployeeId"></param>
+    /// <returns></returns>
+    public Result CanDelete(Guid currentUserEmployeeId)
+    {
+        return CanEmployeeManage(currentUserEmployeeId);
+    }
+
+    /// <summary>
+    /// Can the employee manage the Roadmap.
+    /// </summary>
+    /// <param name="employeeId"></param>
+    /// <returns></returns>
+    private Result CanEmployeeManage(Guid employeeId)
+    {
+        if (!_managers.Any(x => x.ManagerId == employeeId))
+        {
+            return Result.Failure("User is not a manager of this roadmap.");
+        }
+
         return Result.Success();
     }
 

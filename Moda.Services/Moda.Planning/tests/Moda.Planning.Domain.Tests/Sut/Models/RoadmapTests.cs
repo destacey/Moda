@@ -98,13 +98,14 @@ public class RoadmapTests
     public void AddManager_ValidManagerId_ShouldReturnSuccess()
     {
         // Arrange
-        var initialManagers = new Guid[] { Guid.NewGuid() };
+        var userEmployeeId = Guid.NewGuid();
+        var initialManagers = new Guid[] { userEmployeeId };
         var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, initialManagers).Value;
-        var managerId = Guid.NewGuid();
-        var expectedManagers = initialManagers.Append(managerId);
+        var managerId2 = Guid.NewGuid();
+        var expectedManagers = initialManagers.Append(managerId2);
 
         // Act
-        var result = roadmap.AddManager(managerId);
+        var result = roadmap.AddManager(managerId2, userEmployeeId);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -116,11 +117,11 @@ public class RoadmapTests
     public void AddManager_DuplicateManagerId_ShouldReturnFailure()
     {
         // Arrange
-        var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [managerId]).Value;
+        var userEmployeeId = Guid.NewGuid();
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [userEmployeeId]).Value;
 
         // Act
-        var result = roadmap.AddManager(managerId);
+        var result = roadmap.AddManager(userEmployeeId, userEmployeeId);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -132,27 +133,28 @@ public class RoadmapTests
     public void RemoveManager_ValidManagerId_ShouldReturnSuccess()
     {
         // Arrange
-        var managerId1 = Guid.NewGuid();
+        var userEmployeeId = Guid.NewGuid();
         var managerId2 = Guid.NewGuid();
-        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [managerId1, managerId2]).Value;
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [userEmployeeId, managerId2]).Value;
 
         // Act
-        var result = roadmap.RemoveManager(managerId2);
+        var result = roadmap.RemoveManager(managerId2, userEmployeeId);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
         roadmap.Managers.Should().HaveCount(1);
-        roadmap.Managers.First().ManagerId.Should().Be(managerId1);
+        roadmap.Managers.First().ManagerId.Should().Be(userEmployeeId);
     }
 
     [Fact]
     public void RemoveManager_InvalidManagerId_ShouldReturnFailure()
     {
         // Arrange
-        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var userEmployeeId = Guid.NewGuid();
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [userEmployeeId]).Value;
 
         // Act
-        var result = roadmap.RemoveManager(Guid.NewGuid());
+        var result = roadmap.RemoveManager(Guid.NewGuid(), userEmployeeId);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -167,7 +169,7 @@ public class RoadmapTests
         var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [managerId]).Value;
 
         // Act
-        var result = roadmap.RemoveManager(managerId);
+        var result = roadmap.RemoveManager(managerId, managerId);
 
         // Assert
         result.IsFailure.Should().BeTrue();

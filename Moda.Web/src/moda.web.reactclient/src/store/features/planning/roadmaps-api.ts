@@ -73,13 +73,26 @@ export const roadmapApi = apiSlice.injectEndpoints({
         { type: QueryTags.Roadmap, id: arg.cacheKey },
       ],
     }),
+    deleteRoadmap: builder.mutation<void, { id: string; cacheKey: number }>({
+      queryFn: async (request) => {
+        try {
+          const data = await (await getRoadmapsClient()).delete(request.id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.Roadmap, id: arg.cacheKey },
+      ],
+    }),
     getVisibilityOptions: builder.query<OptionModel<number>[], void>({
       queryFn: async () => {
         try {
           const visibilities = await (
             await getRoadmapsClient()
           ).getVisibilityOptions()
-          //const visibilities = _.sortBy(dtos, ['order'])
           const data: OptionModel<number>[] = visibilities
             .sort((a, b) => a.order - b.order)
             .map((s) => ({
@@ -108,5 +121,6 @@ export const {
   useGetRoadmapQuery,
   useCreateRoadmapMutation,
   useUpdateRoadmapMutation,
+  useDeleteRoadmapMutation,
   useGetVisibilityOptionsQuery,
 } = roadmapApi

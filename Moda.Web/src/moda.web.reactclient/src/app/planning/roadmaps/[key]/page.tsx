@@ -10,13 +10,21 @@ import RoadmapDetailsLoading from './loading'
 import { useEffect, useMemo, useState } from 'react'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
-import { MenuProps, message } from 'antd'
+import { Descriptions, MenuProps, message } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import EditRoadmapForm from '../components/edit-roadmap-form'
+import ReactMarkdown from 'react-markdown'
+import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
+import DeleteRoadmapForm from '../components/delete-roadmap-form'
+import router from 'next/router'
+
+const { Item } = Descriptions
 
 const RoadmapDetailsPage = ({ params }) => {
   useDocumentTitle('Roadmap Details')
   const [openEditRoadmapForm, setOpenEditRoadmapForm] = useState<boolean>(false)
+  const [openDeleteRoadmapForm, setOpenDeleteRoadmapForm] =
+    useState<boolean>(false)
   const [messageApi, contextHolder] = message.useMessage()
 
   const pathname = usePathname()
@@ -48,6 +56,14 @@ const RoadmapDetailsPage = ({ params }) => {
     }
   }
 
+  const onDeleteRoadmapFormClosed = (wasSaved: boolean) => {
+    setOpenDeleteRoadmapForm(false)
+    if (wasSaved) {
+      // redirect to the roadmap list page
+      router.push('/planning/roadmaps/')
+    }
+  }
+
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const items: ItemType[] = []
     if (canUpdateRoadmap) {
@@ -57,11 +73,11 @@ const RoadmapDetailsPage = ({ params }) => {
           label: 'Edit',
           onClick: () => setOpenEditRoadmapForm(true),
         },
-        // {
-        //   key: 'delete',
-        //   label: 'Delete',
-        //   onClick: () => setOpenDeleteObjectiveForm(true),
-        // },
+        {
+          key: 'delete',
+          label: 'Delete',
+          onClick: () => setOpenDeleteRoadmapForm(true),
+        },
       )
     }
 
@@ -92,12 +108,28 @@ const RoadmapDetailsPage = ({ params }) => {
         actions={<PageActions actionItems={actionsMenuItems} />}
         tags={visibilityTag}
       />
+      {roadmapData?.description && (
+        <Descriptions>
+          <Item>
+            <ModaMarkdownDescription content={roadmapData?.description} />
+          </Item>
+        </Descriptions>
+      )}
       {openEditRoadmapForm && (
         <EditRoadmapForm
           roadmapId={roadmapData?.id}
           showForm={openEditRoadmapForm}
           onFormComplete={() => onEditRoadmapFormClosed(true)}
           onFormCancel={() => onEditRoadmapFormClosed(false)}
+          messageApi={messageApi}
+        />
+      )}
+      {openDeleteRoadmapForm && (
+        <DeleteRoadmapForm
+          roadmap={roadmapData}
+          showForm={openDeleteRoadmapForm}
+          onFormComplete={() => onDeleteRoadmapFormClosed(true)}
+          onFormCancel={() => onDeleteRoadmapFormClosed(false)}
           messageApi={messageApi}
         />
       )}

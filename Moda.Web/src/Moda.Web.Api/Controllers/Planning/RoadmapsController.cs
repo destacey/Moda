@@ -2,6 +2,7 @@
 using Moda.Common.Application.Requests;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
+using Moda.Planning.Application.Roadmaps.Commands;
 using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Application.Roadmaps.Queries;
 using Moda.Web.Api.Models.Planning.Roadmaps;
@@ -79,6 +80,20 @@ public class RoadmapsController : ControllerBase
             : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Update"));
     }
 
+    [HttpDelete("{id}")]
+    [MustHavePermission(ApplicationAction.Delete, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Delete a roadmap.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeleteRoadmapCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Delete"));
+    }
+
     [HttpGet("visibility-options")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get a list of all visibility.", "")]
@@ -89,4 +104,6 @@ public class RoadmapsController : ControllerBase
         var items = await _sender.Send(new GetVisibilitiesQuery(), cancellationToken);
         return Ok(items.OrderBy(c => c.Order));
     }
+
+
 }
