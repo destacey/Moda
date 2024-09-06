@@ -25,7 +25,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         QueryTags.Roadmap,
-        ...result.map(({ key }) => ({ type: QueryTags.Roadmap, key })),
+        //...result.map(({ key }) => ({ type: QueryTags.Roadmap, key })),
       ],
     }),
     getRoadmap: builder.query<RoadmapDetailsDto, string>({
@@ -39,12 +39,16 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
       // need to check result for null when 404 or after delete
-      providesTags: (result, error, arg) => {
-        if (result) {
-          return [{ type: QueryTags.Roadmap, id: result.key }]
-        }
-        return []
-      },
+      providesTags: (result, error, arg) => [
+        QueryTags.Roadmap,
+        //...result.map(({ key }) => ({ type: QueryTags.Roadmap, key })),
+      ],
+      // providesTags: (result, error, arg) => {
+      //   if (result) {
+      //     return [{ type: QueryTags.Roadmap, id: result.key }]
+      //   }
+      //   return []
+      // },
     }),
     createRoadmap: builder.mutation<ObjectIdAndKey, CreateRoadmapRequest>({
       queryFn: async (request) => {
@@ -73,9 +77,10 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: (result, error, arg) => [
-        { type: QueryTags.Roadmap, id: arg.cacheKey },
-      ],
+      invalidatesTags: (result, error, arg) => [QueryTags.Roadmap],
+      // invalidatesTags: (result, error, arg) => [
+      //   { type: QueryTags.Roadmap, id: arg.cacheKey },
+      // ],
     }),
     deleteRoadmap: builder.mutation<void, { id: string; cacheKey: number }>({
       queryFn: async (request) => {
