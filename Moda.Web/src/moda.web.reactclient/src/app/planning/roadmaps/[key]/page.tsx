@@ -16,6 +16,7 @@ import EditRoadmapForm from '../components/edit-roadmap-form'
 import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
 import DeleteRoadmapForm from '../components/delete-roadmap-form'
 import CreateRoadmapForm from '../components/create-roadmap-form'
+import RoadmapViewManager from './roadmap-view-manager'
 
 const { Item } = Descriptions
 const { Item: ListItem } = List
@@ -154,7 +155,7 @@ const RoadmapDetailsPage = ({ params }) => {
           </Item>
         </Descriptions>
       )}
-      <List
+      {/* <List
         dataSource={children}
         renderItem={(item) => (
           <ListItem>
@@ -164,6 +165,11 @@ const RoadmapDetailsPage = ({ params }) => {
             />
           </ListItem>
         )}
+      /> */}
+      <RoadmapViewManager
+        roadmap={roadmapData}
+        isLoading={isLoading}
+        refreshRoadmap={refetchRoadmap}
       />
       {openCreateRoadmapForm && (
         <CreateRoadmapForm

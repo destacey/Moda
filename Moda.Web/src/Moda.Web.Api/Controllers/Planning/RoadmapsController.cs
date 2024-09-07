@@ -67,7 +67,6 @@ public class RoadmapsController : ControllerBase
             var addLinkResult = await _sender.Send(new CreateRoadmapLinkCommand(request.ParentId.Value, response.RoadmapIds.Id), cancellationToken);
             if (addLinkResult.IsFailure)
                 response.LinkToParentError = addLinkResult.Error;
-            response.LinkToParentError = "This is a test error";
         }
 
         return CreatedAtAction(nameof(GetRoadmap), new { idOrKey = response.RoadmapIds.Id.ToString() }, response);

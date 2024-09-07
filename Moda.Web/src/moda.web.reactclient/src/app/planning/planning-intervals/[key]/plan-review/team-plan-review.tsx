@@ -74,16 +74,15 @@ const TeamPlanReview = ({
     team?.id,
   )
 
-  const { hasClaim } = useAuth()
-  const canManageObjectives = hasClaim(
-    'Permission',
+  const { hasPermissionClaim } = useAuth()
+  const canManageObjectives = hasPermissionClaim(
     'Permissions.PlanningIntervalObjectives.Manage',
   )
   const canCreatePIObjectiveHealthChecks =
     !!canManageObjectives &&
-    hasClaim('Permission', 'Permissions.HealthChecks.Create')
-  const canCreateRisks = hasClaim('Permission', 'Permissions.Risks.Create')
-  const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
+    hasPermissionClaim('Permissions.HealthChecks.Create')
+  const canCreateRisks = hasPermissionClaim('Permissions.Risks.Create')
+  const canUpdateRisks = hasPermissionClaim('Permissions.Risks.Update')
 
   const viewSelector = useMemo(
     () => (
