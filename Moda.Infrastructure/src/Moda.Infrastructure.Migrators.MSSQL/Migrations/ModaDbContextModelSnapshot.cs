@@ -838,14 +838,20 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SourceId");
-
-                    b.HasIndex("TargetId");
-
                     b.HasIndex("Id", "IsDeleted")
                         .HasFilter("[IsDeleted] = 0");
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "IsDeleted"), new[] { "SourceId", "TargetId" });
+
+                    b.HasIndex("SourceId", "IsDeleted")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("SourceId", "IsDeleted"), new[] { "Id", "TargetId" });
+
+                    b.HasIndex("TargetId", "IsDeleted")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("TargetId", "IsDeleted"), new[] { "Id", "SourceId" });
 
                     b.ToTable("TeamMemberships", "Organization");
                 });
@@ -1326,6 +1332,50 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id", "Name", "Visibility" });
 
                     b.ToTable("Roadmaps", "Planning");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.RoadmapLink", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChildId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ChildId"), new[] { "Id", "ParentId" });
+
+                    b.HasIndex("Id");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "ParentId", "ChildId", "Order" });
+
+                    b.HasIndex("ParentId");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ParentId"), new[] { "Id", "ChildId", "Order" });
+
+                    b.ToTable("RoadmapLinks", "Planning");
                 });
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.RoadmapManager", b =>
@@ -2325,6 +2375,25 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
+            modelBuilder.Entity("Moda.Planning.Domain.Models.RoadmapLink", b =>
+                {
+                    b.HasOne("Moda.Planning.Domain.Models.Roadmap", "Child")
+                        .WithMany()
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Planning.Domain.Models.Roadmap", "Parent")
+                        .WithMany("ChildLinks")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Child");
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("Moda.Planning.Domain.Models.RoadmapManager", b =>
                 {
                     b.HasOne("Moda.Common.Domain.Employees.Employee", "Manager")
@@ -2725,6 +2794,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmap", b =>
                 {
+                    b.Navigation("ChildLinks");
+
                     b.Navigation("Managers");
                 });
 

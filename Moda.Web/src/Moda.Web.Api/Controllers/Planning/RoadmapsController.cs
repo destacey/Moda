@@ -52,14 +52,25 @@ public class RoadmapsController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roadmaps)]
     [OpenApiOperation("Create a roadmap.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
-    public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateRoadmapRequest request, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(CreateRoadmapReponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    public async Task<ActionResult<CreateRoadmapReponse>> Create([FromBody] CreateRoadmapRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateRoadmapCommand(), cancellationToken);
+        if (result.IsFailure)
+            return BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Create"));
 
-        return result.IsSuccess
-            ? CreatedAtAction(nameof(GetRoadmap), new { idOrKey = result.Value.Id.ToString() }, result.Value)
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Create"));
+        var response = new CreateRoadmapReponse { RoadmapIds = result.Value };
+        if (request.ParentId.HasValue)
+        {
+            var addLinkResult = await _sender.Send(new CreateRoadmapLinkCommand(request.ParentId.Value, response.RoadmapIds.Id), cancellationToken);
+            if (addLinkResult.IsFailure)
+                response.LinkToParentError = addLinkResult.Error;
+            response.LinkToParentError = "This is a test error";
+        }
+
+        return CreatedAtAction(nameof(GetRoadmap), new { idOrKey = response.RoadmapIds.Id.ToString() }, response);
     }
 
     [HttpPut("{id}")]

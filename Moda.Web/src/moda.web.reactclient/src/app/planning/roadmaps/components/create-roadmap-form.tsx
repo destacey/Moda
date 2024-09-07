@@ -15,6 +15,7 @@ const { Group: RadioGroup } = Radio
 
 export interface CreateRoadmapFormProps {
   showForm: boolean
+  parentRoadmapId?: string | null
   onFormComplete: () => void
   onFormCancel: () => void
   messageApi: MessageInstance
@@ -30,6 +31,7 @@ interface CreateRoadmapFormValues {
 
 const mapToRequestValues = (
   values: CreateRoadmapFormValues,
+  parentRoadmapId?: string | null,
 ): CreateRoadmapRequest => {
   return {
     name: values.name,
@@ -37,6 +39,7 @@ const mapToRequestValues = (
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
     visibilityId: values.visibilityId,
+    parentId: parentRoadmapId,
   } as CreateRoadmapRequest
 }
 
@@ -57,15 +60,19 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
   const { hasPermissionClaim } = useAuth()
   const canCreateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Create')
 
-  const create = async (values: CreateRoadmapFormValues) => {
+  const create = async (values: CreateRoadmapFormValues, parentRoadmapId) => {
     try {
-      const request = mapToRequestValues(values)
+      const request = mapToRequestValues(values, parentRoadmapId)
       await createRoadmap(request)
         .unwrap()
         .then((response) => {
           props.messageApi.success(
-            `Roadmap created successfully. Roadmap Key ${response.key}`,
+            `Roadmap created successfully. Roadmap Key ${response.roadmapIds.key}`,
           )
+          if (response.linkToParentError) {
+            const message = `Roadmap created successfully, but there was an error linking it to the parent roadmap. Error: ${response.linkToParentError}`
+            props.messageApi.error(message)
+          }
         })
         .catch((error) => {
           throw error
@@ -90,7 +97,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values)) {
+      if (await create(values, props.parentRoadmapId)) {
         setIsOpen(false)
         form.resetFields()
         props.onFormComplete()

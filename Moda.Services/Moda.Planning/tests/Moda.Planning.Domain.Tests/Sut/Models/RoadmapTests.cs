@@ -173,6 +173,76 @@ public class RoadmapTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        Assert.Equal("Roadmap must have at least one manager.", result.Error);
+        result.Error.Should().Be("Roadmap must have at least one manager.");
+    }
+
+    [Fact]
+    public void AddChildLink_ShouldReturnSuccess_WhenValid()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var childId = Guid.NewGuid();
+        var currentUserEmployeeId = roadmap.Managers.First().ManagerId;
+
+        // Act
+        var result = roadmap.AddChildLink(childId, currentUserEmployeeId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        roadmap.ChildLinks.Should().Contain(link => link.ChildId == childId);
+        roadmap.ChildLinks.Count.Should().Be(1);
+    }
+
+    [Fact]
+    public void AddChildLink_ShouldReturnFailure_WhenChildLinkAlreadyExists()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var childId = Guid.NewGuid();
+        var currentUserEmployeeId = roadmap.Managers.First().ManagerId;
+        roadmap.AddChildLink(childId, currentUserEmployeeId);
+
+        // Act
+        var result = roadmap.AddChildLink(childId, currentUserEmployeeId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Child Roadmap already exists on this roadmap.");
+        roadmap.ChildLinks.Count.Should().Be(1);
+    }
+
+    [Fact]
+    public void RemoveChildLink_ShouldReturnSuccess_WhenValid()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var childId = Guid.NewGuid();
+        var currentUserEmployeeId = roadmap.Managers.First().ManagerId;
+        roadmap.AddChildLink(childId, currentUserEmployeeId);
+
+        // Act
+        var result = roadmap.RemoveChildLink(childId, currentUserEmployeeId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        roadmap.ChildLinks.Count.Should().Be(0);
+    }
+
+    [Fact]
+    public void RemoveChildLink_ShouldReturnFailure_WhenChildLinkDoesNotExist()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var childId = Guid.NewGuid();
+        var currentUserEmployeeId = roadmap.Managers.First().ManagerId;
+        roadmap.AddChildLink(Guid.NewGuid(), currentUserEmployeeId);
+
+        // Act
+        var result = roadmap.RemoveChildLink(childId, currentUserEmployeeId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Child Roadmap does not exist on this roadmap.");
+        roadmap.ChildLinks.Count.Should().Be(1);
     }
 }

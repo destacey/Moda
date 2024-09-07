@@ -1,6 +1,6 @@
+import { CreateRoadmapReponse } from './../../../services/moda-api'
 import {
   CreateRoadmapRequest,
-  ObjectIdAndKey,
   RoadmapDetailsDto,
   RoadmapListDto,
   UpdateRoadmapRequest,
@@ -50,18 +50,20 @@ export const roadmapApi = apiSlice.injectEndpoints({
       //   return []
       // },
     }),
-    createRoadmap: builder.mutation<ObjectIdAndKey, CreateRoadmapRequest>({
-      queryFn: async (request) => {
-        try {
-          const data = await (await getRoadmapsClient()).create(request)
-          return { data }
-        } catch (error) {
-          console.error('API Error:', error)
-          return { error }
-        }
+    createRoadmap: builder.mutation<CreateRoadmapReponse, CreateRoadmapRequest>(
+      {
+        queryFn: async (request) => {
+          try {
+            const data = await (await getRoadmapsClient()).create(request)
+            return { data }
+          } catch (error) {
+            console.error('API Error:', error)
+            return { error }
+          }
+        },
+        invalidatesTags: (result, error, arg) => [QueryTags.Roadmap],
       },
-      invalidatesTags: (result, error, arg) => [QueryTags.Roadmap],
-    }),
+    ),
     updateRoadmap: builder.mutation<
       void,
       { request: UpdateRoadmapRequest; cacheKey: number }

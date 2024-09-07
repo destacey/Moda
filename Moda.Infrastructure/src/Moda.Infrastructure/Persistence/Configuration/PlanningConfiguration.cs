@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Runtime.Intrinsics.Arm;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Enums.Organization;
@@ -341,6 +342,16 @@ public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
             .WithOne()
             .HasForeignKey(rm => rm.RoadmapId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.ChildLinks)
+            .WithOne(rl => rl.Parent)
+            .HasForeignKey(rl => rl.ParentId)
+            .OnDelete(DeleteBehavior.NoAction); // Manually delete the child links
+
+        builder.HasMany<RoadmapLink>()
+            .WithOne(rl => rl.Child)
+            .HasForeignKey(rl => rl.ChildId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
@@ -362,6 +373,38 @@ public class RoadmapManagerConfiguration : IEntityTypeConfiguration<RoadmapManag
             .WithMany()
             .HasForeignKey(rm => rm.ManagerId)
             .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+public class RoadmapLinkConfiguration : IEntityTypeConfiguration<RoadmapLink>
+{
+    public void Configure(EntityTypeBuilder<RoadmapLink> builder)
+    {
+        builder.ToTable("RoadmapLinks", SchemaNames.Planning);
+
+        builder.HasKey(rl => rl.Id);
+
+        builder.HasIndex(rl => rl.Id)
+            .IncludeProperties(rl => new { rl.ParentId, rl.ChildId, rl.Order });
+
+        builder.HasIndex(rl => rl.ParentId)
+            .IncludeProperties(rl => new { rl.Id, rl.ChildId, rl.Order });
+
+        builder.HasIndex(rl => rl.ChildId)
+            .IncludeProperties(rl => new { rl.Id, rl.ParentId });
+
+        builder.Property(rl => rl.Order)
+            .IsRequired();
+
+        //builder.HasOne(rl => rl.Parent)
+        //    .WithMany(rl => rl.ChildLinks)
+        //    .HasForeignKey(rm => rm.ParentId)
+        //    .OnDelete(DeleteBehavior.Cascade);
+
+        //builder.HasOne(rl => rl.Child)
+        //    .WithMany()
+        //    .HasForeignKey(rm => rm.ChildId)
+        //    .OnDelete(DeleteBehavior.Cascade);
     }
 }
 

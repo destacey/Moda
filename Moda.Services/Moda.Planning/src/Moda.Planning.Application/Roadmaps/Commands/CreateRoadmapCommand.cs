@@ -43,7 +43,10 @@ internal sealed class CreateRoadmapCommandHandler(IPlanningDbContext planningDbC
                 );
 
             if (result.IsFailure)
+            {
+                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", request.GetType().Name, request, result.Error);
                 return Result.Failure<ObjectIdAndKey>(result.Error);
+            }
 
             await _planningDbContext.Roadmaps.AddAsync(result.Value, cancellationToken);
             await _planningDbContext.SaveChangesAsync(cancellationToken);

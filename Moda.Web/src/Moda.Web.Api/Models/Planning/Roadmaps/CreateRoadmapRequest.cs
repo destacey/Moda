@@ -30,6 +30,11 @@ public sealed record CreateRoadmapRequest
     /// </summary>
     public int VisibilityId { get; set; }
 
+    /// <summary>
+    /// Informs the API to link the Roadmap to the Roadmap with the provided parentId after creation.
+    /// </summary>
+    public Guid? ParentId { get; set; }
+
     public CreateRoadmapCommand ToCreateRoadmapCommand()
     {
         return new CreateRoadmapCommand(Name, Description, new LocalDateRange(Start, End), (Visibility)VisibilityId);
@@ -60,5 +65,11 @@ public sealed class CreateRoadmapRequestValidator : CustomValidator<CreateRoadma
         RuleFor(t => (Visibility)t.VisibilityId)
             .IsInEnum()
             .WithMessage("A valid visibility must be selected.");
+
+        When(t => t.ParentId.HasValue, () =>
+        {
+            RuleFor(t => t.ParentId)
+                .NotEmpty();
+        });
     }
 }

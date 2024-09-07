@@ -13,6 +13,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     private LocalDateRange _dateRange = default!;
 
     private readonly List<RoadmapManager> _managers = [];
+    private readonly List<RoadmapLink> _childLinks = [];
 
     private Roadmap() { }
 
@@ -77,6 +78,11 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// The managers of the Roadmap. Managers have full control over the Roadmap.
     /// </summary>
     public IReadOnlyCollection<RoadmapManager> Managers => _managers.AsReadOnly();
+
+    /// <summary>
+    /// The links of the Roadmap. Links are used to connect Roadmaps together.
+    /// </summary>
+    public IReadOnlyCollection<RoadmapLink> ChildLinks => _childLinks.AsReadOnly();
 
     /// <summary>
     /// Updates the Roadmap.
@@ -154,6 +160,61 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         }
 
         _managers.Remove(manager);
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Adds a child Roadmap link to the Roadmap.
+    /// </summary>
+    /// <param name="childId"></param>
+    /// <param name="currentUserEmployeeId"></param>
+    /// <returns></returns>
+    public Result AddChildLink(Guid childId, Guid currentUserEmployeeId)
+    {
+        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        if (isManagerResult.IsFailure)
+        {
+            return isManagerResult;
+        }
+
+        if (_childLinks.Any(x => x.ChildId == childId))
+        {
+            return Result.Failure("Child Roadmap already exists on this roadmap.");
+        }
+
+        var order = _childLinks.Count + 1;
+
+        _childLinks.Add(new RoadmapLink(Id, childId, order));
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Removes a child Roadmap link from the Roadmap.
+    /// </summary>
+    /// <param name="childId"></param>
+    /// <param name="currentUserEmployeeId"></param>
+    /// <returns></returns>
+    public Result RemoveChildLink(Guid childId, Guid currentUserEmployeeId)
+    {
+        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        if (isManagerResult.IsFailure)
+        {
+            return isManagerResult;
+        }
+
+        var childLink = _childLinks.FirstOrDefault(x => x.ChildId == childId);
+        if (childLink is null)
+        {
+            return Result.Failure("Child Roadmap does not exist on this roadmap.");
+        }
+
+        _childLinks.Remove(childLink);
+
+        foreach (var link in _childLinks.Where(x => x.Order > childLink.Order))
+        {
+            link.SetOrder(link.Order - 1);
+        }
+
         return Result.Success();
     }
 

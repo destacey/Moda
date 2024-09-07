@@ -3717,7 +3717,7 @@ export class RoadmapsClient {
     /**
      * Create a roadmap.
      */
-    create(request: CreateRoadmapRequest, cancelToken?: CancelToken): Promise<ObjectIdAndKey> {
+    create(request: CreateRoadmapRequest, cancelToken?: CancelToken): Promise<CreateRoadmapReponse> {
         let url_ = this.baseUrl + "/api/planning/roadmaps";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3745,7 +3745,7 @@ export class RoadmapsClient {
         });
     }
 
-    protected processCreate(response: AxiosResponse): Promise<ObjectIdAndKey> {
+    protected processCreate(response: AxiosResponse): Promise<CreateRoadmapReponse> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -3760,7 +3760,7 @@ export class RoadmapsClient {
             let result201: any = null;
             let resultData201  = _responseText;
             result201 = JSON.parse(resultData201);
-            return Promise.resolve<ObjectIdAndKey>(result201);
+            return Promise.resolve<CreateRoadmapReponse>(result201);
 
         } else if (status === 422) {
             const _responseText = response.data;
@@ -10389,6 +10389,18 @@ export interface RoadmapDetailsDto {
     end?: Date;
     visibility?: SimpleNavigationDto;
     managers?: EmployeeNavigationDto[];
+    children?: RoadmapChildDto[];
+}
+
+export interface RoadmapChildDto {
+    roadmap?: RoadmapListDto;
+    order?: number;
+}
+
+export interface CreateRoadmapReponse {
+    roadmapIds?: ObjectIdAndKey;
+    /** The result of linking the Roadmap to the parent. If the action was successful, this will be null.  If a parentId was not provided in the request, this will be null. */
+    linkToParentError?: string | undefined;
 }
 
 export interface ObjectIdAndKey {
@@ -10407,6 +10419,8 @@ export interface CreateRoadmapRequest {
     end: Date;
     /** The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap. */
     visibilityId?: number;
+    /** Informs the API to link the Roadmap to the Roadmap with the provided parentId after creation. */
+    parentId?: string | undefined;
 }
 
 export interface UpdateRoadmapRequest {

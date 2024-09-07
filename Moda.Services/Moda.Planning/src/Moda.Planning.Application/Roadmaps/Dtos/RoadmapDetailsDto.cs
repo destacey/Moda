@@ -42,12 +42,15 @@ public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
     /// </summary>
     public required List<EmployeeNavigationDto> Managers { get; set; }
 
+    public required List<RoadmapChildDto> Children { get; set; }
+
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Roadmap, RoadmapDetailsDto>()
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End)
             .Map(dest => dest.Visibility, src => SimpleNavigationDto.FromEnum(src.Visibility))
-            .Map(dest => dest.Managers, src => src.Managers.Select(m => EmployeeNavigationDto.From(m.Manager!)));
+            .Map(dest => dest.Managers, src => src.Managers.Select(m => EmployeeNavigationDto.From(m.Manager!)))
+            .Map(dest => dest.Children, src => src.ChildLinks);
     }
 }

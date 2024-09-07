@@ -57,8 +57,7 @@ internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbC
                 await _planningDbContext.Entry(roadmap).ReloadAsync(cancellationToken);
                 roadmap.ClearDomainEvents();
 
-                var requestName = request.GetType().Name;
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
+                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", request.GetType().Name, request, updateResult.Error);
                 return Result.Failure(updateResult.Error);
             }
 

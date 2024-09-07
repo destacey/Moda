@@ -32,8 +32,7 @@ internal sealed class DeleteRoadmapCommandHandler(IPlanningDbContext planningDbC
 
             if (deleteResult.IsFailure)
             {
-                var requestName = request.GetType().Name;
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, deleteResult.Error);
+                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", request.GetType().Name, request, deleteResult.Error);
                 return Result.Failure(deleteResult.Error);
             }
 
