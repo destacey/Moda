@@ -155,17 +155,6 @@ const RoadmapDetailsPage = ({ params }) => {
           </Item>
         </Descriptions>
       )}
-      {/* <List
-        dataSource={children}
-        renderItem={(item) => (
-          <ListItem>
-            <ListItem.Meta
-              title={`${item.roadmap.key} - ${item.roadmap.name} (${item.order})`}
-              description={`${item.roadmap.start} - ${item.roadmap.end}`}
-            />
-          </ListItem>
-        )}
-      /> */}
       <RoadmapViewManager
         roadmap={roadmapData}
         isLoading={isLoading}

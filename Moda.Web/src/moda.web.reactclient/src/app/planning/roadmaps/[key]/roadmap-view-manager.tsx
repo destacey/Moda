@@ -1,13 +1,14 @@
 'use client'
 
 import { RoadmapDetailsDto, RoadmapListDto } from '@/src/services/moda-api'
-import { MenuOutlined } from '@ant-design/icons'
+import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import { Flex } from 'antd'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { useEffect, useMemo, useState } from 'react'
 import RoadmapsGrid from '../components/roadmaps-grid'
+import RoadmapsTimeline from '../components/roadmaps-timeline'
 
-export interface RoadmapViewManagerProps {
+interface RoadmapViewManagerProps {
   roadmap: RoadmapDetailsDto
   isLoading: boolean
   refreshRoadmap: () => void
@@ -18,10 +19,10 @@ const viewSelectorOptions: SegmentedLabeledOption[] = [
     value: 'List',
     icon: <MenuOutlined alt="List" title="List" />,
   },
-  //   {
-  //     value: 'Timeline',
-  //     icon: <BuildOutlined alt="Timeline" title="Timeline" />,
-  //   },
+  {
+    value: 'Timeline',
+    icon: <BuildOutlined alt="Timeline" title="Timeline" />,
+  },
 ]
 
 const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
@@ -59,6 +60,14 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
           roadmapsLoading={props.isLoading}
           refreshRoadmaps={props.refreshRoadmap}
           gridHeight={550}
+        />
+      )}
+      {currentView === 'Timeline' && (
+        <RoadmapsTimeline
+          roadmap={props.roadmap}
+          roadmaps={children}
+          isLoading={props.isLoading}
+          refreshRoadmap={props.refreshRoadmap}
         />
       )}
     </>
