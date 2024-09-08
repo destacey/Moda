@@ -93,9 +93,9 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
   ) => {
     try {
       const request = mapToRequestValues(values, roadmap.id)
-      await updateRoadmap({ request, cacheKey: roadmap.key })
+      updateRoadmap({ request, cacheKey: roadmap.key })
         .unwrap()
-        .then((response) => {
+        .then(() => {
           props.messageApi.success(`Roadmap updated successfully.`)
         })
         .catch((error) => {

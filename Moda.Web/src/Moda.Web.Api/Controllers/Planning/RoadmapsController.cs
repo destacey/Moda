@@ -115,6 +115,44 @@ public class RoadmapsController : ControllerBase
         return Ok(roadmaps);
     }
 
+    [HttpPost("{id}/child-links/order")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Update the order of child roadmap links.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdateChildLinksOrder(Guid id, [FromBody] UpdateRoadmapLinksOrderRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.RoadmapId)
+            return BadRequest();
+
+        var result = await _sender.Send(new UpdateRoadmapLinksOrderCommand(request.RoadmapId, request.RoadmapLinks), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildLinksOrder"));
+    }
+
+    [HttpPost("{id}/child-links/{roadmapLinkId}/order")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Update the order of child roadmap links based on a single change.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdateChildLinkOrder(Guid id, Guid roadmapLinkId, [FromBody] UpdateRoadmapLinkOrderRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.RoadmapId)
+            return BadRequest();
+
+        if (roadmapLinkId != request.RoadmapLinkId)
+            return BadRequest();
+
+
+        var result = await _sender.Send(new UpdateRoadmapLinkOrderCommand(request.RoadmapId, request.RoadmapLinkId, request.Order), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildLinkOrder"));
+    }
+
     [HttpGet("visibility-options")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get a list of all visibility.", "")]

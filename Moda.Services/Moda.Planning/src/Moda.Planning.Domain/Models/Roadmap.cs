@@ -219,6 +219,101 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     }
 
     /// <summary>
+    /// Sets the order of the child Roadmap links. This is used to set the order of all child links at once.
+    /// </summary>
+    /// <param name="childLinks"></param>
+    /// <param name="currentUserEmployeeId"></param>
+    /// <returns></returns>
+    public Result SetChildLinksOrder(Dictionary<Guid, int> childLinks, Guid currentUserEmployeeId)
+    {
+        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        if (isManagerResult.IsFailure)
+        {
+            return isManagerResult;
+        }
+
+        if (childLinks.Count != _childLinks.Count)
+        {
+            return Result.Failure("Not all child roadmap links provided were found.");
+        }
+
+        foreach (var childLink in _childLinks)
+        {
+            if (!childLinks.ContainsKey(childLink.ChildId))
+            {
+                return Result.Failure("Not all child roadmap links provided were found.");
+            }
+
+            childLink.SetOrder(childLinks[childLink.ChildId]);
+        }
+
+        ResetChildLinksOrder();
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Updates the order of the child Roadmap links based on a single link changing its order.
+    /// </summary>
+    /// <param name="childLinkId"></param>
+    /// <param name="order"></param>
+    /// <param name="currentUserEmployeeId"></param>
+    /// <returns></returns>
+    public Result SetChildLinksOrder(Guid childLinkId, int order, Guid currentUserEmployeeId)
+    {
+        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        if (isManagerResult.IsFailure)
+        {
+            return isManagerResult;
+        }
+
+        var childLink = _childLinks.FirstOrDefault(x => x.ChildId == childLinkId);
+        if (childLink is null)
+        {
+            return Result.Failure("Child roadmap link does not exist on this roadmap.");
+        }
+
+        if (childLink.Order == order)
+        {
+            return Result.Success();
+        }
+
+        if (childLink.Order < order)
+        {
+            foreach (var link in _childLinks.Where(x => x.Order > childLink.Order && x.Order <= order))
+            {
+                link.SetOrder(link.Order - 1);
+            }
+        }
+        else
+        {
+            foreach (var link in _childLinks.Where(x => x.Order >= order && x.Order < childLink.Order))
+            {
+                link.SetOrder(link.Order + 1);
+            }
+        }
+
+        childLink.SetOrder(order);
+
+        ResetChildLinksOrder();
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Resets the order of the child Roadmap links. This is used to remove any gaps in the order.
+    /// </summary>
+    private void ResetChildLinksOrder()
+    {
+        int i = 1;
+        foreach (var link in _childLinks.OrderBy(x => x.Order))
+        {
+            link.SetOrder(i);
+            i++;
+        }
+    }
+
+    /// <summary>
     /// Can the Roadmap be deleted.
     /// </summary>
     /// <param name="currentUserEmployeeId"></param>

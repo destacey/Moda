@@ -155,23 +155,29 @@ const RoadmapDetailsPage = ({ params }) => {
         tags={visibilityTag}
       />
       {roadmapData && (
-        <Descriptions>
-          <Item label="Dates">
-            <ModaDateRange
-              dateRange={{ start: roadmapData.start, end: roadmapData.end }}
-            />
-          </Item>
-          {roadmapData.description && (
-            <Item>
-              <ModaMarkdownDescription content={roadmapData.description} />
+        <>
+          <Descriptions>
+            <Item label="Dates">
+              <ModaDateRange
+                dateRange={{ start: roadmapData.start, end: roadmapData.end }}
+              />
             </Item>
-          )}
-        </Descriptions>
+          </Descriptions>
+          <Descriptions>
+            {roadmapData.description && (
+              <Item>
+                <ModaMarkdownDescription content={roadmapData.description} />
+              </Item>
+            )}
+          </Descriptions>
+        </>
       )}
       <RoadmapViewManager
         roadmap={roadmapData}
         isLoading={isLoading}
         refreshRoadmap={refetchRoadmap}
+        canUpdateRoadmap={canUpdateRoadmap}
+        messageApi={messageApi}
       />
       {openCreateRoadmapForm && (
         <CreateRoadmapForm
