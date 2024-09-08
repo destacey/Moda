@@ -28,6 +28,8 @@ public sealed class UpdateRoadmapCommandValidator : AbstractValidator<UpdateRoad
 
 internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<UpdateRoadmapCommandHandler> logger) : ICommandHandler<UpdateRoadmapCommand>
 {
+    private const string AppRequestName = nameof(UpdateRoadmapLinksOrderCommand);
+
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
     private readonly ILogger<UpdateRoadmapCommandHandler> _logger = logger;
@@ -57,7 +59,7 @@ internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbC
                 await _planningDbContext.Entry(roadmap).ReloadAsync(cancellationToken);
                 roadmap.ClearDomainEvents();
 
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", request.GetType().Name, request, updateResult.Error);
+                _logger.LogError("Failure for Request {CommandName} {@Request}.  Error message: {Error}", AppRequestName, request, updateResult.Error);
                 return Result.Failure(updateResult.Error);
             }
 
@@ -67,11 +69,8 @@ internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbC
         }
         catch (Exception ex)
         {
-            var requestName = request.GetType().Name;
-
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-
-            return Result.Failure($"Moda Request: Exception for Request {requestName} {request}");
+            _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
+            return Result.Failure($"Error handling {AppRequestName} command.");
         }
     }
 }

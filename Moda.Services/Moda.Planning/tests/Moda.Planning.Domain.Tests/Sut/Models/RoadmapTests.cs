@@ -194,6 +194,31 @@ public class RoadmapTests
     }
 
     [Fact]
+    public void SetChildLinkOrder_WithMultiple_ShouldReturnCorrectOrder()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var currentUserEmployeeId = roadmap.Managers.First().ManagerId;
+
+        var childLink1Id = Guid.NewGuid();
+        var childLink2Id = Guid.NewGuid();
+        var childLink3Id = Guid.NewGuid();
+
+        // Act
+        var result1 = roadmap.AddChildLink(childLink1Id, currentUserEmployeeId);
+        var result2 = roadmap.AddChildLink(childLink2Id, currentUserEmployeeId);
+        var result3 = roadmap.AddChildLink(childLink3Id, currentUserEmployeeId);
+
+        // Assert
+        result1.IsSuccess.Should().BeTrue();
+        roadmap.ChildLinks.First(x => x.ChildId == childLink1Id).Order.Should().Be(1);
+        result2.IsSuccess.Should().BeTrue();
+        roadmap.ChildLinks.First(x => x.ChildId == childLink2Id).Order.Should().Be(2);
+        result3.IsSuccess.Should().BeTrue();
+        roadmap.ChildLinks.First(x => x.ChildId == childLink3Id).Order.Should().Be(3);
+    }
+
+    [Fact]
     public void AddChildLink_ShouldReturnFailure_WhenChildLinkAlreadyExists()
     {
         // Arrange
@@ -229,7 +254,7 @@ public class RoadmapTests
     }
 
     [Fact]
-    public void RemoveChildLink_ShouldReturnFailure_WhenChildLinkDoesNotExist()
+    public void RemoveChildLink_WhenChildLinkDoesNotExist_ShouldReturnFailure()
     {
         // Arrange
         var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
@@ -244,5 +269,189 @@ public class RoadmapTests
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("Child Roadmap does not exist on this roadmap.");
         roadmap.ChildLinks.Count.Should().Be(1);
+    }
+
+    [Fact]
+    public void SetChildLinksOrder_ForAll_WhenValidChildLinksProvided_ShouldReturnSuccess()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var currentUserEmployeeId = roadmap.Managers.First().ManagerId;
+
+        var childLink1Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink1Id, currentUserEmployeeId);
+
+        var childLink2Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink2Id, currentUserEmployeeId);
+
+        var childLink3Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink3Id, currentUserEmployeeId);
+
+        var childLinks = new Dictionary<Guid, int> 
+        { 
+            { childLink1Id, 2 }, 
+            { childLink2Id, 17 }, // setting the higher order than the count of child links should still set it to the last
+            { childLink3Id, 1 } 
+        };
+
+        // Act
+        var result = roadmap.SetChildLinksOrder(childLinks, currentUserEmployeeId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        roadmap.ChildLinks.First(x => x.ChildId == childLink1Id).Order.Should().Be(2);
+        roadmap.ChildLinks.First(x => x.ChildId == childLink2Id).Order.Should().Be(3);
+        roadmap.ChildLinks.First(x => x.ChildId == childLink3Id).Order.Should().Be(1);
+    }
+
+    [Fact]
+    public void SetChildLinksOrder_ForAll_WhenUserIsNotManager_ShouldReturnFailure()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var childLinks = new Dictionary<Guid, int>();
+        var nonManagerId = Guid.NewGuid();
+
+        // Act
+        var result = roadmap.SetChildLinksOrder(childLinks, nonManagerId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("User is not a manager of this roadmap.");
+    }
+
+    [Fact]
+    public void SetChildLinksOrder_ForAll_WhenChildLinksCountMismatch_ShouldReturnFailure()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var childLinks = new Dictionary<Guid, int> { { Guid.NewGuid(), 1 } };
+        var currentUserEmployeeId = roadmap.Managers.First().ManagerId;
+
+        // Act
+        var result = roadmap.SetChildLinksOrder(childLinks, currentUserEmployeeId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Not all child roadmap links provided were found.");
+    }
+
+    [Fact]
+    public void SetChildLinksOrder_ForAll_WhenChildLinkNotFound_ShouldReturnFailure()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var childLinkId = Guid.NewGuid();
+        roadmap.AddChildLink(childLinkId, roadmap.Managers.First().ManagerId);
+        var childLinks = new Dictionary<Guid, int> { { Guid.NewGuid(), 1 } };
+        var currentUserEmployeeId = roadmap.Managers.First().ManagerId;
+
+        // Act
+        var result = roadmap.SetChildLinksOrder(childLinks, currentUserEmployeeId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Not all child roadmap links provided were found.");
+    }
+
+    [Fact]
+    public void SetChildLinksOrder_ForOne_WhenMovingDown_ShouldReturnSuccess()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var currentUserEmployeeId = roadmap.Managers.First().ManagerId;
+
+        var childLink1Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink1Id, currentUserEmployeeId);
+
+        var childLink2Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink2Id, currentUserEmployeeId);
+
+        var childLink3Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink3Id, currentUserEmployeeId);
+
+        var childLink4Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink4Id, currentUserEmployeeId);
+
+        var childLink5Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink5Id, currentUserEmployeeId);
+
+        // Act
+        var result = roadmap.SetChildLinksOrder(childLink2Id, 4, currentUserEmployeeId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        roadmap.ChildLinks.First(x => x.ChildId == childLink1Id).Order.Should().Be(1);
+        roadmap.ChildLinks.First(x => x.ChildId == childLink2Id).Order.Should().Be(4);
+        roadmap.ChildLinks.First(x => x.ChildId == childLink3Id).Order.Should().Be(2);
+        roadmap.ChildLinks.First(x => x.ChildId == childLink4Id).Order.Should().Be(3);
+        roadmap.ChildLinks.First(x => x.ChildId == childLink5Id).Order.Should().Be(5);
+    }
+
+    [Fact]
+    public void SetChildLinksOrder_ForOne_WhenMovingUp_ShouldReturnSuccess()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var currentUserEmployeeId = roadmap.Managers.First().ManagerId;
+
+        var childLink1Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink1Id, currentUserEmployeeId);
+
+        var childLink2Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink2Id, currentUserEmployeeId);
+
+        var childLink3Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink3Id, currentUserEmployeeId);
+
+        var childLink4Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink4Id, currentUserEmployeeId);
+
+        var childLink5Id = Guid.NewGuid();
+        roadmap.AddChildLink(childLink5Id, currentUserEmployeeId);
+
+        // Act
+        var result = roadmap.SetChildLinksOrder(childLink4Id, 2, currentUserEmployeeId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        roadmap.ChildLinks.First(x => x.ChildId == childLink1Id).Order.Should().Be(1);
+        roadmap.ChildLinks.First(x => x.ChildId == childLink2Id).Order.Should().Be(3);
+        roadmap.ChildLinks.First(x => x.ChildId == childLink3Id).Order.Should().Be(4);
+        roadmap.ChildLinks.First(x => x.ChildId == childLink4Id).Order.Should().Be(2);
+        roadmap.ChildLinks.First(x => x.ChildId == childLink5Id).Order.Should().Be(5);
+    }
+
+    [Fact]
+    public void SetChildLinksOrder_ForOne_WhenUserIsNotManager_ShouldReturnFailure()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var childLinks = new Dictionary<Guid, int>();
+        var nonManagerId = Guid.NewGuid();
+
+        // Act
+        var result = roadmap.SetChildLinksOrder(childLinks, nonManagerId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("User is not a manager of this roadmap.");
+    }
+
+    [Fact]
+    public void SetChildLinksOrder_ForOne_WhenChildLinkNotFound_ShouldReturnFailure()
+    {
+        // Arrange
+        var roadmap = Roadmap.Create("Test Roadmap", "Test Description", new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusDays(10)), Visibility.Public, [Guid.NewGuid()]).Value;
+        var childLinkId = Guid.NewGuid();
+        roadmap.AddChildLink(childLinkId, roadmap.Managers.First().ManagerId);
+        var currentUserEmployeeId = roadmap.Managers.First().ManagerId;
+
+        // Act
+        var result = roadmap.SetChildLinksOrder(Guid.NewGuid(), 1, currentUserEmployeeId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Child roadmap link does not exist on this roadmap.");
     }
 }

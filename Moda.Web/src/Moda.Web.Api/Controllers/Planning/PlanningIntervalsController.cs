@@ -360,18 +360,9 @@ public class PlanningIntervalsController : ControllerBase
 
         var result = await _sender.Send(new UpdatePlanningIntervalObjectivesOrderCommand(request.PlanningIntervalId, request.Objectives), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "PlanningIntervalsController.UpdateObjectivesOrder"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.UpdateObjectivesOrder"));
     }
 
     [HttpGet("{idOrKey}/objectives/health-report")]
