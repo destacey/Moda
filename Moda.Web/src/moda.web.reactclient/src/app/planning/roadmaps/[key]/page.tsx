@@ -1,6 +1,10 @@
 'use client'
 
-import { PageActions, PageTitle } from '@/src/app/components/common'
+import {
+  ModaDateRange,
+  PageActions,
+  PageTitle,
+} from '@/src/app/components/common'
 import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/app/hooks'
@@ -17,6 +21,8 @@ import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-d
 import DeleteRoadmapForm from '../components/delete-roadmap-form'
 import CreateRoadmapForm from '../components/create-roadmap-form'
 import RoadmapViewManager from './roadmap-view-manager'
+import dayjs from 'dayjs'
+import { defaultDropAnimation } from '@dnd-kit/core'
 
 const { Item } = Descriptions
 const { Item: ListItem } = List
@@ -148,11 +154,18 @@ const RoadmapDetailsPage = ({ params }) => {
         actions={<PageActions actionItems={actionsMenuItems} />}
         tags={visibilityTag}
       />
-      {roadmapData?.description && (
+      {roadmapData && (
         <Descriptions>
-          <Item>
-            <ModaMarkdownDescription content={roadmapData?.description} />
+          <Item label="Dates">
+            <ModaDateRange
+              dateRange={{ start: roadmapData.start, end: roadmapData.end }}
+            />
           </Item>
+          {roadmapData.description && (
+            <Item>
+              <ModaMarkdownDescription content={roadmapData.description} />
+            </Item>
+          )}
         </Descriptions>
       )}
       <RoadmapViewManager

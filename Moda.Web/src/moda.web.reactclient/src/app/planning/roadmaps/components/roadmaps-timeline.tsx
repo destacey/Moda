@@ -3,7 +3,6 @@
 import {
   DataItem,
   Timeline,
-  TimelineItem,
   TimelineOptions,
 } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import 'vis-timeline/styles/vis-timeline-graph2d.css'
@@ -272,14 +271,16 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       label: (
         <>
           <Space direction="vertical" size="small">
-            <Space>
-              <Switch
-                size="small"
-                checked={drillDown}
-                onChange={onDrillDownChange}
-              />
-              Drill Down
-            </Space>
+            {levelTwoRoadmaps && levelTwoRoadmaps.length > 0 && (
+              <Space>
+                <Switch
+                  size="small"
+                  checked={drillDown}
+                  onChange={onDrillDownChange}
+                />
+                Drill Down
+              </Space>
+            )}
             <Space>
               <Switch
                 size="small"
