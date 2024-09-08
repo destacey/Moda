@@ -2,10 +2,10 @@
 
     <ItemGroup>
         <PackageReference Include="Ardalis.GuardClauses" Version="4.6.0" />
-        <PackageReference Include="CSharpFunctionalExtensions" Version="2.42.5" />
+        <PackageReference Include="CSharpFunctionalExtensions" Version="3.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
-        <PackageReference Include="RestSharp" Version="111.4.1" />
+        <PackageReference Include="RestSharp" Version="112.0.0" />
     </ItemGroup>
 
     <ItemGroup>
