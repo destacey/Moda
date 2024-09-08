@@ -83,8 +83,7 @@ internal sealed class UpdateRiskCommandHandler : ICommandHandler<UpdateRiskComma
                 await _planningDbContext.Entry(risk).ReloadAsync(cancellationToken);
                 risk.ClearDomainEvents();
 
-                var requestName = request.GetType().Name;
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
+                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", request.GetType().Name, request, updateResult.Error);
                 return Result.Failure<int>(updateResult.Error);
             }
 

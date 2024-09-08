@@ -74,6 +74,14 @@ public class TeamMembershipConfig : IEntityTypeConfiguration<TeamMembership>
             .IncludeProperties(m => new { m.SourceId, m.TargetId })
             .HasFilter("[IsDeleted] = 0");
 
+        builder.HasIndex(m => new { m.SourceId, m.IsDeleted })
+            .IncludeProperties(m => new { m.Id, m.TargetId })
+            .HasFilter("[IsDeleted] = 0");
+
+        builder.HasIndex(m => new { m.TargetId, m.IsDeleted })
+            .IncludeProperties(m => new { m.Id, m.SourceId })
+            .HasFilter("[IsDeleted] = 0");
+
         // Value Objects
         builder.ComplexProperty(m => m.DateRange, options =>
         {

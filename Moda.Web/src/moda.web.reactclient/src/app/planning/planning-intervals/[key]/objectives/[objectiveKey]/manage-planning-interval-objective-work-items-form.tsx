@@ -173,7 +173,6 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
         setIsOpen(false)
         setIsSaving(false)
         props.onFormSave()
-        messageApi.success(`Successfully updated PI Objective Work Items.`)
       } else {
         setIsSaving(false)
       }

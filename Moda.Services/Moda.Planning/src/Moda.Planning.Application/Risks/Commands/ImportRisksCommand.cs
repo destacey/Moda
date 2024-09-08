@@ -27,18 +27,11 @@ public sealed class ImportRisksCommandValidator : CustomValidator<ImportRisksCom
     }
 }
 
-internal sealed class ImportRisksCommandHandler : ICommandHandler<ImportRisksCommand>
+internal sealed class ImportRisksCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider, ILogger<ImportRisksCommandHandler> logger) : ICommandHandler<ImportRisksCommand>
 {
-    private readonly IPlanningDbContext _planningDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<ImportRisksCommandHandler> _logger;
-
-    public ImportRisksCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider, ILogger<ImportRisksCommandHandler> logger)
-    {
-        _planningDbContext = planningDbContext;
-        _dateTimeProvider = dateTimeProvider;
-        _logger = logger;
-    }
+    private readonly IPlanningDbContext _planningDbContext = planningDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly ILogger<ImportRisksCommandHandler> _logger = logger;
 
     public async Task<Result> Handle(ImportRisksCommand request, CancellationToken cancellationToken)
     {

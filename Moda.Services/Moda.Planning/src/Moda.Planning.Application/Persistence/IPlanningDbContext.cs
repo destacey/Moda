@@ -5,4 +5,6 @@ public interface IPlanningDbContext : IModaDbContext
     DbSet<Risk> Risks { get; }
     DbSet<PlanningTeam> PlanningTeams { get; }
     DbSet<SimpleHealthCheck> PlanningHealthChecks { get; }
+    DbSet<Roadmap> Roadmaps { get; }
+    DbSet<RoadmapLink> RoadmapLinks { get; }
 }

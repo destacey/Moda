@@ -3,7 +3,7 @@ using Moda.Common.Domain.Enums.Goals;
 using Moda.Goals.Domain.Enums;
 
 namespace Moda.Goals.Domain.Models;
-public class Objective : BaseAuditableEntity<Guid>
+public class Objective : BaseSoftDeletableEntity<Guid>
 {
     private string _name = default!;
     private string? _description;

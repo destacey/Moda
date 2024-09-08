@@ -15,7 +15,7 @@ export const backgroundJobsApi = apiSlice.injectEndpoints({
           const data = await (await getBackgroundJobsClient()).getRunningJobs()
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -30,7 +30,7 @@ export const backgroundJobsApi = apiSlice.injectEndpoints({
           const data = await (await getBackgroundJobsClient()).getJobTypes()
           return { data }
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -44,7 +44,7 @@ export const backgroundJobsApi = apiSlice.injectEndpoints({
         try {
           await (await getBackgroundJobsClient()).run(jobTypeId)
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },
@@ -54,7 +54,7 @@ export const backgroundJobsApi = apiSlice.injectEndpoints({
         try {
           await (await getBackgroundJobsClient()).create(request)
         } catch (error) {
-          console.error('Error:', error)
+          console.error('API Error:', error)
           return { error }
         }
       },

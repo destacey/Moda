@@ -41,6 +41,7 @@ public static class ApplicationResource
     public const string PlanningIntervals = nameof(PlanningIntervals);
     public const string PlanningIntervalObjectives = nameof(PlanningIntervalObjectives);
     public const string Risks = nameof(Risks);
+    public const string Roadmaps = nameof(Roadmaps);
 
     public const string WorkTypeTiers = nameof(WorkTypeTiers);
     public const string WorkTypeLevels = nameof(WorkTypeLevels);
@@ -146,6 +147,11 @@ public static class ApplicationPermissions
         new("Update Risks", ApplicationAction.Update, ApplicationResource.Risks, IsBasic: true),
         new("Delete Risks", ApplicationAction.Delete, ApplicationResource.Risks, IsBasic: true),
         new("Import Risks", ApplicationAction.Import, ApplicationResource.Risks),
+
+        new("View Roadmaps", ApplicationAction.View, ApplicationResource.Roadmaps, IsBasic: true),
+        new("Create Roadmaps", ApplicationAction.Create, ApplicationResource.Roadmaps, IsBasic: true),
+        new("Update Roadmaps", ApplicationAction.Update, ApplicationResource.Roadmaps, IsBasic: true),
+        new("Delete Roadmaps", ApplicationAction.Delete, ApplicationResource.Roadmaps, IsBasic: true),
     ];
 
     private static readonly ApplicationPermission[] _work =

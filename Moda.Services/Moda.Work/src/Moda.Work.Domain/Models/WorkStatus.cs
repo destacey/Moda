@@ -6,9 +6,9 @@ using NodaTime;
 namespace Moda.Work.Domain.Models;
 
 /// <summary>Represents the status within a workflow.</summary>
-/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
-public sealed class WorkStatus : BaseAuditableEntity<int>, IActivatable
+public sealed class WorkStatus : BaseSoftDeletableEntity<int>, IActivatable
 {
     private string _name = null!;
     private string? _description;

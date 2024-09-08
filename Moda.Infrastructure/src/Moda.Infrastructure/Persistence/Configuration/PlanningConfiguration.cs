@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Runtime.Intrinsics.Arm;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Enums.Organization;
@@ -297,6 +298,117 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
             .OnDelete(DeleteBehavior.NoAction);
     }
 }
+
+public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
+{
+    public void Configure(EntityTypeBuilder<Roadmap> builder)
+    {
+        builder.ToTable("Roadmaps", SchemaNames.Planning);
+
+        builder.HasKey(p => p.Id);
+        builder.HasAlternateKey(p => p.Key);
+
+        builder.HasIndex(p => p.Id)
+            .IncludeProperties(p => new { p.Key, p.Name, p.Visibility });
+
+        builder.HasIndex(p => p.Key)
+            .IncludeProperties(p => new { p.Id, p.Name, p.Visibility });
+
+        builder.Property(p => p.Key).ValueGeneratedOnAdd();
+
+        builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
+        builder.Property(p => p.Description).HasMaxLength(2048);
+
+        builder.Property(p => p.Visibility).IsRequired()
+            .HasConversion<EnumConverter<Visibility>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        // Value Objects
+        builder.ComplexProperty(p => p.DateRange, options =>
+        {
+            options.Property(d => d.Start).HasColumnName("Start").IsRequired();
+            options.Property(d => d.End).HasColumnName("End").IsRequired();
+        });
+
+        // Audit
+        builder.Property(p => p.Created);
+        builder.Property(p => p.CreatedBy);
+        builder.Property(p => p.LastModified);
+        builder.Property(p => p.LastModifiedBy);
+
+        // Relationships
+        builder.HasMany(p => p.Managers)
+            .WithOne()
+            .HasForeignKey(rm => rm.RoadmapId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.ChildLinks)
+            .WithOne(rl => rl.Parent)
+            .HasForeignKey(rl => rl.ParentId)
+            .OnDelete(DeleteBehavior.NoAction); // Manually delete the child links
+
+        builder.HasMany<RoadmapLink>()
+            .WithOne(rl => rl.Child)
+            .HasForeignKey(rl => rl.ChildId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class RoadmapManagerConfiguration : IEntityTypeConfiguration<RoadmapManager>
+{
+    public void Configure(EntityTypeBuilder<RoadmapManager> builder)
+    {
+        builder.ToTable("RoadmapManagers", SchemaNames.Planning);
+
+        builder.HasKey(rm => new { rm.RoadmapId, rm.ManagerId });
+
+        builder.Property(rm => rm.RoadmapId)
+            .IsRequired();
+
+        builder.Property(rm => rm.ManagerId)
+            .IsRequired();
+
+        builder.HasOne(rm => rm.Manager)
+            .WithMany()
+            .HasForeignKey(rm => rm.ManagerId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+public class RoadmapLinkConfiguration : IEntityTypeConfiguration<RoadmapLink>
+{
+    public void Configure(EntityTypeBuilder<RoadmapLink> builder)
+    {
+        builder.ToTable("RoadmapLinks", SchemaNames.Planning);
+
+        builder.HasKey(rl => rl.Id);
+
+        builder.HasIndex(rl => rl.Id)
+            .IncludeProperties(rl => new { rl.ParentId, rl.ChildId, rl.Order });
+
+        builder.HasIndex(rl => rl.ParentId)
+            .IncludeProperties(rl => new { rl.Id, rl.ChildId, rl.Order });
+
+        builder.HasIndex(rl => rl.ChildId)
+            .IncludeProperties(rl => new { rl.Id, rl.ParentId });
+
+        builder.Property(rl => rl.Order)
+            .IsRequired();
+
+        //builder.HasOne(rl => rl.Parent)
+        //    .WithMany(rl => rl.ChildLinks)
+        //    .HasForeignKey(rm => rm.ParentId)
+        //    .OnDelete(DeleteBehavior.Cascade);
+
+        //builder.HasOne(rl => rl.Child)
+        //    .WithMany()
+        //    .HasForeignKey(rm => rm.ChildId)
+        //    .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+
 
 public class SimpleHealthCheckConfig : IEntityTypeConfiguration<SimpleHealthCheck>
 {

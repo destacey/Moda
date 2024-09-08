@@ -3086,6 +3086,360 @@
         ]
       }
     },
+    "/api/planning/roadmaps": {
+      "get": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Get a list of roadmaps.",
+        "operationId": "Roadmaps_GetRoadmaps",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoadmapListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Create a roadmap.",
+        "operationId": "Roadmaps_Create",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoadmapRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateRoadmapReponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/roadmaps/{idOrKey}": {
+      "get": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Get roadmap details.",
+        "operationId": "Roadmaps_GetRoadmap",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoadmapDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/roadmaps/{id}": {
+      "put": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Update a roadmap.",
+        "operationId": "Roadmaps_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoadmapRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Delete a roadmap.",
+        "operationId": "Roadmaps_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/roadmaps/child-links": {
+      "post": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Retrieve child roadmap links for specified roadmap Ids.",
+        "operationId": "Roadmaps_GetChildRoadmapLinks",
+        "requestBody": {
+          "x-name": "roadmapIds",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "guid",
+                  "nullable": false,
+                  "example": "00000000-0000-0000-0000-000000000000"
+                }
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoadmapLinkDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/roadmaps/visibility-options": {
+      "get": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Get a list of all visibility.",
+        "operationId": "Roadmaps_GetVisibilityOptions",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VisibilityDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/organization/team-types": {
       "get": {
         "tags": [
@@ -9770,6 +10124,276 @@
         }
       },
       "RiskGradeDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "RoadmapListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date"
+          },
+          "end": {
+            "type": "string",
+            "format": "date"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          }
+        }
+      },
+      "RoadmapDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "start": {
+            "type": "string",
+            "format": "date"
+          },
+          "end": {
+            "type": "string",
+            "format": "date"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "managers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoadmapChildDto"
+            }
+          }
+        }
+      },
+      "RoadmapChildDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "roadmap": {
+            "$ref": "#/components/schemas/RoadmapListDto"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreateRoadmapReponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "roadmapIds": {
+            "$ref": "#/components/schemas/ObjectIdAndKey"
+          },
+          "linkToParentError": {
+            "type": "string",
+            "description": "The result of linking the Roadmap to the parent. If the action was successful, this will be null.  If a parentId was not provided in the request, this will be null.",
+            "nullable": true
+          }
+        }
+      },
+      "ObjectIdAndKey": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreateRoadmapRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "start",
+          "end"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the Roadmap.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the Roadmap.",
+            "maxLength": 2048,
+            "minLength": 0,
+            "nullable": true
+          },
+          "start": {
+            "type": "string",
+            "description": "The Roadmap start date.",
+            "format": "date",
+            "nullable": false
+          },
+          "end": {
+            "type": "string",
+            "description": "The Roadmap end date.",
+            "format": "date",
+            "nullable": false
+          },
+          "visibilityId": {
+            "type": "integer",
+            "description": "The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap.",
+            "format": "int32"
+          },
+          "parentId": {
+            "type": "string",
+            "description": "Informs the API to link the Roadmap to the Roadmap with the provided parentId after creation.",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          }
+        }
+      },
+      "UpdateRoadmapRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "start",
+          "end"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier of the Roadmap.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the Roadmap.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the Roadmap.",
+            "maxLength": 2048,
+            "minLength": 0,
+            "nullable": true
+          },
+          "start": {
+            "type": "string",
+            "description": "The Roadmap start date.",
+            "format": "date",
+            "nullable": false
+          },
+          "end": {
+            "type": "string",
+            "description": "The Roadmap end date.",
+            "format": "date",
+            "nullable": false
+          },
+          "visibilityId": {
+            "type": "integer",
+            "description": "The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap.",
+            "format": "int32"
+          }
+        }
+      },
+      "RoadmapLinkDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "parentId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "roadmap": {
+            "$ref": "#/components/schemas/RoadmapListDto"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "VisibilityDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CommonEnumDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "CommonEnumDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {

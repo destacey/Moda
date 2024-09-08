@@ -32,11 +32,8 @@ const WorkspaceDetailsPage = ({ params }) => {
     setOpenSetWorkspaceExternalUrlTemplatesForm,
   ] = useState<boolean>(false)
 
-  const { hasClaim } = useAuth()
-  const canUpdateWorkspace = hasClaim(
-    'Permission',
-    'Permissions.Workspaces.Update',
-  )
+  const { hasPermissionClaim } = useAuth()
+  const canUpdateWorkspace = hasPermissionClaim('Permissions.Workspaces.Update')
 
   const {
     data: workspaceData,

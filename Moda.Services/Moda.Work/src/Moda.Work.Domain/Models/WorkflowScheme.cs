@@ -4,7 +4,7 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-public sealed class WorkflowScheme : BaseAuditableEntity<Guid>, IActivatable
+public sealed class WorkflowScheme : BaseSoftDeletableEntity<Guid>, IActivatable
 {
     private WorkflowScheme() { }
     internal WorkflowScheme(Guid workflowId, int workStatusId, WorkStatusCategory workStatusCategory, int order)

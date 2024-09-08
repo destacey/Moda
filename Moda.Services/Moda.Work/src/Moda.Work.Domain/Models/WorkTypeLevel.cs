@@ -7,7 +7,7 @@ using NodaTime;
 namespace Moda.Work.Domain.Models;
 
 /// <summary>Allows work types to be grouped and defined in a hierarchy.</summary>
-/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Int32&gt;" />
+/// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Int32&gt;" />
 public sealed class WorkTypeLevel : BaseEntity<int>, ISystemAuditable
 {
     private string _name = null!;

@@ -183,7 +183,6 @@ const ModaGrid = ({
             noRowsOverlayComponent={() => (
               <ModaEmpty message="No records found." />
             )}
-            reactiveCustomComponents={true}
             {...props}
           ></AgGridReact>
         </div>

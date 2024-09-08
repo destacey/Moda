@@ -1,4 +1,6 @@
-﻿using Moda.Planning.Domain.Enums;
+﻿using Ardalis.GuardClauses;
+using Moda.Common.Application.Interfaces;
+using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.Risks.Commands;
 public sealed record CreateRiskCommand(string Summary, string? Description, Guid TeamId,
@@ -38,35 +40,23 @@ public sealed class CreateRiskCommandValidator : CustomValidator<CreateRiskComma
     }
 }
 
-internal sealed class CreateRiskCommandHandler : ICommandHandler<CreateRiskCommand, int>
+internal sealed class CreateRiskCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateRiskCommandHandler> logger, ICurrentUser currentUser) : ICommandHandler<CreateRiskCommand, int>
 {
-    private readonly IPlanningDbContext _planningDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<CreateRiskCommandHandler> _logger;
-    private readonly ICurrentUser _currentUser;
-
-    public CreateRiskCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateRiskCommandHandler> logger, ICurrentUser currentUser)
-    {
-        _planningDbContext = planningDbContext;
-        _dateTimeProvider = dateTimeProvider;
-        _logger = logger;
-        _currentUser = currentUser;
-    }
+    private readonly IPlanningDbContext _planningDbContext = planningDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+    private readonly ILogger<CreateRiskCommandHandler> _logger = logger;
+    private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
 
     public async Task<Result<int>> Handle(CreateRiskCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            Guid? currentUserEmployeeId = _currentUser.GetEmployeeId();
-            if (currentUserEmployeeId is null)
-                return Result.Failure<int>("Unable to determine current user's employee Id.");
-
             var risk = Risk.Create(
                 request.Summary,
                 request.Description,
                 request.TeamId,
                 _dateTimeProvider.Now,
-                currentUserEmployeeId.Value,
+                _currentUserEmployeeId,
                 request.Category,
                 request.Impact,
                 request.Likelihood,

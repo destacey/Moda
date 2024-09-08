@@ -7,9 +7,9 @@ using NodaTime;
 namespace Moda.Work.Domain.Models;
 
 /// <summary>A workspace is a container for work items.</summary>
-/// <seealso cref="Moda.Common.Domain.Data.BaseAuditableEntity&lt;System.Guid&gt;" />
+/// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable&lt;Moda.Work.Domain.Models.WorkspaceActivatableArgs, NodaTime.Instant&gt;" />
-public sealed class Workspace : BaseAuditableEntity<Guid>, IActivatable<WorkspaceActivatableArgs, Instant>
+public sealed class Workspace : BaseSoftDeletableEntity<Guid>, IActivatable<WorkspaceActivatableArgs, Instant>
 {
     private WorkspaceKey _key = null!;
     private string _name = null!;

@@ -4,7 +4,7 @@ using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 
-public sealed class WorkProcessScheme : BaseAuditableEntity<Guid>, IActivatable
+public sealed class WorkProcessScheme : BaseSoftDeletableEntity<Guid>, IActivatable
 {
     private WorkProcessScheme() { }
 
