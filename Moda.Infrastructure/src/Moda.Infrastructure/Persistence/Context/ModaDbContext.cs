@@ -67,6 +67,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<PlanningTeam> PlanningTeams => Set<PlanningTeam>();
     public DbSet<SimpleHealthCheck> PlanningHealthChecks => Set<SimpleHealthCheck>();
     public DbSet<Roadmap> Roadmaps => Set<Roadmap>();
+    public DbSet<RoadmapLink> RoadmapLinks => Set<RoadmapLink>();
 
     #endregion IPlanning
 
