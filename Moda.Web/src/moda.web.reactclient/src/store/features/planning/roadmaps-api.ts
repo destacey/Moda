@@ -1,6 +1,8 @@
 import {
   CreateRoadmapReponse,
   RoadmapLinkDto,
+  UpdateRoadmapLinkOrderRequest,
+  UpdateRoadmapLinksOrderRequest,
 } from './../../../services/moda-api'
 import {
   CreateRoadmapRequest,
@@ -116,6 +118,43 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
     }),
+    updateChildLinksOrder: builder.mutation<
+      void,
+      UpdateRoadmapLinksOrderRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await (
+            await getRoadmapsClient()
+          ).updateChildLinksOrder(request.roadmapId, request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [QueryTags.Roadmap],
+    }),
+    updateChildLinkOrder: builder.mutation<void, UpdateRoadmapLinkOrderRequest>(
+      {
+        queryFn: async (request) => {
+          try {
+            const data = await (
+              await getRoadmapsClient()
+            ).updateChildLinkOrder(
+              request.roadmapId,
+              request.roadmapLinkId,
+              request,
+            )
+            return { data }
+          } catch (error) {
+            console.error('API Error:', error)
+            return { error }
+          }
+        },
+        invalidatesTags: (result, error, arg) => [QueryTags.Roadmap],
+      },
+    ),
     getVisibilityOptions: builder.query<OptionModel<number>[], void>({
       queryFn: async () => {
         try {
@@ -152,5 +191,7 @@ export const {
   useUpdateRoadmapMutation,
   useDeleteRoadmapMutation,
   useGetRoadmapLinksQuery,
+  useUpdateChildLinksOrderMutation,
+  useUpdateChildLinkOrderMutation,
   useGetVisibilityOptionsQuery,
 } = roadmapApi

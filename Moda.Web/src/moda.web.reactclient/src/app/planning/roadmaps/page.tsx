@@ -63,6 +63,7 @@ const RoadmapsPage: React.FC = () => {
         roadmapsData={roadmapData || []}
         roadmapsLoading={isLoading}
         refreshRoadmaps={refresh}
+        messageApi={messageApi}
       />
       {openCreateRoadmapForm && (
         <CreateRoadmapForm

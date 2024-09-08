@@ -43,7 +43,7 @@ internal sealed class UpdateRoadmapLinkOrderCommandHandler(IPlanningDbContext pl
             if (roadmap is null)
                 return Result.Failure($"Roadmap with id {request.RoadmapId} not found");
 
-            var roadmapLink = roadmap.ChildLinks.FirstOrDefault(x => x.Id == request.RoadmapLinkId);
+            var roadmapLink = roadmap.ChildLinks.FirstOrDefault(x => x.ChildId == request.RoadmapLinkId);
             if (roadmapLink is null)
                 return Result.Failure($"Roadmap link with id {request.RoadmapLinkId} not found");
 

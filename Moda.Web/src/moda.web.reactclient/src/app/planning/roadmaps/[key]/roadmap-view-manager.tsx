@@ -6,11 +6,14 @@ import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { useEffect, useMemo, useState } from 'react'
 import RoadmapsGrid from '../components/roadmaps-grid'
 import RoadmapsTimeline from '../components/roadmaps-timeline'
+import { MessageInstance } from 'antd/es/message/interface'
 
 interface RoadmapViewManagerProps {
   roadmap: RoadmapDetailsDto
   isLoading: boolean
   refreshRoadmap: () => void
+  canUpdateRoadmap: boolean
+  messageApi: MessageInstance
 }
 
 const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
@@ -64,6 +67,9 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
           refreshRoadmaps={props.refreshRoadmap}
           gridHeight={550}
           viewSelector={viewSelector}
+          enableRowDrag={props.canUpdateRoadmap}
+          parentRoadmapId={props.roadmap.id}
+          messageApi={props.messageApi}
         />
       )}
       {currentView === 'Timeline' && (

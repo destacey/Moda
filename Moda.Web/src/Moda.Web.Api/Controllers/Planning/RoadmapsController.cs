@@ -142,7 +142,7 @@ public class RoadmapsController : ControllerBase
         if (id != request.RoadmapId)
             return BadRequest();
 
-        if (roadmapLinkId != request.RoadmapId)
+        if (roadmapLinkId != request.RoadmapLinkId)
             return BadRequest();
 
 

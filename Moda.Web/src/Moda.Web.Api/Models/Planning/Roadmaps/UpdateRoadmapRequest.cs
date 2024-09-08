@@ -50,6 +50,7 @@ public sealed class UpdateRoadmapRequestValidator : CustomValidator<UpdateRoadma
         RuleFor(t => t.Id)
             .NotEmpty();
 
+
         RuleFor(t => t.Name)
             .NotEmpty()
             .MaximumLength(128);
