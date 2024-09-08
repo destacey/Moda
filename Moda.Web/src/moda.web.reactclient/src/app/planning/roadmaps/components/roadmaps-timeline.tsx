@@ -9,15 +9,26 @@ import {
 import 'vis-timeline/styles/vis-timeline-graph2d.css'
 import './roadmaps-timeline.css'
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
-import Link from 'next/link'
-import { Card, Flex, Spin, Typography } from 'antd'
+import {
+  Button,
+  Card,
+  Divider,
+  Dropdown,
+  Flex,
+  Space,
+  Spin,
+  Switch,
+  Typography,
+} from 'antd'
 import { RoadmapDetailsDto, RoadmapListDto } from '@/src/services/moda-api'
-import { use, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import useTheme from '@/src/app/components/contexts/theme'
 import dayjs from 'dayjs'
-import { set } from 'lodash'
 import { ModaEmpty } from '@/src/app/components/common'
+import { ItemType } from 'antd/es/menu/interface'
+import { ControlOutlined } from '@ant-design/icons'
+import { useGetRoadmapLinksQuery } from '@/src/store/features/planning/roadmaps-api'
 
 const { Text } = Typography
 
@@ -26,6 +37,7 @@ interface RoadmapsTimelineProps {
   roadmaps: RoadmapListDto[]
   isLoading: boolean
   refreshRoadmap: () => void
+  viewSelector?: React.ReactNode | undefined
 }
 
 // TODO: abstract this into a shared component
@@ -38,6 +50,7 @@ interface RoadmapTimelineItem extends DataItem {
   group?: string
   type?: string
   roadmap?: RoadmapListDto
+  order?: number
 }
 
 interface RoadmapTimelineTemplateProps {
@@ -61,12 +74,12 @@ export const RoadmapTimelineTemplate = ({
 }
 
 const getDataGroups = (
-  groupNames: string[],
-  roadmaps: TimelineItem[],
+  groupItems: RoadmapTimelineItem[],
+  roadmaps: RoadmapTimelineItem[],
   timelineFontColor: string,
 ): DataGroup[] => {
   let groups = []
-  if (!groupNames || groupNames.length === 0) {
+  if (!groupItems || groupItems.length === 0) {
     groups = roadmaps.reduce((acc, roadmap) => {
       if (!acc.includes(roadmap.group)) {
         acc.push(roadmap.group)
@@ -74,13 +87,13 @@ const getDataGroups = (
       return acc
     }, [])
   } else {
-    groups = groupNames
+    groups = groupItems
   }
 
-  return groups.map((roadmap) => {
+  return groups.map((group) => {
     return {
-      id: roadmap,
-      content: roadmap,
+      id: group.roadmap.id,
+      content: group.roadmap.name,
       style: `color: ${timelineFontColor};`,
     } as DataGroup
   })
@@ -90,8 +103,16 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [isLoading, setIsLoading] = useState(true)
   const [timelineStart, setTimelineStart] = useState<Date>(undefined)
   const [timelineEnd, setTimelineEnd] = useState<Date>(undefined)
-  const [roadmaps, setRoadmaps] = useState<RoadmapTimelineItem[]>([])
+  const [levelOneRoadmaps, setLevelOneRoadmaps] = useState<
+    RoadmapTimelineItem[]
+  >([])
+  const [levelTwoRoadmaps, setLevelTwoRoadmaps] = useState<
+    RoadmapTimelineItem[]
+  >([])
   const timelineRef = useRef<HTMLDivElement>(null)
+
+  const [drillDown, setDrillDown] = useState<boolean>(false)
+  const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
 
   const { currentThemeName } = useTheme()
   const timelineBackgroundColor =
@@ -99,6 +120,15 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const timelineForegroundColor =
     currentThemeName === 'light' ? '#c7edff' : '#17354d'
   const timelineFontColor = currentThemeName === 'light' ? '#4d4d4d' : '#FFFFFF'
+
+  const {
+    data: roadmapLinksData,
+    isLoading: isLoadingRoadmapLinks,
+    error: errorRoadmapLinks,
+    refetch: refetchRoadmapLinks,
+  } = useGetRoadmapLinksQuery(props.roadmaps?.map((r) => r.id) || [], {
+    skip: !props.roadmaps && props.roadmaps.length === 0,
+  })
 
   // TODO: add the ability to export/save as svg or png
   // TODO: update the styles to match the rest of the app.  Especially for dark mode.
@@ -110,14 +140,14 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       maxHeight: 650,
       minHeight: 200,
       moveable: true,
-      showCurrentTime: true,
+      showCurrentTime: showCurrentTime,
       verticalScroll: true,
       zoomKey: 'ctrlKey',
       start: dayjs(timelineStart).toDate(),
       end: dayjs(timelineEnd).toDate(),
       min: dayjs(timelineStart).toDate(),
       max: dayjs(timelineEnd).toDate(),
-      groupOrder: 'content',
+      groupOrder: 'order',
       xss: { disabled: false },
       template: (
         item: RoadmapTimelineItem,
@@ -143,7 +173,13 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         }
       },
     }
-  }, [timelineStart, timelineEnd, timelineFontColor, timelineForegroundColor])
+  }, [
+    showCurrentTime,
+    timelineStart,
+    timelineEnd,
+    timelineFontColor,
+    timelineForegroundColor,
+  ])
 
   useEffect(() => {
     if (!props.roadmaps) return
@@ -151,10 +187,10 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     setTimelineStart(props.roadmap.start)
     setTimelineEnd(props.roadmap.end)
 
-    const roadmaps = props.roadmaps.map((roadmap) => {
+    const levelOneRoadmaps = props.roadmaps.map((roadmap) => {
       return {
         id: roadmap.key,
-        title: roadmap.name,
+        title: `${roadmap.key} - ${roadmap.name}`,
         content: '',
         start: dayjs(roadmap.start).toDate(),
         end: dayjs(roadmap.end).toDate(),
@@ -165,16 +201,39 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         roadmap: roadmap,
       } as RoadmapTimelineItem
     })
+    setLevelOneRoadmaps(levelOneRoadmaps)
 
-    setRoadmaps(roadmaps)
+    const levelTwoRoadmaps = roadmapLinksData?.map((roadmapLink) => {
+      return {
+        id: roadmapLink.roadmap.key,
+        title: `${roadmapLink.roadmap.key} - ${roadmapLink.roadmap.name}`,
+        content: '',
+        start: dayjs(roadmapLink.roadmap.start).toDate(),
+        end: dayjs(roadmapLink.roadmap.end).toDate(),
+        group: roadmapLink.parentId,
+        type: 'range',
+        style: `background: ${timelineBackgroundColor}; border-color: ${timelineBackgroundColor};`,
+        zIndex: 1,
+        roadmap: roadmapLink.roadmap,
+      } as RoadmapTimelineItem
+    })
+    setLevelTwoRoadmaps(levelTwoRoadmaps)
+
     setIsLoading(props.isLoading)
-  }, [props, timelineBackgroundColor])
+  }, [drillDown, props, roadmapLinksData, timelineBackgroundColor])
 
   useEffect(() => {
-    if (!roadmaps || roadmaps.length === 0 || isLoading) return
-
     // TODO: add the ability for content to overflow if the text is too long
-    const items: RoadmapTimelineItem[] = [...roadmaps]
+    let items: RoadmapTimelineItem[]
+    if (drillDown) {
+      if (!levelTwoRoadmaps || levelTwoRoadmaps.length === 0 || isLoading)
+        return
+      items = [...levelTwoRoadmaps]
+    } else {
+      if (!levelOneRoadmaps || levelOneRoadmaps.length === 0 || isLoading)
+        return
+      items = [...levelOneRoadmaps]
+    }
 
     const timeline = new Timeline(
       timelineRef.current,
@@ -182,20 +241,74 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       options as TimelineOptions,
     )
 
-    // if (enableGroups === true) {
-    //   timeline.setGroups(
-    //     getDataGroups(teamNames, objectives, timelineFontColor),
-    //   )
-    // }
-  }, [isLoading, options, roadmaps])
+    if (drillDown === true) {
+      const groups = getDataGroups(
+        levelOneRoadmaps,
+        levelTwoRoadmaps,
+        timelineFontColor,
+      )
+
+      timeline.setGroups(groups)
+    }
+  }, [
+    drillDown,
+    isLoading,
+    options,
+    levelOneRoadmaps,
+    levelTwoRoadmaps,
+    timelineFontColor,
+  ])
+
+  const onDrillDownChange = (checked: boolean) => {
+    setDrillDown(checked)
+  }
+
+  const onShowCurrentTimeChange = (checked: boolean) => {
+    setShowCurrentTime(checked)
+  }
+
+  const controlItems: ItemType[] = [
+    {
+      label: (
+        <>
+          <Space direction="vertical" size="small">
+            <Space>
+              <Switch
+                size="small"
+                checked={drillDown}
+                onChange={onDrillDownChange}
+              />
+              Drill Down
+            </Space>
+            <Space>
+              <Switch
+                size="small"
+                checked={showCurrentTime}
+                onChange={onShowCurrentTimeChange}
+              />
+              Show Current Time
+            </Space>
+          </Space>
+        </>
+      ),
+      key: '0',
+    },
+  ]
 
   const TimelineChart = () => {
-    if (!roadmaps || roadmaps.length === 0) {
+    if (!levelOneRoadmaps || levelOneRoadmaps.length === 0) {
       return <ModaEmpty message="No roadmaps" />
     }
 
     return (
       <>
+        <Flex justify="end" align="center" style={{ paddingBottom: '16px' }}>
+          <Dropdown menu={{ items: controlItems }} trigger={['click']}>
+            <Button type="text" shape="circle" icon={<ControlOutlined />} />
+          </Dropdown>
+          <Divider type="vertical" style={{ height: '30px' }} />
+          {props.viewSelector}
+        </Flex>
         <Card size="small" bordered={false}>
           <div ref={timelineRef} id="timeline-vis"></div>
         </Card>

@@ -3969,6 +3969,68 @@ export class RoadmapsClient {
     }
 
     /**
+     * Retrieve child roadmap links for specified roadmap Ids.
+     */
+    getChildRoadmapLinks(roadmapIds: string[], cancelToken?: CancelToken): Promise<RoadmapLinkDto[]> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/child-links";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(roadmapIds);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetChildRoadmapLinks(_response);
+        });
+    }
+
+    protected processGetChildRoadmapLinks(response: AxiosResponse): Promise<RoadmapLinkDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<RoadmapLinkDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<RoadmapLinkDto[]>(null as any);
+    }
+
+    /**
      * Get a list of all visibility.
      */
     getVisibilityOptions( cancelToken?: CancelToken): Promise<VisibilityDto[]> {
@@ -10436,6 +10498,12 @@ export interface UpdateRoadmapRequest {
     end: Date;
     /** The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap. */
     visibilityId?: number;
+}
+
+export interface RoadmapLinkDto {
+    parentId?: string;
+    roadmap?: RoadmapListDto;
+    order?: number;
 }
 
 export interface CommonEnumDto {

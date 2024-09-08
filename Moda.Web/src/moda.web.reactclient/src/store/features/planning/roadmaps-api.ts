@@ -1,4 +1,7 @@
-import { CreateRoadmapReponse } from './../../../services/moda-api'
+import {
+  CreateRoadmapReponse,
+  RoadmapLinkDto,
+} from './../../../services/moda-api'
 import {
   CreateRoadmapRequest,
   RoadmapDetailsDto,
@@ -100,6 +103,19 @@ export const roadmapApi = apiSlice.injectEndpoints({
         //{ type: QueryTags.Roadmap, id: arg.cacheKey },
       ],
     }),
+    getRoadmapLinks: builder.query<RoadmapLinkDto[], string[]>({
+      queryFn: async (parentIds: string[]) => {
+        try {
+          const data = await (
+            await getRoadmapsClient()
+          ).getChildRoadmapLinks(parentIds)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+    }),
     getVisibilityOptions: builder.query<OptionModel<number>[], void>({
       queryFn: async () => {
         try {
@@ -135,5 +151,6 @@ export const {
   useCreateRoadmapMutation,
   useUpdateRoadmapMutation,
   useDeleteRoadmapMutation,
+  useGetRoadmapLinksQuery,
   useGetVisibilityOptionsQuery,
 } = roadmapApi

@@ -104,6 +104,17 @@ public class RoadmapsController : ControllerBase
             : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Delete"));
     }
 
+    [HttpPost("child-links")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Retrieve child roadmap links for specified roadmap Ids.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<List<RoadmapLinkDto>>> GetChildRoadmapLinks([FromBody] List<Guid> roadmapIds, CancellationToken cancellationToken)
+    {
+        var roadmaps = await _sender.Send(new GetRoadmapLinksQuery(roadmapIds), cancellationToken);
+        return Ok(roadmaps);
+    }
+
     [HttpGet("visibility-options")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get a list of all visibility.", "")]

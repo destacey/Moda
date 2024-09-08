@@ -51,15 +51,13 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
 
   return (
     <>
-      <Flex justify="flex-end" align="center" style={{ paddingBottom: '16px' }}>
-        {viewSelector}
-      </Flex>
       {currentView === 'List' && (
         <RoadmapsGrid
           roadmapsData={children}
           roadmapsLoading={props.isLoading}
           refreshRoadmaps={props.refreshRoadmap}
           gridHeight={550}
+          viewSelector={viewSelector}
         />
       )}
       {currentView === 'Timeline' && (
@@ -68,6 +66,7 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
           roadmaps={children}
           isLoading={props.isLoading}
           refreshRoadmap={props.refreshRoadmap}
+          viewSelector={viewSelector}
         />
       )}
     </>
