@@ -12,7 +12,11 @@ import { useGetRoadmapQuery } from '@/src/store/features/planning/roadmaps-api'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import RoadmapDetailsLoading from './loading'
 import { useEffect, useMemo, useState } from 'react'
-import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
+import {
+  BreadcrumbItem,
+  setBreadcrumbRoute,
+  setBreadcrumbTitle,
+} from '@/src/store/breadcrumbs'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
 import { Descriptions, List, MenuProps, message } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
@@ -21,8 +25,6 @@ import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-d
 import DeleteRoadmapForm from '../components/delete-roadmap-form'
 import CreateRoadmapForm from '../components/create-roadmap-form'
 import RoadmapViewManager from './roadmap-view-manager'
-import dayjs from 'dayjs'
-import { defaultDropAnimation } from '@dnd-kit/core'
 
 const { Item } = Descriptions
 const { Item: ListItem } = List
@@ -61,8 +63,31 @@ const RoadmapDetailsPage = ({ params }) => {
   } = useGetRoadmapQuery(params.key)
 
   useEffect(() => {
-    dispatch(setBreadcrumbTitle({ title: 'Details', pathname }))
-  }, [dispatch, pathname])
+    if (!roadmapData) return
+
+    const breadcrumbRoute: BreadcrumbItem[] = [
+      {
+        title: 'Planning',
+      },
+      {
+        href: `/planning/roadmaps`,
+        title: 'Roadmaps',
+      },
+    ]
+
+    if (roadmapData.parent) {
+      breadcrumbRoute.push({
+        href: `/planning/roadmaps/${roadmapData.parent.key}`,
+        title: roadmapData.parent.name,
+      })
+    }
+
+    breadcrumbRoute.push({
+      title: 'Details',
+    })
+
+    dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
+  }, [dispatch, pathname, roadmapData])
 
   useEffect(() => {
     if (!roadmapData) return

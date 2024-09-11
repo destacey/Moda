@@ -42,6 +42,10 @@ public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
     /// </summary>
     public required List<EmployeeNavigationDto> Managers { get; set; }
 
+    [AdaptIgnore]
+    public NavigationDto? Parent { get; set; }
+
+    [AdaptIgnore]
     public required List<RoadmapChildDto> Children { get; set; } = [];
 
     public void ConfigureMapping(TypeAdapterConfig config)

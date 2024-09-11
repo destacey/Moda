@@ -10576,6 +10576,7 @@ export interface RoadmapDetailsDto {
     end?: Date;
     visibility?: SimpleNavigationDto;
     managers?: EmployeeNavigationDto[];
+    parent?: NavigationDto | undefined;
     children?: RoadmapChildDto[];
 }
 

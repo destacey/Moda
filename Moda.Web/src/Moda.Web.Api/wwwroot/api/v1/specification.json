@@ -10334,6 +10334,14 @@
               "$ref": "#/components/schemas/EmployeeNavigationDto"
             }
           },
+          "parent": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NavigationDto"
+              }
+            ]
+          },
           "children": {
             "type": "array",
             "items": {
