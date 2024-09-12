@@ -37,22 +37,22 @@ internal sealed class GetRoadmapQueryHandler(IPlanningDbContext planningDbContex
             return null;
         }
 
-        // TODO: make this better
-        var parentRoadmap = await _planningDbContext.RoadmapLinks
-            .Where(r => r.ChildId == roadmap.Id)
-            .Where(r => r.Parent!.Visibility == publicVisibility || r.Parent.Managers.Any(m => m.ManagerId == _currentUserEmployeeId))
-            .Select(r => NavigationDto.Create(r.ParentId, r.Parent!.Key, r.Parent!.Name))
-            .FirstOrDefaultAsync(cancellationToken);
+        //// TODO: make this better
+        //var parentRoadmap = await _planningDbContext.RoadmapLinks
+        //    .Where(r => r.ChildId == roadmap.Id)
+        //    .Where(r => r.Parent!.Visibility == publicVisibility || r.Parent.Managers.Any(m => m.ManagerId == _currentUserEmployeeId))
+        //    .Select(r => NavigationDto.Create(r.ParentId, r.Parent!.Key, r.Parent!.Name))
+        //    .FirstOrDefaultAsync(cancellationToken);
 
-        roadmap.Parent = parentRoadmap;
+        //roadmap.Parent = parentRoadmap;
 
-        var roadmapChildLinks = await _planningDbContext.RoadmapLinks
-            .Where(r => r.ParentId == roadmap.Id)
-            .Where(r => r.Child!.Visibility == publicVisibility || r.Child.Managers.Any(m => m.ManagerId == _currentUserEmployeeId))
-            .ProjectToType<RoadmapChildDto>()
-            .ToListAsync(cancellationToken);
+        //var roadmapChildLinks = await _planningDbContext.RoadmapLinks
+        //    .Where(r => r.ParentId == roadmap.Id)
+        //    .Where(r => r.Child!.Visibility == publicVisibility || r.Child.Managers.Any(m => m.ManagerId == _currentUserEmployeeId))
+        //    .ProjectToType<RoadmapChildDto>()
+        //    .ToListAsync(cancellationToken);
 
-        roadmap.Children = roadmapChildLinks;
+        //roadmap.Children = roadmapChildLinks;
 
         return roadmap;
     }

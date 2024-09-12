@@ -28,7 +28,7 @@ public sealed class UpdateRoadmapCommandValidator : AbstractValidator<UpdateRoad
 
 internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<UpdateRoadmapCommandHandler> logger) : ICommandHandler<UpdateRoadmapCommand>
 {
-    private const string AppRequestName = nameof(UpdateRoadmapLinksOrderCommand);
+    private const string AppRequestName = nameof(UpdateRoadmapChildrenOrderCommand);
 
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());

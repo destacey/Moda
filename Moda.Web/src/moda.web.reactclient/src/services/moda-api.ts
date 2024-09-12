@@ -3717,7 +3717,7 @@ export class RoadmapsClient {
     /**
      * Create a roadmap.
      */
-    create(request: CreateRoadmapRequest, cancelToken?: CancelToken): Promise<CreateRoadmapReponse> {
+    create(request: CreateRoadmapRequest, cancelToken?: CancelToken): Promise<ObjectIdAndKey> {
         let url_ = this.baseUrl + "/api/planning/roadmaps";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3745,7 +3745,7 @@ export class RoadmapsClient {
         });
     }
 
-    protected processCreate(response: AxiosResponse): Promise<CreateRoadmapReponse> {
+    protected processCreate(response: AxiosResponse): Promise<ObjectIdAndKey> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -3760,7 +3760,7 @@ export class RoadmapsClient {
             let result201: any = null;
             let resultData201  = _responseText;
             result201 = JSON.parse(resultData201);
-            return Promise.resolve<CreateRoadmapReponse>(result201);
+            return Promise.resolve<ObjectIdAndKey>(result201);
 
         } else if (status === 422) {
             const _responseText = response.data;
@@ -3969,10 +3969,10 @@ export class RoadmapsClient {
     }
 
     /**
-     * Retrieve child roadmap links for specified roadmap Ids.
+     * Retrieve child roadmaps for specified roadmap Ids.
      */
-    getChildRoadmapLinks(roadmapIds: string[], cancelToken?: CancelToken): Promise<RoadmapLinkDto[]> {
-        let url_ = this.baseUrl + "/api/planning/roadmaps/child-links";
+    getChildren(roadmapIds: string[], cancelToken?: CancelToken): Promise<RoadmapChildrenDto[]> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/children";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(roadmapIds);
@@ -3995,11 +3995,11 @@ export class RoadmapsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetChildRoadmapLinks(_response);
+            return this.processGetChildren(_response);
         });
     }
 
-    protected processGetChildRoadmapLinks(response: AxiosResponse): Promise<RoadmapLinkDto[]> {
+    protected processGetChildren(response: AxiosResponse): Promise<RoadmapChildrenDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -4014,7 +4014,7 @@ export class RoadmapsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<RoadmapLinkDto[]>(result200);
+            return Promise.resolve<RoadmapChildrenDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -4027,14 +4027,14 @@ export class RoadmapsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<RoadmapLinkDto[]>(null as any);
+        return Promise.resolve<RoadmapChildrenDto[]>(null as any);
     }
 
     /**
-     * Update the order of child roadmap links.
+     * Update the order of child roadmaps.
      */
-    updateChildLinksOrder(id: string, request: UpdateRoadmapLinksOrderRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/planning/roadmaps/{id}/child-links/order";
+    updateChildrenOrder(id: string, request: UpdateRoadmapChildrenOrderRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/{id}/children/order";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -4059,11 +4059,11 @@ export class RoadmapsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processUpdateChildLinksOrder(_response);
+            return this.processUpdateChildrenOrder(_response);
         });
     }
 
-    protected processUpdateChildLinksOrder(response: AxiosResponse): Promise<void> {
+    protected processUpdateChildrenOrder(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -4092,16 +4092,16 @@ export class RoadmapsClient {
     }
 
     /**
-     * Update the order of child roadmap links based on a single change.
+     * Update the order of child roadmaps based on a single change.
      */
-    updateChildLinkOrder(id: string, roadmapLinkId: string, request: UpdateRoadmapLinkOrderRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/planning/roadmaps/{id}/child-links/{roadmapLinkId}/order";
+    updateChildOrder(id: string, childRoadmapId: string, request: UpdateRoadmapChildOrderRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/{id}/children/{childRoadmapId}/order";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        if (roadmapLinkId === undefined || roadmapLinkId === null)
-            throw new Error("The parameter 'roadmapLinkId' must be defined.");
-        url_ = url_.replace("{roadmapLinkId}", encodeURIComponent("" + roadmapLinkId));
+        if (childRoadmapId === undefined || childRoadmapId === null)
+            throw new Error("The parameter 'childRoadmapId' must be defined.");
+        url_ = url_.replace("{childRoadmapId}", encodeURIComponent("" + childRoadmapId));
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -4123,11 +4123,11 @@ export class RoadmapsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processUpdateChildLinkOrder(_response);
+            return this.processUpdateChildOrder(_response);
         });
     }
 
-    protected processUpdateChildLinkOrder(response: AxiosResponse): Promise<void> {
+    protected processUpdateChildOrder(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -10577,18 +10577,6 @@ export interface RoadmapDetailsDto {
     visibility?: SimpleNavigationDto;
     managers?: EmployeeNavigationDto[];
     parent?: NavigationDto | undefined;
-    children?: RoadmapChildDto[];
-}
-
-export interface RoadmapChildDto {
-    roadmap?: RoadmapListDto;
-    order?: number;
-}
-
-export interface CreateRoadmapReponse {
-    roadmapIds?: ObjectIdAndKey;
-    /** The result of linking the Roadmap to the parent. If the action was successful, this will be null.  If a parentId was not provided in the request, this will be null. */
-    linkToParentError?: string | undefined;
 }
 
 export interface ObjectIdAndKey {
@@ -10626,20 +10614,25 @@ export interface UpdateRoadmapRequest {
     visibilityId?: number;
 }
 
-export interface RoadmapLinkDto {
-    parentId?: string;
-    roadmap?: RoadmapListDto;
+export interface RoadmapChildrenDto {
+    id?: string;
+    key?: number;
+    name?: string;
+    start?: Date;
+    end?: Date;
+    visibility?: SimpleNavigationDto;
     order?: number;
+    parent?: NavigationDto;
 }
 
-export interface UpdateRoadmapLinksOrderRequest {
+export interface UpdateRoadmapChildrenOrderRequest {
     roadmapId?: string;
-    roadmapLinks?: { [key: string]: number; };
+    childrenOrder?: { [key: string]: number; };
 }
 
-export interface UpdateRoadmapLinkOrderRequest {
+export interface UpdateRoadmapChildOrderRequest {
     roadmapId: string;
-    roadmapLinkId: string;
+    childRoadmapId: string;
     order?: number;
 }
 

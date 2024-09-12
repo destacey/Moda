@@ -3148,7 +3148,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateRoadmapReponse"
+                  "$ref": "#/components/schemas/ObjectIdAndKey"
                 }
               }
             }
@@ -3344,13 +3344,13 @@
         ]
       }
     },
-    "/api/planning/roadmaps/child-links": {
+    "/api/planning/roadmaps/children": {
       "post": {
         "tags": [
           "Roadmaps"
         ],
-        "summary": "Retrieve child roadmap links for specified roadmap Ids.",
-        "operationId": "Roadmaps_GetChildRoadmapLinks",
+        "summary": "Retrieve child roadmaps for specified roadmap Ids.",
+        "operationId": "Roadmaps_GetChildren",
         "requestBody": {
           "x-name": "roadmapIds",
           "content": {
@@ -3377,7 +3377,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RoadmapLinkDto"
+                    "$ref": "#/components/schemas/RoadmapChildrenDto"
                   }
                 }
               }
@@ -3401,13 +3401,13 @@
         ]
       }
     },
-    "/api/planning/roadmaps/{id}/child-links/order": {
+    "/api/planning/roadmaps/{id}/children/order": {
       "post": {
         "tags": [
           "Roadmaps"
         ],
-        "summary": "Update the order of child roadmap links.",
-        "operationId": "Roadmaps_UpdateChildLinksOrder",
+        "summary": "Update the order of child roadmaps.",
+        "operationId": "Roadmaps_UpdateChildrenOrder",
         "parameters": [
           {
             "name": "id",
@@ -3427,7 +3427,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateRoadmapLinksOrderRequest"
+                "$ref": "#/components/schemas/UpdateRoadmapChildrenOrderRequest"
               }
             }
           },
@@ -3456,13 +3456,13 @@
         ]
       }
     },
-    "/api/planning/roadmaps/{id}/child-links/{roadmapLinkId}/order": {
+    "/api/planning/roadmaps/{id}/children/{childRoadmapId}/order": {
       "post": {
         "tags": [
           "Roadmaps"
         ],
-        "summary": "Update the order of child roadmap links based on a single change.",
-        "operationId": "Roadmaps_UpdateChildLinkOrder",
+        "summary": "Update the order of child roadmaps based on a single change.",
+        "operationId": "Roadmaps_UpdateChildOrder",
         "parameters": [
           {
             "name": "id",
@@ -3477,7 +3477,7 @@
             "x-position": 1
           },
           {
-            "name": "roadmapLinkId",
+            "name": "childRoadmapId",
             "in": "path",
             "required": true,
             "schema": {
@@ -3494,7 +3494,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateRoadmapLinkOrderRequest"
+                "$ref": "#/components/schemas/UpdateRoadmapChildOrderRequest"
               }
             }
           },
@@ -10341,39 +10341,6 @@
                 "$ref": "#/components/schemas/NavigationDto"
               }
             ]
-          },
-          "children": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RoadmapChildDto"
-            }
-          }
-        }
-      },
-      "RoadmapChildDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "roadmap": {
-            "$ref": "#/components/schemas/RoadmapListDto"
-          },
-          "order": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "CreateRoadmapReponse": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "roadmapIds": {
-            "$ref": "#/components/schemas/ObjectIdAndKey"
-          },
-          "linkToParentError": {
-            "type": "string",
-            "description": "The result of linking the Roadmap to the parent. If the action was successful, this will be null.  If a parentId was not provided in the request, this will be null.",
-            "nullable": true
           }
         }
       },
@@ -10493,26 +10460,44 @@
           }
         }
       },
-      "RoadmapLinkDto": {
+      "RoadmapChildrenDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "parentId": {
+          "id": {
             "type": "string",
             "format": "guid",
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "roadmap": {
-            "$ref": "#/components/schemas/RoadmapListDto"
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date"
+          },
+          "end": {
+            "type": "string",
+            "format": "date"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           },
           "order": {
             "type": "integer",
             "format": "int32"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/NavigationDto"
           }
         }
       },
-      "UpdateRoadmapLinksOrderRequest": {
+      "UpdateRoadmapChildrenOrderRequest": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -10522,7 +10507,7 @@
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "roadmapLinks": {
+          "childrenOrder": {
             "type": "object",
             "additionalProperties": {
               "type": "integer",
@@ -10531,12 +10516,12 @@
           }
         }
       },
-      "UpdateRoadmapLinkOrderRequest": {
+      "UpdateRoadmapChildOrderRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "roadmapId",
-          "roadmapLinkId"
+          "childRoadmapId"
         ],
         "properties": {
           "roadmapId": {
@@ -10546,7 +10531,7 @@
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "roadmapLinkId": {
+          "childRoadmapId": {
             "type": "string",
             "format": "guid",
             "minLength": 1,

@@ -37,7 +37,7 @@ public sealed record CreateRoadmapRequest
 
     public CreateRoadmapCommand ToCreateRoadmapCommand()
     {
-        return new CreateRoadmapCommand(Name, Description, new LocalDateRange(Start, End), (Visibility)VisibilityId);
+        return new CreateRoadmapCommand(Name, Description, new LocalDateRange(Start, End), (Visibility)VisibilityId, ParentId);
     }
 }
 

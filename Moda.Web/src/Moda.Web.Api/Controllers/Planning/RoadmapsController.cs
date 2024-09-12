@@ -1,7 +1,5 @@
 ﻿using Moda.Common.Application.Models;
 using Moda.Common.Application.Requests;
-using Moda.Planning.Application.Risks.Dtos;
-using Moda.Planning.Application.Risks.Queries;
 using Moda.Planning.Application.Roadmaps.Commands;
 using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Application.Roadmaps.Queries;
@@ -52,24 +50,14 @@ public class RoadmapsController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roadmaps)]
     [OpenApiOperation("Create a roadmap.", "")]
-    [ProducesResponseType(typeof(CreateRoadmapReponse), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult<CreateRoadmapReponse>> Create([FromBody] CreateRoadmapRequest request, CancellationToken cancellationToken)
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateRoadmapRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateRoadmapCommand(), cancellationToken);
         if (result.IsFailure)
             return BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Create"));
 
-        var response = new CreateRoadmapReponse { RoadmapIds = result.Value };
-        if (request.ParentId.HasValue)
-        {
-            var addLinkResult = await _sender.Send(new CreateRoadmapLinkCommand(request.ParentId.Value, response.RoadmapIds.Id), cancellationToken);
-            if (addLinkResult.IsFailure)
-                response.LinkToParentError = addLinkResult.Error;
-        }
-
-        return CreatedAtAction(nameof(GetRoadmap), new { idOrKey = response.RoadmapIds.Id.ToString() }, response);
+        return CreatedAtAction(nameof(GetRoadmap), new { idOrKey = result.Value.Id.ToString() }, result.Value);
     }
 
     [HttpPut("{id}")]
@@ -104,53 +92,53 @@ public class RoadmapsController : ControllerBase
             : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Delete"));
     }
 
-    [HttpPost("child-links")]
+    [HttpPost("children")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Roadmaps)]
-    [OpenApiOperation("Retrieve child roadmap links for specified roadmap Ids.", "")]
+    [OpenApiOperation("Retrieve child roadmaps for specified roadmap Ids.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<List<RoadmapLinkDto>>> GetChildRoadmapLinks([FromBody] List<Guid> roadmapIds, CancellationToken cancellationToken)
+    public async Task<ActionResult<List<RoadmapChildrenDto>>> GetChildren([FromBody] List<Guid> roadmapIds, CancellationToken cancellationToken)
     {
-        var roadmaps = await _sender.Send(new GetRoadmapLinksQuery(roadmapIds), cancellationToken);
+        var roadmaps = await _sender.Send(new GetRoadmapChildrenQuery(roadmapIds), cancellationToken);
         return Ok(roadmaps);
     }
 
-    [HttpPost("{id}/child-links/order")]
+    [HttpPost("{id}/children/order")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
-    [OpenApiOperation("Update the order of child roadmap links.", "")]
+    [OpenApiOperation("Update the order of child roadmaps.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> UpdateChildLinksOrder(Guid id, [FromBody] UpdateRoadmapLinksOrderRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateChildrenOrder(Guid id, [FromBody] UpdateRoadmapChildrenOrderRequest request, CancellationToken cancellationToken)
     {
         if (id != request.RoadmapId)
             return BadRequest();
 
-        var result = await _sender.Send(new UpdateRoadmapLinksOrderCommand(request.RoadmapId, request.RoadmapLinks), cancellationToken);
+        var result = await _sender.Send(new UpdateRoadmapChildrenOrderCommand(request.RoadmapId, request.ChildrenOrder), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildLinksOrder"));
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildrenOrder"));
     }
 
-    [HttpPost("{id}/child-links/{roadmapLinkId}/order")]
+    [HttpPost("{id}/children/{childRoadmapId}/order")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
-    [OpenApiOperation("Update the order of child roadmap links based on a single change.", "")]
+    [OpenApiOperation("Update the order of child roadmaps based on a single change.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> UpdateChildLinkOrder(Guid id, Guid roadmapLinkId, [FromBody] UpdateRoadmapLinkOrderRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateChildOrder(Guid id, Guid childRoadmapId, [FromBody] UpdateRoadmapChildOrderRequest request, CancellationToken cancellationToken)
     {
         if (id != request.RoadmapId)
             return BadRequest();
 
-        if (roadmapLinkId != request.RoadmapLinkId)
+        if (childRoadmapId != request.ChildRoadmapId)
             return BadRequest();
 
 
-        var result = await _sender.Send(new UpdateRoadmapLinkOrderCommand(request.RoadmapId, request.RoadmapLinkId, request.Order), cancellationToken);
+        var result = await _sender.Send(new UpdateRoadmapChildOrderCommand(request.RoadmapId, request.ChildRoadmapId, request.Order), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildLinkOrder"));
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildOrder"));
     }
 
     [HttpGet("visibility-options")]
@@ -163,6 +151,4 @@ public class RoadmapsController : ControllerBase
         var items = await _sender.Send(new GetVisibilitiesQuery(), cancellationToken);
         return Ok(items.OrderBy(c => c.Order));
     }
-
-
 }

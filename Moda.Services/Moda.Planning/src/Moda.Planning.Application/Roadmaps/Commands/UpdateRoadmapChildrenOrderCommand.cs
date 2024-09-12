@@ -1,11 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
-public sealed record UpdateRoadmapLinksOrderCommand(Guid RoadmapId, Dictionary<Guid,int> RoadmapLinks) : ICommand;
+public sealed record UpdateRoadmapChildrenOrderCommand(Guid RoadmapId, Dictionary<Guid,int> ChildrenOrder) : ICommand;
 
-public sealed class UpdateRoadmapLinksOrderCommandValidator : CustomValidator<UpdateRoadmapLinksOrderCommand>
+public sealed class UpdateRoadmapChildrenOrderCommandValidator : CustomValidator<UpdateRoadmapChildrenOrderCommand>
 {
-    public UpdateRoadmapLinksOrderCommandValidator()
+    public UpdateRoadmapChildrenOrderCommandValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -13,40 +13,40 @@ public sealed class UpdateRoadmapLinksOrderCommandValidator : CustomValidator<Up
             .NotEmpty()
             .WithMessage("A roadmap must be selected.");
 
-        RuleFor(o => o.RoadmapLinks)
+        RuleFor(o => o.ChildrenOrder)
             .NotEmpty()
-            .WithMessage("At least one roadmap link must be provided.");
+            .WithMessage("At least one child roadmap must be provided.");
     }
 }
 
-internal sealed class UpdateRoadmapLinksOrderCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<UpdateRoadmapLinksOrderCommandHandler> logger) : ICommandHandler<UpdateRoadmapLinksOrderCommand>
+internal sealed class UpdateRoadmapChildrenOrderCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<UpdateRoadmapChildrenOrderCommandHandler> logger) : ICommandHandler<UpdateRoadmapChildrenOrderCommand>
 {
-    private const string AppRequestName = nameof(UpdateRoadmapLinksOrderCommand);
+    private const string AppRequestName = nameof(UpdateRoadmapChildrenOrderCommand);
 
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
-    private readonly ILogger<UpdateRoadmapLinksOrderCommandHandler> _logger = logger;
+    private readonly ILogger<UpdateRoadmapChildrenOrderCommandHandler> _logger = logger;
 
-    public async Task<Result> Handle(UpdateRoadmapLinksOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateRoadmapChildrenOrderCommand request, CancellationToken cancellationToken)
     {
         try
         {
             var roadmap = await _planningDbContext.Roadmaps
                 .Include(x => x.Managers)
-                .Include(x => x.ChildLinks)
+                .Include(x => x.Children)
                 .FirstOrDefaultAsync(r => r.Id == request.RoadmapId, cancellationToken);
 
             if (roadmap is null)
                 return Result.Failure($"Roadmap with id {request.RoadmapId} not found");
 
-            if (roadmap.ChildLinks.Count != request.RoadmapLinks.Count)
+            if (roadmap.Children.Count != request.ChildrenOrder.Count)
             {
-                var missingRoadmapLinks = request.RoadmapLinks.Keys.Except(roadmap.ChildLinks.Select(o => o.Id));
+                var missingRoadmapLinks = request.ChildrenOrder.Keys.Except(roadmap.Children.Select(o => o.Id));
                 _logger.LogWarning("Not all roadmap links provided were found for roadmap {RoadmapId}. The following roadmap links were not found: {RoadmapLinkIds}", roadmap.Id, missingRoadmapLinks);
                 return Result.Failure("Not all roadmap links provided were found.");
             }
 
-            var updateResult = roadmap.SetChildLinksOrder(request.RoadmapLinks, _currentUserEmployeeId);
+            var updateResult = roadmap.SetChildrenOrder(request.ChildrenOrder, _currentUserEmployeeId);
             if (updateResult.IsFailure)
             {
                 // Reset the entity
