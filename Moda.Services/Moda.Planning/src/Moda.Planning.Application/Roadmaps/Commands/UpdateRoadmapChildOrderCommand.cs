@@ -1,21 +1,21 @@
 ﻿using Ardalis.GuardClauses;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
-public sealed record UpdateRoadmapLinkOrderCommand(Guid RoadmapId, Guid RoadmapLinkId, int Order) : ICommand;
+public sealed record UpdateRoadmapChildOrderCommand(Guid RoadmapId, Guid ChildRoadmapId, int Order) : ICommand;
 
-public sealed class UpdateRoadmapLinkOrderCommandValidator : CustomValidator<UpdateRoadmapLinkOrderCommand>
+public sealed class UpdateRoadmapChildOrderCommandValidator : CustomValidator<UpdateRoadmapChildOrderCommand>
 {
-    public UpdateRoadmapLinkOrderCommandValidator()
+    public UpdateRoadmapChildOrderCommandValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(o => o.RoadmapId)
             .NotEmpty()
-            .WithMessage("A valid roadmap must be provided.");
+            .WithMessage("A valid roadmap id must be provided.");
 
-        RuleFor(o => o.RoadmapLinkId)
+        RuleFor(o => o.ChildRoadmapId)
             .NotEmpty()
-            .WithMessage("A valid roadmap link must be provided.");
+            .WithMessage("A valid child roadmap id must be provided.");
 
         RuleFor(o => o.Order)
             .GreaterThan(0)
@@ -23,31 +23,27 @@ public sealed class UpdateRoadmapLinkOrderCommandValidator : CustomValidator<Upd
     }
 }
 
-internal sealed class UpdateRoadmapLinkOrderCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<UpdateRoadmapLinkOrderCommandHandler> logger) : ICommandHandler<UpdateRoadmapLinkOrderCommand>
+internal sealed class UpdateRoadmapChildOrderCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<UpdateRoadmapChildOrderCommandHandler> logger) : ICommandHandler<UpdateRoadmapChildOrderCommand>
 {
-    private const string AppRequestName = nameof(UpdateRoadmapLinkOrderCommand);
+    private const string AppRequestName = nameof(UpdateRoadmapChildOrderCommand);
 
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
-    private readonly ILogger<UpdateRoadmapLinkOrderCommandHandler> _logger = logger;
+    private readonly ILogger<UpdateRoadmapChildOrderCommandHandler> _logger = logger;
 
-    public async Task<Result> Handle(UpdateRoadmapLinkOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateRoadmapChildOrderCommand request, CancellationToken cancellationToken)
     {
         try
         {
             var roadmap = await _planningDbContext.Roadmaps
                 .Include(x => x.Managers)
-                .Include(x => x.ChildLinks)
+                .Include(x => x.Children)
                 .FirstOrDefaultAsync(r => r.Id == request.RoadmapId, cancellationToken);
 
             if (roadmap is null)
                 return Result.Failure($"Roadmap with id {request.RoadmapId} not found");
 
-            var roadmapLink = roadmap.ChildLinks.FirstOrDefault(x => x.ChildId == request.RoadmapLinkId);
-            if (roadmapLink is null)
-                return Result.Failure($"Roadmap link with id {request.RoadmapLinkId} not found");
-
-            var updateResult = roadmap.SetChildLinksOrder(request.RoadmapLinkId, request.Order, _currentUserEmployeeId);
+            var updateResult = roadmap.SetChildrenOrder(request.ChildRoadmapId, request.Order, _currentUserEmployeeId);
             if (updateResult.IsFailure)
             {
                 // Reset the entity

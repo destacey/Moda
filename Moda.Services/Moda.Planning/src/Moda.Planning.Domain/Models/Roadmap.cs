@@ -13,11 +13,11 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     private LocalDateRange _dateRange = default!;
 
     private readonly List<RoadmapManager> _managers = [];
-    private readonly List<RoadmapLink> _childLinks = [];
+    private readonly List<Roadmap> _children = [];
 
     private Roadmap() { }
 
-    private Roadmap(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers)
+    private Roadmap(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers, Guid? parentId, int? orderId)
     {
         _objectConstruction = true;
 
@@ -28,6 +28,8 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         DateRange = dateRange;
         Visibility = visibility;
 
+        ParentId = parentId;
+        Order = orderId;
 
         foreach (var managerId in managers)
         {
@@ -75,14 +77,29 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     public Visibility Visibility { get; private set; }
 
     /// <summary>
-    /// The managers of the Roadmap. Managers have full control over the Roadmap.
+    /// The parent Roadmap Id. This is used to connect Roadmaps together.
     /// </summary>
-    public IReadOnlyCollection<RoadmapManager> Managers => _managers.AsReadOnly();
+    public Guid? ParentId { get; private set; }
 
     /// <summary>
-    /// The links of the Roadmap. Links are used to connect Roadmaps together.
+    /// The parent Roadmap. This is used to connect Roadmaps together.
     /// </summary>
-    public IReadOnlyCollection<RoadmapLink> ChildLinks => _childLinks.AsReadOnly();
+    public Roadmap? Parent { get; private set; }
+
+    /// <summary>
+    /// The order of the Roadmap within the parent Roadmap.
+    /// </summary>
+    public int? Order { get; private set; }
+
+    /// <summary>
+    /// The children of the Roadmap. Children are used to connect Roadmaps together.
+    /// </summary>
+    public IReadOnlyList<Roadmap> Children => _children.AsReadOnly();
+
+    /// <summary>
+    /// The managers of the Roadmap. Managers have full control over the Roadmap.
+    /// </summary>
+    public IReadOnlyList<RoadmapManager> Managers => _managers.AsReadOnly();
 
     /// <summary>
     /// Updates the Roadmap.
@@ -162,14 +179,15 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         _managers.Remove(manager);
         return Result.Success();
     }
+    
 
     /// <summary>
-    /// Adds a child Roadmap link to the Roadmap.
+    /// Removes a child Roadmap from the Roadmap.
     /// </summary>
     /// <param name="childId"></param>
     /// <param name="currentUserEmployeeId"></param>
     /// <returns></returns>
-    public Result AddChildLink(Guid childId, Guid currentUserEmployeeId)
+    public Result RemoveChild(Guid childId, Guid currentUserEmployeeId)
     {
         var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
@@ -177,54 +195,29 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
             return isManagerResult;
         }
 
-        if (_childLinks.Any(x => x.ChildId == childId))
-        {
-            return Result.Failure("Child Roadmap already exists on this roadmap.");
-        }
-
-        var order = _childLinks.Count + 1;
-
-        _childLinks.Add(new RoadmapLink(Id, childId, order));
-        return Result.Success();
-    }
-
-    /// <summary>
-    /// Removes a child Roadmap link from the Roadmap.
-    /// </summary>
-    /// <param name="childId"></param>
-    /// <param name="currentUserEmployeeId"></param>
-    /// <returns></returns>
-    public Result RemoveChildLink(Guid childId, Guid currentUserEmployeeId)
-    {
-        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
-        if (isManagerResult.IsFailure)
-        {
-            return isManagerResult;
-        }
-
-        var childLink = _childLinks.FirstOrDefault(x => x.ChildId == childId);
-        if (childLink is null)
+        var child = _children.FirstOrDefault(x => x.Id == childId);
+        if (child is null)
         {
             return Result.Failure("Child Roadmap does not exist on this roadmap.");
         }
 
-        _childLinks.Remove(childLink);
+        _children.Remove(child);
 
-        foreach (var link in _childLinks.Where(x => x.Order > childLink.Order))
-        {
-            link.SetOrder(link.Order - 1);
-        }
+        child.ParentId = null;
+        child.Order = null;
+
+        ResetChildrenOrder();
 
         return Result.Success();
     }
 
     /// <summary>
-    /// Sets the order of the child Roadmap links. This is used to set the order of all child links at once.
+    /// Sets the order of the child Roadmaps. This is used to set the order of all child roadmaps at once.
     /// </summary>
-    /// <param name="childLinks"></param>
+    /// <param name="childRoadmaps"></param>
     /// <param name="currentUserEmployeeId"></param>
     /// <returns></returns>
-    public Result SetChildLinksOrder(Dictionary<Guid, int> childLinks, Guid currentUserEmployeeId)
+    public Result SetChildrenOrder(Dictionary<Guid, int> childRoadmaps, Guid currentUserEmployeeId)
     {
         var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
@@ -232,70 +225,81 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
             return isManagerResult;
         }
 
-        if (childLinks.Count != _childLinks.Count)
+        if (childRoadmaps.Count != _children.Count)
         {
-            return Result.Failure("Not all child roadmap links provided were found.");
+            return Result.Failure("Not all child roadmaps provided were found.");
         }
 
-        foreach (var childLink in _childLinks)
+        foreach (var child in _children)
         {
-            if (!childLinks.ContainsKey(childLink.ChildId))
+            if (!childRoadmaps.ContainsKey(child.Id))
             {
-                return Result.Failure("Not all child roadmap links provided were found.");
+                return Result.Failure("Not all child roadmaps provided were found.");
             }
 
-            childLink.SetOrder(childLinks[childLink.ChildId]);
+            var order = childRoadmaps[child.Id];
+            if (order < 1)
+            {
+                return Result.Failure("Order must be greater than 0.");
+            }
+
+            child.Order = order;
         }
 
-        ResetChildLinksOrder();
+        ResetChildrenOrder();
 
         return Result.Success();
     }
 
     /// <summary>
-    /// Updates the order of the child Roadmap links based on a single link changing its order.
+    /// Updates the order of the child Roadmap based on a single roadmap changing its order.
     /// </summary>
-    /// <param name="childLinkId"></param>
+    /// <param name="childRoadmapId"></param>
     /// <param name="order"></param>
     /// <param name="currentUserEmployeeId"></param>
     /// <returns></returns>
-    public Result SetChildLinksOrder(Guid childLinkId, int order, Guid currentUserEmployeeId)
+    public Result SetChildrenOrder(Guid childRoadmapId, int order, Guid currentUserEmployeeId)
     {
+        if (order < 1)
+        {
+            return Result.Failure("Order must be greater than 0.");
+        }
+
         var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
         {
             return isManagerResult;
         }
 
-        var childLink = _childLinks.FirstOrDefault(x => x.ChildId == childLinkId);
-        if (childLink is null)
+        var childRoadmap = _children.FirstOrDefault(x => x.Id == childRoadmapId);
+        if (childRoadmap is null)
         {
-            return Result.Failure("Child roadmap link does not exist on this roadmap.");
+            return Result.Failure("Child roadmap does not exist on this roadmap.");
         }
 
-        if (childLink.Order == order)
+        if (childRoadmap.Order == order)
         {
             return Result.Success();
         }
 
-        if (childLink.Order < order)
+        if (childRoadmap.Order < order)
         {
-            foreach (var link in _childLinks.Where(x => x.Order > childLink.Order && x.Order <= order))
+            foreach (var child in _children.Where(x => x.Order > childRoadmap.Order && x.Order <= order))
             {
-                link.SetOrder(link.Order - 1);
+                child.Order = child.Order - 1;
             }
         }
         else
         {
-            foreach (var link in _childLinks.Where(x => x.Order >= order && x.Order < childLink.Order))
+            foreach (var child in _children.Where(x => x.Order >= order && x.Order < childRoadmap.Order))
             {
-                link.SetOrder(link.Order + 1);
+                child.Order = child.Order + 1;
             }
         }
 
-        childLink.SetOrder(order);
+        childRoadmap.Order = order;
 
-        ResetChildLinksOrder();
+        ResetChildrenOrder();
 
         return Result.Success();
     }
@@ -303,12 +307,12 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <summary>
     /// Resets the order of the child Roadmap links. This is used to remove any gaps in the order.
     /// </summary>
-    private void ResetChildLinksOrder()
+    private void ResetChildrenOrder()
     {
         int i = 1;
-        foreach (var link in _childLinks.OrderBy(x => x.Order))
+        foreach (var roadmap in _children.OrderBy(x => x.Order))
         {
-            link.SetOrder(i);
+            roadmap.Order = i;
             i++;
         }
     }
@@ -339,6 +343,64 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     }
 
     /// <summary>
+    /// Creates a new Roadmap as a child of this Roadmap.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="description"></param>
+    /// <param name="dateRange"></param>
+    /// <param name="visibility"></param>
+    /// <param name="managers"></param>
+    /// <returns></returns>
+    public Result<Roadmap> CreateChild(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers, Guid currentUserEmployeeId)
+    {
+        try
+        {
+            var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+            if (isManagerResult.IsFailure)
+            {
+                return Result.Failure<Roadmap>(isManagerResult.Error);
+            }
+
+            var order = _children.Count + 1;
+
+            var roadmap = new Roadmap(name, description, dateRange, visibility, managers, Id, order);
+
+            _children.Add(roadmap);
+
+            return roadmap;
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<Roadmap>(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Creates a new Roadmap as a child of an existing Roadmap.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="description"></param>
+    /// <param name="dateRange"></param>
+    /// <param name="visibility"></param>
+    /// <param name="managers"></param>
+    /// <param name="parentId"></param>
+    /// <param name="orderId"></param>
+    /// <returns></returns>
+    //public static Result<Roadmap> CreateChild(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers, Guid parentId, int orderId)
+    //{
+    //    try
+    //    {
+    //        var roadmap = new Roadmap(name, description, dateRange, visibility, managers, parentId, orderId);
+
+    //        return roadmap;
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return Result.Failure<Roadmap>(ex.Message);
+    //    }
+    //}
+
+    /// <summary>
     /// Creates a new Roadmap.
     /// </summary>
     /// <param name="name"></param>
@@ -347,11 +409,11 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <param name="visibility"></param>
     /// <param name="managers"></param>
     /// <returns></returns>
-    public static Result<Roadmap> Create(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers)
+    public static Result<Roadmap> CreateRoot(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers)
     {
         try
         {
-            var roadmap = new Roadmap(name, description, dateRange, visibility, managers);
+            var roadmap = new Roadmap(name, description, dateRange, visibility, managers, null, null);
 
             return roadmap;
         }

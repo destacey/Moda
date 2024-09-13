@@ -3,9 +3,9 @@
 import { ModaGrid } from '@/src/app/components/common'
 import {
   RoadmapListDto,
-  UpdateRoadmapLinkOrderRequest,
+  UpdateRoadmapChildOrderRequest,
 } from '@/src/services/moda-api'
-import { useUpdateChildLinkOrderMutation } from '@/src/store/features/planning/roadmaps-api'
+import { useUpdateChildOrderMutation } from '@/src/store/features/planning/roadmaps-api'
 import { ColDef, RowDragEndEvent } from 'ag-grid-community'
 import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
@@ -23,7 +23,7 @@ export interface RoadmapsGridProps {
   parentRoadmapId?: string | undefined
 }
 
-const RoadmapLinkCellRenderer = ({ value, data }) => {
+const RoadmapCellRenderer = ({ value, data }) => {
   return <Link href={`/planning/roadmaps/${data.key}`}>{value}</Link>
 }
 
@@ -34,15 +34,15 @@ const RoadmapsGrid: React.FC<RoadmapsGridProps> = (
     props.enableRowDrag ?? false,
   )
 
-  const [updateChildLinkOrder, { error: mutationError }] =
-    useUpdateChildLinkOrderMutation()
+  const [updateChildOrder, { error: mutationError }] =
+    useUpdateChildOrderMutation()
 
   // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
   const columnDefs = useMemo<ColDef<RoadmapListDto>[]>(
     () => [
       // rowDrag is typically set on the first column
       { field: 'key', width: enableRowDrag ? 110 : 90, rowDrag: enableRowDrag },
-      { field: 'name', width: 350, cellRenderer: RoadmapLinkCellRenderer },
+      { field: 'name', width: 350, cellRenderer: RoadmapCellRenderer },
       {
         field: 'start',
         width: 125,
@@ -64,21 +64,21 @@ const RoadmapsGrid: React.FC<RoadmapsGridProps> = (
 
   const onRowDragEnd = useCallback(
     async (e: RowDragEndEvent) => {
-      updateChildLinkOrder({
+      updateChildOrder({
         roadmapId: props.parentRoadmapId,
-        roadmapLinkId: e.api.getRowNode(e.node.id).data.id,
+        childRoadmapId: e.api.getRowNode(e.node.id).data.id,
         order: e.node.rowIndex + 1,
-      } as UpdateRoadmapLinkOrderRequest)
+      } as UpdateRoadmapChildOrderRequest)
         .unwrap()
         .then(() => {
-          props.messageApi.success(`Roadmap link order updated successfully.`)
+          props.messageApi.success(`Roadmap order updated successfully.`)
         })
         .catch((error) => {
-          props.messageApi.success(`Error updating roadmap link order.`)
-          console.error('Error updating roadmap link order:', error)
+          props.messageApi.success(`Error updating roadmap order.`)
+          console.error('Error updating roadmap order:', error)
         })
     },
-    [props, updateChildLinkOrder],
+    [props, updateChildOrder],
   )
 
   return (

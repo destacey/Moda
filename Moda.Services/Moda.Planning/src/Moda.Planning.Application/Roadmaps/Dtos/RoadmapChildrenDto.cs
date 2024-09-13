@@ -1,8 +1,7 @@
 ﻿using Moda.Common.Application.Dtos;
-using Moda.Common.Application.Employees.Dtos;
 
 namespace Moda.Planning.Application.Roadmaps.Dtos;
-public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
+public sealed record RoadmapChildrenDto : IMapFrom<Roadmap>
 {
     /// <summary>Gets or sets the identifier.</summary>
     /// <value>The identifier.</value>
@@ -16,11 +15,6 @@ public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
     /// The name of the Roadmap.
     /// </summary>
     public required string Name { get; set; }
-
-    /// <summary>
-    /// The description of the Roadmap.
-    /// </summary>
-    public string? Description { get; set; }
 
     /// <summary>
     /// The Roadmap start date.
@@ -38,22 +32,21 @@ public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
     public required SimpleNavigationDto Visibility { get; set; }
 
     /// <summary>
-    /// The managers of the Roadmap.
+    /// The order of the Roadmap within its parent.
     /// </summary>
-    public required List<EmployeeNavigationDto> Managers { get; set; }
+    public int Order { get; set; }
 
     /// <summary>
     /// The parent Roadmap.
     /// </summary>
-    public NavigationDto? Parent { get; set; }
+    public required NavigationDto Parent { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
-        config.NewConfig<Roadmap, RoadmapDetailsDto>()
+        config.NewConfig<Roadmap, RoadmapChildrenDto>()
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End)
             .Map(dest => dest.Visibility, src => SimpleNavigationDto.FromEnum(src.Visibility))
-            .Map(dest => dest.Managers, src => src.Managers.Select(m => EmployeeNavigationDto.From(m.Manager!)))
-            .Map(dest => dest.Parent, src => src.Parent == null ? null : NavigationDto.Create(src.Parent.Id, src.Parent.Key, src.Parent.Name));
+            .Map(dest => dest.Parent, src => NavigationDto.Create(src.Parent!.Id, src.Parent.Key, src.Parent.Name));
     }
 }

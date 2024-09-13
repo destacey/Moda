@@ -23,17 +23,32 @@ internal sealed class DeleteRoadmapCommandHandler(IPlanningDbContext planningDbC
         {
             var roadmap = await _planningDbContext.Roadmaps
                 .Include(x => x.Managers)
+                .Include(x => x.Children)
                 .FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
 
             if (roadmap is null)
                 return Result.Failure($"Roadmap with id {request.Id} not found");
 
             var deleteResult = roadmap.CanDelete(_currentUserEmployeeId);
-
             if (deleteResult.IsFailure)
             {
                 _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", request.GetType().Name, request, deleteResult.Error);
                 return Result.Failure(deleteResult.Error);
+            }
+
+            var childrenToRemove = roadmap.Children.ToList();
+            foreach (var child in childrenToRemove)
+            {
+                var removeChildResult = roadmap.RemoveChild(child.Id, _currentUserEmployeeId);
+                if (removeChildResult.IsFailure)
+                {
+                    // Reset the entity
+                    await _planningDbContext.Entry(roadmap).ReloadAsync(cancellationToken);
+                    roadmap.ClearDomainEvents();
+
+                    _logger.LogError("Unable to remove child {ChildRoadmapId} from roadmap {RoadmapId}. Error message: {Error}", child.Id, roadmap.Id, removeChildResult.Error);
+                    return Result.Failure(removeChildResult.Error);
+                }
             }
 
             _planningDbContext.Roadmaps.Remove(roadmap);

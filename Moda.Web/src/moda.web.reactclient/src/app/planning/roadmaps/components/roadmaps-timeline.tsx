@@ -27,15 +27,15 @@ import dayjs from 'dayjs'
 import { ModaEmpty } from '@/src/app/components/common'
 import { ItemType } from 'antd/es/menu/interface'
 import { ControlOutlined } from '@ant-design/icons'
-import { useGetRoadmapLinksQuery } from '@/src/store/features/planning/roadmaps-api'
+import { useGetRoadmapChildrenQuery } from '@/src/store/features/planning/roadmaps-api'
 
 const { Text } = Typography
 
 interface RoadmapsTimelineProps {
   roadmap: RoadmapDetailsDto
-  roadmaps: RoadmapListDto[]
-  isLoading: boolean
-  refreshRoadmap: () => void
+  roadmapChildren: RoadmapListDto[]
+  isChildrenLoading: boolean
+  refreshChildren: () => void
   viewSelector?: React.ReactNode | undefined
 }
 
@@ -125,9 +125,12 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     isLoading: isLoadingRoadmapLinks,
     error: errorRoadmapLinks,
     refetch: refetchRoadmapLinks,
-  } = useGetRoadmapLinksQuery(props.roadmaps?.map((r) => r.id) || [], {
-    skip: !props.roadmaps && props.roadmaps.length === 0,
-  })
+  } = useGetRoadmapChildrenQuery(
+    props.roadmapChildren?.map((r) => r.id) || [],
+    {
+      skip: !props.roadmapChildren && props.roadmapChildren.length === 0,
+    },
+  )
 
   // TODO: add the ability to export/save as svg or png
   // TODO: update the styles to match the rest of the app.  Especially for dark mode.
@@ -181,12 +184,12 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   ])
 
   useEffect(() => {
-    if (!props.roadmaps) return
+    if (!props.roadmapChildren) return
 
     setTimelineStart(props.roadmap.start)
     setTimelineEnd(props.roadmap.end)
 
-    const levelOneRoadmaps = props.roadmaps.map((roadmap) => {
+    const levelOneRoadmaps = props.roadmapChildren.map((roadmap) => {
       return {
         id: roadmap.key,
         title: `${roadmap.key} - ${roadmap.name}`,
@@ -204,21 +207,21 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
 
     const levelTwoRoadmaps = roadmapLinksData?.map((roadmapLink) => {
       return {
-        id: roadmapLink.roadmap.key,
-        title: `${roadmapLink.roadmap.key} - ${roadmapLink.roadmap.name}`,
+        id: roadmapLink.key,
+        title: `${roadmapLink.key} - ${roadmapLink.name}`,
         content: '',
-        start: dayjs(roadmapLink.roadmap.start).toDate(),
-        end: dayjs(roadmapLink.roadmap.end).toDate(),
-        group: roadmapLink.parentId,
+        start: dayjs(roadmapLink.start).toDate(),
+        end: dayjs(roadmapLink.end).toDate(),
+        group: roadmapLink.parent.id,
         type: 'range',
         style: `background: ${timelineBackgroundColor}; border-color: ${timelineBackgroundColor};`,
         zIndex: 1,
-        roadmap: roadmapLink.roadmap,
+        roadmap: roadmapLink,
       } as RoadmapTimelineItem
     })
     setLevelTwoRoadmaps(levelTwoRoadmaps)
 
-    setIsLoading(props.isLoading)
+    setIsLoading(props.isChildrenLoading)
   }, [drillDown, props, roadmapLinksData, timelineBackgroundColor])
 
   useEffect(() => {

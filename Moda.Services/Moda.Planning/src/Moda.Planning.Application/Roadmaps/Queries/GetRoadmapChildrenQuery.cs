@@ -3,11 +3,11 @@ using Moda.Common.Domain.Enums;
 using Moda.Planning.Application.Roadmaps.Dtos;
 
 namespace Moda.Planning.Application.Roadmaps.Queries;
-public sealed record GetRoadmapLinksQuery(List<Guid> RoadmapIds) : IQuery<List<RoadmapLinkDto>>;
+public sealed record GetRoadmapChildrenQuery(List<Guid> RoadmapIds) : IQuery<List<RoadmapChildrenDto>>;
 
-public sealed class GetRoadmapLinksQueryValidator : AbstractValidator<GetRoadmapLinksQuery>
+public sealed class GetRoadmapChildrenQueryValidator : AbstractValidator<GetRoadmapChildrenQuery>
 {
-    public GetRoadmapLinksQueryValidator()
+    public GetRoadmapChildrenQueryValidator()
     {
         RuleFor(x => x.RoadmapIds).NotEmpty();
 
@@ -16,20 +16,19 @@ public sealed class GetRoadmapLinksQueryValidator : AbstractValidator<GetRoadmap
     }
 }
 
-internal sealed class GetRoadmapLinksQueryHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser) : IQueryHandler<GetRoadmapLinksQuery, List<RoadmapLinkDto>>
+internal sealed class GetRoadmapChildrenQueryHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser) : IQueryHandler<GetRoadmapChildrenQuery, List<RoadmapChildrenDto>>
 {
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
 
-    public async Task<List<RoadmapLinkDto>> Handle(GetRoadmapLinksQuery request, CancellationToken cancellationToken)
+    public async Task<List<RoadmapChildrenDto>> Handle(GetRoadmapChildrenQuery request, CancellationToken cancellationToken)
     {
         var publicVisibility = Visibility.Public;
 
         return await _planningDbContext.Roadmaps
-            .Where(r => request.RoadmapIds.Contains(r.Id))
+            .Where(r => r.ParentId != null && request.RoadmapIds.Contains(r.ParentId.Value))
             .Where(r => r.Visibility == publicVisibility || r.Managers.Any(m => m.ManagerId == _currentUserEmployeeId))
-            .SelectMany(r => r.ChildLinks)
-            .ProjectToType<RoadmapLinkDto>()
+            .ProjectToType<RoadmapChildrenDto>()
             .ToListAsync(cancellationToken);
     }
 }

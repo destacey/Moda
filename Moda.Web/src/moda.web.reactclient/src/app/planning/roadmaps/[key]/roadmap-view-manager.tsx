@@ -1,6 +1,10 @@
 'use client'
 
-import { RoadmapDetailsDto, RoadmapListDto } from '@/src/services/moda-api'
+import {
+  RoadmapChildrenDto,
+  RoadmapDetailsDto,
+  RoadmapListDto,
+} from '@/src/services/moda-api'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { useEffect, useMemo, useState } from 'react'
@@ -10,8 +14,9 @@ import { MessageInstance } from 'antd/es/message/interface'
 
 interface RoadmapViewManagerProps {
   roadmap: RoadmapDetailsDto
-  isLoading: boolean
-  refreshRoadmap: () => void
+  roadmapChildren: RoadmapChildrenDto[]
+  isChildrenLoading: boolean
+  refreshChildren: () => void
   canUpdateRoadmap: boolean
   messageApi: MessageInstance
 }
@@ -21,13 +26,12 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
   const [children, setChildren] = useState<RoadmapListDto[]>([])
 
   useEffect(() => {
-    const children: RoadmapListDto[] = props.roadmap.children
+    const children: RoadmapChildrenDto[] = props.roadmapChildren
       .slice()
       .sort((a, b) => a.order - b.order)
-      .map((r) => r.roadmap)
 
     setChildren(children)
-  }, [props.roadmap])
+  }, [props.roadmap, props.roadmapChildren])
 
   const viewSelectorOptions: SegmentedLabeledOption[] = useMemo(() => {
     const options = [
@@ -63,8 +67,8 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
       {currentView === 'List' && (
         <RoadmapsGrid
           roadmapsData={children}
-          roadmapsLoading={props.isLoading}
-          refreshRoadmaps={props.refreshRoadmap}
+          roadmapsLoading={props.isChildrenLoading}
+          refreshRoadmaps={props.refreshChildren}
           gridHeight={550}
           viewSelector={viewSelector}
           enableRowDrag={props.canUpdateRoadmap}
@@ -75,9 +79,9 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
       {currentView === 'Timeline' && (
         <RoadmapsTimeline
           roadmap={props.roadmap}
-          roadmaps={children}
-          isLoading={props.isLoading}
-          refreshRoadmap={props.refreshRoadmap}
+          roadmapChildren={children}
+          isChildrenLoading={props.isChildrenLoading}
+          refreshChildren={props.refreshChildren}
           viewSelector={viewSelector}
         />
       )}
