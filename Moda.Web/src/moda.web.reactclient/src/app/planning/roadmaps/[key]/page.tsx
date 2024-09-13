@@ -8,17 +8,16 @@ import {
 import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/app/hooks'
-import { useGetRoadmapQuery } from '@/src/store/features/planning/roadmaps-api'
+import {
+  useGetRoadmapChildrenQuery,
+  useGetRoadmapQuery,
+} from '@/src/store/features/planning/roadmaps-api'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import RoadmapDetailsLoading from './loading'
 import { useEffect, useMemo, useState } from 'react'
-import {
-  BreadcrumbItem,
-  setBreadcrumbRoute,
-  setBreadcrumbTitle,
-} from '@/src/store/breadcrumbs'
+import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
-import { Descriptions, List, MenuProps, message } from 'antd'
+import { Descriptions, MenuProps, message } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import EditRoadmapForm from '../components/edit-roadmap-form'
 import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
@@ -27,7 +26,6 @@ import CreateRoadmapForm from '../components/create-roadmap-form'
 import RoadmapViewManager from './roadmap-view-manager'
 
 const { Item } = Descriptions
-const { Item: ListItem } = List
 
 const visibilityTitle = (visibility: string, managersInfo: string) => {
   return `This roadmap is set to ${visibility}.\n\nThe roadmap managers are: ${managersInfo}`
@@ -61,6 +59,15 @@ const RoadmapDetailsPage = ({ params }) => {
     error,
     refetch: refetchRoadmap,
   } = useGetRoadmapQuery(params.key)
+
+  const {
+    data: roadmapChildren,
+    isLoading: isChildrenLoading,
+    isFetching: isChildrenFetching,
+    refetch: refetchChildren,
+  } = useGetRoadmapChildrenQuery([roadmapData?.id], {
+    skip: !roadmapData,
+  })
 
   useEffect(() => {
     if (!roadmapData) return
@@ -98,11 +105,13 @@ const RoadmapDetailsPage = ({ params }) => {
       .join(', ')
     setManagersInfo(managers)
 
-    const children = roadmapData.children
-      .slice()
-      .sort((a, b) => a.order - b.order)
-    setChildren(children)
-  }, [roadmapData])
+    if (roadmapChildren) {
+      const children = roadmapChildren.slice().sort((a, b) => a.order - b.order)
+      setChildren(children)
+    } else {
+      setChildren([])
+    }
+  }, [roadmapChildren, roadmapData])
 
   useEffect(() => {
     error && console.error(error)
@@ -152,7 +161,7 @@ const RoadmapDetailsPage = ({ params }) => {
   const onCreateRoadmapFormClosed = (wasCreated: boolean) => {
     setOpenCreateRoadmapForm(false)
     if (wasCreated) {
-      refetchRoadmap()
+      refetchChildren
     }
   }
 
@@ -160,6 +169,17 @@ const RoadmapDetailsPage = ({ params }) => {
     setOpenEditRoadmapForm(false)
     if (wasSaved) {
       refetchRoadmap()
+    }
+  }
+
+  const onDeleteFormClosed = (wasDeleted: boolean) => {
+    setOpenDeleteRoadmapForm(false)
+    if (wasDeleted) {
+      if (roadmapData.parent) {
+        router.push(`/planning/roadmaps/${roadmapData.parent.key}`)
+      } else {
+        router.push('/planning/roadmaps/')
+      }
     }
   }
 
@@ -199,8 +219,9 @@ const RoadmapDetailsPage = ({ params }) => {
       )}
       <RoadmapViewManager
         roadmap={roadmapData}
-        isLoading={isLoading}
-        refreshRoadmap={refetchRoadmap}
+        roadmapChildren={children}
+        isChildrenLoading={isChildrenLoading}
+        refreshChildren={refetchChildren}
         canUpdateRoadmap={canUpdateRoadmap}
         messageApi={messageApi}
       />
@@ -226,8 +247,8 @@ const RoadmapDetailsPage = ({ params }) => {
         <DeleteRoadmapForm
           roadmap={roadmapData}
           showForm={openDeleteRoadmapForm}
-          onFormComplete={() => router.push('/planning/roadmaps/')}
-          onFormCancel={() => setOpenDeleteRoadmapForm(false)}
+          onFormComplete={() => onDeleteFormClosed(true)}
+          onFormCancel={() => onDeleteFormClosed(false)}
           messageApi={messageApi}
         />
       )}

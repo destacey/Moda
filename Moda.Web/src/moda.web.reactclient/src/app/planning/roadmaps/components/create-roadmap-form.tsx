@@ -63,16 +63,12 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
   const create = async (values: CreateRoadmapFormValues, parentRoadmapId) => {
     try {
       const request = mapToRequestValues(values, parentRoadmapId)
-      await createRoadmap(request)
+      createRoadmap(request)
         .unwrap()
         .then((response) => {
           props.messageApi.success(
-            `Roadmap created successfully. Roadmap Key ${response.roadmapIds.key}`,
+            `Roadmap created successfully. Roadmap Key ${response.key}`,
           )
-          if (response.linkToParentError) {
-            const message = `Roadmap created successfully, but there was an error linking it to the parent roadmap. Error: ${response.linkToParentError}`
-            props.messageApi.error(message)
-          }
         })
         .catch((error) => {
           throw error

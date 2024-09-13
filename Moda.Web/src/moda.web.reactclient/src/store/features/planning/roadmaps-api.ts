@@ -1,8 +1,8 @@
 import {
-  CreateRoadmapReponse,
-  RoadmapLinkDto,
-  UpdateRoadmapLinkOrderRequest,
-  UpdateRoadmapLinksOrderRequest,
+  ObjectIdAndKey,
+  RoadmapChildrenDto,
+  UpdateRoadmapChildOrderRequest,
+  UpdateRoadmapChildrenOrderRequest,
 } from './../../../services/moda-api'
 import {
   CreateRoadmapRequest,
@@ -30,7 +30,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         QueryTags.Roadmap,
-        //...result.map(({ key }) => ({ type: QueryTags.Roadmap, key })),
+        ...result.map(({ key }) => ({ type: QueryTags.Roadmap, key })),
       ],
     }),
     getRoadmap: builder.query<RoadmapDetailsDto, string>({
@@ -43,32 +43,25 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      // need to check result for null when 404 or after delete
       providesTags: (result, error, arg) => [
-        QueryTags.Roadmap,
-        //...result.map(({ key }) => ({ type: QueryTags.Roadmap, key })),
+        { type: QueryTags.Roadmap, id: result?.key },
       ],
-      // providesTags: (result, error, arg) => {
-      //   if (result) {
-      //     return [{ type: QueryTags.Roadmap, id: result.key }]
-      //   }
-      //   return []
-      // },
     }),
-    createRoadmap: builder.mutation<CreateRoadmapReponse, CreateRoadmapRequest>(
-      {
-        queryFn: async (request) => {
-          try {
-            const data = await (await getRoadmapsClient()).create(request)
-            return { data }
-          } catch (error) {
-            console.error('API Error:', error)
-            return { error }
-          }
-        },
-        invalidatesTags: (result, error, arg) => [QueryTags.Roadmap],
+    createRoadmap: builder.mutation<ObjectIdAndKey, CreateRoadmapRequest>({
+      queryFn: async (request) => {
+        try {
+          const data = await (await getRoadmapsClient()).create(request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
       },
-    ),
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.Roadmap },
+        { type: QueryTags.RoadmapChildren },
+      ],
+    }),
     updateRoadmap: builder.mutation<
       void,
       { request: UpdateRoadmapRequest; cacheKey: number }
@@ -84,10 +77,10 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: (result, error, arg) => [QueryTags.Roadmap],
-      // invalidatesTags: (result, error, arg) => [
-      //   { type: QueryTags.Roadmap, id: arg.cacheKey },
-      // ],
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.Roadmap, id: arg.cacheKey },
+        { type: QueryTags.RoadmapChildren, id: arg.cacheKey }, // TODO: this is not working
+      ],
     }),
     deleteRoadmap: builder.mutation<void, { id: string; cacheKey: number }>({
       queryFn: async (request) => {
@@ -105,56 +98,52 @@ export const roadmapApi = apiSlice.injectEndpoints({
         //{ type: QueryTags.Roadmap, id: arg.cacheKey },
       ],
     }),
-    getRoadmapLinks: builder.query<RoadmapLinkDto[], string[]>({
+    getRoadmapChildren: builder.query<RoadmapChildrenDto[], string[]>({
       queryFn: async (parentIds: string[]) => {
         try {
-          const data = await (
-            await getRoadmapsClient()
-          ).getChildRoadmapLinks(parentIds)
+          const data = await (await getRoadmapsClient()).getChildren(parentIds)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
+      providesTags: (result, error, arg) => [
+        QueryTags.RoadmapChildren,
+        ...result.map(({ key }) => ({ type: QueryTags.RoadmapChildren, key })),
+      ],
     }),
-    updateChildLinksOrder: builder.mutation<
+    updateChildrenOrder: builder.mutation<
       void,
-      UpdateRoadmapLinksOrderRequest
+      UpdateRoadmapChildrenOrderRequest
     >({
       queryFn: async (request) => {
         try {
           const data = await (
             await getRoadmapsClient()
-          ).updateChildLinksOrder(request.roadmapId, request)
+          ).updateChildrenOrder(request.roadmapId, request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
-      invalidatesTags: (result, error, arg) => [QueryTags.Roadmap],
+      invalidatesTags: (result, error, arg) => [QueryTags.RoadmapChildren],
     }),
-    updateChildLinkOrder: builder.mutation<void, UpdateRoadmapLinkOrderRequest>(
-      {
-        queryFn: async (request) => {
-          try {
-            const data = await (
-              await getRoadmapsClient()
-            ).updateChildLinkOrder(
-              request.roadmapId,
-              request.roadmapLinkId,
-              request,
-            )
-            return { data }
-          } catch (error) {
-            console.error('API Error:', error)
-            return { error }
-          }
-        },
-        invalidatesTags: (result, error, arg) => [QueryTags.Roadmap],
+    updateChildOrder: builder.mutation<void, UpdateRoadmapChildOrderRequest>({
+      queryFn: async (request) => {
+        try {
+          const data = await (
+            await getRoadmapsClient()
+          ).updateChildOrder(request.roadmapId, request.childRoadmapId, request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
       },
-    ),
+      invalidatesTags: (result, error, arg) => [QueryTags.RoadmapChildren],
+    }),
     getVisibilityOptions: builder.query<OptionModel<number>[], void>({
       queryFn: async () => {
         try {
@@ -190,8 +179,8 @@ export const {
   useCreateRoadmapMutation,
   useUpdateRoadmapMutation,
   useDeleteRoadmapMutation,
-  useGetRoadmapLinksQuery,
-  useUpdateChildLinksOrderMutation,
-  useUpdateChildLinkOrderMutation,
+  useGetRoadmapChildrenQuery,
+  useUpdateChildrenOrderMutation,
+  useUpdateChildOrderMutation,
   useGetVisibilityOptionsQuery,
 } = roadmapApi

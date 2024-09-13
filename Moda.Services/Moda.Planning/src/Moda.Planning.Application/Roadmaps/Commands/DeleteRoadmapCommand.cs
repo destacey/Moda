@@ -36,7 +36,8 @@ internal sealed class DeleteRoadmapCommandHandler(IPlanningDbContext planningDbC
                 return Result.Failure(deleteResult.Error);
             }
 
-            foreach (var child in roadmap.Children)
+            var childrenToRemove = roadmap.Children.ToList();
+            foreach (var child in childrenToRemove)
             {
                 var removeChildResult = roadmap.RemoveChild(child.Id, _currentUserEmployeeId);
                 if (removeChildResult.IsFailure)
