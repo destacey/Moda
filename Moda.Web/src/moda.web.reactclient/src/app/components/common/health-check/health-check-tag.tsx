@@ -1,3 +1,5 @@
+'use client'
+
 import { PlanningHealthCheckDto } from '@/src/services/moda-api'
 import { Descriptions, Popover, Space, Spin, Tag } from 'antd'
 import dayjs from 'dayjs'
@@ -38,12 +40,7 @@ const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
       : '250px'
 
     return (
-      <Descriptions
-        size="small"
-        column={1}
-        title="Health Check"
-        style={{ maxWidth: maxWidth }}
-      >
+      <Descriptions size="small" column={1} style={{ maxWidth: maxWidth }}>
         <Item label="Reported By">{healthCheckData.reportedBy.name}</Item>
         <Item label="Reported On">
           {dayjs(healthCheckData.reportedOn).format('M/D/YYYY')}
@@ -61,7 +58,12 @@ const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
   }
 
   return (
-    <Popover content={content} trigger="hover" onOpenChange={handleHoverChange}>
+    <Popover
+      title="Health Check"
+      content={content}
+      trigger="hover"
+      onOpenChange={handleHoverChange}
+    >
       <Tag color={healthCheckTagColor(healthCheck.status.name)}>
         {healthCheck.status.name}
       </Tag>
