@@ -53,7 +53,7 @@ const UsersListPage = () => {
         columnDefs={columnDefs}
         rowData={usersData}
         loadData={refresh}
-        isDataLoading={isLoading}
+        loading={isLoading}
       />
     </>
   )

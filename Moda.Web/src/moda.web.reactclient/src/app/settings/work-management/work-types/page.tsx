@@ -138,7 +138,7 @@ const WorkTypesPage = () => {
         gridControlMenuItems={controlItems}
         rowData={workTypes}
         loadData={refresh}
-        isDataLoading={isLoading}
+        loading={isLoading}
       />
       {openUpdateWorkTypeForm && (
         <EditWorkTypeForm

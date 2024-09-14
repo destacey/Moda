@@ -37,7 +37,6 @@ interface ModaGridProps extends AgGridReactProps {
   gridControlMenuItems?: ItemType[]
   toolbarActions?: React.ReactNode | null
   loadData?: () => Promise<void> | void
-  isDataLoading?: boolean
 }
 
 const modaDefaultColDef = {
@@ -58,7 +57,6 @@ const ModaGrid = ({
   defaultColDef,
   rowData,
   loadData,
-  isDataLoading,
   ...props
 }: ModaGridProps) => {
   const { agGridTheme } = useTheme()
@@ -72,7 +70,7 @@ const ModaGrid = ({
   const rowCount = rowData?.length ?? 0
 
   const onGridReady = () => {
-    if (!isDataLoading && rowCount === 0 && loadData) {
+    if (!props.loading && rowCount === 0 && loadData) {
       loadData()
     }
   }
@@ -88,18 +86,6 @@ const ModaGrid = ({
   const onBtnExport = useCallback(() => {
     gridRef.current?.api.exportDataAsCsv()
   }, [])
-
-  useEffect(() => {
-    if (!gridRef.current?.api) return
-
-    if (isDataLoading) {
-      gridRef.current?.api.showLoadingOverlay()
-    } else if (rowData && rowCount === 0) {
-      gridRef.current?.api.showNoRowsOverlay()
-    } else {
-      gridRef.current?.api.hideOverlay()
-    }
-  }, [isDataLoading, rowCount, rowData])
 
   return (
     <div style={{ width: width }}>
@@ -147,7 +133,7 @@ const ModaGrid = ({
                       type="text"
                       shape="circle"
                       icon={<ReloadOutlined />}
-                      onClick={() => loadData?.()}
+                      onClick={loadData}
                     />
                   </Tooltip>
                 )}
@@ -175,14 +161,17 @@ const ModaGrid = ({
             ref={gridRef}
             defaultColDef={defaultColDef ?? modaDefaultColDef}
             onGridReady={onGridReady}
-            animateRows={true}
+            animateRows={false} // annimation has to be off for cell text selection to work correctly
             rowData={rowData}
             onModelUpdated={onModelUpdated}
             multiSortKey="ctrl"
+            loading={props.loading}
             loadingOverlayComponent={() => <Spin size="large" />}
             noRowsOverlayComponent={() => (
               <ModaEmpty message="No records found." />
             )}
+            enableCellTextSelection={true}
+            ensureDomOrder={true}
             {...props}
           ></AgGridReact>
         </div>

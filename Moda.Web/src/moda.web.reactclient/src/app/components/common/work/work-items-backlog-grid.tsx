@@ -136,7 +136,7 @@ const WorkItemsBacklogGrid = (props: WorkItemsBacklogGridProps) => {
         columnDefs={columnDefs}
         rowData={props.workItems}
         loadData={refresh}
-        isDataLoading={props.isLoading}
+        loading={props.isLoading}
       />
     </>
   )

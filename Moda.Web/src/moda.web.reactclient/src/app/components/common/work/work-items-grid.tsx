@@ -133,7 +133,7 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         columnDefs={columnDefs}
         rowData={props.workItems}
         loadData={refresh}
-        isDataLoading={props.isLoading}
+        loading={props.isLoading}
       />
     </>
   )

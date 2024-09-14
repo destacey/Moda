@@ -113,6 +113,7 @@ const ObjectiveHealthReportPage = ({ params }) => {
       <ModaGrid
         columnDefs={columnDefs}
         rowData={healthReport}
+        loading={isLoading}
         loadData={refresh}
       />
     </>

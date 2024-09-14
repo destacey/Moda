@@ -58,7 +58,7 @@ const RoleListPage = () => {
         columnDefs={columnDefs}
         rowData={roleData}
         loadData={refresh}
-        isDataLoading={isLoading}
+        loading={isLoading}
       />
 
       {openCreateRoleForm && (

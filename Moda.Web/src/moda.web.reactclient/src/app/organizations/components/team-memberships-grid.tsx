@@ -172,6 +172,7 @@ const TeamMembershipsGrid = ({
         height={550}
         columnDefs={columnDefs}
         rowData={teamMembershipsQuery.data}
+        loading={teamMembershipsQuery.isLoading}
         loadData={refresh}
       />
       {openEditTeamMembershipForm && (

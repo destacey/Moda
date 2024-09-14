@@ -25,6 +25,7 @@ import { ColDef } from 'ag-grid-community'
 export interface PlanningIntervalObjectivesGridProps {
   objectivesData: PlanningIntervalObjectiveListDto[]
   refreshObjectives: () => void
+  isLoading: boolean
   planningIntervalId?: string
   hidePlanningIntervalColumn?: boolean
   hideTeamColumn?: boolean
@@ -93,6 +94,7 @@ const getRowMenuItems = (props: RowMenuProps) => {
 const PlanningIntervalObjectivesGrid = ({
   objectivesData,
   refreshObjectives,
+  isLoading,
   planningIntervalId,
   hidePlanningIntervalColumn = false,
   hideTeamColumn = false,
@@ -289,6 +291,7 @@ const PlanningIntervalObjectivesGrid = ({
         height={650}
         columnDefs={columnDefs}
         rowData={objectivesData}
+        loading={isLoading}
         loadData={refresh}
         gridControlMenuItems={controlItems}
         toolbarActions={viewSelector}

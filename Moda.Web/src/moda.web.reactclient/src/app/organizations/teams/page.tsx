@@ -99,7 +99,7 @@ const TeamListPage = () => {
         loadData={() => {
           dispatch(retrieveTeams())
         }}
-        isDataLoading={isLoading}
+        loading={isLoading}
       />
       {isInEditMode && <ModalCreateTeamForm />}
     </>

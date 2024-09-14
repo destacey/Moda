@@ -97,7 +97,7 @@ const ConnectionsPage = () => {
         gridControlMenuItems={controlItems}
         rowData={connectionsData}
         loadData={refresh}
-        isDataLoading={isLoading}
+        loading={isLoading}
       />
 
       {openCreateConnectionForm && (

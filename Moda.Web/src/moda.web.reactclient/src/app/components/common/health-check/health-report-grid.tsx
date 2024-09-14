@@ -77,7 +77,7 @@ const HealthReportGrid = (props: HealthReportGridProps) => {
         columnDefs={columnDefs}
         rowData={healthReport}
         loadData={refresh}
-        isDataLoading={isLoading}
+        loading={isLoading}
       />
     </>
   )

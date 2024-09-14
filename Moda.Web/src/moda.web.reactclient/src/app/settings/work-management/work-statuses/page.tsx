@@ -76,7 +76,7 @@ const WorkStatusesPage = () => {
         gridControlMenuItems={controlItems}
         rowData={workStatuses}
         loadData={refresh}
-        isDataLoading={isLoading}
+        loading={isLoading}
       />
     </>
   )

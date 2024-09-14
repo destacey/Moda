@@ -81,7 +81,7 @@ const WorkProcessesPage: React.FC = () => {
         gridControlMenuItems={controlItems}
         rowData={workProcessesData}
         loadData={refresh}
-        isDataLoading={isLoading}
+        loading={isLoading}
       />
     </>
   )

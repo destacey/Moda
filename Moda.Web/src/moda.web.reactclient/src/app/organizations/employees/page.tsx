@@ -83,7 +83,7 @@ const EmployeeListPage = () => {
         columnDefs={columnDefs}
         gridControlMenuItems={controlItems}
         rowData={employeesData}
-        isDataLoading={isLoading}
+        loading={isLoading}
         loadData={refresh}
       />
     </>

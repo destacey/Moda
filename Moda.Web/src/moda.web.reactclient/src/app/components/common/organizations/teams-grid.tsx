@@ -45,6 +45,7 @@ const TeamsGrid = ({ teamsQuery }: TeamsGridProps) => {
         columnDefs={columnDefs}
         rowData={teamsQuery.data}
         loadData={refresh}
+        loading={teamsQuery.isLoading}
       />
     </>
   )

@@ -37,7 +37,7 @@ const WorkspacesGrid = (props: WorkspacesGridProps) => {
         columnDefs={columnDefs}
         rowData={props.workspaces}
         loadData={refresh}
-        isDataLoading={props.isLoading}
+        loading={props.isLoading}
         toolbarActions={props.viewSelector}
       />
     </>

@@ -190,6 +190,7 @@ const RisksGrid = ({
         height={gridHeight}
         columnDefs={columnDefs}
         rowData={risksQuery.data}
+        loading={risksQuery.isLoading}
         loadData={refresh}
         actions={showActions && actions()}
         gridControlMenuItems={controlItems}
