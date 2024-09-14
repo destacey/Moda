@@ -22,6 +22,7 @@ import {
 } from '../../components/common/moda-grid-cell-renderers'
 import { TeamListItem } from '../types'
 import { ColDef } from 'ag-grid-community'
+import { ControlItemSwitch } from '../../components/common/control-items-menu'
 
 const TeamListPage = () => {
   useDocumentTitle('Teams')
@@ -76,16 +77,14 @@ const TeamListPage = () => {
   const controlItems: ItemType[] = [
     {
       label: (
-        <Space>
-          <Switch
-            size="small"
-            checked={includeDisabled}
-            onChange={onIncludeDisabledChange}
-          />
-          Include Disabled
-        </Space>
+        <ControlItemSwitch
+          label="Include Disabled"
+          checked={includeDisabled}
+          onChange={onIncludeDisabledChange}
+        />
       ),
-      key: '0',
+      key: 'include-disabled',
+      onClick: () => onIncludeDisabledChange(!includeDisabled),
     },
   ]
 

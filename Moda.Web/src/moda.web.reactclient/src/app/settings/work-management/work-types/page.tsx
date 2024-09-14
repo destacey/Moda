@@ -8,7 +8,7 @@ import {
 } from '@/src/app/hooks'
 import { WorkTypeDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
-import { Button, Space, Switch } from 'antd'
+import { Button } from 'antd'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { setIncludeInactive } from '../../../../store/features/work-management/work-type-slice'
 import { authorizePage } from '@/src/app/components/hoc'
@@ -17,6 +17,8 @@ import useAuth from '@/src/app/components/contexts/auth'
 import { EditOutlined } from '@ant-design/icons'
 import EditWorkTypeForm from './components/edit-work-type-form'
 import Link from 'next/link'
+import { ItemType } from 'antd/es/menu/interface'
+import { ControlItemSwitch } from '@/src/app/components/common/control-items-menu'
 
 const WorkTypesPage = () => {
   useDocumentTitle('Work Management - Work Types')
@@ -104,19 +106,17 @@ const WorkTypesPage = () => {
     refresh()
   }
 
-  const controlItems = [
+  const controlItems: ItemType[] = [
     {
       label: (
-        <Space>
-          <Switch
-            size="small"
-            checked={includeInactive}
-            onChange={onIncludeInactiveChange}
-          />
-          Include Inactive
-        </Space>
+        <ControlItemSwitch
+          label="Include Inactive"
+          checked={includeInactive}
+          onChange={onIncludeInactiveChange}
+        />
       ),
-      key: '0',
+      key: 'include-inactive',
+      onClick: () => onIncludeInactiveChange(!includeInactive),
     },
   ]
 

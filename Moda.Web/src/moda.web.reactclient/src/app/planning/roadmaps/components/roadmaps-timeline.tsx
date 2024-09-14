@@ -8,17 +8,7 @@ import {
 import 'vis-timeline/styles/vis-timeline-graph2d.css'
 import './roadmaps-timeline.css'
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
-import {
-  Button,
-  Card,
-  Divider,
-  Dropdown,
-  Flex,
-  Space,
-  Spin,
-  Switch,
-  Typography,
-} from 'antd'
+import { Card, Divider, Flex, Space, Spin, Switch, Typography } from 'antd'
 import { RoadmapDetailsDto, RoadmapListDto } from '@/src/services/moda-api'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -26,8 +16,8 @@ import useTheme from '@/src/app/components/contexts/theme'
 import dayjs from 'dayjs'
 import { ModaEmpty } from '@/src/app/components/common'
 import { ItemType } from 'antd/es/menu/interface'
-import { ControlOutlined } from '@ant-design/icons'
 import { useGetRoadmapChildrenQuery } from '@/src/store/features/planning/roadmaps-api'
+import { ControlItemsMenu } from '@/src/app/components/common/control-items-menu'
 
 const { Text } = Typography
 
@@ -269,35 +259,43 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     setShowCurrentTime(checked)
   }
 
-  const controlItems: ItemType[] = [
-    {
-      label: (
-        <>
-          <Space direction="vertical" size="small">
-            {levelTwoRoadmaps && levelTwoRoadmaps.length > 0 && (
-              <Space>
-                <Switch
-                  size="small"
-                  checked={drillDown}
-                  onChange={onDrillDownChange}
-                />
-                Drill Down
-              </Space>
-            )}
-            <Space>
-              <Switch
-                size="small"
-                checked={showCurrentTime}
-                onChange={onShowCurrentTimeChange}
-              />
-              Show Current Time
-            </Space>
+  const controlItems = (): ItemType[] => {
+    const items: ItemType[] = []
+
+    if (levelTwoRoadmaps && levelTwoRoadmaps.length > 0) {
+      items.push({
+        label: (
+          <Space>
+            <Switch
+              size="small"
+              checked={drillDown}
+              onChange={onDrillDownChange}
+            />
+            Drill Down
           </Space>
-        </>
+        ),
+        key: 'drill-down',
+        onClick: () => onDrillDownChange(!drillDown),
+      })
+    }
+
+    items.push({
+      label: (
+        <Space>
+          <Switch
+            size="small"
+            checked={showCurrentTime}
+            onChange={onShowCurrentTimeChange}
+          />
+          Show Current Time
+        </Space>
       ),
-      key: '0',
-    },
-  ]
+      key: 'show-current-time',
+      onClick: () => setShowCurrentTime(!showCurrentTime),
+    })
+
+    return items
+  }
 
   const TimelineChart = () => {
     if (!levelOneRoadmaps || levelOneRoadmaps.length === 0) {
@@ -307,9 +305,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     return (
       <>
         <Flex justify="end" align="center" style={{ paddingBottom: '16px' }}>
-          <Dropdown menu={{ items: controlItems }} trigger={['click']}>
-            <Button type="text" shape="circle" icon={<ControlOutlined />} />
-          </Dropdown>
+          <ControlItemsMenu items={controlItems()} />
           <Divider type="vertical" style={{ height: '30px' }} />
           {props.viewSelector}
         </Flex>

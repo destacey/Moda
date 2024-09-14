@@ -3,12 +3,11 @@
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-balham.css'
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import {
   Button,
   Col,
   Divider,
-  Dropdown,
   Input,
   Row,
   Space,
@@ -17,7 +16,6 @@ import {
   Typography,
 } from 'antd'
 import {
-  ControlOutlined,
   DownloadOutlined,
   ReloadOutlined,
   SearchOutlined,
@@ -25,6 +23,7 @@ import {
 import { ItemType } from 'antd/es/menu/interface'
 import useTheme from '../contexts/theme'
 import ModaEmpty from './moda-empty'
+import { ControlItemsMenu } from './control-items-menu'
 
 const { Text } = Typography
 
@@ -113,19 +112,7 @@ const ModaGrid = ({
               </Space>
               <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 {showGridControls && (
-                  // TODO: this tooltip is triggering "findDOMNode is deprecated in StrictMode" warnings
-                  // <Tooltip title="Grid Controls">
-                  <Dropdown
-                    menu={{ items: gridControlMenuItems }}
-                    trigger={['click']}
-                  >
-                    <Button
-                      type="text"
-                      shape="circle"
-                      icon={<ControlOutlined />}
-                    />
-                  </Dropdown>
-                  // </Tooltip>
+                  <ControlItemsMenu items={gridControlMenuItems} />
                 )}
                 {loadData && (
                   <Tooltip title="Refresh Grid">
