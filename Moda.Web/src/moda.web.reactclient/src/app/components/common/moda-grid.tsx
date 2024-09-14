@@ -36,8 +36,7 @@ interface ModaGridProps extends AgGridReactProps {
   actions?: React.ReactNode | null
   gridControlMenuItems?: ItemType[]
   toolbarActions?: React.ReactNode | null
-  loadData?: () => Promise<void> | void
-  isDataLoading?: boolean
+  loadData?: () => Promise<void> | (() => void)
 }
 
 const modaDefaultColDef = {
@@ -58,7 +57,6 @@ const ModaGrid = ({
   defaultColDef,
   rowData,
   loadData,
-  isDataLoading,
   ...props
 }: ModaGridProps) => {
   const { agGridTheme } = useTheme()
@@ -72,7 +70,7 @@ const ModaGrid = ({
   const rowCount = rowData?.length ?? 0
 
   const onGridReady = () => {
-    if (!isDataLoading && rowCount === 0 && loadData) {
+    if (!props.loading && rowCount === 0 && loadData) {
       loadData()
     }
   }
@@ -135,7 +133,7 @@ const ModaGrid = ({
                       type="text"
                       shape="circle"
                       icon={<ReloadOutlined />}
-                      onClick={() => loadData?.()}
+                      onClick={loadData}
                     />
                   </Tooltip>
                 )}
@@ -167,11 +165,12 @@ const ModaGrid = ({
             rowData={rowData}
             onModelUpdated={onModelUpdated}
             multiSortKey="ctrl"
-            loading={isDataLoading}
+            loading={props.loading}
             loadingOverlayComponent={() => <Spin size="large" />}
             noRowsOverlayComponent={() => (
               <ModaEmpty message="No records found." />
             )}
+            suppressCopyRowsToClipboard={true}
             {...props}
           ></AgGridReact>
         </div>

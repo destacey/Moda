@@ -21,7 +21,7 @@ const PlanningIntervalListPage = () => {
   const [openCreatePlanningIntervalForm, setOpenCreatePlanningIntervalForm] =
     useState<boolean>(false)
 
-  const { data, refetch } = useGetPlanningIntervals()
+  const { data, isLoading, refetch } = useGetPlanningIntervals()
 
   const { hasClaim } = useAuth()
   const canCreatePlanningInterval = hasClaim(
@@ -52,7 +52,8 @@ const PlanningIntervalListPage = () => {
   )
 
   const refresh = useCallback(async () => {
-    refetch
+    // TODO: this is not getting called when grid refresh button is clicked
+    refetch()
   }, [refetch])
 
   const onCreatePlanningIntervalFormClosed = (wasCreated: boolean) => {
@@ -81,7 +82,12 @@ const PlanningIntervalListPage = () => {
         title="Planning Intervals"
         actions={showActions && actions()}
       />
-      <ModaGrid columnDefs={columnDefs} rowData={data} loadData={refresh} />
+      <ModaGrid
+        columnDefs={columnDefs}
+        rowData={data}
+        loading={isLoading}
+        loadData={refresh}
+      />
       {openCreatePlanningIntervalForm && (
         <CreatePlanningIntervalForm
           showForm={openCreatePlanningIntervalForm}

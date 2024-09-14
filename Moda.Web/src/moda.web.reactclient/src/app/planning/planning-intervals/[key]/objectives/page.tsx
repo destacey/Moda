@@ -44,14 +44,17 @@ const PlanningIntervalObjectivesPage = ({ params }) => {
     refetch: refetchPlanningInterval,
   } = useGetPlanningIntervalByKey(params.key)
 
-  const { data: objectivesData, refetch: refectObjectives } =
-    useGetPlanningIntervalObjectivesQuery(
-      {
-        planningIntervalId: planningIntervalData?.id,
-        teamId: null,
-      },
-      { skip: !planningIntervalData?.id },
-    )
+  const {
+    data: objectivesData,
+    isLoading: isLoadingObjectives,
+    refetch: refectObjectives,
+  } = useGetPlanningIntervalObjectivesQuery(
+    {
+      planningIntervalId: planningIntervalData?.id,
+      teamId: null,
+    },
+    { skip: !planningIntervalData?.id },
+  )
 
   const calendarQuery = useGetPlanningIntervalCalendar(planningIntervalData?.id)
 
@@ -112,6 +115,7 @@ const PlanningIntervalObjectivesPage = ({ params }) => {
       {currentView === 'List' && (
         <PlanningIntervalObjectivesGrid
           objectivesData={objectivesData}
+          isLoading={isLoadingObjectives}
           refreshObjectives={refectObjectives}
           planningIntervalId={planningIntervalData?.id}
           hidePlanningIntervalColumn={true}
