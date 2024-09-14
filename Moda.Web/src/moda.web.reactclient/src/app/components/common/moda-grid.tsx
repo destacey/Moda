@@ -36,7 +36,7 @@ interface ModaGridProps extends AgGridReactProps {
   actions?: React.ReactNode | null
   gridControlMenuItems?: ItemType[]
   toolbarActions?: React.ReactNode | null
-  loadData?: () => Promise<void> | (() => void)
+  loadData?: () => Promise<void> | void
 }
 
 const modaDefaultColDef = {
