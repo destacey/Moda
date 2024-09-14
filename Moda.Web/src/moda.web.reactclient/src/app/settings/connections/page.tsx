@@ -12,6 +12,7 @@ import { ConnectionListDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import { ItemType } from 'antd/es/menu/interface'
 import { useGetAzdoConnectionsQuery } from '@/src/store/features/app-integration/azdo-integration-api'
+import { ControlItemSwitch } from '../../components/common/control-items-menu'
 
 const ConnectionLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/settings/connections/${data.id}`}>{value}</Link>
@@ -68,19 +69,17 @@ const ConnectionsPage = () => {
     setIncludeDisabled(checked)
   }
 
-  const controlItems = [
+  const controlItems: ItemType[] = [
     {
       label: (
-        <Space>
-          <Switch
-            size="small"
-            checked={includeDisabled}
-            onChange={onIncludeDisabledChange}
-          />
-          Include Disabled
-        </Space>
+        <ControlItemSwitch
+          label="Include Disabled"
+          checked={includeDisabled}
+          onChange={onIncludeDisabledChange}
+        />
       ),
-      key: '0',
+      key: 'include-disabled',
+      onClick: () => onIncludeDisabledChange(!includeDisabled),
     },
   ]
 

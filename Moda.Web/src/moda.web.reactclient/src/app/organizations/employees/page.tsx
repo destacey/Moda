@@ -4,10 +4,10 @@ import PageTitle from '@/src/app/components/common/page-title'
 import ModaGrid from '../../components/common/moda-grid'
 import { useCallback, useMemo, useState } from 'react'
 import { ItemType } from 'antd/es/menu/interface'
-import { Space, Switch } from 'antd'
 import Link from 'next/link'
 import { useDocumentTitle } from '../../hooks/use-document-title'
 import { useGetEmployees } from '@/src/services/queries/organization-queries'
+import { ControlItemSwitch } from '../../components/common/control-items-menu'
 
 const EmployeeLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/organizations/employees/${data.key}`}>{value}</Link>
@@ -63,16 +63,14 @@ const EmployeeListPage = () => {
   const controlItems: ItemType[] = [
     {
       label: (
-        <Space>
-          <Switch
-            size="small"
-            checked={includeInactive}
-            onChange={onIncludeInactiveChange}
-          />
-          Include Inactive
-        </Space>
+        <ControlItemSwitch
+          label="Include Inactive"
+          checked={includeInactive}
+          onChange={onIncludeInactiveChange}
+        />
       ),
-      key: '0',
+      key: 'include-inactive',
+      onClick: () => onIncludeInactiveChange(!includeInactive),
     },
   ]
 

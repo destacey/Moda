@@ -8,11 +8,12 @@ import {
 } from '@/src/app/hooks'
 import { WorkStatusDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
-import { Space, Switch } from 'antd'
 import { useCallback, useEffect, useMemo } from 'react'
 import { setIncludeInactive } from '../../../../store/features/work-management/work-status-slice'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useGetWorkStatusesQuery } from '@/src/store/features/work-management/work-status-api'
+import { ControlItemSwitch } from '@/src/app/components/common/control-items-menu'
+import { ItemType } from 'antd/es/menu/interface'
 
 const WorkStatusesPage = () => {
   useDocumentTitle('Work Management - Work Statuses')
@@ -50,19 +51,17 @@ const WorkStatusesPage = () => {
     refresh()
   }
 
-  const controlItems = [
+  const controlItems: ItemType[] = [
     {
       label: (
-        <Space>
-          <Switch
-            size="small"
-            checked={includeInactive}
-            onChange={onIncludeInactiveChange}
-          />
-          Include Inactive
-        </Space>
+        <ControlItemSwitch
+          label="Include Inactive"
+          checked={includeInactive}
+          onChange={onIncludeInactiveChange}
+        />
       ),
-      key: '0',
+      key: 'include-inactive',
+      onClick: () => onIncludeInactiveChange(!includeInactive),
     },
   ]
 

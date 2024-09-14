@@ -1,6 +1,7 @@
 'use client'
 
 import { ModaGrid, PageTitle } from '@/src/app/components/common'
+import { ControlItemSwitch } from '@/src/app/components/common/control-items-menu'
 import { authorizePage } from '@/src/app/components/hoc'
 import {
   useAppDispatch,
@@ -11,7 +12,7 @@ import { WorkProcessListDto } from '@/src/services/moda-api'
 import { useGetWorkProcessesQuery } from '@/src/store/features/work-management/work-process-api'
 import { setIncludeInactive } from '@/src/store/features/work-management/work-process-slice'
 import { ColDef } from 'ag-grid-community'
-import { Space, Switch } from 'antd'
+import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
@@ -55,19 +56,17 @@ const WorkProcessesPage: React.FC = () => {
     dispatch(setIncludeInactive(checked))
   }
 
-  const controlItems = [
+  const controlItems: ItemType[] = [
     {
       label: (
-        <Space>
-          <Switch
-            size="small"
-            checked={includeInactive}
-            onChange={onIncludeInactiveChange}
-          />
-          Include Disabled
-        </Space>
+        <ControlItemSwitch
+          label="Include Disabled"
+          checked={includeInactive}
+          onChange={onIncludeInactiveChange}
+        />
       ),
-      key: '0',
+      key: 'include-disabled',
+      onClick: () => onIncludeInactiveChange(!includeInactive),
     },
   ]
 

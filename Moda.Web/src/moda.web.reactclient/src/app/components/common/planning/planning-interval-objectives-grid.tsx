@@ -21,6 +21,7 @@ import {
   NestedPlanningIntervalLinkCellRenderer,
 } from '../moda-grid-cell-renderers'
 import { ColDef } from 'ag-grid-community'
+import { ControlItemSwitch } from '../control-items-menu'
 
 export interface PlanningIntervalObjectivesGridProps {
   objectivesData: PlanningIntervalObjectiveListDto[]
@@ -240,33 +241,36 @@ const PlanningIntervalObjectivesGrid = ({
     setHideTeam(checked)
   }
 
-  const controlItems: ItemType[] = [
-    {
-      label: (
-        <>
-          <Space direction="vertical" size="small">
-            <Space>
-              <Switch
-                size="small"
-                checked={hidePlanningInterval}
-                onChange={onHidePlanningIntervalChange}
-              />
-              Hide PI
-            </Space>
-            <Space>
-              <Switch
-                size="small"
-                checked={hideTeam}
-                onChange={onHideTeamChange}
-              />
-              Hide Team
-            </Space>
-          </Space>
-        </>
-      ),
-      key: '0',
-    },
-  ]
+  const controlItems = (): ItemType[] => {
+    const items: ItemType[] = []
+
+    items.push(
+      {
+        label: (
+          <ControlItemSwitch
+            label="Hide PI"
+            checked={hidePlanningInterval}
+            onChange={onHidePlanningIntervalChange}
+          />
+        ),
+        key: 'hide-planning-interval',
+        onClick: () => onHidePlanningIntervalChange(!hidePlanningInterval),
+      },
+      {
+        label: (
+          <ControlItemSwitch
+            label="Hide Team"
+            checked={hideTeam}
+            onChange={onHideTeamChange}
+          />
+        ),
+        key: 'hide-team',
+        onClick: () => onHideTeamChange(!hideTeam),
+      },
+    )
+
+    return items
+  }
 
   const onEditObjectiveFormClosed = (wasSaved: boolean) => {
     setOpenUpdateObjectiveForm(false)
@@ -293,7 +297,7 @@ const PlanningIntervalObjectivesGrid = ({
         rowData={objectivesData}
         loading={isLoading}
         loadData={refresh}
-        gridControlMenuItems={controlItems}
+        gridControlMenuItems={controlItems()}
         toolbarActions={viewSelector}
       />
       {openUpdateObjectiveForm && (

@@ -12,6 +12,7 @@ import EditRiskForm from './edit-risk-form'
 import { UseQueryResult } from 'react-query'
 import { NestedTeamNameLinkCellRenderer } from '../moda-grid-cell-renderers'
 import { ColDef } from 'ag-grid-community'
+import { ControlItemSwitch } from '../control-items-menu'
 
 export interface RisksGridProps {
   risksQuery: UseQueryResult<RiskListDto[], unknown>
@@ -103,28 +104,25 @@ const RisksGrid = ({
   const controlItems: ItemType[] = [
     {
       label: (
-        <>
-          <Space direction="vertical" size="small">
-            <Space>
-              <Switch
-                size="small"
-                checked={includeClosed}
-                onChange={onIncludeClosedChange}
-              />
-              Include Closed
-            </Space>
-            <Space>
-              <Switch
-                size="small"
-                checked={hideTeam}
-                onChange={onHideTeamChange}
-              />
-              Hide Team
-            </Space>
-          </Space>
-        </>
+        <ControlItemSwitch
+          label="Include Closed"
+          checked={includeClosed}
+          onChange={onIncludeClosedChange}
+        />
       ),
-      key: '0',
+      key: 'include-closed',
+      onClick: () => onIncludeClosedChange(!includeClosed),
+    },
+    {
+      label: (
+        <ControlItemSwitch
+          label="Hide Team"
+          checked={hideTeam}
+          onChange={onHideTeamChange}
+        />
+      ),
+      key: 'hide-team',
+      onClick: () => onHideTeamChange(!hideTeam),
     },
   ]
 
