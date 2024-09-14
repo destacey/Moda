@@ -12,10 +12,14 @@ const config: Config = {
   testEnvironment: 'jsdom',
   collectCoverage: true,
   moduleNameMapper: {
-    'react-markdown': '<rootDir>/node_modules/react-markdown/lib/index.js',
+    'react-markdown': './node_modules/react-markdown/lib/index.js',
   },
   // Add more setup options before each test is run
-  // setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  setupFilesAfterEnv: ['./src/jest.setup.ts'],
+  transform: {
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+  },
+  testPathIgnorePatterns: ['./.next/', './node_modules/'],
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
