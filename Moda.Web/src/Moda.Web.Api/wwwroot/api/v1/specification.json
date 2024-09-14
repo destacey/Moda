@@ -10293,6 +10293,12 @@
           },
           "visibility": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "roadmapManagers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
           }
         }
       },
@@ -10487,6 +10493,12 @@
           },
           "visibility": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "roadmapManagers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
           },
           "order": {
             "type": "integer",

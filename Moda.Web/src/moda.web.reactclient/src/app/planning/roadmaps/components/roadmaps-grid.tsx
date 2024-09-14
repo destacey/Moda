@@ -54,6 +54,16 @@ const RoadmapsGrid: React.FC<RoadmapsGridProps> = (
         valueGetter: (params) => dayjs(params.data.end).format('M/D/YYYY'),
       },
       {
+        field: 'roadmapManagers',
+        // conver the list to a string of names
+        valueGetter: (params) =>
+          params.data.roadmapManagers
+            .slice()
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((m) => m.name)
+            .join(', '),
+      },
+      {
         field: 'visibility.name',
         headerName: 'Visibility',
         width: 125,

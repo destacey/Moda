@@ -21,9 +21,8 @@ import { Descriptions, MenuProps, message } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import EditRoadmapForm from '../components/edit-roadmap-form'
 import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
-import DeleteRoadmapForm from '../components/delete-roadmap-form'
-import CreateRoadmapForm from '../components/create-roadmap-form'
 import RoadmapViewManager from './roadmap-view-manager'
+import { CreateRoadmapForm, DeleteRoadmapForm } from '../components'
 
 const { Item } = Descriptions
 

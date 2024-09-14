@@ -10565,6 +10565,7 @@ export interface RoadmapListDto {
     start?: Date;
     end?: Date;
     visibility?: SimpleNavigationDto;
+    roadmapManagers?: EmployeeNavigationDto[];
 }
 
 export interface RoadmapDetailsDto {
@@ -10621,6 +10622,7 @@ export interface RoadmapChildrenDto {
     start?: Date;
     end?: Date;
     visibility?: SimpleNavigationDto;
+    roadmapManagers?: EmployeeNavigationDto[];
     order?: number;
     parent?: NavigationDto;
 }

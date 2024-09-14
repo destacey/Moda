@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Application.Dtos;
+using Moda.Common.Application.Employees.Dtos;
 
 namespace Moda.Planning.Application.Roadmaps.Dtos;
 public sealed record RoadmapChildrenDto : IMapFrom<Roadmap>
@@ -32,6 +33,11 @@ public sealed record RoadmapChildrenDto : IMapFrom<Roadmap>
     public required SimpleNavigationDto Visibility { get; set; }
 
     /// <summary>
+    /// The managers of the Roadmap.
+    /// </summary>
+    public required List<EmployeeNavigationDto> RoadmapManagers { get; set; } = [];
+
+    /// <summary>
     /// The order of the Roadmap within its parent.
     /// </summary>
     public int Order { get; set; }
@@ -47,6 +53,7 @@ public sealed record RoadmapChildrenDto : IMapFrom<Roadmap>
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End)
             .Map(dest => dest.Visibility, src => SimpleNavigationDto.FromEnum(src.Visibility))
+            .Map(dest => dest.RoadmapManagers, src => src.Managers.Select(x => EmployeeNavigationDto.From(x.Manager!)).ToList())
             .Map(dest => dest.Parent, src => NavigationDto.Create(src.Parent!.Id, src.Parent.Key, src.Parent.Name));
     }
 }

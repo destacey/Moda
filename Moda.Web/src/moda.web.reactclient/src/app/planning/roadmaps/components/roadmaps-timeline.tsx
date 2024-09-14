@@ -21,7 +21,7 @@ import { ControlItemsMenu } from '@/src/app/components/common/control-items-menu
 
 const { Text } = Typography
 
-interface RoadmapsTimelineProps {
+export interface RoadmapsTimelineProps {
   roadmap: RoadmapDetailsDto
   roadmapChildren: RoadmapListDto[]
   isChildrenLoading: boolean

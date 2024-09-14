@@ -5,7 +5,7 @@ import { Modal } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
-interface DeleteRoadmapFormProps {
+export interface DeleteRoadmapFormProps {
   roadmap: RoadmapDetailsDto
   showForm: boolean
   onFormComplete: () => void
