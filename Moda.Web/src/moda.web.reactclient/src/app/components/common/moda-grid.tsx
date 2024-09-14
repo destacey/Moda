@@ -161,7 +161,7 @@ const ModaGrid = ({
             ref={gridRef}
             defaultColDef={defaultColDef ?? modaDefaultColDef}
             onGridReady={onGridReady}
-            animateRows={true}
+            animateRows={false} // annimation has to be off for cell text selection to work correctly
             rowData={rowData}
             onModelUpdated={onModelUpdated}
             multiSortKey="ctrl"
@@ -170,7 +170,8 @@ const ModaGrid = ({
             noRowsOverlayComponent={() => (
               <ModaEmpty message="No records found." />
             )}
-            suppressCopyRowsToClipboard={true}
+            enableCellTextSelection={true}
+            ensureDomOrder={true}
             {...props}
           ></AgGridReact>
         </div>

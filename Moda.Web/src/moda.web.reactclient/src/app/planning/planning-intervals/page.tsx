@@ -52,7 +52,6 @@ const PlanningIntervalListPage = () => {
   )
 
   const refresh = useCallback(async () => {
-    // TODO: this is not getting called when grid refresh button is clicked
     refetch()
   }, [refetch])
 
