@@ -55,7 +55,6 @@ const RoadmapsGrid: React.FC<RoadmapsGridProps> = (
       },
       {
         field: 'roadmapManagers',
-        // conver the list to a string of names
         valueGetter: (params) =>
           params.data.roadmapManagers
             .slice()

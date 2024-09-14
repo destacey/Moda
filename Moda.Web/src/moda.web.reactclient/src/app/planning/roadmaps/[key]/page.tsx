@@ -97,7 +97,7 @@ const RoadmapDetailsPage = ({ params }) => {
 
   useEffect(() => {
     if (!roadmapData) return
-    const managers = roadmapData.managers
+    const managers = roadmapData.roadmapManagers
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((m) => m.name)

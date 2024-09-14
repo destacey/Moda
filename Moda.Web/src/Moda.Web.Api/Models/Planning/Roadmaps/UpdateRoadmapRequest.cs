@@ -31,13 +31,18 @@ public sealed record UpdateRoadmapRequest
     public LocalDate End { get; set; }
 
     /// <summary>
+    /// The managers of the Roadmap.
+    /// </summary>
+    public required List<Guid> RoadmapManagerIds { get; set; }
+
+    /// <summary>
     /// The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap.
     /// </summary>
     public int VisibilityId { get; set; }
 
     public UpdateRoadmapCommand ToUpdateRoadmapCommand()
     {
-        return new UpdateRoadmapCommand(Id, Name, Description, new LocalDateRange(Start, End), (Visibility)VisibilityId);
+        return new UpdateRoadmapCommand(Id, Name, Description, new LocalDateRange(Start, End), RoadmapManagerIds, (Visibility)VisibilityId);
     }
 }
 
@@ -68,5 +73,11 @@ public sealed class UpdateRoadmapRequestValidator : CustomValidator<UpdateRoadma
         RuleFor(t => (Visibility)t.VisibilityId)
             .IsInEnum()
             .WithMessage("A valid visibility must be selected.");
+
+        RuleFor(t => t.RoadmapManagerIds)
+            .NotEmpty();
+
+        RuleForEach(t => t.RoadmapManagerIds)
+            .NotEmpty();
     }
 }

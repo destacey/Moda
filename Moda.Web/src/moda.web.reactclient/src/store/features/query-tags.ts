@@ -6,6 +6,7 @@ export enum QueryTags {
   AzdoConnectionTeams = 'AppIntegration.AzdoConnectionTeams',
   Connections = 'AppIntegration.Connections',
   // ORGANIZATIONS
+  EmployeeOptions = 'Organizations.EmployeeOptions',
   Team = 'Organizations.Team',
   TeamBacklog = 'Organizations.TeamBacklog',
   // PLANNING

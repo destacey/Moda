@@ -188,6 +188,42 @@
         ]
       }
     },
+    "/api/user-management/profiles/internal-employee-id": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Get internal employee id of currently logged in user.",
+        "operationId": "Profile_GetInternalEmployeeId",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/user-management/profiles/logs": {
       "get": {
         "tags": [
@@ -10334,7 +10370,7 @@
           "visibility": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           },
-          "managers": {
+          "roadmapManagers": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/EmployeeNavigationDto"
@@ -10422,7 +10458,8 @@
           "id",
           "name",
           "start",
-          "end"
+          "end",
+          "roadmapManagerIds"
         ],
         "properties": {
           "id": {
@@ -10458,6 +10495,18 @@
             "description": "The Roadmap end date.",
             "format": "date",
             "nullable": false
+          },
+          "roadmapManagerIds": {
+            "type": "array",
+            "description": "The managers of the Roadmap.",
+            "minLength": 1,
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
           },
           "visibilityId": {
             "type": "integer",

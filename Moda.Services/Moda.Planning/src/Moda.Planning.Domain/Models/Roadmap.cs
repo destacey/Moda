@@ -110,7 +110,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <param name="visibility"></param>
     /// <param name="currentUserEmployeeId"
     /// <returns></returns>
-    public Result Update(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid currentUserEmployeeId)
+    public Result Update(string name, string? description, LocalDateRange dateRange, IEnumerable<Guid> managerIds, Visibility visibility, Guid currentUserEmployeeId)
     {
         var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
@@ -118,10 +118,40 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
             return isManagerResult;
         }
 
+        if (!managerIds.Contains(currentUserEmployeeId))
+        {
+            return Result.Failure("The current user must be a manager of the Roadmap in order to update it.");
+        }
+
+        var syncManagersResult = SyncManagers(managerIds, currentUserEmployeeId);
+        if (syncManagersResult.IsFailure)
+        {
+            return syncManagersResult;
+        }
+
         Name = name;
         Description = description;
         DateRange = dateRange;
         Visibility = visibility;
+
+        return Result.Success();
+    }
+
+    private Result SyncManagers(IEnumerable<Guid> managerIds, Guid currentUserEmployeeId)
+    {
+        // TODO: This is a temporary solution to sync managers. 
+        var managerIdsToAdd = managerIds.Where(x => !_managers.Any(y => y.ManagerId == x)).ToArray();
+        var managerIdsToRemove = _managers.Where(x => !managerIds.Contains(x.ManagerId)).Select(x => x.ManagerId).ToArray();
+
+        foreach (var managerId in managerIdsToAdd)
+        {
+            AddManager(managerId, currentUserEmployeeId);
+        }
+
+        foreach (var managerId in managerIdsToRemove)
+        {
+            RemoveManager(managerId, currentUserEmployeeId);
+        }
 
         return Result.Success();
     }

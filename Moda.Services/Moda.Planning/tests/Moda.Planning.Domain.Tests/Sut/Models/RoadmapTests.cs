@@ -69,7 +69,7 @@ public class RoadmapTests
         var newVisibility = Visibility.Private;
 
         // Act
-        var result = roadmap.Update(newName, newDescription, newDateRange, newVisibility, managerId);
+        var result = roadmap.Update(newName, newDescription, newDateRange,[managerId], newVisibility, managerId);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -88,7 +88,7 @@ public class RoadmapTests
         var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
 
         // Act
-        var result = roadmap.Update("Updated Name", "Updated Description", new LocalDateRange(_dateTimeProvider.Today.PlusDays(1), _dateTimeProvider.Today.PlusDays(11)), Visibility.Private, Guid.NewGuid());
+        var result = roadmap.Update("Updated Name", "Updated Description", new LocalDateRange(_dateTimeProvider.Today.PlusDays(1), _dateTimeProvider.Today.PlusDays(11)), [managerId], Visibility.Private, Guid.NewGuid());
 
         // Assert
         result.IsFailure.Should().BeTrue();
