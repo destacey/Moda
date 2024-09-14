@@ -89,18 +89,6 @@ const ModaGrid = ({
     gridRef.current?.api.exportDataAsCsv()
   }, [])
 
-  useEffect(() => {
-    if (!gridRef.current?.api) return
-
-    if (isDataLoading) {
-      gridRef.current?.api.showLoadingOverlay()
-    } else if (rowData && rowCount === 0) {
-      gridRef.current?.api.showNoRowsOverlay()
-    } else {
-      gridRef.current?.api.hideOverlay()
-    }
-  }, [isDataLoading, rowCount, rowData])
-
   return (
     <div style={{ width: width }}>
       <Space direction="vertical" style={{ width: '100%' }}>
@@ -179,6 +167,7 @@ const ModaGrid = ({
             rowData={rowData}
             onModelUpdated={onModelUpdated}
             multiSortKey="ctrl"
+            loading={isDataLoading}
             loadingOverlayComponent={() => <Spin size="large" />}
             noRowsOverlayComponent={() => (
               <ModaEmpty message="No records found." />
