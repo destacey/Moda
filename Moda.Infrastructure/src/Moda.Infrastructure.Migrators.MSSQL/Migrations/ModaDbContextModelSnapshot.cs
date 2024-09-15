@@ -2541,7 +2541,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
                 {
-                    b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration", "Configuration", b1 =>
+                    b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.Configuration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration", "Configuration", b1 =>
                         {
                             b1.Property<Guid>("AzureDevOpsBoardsConnectionId")
                                 .HasColumnType("uniqueidentifier");
@@ -2563,7 +2563,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("AzureDevOpsBoardsConnectionId");
 
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkProcess", "WorkProcesses", b2 =>
+                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.Configuration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration.WorkProcesses#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkProcess", "WorkProcesses", b2 =>
                                 {
                                     b2.Property<Guid>("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
                                         .HasColumnType("uniqueidentifier");
@@ -2589,7 +2589,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                     b2.WithOwner()
                                         .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
 
-                                    b2.OwnsOne("Moda.Common.Domain.Models.IntegrationState<System.Guid>", "IntegrationState", b3 =>
+                                    b2.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.Configuration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration.WorkProcesses#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkProcess.IntegrationState#Moda.Common.Domain.Models.IntegrationState<System.Guid>", "IntegrationState", b3 =>
                                         {
                                             b3.Property<Guid>("AzureDevOpsBoardsWorkProcessAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
                                                 .HasColumnType("uniqueidentifier");
@@ -2614,7 +2614,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                     b2.Navigation("IntegrationState");
                                 });
 
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace", "Workspaces", b2 =>
+                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.Configuration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration.Workspaces#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace", "Workspaces", b2 =>
                                 {
                                     b2.Property<Guid>("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
                                         .HasColumnType("uniqueidentifier");
@@ -2643,7 +2643,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                                     b2.WithOwner()
                                         .HasForeignKey("AzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId");
 
-                                    b2.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace.IntegrationState#IntegrationState", "IntegrationState", b3 =>
+                                    b2.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.Configuration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnectionConfiguration.Workspaces#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace.IntegrationState#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspace.IntegrationState#IntegrationState", "IntegrationState", b3 =>
                                         {
                                             b3.Property<Guid>("AzureDevOpsBoardsWorkspaceAzureDevOpsBoardsConnectionConfigurationAzureDevOpsBoardsConnectionId")
                                                 .HasColumnType("uniqueidentifier");
@@ -2673,7 +2673,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                             b1.Navigation("Workspaces");
                         });
 
-                    b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsTeamConfiguration", "TeamConfiguration", b1 =>
+                    b.OwnsOne("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.TeamConfiguration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsTeamConfiguration", "TeamConfiguration", b1 =>
                         {
                             b1.Property<Guid>("AzureDevOpsBoardsConnectionId")
                                 .HasColumnType("uniqueidentifier");
@@ -2687,7 +2687,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("AzureDevOpsBoardsConnectionId");
 
-                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspaceTeam", "WorkspaceTeams", b2 =>
+                            b1.OwnsMany("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection.TeamConfiguration#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsTeamConfiguration.WorkspaceTeams#Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsWorkspaceTeam", "WorkspaceTeams", b2 =>
                                 {
                                     b2.Property<Guid>("AzureDevOpsBoardsTeamConfigurationAzureDevOpsBoardsConnectionId")
                                         .HasColumnType("uniqueidentifier");

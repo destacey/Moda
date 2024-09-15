@@ -41,12 +41,11 @@ public sealed class UpdateRoadmapCommandValidator : AbstractValidator<UpdateRoad
         var employeeId = Guard.Against.NullOrEmpty(_currentUser.GetEmployeeId());
         return  roadmapManagerIds.Contains(employeeId);
     }
-
 }
 
 internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<UpdateRoadmapCommandHandler> logger) : ICommandHandler<UpdateRoadmapCommand>
 {
-    private const string AppRequestName = nameof(UpdateRoadmapChildrenOrderCommand);
+    private const string AppRequestName = nameof(UpdateRoadmapCommand);
 
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
@@ -57,7 +56,7 @@ internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbC
         try
         {
             var roadmap = await _planningDbContext.Roadmaps
-                .Include(x => x.Managers)
+                .Include(x => x.RoadmapManagers)
                 .FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
 
             if (roadmap is null)

@@ -12,16 +12,16 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     private string? _description;
     private LocalDateRange _dateRange = default!;
 
-    private readonly List<RoadmapManager> _managers = [];
+    private readonly List<RoadmapManager> _roadmapManagers = [];
     private readonly List<Roadmap> _children = [];
 
     private Roadmap() { }
 
-    private Roadmap(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers, Guid? parentId, int? orderId)
+    private Roadmap(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds, Guid? parentId, int? orderId)
     {
         _objectConstruction = true;
 
-        Guard.Against.NullOrEmpty(managers, nameof(managers));
+        Guard.Against.NullOrEmpty(roadmapManagerIds, nameof(roadmapManagerIds));
 
         Name = name;
         Description = description;
@@ -31,7 +31,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         ParentId = parentId;
         Order = orderId;
 
-        foreach (var managerId in managers)
+        foreach (var managerId in roadmapManagerIds)
         {
             AddManager(managerId, managerId);
         }
@@ -99,7 +99,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <summary>
     /// The managers of the Roadmap. Managers have full control over the Roadmap.
     /// </summary>
-    public IReadOnlyList<RoadmapManager> Managers => _managers.AsReadOnly();
+    public IReadOnlyList<RoadmapManager> RoadmapManagers => _roadmapManagers.AsReadOnly();
 
     /// <summary>
     /// Updates the Roadmap.
@@ -110,7 +110,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <param name="visibility"></param>
     /// <param name="currentUserEmployeeId"
     /// <returns></returns>
-    public Result Update(string name, string? description, LocalDateRange dateRange, IEnumerable<Guid> managerIds, Visibility visibility, Guid currentUserEmployeeId)
+    public Result Update(string name, string? description, LocalDateRange dateRange, IEnumerable<Guid> roadmapManagerIds, Visibility visibility, Guid currentUserEmployeeId)
     {
         var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
@@ -118,12 +118,12 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
             return isManagerResult;
         }
 
-        if (!managerIds.Contains(currentUserEmployeeId))
+        if (!roadmapManagerIds.Contains(currentUserEmployeeId))
         {
-            return Result.Failure("The current user must be a manager of the Roadmap in order to update it.");
+            return Result.Failure("The current user must be a roadmap manager of the Roadmap in order to update it.");
         }
 
-        var syncManagersResult = SyncManagers(managerIds, currentUserEmployeeId);
+        var syncManagersResult = SyncManagers(roadmapManagerIds, currentUserEmployeeId);
         if (syncManagersResult.IsFailure)
         {
             return syncManagersResult;
@@ -137,11 +137,11 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         return Result.Success();
     }
 
-    private Result SyncManagers(IEnumerable<Guid> managerIds, Guid currentUserEmployeeId)
+    private Result SyncManagers(IEnumerable<Guid> roadmapManagerIds, Guid currentUserEmployeeId)
     {
         // TODO: This is a temporary solution to sync managers. 
-        var managerIdsToAdd = managerIds.Where(x => !_managers.Any(y => y.ManagerId == x)).ToArray();
-        var managerIdsToRemove = _managers.Where(x => !managerIds.Contains(x.ManagerId)).Select(x => x.ManagerId).ToArray();
+        var managerIdsToAdd = roadmapManagerIds.Where(x => !_roadmapManagers.Any(y => y.ManagerId == x)).ToArray();
+        var managerIdsToRemove = _roadmapManagers.Where(x => !roadmapManagerIds.Contains(x.ManagerId)).Select(x => x.ManagerId).ToArray();
 
         foreach (var managerId in managerIdsToAdd)
         {
@@ -159,9 +159,9 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <summary>
     /// Adds a manager to the Roadmap.
     /// </summary>
-    /// <param name="managerId"></param>
+    /// <param name="roadmapManagerId"></param>
     /// <returns></returns>
-    public Result AddManager(Guid managerId, Guid currentUserEmployeeId)
+    public Result AddManager(Guid roadmapManagerId, Guid currentUserEmployeeId)
     {
         // bypass manager check if no managers exist on initial creation
         if (!_objectConstruction)
@@ -173,21 +173,21 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
             }
         }
 
-        if (_managers.Any(x => x.ManagerId == managerId))
+        if (_roadmapManagers.Any(x => x.ManagerId == roadmapManagerId))
         {
             return Result.Failure("Roadmap manager already exists on this roadmap.");
         }
 
-        _managers.Add(new RoadmapManager(this, managerId));
+        _roadmapManagers.Add(new RoadmapManager(this, roadmapManagerId));
         return Result.Success();
     }
 
     /// <summary>
-    /// Removes a manager from the Roadmap.
+    /// Removes a roadmap manager from the Roadmap.
     /// </summary>
-    /// <param name="managerId"></param>
+    /// <param name="roadmapManagerId"></param>
     /// <returns></returns>
-    public Result RemoveManager(Guid managerId, Guid currentUserEmployeeId)
+    public Result RemoveManager(Guid roadmapManagerId, Guid currentUserEmployeeId)
     {
         var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
@@ -195,18 +195,18 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
             return isManagerResult;
         }
 
-        var manager = _managers.FirstOrDefault(x => x.ManagerId == managerId);
+        var manager = _roadmapManagers.FirstOrDefault(x => x.ManagerId == roadmapManagerId);
         if (manager is null)
         {
             return Result.Failure("Roadmap manager does not exist on this roadmap.");
         }
 
-        if (_managers.Count == 1)
+        if (_roadmapManagers.Count == 1)
         {
-            return Result.Failure("Roadmap must have at least one manager.");
+            return Result.Failure("Roadmap must have at least one roadmap manager.");
         }
 
-        _managers.Remove(manager);
+        _roadmapManagers.Remove(manager);
         return Result.Success();
     }
     
@@ -364,9 +364,9 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <returns></returns>
     private Result CanEmployeeManage(Guid employeeId)
     {
-        if (!_managers.Any(x => x.ManagerId == employeeId))
+        if (!_roadmapManagers.Any(x => x.ManagerId == employeeId))
         {
-            return Result.Failure("User is not a manager of this roadmap.");
+            return Result.Failure("User is not a roadmap manager of this roadmap.");
         }
 
         return Result.Success();
@@ -379,21 +379,21 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <param name="description"></param>
     /// <param name="dateRange"></param>
     /// <param name="visibility"></param>
-    /// <param name="managers"></param>
+    /// <param name="roadmapManagerIds"></param>
     /// <returns></returns>
-    public Result<Roadmap> CreateChild(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers, Guid currentUserEmployeeId)
+    public Result<Roadmap> CreateChild(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds, Guid currentUserEmployeeId)
     {
         try
         {
             var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
             if (isManagerResult.IsFailure)
             {
-                return Result.Failure<Roadmap>(isManagerResult.Error);
+                return Result.Failure<Roadmap>("User is not a roadmap manager of the parent roadmap.");
             }
 
             var order = _children.Count + 1;
 
-            var roadmap = new Roadmap(name, description, dateRange, visibility, managers, Id, order);
+            var roadmap = new Roadmap(name, description, dateRange, visibility, roadmapManagerIds, Id, order);
 
             _children.Add(roadmap);
 
@@ -406,44 +406,19 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     }
 
     /// <summary>
-    /// Creates a new Roadmap as a child of an existing Roadmap.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <param name="dateRange"></param>
-    /// <param name="visibility"></param>
-    /// <param name="managers"></param>
-    /// <param name="parentId"></param>
-    /// <param name="orderId"></param>
-    /// <returns></returns>
-    //public static Result<Roadmap> CreateChild(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers, Guid parentId, int orderId)
-    //{
-    //    try
-    //    {
-    //        var roadmap = new Roadmap(name, description, dateRange, visibility, managers, parentId, orderId);
-
-    //        return roadmap;
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return Result.Failure<Roadmap>(ex.Message);
-    //    }
-    //}
-
-    /// <summary>
     /// Creates a new Roadmap.
     /// </summary>
     /// <param name="name"></param>
     /// <param name="description"></param>
     /// <param name="dateRange"></param>
     /// <param name="visibility"></param>
-    /// <param name="managers"></param>
+    /// <param name="roadmapManagerIds"></param>
     /// <returns></returns>
-    public static Result<Roadmap> CreateRoot(string name, string? description, LocalDateRange dateRange, Visibility visibility, Guid[] managers)
+    public static Result<Roadmap> CreateRoot(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds)
     {
         try
         {
-            var roadmap = new Roadmap(name, description, dateRange, visibility, managers, null, null);
+            var roadmap = new Roadmap(name, description, dateRange, visibility, roadmapManagerIds, null, null);
 
             return roadmap;
         }

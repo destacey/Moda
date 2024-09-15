@@ -262,7 +262,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
                   if (!value.includes(currentUserInternalEmployeeId)) {
                     return Promise.reject(
                       new Error(
-                        'You must be a roadmap manager to update this roadmap',
+                        'You must also be a roadmap manager to update this roadmap',
                       ),
                     )
                   }
@@ -274,7 +274,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
             <Select
               mode="multiple"
               allowClear
-              placeholder="Select a roadmap manager"
+              placeholder="Select one or more roadmap managers"
               optionFilterProp="children"
               filterOption={(input, option) =>
                 (option?.label.toLowerCase() ?? '').includes(

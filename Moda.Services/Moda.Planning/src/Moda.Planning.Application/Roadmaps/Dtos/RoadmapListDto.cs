@@ -43,6 +43,6 @@ public sealed record RoadmapListDto : IMapFrom<Roadmap>
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End)
             .Map(dest => dest.Visibility, src => SimpleNavigationDto.FromEnum(src.Visibility))
-            .Map(dest => dest.RoadmapManagers, src => src.Managers.Select(x => EmployeeNavigationDto.From(x.Manager!)).ToList());
+            .Map(dest => dest.RoadmapManagers, src => src.RoadmapManagers.Select(x => EmployeeNavigationDto.From(x.Manager!)).ToList());
     }
 }

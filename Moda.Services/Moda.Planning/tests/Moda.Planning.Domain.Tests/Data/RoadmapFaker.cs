@@ -33,7 +33,7 @@ public static class RoadmapFakerExtensions
         if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
         if (dateRange is not null) { faker.RuleFor(x => x.DateRange, dateRange); }
         if (visibility.HasValue) { faker.RuleFor(x => x.Visibility, visibility); }
-        // TODO - Add managers
+        // TODO - Add roadmap managers
         if (parentId.HasValue) { faker.RuleFor(x => x.ParentId, parentId); }
         if (order.HasValue) { faker.RuleFor(x => x.Order, order); }
 
@@ -56,7 +56,7 @@ public static class RoadmapFakerExtensions
         var managers = new RoadmapManagerFaker(roadmapId).Generate(1);
 
         faker.RuleFor("_children", f => children.ToList());
-        faker.RuleFor("_managers", f => managers.ToList());
+        faker.RuleFor("_roadmapManagers", f => managers.ToList());
 
         return faker.WithData(id: roadmapId).Generate();
     }

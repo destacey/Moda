@@ -10652,6 +10652,8 @@ export interface CreateRoadmapRequest {
     start: Date;
     /** The Roadmap end date. */
     end: Date;
+    /** The managers of the Roadmap. */
+    roadmapManagerIds: string[];
     /** The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap. */
     visibilityId?: number;
     /** Informs the API to link the Roadmap to the Roadmap with the provided parentId after creation. */

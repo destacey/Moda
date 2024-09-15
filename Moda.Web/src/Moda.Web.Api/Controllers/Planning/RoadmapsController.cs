@@ -17,13 +17,11 @@ public class RoadmapsController : ControllerBase
 {
     private readonly ILogger<RoadmapsController> _logger;
     private readonly ISender _sender;
-    private readonly ICurrentUser _currentUser;
 
-    public RoadmapsController(ILogger<RoadmapsController> logger, ISender sender, ICurrentUser currentUser)
+    public RoadmapsController(ILogger<RoadmapsController> logger, ISender sender)
     {
         _logger = logger;
         _sender = sender;
-        _currentUser = currentUser;
     }
 
     [HttpGet]
@@ -75,13 +73,6 @@ public class RoadmapsController : ControllerBase
     {
         if (id != request.Id)
             return BadRequest();
-
-        //var currentUserEmployeeId = Guard.Against.NullOrEmpty(_currentUser.GetEmployeeId());
-        //if (!request.RoadmapManagerIds.Contains(currentUserEmployeeId))
-        //{
-        //    ModelState.AddModelError(nameof(request.RoadmapManagerIds), "The current user is not listed as a roadmap manager of the roadmap.");
-        //    return ValidationProblem();
-        //}
 
         var result = await _sender.Send(request.ToUpdateRoadmapCommand(), cancellationToken);
 

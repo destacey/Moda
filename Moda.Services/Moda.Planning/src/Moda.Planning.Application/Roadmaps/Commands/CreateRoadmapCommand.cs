@@ -3,12 +3,16 @@ using Moda.Common.Application.Models;
 using Moda.Common.Domain.Enums;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
-public sealed record CreateRoadmapCommand(string Name, string? Description, LocalDateRange DateRange, Visibility Visibility, Guid? ParentId) : ICommand<ObjectIdAndKey>;
+public sealed record CreateRoadmapCommand(string Name, string? Description, LocalDateRange DateRange, List<Guid> RoadmapManagerIds, Visibility Visibility, Guid? ParentId) : ICommand<ObjectIdAndKey>;
 
 public sealed class CreateRoadmapCommandValidator : AbstractValidator<CreateRoadmapCommand>
 {
-    public CreateRoadmapCommandValidator()
+    private readonly ICurrentUser _currentUser;
+
+    public CreateRoadmapCommandValidator(ICurrentUser currentUser)
     {
+        _currentUser = currentUser;
+
         RuleFor(x => x.Name)
             .NotEmpty()
             .MaximumLength(128);
@@ -19,6 +23,13 @@ public sealed class CreateRoadmapCommandValidator : AbstractValidator<CreateRoad
         RuleFor(x => x.DateRange)
             .NotNull();
 
+        RuleFor(x => x.RoadmapManagerIds)
+            .NotEmpty()
+            .Must(IncludeCurrentUser).WithMessage("The current user must be a manager of the Roadmap.");
+
+        RuleForEach(x => x.RoadmapManagerIds)
+            .NotEmpty();
+
         RuleFor(x => x.Visibility)
             .IsInEnum();
 
@@ -27,6 +38,12 @@ public sealed class CreateRoadmapCommandValidator : AbstractValidator<CreateRoad
             RuleFor(x => x.ParentId)
                 .NotEmpty();
         });
+    }
+
+    public bool IncludeCurrentUser(IEnumerable<Guid> roadmapManagerIds)
+    {
+        var employeeId = Guard.Against.NullOrEmpty(_currentUser.GetEmployeeId());
+        return roadmapManagerIds.Contains(employeeId);
     }
 }
 
@@ -59,7 +76,7 @@ internal sealed class CreateRoadmapCommandHandler(IPlanningDbContext planningDbC
     private async Task<Result<ObjectIdAndKey>> CreateChildRoadmap(CreateRoadmapCommand request, CancellationToken cancellationToken)
     {
         var parentRoadmap = await _planningDbContext.Roadmaps
-            .Include(r => r.Managers)
+            .Include(r => r.RoadmapManagers)
             .Include(r => r.Children)
             .FirstOrDefaultAsync(r => r.Id == request.ParentId, cancellationToken);
 
@@ -71,7 +88,7 @@ internal sealed class CreateRoadmapCommandHandler(IPlanningDbContext planningDbC
             request.Description,
             request.DateRange,
             request.Visibility,
-            parentRoadmap.Managers.Select(m => m.ManagerId).ToArray(),
+            request.RoadmapManagerIds,
             _currentUserEmployeeId
             );
 
@@ -89,12 +106,12 @@ internal sealed class CreateRoadmapCommandHandler(IPlanningDbContext planningDbC
     private async Task<Result<ObjectIdAndKey>> CreateRootRoadmap(CreateRoadmapCommand request, CancellationToken cancellationToken)
     {
         var result = Roadmap.CreateRoot(
-                    request.Name,
-                    request.Description,
-                    request.DateRange,
-                    request.Visibility,
-                    [_currentUserEmployeeId]
-                    );
+            request.Name,
+            request.Description,
+            request.DateRange,
+            request.Visibility,
+            request.RoadmapManagerIds
+            );
 
         if (result.IsFailure)
         {

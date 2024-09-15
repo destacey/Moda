@@ -23,12 +23,12 @@ public sealed record UpdateRoadmapRequest
     /// <summary>
     /// The Roadmap start date.
     /// </summary>
-    public LocalDate Start { get; set; }
+    public required LocalDate Start { get; set; }
 
     /// <summary>
     /// The Roadmap end date.
     /// </summary>
-    public LocalDate End { get; set; }
+    public required LocalDate End { get; set; }
 
     /// <summary>
     /// The managers of the Roadmap.
@@ -70,14 +70,14 @@ public sealed class UpdateRoadmapRequestValidator : CustomValidator<UpdateRoadma
             .Must((membership, end) => membership.Start <= end)
                 .WithMessage("End date must be greater than or equal to start date");
 
-        RuleFor(t => (Visibility)t.VisibilityId)
-            .IsInEnum()
-            .WithMessage("A valid visibility must be selected.");
-
         RuleFor(t => t.RoadmapManagerIds)
             .NotEmpty();
 
         RuleForEach(t => t.RoadmapManagerIds)
             .NotEmpty();
+
+        RuleFor(t => (Visibility)t.VisibilityId)
+            .IsInEnum()
+            .WithMessage("A valid visibility must be selected.");
     }
 }

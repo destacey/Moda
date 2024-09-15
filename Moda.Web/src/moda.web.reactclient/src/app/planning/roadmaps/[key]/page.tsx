@@ -228,6 +228,9 @@ const RoadmapDetailsPage = ({ params }) => {
         <CreateRoadmapForm
           showForm={openCreateRoadmapForm}
           parentRoadmapId={roadmapData?.id}
+          parentRoadmapManagerIds={roadmapData.roadmapManagers.map(
+            (rm) => rm.id,
+          )}
           onFormComplete={() => onCreateRoadmapFormClosed(true)}
           onFormCancel={() => onCreateRoadmapFormClosed(false)}
           messageApi={messageApi}

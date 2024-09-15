@@ -34,8 +34,8 @@ public class RoadmapTests
         result.Value.Description.Should().Be(fakeRoadmap.Description);
         result.Value.DateRange.Should().Be(fakeRoadmap.DateRange);
         result.Value.Visibility.Should().Be(fakeRoadmap.Visibility);
-        result.Value.Managers.Should().HaveCount(1);
-        result.Value.Managers.First().ManagerId.Should().Be(managerId);
+        result.Value.RoadmapManagers.Should().HaveCount(1);
+        result.Value.RoadmapManagers.First().ManagerId.Should().Be(managerId);
         result.Value.ParentId.Should().BeNull();
         result.Value.Order.Should().BeNull();
     }
@@ -52,7 +52,7 @@ public class RoadmapTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("Required input managers was empty. (Parameter 'managers')");
+        result.Error.Should().Be("Required input roadmapManagerIds was empty. (Parameter 'roadmapManagerIds')");
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public class RoadmapTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("User is not a manager of this roadmap.");
+        result.Error.Should().Be("User is not a roadmap manager of this roadmap.");
     }
 
     [Fact]
@@ -112,8 +112,8 @@ public class RoadmapTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        roadmap.Managers.Should().HaveCount(2);
-        roadmap.Managers.Select(x => x.ManagerId).Should().BeEquivalentTo(expectedManagers);
+        roadmap.RoadmapManagers.Should().HaveCount(2);
+        roadmap.RoadmapManagers.Select(x => x.ManagerId).Should().BeEquivalentTo(expectedManagers);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class RoadmapTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("Roadmap manager already exists on this roadmap.");
-        roadmap.Managers.Should().HaveCount(1);
+        roadmap.RoadmapManagers.Should().HaveCount(1);
     }
 
     [Fact]
@@ -147,8 +147,8 @@ public class RoadmapTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        roadmap.Managers.Should().HaveCount(1);
-        roadmap.Managers.First().ManagerId.Should().Be(managerId);
+        roadmap.RoadmapManagers.Should().HaveCount(1);
+        roadmap.RoadmapManagers.First().ManagerId.Should().Be(managerId);
     }
 
     [Fact]
@@ -180,7 +180,7 @@ public class RoadmapTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("Roadmap must have at least one manager.");
+        result.Error.Should().Be("Roadmap must have at least one roadmap manager.");
     }
 
     [Fact]
@@ -208,7 +208,7 @@ public class RoadmapTests
     {
         // Arrange
         var roadmap = _faker.WithChildren(2);
-        var managerId = roadmap.Managers.First().ManagerId;
+        var managerId = roadmap.RoadmapManagers.First().ManagerId;
         var fakeChildRoadmap = _faker.Generate();
 
         // Act
@@ -263,7 +263,7 @@ public class RoadmapTests
     {
         // Arrange
         var roadmap = _faker.WithChildren(3);
-        var managerId = roadmap.Managers.First().ManagerId;
+        var managerId = roadmap.RoadmapManagers.First().ManagerId;
 
         var children = roadmap.Children.OrderBy(c => c.Order).ToList();
 
@@ -301,7 +301,7 @@ public class RoadmapTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("User is not a manager of this roadmap.");
+        result.Error.Should().Be("User is not a roadmap manager of this roadmap.");
     }
 
     [Fact]
@@ -309,7 +309,7 @@ public class RoadmapTests
     {
         // Arrange
         var roadmap = _faker.WithChildren(2);
-        var managerId = roadmap.Managers.First().ManagerId;
+        var managerId = roadmap.RoadmapManagers.First().ManagerId;
         var childLinks = new Dictionary<Guid, int> { { Guid.NewGuid(), 1 } };
 
         // Act
@@ -325,7 +325,7 @@ public class RoadmapTests
     {
         // Arrange
         var roadmap = _faker.WithChildren(1);
-        var managerId = roadmap.Managers.First().ManagerId;
+        var managerId = roadmap.RoadmapManagers.First().ManagerId;
         var childLinks = new Dictionary<Guid, int> { { Guid.NewGuid(), 1 } };
 
         // Act
@@ -341,7 +341,7 @@ public class RoadmapTests
     {
         // Arrange
         var roadmap = _faker.WithChildren(5);
-        var managerId = roadmap.Managers.First().ManagerId;
+        var managerId = roadmap.RoadmapManagers.First().ManagerId;
 
         var children = roadmap.Children.OrderBy(c => c.Order).ToList();
 
@@ -368,7 +368,7 @@ public class RoadmapTests
     {
         // Arrange
         var roadmap = _faker.WithChildren(5);
-        var managerId = roadmap.Managers.First().ManagerId;
+        var managerId = roadmap.RoadmapManagers.First().ManagerId;
 
         var children = roadmap.Children.OrderBy(c => c.Order).ToList();
 
@@ -403,7 +403,7 @@ public class RoadmapTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("User is not a manager of this roadmap.");
+        result.Error.Should().Be("User is not a roadmap manager of this roadmap.");
     }
 
     [Fact]
@@ -411,7 +411,7 @@ public class RoadmapTests
     {
         // Arrange
         var roadmap = _faker.WithChildren(3);
-        var managerId = roadmap.Managers.First().ManagerId;
+        var managerId = roadmap.RoadmapManagers.First().ManagerId;
 
         // Act
         var result = roadmap.SetChildrenOrder(Guid.NewGuid(), 1, managerId);
