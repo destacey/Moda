@@ -22,7 +22,7 @@ internal sealed class DeleteRoadmapCommandHandler(IPlanningDbContext planningDbC
         try
         {
             var roadmap = await _planningDbContext.Roadmaps
-                .Include(x => x.Managers)
+                .Include(x => x.RoadmapManagers)
                 .Include(x => x.Children)
                 .FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
 

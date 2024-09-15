@@ -23,12 +23,17 @@ public sealed record UpdateRoadmapRequest
     /// <summary>
     /// The Roadmap start date.
     /// </summary>
-    public LocalDate Start { get; set; }
+    public required LocalDate Start { get; set; }
 
     /// <summary>
     /// The Roadmap end date.
     /// </summary>
-    public LocalDate End { get; set; }
+    public required LocalDate End { get; set; }
+
+    /// <summary>
+    /// The managers of the Roadmap.
+    /// </summary>
+    public required List<Guid> RoadmapManagerIds { get; set; }
 
     /// <summary>
     /// The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap.
@@ -37,7 +42,7 @@ public sealed record UpdateRoadmapRequest
 
     public UpdateRoadmapCommand ToUpdateRoadmapCommand()
     {
-        return new UpdateRoadmapCommand(Id, Name, Description, new LocalDateRange(Start, End), (Visibility)VisibilityId);
+        return new UpdateRoadmapCommand(Id, Name, Description, new LocalDateRange(Start, End), RoadmapManagerIds, (Visibility)VisibilityId);
     }
 }
 
@@ -64,6 +69,12 @@ public sealed class UpdateRoadmapRequestValidator : CustomValidator<UpdateRoadma
             .NotNull()
             .Must((membership, end) => membership.Start <= end)
                 .WithMessage("End date must be greater than or equal to start date");
+
+        RuleFor(t => t.RoadmapManagerIds)
+            .NotEmpty();
+
+        RuleForEach(t => t.RoadmapManagerIds)
+            .NotEmpty();
 
         RuleFor(t => (Visibility)t.VisibilityId)
             .IsInEnum()

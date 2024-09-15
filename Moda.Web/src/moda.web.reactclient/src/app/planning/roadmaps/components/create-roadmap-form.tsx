@@ -1,11 +1,13 @@
 import useAuth from '@/src/app/components/contexts/auth'
 import { CreateRoadmapRequest } from '@/src/services/moda-api'
+import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import {
   useCreateRoadmapMutation,
   useGetVisibilityOptionsQuery,
 } from '@/src/store/features/planning/roadmaps-api'
+import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Input, Modal, Radio } from 'antd'
+import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -16,6 +18,7 @@ const { Group: RadioGroup } = Radio
 export interface CreateRoadmapFormProps {
   showForm: boolean
   parentRoadmapId?: string | null
+  parentRoadmapManagerIds?: string[] | null
   onFormComplete: () => void
   onFormCancel: () => void
   messageApi: MessageInstance
@@ -26,6 +29,7 @@ interface CreateRoadmapFormValues {
   description?: string
   start: Date
   end: Date
+  roadmapManagerIds: string[]
   visibilityId: number
 }
 
@@ -38,6 +42,7 @@ const mapToRequestValues = (
     description: values.description,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
+    roadmapManagerIds: values.roadmapManagerIds,
     visibilityId: values.visibilityId,
     parentId: parentRoadmapId,
   } as CreateRoadmapRequest
@@ -57,22 +62,41 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
   } = useGetVisibilityOptionsQuery()
   const [createRoadmap, { error: mutationError }] = useCreateRoadmapMutation()
 
+  const {
+    data: employeeData,
+    isLoading: employeeOptionsIsLoading,
+    error: employeeOptionsError,
+  } = useGetEmployeeOptionsQuery(true)
+
+  const {
+    data: currentUserInternalEmployeeId,
+    error: currentUserInternalEmployeeIdError,
+  } = useGetInternalEmployeeIdQuery()
+
   const { hasPermissionClaim } = useAuth()
   const canCreateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Create')
+
+  const mapToFormValues = useCallback(
+    (roadmapManagerIds: string[]) => {
+      form.setFieldsValue({
+        roadmapManagerIds: roadmapManagerIds,
+      })
+    },
+    [form],
+  )
 
   const create = async (values: CreateRoadmapFormValues, parentRoadmapId) => {
     try {
       const request = mapToRequestValues(values, parentRoadmapId)
-      createRoadmap(request)
-        .unwrap()
-        .then((response) => {
-          props.messageApi.success(
-            `Roadmap created successfully. Roadmap Key ${response.key}`,
-          )
-        })
-        .catch((error) => {
-          throw error
-        })
+      const response = await createRoadmap(request)
+      if (response.error) {
+        throw response.error
+      }
+
+      props.messageApi.success(
+        `Roadmap created successfully. Roadmap Key ${response.data.key}`,
+      )
+
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -117,11 +141,18 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
   useEffect(() => {
     if (canCreateRoadmap) {
       setIsOpen(props.showForm)
+      if (props.showForm) {
+        if (props.parentRoadmapManagerIds) {
+          mapToFormValues(props.parentRoadmapManagerIds)
+        } else {
+          mapToFormValues([currentUserInternalEmployeeId])
+        }
+      }
     } else {
       props.onFormCancel()
       props.messageApi.error('You do not have permission to create roadmaps.')
     }
-  }, [canCreateRoadmap, props])
+  }, [canCreateRoadmap, currentUserInternalEmployeeId, mapToFormValues, props])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -137,7 +168,19 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
           'An error occurred while loading visibility options. Please try again.',
       )
     }
-  }, [error, props])
+    if (employeeOptionsError) {
+      props.messageApi.error(
+        employeeOptionsError.supportMessage ??
+          'An error occurred while loading employee options. Please try again.',
+      )
+    }
+    if (currentUserInternalEmployeeIdError) {
+      props.messageApi.error(
+        currentUserInternalEmployeeIdError.supportMessage ??
+          'An error occurred while loading current user profile data. Please try again.',
+      )
+    }
+  }, [currentUserInternalEmployeeIdError, employeeOptionsError, error, props])
 
   return (
     <>
@@ -178,6 +221,41 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
           </Item>
           <Item name="end" label="End" rules={[{ required: true }]}>
             <DatePicker />
+          </Item>
+          <Item
+            name="roadmapManagerIds"
+            label="Roadmap Managers"
+            rules={[
+              {
+                required: true,
+                message: 'Select at least one roadmap manager',
+              },
+              {
+                validator: async (_, value) => {
+                  if (!value.includes(currentUserInternalEmployeeId)) {
+                    return Promise.reject(
+                      new Error(
+                        'You must also be a roadmap manager to create this roadmap',
+                      ),
+                    )
+                  }
+                  return Promise.resolve()
+                },
+              },
+            ]}
+          >
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Select one or more roadmap managers"
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.label.toLowerCase() ?? '').includes(
+                  input.toLowerCase(),
+                )
+              }
+              options={employeeData}
+            />
           </Item>
           <Item
             name="visibilityId"

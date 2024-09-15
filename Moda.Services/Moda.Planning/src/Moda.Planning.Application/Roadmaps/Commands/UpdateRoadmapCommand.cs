@@ -2,12 +2,16 @@
 using Moda.Common.Domain.Enums;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
-public sealed record UpdateRoadmapCommand(Guid Id, string Name, string? Description, LocalDateRange DateRange, Visibility Visibility) : ICommand;
+public sealed record UpdateRoadmapCommand(Guid Id, string Name, string? Description, LocalDateRange DateRange, List<Guid> RoadmapManagerIds, Visibility Visibility) : ICommand;
 
 public sealed class UpdateRoadmapCommandValidator : AbstractValidator<UpdateRoadmapCommand>
 {
-    public UpdateRoadmapCommandValidator()
+    private readonly ICurrentUser _currentUser;
+
+    public UpdateRoadmapCommandValidator(ICurrentUser currentUser)
     {
+        _currentUser = currentUser;
+
         RuleFor(x => x.Id)
             .NotEmpty();
 
@@ -21,14 +25,27 @@ public sealed class UpdateRoadmapCommandValidator : AbstractValidator<UpdateRoad
         RuleFor(x => x.DateRange)
             .NotNull();
 
+        RuleFor(x => x.RoadmapManagerIds)
+            .NotEmpty()
+            .Must(IncludeCurrentUser).WithMessage("The current user must be a manager of the Roadmap.");
+
+        RuleForEach(x => x.RoadmapManagerIds)
+            .NotEmpty();
+
         RuleFor(x => x.Visibility)
             .IsInEnum();
+    }
+
+    public bool IncludeCurrentUser(IEnumerable<Guid> roadmapManagerIds)
+    {
+        var employeeId = Guard.Against.NullOrEmpty(_currentUser.GetEmployeeId());
+        return  roadmapManagerIds.Contains(employeeId);
     }
 }
 
 internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<UpdateRoadmapCommandHandler> logger) : ICommandHandler<UpdateRoadmapCommand>
 {
-    private const string AppRequestName = nameof(UpdateRoadmapChildrenOrderCommand);
+    private const string AppRequestName = nameof(UpdateRoadmapCommand);
 
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
@@ -39,7 +56,7 @@ internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbC
         try
         {
             var roadmap = await _planningDbContext.Roadmaps
-                .Include(x => x.Managers)
+                .Include(x => x.RoadmapManagers)
                 .FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
 
             if (roadmap is null)
@@ -49,6 +66,7 @@ internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbC
                 request.Name,
                 request.Description,
                 request.DateRange,
+                request.RoadmapManagerIds,
                 request.Visibility,
                 _currentUserEmployeeId
                 );

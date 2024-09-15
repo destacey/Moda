@@ -21,9 +21,8 @@ import { Descriptions, MenuProps, message } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import EditRoadmapForm from '../components/edit-roadmap-form'
 import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
-import DeleteRoadmapForm from '../components/delete-roadmap-form'
-import CreateRoadmapForm from '../components/create-roadmap-form'
 import RoadmapViewManager from './roadmap-view-manager'
+import { CreateRoadmapForm, DeleteRoadmapForm } from '../components'
 
 const { Item } = Descriptions
 
@@ -98,7 +97,7 @@ const RoadmapDetailsPage = ({ params }) => {
 
   useEffect(() => {
     if (!roadmapData) return
-    const managers = roadmapData.managers
+    const managers = roadmapData.roadmapManagers
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((m) => m.name)
@@ -229,6 +228,9 @@ const RoadmapDetailsPage = ({ params }) => {
         <CreateRoadmapForm
           showForm={openCreateRoadmapForm}
           parentRoadmapId={roadmapData?.id}
+          parentRoadmapManagerIds={roadmapData.roadmapManagers.map(
+            (rm) => rm.id,
+          )}
           onFormComplete={() => onCreateRoadmapFormClosed(true)}
           onFormCancel={() => onCreateRoadmapFormClosed(false)}
           messageApi={messageApi}

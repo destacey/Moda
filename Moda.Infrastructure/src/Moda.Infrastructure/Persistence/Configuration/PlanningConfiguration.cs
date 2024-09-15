@@ -346,7 +346,7 @@ public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
         builder.Property(r => r.LastModifiedBy);
 
         // Relationships
-        builder.HasMany(r => r.Managers)
+        builder.HasMany(r => r.RoadmapManagers)
             .WithOne()
             .HasForeignKey(rm => rm.RoadmapId)
             .OnDelete(DeleteBehavior.Cascade);

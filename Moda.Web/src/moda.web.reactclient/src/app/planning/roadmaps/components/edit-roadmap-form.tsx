@@ -9,10 +9,12 @@ import {
   useGetRoadmapQuery,
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Input, Modal, Radio } from 'antd'
+import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
+import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
+import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -31,6 +33,7 @@ interface EditRoadmapFormValues {
   description?: string
   start: Date
   end: Date
+  roadmapManagerIds: string[]
   visibilityId: number
 }
 
@@ -44,6 +47,7 @@ const mapToRequestValues = (
     description: values.description,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
+    roadmapManagerIds: values.roadmapManagerIds,
     visibilityId: values.visibilityId,
   } as UpdateRoadmapRequest
 }
@@ -68,7 +72,18 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
   } = useGetVisibilityOptionsQuery()
   const [updateRoadmap, { error: mutationError }] = useUpdateRoadmapMutation()
 
-  const { hasPermissionClaim } = useAuth()
+  const {
+    data: employeeData,
+    isLoading: employeeOptionsIsLoading,
+    error: employeeOptionsError,
+  } = useGetEmployeeOptionsQuery(true)
+
+  const {
+    data: currentUserInternalEmployeeId,
+    error: currentUserInternalEmployeeIdError,
+  } = useGetInternalEmployeeIdQuery()
+
+  const { hasClaim, hasPermissionClaim } = useAuth()
   const canUpdateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Update')
 
   const mapToFormValues = useCallback(
@@ -82,27 +97,26 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
         start: dayjs(roadmap.start),
         end: dayjs(roadmap.end),
         visibilityId: roadmap.visibility.id,
+        roadmapManagerIds: roadmap.roadmapManagers.map((rm) => rm.id),
       })
     },
     [form],
   )
 
-  const create = async (
+  const update = async (
     values: EditRoadmapFormValues,
     roadmap: RoadmapDetailsDto,
   ) => {
     try {
       const request = mapToRequestValues(values, roadmap.id)
-      updateRoadmap({ request, cacheKey: roadmap.key })
-        .unwrap()
-        .then(() => {
-          props.messageApi.success(`Roadmap updated successfully.`)
-        })
-        .catch((error) => {
-          throw error
-        })
+      const response = await updateRoadmap({ request, cacheKey: roadmap.key })
+      if (response.error) {
+        throw response.error
+      }
+      props.messageApi.success(`Roadmap updated successfully.`)
       return true
     } catch (error) {
+      console.error('update error', error)
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
@@ -121,7 +135,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values, roadmapData)) {
+      if (await update(values, roadmapData)) {
         setIsOpen(false)
         form.resetFields()
         props.onFormComplete()
@@ -175,7 +189,25 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
           'An error occurred while loading visibility options. Please try again.',
       )
     }
-  }, [error, props, visibilityError])
+    if (employeeOptionsError) {
+      props.messageApi.error(
+        employeeOptionsError.supportMessage ??
+          'An error occurred while loading employee options. Please try again.',
+      )
+    }
+    if (currentUserInternalEmployeeIdError) {
+      props.messageApi.error(
+        currentUserInternalEmployeeIdError.supportMessage ??
+          'An error occurred while loading current user profile data. Please try again.',
+      )
+    }
+  }, [
+    currentUserInternalEmployeeIdError,
+    employeeOptionsError,
+    error,
+    props,
+    visibilityError,
+  ])
 
   return (
     <>
@@ -216,6 +248,41 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
           </Item>
           <Item name="end" label="End" rules={[{ required: true }]}>
             <DatePicker />
+          </Item>
+          <Item
+            name="roadmapManagerIds"
+            label="Roadmap Managers"
+            rules={[
+              {
+                required: true,
+                message: 'Select at least one roadmap manager',
+              },
+              {
+                validator: async (_, value) => {
+                  if (!value.includes(currentUserInternalEmployeeId)) {
+                    return Promise.reject(
+                      new Error(
+                        'You must also be a roadmap manager to update this roadmap',
+                      ),
+                    )
+                  }
+                  return Promise.resolve()
+                },
+              },
+            ]}
+          >
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Select one or more roadmap managers"
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.label.toLowerCase() ?? '').includes(
+                  input.toLowerCase(),
+                )
+              }
+              options={employeeData}
+            />
           </Item>
           <Item
             name="visibilityId"

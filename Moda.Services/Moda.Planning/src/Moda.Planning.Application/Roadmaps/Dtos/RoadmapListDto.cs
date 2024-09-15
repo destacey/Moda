@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Application.Dtos;
+using Moda.Common.Application.Employees.Dtos;
 
 namespace Moda.Planning.Application.Roadmaps.Dtos;
 public sealed record RoadmapListDto : IMapFrom<Roadmap>
@@ -31,11 +32,17 @@ public sealed record RoadmapListDto : IMapFrom<Roadmap>
     /// </summary>
     public required SimpleNavigationDto Visibility { get; set; }
 
+    /// <summary>
+    /// The managers of the Roadmap.
+    /// </summary>
+    public required List<EmployeeNavigationDto> RoadmapManagers { get; set; } = [];
+
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Roadmap, RoadmapListDto>()
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End)
-            .Map(dest => dest.Visibility, src => SimpleNavigationDto.FromEnum(src.Visibility));
+            .Map(dest => dest.Visibility, src => SimpleNavigationDto.FromEnum(src.Visibility))
+            .Map(dest => dest.RoadmapManagers, src => src.RoadmapManagers.Select(x => EmployeeNavigationDto.From(x.Manager!)).ToList());
     }
 }

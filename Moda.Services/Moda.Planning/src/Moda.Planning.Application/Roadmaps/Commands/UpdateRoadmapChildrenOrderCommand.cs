@@ -32,7 +32,7 @@ internal sealed class UpdateRoadmapChildrenOrderCommandHandler(IPlanningDbContex
         try
         {
             var roadmap = await _planningDbContext.Roadmaps
-                .Include(x => x.Managers)
+                .Include(x => x.RoadmapManagers)
                 .Include(x => x.Children)
                 .FirstOrDefaultAsync(r => r.Id == request.RoadmapId, cancellationToken);
 

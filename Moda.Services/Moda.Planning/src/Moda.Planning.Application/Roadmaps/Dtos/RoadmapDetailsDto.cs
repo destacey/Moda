@@ -40,7 +40,7 @@ public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
     /// <summary>
     /// The managers of the Roadmap.
     /// </summary>
-    public required List<EmployeeNavigationDto> Managers { get; set; }
+    public required List<EmployeeNavigationDto> RoadmapManagers { get; set; }
 
     /// <summary>
     /// The parent Roadmap.
@@ -53,7 +53,7 @@ public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End)
             .Map(dest => dest.Visibility, src => SimpleNavigationDto.FromEnum(src.Visibility))
-            .Map(dest => dest.Managers, src => src.Managers.Select(m => EmployeeNavigationDto.From(m.Manager!)))
+            .Map(dest => dest.RoadmapManagers, src => src.RoadmapManagers.Select(m => EmployeeNavigationDto.From(m.Manager!)))
             .Map(dest => dest.Parent, src => src.Parent == null ? null : NavigationDto.Create(src.Parent.Id, src.Parent.Key, src.Parent.Name));
     }
 }

@@ -27,7 +27,7 @@ internal sealed class GetRoadmapChildrenQueryHandler(IPlanningDbContext planning
 
         return await _planningDbContext.Roadmaps
             .Where(r => r.ParentId != null && request.RoadmapIds.Contains(r.ParentId.Value))
-            .Where(r => r.Visibility == publicVisibility || r.Managers.Any(m => m.ManagerId == _currentUserEmployeeId))
+            .Where(r => r.Visibility == publicVisibility || r.RoadmapManagers.Any(m => m.ManagerId == _currentUserEmployeeId))
             .ProjectToType<RoadmapChildrenDto>()
             .ToListAsync(cancellationToken);
     }

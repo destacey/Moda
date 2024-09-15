@@ -89,8 +89,8 @@ const EditRiskForm = ({
   const { data: riskGradeOptions } = useGetRiskGradeOptions()
   const { data: employeeOptions } = useGetEmployeeOptions()
 
-  const { hasClaim } = useAuth()
-  const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')
+  const { hasPermissionClaim } = useAuth()
+  const canUpdateRisks = hasPermissionClaim('Permissions.Risks.Update')
 
   const mapToFormValues = useCallback(
     (risk: RiskDetailsDto) => {
