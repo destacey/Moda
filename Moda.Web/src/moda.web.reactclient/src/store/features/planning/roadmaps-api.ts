@@ -29,8 +29,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result, error, arg) => [
-        QueryTags.Roadmap,
-        ...result.map(({ key }) => ({ type: QueryTags.Roadmap, key })),
+        { type: QueryTags.Roadmap, id: 'LIST' },
       ],
     }),
     getRoadmap: builder.query<RoadmapDetailsDto, string>({
@@ -57,14 +56,21 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: (result, error, arg) => [
-        { type: QueryTags.Roadmap },
-        { type: QueryTags.RoadmapChildren },
-      ],
+      invalidatesTags: (result, error, arg) => {
+        if (!arg.parentId) {
+          return [{ type: QueryTags.Roadmap, id: 'LIST' }]
+        } else {
+          return [{ type: QueryTags.RoadmapChildren, id: arg.parentId }]
+        }
+      },
     }),
     updateRoadmap: builder.mutation<
       void,
-      { request: UpdateRoadmapRequest; cacheKey: number }
+      {
+        request: UpdateRoadmapRequest
+        cacheKey: number
+        parentCacheKey?: string | null
+      }
     >({
       queryFn: async (mutationRequest) => {
         try {
@@ -77,12 +83,29 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: (result, error, arg) => [
-        { type: QueryTags.Roadmap, id: arg.cacheKey },
-        { type: QueryTags.RoadmapChildren, id: arg.cacheKey }, // TODO: this is not working
-      ],
+      invalidatesTags: (result, error, arg) => {
+        const tags: {
+          type: QueryTags
+          id: any
+        }[] = [{ type: QueryTags.Roadmap, id: arg.cacheKey }]
+
+        if (arg.parentCacheKey) {
+          tags.push({ type: QueryTags.RoadmapChildren, id: arg.parentCacheKey })
+        } else {
+          tags.push({ type: QueryTags.Roadmap, id: 'LIST' })
+        }
+
+        return tags
+      },
     }),
-    deleteRoadmap: builder.mutation<void, { id: string; cacheKey: number }>({
+    deleteRoadmap: builder.mutation<
+      void,
+      {
+        id: string
+        cacheKey: number
+        parentCacheKey?: string | null
+      }
+    >({
       queryFn: async (request) => {
         try {
           const data = await (await getRoadmapsClient()).delete(request.id)
@@ -92,11 +115,22 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: (result, error, arg) => [
-        // TODO: this is triggering a refetch on removed roadmap which is causing a 404
-        QueryTags.Roadmap,
-        //{ type: QueryTags.Roadmap, id: arg.cacheKey },
-      ],
+      invalidatesTags: (result, error, arg) => {
+        const tags: {
+          type: QueryTags
+          id: any
+        }[] = [
+          // LIST is needed to handle orphaned children
+          { type: QueryTags.Roadmap, id: 'LIST' },
+          { type: QueryTags.Roadmap, id: arg.cacheKey },
+        ]
+
+        if (arg.parentCacheKey) {
+          tags.push({ type: QueryTags.RoadmapChildren, id: arg.parentCacheKey })
+        }
+
+        return tags
+      },
     }),
     getRoadmapChildren: builder.query<RoadmapChildrenDto[], string[]>({
       queryFn: async (parentIds: string[]) => {
@@ -110,7 +144,10 @@ export const roadmapApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         QueryTags.RoadmapChildren,
-        ...result.map(({ key }) => ({ type: QueryTags.RoadmapChildren, key })),
+        ...result.map(({ parent }) => ({
+          type: QueryTags.RoadmapChildren,
+          id: parent.id,
+        })),
       ],
     }),
     updateChildrenOrder: builder.mutation<
@@ -128,7 +165,12 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: (result, error, arg) => [QueryTags.RoadmapChildren],
+      invalidatesTags: (result, error, arg) => [
+        {
+          type: QueryTags.RoadmapChildren,
+          id: arg.roadmapId,
+        },
+      ],
     }),
     updateChildOrder: builder.mutation<void, UpdateRoadmapChildOrderRequest>({
       queryFn: async (request) => {
@@ -142,7 +184,12 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: (result, error, arg) => [QueryTags.RoadmapChildren],
+      invalidatesTags: (result, error, arg) => [
+        {
+          type: QueryTags.RoadmapChildren,
+          id: arg.roadmapId,
+        },
+      ],
     }),
     getVisibilityOptions: builder.query<OptionModel<number>[], void>({
       queryFn: async () => {
@@ -162,13 +209,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
-        QueryTags.RoadmapVisibility,
-        ...result.map(({ value }) => ({
-          type: QueryTags.RoadmapVisibility,
-          value,
-        })),
-      ],
+      providesTags: (result, error, arg) => [QueryTags.RoadmapVisibility],
     }),
   }),
 })
