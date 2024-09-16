@@ -9,7 +9,7 @@ import 'vis-timeline/styles/vis-timeline-graph2d.css'
 import './roadmaps-timeline.css'
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import { Card, Divider, Flex, Space, Spin, Switch, Typography } from 'antd'
-import { RoadmapDetailsDto, RoadmapListDto } from '@/src/services/moda-api'
+import { RoadmapChildrenDto, RoadmapDetailsDto } from '@/src/services/moda-api'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import useTheme from '@/src/app/components/contexts/theme'
@@ -23,7 +23,7 @@ const { Text } = Typography
 
 export interface RoadmapsTimelineProps {
   roadmap: RoadmapDetailsDto
-  roadmapChildren: RoadmapListDto[]
+  roadmapChildren: RoadmapChildrenDto[]
   isChildrenLoading: boolean
   refreshChildren: () => void
   viewSelector?: React.ReactNode | undefined
@@ -38,12 +38,12 @@ interface RoadmapTimelineItem extends DataItem {
   end: Date
   group?: string
   type?: string
-  roadmap?: RoadmapListDto
+  roadmap?: RoadmapChildrenDto
   order?: number
 }
 
 interface RoadmapTimelineTemplateProps {
-  roadmap: RoadmapListDto
+  roadmap: RoadmapChildrenDto
   timelineFontColor: string
   timelineForegroundColor: string
 }
@@ -190,6 +190,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         type: 'range',
         style: `background: ${timelineBackgroundColor}; border-color: ${timelineBackgroundColor};`,
         zIndex: 1,
+        order: roadmap.order,
         roadmap: roadmap,
       } as RoadmapTimelineItem
     })
@@ -206,6 +207,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         type: 'range',
         style: `background: ${timelineBackgroundColor}; border-color: ${timelineBackgroundColor};`,
         zIndex: 1,
+        order: roadmapLink.order,
         roadmap: roadmapLink,
       } as RoadmapTimelineItem
     })

@@ -25,10 +25,7 @@ export const employeeApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
-        QueryTags.EmployeeOptions,
-        ...result.map(({ key }) => ({ type: QueryTags.EmployeeOptions, key })),
-      ],
+      providesTags: (result, error, arg) => [QueryTags.EmployeeOptions],
     }),
   }),
 })

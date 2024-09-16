@@ -65,6 +65,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
     error,
     refetch,
   } = useGetRoadmapQuery(props.roadmapId)
+
   const {
     data: visibilityData,
     isLoading: visibilityLoading,
@@ -109,7 +110,11 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
   ) => {
     try {
       const request = mapToRequestValues(values, roadmap.id)
-      const response = await updateRoadmap({ request, cacheKey: roadmap.key })
+      const response = await updateRoadmap({
+        request,
+        cacheKey: roadmap.key,
+        parentCacheKey: roadmap.parent?.id,
+      })
       if (response.error) {
         throw response.error
       }

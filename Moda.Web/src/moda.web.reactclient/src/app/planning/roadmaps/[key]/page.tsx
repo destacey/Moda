@@ -160,7 +160,7 @@ const RoadmapDetailsPage = ({ params }) => {
   const onCreateRoadmapFormClosed = (wasCreated: boolean) => {
     setOpenCreateRoadmapForm(false)
     if (wasCreated) {
-      refetchChildren
+      refetchChildren()
     }
   }
 
