@@ -122,7 +122,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }[] = [
           // LIST is needed to handle orphaned children
           { type: QueryTags.Roadmap, id: 'LIST' },
-          { type: QueryTags.Roadmap, id: arg.cacheKey },
+          //{ type: QueryTags.Roadmap, id: arg.cacheKey }, // This triggers a 404 error
         ]
 
         if (arg.parentCacheKey) {
@@ -144,9 +144,9 @@ export const roadmapApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         QueryTags.RoadmapChildren,
-        ...result.map(({ parent }) => ({
+        ...arg.map((parentId) => ({
           type: QueryTags.RoadmapChildren,
-          id: parent.id,
+          id: parentId,
         })),
       ],
     }),

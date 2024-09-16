@@ -27,6 +27,7 @@ const RoadmapCellRenderer = ({ value, data }) => {
   return <Link href={`/planning/roadmaps/${data.key}`}>{value}</Link>
 }
 
+// TODO: split this into two grids sharing one column definition
 const RoadmapsGrid: React.FC<RoadmapsGridProps> = (
   props: RoadmapsGridProps,
 ) => {
