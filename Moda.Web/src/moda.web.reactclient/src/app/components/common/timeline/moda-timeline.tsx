@@ -52,6 +52,7 @@ const ModaTimeline = (props: ModaTimelineProps) => {
   const [itemForegroundColor, setItemForegroundColor] = useState('')
   const [itemFontColor, setItemFontColor] = useState('')
 
+  const elementMapRef = useRef({})
   const timelineRef = useRef<HTMLDivElement>(null)
 
   const { currentThemeName } = useTheme()
@@ -60,15 +61,39 @@ const ModaTimeline = (props: ModaTimelineProps) => {
     setItemBackgroundColor(isLightTheme ? '#ecf0f1' : '#303030')
     setItemForegroundColor(isLightTheme ? '#c7edff' : '#17354d')
     setItemFontColor(isLightTheme ? '#4d4d4d' : '#FFFFFF')
+
+    // cleanup function to remove the timeline when the component is unmounted
+    return () => {
+      elementMapRef.current = {}
+    }
   }, [currentThemeName])
 
   const itemTemplateManager: TimelineOptionsTemplateFunction = useCallback(
     (item: DataItem, element: HTMLElement, data: any) => {
-      if (!item || !element) {
-        return null
-      }
+      // if (!item || !element) {
+      //   return null
+      // }
 
-      const root = createRoot(element)
+      // const root = createRoot(element)
+
+      // if (item.type === 'range') {
+      //   root.render(<RangeItemTemplate item={item} fontColor={itemFontColor} />)
+      // } else if (item.type === 'background') {
+      //   root.render(<BackgroundItemTemplate item={item} />)
+      // }
+
+      // return
+
+      if (!item) return
+
+      const mapId = item?.id
+      if (elementMapRef.current?.[mapId]) return elementMapRef.current[mapId]
+
+      // Create a container for the react element (prevents DOM node errors)
+      const container = document.createElement('div')
+      element.appendChild(container)
+
+      const root = createRoot(container)
 
       if (item.type === 'range') {
         root.render(<RangeItemTemplate item={item} fontColor={itemFontColor} />)
@@ -76,24 +101,48 @@ const ModaTimeline = (props: ModaTimelineProps) => {
         root.render(<BackgroundItemTemplate item={item} />)
       }
 
-      return
+      // Store the rendered element container to reference later
+      elementMapRef.current[mapId] = container
+
+      // Return the new container
+      return container
     },
     [itemFontColor],
   )
 
   const groupTemplateManager: TimelineOptionsTemplateFunction = useCallback(
     (item: DataItem, element: HTMLElement, data: any) => {
-      if (!item || !element) {
-        return null
-      }
+      // if (!item || !element) {
+      //   return null
+      // }
 
-      createRoot(element).render(
+      // createRoot(element).render(
+      //   <Text style={{ padding: '5px', color: itemFontColor }}>
+      //     {item.content}
+      //   </Text>,
+      // )
+
+      // return
+
+      if (!item) return
+
+      const mapId = item?.id
+      if (elementMapRef.current?.[mapId]) return elementMapRef.current[mapId]
+
+      // Create a container for the react element (prevents DOM node errors)
+      const container = document.createElement('div')
+      element.appendChild(container)
+      createRoot(container).render(
         <Text style={{ padding: '5px', color: itemFontColor }}>
           {item.content}
         </Text>,
       )
 
-      return
+      // Store the rendered element container to reference later
+      elementMapRef.current[mapId] = container
+
+      // Return the new container
+      return container
     },
     [itemFontColor],
   )
@@ -172,6 +221,7 @@ const ModaTimeline = (props: ModaTimelineProps) => {
 
     // cleanup function to remove the timeline when the component is unmounted
     return () => {
+      elementMapRef.current = {}
       if (timeline) {
         timeline.destroy()
       }
