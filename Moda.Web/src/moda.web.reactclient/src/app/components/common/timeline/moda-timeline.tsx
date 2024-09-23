@@ -18,15 +18,6 @@ import { ModaEmpty } from '..'
 
 const { Text } = Typography
 
-// export type ModaTimelineProps<
-//   TObjectData = DataItem,
-//   TDataItem = TObjectData extends DataItem
-//     ? TObjectData
-//     : DataItem & {
-//         objectData: TObjectData
-//       },
-// > = {
-//   data: TDataItem[]
 export type ModaTimelineProps = {
   data: ModaDataItem[]
   groups?: DataGroup[]
@@ -229,6 +220,7 @@ const ModaTimeline = (props: ModaTimelineProps) => {
     options,
     props.data,
     props.groups,
+    props.isLoading,
   ])
 
   return (
