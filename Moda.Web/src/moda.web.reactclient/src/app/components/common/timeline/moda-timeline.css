@@ -1,0 +1,10 @@
+.vis-item.vis-range .vis-item-content  {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .vis-item.vis-background .vis-item-content  {
+    margin: 0;
+    padding-top: 0;
+  }
