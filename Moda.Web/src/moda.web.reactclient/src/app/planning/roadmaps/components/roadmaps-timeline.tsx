@@ -1,7 +1,9 @@
 'use client'
 
-import { DataItem } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
-import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
+import {
+  DataGroup,
+  DataItem,
+} from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import { Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { RoadmapChildrenDto, RoadmapDetailsDto } from '@/src/services/moda-api'
 import { useEffect, useMemo, useState } from 'react'
@@ -35,24 +37,6 @@ interface RoadmapTimelineItem extends DataItem {
   type?: string
   roadmap?: RoadmapChildrenDto
   order?: number
-}
-
-interface RoadmapTimelineTemplateProps {
-  roadmap: RoadmapChildrenDto
-  timelineFontColor: string
-}
-
-export const RoadmapTimelineTemplate = ({
-  roadmap,
-  timelineFontColor,
-}: RoadmapTimelineTemplateProps) => {
-  return (
-    <div>
-      <Text style={{ padding: '5px', color: timelineFontColor }}>
-        {roadmap.name}
-      </Text>
-    </div>
-  )
 }
 
 const getDataGroups = (

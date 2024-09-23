@@ -1,2 +1,6 @@
 export { default as ModaTimeline } from './moda-timeline'
-export type { ModaTimelineOptions } from './types'
+export type {
+  ModaDataItem,
+  ModaTimelineOptions,
+  RangeItemTemplateProps,
+} from './types'

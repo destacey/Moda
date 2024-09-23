@@ -13,21 +13,27 @@ import './moda-timeline.css'
 import { Spin, Typography } from 'antd'
 import useTheme from '../../contexts/theme'
 import { createRoot } from 'react-dom/client'
-import { ModaTimelineOptions } from '.'
+import { ModaDataItem, ModaTimelineOptions, RangeItemTemplateProps } from '.'
 import { ModaEmpty } from '..'
 
 const { Text } = Typography
 
-export interface ModaTimelineProps {
-  data: DataItem[]
+// export type ModaTimelineProps<
+//   TObjectData = DataItem,
+//   TDataItem = TObjectData extends DataItem
+//     ? TObjectData
+//     : DataItem & {
+//         objectData: TObjectData
+//       },
+// > = {
+//   data: TDataItem[]
+export type ModaTimelineProps = {
+  data: ModaDataItem[]
   groups?: DataGroup[]
   isLoading: boolean
   options: ModaTimelineOptions
-}
-
-interface RangeItemTemplateProps {
-  item: DataItem
-  fontColor: string
+  rangeItemTemplate?: (RangeItemTemplateProps) => JSX.Element
+  emptyMessage?: string
 }
 
 const RangeItemTemplate = (props: RangeItemTemplateProps) => {
@@ -39,51 +45,35 @@ const RangeItemTemplate = (props: RangeItemTemplateProps) => {
 }
 
 interface BackgroundItemTemplateProps {
-  item: DataItem
+  item: ModaDataItem
+  fontColor: string
 }
 
 const BackgroundItemTemplate = (props: BackgroundItemTemplateProps) => {
-  return <Text>{props.item.content}</Text>
+  return (
+    <div>
+      <Text>{props.item.content}</Text>
+    </div>
+  )
 }
 
 const ModaTimeline = (props: ModaTimelineProps) => {
   const [isTimelineLoading, setIsTimelineLoading] = useState(false)
-  const [itemBackgroundColor, setItemBackgroundColor] = useState('')
-  const [itemForegroundColor, setItemForegroundColor] = useState('')
-  const [itemFontColor, setItemFontColor] = useState('')
 
   const elementMapRef = useRef({})
   const timelineRef = useRef<HTMLDivElement>(null)
 
   const { currentThemeName } = useTheme()
-  useEffect(() => {
-    const isLightTheme = currentThemeName === 'light'
-    setItemBackgroundColor(isLightTheme ? '#ecf0f1' : '#303030')
-    setItemForegroundColor(isLightTheme ? '#c7edff' : '#17354d')
-    setItemFontColor(isLightTheme ? '#4d4d4d' : '#FFFFFF')
-
-    // cleanup function to remove the timeline when the component is unmounted
-    return () => {
-      elementMapRef.current = {}
-    }
-  }, [currentThemeName])
+  const itemBackgroundColor =
+    currentThemeName === 'light' ? '#ecf0f1' : '#303030'
+  const itemForegroundColor =
+    currentThemeName === 'light' ? '#c7edff' : '#17354d'
+  const itemFontColor = currentThemeName === 'light' ? '#4d4d4d' : '#FFFFFF'
+  const backgroundBackgroundColor =
+    currentThemeName === 'light' ? '#d0d3d4' : '#61646e'
 
   const itemTemplateManager: TimelineOptionsTemplateFunction = useCallback(
     (item: DataItem, element: HTMLElement, data: any) => {
-      // if (!item || !element) {
-      //   return null
-      // }
-
-      // const root = createRoot(element)
-
-      // if (item.type === 'range') {
-      //   root.render(<RangeItemTemplate item={item} fontColor={itemFontColor} />)
-      // } else if (item.type === 'background') {
-      //   root.render(<BackgroundItemTemplate item={item} />)
-      // }
-
-      // return
-
       if (!item) return
 
       const mapId = item?.id
@@ -96,9 +86,23 @@ const ModaTimeline = (props: ModaTimelineProps) => {
       const root = createRoot(container)
 
       if (item.type === 'range') {
-        root.render(<RangeItemTemplate item={item} fontColor={itemFontColor} />)
+        if (props.rangeItemTemplate) {
+          root.render(
+            props.rangeItemTemplate({
+              item: item,
+              fontColor: itemFontColor,
+              foregroundColor: itemForegroundColor,
+            }),
+          )
+        } else {
+          root.render(
+            <RangeItemTemplate item={item} fontColor={itemFontColor} />,
+          )
+        }
       } else if (item.type === 'background') {
-        root.render(<BackgroundItemTemplate item={item} />)
+        root.render(
+          <BackgroundItemTemplate item={item} fontColor={itemFontColor} />,
+        )
       }
 
       // Store the rendered element container to reference later
@@ -107,23 +111,11 @@ const ModaTimeline = (props: ModaTimelineProps) => {
       // Return the new container
       return container
     },
-    [itemFontColor],
+    [itemFontColor, itemForegroundColor, props],
   )
 
   const groupTemplateManager: TimelineOptionsTemplateFunction = useCallback(
     (item: DataItem, element: HTMLElement, data: any) => {
-      // if (!item || !element) {
-      //   return null
-      // }
-
-      // createRoot(element).render(
-      //   <Text style={{ padding: '5px', color: itemFontColor }}>
-      //     {item.content}
-      //   </Text>,
-      // )
-
-      // return
-
       if (!item) return
 
       const mapId = item?.id
@@ -162,7 +154,7 @@ const ModaTimeline = (props: ModaTimelineProps) => {
       end: props.options.end,
       min: props.options.min,
       max: props.options.max,
-      groupOrder: 'order',
+      groupOrder: props.options.groupOrder ?? 'order',
       xss: { disabled: false },
       template: props.options.template ?? itemTemplateManager,
       groupTemplate: groupTemplateManager,
@@ -171,6 +163,7 @@ const ModaTimeline = (props: ModaTimelineProps) => {
     groupTemplateManager,
     itemTemplateManager,
     props.options.end,
+    props.options.groupOrder,
     props.options.max,
     props.options.maxHeight,
     props.options.min,
@@ -181,8 +174,8 @@ const ModaTimeline = (props: ModaTimelineProps) => {
 
   useEffect(() => {
     if (
-      props.data.length === 0 &&
-      (!props.groups || props.groups?.length === 0)
+      props.isLoading ||
+      (props.data.length === 0 && (!props.groups || props.groups?.length === 0))
     )
       return
 
@@ -193,7 +186,11 @@ const ModaTimeline = (props: ModaTimelineProps) => {
       const newItem = {
         style: item.style
           ? item.style
-          : `background: ${itemBackgroundColor}; border-color: ${itemBackgroundColor};`,
+          : item.type == 'range'
+            ? `background: ${itemBackgroundColor}; border-color: ${itemBackgroundColor};`
+            : item.type == 'background'
+              ? `background: ${backgroundBackgroundColor}; border-style: inset; border-width: 1px;`
+              : '',
         ...item,
       }
       datasetItems.add(newItem)
@@ -226,7 +223,13 @@ const ModaTimeline = (props: ModaTimelineProps) => {
         timeline.destroy()
       }
     }
-  }, [itemBackgroundColor, options, props.data, props.groups])
+  }, [
+    backgroundBackgroundColor,
+    itemBackgroundColor,
+    options,
+    props.data,
+    props.groups,
+  ])
 
   return (
     <Spin
@@ -237,7 +240,7 @@ const ModaTimeline = (props: ModaTimelineProps) => {
       <div ref={timelineRef} />
       {(!props.data || props.data.length === 0) &&
         (!props.groups || props.groups.length === 0) && (
-          <ModaEmpty message="No timeline data" />
+          <ModaEmpty message={props.emptyMessage ?? 'No timeline data'} />
         )}
     </Spin>
   )
