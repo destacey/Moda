@@ -12,6 +12,13 @@ import { useMemo } from 'react'
 import type { DescriptionsProps } from 'antd'
 import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
 import PlanningIntervalIterationsList from './planning-interval-iterations-list'
+import ObjectiveStatusChart, {
+  ObjectiveStatusChartDataItem,
+} from './objective-status-chart'
+import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
+import ObjectiveHealthChart, {
+  ObjectiveHealthChartDataItem,
+} from './objective-health-chart'
 
 const { Item } = Descriptions
 
@@ -24,6 +31,18 @@ const PlanningIntervalDetails = ({
 }: PlanningIntervalDetailsProps) => {
   const { data: piPredictabilityData } = useGetPlanningIntervalPredictability(
     planningInterval?.id,
+  )
+
+  const {
+    data: objectivesData,
+    isLoading: isLoadingObjectives,
+    refetch: refectObjectives,
+  } = useGetPlanningIntervalObjectivesQuery(
+    {
+      planningIntervalId: planningInterval?.id,
+      teamId: null,
+    },
+    { skip: !planningInterval?.id || planningInterval?.state === 'Future' },
   )
 
   const detailsItems: DescriptionsProps['items'] = [
@@ -107,6 +126,48 @@ const PlanningIntervalDetails = ({
     )
   }, [planningInterval, piPredictabilityData])
 
+  const { objectiveStatusData, objectiveHealthData } = useMemo(() => {
+    if (!objectivesData)
+      return { objectiveStatusData: [], objectiveHealthData: [] }
+    const objectives = objectivesData.map((o) => ({
+      status: o.status.name,
+      health:
+        o.status.name === 'Completed'
+          ? 'Healthy'
+          : o.status.name === 'Canceled' || o.status.name === 'Missed'
+            ? 'Unhealthy'
+            : (o.healthCheck?.status.name ?? 'Unknown'),
+    }))
+
+    // group by status with count
+    const statusData = objectives.reduce(
+      (acc, obj) => {
+        acc[obj.status] = acc[obj.status] ? acc[obj.status] + 1 : 1
+        return acc
+      },
+      {} as Record<string, number>,
+    )
+
+    const objectiveStatusData: ObjectiveStatusChartDataItem[] = Object.entries(
+      statusData,
+    ).map(([status, count]) => ({ type: status, count }))
+
+    // group by status with count
+    const healthData = objectives.reduce(
+      (acc, obj) => {
+        acc[obj.health] = acc[obj.health] ? acc[obj.health] + 1 : 1
+        return acc
+      },
+      {} as Record<string, number>,
+    )
+
+    const objectiveHealthData: ObjectiveHealthChartDataItem[] = Object.entries(
+      healthData,
+    ).map(([health, count]) => ({ type: health, count }))
+
+    return { objectiveStatusData, objectiveHealthData }
+  }, [objectivesData])
+
   if (!planningInterval) return null
 
   return (
@@ -137,6 +198,12 @@ const PlanningIntervalDetails = ({
         {daysCountdownMetric}
         {planningIntervalPredictability}
         {teamPredictabilityChart}
+        {planningInterval && planningInterval.state !== 'Future' && (
+          <>
+            <ObjectiveStatusChart data={objectiveStatusData} />
+            <ObjectiveHealthChart data={objectiveHealthData} />
+          </>
+        )}
         <LinksCard objectId={planningInterval.id} />
       </Space>
     </>

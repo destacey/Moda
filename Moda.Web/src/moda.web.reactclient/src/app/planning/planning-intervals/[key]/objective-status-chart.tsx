@@ -1,9 +1,18 @@
+'use client'
+
 import useTheme from '@/src/app/components/contexts/theme'
 import { Pie, PieConfig } from '@ant-design/charts'
 import { Card } from 'antd'
 import { useMemo } from 'react'
 
-export interface ObjectiveStatusChartProps {}
+export interface ObjectiveStatusChartProps {
+  data: ObjectiveStatusChartDataItem[]
+}
+
+export interface ObjectiveStatusChartDataItem {
+  type: string
+  count: number
+}
 
 const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
   const { currentThemeName, antDesignChartsTheme } = useTheme()
@@ -23,20 +32,14 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
         },
       },
       theme: antDesignChartsTheme,
-      data: [
-        { type: 'Not Started', count: 5 },
-        { type: 'In Progress', count: 15 },
-        { type: 'Completed', count: 10 },
-        { type: 'Canceled', count: 3 },
-        { type: 'Missed', count: 2 },
-      ],
+      data: props.data ?? [],
       angleField: 'count',
       colorField: 'type',
       height: 350,
-      width: 450,
+      width: 425,
       label: {
-        text: (d) => `${d.type}\n ${d.count}`,
-        // text: (d) => `${d.type}\n ${Math.round((d.count / 35) * 100)}%`,
+        text: (d) =>
+          `${d.type}\n ${d.count} (${Math.round((d.count / 35) * 100)}%)`,
         //position: 'outside',
         // style: {
         //   fontWeight: 'bold',
@@ -55,7 +58,9 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
         },
       },
     } as PieConfig
-  }, [antDesignChartsTheme, fontColor])
+  }, [antDesignChartsTheme, fontColor, props.data])
+
+  if (!props.data || props.data.length === 0) return
 
   return (
     <Card size="small">
