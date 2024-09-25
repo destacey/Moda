@@ -37,14 +37,7 @@ const ProgressCellRenderer = ({ value, data }) => {
   const progressStatus = ['Canceled', 'Missed'].includes(data.status?.name)
     ? 'exception'
     : undefined
-  return (
-    <Progress
-      percent={value}
-      size="small"
-      status={progressStatus}
-      style={{ marginLeft: '5px', marginRight: '5px' }}
-    />
-  )
+  return <Progress percent={value} size="small" status={progressStatus} />
 }
 
 interface RowMenuProps extends MenuProps {

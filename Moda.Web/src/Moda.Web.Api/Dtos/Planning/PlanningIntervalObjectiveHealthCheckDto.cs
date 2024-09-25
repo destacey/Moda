@@ -31,6 +31,8 @@ public sealed record PlanningIntervalObjectiveHealthCheckDto
 
     public required PlanningTeamNavigationDto Team { get; set; }
 
+    public double Progress { get; set; }
+
     /// <summary>Gets a value indicating whether this instance is stretch.</summary>
     /// <value><c>true</c> if this instance is stretch; otherwise, <c>false</c>.</value>
     public bool IsStretch { get; set; }
@@ -71,6 +73,7 @@ public sealed record PlanningIntervalObjectiveHealthCheckDto
             Type = objective.Type,
             PlanningInterval = objective.PlanningInterval,
             Team = objective.Team,
+            Progress = objective.Progress,
             IsStretch = objective.IsStretch,
             HealthCheckId = healthCheck?.Id,
             HealthStatus = healthCheck?.Status,
