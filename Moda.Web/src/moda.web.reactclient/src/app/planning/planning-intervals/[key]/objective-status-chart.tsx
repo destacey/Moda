@@ -22,6 +22,7 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
       : 'rgba(255, 255, 255, 0.45)'
 
   const config = useMemo(() => {
+    const total = props.data.reduce((acc, x) => acc + x.count, 0)
     return {
       title: {
         title: 'Objectives By Status',
@@ -39,7 +40,7 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
       width: 425,
       label: {
         text: (d) =>
-          `${d.type}\n ${d.count} (${Math.round((d.count / 35) * 100)}%)`,
+          `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
         //position: 'outside',
         // style: {
         //   fontWeight: 'bold',
