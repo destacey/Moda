@@ -10455,6 +10455,7 @@ export interface PlanningIntervalObjectiveHealthCheckDto {
     type?: SimpleNavigationDto;
     planningInterval?: NavigationDto;
     team?: PlanningTeamNavigationDto;
+    progress?: number;
     /** Gets a value indicating whether this instance is stretch. */
     isStretch?: boolean;
     /** The id of the health check. */

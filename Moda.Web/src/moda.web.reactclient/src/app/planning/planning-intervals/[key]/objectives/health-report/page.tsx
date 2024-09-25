@@ -18,6 +18,7 @@ import {
 } from '@/src/app/components/common/moda-grid-cell-renderers'
 import dayjs from 'dayjs'
 import { ModaGrid } from '@/src/app/components/common'
+import { Progress } from 'antd'
 
 const LocalHealthCheckCellRenderer = ({ data }) => {
   if (!data.healthCheckId) return null
@@ -27,6 +28,13 @@ const LocalHealthCheckCellRenderer = ({ data }) => {
     expiration: data.expiration,
   }
   return HealthCheckStatusCellRenderer({ data: healthCheck })
+}
+
+const ProgressCellRenderer = ({ value, data }) => {
+  const progressStatus = ['Canceled', 'Missed'].includes(data.status?.name)
+    ? 'exception'
+    : undefined
+  return <Progress percent={value} size="small" status={progressStatus} />
 }
 
 const ObjectiveHealthReportPage = ({ params }) => {
@@ -67,6 +75,7 @@ const ObjectiveHealthReportPage = ({ params }) => {
         cellRenderer: NestedTeamNameLinkCellRenderer,
         hide: false,
       },
+      { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
       { field: 'healthCheckId', hide: true },
       {
         field: 'healthStatus.name',

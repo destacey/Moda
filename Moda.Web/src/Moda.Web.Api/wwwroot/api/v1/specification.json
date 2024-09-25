@@ -9700,6 +9700,10 @@
           "team": {
             "$ref": "#/components/schemas/PlanningTeamNavigationDto"
           },
+          "progress": {
+            "type": "number",
+            "format": "double"
+          },
           "isStretch": {
             "type": "boolean",
             "description": "Gets a value indicating whether this instance is stretch."
