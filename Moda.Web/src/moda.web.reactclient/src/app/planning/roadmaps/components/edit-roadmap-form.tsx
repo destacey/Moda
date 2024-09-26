@@ -1,3 +1,5 @@
+'use client'
+
 import useAuth from '@/src/app/components/contexts/auth'
 import {
   RoadmapDetailsDto,
@@ -9,12 +11,23 @@ import {
   useGetRoadmapQuery,
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
+import {
+  ColorPicker,
+  ColorPickerProps,
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  Radio,
+  Select,
+} from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
+import useTheme from '@/src/app/components/contexts/theme'
+import { ModaColorPicker } from '@/src/app/components/common'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -34,6 +47,7 @@ interface EditRoadmapFormValues {
   start: Date
   end: Date
   roadmapManagerIds: string[]
+  color?: string
   visibilityId: number
 }
 
@@ -140,6 +154,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
+      console.log('values', values)
       if (await update(values, roadmapData)) {
         setIsOpen(false)
         form.resetFields()
@@ -288,6 +303,9 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
               }
               options={employeeData}
             />
+          </Item>
+          <Item name="color" label="Color">
+            <ModaColorPicker />
           </Item>
           <Item
             name="visibilityId"
