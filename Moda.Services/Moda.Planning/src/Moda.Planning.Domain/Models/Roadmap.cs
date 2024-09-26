@@ -11,13 +11,13 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     private string _name = default!;
     private string? _description;
     private LocalDateRange _dateRange = default!;
-
+    private string? _color;
     private readonly List<RoadmapManager> _roadmapManagers = [];
     private readonly List<Roadmap> _children = [];
 
     private Roadmap() { }
 
-    private Roadmap(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds, Guid? parentId, int? orderId)
+    private Roadmap(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds, Guid? parentId, int? orderId, string? color)
     {
         _objectConstruction = true;
 
@@ -27,6 +27,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         Description = description;
         DateRange = dateRange;
         Visibility = visibility;
+        Color = color;
 
         ParentId = parentId;
         Order = orderId;
@@ -77,6 +78,11 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     public Visibility Visibility { get; private set; }
 
     /// <summary>
+    /// The color of the Roadmap. This is used to display the Roadmap in the UI.
+    /// </summary>
+    public string? Color { get => _color; private set => _color = value.NullIfWhiteSpacePlusTrim(); }
+
+    /// <summary>
     /// The parent Roadmap Id. This is used to connect Roadmaps together.
     /// </summary>
     public Guid? ParentId { get; private set; }
@@ -108,9 +114,10 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <param name="description"></param>
     /// <param name="dateRange"></param>
     /// <param name="visibility"></param>
+    /// <param name="color"></param>
     /// <param name="currentUserEmployeeId"
     /// <returns></returns>
-    public Result Update(string name, string? description, LocalDateRange dateRange, IEnumerable<Guid> roadmapManagerIds, Visibility visibility, Guid currentUserEmployeeId)
+    public Result Update(string name, string? description, LocalDateRange dateRange, IEnumerable<Guid> roadmapManagerIds, Visibility visibility, string? color, Guid currentUserEmployeeId)
     {
         var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
@@ -133,6 +140,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         Description = description;
         DateRange = dateRange;
         Visibility = visibility;
+        Color = color;
 
         return Result.Success();
     }
@@ -380,8 +388,10 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <param name="dateRange"></param>
     /// <param name="visibility"></param>
     /// <param name="roadmapManagerIds"></param>
+    /// <param name="color"></param>
+    /// <param name="currentUserEmployeeId"></param>
     /// <returns></returns>
-    public Result<Roadmap> CreateChild(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds, Guid currentUserEmployeeId)
+    public Result<Roadmap> CreateChild(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds, string? color, Guid currentUserEmployeeId)
     {
         try
         {
@@ -393,7 +403,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
 
             var order = _children.Count + 1;
 
-            var roadmap = new Roadmap(name, description, dateRange, visibility, roadmapManagerIds, Id, order);
+            var roadmap = new Roadmap(name, description, dateRange, visibility, roadmapManagerIds, Id, order, color);
 
             _children.Add(roadmap);
 
@@ -413,12 +423,13 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <param name="dateRange"></param>
     /// <param name="visibility"></param>
     /// <param name="roadmapManagerIds"></param>
+    /// <param name="color"></param>
     /// <returns></returns>
-    public static Result<Roadmap> CreateRoot(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds)
+    public static Result<Roadmap> CreateRoot(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds, string? color)
     {
         try
         {
-            var roadmap = new Roadmap(name, description, dateRange, visibility, roadmapManagerIds, null, null);
+            var roadmap = new Roadmap(name, description, dateRange, visibility, roadmapManagerIds, null, null, color);
 
             return roadmap;
         }

@@ -26,7 +26,7 @@ public class RoadmapTests
         var managerId = Guid.NewGuid();
 
         // Act
-        var result = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]);
+        var result = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId], fakeRoadmap.Color);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -38,6 +38,7 @@ public class RoadmapTests
         result.Value.RoadmapManagers.First().ManagerId.Should().Be(managerId);
         result.Value.ParentId.Should().BeNull();
         result.Value.Order.Should().BeNull();
+        result.Value.Color.Should().Be(fakeRoadmap.Color);
     }
 
     [Fact]
@@ -48,7 +49,7 @@ public class RoadmapTests
         var managers = Array.Empty<Guid>();
 
         // Act
-        var result = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, managers);
+        var result = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, managers, fakeRoadmap.Color);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -61,15 +62,16 @@ public class RoadmapTests
         // Arrange
         var fakeRoadmap = _faker.Generate();
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId], fakeRoadmap.Color).Value;
         
         var newName = "Updated Name";
         var newDescription = "Updated Description";
         var newDateRange = new LocalDateRange(_dateTimeProvider.Today.PlusDays(1), _dateTimeProvider.Today.PlusDays(11));
         var newVisibility = Visibility.Private;
+        var newColor = "#FFFFFF";
 
         // Act
-        var result = roadmap.Update(newName, newDescription, newDateRange,[managerId], newVisibility, managerId);
+        var result = roadmap.Update(newName, newDescription, newDateRange,[managerId], newVisibility, newColor, managerId);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -77,6 +79,7 @@ public class RoadmapTests
         roadmap.Description.Should().Be(newDescription);
         roadmap.DateRange.Should().Be(newDateRange);
         roadmap.Visibility.Should().Be(newVisibility);
+        roadmap.Color.Should().Be(newColor);
     }
 
     [Fact]
@@ -85,10 +88,10 @@ public class RoadmapTests
         // Arrange
         var fakeRoadmap = _faker.Generate();
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId], fakeRoadmap.Color).Value;
 
         // Act
-        var result = roadmap.Update("Updated Name", "Updated Description", new LocalDateRange(_dateTimeProvider.Today.PlusDays(1), _dateTimeProvider.Today.PlusDays(11)), [managerId], Visibility.Private, Guid.NewGuid());
+        var result = roadmap.Update("Updated Name", "Updated Description", new LocalDateRange(_dateTimeProvider.Today.PlusDays(1), _dateTimeProvider.Today.PlusDays(11)), [managerId], Visibility.Private, roadmap.Color, Guid.NewGuid());
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -101,7 +104,7 @@ public class RoadmapTests
         // Arrange
         var fakeRoadmap = _faker.Generate();
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId], fakeRoadmap.Color).Value;
 
         var initialManagers = new Guid[] { managerId };
         var managerId2 = Guid.NewGuid();
@@ -122,7 +125,7 @@ public class RoadmapTests
         // Arrange
         var fakeRoadmap = _faker.Generate();
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId], fakeRoadmap.Color).Value;
 
         // Act
         var result = roadmap.AddManager(managerId, managerId);
@@ -140,7 +143,7 @@ public class RoadmapTests
         var fakeRoadmap = _faker.Generate();
         var managerId = Guid.NewGuid();
         var managerId2 = Guid.NewGuid();
-        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId, managerId2]).Value;
+        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId, managerId2], fakeRoadmap.Color).Value;
 
         // Act
         var result = roadmap.RemoveManager(managerId2, managerId);
@@ -157,7 +160,7 @@ public class RoadmapTests
         // Arrange
         var fakeRoadmap = _faker.Generate();
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId], fakeRoadmap.Color).Value;
 
         // Act
         var result = roadmap.RemoveManager(Guid.NewGuid(), managerId);
@@ -173,7 +176,7 @@ public class RoadmapTests
         // Arrange
         var fakeRoadmap = _faker.Generate();
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId], fakeRoadmap.Color).Value;
 
         // Act
         var result = roadmap.RemoveManager(managerId, managerId);
@@ -189,12 +192,12 @@ public class RoadmapTests
         // Arrange
         var fakeRoadmap = _faker.Generate();
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId], fakeRoadmap.Color).Value;
 
         var fakeChildRoadmap = _faker.Generate();
 
         // Act
-        var result = roadmap.CreateChild(fakeChildRoadmap.Name, fakeChildRoadmap.Description, fakeChildRoadmap.DateRange, fakeChildRoadmap.Visibility, [managerId], managerId);
+        var result = roadmap.CreateChild(fakeChildRoadmap.Name, fakeChildRoadmap.Description, fakeChildRoadmap.DateRange, fakeChildRoadmap.Visibility, [managerId], fakeChildRoadmap.Color, managerId);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -212,7 +215,7 @@ public class RoadmapTests
         var fakeChildRoadmap = _faker.Generate();
 
         // Act
-        var result3 = roadmap.CreateChild(fakeChildRoadmap.Name, fakeChildRoadmap.Description, fakeChildRoadmap.DateRange, fakeChildRoadmap.Visibility, [managerId], managerId);
+        var result3 = roadmap.CreateChild(fakeChildRoadmap.Name, fakeChildRoadmap.Description, fakeChildRoadmap.DateRange, fakeChildRoadmap.Visibility, [managerId], fakeChildRoadmap.Color, managerId);
 
         // Assert
         result3.IsSuccess.Should().BeTrue();
@@ -225,10 +228,10 @@ public class RoadmapTests
         // Arrange
         var fakeRoadmap = _faker.Generate();
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId], fakeRoadmap.Color).Value;
 
         var fakeChildRoadmap = _faker.Generate();
-        var child = roadmap.CreateChild(fakeChildRoadmap.Name, fakeChildRoadmap.Description, fakeChildRoadmap.DateRange, fakeChildRoadmap.Visibility, [managerId], managerId).Value;
+        var child = roadmap.CreateChild(fakeChildRoadmap.Name, fakeChildRoadmap.Description, fakeChildRoadmap.DateRange, fakeChildRoadmap.Visibility, [managerId], fakeChildRoadmap.Color, managerId).Value;
 
         // Act
         var result = roadmap.RemoveChild(child.Id, managerId);
@@ -244,10 +247,10 @@ public class RoadmapTests
         // Arrange
         var fakeRoadmap = _faker.Generate();
         var managerId = Guid.NewGuid();
-        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId]).Value;
+        var roadmap = Roadmap.CreateRoot(fakeRoadmap.Name, fakeRoadmap.Description, fakeRoadmap.DateRange, fakeRoadmap.Visibility, [managerId], fakeRoadmap.Color).Value;
 
         var fakeChildRoadmap = _faker.Generate();
-        var child = roadmap.CreateChild(fakeChildRoadmap.Name, fakeChildRoadmap.Description, fakeChildRoadmap.DateRange, fakeChildRoadmap.Visibility, [managerId], managerId).Value;
+        var child = roadmap.CreateChild(fakeChildRoadmap.Name, fakeChildRoadmap.Description, fakeChildRoadmap.DateRange, fakeChildRoadmap.Visibility, [managerId], fakeChildRoadmap.Color, managerId).Value;
 
         // Act
         var result = roadmap.RemoveChild(Guid.NewGuid(), managerId);

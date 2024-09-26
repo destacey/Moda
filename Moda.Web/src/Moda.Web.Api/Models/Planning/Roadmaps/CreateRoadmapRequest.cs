@@ -36,13 +36,18 @@ public sealed record CreateRoadmapRequest
     public int VisibilityId { get; set; }
 
     /// <summary>
+    /// The color of the Roadmap. Must be a valid hex color code.
+    /// </summary>
+    public string? Color { get; set; }
+
+    /// <summary>
     /// Informs the API to link the Roadmap to the Roadmap with the provided parentId after creation.
     /// </summary>
     public Guid? ParentId { get; set; }
 
     public CreateRoadmapCommand ToCreateRoadmapCommand()
     {
-        return new CreateRoadmapCommand(Name, Description, new LocalDateRange(Start, End), RoadmapManagerIds, (Visibility)VisibilityId, ParentId);
+        return new CreateRoadmapCommand(Name, Description, new LocalDateRange(Start, End), RoadmapManagerIds, (Visibility)VisibilityId, Color, ParentId);
     }
 }
 
@@ -76,6 +81,10 @@ public sealed class CreateRoadmapRequestValidator : CustomValidator<CreateRoadma
         RuleFor(t => (Visibility)t.VisibilityId)
             .IsInEnum()
             .WithMessage("A valid visibility must be selected.");
+
+        When(t => t.Color != null, () => RuleFor(t => t.Color)
+            .Matches("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
+            .WithMessage("Color must be a valid hex color code."));
 
         When(t => t.ParentId.HasValue, () =>
         {

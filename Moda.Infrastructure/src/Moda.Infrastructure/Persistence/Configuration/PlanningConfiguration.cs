@@ -330,6 +330,10 @@ public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
             .HasMaxLength(32)
             .HasColumnType("varchar");
 
+        builder.Property(r => r.Color)
+            .HasMaxLength(7)
+            .HasColumnType("varchar");
+
         builder.Property(r => r.Order);
 
         // Value Objects

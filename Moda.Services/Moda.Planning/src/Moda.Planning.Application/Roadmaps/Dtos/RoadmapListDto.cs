@@ -33,6 +33,11 @@ public sealed record RoadmapListDto : IMapFrom<Roadmap>
     public required SimpleNavigationDto Visibility { get; set; }
 
     /// <summary>
+    /// The color of the Roadmap. Must be a valid hex color code.
+    /// </summary>
+    public string? Color { get; set; }
+
+    /// <summary>
     /// The managers of the Roadmap.
     /// </summary>
     public required List<EmployeeNavigationDto> RoadmapManagers { get; set; } = [];
