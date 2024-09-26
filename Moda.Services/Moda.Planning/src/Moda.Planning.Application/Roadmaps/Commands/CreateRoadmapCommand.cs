@@ -3,7 +3,7 @@ using Moda.Common.Application.Models;
 using Moda.Common.Domain.Enums;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
-public sealed record CreateRoadmapCommand(string Name, string? Description, LocalDateRange DateRange, List<Guid> RoadmapManagerIds, Visibility Visibility, Guid? ParentId) : ICommand<ObjectIdAndKey>;
+public sealed record CreateRoadmapCommand(string Name, string? Description, LocalDateRange DateRange, List<Guid> RoadmapManagerIds, Visibility Visibility, string? color, Guid? ParentId) : ICommand<ObjectIdAndKey>;
 
 public sealed class CreateRoadmapCommandValidator : AbstractValidator<CreateRoadmapCommand>
 {
@@ -32,6 +32,10 @@ public sealed class CreateRoadmapCommandValidator : AbstractValidator<CreateRoad
 
         RuleFor(x => x.Visibility)
             .IsInEnum();
+
+        When(x => x.color != null, () => RuleFor(x => x.color)
+            .Matches("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
+            .WithMessage("Color must be a valid hex color code."));
 
         When(x => x.ParentId.HasValue, () =>
         {
@@ -89,6 +93,7 @@ internal sealed class CreateRoadmapCommandHandler(IPlanningDbContext planningDbC
             request.DateRange,
             request.Visibility,
             request.RoadmapManagerIds,
+            request.color,
             _currentUserEmployeeId
             );
 
@@ -110,7 +115,8 @@ internal sealed class CreateRoadmapCommandHandler(IPlanningDbContext planningDbC
             request.Description,
             request.DateRange,
             request.Visibility,
-            request.RoadmapManagerIds
+            request.RoadmapManagerIds,
+            request.color
             );
 
         if (result.IsFailure)

@@ -102,6 +102,10 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         content: roadmap.name,
         start: dayjs(roadmap.start).toDate(),
         end: dayjs(roadmap.end).toDate(),
+        style:
+          roadmap.color === null
+            ? undefined
+            : `background: ${roadmap.color}; border-color: ${roadmap.color};`,
         group: null,
         type: 'range',
         order: roadmap.order,
@@ -117,6 +121,10 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         content: roadmapLink.name,
         start: dayjs(roadmapLink.start).toDate(),
         end: dayjs(roadmapLink.end).toDate(),
+        style:
+          roadmapLink.color === null
+            ? undefined
+            : `background: ${roadmapLink.color}; border-color: ${roadmapLink.color};`,
         group: roadmapLink.parent.id,
         type: 'range',
         order: roadmapLink.order,

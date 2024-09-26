@@ -40,9 +40,14 @@ public sealed record UpdateRoadmapRequest
     /// </summary>
     public int VisibilityId { get; set; }
 
+    /// <summary>
+    /// The color of the Roadmap. Must be a valid hex color code.
+    /// </summary>
+    public string? Color { get; set; }
+
     public UpdateRoadmapCommand ToUpdateRoadmapCommand()
     {
-        return new UpdateRoadmapCommand(Id, Name, Description, new LocalDateRange(Start, End), RoadmapManagerIds, (Visibility)VisibilityId);
+        return new UpdateRoadmapCommand(Id, Name, Description, new LocalDateRange(Start, End), RoadmapManagerIds, (Visibility)VisibilityId, Color);
     }
 }
 
@@ -79,5 +84,9 @@ public sealed class UpdateRoadmapRequestValidator : CustomValidator<UpdateRoadma
         RuleFor(t => (Visibility)t.VisibilityId)
             .IsInEnum()
             .WithMessage("A valid visibility must be selected.");
+
+        When(t => t.Color != null, () => RuleFor(t => t.Color)
+            .Matches("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
+            .WithMessage("Color must be a valid hex color code."));
     }
 }

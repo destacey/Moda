@@ -2,7 +2,7 @@
 using Moda.Common.Domain.Enums;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
-public sealed record UpdateRoadmapCommand(Guid Id, string Name, string? Description, LocalDateRange DateRange, List<Guid> RoadmapManagerIds, Visibility Visibility) : ICommand;
+public sealed record UpdateRoadmapCommand(Guid Id, string Name, string? Description, LocalDateRange DateRange, List<Guid> RoadmapManagerIds, Visibility Visibility, string? color) : ICommand;
 
 public sealed class UpdateRoadmapCommandValidator : AbstractValidator<UpdateRoadmapCommand>
 {
@@ -34,6 +34,10 @@ public sealed class UpdateRoadmapCommandValidator : AbstractValidator<UpdateRoad
 
         RuleFor(x => x.Visibility)
             .IsInEnum();
+
+        When(x => x.color != null, () => RuleFor(x => x.color)
+            .Matches("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
+            .WithMessage("Color must be a valid hex color code."));
     }
 
     public bool IncludeCurrentUser(IEnumerable<Guid> roadmapManagerIds)
@@ -68,6 +72,7 @@ internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbC
                 request.DateRange,
                 request.RoadmapManagerIds,
                 request.Visibility,
+                request.color,
                 _currentUserEmployeeId
                 );
 

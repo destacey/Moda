@@ -16,6 +16,7 @@ public class RoadmapFaker : PrivateConstructorFaker<Roadmap>
         RuleFor(x => x.Description, f => f.Random.Words(5));
         RuleFor(x => x.DateRange, f => new LocalDateRange(BaseDate, BaseDate.PlusDays(10)));
         RuleFor(x => x.Visibility, f => f.PickRandom<Visibility>());
+        RuleFor(x => x.Color, f => string.Format("#{0:X6}", f.Random.Hexadecimal(0x1000000)));
         //RuleFor(x => x.Managers, f => managerFaker.Generate(1)); // TODO not working
         RuleFor(x => x.ParentId, f => null);
         RuleFor(x => x.Order, f => null);
@@ -26,7 +27,7 @@ public class RoadmapFaker : PrivateConstructorFaker<Roadmap>
 
 public static class RoadmapFakerExtensions
 {
-    public static RoadmapFaker WithData(this RoadmapFaker faker, Guid? id = null, string? name = null, string? description = null, LocalDateRange? dateRange = null, Visibility? visibility = null, Guid? parentId = null, int? order = null)
+    public static RoadmapFaker WithData(this RoadmapFaker faker, Guid? id = null, string? name = null, string? description = null, LocalDateRange? dateRange = null, Visibility? visibility = null, Guid? parentId = null, int? order = null, string? color = null)
     {
         if (id.HasValue) { faker.RuleFor(x => x.Id, id.Value); }
         if (!string.IsNullOrWhiteSpace(name)) { faker.RuleFor(x => x.Name, name); }
@@ -36,6 +37,7 @@ public static class RoadmapFakerExtensions
         // TODO - Add roadmap managers
         if (parentId.HasValue) { faker.RuleFor(x => x.ParentId, parentId); }
         if (order.HasValue) { faker.RuleFor(x => x.Order, order); }
+        if (!string.IsNullOrWhiteSpace(color)) { faker.RuleFor(x => x.Color, color); }
 
         return faker;
     }

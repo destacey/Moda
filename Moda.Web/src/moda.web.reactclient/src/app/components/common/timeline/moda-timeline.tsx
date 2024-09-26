@@ -175,14 +175,14 @@ const ModaTimeline = (props: ModaTimelineProps) => {
     const datasetItems = new DataSet([])
     props.data.map((item) => {
       const newItem = {
+        ...item,
         style: item.style
           ? item.style
-          : item.type == 'range'
+          : item.type === 'range'
             ? `background: ${itemBackgroundColor}; border-color: ${itemBackgroundColor};`
-            : item.type == 'background'
+            : item.type === 'background'
               ? `background: ${backgroundBackgroundColor}; border-style: inset; border-width: 1px;`
-              : '',
-        ...item,
+              : undefined,
       }
       datasetItems.add(newItem)
     })
