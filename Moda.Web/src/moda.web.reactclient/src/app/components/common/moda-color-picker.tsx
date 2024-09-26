@@ -40,7 +40,7 @@ const ModaColorPicker = (props: ModaColorPickerProps) => {
     red: red.slice(2, 8).filter((_, index) => index % 2 === 0),
     green: green.slice(2, 8).filter((_, index) => index % 2 === 0),
     yellow: yellow.slice(2, 8).filter((_, index) => index % 2 === 0),
-    grey1: grey.slice(1, 6).filter((_, index) => index % 2 === 0),
+    grey: grey.slice(1, 6).filter((_, index) => index % 2 === 0),
   })
 
   const onPickerChange = (color: Color) => {
