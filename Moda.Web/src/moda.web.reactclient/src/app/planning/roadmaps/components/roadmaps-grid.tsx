@@ -7,6 +7,7 @@ import {
 } from '@/src/services/moda-api'
 import { useUpdateChildOrderMutation } from '@/src/store/features/planning/roadmaps-api'
 import { ColDef, RowDragEndEvent } from 'ag-grid-community'
+import { ColorPicker } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
 import Link from 'next/link'
@@ -67,6 +68,19 @@ const RoadmapsGrid: React.FC<RoadmapsGridProps> = (
         field: 'visibility.name',
         headerName: 'Visibility',
         width: 125,
+      },
+      {
+        field: 'color',
+        width: 125,
+        cellRenderer: (params) =>
+          params.value && (
+            <ColorPicker
+              defaultValue={params.value}
+              size="small"
+              showText
+              disabled
+            />
+          ),
       },
     ],
     [enableRowDrag],
