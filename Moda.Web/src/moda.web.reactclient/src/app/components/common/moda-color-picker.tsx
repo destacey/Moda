@@ -1,6 +1,6 @@
 'use client'
 
-import { Col, ColorPicker, ColorPickerProps, Divider, Row, Space } from 'antd'
+import { ColorPicker, ColorPickerProps } from 'antd'
 import {
   generate,
   green,
@@ -15,6 +15,7 @@ import { Color } from 'antd/es/color-picker'
 
 export interface ModaColorPickerProps {
   color?: string | undefined
+  onChange: (color: string) => void
 }
 
 type Presets = Required<ColorPickerProps>['presets'][number]
@@ -49,10 +50,12 @@ const ModaColorPicker = (props: ModaColorPickerProps) => {
     } else {
       setSelectedColor(undefined)
     }
+    props.onChange(colorValue)
   }
 
   return (
     <ColorPicker
+      defaultFormat="hex"
       value={selectedColor}
       presets={colorPresets}
       allowClear

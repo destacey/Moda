@@ -1,3 +1,4 @@
+import { ModaColorPicker } from '@/src/app/components/common'
 import useAuth from '@/src/app/components/contexts/auth'
 import { CreateRoadmapRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
@@ -31,6 +32,7 @@ interface CreateRoadmapFormValues {
   end: Date
   roadmapManagerIds: string[]
   visibilityId: number
+  color?: string | undefined
 }
 
 const mapToRequestValues = (
@@ -44,6 +46,7 @@ const mapToRequestValues = (
     end: (values.end as any)?.format('YYYY-MM-DD'),
     roadmapManagerIds: values.roadmapManagerIds,
     visibilityId: values.visibilityId,
+    color: values.color,
     parentId: parentRoadmapId,
   } as CreateRoadmapRequest
 }
@@ -182,6 +185,10 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
     }
   }, [currentUserInternalEmployeeIdError, employeeOptionsError, error, props])
 
+  const onColorChange = (color: string) => {
+    form.setFieldsValue({ color })
+  }
+
   return (
     <>
       <Modal
@@ -266,6 +273,12 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
               options={visibilityData}
               optionType="button"
               buttonStyle="solid"
+            />
+          </Item>
+          <Item name="color" label="Color">
+            <ModaColorPicker
+              color={form.getFieldValue('color')}
+              onChange={onColorChange}
             />
           </Item>
         </Form>

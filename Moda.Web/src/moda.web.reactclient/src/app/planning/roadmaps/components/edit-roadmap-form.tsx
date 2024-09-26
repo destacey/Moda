@@ -11,22 +11,12 @@ import {
   useGetRoadmapQuery,
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
-import {
-  ColorPicker,
-  ColorPickerProps,
-  DatePicker,
-  Form,
-  Input,
-  Modal,
-  Radio,
-  Select,
-} from 'antd'
+import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
-import useTheme from '@/src/app/components/contexts/theme'
 import { ModaColorPicker } from '@/src/app/components/common'
 
 const { Item } = Form
@@ -47,8 +37,8 @@ interface EditRoadmapFormValues {
   start: Date
   end: Date
   roadmapManagerIds: string[]
-  color?: string
   visibilityId: number
+  color?: string | undefined
 }
 
 const mapToRequestValues = (
@@ -63,6 +53,7 @@ const mapToRequestValues = (
     end: (values.end as any)?.format('YYYY-MM-DD'),
     roadmapManagerIds: values.roadmapManagerIds,
     visibilityId: values.visibilityId,
+    color: values.color,
   } as UpdateRoadmapRequest
 }
 
@@ -112,6 +103,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
         start: dayjs(roadmap.start),
         end: dayjs(roadmap.end),
         visibilityId: roadmap.visibility.id,
+        color: roadmap.color,
         roadmapManagerIds: roadmap.roadmapManagers.map((rm) => rm.id),
       })
     },
@@ -154,7 +146,6 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      console.log('values', values)
       if (await update(values, roadmapData)) {
         setIsOpen(false)
         form.resetFields()
@@ -228,6 +219,10 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
     props,
     visibilityError,
   ])
+
+  const onColorChange = (color: string) => {
+    form.setFieldsValue({ color })
+  }
 
   return (
     <>
@@ -304,9 +299,6 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
               options={employeeData}
             />
           </Item>
-          <Item name="color" label="Color">
-            <ModaColorPicker />
-          </Item>
           <Item
             name="visibilityId"
             label="Visibility"
@@ -316,6 +308,12 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
               options={visibilityData}
               optionType="button"
               buttonStyle="solid"
+            />
+          </Item>
+          <Item name="color" label="Color">
+            <ModaColorPicker
+              color={form.getFieldValue('color')}
+              onChange={onColorChange}
             />
           </Item>
         </Form>
