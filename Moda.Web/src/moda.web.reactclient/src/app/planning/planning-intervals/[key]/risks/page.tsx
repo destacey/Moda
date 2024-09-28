@@ -5,7 +5,7 @@ import {
   useGetPlanningIntervalByKey,
   useGetPlanningIntervalRisks,
 } from '@/src/services/queries/planning-queries'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { PageTitle } from '@/src/app/components/common'
 import { notFound } from 'next/navigation'
 import RisksGrid from '@/src/app/components/common/planning/risks-grid'
@@ -19,7 +19,6 @@ const PlanningIntervalRisksPage = ({ params }) => {
     data: planningIntervalData,
     isLoading,
     isFetching,
-    refetch: refetchPlanningInterval,
   } = useGetPlanningIntervalByKey(params.key)
 
   const risksQuery = useGetPlanningIntervalRisks(

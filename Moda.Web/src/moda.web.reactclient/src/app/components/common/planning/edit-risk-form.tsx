@@ -14,7 +14,6 @@ import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
 import { RiskDetailsDto, UpdateRiskRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
-import _ from 'lodash'
 import dayjs from 'dayjs'
 import {
   useGetRiskById,

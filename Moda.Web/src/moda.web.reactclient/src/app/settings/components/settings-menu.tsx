@@ -164,7 +164,7 @@ export default function SettingsMenu() {
 
   useEffect(() => {
     // Reduce the menu items based on the user's claims and transformed into antd menu items using the getItem function
-    var filteredMenu = settingsMenuItems.reduce(
+    const filteredMenu = settingsMenuItems.reduce(
       (acc: ItemType<MenuItemType>[], item: SectionMenuItem) =>
         authorizeMenuItems(acc, item, hasPermissionClaim),
       [],

@@ -25,7 +25,7 @@ const genPresets = (presets = presetPalettes) =>
 
 const customPanelRender: ColorPickerProps['panelRender'] = (
   _,
-  { components: { Picker, Presets } },
+  { components: { Presets } },
 ) => <Presets />
 
 const ModaColorPicker = (props: ModaColorPickerProps) => {

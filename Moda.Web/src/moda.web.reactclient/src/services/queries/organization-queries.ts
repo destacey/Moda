@@ -99,25 +99,21 @@ export interface UpdateTeamMembershipMutationRequest {
 export const useUpdateTeamMembershipMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({
-      membership,
-      parentTeamId,
-      teamType,
-    }: UpdateTeamMembershipMutationRequest) => {
-      if (teamType === 'Team') {
+    mutationFn: async (request: UpdateTeamMembershipMutationRequest) => {
+      if (request.teamType === 'Team') {
         return (await getTeamsClient()).updateTeamMembership(
-          membership.teamId,
-          membership.teamMembershipId,
-          membership,
+          request.membership.teamId,
+          request.membership.teamMembershipId,
+          request.membership,
         )
-      } else if (teamType === 'Team of Teams') {
+      } else if (request.teamType === 'Team of Teams') {
         return (await getTeamsOfTeamsClient()).updateTeamMembership(
-          membership.teamId,
-          membership.teamMembershipId,
-          membership,
+          request.membership.teamId,
+          request.membership.teamMembershipId,
+          request.membership,
         )
       } else {
-        throw new Error(`Invalid team type: ${teamType}`)
+        throw new Error(`Invalid team type: ${request.teamType}`)
       }
     },
     onSuccess: (data, variables) => {
@@ -142,24 +138,19 @@ export interface DeleteTeamMembershipMutationRequest {
 export const useDeleteTeamMembershipMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({
-      teamMembershipId,
-      teamId,
-      parentTeamId,
-      teamType,
-    }: DeleteTeamMembershipMutationRequest) => {
-      if (teamType === 'Team') {
+    mutationFn: async (request: DeleteTeamMembershipMutationRequest) => {
+      if (request.teamType === 'Team') {
         return (await getTeamsClient()).removeTeamMembership(
-          teamId,
-          teamMembershipId,
+          request.teamId,
+          request.teamMembershipId,
         )
-      } else if (teamType === 'Team of Teams') {
+      } else if (request.teamType === 'Team of Teams') {
         return (await getTeamsOfTeamsClient()).removeTeamMembership(
-          teamId,
-          teamMembershipId,
+          request.teamId,
+          request.teamMembershipId,
         )
       } else {
-        throw new Error(`Invalid team type: ${teamType}`)
+        throw new Error(`Invalid team type: ${request.teamType}`)
       }
     },
     onSuccess: (data, variables) => {

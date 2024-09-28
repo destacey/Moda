@@ -5,7 +5,7 @@ import {
   WorkItemsListCard,
 } from '@/src/app/components/common/work'
 import { DashboardOutlined, FormOutlined } from '@ant-design/icons'
-import { Button, Card, Input } from 'antd'
+import { Button, Card } from 'antd'
 import { useState } from 'react'
 import ManagePlanningIntervalObjectiveWorkItemsForm from './manage-planning-interval-objective-work-items-form'
 import { useGetObjectiveWorkItemsQuery } from '@/src/store/features/planning/planning-interval-api'
@@ -29,7 +29,6 @@ const PlanningIntervalObjectiveWorkItemsCard = (
   const {
     data: workItemsData,
     isLoading,
-    isError,
     refetch,
   } = useGetObjectiveWorkItemsQuery({
     planningIntervalId: props.planningIntervalId,

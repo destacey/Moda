@@ -17,7 +17,7 @@ export const workStatusApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.WorkStatus,
         ...result.map(({ id }) => ({ type: QueryTags.WorkType, id })),
       ],
@@ -32,9 +32,7 @@ export const workStatusApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
-        { type: QueryTags.WorkStatus, id: result.id },
-      ],
+      providesTags: (result) => [{ type: QueryTags.WorkStatus, id: result.id }],
     }),
   }),
   overrideExisting: false,

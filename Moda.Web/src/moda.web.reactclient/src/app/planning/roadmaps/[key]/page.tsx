@@ -54,7 +54,6 @@ const RoadmapDetailsPage = ({ params }) => {
   const {
     data: roadmapData,
     isLoading,
-    isFetching,
     error,
     refetch: refetchRoadmap,
   } = useGetRoadmapQuery(params.key)
@@ -62,7 +61,6 @@ const RoadmapDetailsPage = ({ params }) => {
   const {
     data: roadmapChildren,
     isLoading: isChildrenLoading,
-    isFetching: isChildrenFetching,
     refetch: refetchChildren,
   } = useGetRoadmapChildrenQuery([roadmapData?.id], {
     skip: !roadmapData,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import useAuth from '@/src/app/components/contexts/auth'
@@ -70,12 +71,7 @@ const MapAzdoWorkspaceTeamsForm = (props: MapAzdoWorkspaceTeamsFormProps) => {
     'Permissions.Connections.Update',
   )
 
-  const {
-    data: connectionTeamsData,
-    isLoading,
-    error,
-    refetch,
-  } = useGetAzdoConnectionTeamsQuery({
+  const { data: connectionTeamsData } = useGetAzdoConnectionTeamsQuery({
     connectionId: props.connectionId,
     workspaceId: props.workspaceId,
   })

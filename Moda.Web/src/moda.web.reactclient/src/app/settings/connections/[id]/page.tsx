@@ -33,6 +33,7 @@ enum ConnectionTabs {
 const ConnectionDetailsPage = ({ params }) => {
   useDocumentTitle('Connection Details')
   const [activeTab, setActiveTab] = useState(ConnectionTabs.Details)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isSyncingOrganization, setIsSyncingOrganization] = useState(false)
   const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
@@ -56,7 +57,6 @@ const ConnectionDetailsPage = ({ params }) => {
   const {
     data: connectionData,
     isLoading,
-    error,
     refetch,
   } = useGetAzdoConnectionByIdQuery(params.id)
   const azdoOrgUrl = connectionData?.configuration?.organizationUrl

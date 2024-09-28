@@ -135,7 +135,7 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
   }, [searchResult])
 
   useEffect(() => {
-    let selectedIds = []
+    const selectedIds = []
     rightGridRef.current?.api?.forEachNode((n) => selectedIds.push(n.data.id))
 
     setSourceWorkItems(

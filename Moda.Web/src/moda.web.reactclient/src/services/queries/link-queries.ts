@@ -56,7 +56,7 @@ export interface DeleteLinkMutationRequest {
 export const useDeleteLinkMutation = () => {
   const queryClient = useQueryClient()
   return useMutation(
-    async ({ id, objectId }: DeleteLinkMutationRequest) =>
+    async ({ id }: DeleteLinkMutationRequest) =>
       (await getLinksClient()).delete(id),
     {
       onSuccess: (data, variables) => {

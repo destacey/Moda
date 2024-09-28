@@ -29,7 +29,7 @@ const RoleDetails = (props: RolesDetailProps) => {
 
   useEffect(() => setRole(props.role), [props.role])
 
-  const confirmDelete = async (e: React.MouseEvent<HTMLElement>) => {
+  const confirmDelete = async () => {
     try {
       await useDeleteRole.mutateAsync(role.id)
       messageApi.success('Role deleted successfully')
@@ -71,7 +71,7 @@ const RoleDetails = (props: RolesDetailProps) => {
     }
   }
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = () => {
     messageApi.error(`Failed to save role`)
   }
 

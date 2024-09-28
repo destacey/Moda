@@ -30,7 +30,7 @@ export const useCreateHealthCheckMutation = () => {
     async (healthCheck: CreateHealthCheckRequest) =>
       (await getHealthChecksClient()).create(healthCheck),
     {
-      onSuccess: (data, variables) => {},
+      onSuccess: () => {},
     },
   )
 }

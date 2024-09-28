@@ -24,7 +24,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.WorkTypeLevel,
         ...result.map(({ id }) => ({ type: QueryTags.WorkTypeLevel, id })),
       ],
@@ -54,7 +54,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.WorkTypeLevelOption,
         ...result.map(({ id }) => ({
           type: QueryTags.WorkTypeLevelOption,
@@ -72,7 +72,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         { type: QueryTags.WorkTypeLevel, id: result.id },
       ],
     }),
@@ -86,7 +86,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: (result, error, arg) => [
+      invalidatesTags: () => [
         QueryTags.WorkTypeLevel,
         QueryTags.WorkTypeLevelOption,
       ],
@@ -121,7 +121,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: (result, error, arg) => {
+      invalidatesTags: () => {
         return [QueryTags.WorkTypeLevel, QueryTags.WorkTypeLevelOption]
       },
     }),

@@ -68,7 +68,7 @@ const healthCheckSlice = createCrudSlice({
   },
   additionalThunkReducers: ({ createDetail }) => {
     return {
-      [createDetail.fulfilled.type]: (state, action) => {
+      [createDetail.fulfilled.type]: (state) => {
         state.createContext = {
           objectId: '',
           contextId: null,

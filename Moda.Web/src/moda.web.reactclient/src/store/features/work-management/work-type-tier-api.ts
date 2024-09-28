@@ -15,7 +15,7 @@ export const workTypeTierApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.WorkTypeTier,
         ...result.map(({ id }) => ({ type: QueryTags.WorkTypeTier, id })),
       ],

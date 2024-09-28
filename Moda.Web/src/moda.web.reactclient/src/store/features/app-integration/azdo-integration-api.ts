@@ -27,7 +27,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.Connections,
         ...result.map(({ id }) => ({ type: QueryTags.Connections, id })),
       ],
