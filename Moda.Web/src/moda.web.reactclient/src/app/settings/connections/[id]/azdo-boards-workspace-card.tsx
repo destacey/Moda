@@ -26,14 +26,6 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
     useState<boolean>(false)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const onInitWorkspaceFormClosed = (wasSaved: boolean) => {
-    setOpenInitWorkspaceIntegrationForm(false)
-  }
-
-  const onOpenMapAzdoWorkspaceTeamsForm = (wasSaved: boolean) => {
-    setOpenMapAzdoWorkspaceTeamsForm(false)
-  }
-
   const azdoBoardsConnection = useContext(AzdoBoardsConnectionContext)
 
   return (
@@ -89,8 +81,8 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
           connectionId={azdoBoardsConnection.connectionId}
           externalId={props.workspace.externalId}
           workspaceName={props.workspace.name}
-          onFormSave={() => onInitWorkspaceFormClosed(false)}
-          onFormCancel={() => onInitWorkspaceFormClosed(false)}
+          onFormSave={() => setOpenInitWorkspaceIntegrationForm(false)}
+          onFormCancel={() => setOpenInitWorkspaceIntegrationForm(false)}
         />
       )}
       {openMapAzdoWorkspaceTeamsForm && (
@@ -99,8 +91,8 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
           connectionId={azdoBoardsConnection.connectionId}
           workspaceId={props.workspace.externalId}
           workspaceName={props.workspace.name}
-          onFormSave={() => onOpenMapAzdoWorkspaceTeamsForm(false)}
-          onFormCancel={() => onOpenMapAzdoWorkspaceTeamsForm(false)}
+          onFormSave={() => setOpenMapAzdoWorkspaceTeamsForm(false)}
+          onFormCancel={() => setOpenMapAzdoWorkspaceTeamsForm(false)}
           messageApi={messageApi}
         />
       )}

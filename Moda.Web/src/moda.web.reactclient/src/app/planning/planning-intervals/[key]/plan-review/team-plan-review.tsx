@@ -135,7 +135,7 @@ const TeamPlanReview = ({
               teamId={team?.id}
               planningIntervalId={planningInterval?.id}
               newObjectivesAllowed={
-                !planningInterval?.objectivesLocked ?? false
+                planningInterval && !planningInterval.objectivesLocked
               }
               refreshPlanningInterval={refreshPlanningInterval}
               onObjectiveClick={onObjectiveClick}

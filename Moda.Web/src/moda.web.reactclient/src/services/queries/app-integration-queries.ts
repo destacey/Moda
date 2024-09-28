@@ -3,7 +3,7 @@ import {
   InitWorkspaceIntegrationRequest,
   TestAzureDevOpsBoardConnectionRequest,
 } from './../moda-api'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import { QK } from './query-keys'
 import { getAzureDevOpsBoardsConnectionsClient } from '../clients'
 import {
@@ -120,7 +120,7 @@ export const testAzdoBoardsConfiguration = async (
   configuration: TestAzureDevOpsBoardConnectionRequest,
 ) => {
   try {
-    var result = await (
+    await (
       await getAzureDevOpsBoardsConnectionsClient()
     ).testConfig(configuration)
     return 'success'

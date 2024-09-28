@@ -2,8 +2,7 @@
 
 import { WorkProcessDto } from '@/src/services/moda-api'
 import { useGetWorkProcessSchemesQuery } from '@/src/store/features/work-management/work-process-api'
-import { Descriptions, Divider, List } from 'antd'
-import Link from 'next/link'
+import { Descriptions, List } from 'antd'
 
 const { Item } = Descriptions
 const { Item: ListItem } = List

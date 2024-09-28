@@ -3,7 +3,7 @@
 import { WorkItemProgressRollupDto } from '@/src/services/moda-api'
 import { Progress, Tooltip } from 'antd'
 import { round } from 'lodash'
-import React, { use, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useState } from 'react'
 
 export interface WorkProgressProps {

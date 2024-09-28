@@ -6,7 +6,7 @@ import {
 } from '@/src/services/moda-api'
 import WorkItemCycleTime from './work-item-cycle-time'
 import WorkItemTimeToStart from './work-item-time-to-start'
-import { Card, Space, Spin } from 'antd'
+import { Card, Space } from 'antd'
 import WorkItemLeadTime from './work-item-lead-time'
 import { WorkItemsCumulativeFlowChart } from '@/src/app/components/common/work'
 import { useGetWorkItemMetricsQuery } from '@/src/store/features/work-management/workspace-api'

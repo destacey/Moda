@@ -39,7 +39,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.PlanningInterval,
         ...result.map(({ key }) => ({ type: QueryTags.PlanningInterval, key })),
       ],
@@ -73,7 +73,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.PlanningIntervalObjective,
         ...result.map(({ id }) => ({
           type: QueryTags.PlanningIntervalObjective,
@@ -165,7 +165,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      invalidatesTags: (result, error, arg) => {
+      invalidatesTags: () => {
         return [{ type: QueryTags.PlanningIntervalObjective }]
       },
     }),

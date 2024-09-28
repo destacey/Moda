@@ -70,7 +70,8 @@ const PlanningIntervalObjectivesPage = ({ params }) => {
   )
   const canCreateObjectives =
     canManageObjectives &&
-    (!planningIntervalData?.objectivesLocked ?? false) &&
+    planningIntervalData &&
+    !planningIntervalData.objectivesLocked &&
     teamData?.filter((t) => t.type == 'Team').length > 0
   const showActions = canCreateObjectives
 

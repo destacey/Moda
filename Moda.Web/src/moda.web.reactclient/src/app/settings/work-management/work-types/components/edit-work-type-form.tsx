@@ -72,7 +72,7 @@ const EditWorkTypeForm = (props: EditWorkTypeFormProps) => {
     try {
       const values = await form.validateFields()
       const request = mapToRequestValues(props.workTypeId, values)
-      var response = await updateWorkTypeMutation(request)
+      const response = await updateWorkTypeMutation(request)
       if (response.error) {
         throw response.error
       }

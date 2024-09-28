@@ -1,6 +1,4 @@
-import { Result, Typography } from 'antd'
-
-const { Title } = Typography
+import { Result } from 'antd'
 
 const NotAuthorized = () => {
   return (

@@ -13,7 +13,7 @@ import { useSearchWorkItemsQuery } from '@/src/store/features/work-management/wo
 import { SearchOutlined } from '@ant-design/icons'
 import { Input, message, Modal, Space, Typography } from 'antd'
 import { useEffect, useRef, useState } from 'react'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import {
   AgGridTransfer,
@@ -68,16 +68,14 @@ const workItemColDefs: ColDef<WorkItemModel>[] = [
   },
 ]
 
-const leftWorkItemColDefs = [
-  {
-    colId: 'checkbox',
-    maxWidth: 50,
-    checkboxSelection: true,
-    suppressHeaderMenuButton: true,
-    headerCheckboxSelection: true,
-  },
-  ...asDraggableColDefs(workItemColDefs),
-]
+const leftWorkItemColDefs = [...asDraggableColDefs(workItemColDefs)]
+
+const leftGridRowSelection: RowSelectionOptions<WorkItemModel> = {
+  mode: 'multiRow',
+  checkboxes: true,
+  headerCheckbox: true,
+  enableClickSelection: false,
+}
 
 const defaultColDef: ColDef = {
   tooltipValueGetter: (params) => params.value,
@@ -137,7 +135,7 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
   }, [searchResult])
 
   useEffect(() => {
-    let selectedIds = []
+    const selectedIds = []
     rightGridRef.current?.api?.forEachNode((n) => selectedIds.push(n.data.id))
 
     setSourceWorkItems(
@@ -230,6 +228,7 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
                 tooltipHideDelay: 1000,
                 defaultColDef,
               }}
+              leftGridRowSelection={leftGridRowSelection}
             />
             <Text>Search results are limited to 50 records.</Text>
           </Space>

@@ -158,7 +158,7 @@ const TeamObjectivesListCard = ({
     setObjectives(updatedObjectives)
 
     // after optimistic update
-    let changedObjectivesDictionary: { [key: string]: number } = {}
+    const changedObjectivesDictionary: { [key: string]: number } = {}
     updatedObjectives.forEach((o, i) => {
       const position = i + 1
       if (o.order !== position) {

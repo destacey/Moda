@@ -114,7 +114,7 @@ const PlanningIntervalObjectivesTimeline = ({
     setPiEnd(planningIntervalCalendarQuery.data.end)
 
     setIterations(
-      planningIntervalCalendarQuery.data.iterationSchedules.map((i, index) => {
+      planningIntervalCalendarQuery.data.iterationSchedules.map((i) => {
         return {
           id: i.key,
           planningIntervalKey: planningIntervalCalendarQuery.data.key,

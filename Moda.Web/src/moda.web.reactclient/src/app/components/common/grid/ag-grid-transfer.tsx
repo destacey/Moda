@@ -4,6 +4,7 @@ import {
   GridReadyEvent,
   ICellRendererParams,
   RowDragEndEvent,
+  RowSelectionOptions,
 } from 'ag-grid-community'
 import { DeleteOutlined } from '@ant-design/icons'
 import useTheme from '@/src/app/components/contexts/theme'
@@ -66,6 +67,8 @@ interface GridTransferProps<TData extends object> {
   leftGridRef?: React.MutableRefObject<AgGridReact<TData>>
   rightGridRef?: React.MutableRefObject<AgGridReact<TData>>
   GridProps?: AgGridReactProps<TData>
+  leftGridRowSelection?: RowSelectionOptions<TData> | 'single' | 'multiple'
+  rightGridRowSelection?: RowSelectionOptions<TData> | 'single' | 'multiple'
 }
 
 const defaultColDef: ColDef = {
@@ -121,9 +124,10 @@ export const AgGridTransfer = <TData extends object>(
           ref={isLeft ? leftGridRef : rightGridRef}
           getRowId={props.getRowId}
           rowDragManaged={true}
-          rowSelection={isLeft ? 'multiple' : undefined}
+          rowSelection={
+            isLeft ? props.leftGridRowSelection : props.rightGridRowSelection
+          }
           rowDragMultiRow={isLeft}
-          suppressRowClickSelection={isLeft}
           suppressMoveWhenRowDragging={isLeft}
           rowData={isLeft ? props.leftGridData : props.rightGridData}
           columnDefs={isLeft ? props.leftColumnDef : props.rightColumnDef}
@@ -146,6 +150,8 @@ export const AgGridTransfer = <TData extends object>(
       leftGridRef,
       rightGridRef,
       props.getRowId,
+      props.leftGridRowSelection,
+      props.rightGridRowSelection,
       props.leftGridData,
       props.rightGridData,
       props.leftColumnDef,

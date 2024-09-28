@@ -1,6 +1,6 @@
 import { ModaEmpty } from '@/src/app/components/common'
 import { WorkTypeLevelDto, WorkTypeTierDto } from '@/src/services/moda-api'
-import { Button, Card, List, Space, Typography } from 'antd'
+import { Button, Card, List, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import { CreateWorkTypeLevelForm, WorkTypeLevelCard } from '.'
 import { PlusOutlined } from '@ant-design/icons'
@@ -56,8 +56,7 @@ const WorkTypeTierCard = (props: WorkTypeTierCardProps) => {
     }),
   )
 
-  const [updateLevelsOrder, { error: updateLevelsOrderError }] =
-    useUpdateWorkTypeLevelsOrderMutation()
+  const [updateLevelsOrder] = useUpdateWorkTypeLevelsOrderMutation()
 
   useEffect(() => {
     if (!props.levels) return
@@ -92,6 +91,7 @@ const WorkTypeTierCard = (props: WorkTypeTierCardProps) => {
     setOrderedLevels(updatedLevels)
 
     // after optimistic update
+    // eslint-disable-next-line prefer-const
     let changedLevelsDictionary: { [key: string]: number } = {}
     updatedLevels.forEach((o, i) => {
       const position = i + 1

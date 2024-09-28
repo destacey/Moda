@@ -4,7 +4,7 @@ import {
   DataGroup,
   DataItem,
 } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
-import { Card, Divider, Flex, Space, Switch, Typography } from 'antd'
+import { Card, Divider, Flex, Space, Switch } from 'antd'
 import { RoadmapChildrenDto, RoadmapDetailsDto } from '@/src/services/moda-api'
 import { useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
@@ -15,8 +15,6 @@ import {
   ModaTimeline,
   ModaTimelineOptions,
 } from '@/src/app/components/common/timeline'
-
-const { Text } = Typography
 
 export interface RoadmapsTimelineProps {
   roadmap: RoadmapDetailsDto
@@ -77,17 +75,10 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [drillDown, setDrillDown] = useState<boolean>(false)
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
 
-  const {
-    data: roadmapLinksData,
-    isLoading: isLoadingRoadmapLinks,
-    error: errorRoadmapLinks,
-    refetch: refetchRoadmapLinks,
-  } = useGetRoadmapChildrenQuery(
-    props.roadmapChildren?.map((r) => r.id) || [],
-    {
+  const { data: roadmapLinksData, isLoading: isLoadingRoadmapLinks } =
+    useGetRoadmapChildrenQuery(props.roadmapChildren?.map((r) => r.id) || [], {
       skip: !props.roadmapChildren && props.roadmapChildren.length === 0,
-    },
-  )
+    })
 
   useEffect(() => {
     if (!props.roadmapChildren) return
@@ -133,8 +124,8 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     })
     setLevelTwoRoadmaps(levelTwoRoadmaps)
 
-    setIsLoading(props.isChildrenLoading)
-  }, [drillDown, props, roadmapLinksData])
+    setIsLoading(props.isChildrenLoading || isLoadingRoadmapLinks)
+  }, [drillDown, isLoadingRoadmapLinks, props, roadmapLinksData])
 
   const timelineOptions = useMemo((): ModaTimelineOptions => {
     return {

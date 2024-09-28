@@ -5,7 +5,6 @@ import { ModaGrid, PageActions, PageTitle } from '../../components/common'
 import { authorizePage } from '../../components/hoc'
 import { useDocumentTitle } from '../../hooks'
 import useAuth from '../../components/contexts/auth'
-import { Space, Switch } from 'antd'
 import CreateConnectionForm from './components/create-connection-form'
 import Link from 'next/link'
 import { ConnectionListDto } from '@/src/services/moda-api'
@@ -27,7 +26,6 @@ const ConnectionsPage = () => {
   const {
     data: connectionsData,
     isLoading,
-    error,
     refetch,
   } = useGetAzdoConnectionsQuery(includeDisabled)
 

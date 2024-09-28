@@ -43,7 +43,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
           console.error('API Error:', error)
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.Workspace,
         ...result.map(({ key }) => ({ type: QueryTags.Workspace, key })),
       ],
@@ -93,7 +93,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.WorkItem,
         ...result.map(({ key }) => ({ type: QueryTags.WorkItem, key })),
       ],
@@ -129,7 +129,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.WorkItemChildren,
         ...result.map(({ key }) => ({ type: QueryTags.WorkItemChildren, key })),
       ],
@@ -165,7 +165,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.WorkItemSearch,
         ...result.map(({ key }) => ({ type: QueryTags.WorkItemSearch, key })),
       ],

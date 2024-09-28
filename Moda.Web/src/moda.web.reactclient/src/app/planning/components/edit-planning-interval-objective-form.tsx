@@ -21,7 +21,6 @@ import {
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
-import _ from 'lodash'
 import {
   UpdatePlanningIntervalObjectiveMutationRequest,
   useGetPlanningIntervalById,

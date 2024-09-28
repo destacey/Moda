@@ -19,7 +19,7 @@ export const backgroundJobsApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.BackgroundJob,
         ...result.map(({ id }) => ({ type: QueryTags.BackgroundJob, id })),
       ],
@@ -34,7 +34,7 @@ export const backgroundJobsApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.BackgroundJobType,
         ...result.map(({ id }) => ({ type: QueryTags.BackgroundJobType, id })),
       ],

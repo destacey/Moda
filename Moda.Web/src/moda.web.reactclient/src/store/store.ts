@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit'
-import logger from 'redux-logger'
 import breadcrumbReducer from './breadcrumbs/breadcrumb-slice'
 import healthCheckReducer from './features/health-check-slice'
 import teamReducer from './features/organizations/team-slice'

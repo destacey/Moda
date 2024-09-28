@@ -24,7 +24,7 @@ export const teamApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.Team,
         ...result.map(({ key }) => ({ type: QueryTags.Team, key })),
       ],
@@ -52,7 +52,7 @@ export const teamApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.Team,
         ...result.map(({ key }) => ({ type: QueryTags.Team, key })),
       ],
@@ -67,7 +67,7 @@ export const teamApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.TeamBacklog,
         ...result.map(({ key }) => ({ type: QueryTags.TeamBacklog, key })),
       ],

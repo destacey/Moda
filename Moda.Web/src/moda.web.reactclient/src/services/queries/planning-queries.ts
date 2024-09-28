@@ -75,7 +75,7 @@ export const useCreatePlanningIntervalMutation = () => {
   return useMutation({
     mutationFn: async (planningInterval: CreatePlanningIntervalRequest) =>
       (await getPlanningIntervalsClient()).create(planningInterval),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries(QK.PLANNING_INTERVALS)
     },
   })
@@ -256,13 +256,10 @@ export interface CreatePlanningIntervalObjectiveMutationRequest {
 export const useCreatePlanningIntervalObjectiveMutation = () => {
   const queryClient = useQueryClient()
   return useMutation(
-    async ({
-      objective,
-      planningIntervalKey,
-    }: CreatePlanningIntervalObjectiveMutationRequest) =>
+    async (request: CreatePlanningIntervalObjectiveMutationRequest) =>
       (await getPlanningIntervalsClient()).createObjective(
-        objective.planningIntervalId,
-        objective,
+        request.objective.planningIntervalId,
+        request.objective,
       ),
     {
       onSuccess: (data, variables) => {
@@ -292,14 +289,11 @@ export interface UpdatePlanningIntervalObjectiveMutationRequest {
 export const useUpdatePlanningIntervalObjectiveMutation = () => {
   const queryClient = useQueryClient()
   return useMutation(
-    async ({
-      objective,
-      planningIntervalKey,
-    }: UpdatePlanningIntervalObjectiveMutationRequest) =>
+    async (request: UpdatePlanningIntervalObjectiveMutationRequest) =>
       (await getPlanningIntervalsClient()).updateObjective(
-        objective.planningIntervalId,
-        objective.objectiveId,
-        objective,
+        request.objective.planningIntervalId,
+        request.objective.objectiveId,
+        request.objective,
       ),
     {
       onSuccess: (data, variables) => {

@@ -7,17 +7,17 @@ import {
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 
-function providesList<R extends { id: string | number }[], T extends string>(
-  resultsWithIds: R | undefined,
-  tagType: T,
-) {
-  return resultsWithIds
-    ? [
-        { type: tagType, id: 'LIST' },
-        ...resultsWithIds.map(({ id }) => ({ type: tagType, id })),
-      ]
-    : [{ type: tagType, id: 'LIST' }]
-}
+// function providesList<R extends { id: string | number }[], T extends string>(
+//   resultsWithIds: R | undefined,
+//   tagType: T,
+// ) {
+//   return resultsWithIds
+//     ? [
+//         { type: tagType, id: 'LIST' },
+//         ...resultsWithIds.map(({ id }) => ({ type: tagType, id })),
+//       ]
+//     : [{ type: tagType, id: 'LIST' }]
+// }
 
 export interface ChangeWorkProcessIsActiveMutationRequest {
   id: string
@@ -40,7 +40,7 @@ export const workProcessApi = apiSlice.injectEndpoints({
       },
       // TODO: why is the id on the model optional
       //providesTags: (result, error, arg) => providesList(result, QueryTags.WorkProcess),
-      providesTags: (result, error, arg) => [
+      providesTags: (result) => [
         QueryTags.WorkProcess,
         ...result.map(({ id }) => ({ type: QueryTags.WorkProcess, id })),
       ],

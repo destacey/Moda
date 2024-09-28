@@ -33,8 +33,6 @@ const WorkItemDetailsPage = ({ params }) => {
     data: workItemData,
     error,
     isLoading,
-    isError,
-    refetch,
   } = useGetWorkItemQuery({ idOrKey: workspaceKey, workItemKey: workItemKey })
 
   const childWorkItemsQuery = useGetChildWorkItemsQuery(

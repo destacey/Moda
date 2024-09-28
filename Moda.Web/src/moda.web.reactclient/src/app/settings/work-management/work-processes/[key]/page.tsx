@@ -31,6 +31,7 @@ const WorkProcessDetailsPage = ({ params }) => {
     data: workProcessData,
     isLoading,
     error,
+    refetch,
   } = useGetWorkProcessQuery(params.key)
 
   useEffect(() => {
@@ -71,6 +72,9 @@ const WorkProcessDetailsPage = ({ params }) => {
   ]
 
   const onChangeWorkProcessIsActiveFormClosed = (wasSaved: boolean) => {
+    if (wasSaved) {
+      refetch()
+    }
     setOpenChangeWorkProcessIsActiveForm(false)
   }
 

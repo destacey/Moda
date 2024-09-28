@@ -13,7 +13,6 @@ import {
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getRoadmapsClient } from '@/src/services/clients'
-import _ from 'lodash'
 import { OptionModel } from '@/src/app/components/types'
 
 export const roadmapApi = apiSlice.injectEndpoints({
@@ -28,9 +27,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
-        { type: QueryTags.Roadmap, id: 'LIST' },
-      ],
+      providesTags: () => [{ type: QueryTags.Roadmap, id: 'LIST' }],
     }),
     getRoadmap: builder.query<RoadmapDetailsDto, string>({
       queryFn: async (idOrKey: string) => {
@@ -42,9 +39,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [
-        { type: QueryTags.Roadmap, id: result?.key },
-      ],
+      providesTags: (result) => [{ type: QueryTags.Roadmap, id: result?.key }],
     }),
     createRoadmap: builder.mutation<ObjectIdAndKey, CreateRoadmapRequest>({
       queryFn: async (request) => {
@@ -209,7 +204,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, arg) => [QueryTags.RoadmapVisibility],
+      providesTags: () => [QueryTags.RoadmapVisibility],
     }),
   }),
 })

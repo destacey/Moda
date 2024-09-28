@@ -16,13 +16,10 @@ const RoleDetailsPage = ({ params }) => {
 
   const [activeTab, setActiveTab] = useState('details')
 
-  const { hasClaim } = useAuth()
+  const { hasPermissionClaim } = useAuth()
 
-  const canUpdateRole = hasClaim('Permission', 'Permissions.Roles.Update')
-  const canViewPermissions = hasClaim(
-    'Permission',
-    'Permissions.Permissions.View',
-  )
+  //const canUpdateRole = hasPermissionClaim('Permissions.Roles.Update')
+  const canViewPermissions = hasPermissionClaim('Permissions.Permissions.View')
 
   const tabs = [
     {

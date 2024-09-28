@@ -1,4 +1,4 @@
-import { QueryClient, useMutation, useQuery, useQueryClient } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import {
   getPermissionsClient,
   getRolesClient,
@@ -83,7 +83,7 @@ export const useCreateRoleMutation = () => {
   return useMutation({
     mutationFn: async (params: CreateOrUpdateRoleRequest) =>
       (await getRolesClient()).createOrUpdate(params),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries(QK.ROLES)
     },
   })
@@ -107,7 +107,7 @@ export const useDeleteRoleMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => (await getRolesClient()).delete(id),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries(QK.ROLES)
     },
   })

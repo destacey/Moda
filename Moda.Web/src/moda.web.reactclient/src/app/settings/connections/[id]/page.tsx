@@ -33,6 +33,7 @@ enum ConnectionTabs {
 const ConnectionDetailsPage = ({ params }) => {
   useDocumentTitle('Connection Details')
   const [activeTab, setActiveTab] = useState(ConnectionTabs.Details)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isSyncingOrganization, setIsSyncingOrganization] = useState(false)
   const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
@@ -56,7 +57,6 @@ const ConnectionDetailsPage = ({ params }) => {
   const {
     data: connectionData,
     isLoading,
-    error,
     refetch,
   } = useGetAzdoConnectionByIdQuery(params.id)
   const azdoOrgUrl = connectionData?.configuration?.organizationUrl
@@ -180,13 +180,13 @@ const ConnectionDetailsPage = ({ params }) => {
         {
           key: 'toggle-sync-setting',
           label: connectionData?.isSyncEnabled ? 'Disable Sync' : 'Enable Sync',
-          disabled: !connectionData?.isValidConfiguration ?? true,
+          disabled: connectionData && !connectionData.isValidConfiguration,
           onClick: () => updateSyncState(),
         },
         {
           key: 'sync-organization',
           label: 'Sync Organization Configuration',
-          disabled: !connectionData?.isValidConfiguration ?? true,
+          disabled: connectionData && !connectionData.isValidConfiguration,
           onClick: () => {
             setIsSyncingOrganization(true)
             syncOrganizationConfiguration()
@@ -198,8 +198,7 @@ const ConnectionDetailsPage = ({ params }) => {
   }, [
     canDeleteConnections,
     canUpdateConnections,
-    connectionData?.isSyncEnabled,
-    connectionData?.isValidConfiguration,
+    connectionData,
     syncOrganizationConfiguration,
     updateSyncState,
   ])

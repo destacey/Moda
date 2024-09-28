@@ -1,5 +1,5 @@
 import { MoreOutlined } from '@ant-design/icons'
-import { Button, Dropdown, Tag } from 'antd'
+import { Button, Dropdown } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import ReactMarkdown from 'react-markdown'
 import './moda-grid-cell-renderers.css'
