@@ -1,8 +1,9 @@
-export type ModaDataItem<TObjectData = DataItem> =
-  | DataItem
-  | (DataItem & {
-      objectData?: TObjectData
-    })
+import { DataItem } from 'vis-timeline/standalone'
+
+export type ModaDataItem<T = any> = DataItem & {
+  itemColor?: string | undefined
+  objectData?: T
+}
 
 export interface ModaTimelineOptions {
   maxHeight?: number | undefined
@@ -16,8 +17,8 @@ export interface ModaTimelineOptions {
   template?: TimelineOptionsTemplateFunction | undefined
 }
 
-export interface RangeItemTemplateProps {
-  item: ModaDataItem
+export interface RangeItemTemplateProps<T = any> {
+  item: ModaDataItem<T>
   fontColor: string
   foregroundColor?: string | undefined
 }

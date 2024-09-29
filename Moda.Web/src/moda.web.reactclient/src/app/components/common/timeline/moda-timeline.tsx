@@ -18,16 +18,16 @@ import { ModaEmpty } from '..'
 
 const { Text } = Typography
 
-export type ModaTimelineProps = {
-  data: ModaDataItem[]
+export type ModaTimelineProps<T = any> = {
+  data: ModaDataItem<T>[]
   groups?: DataGroup[]
   isLoading: boolean
   options: ModaTimelineOptions
-  rangeItemTemplate?: (RangeItemTemplateProps) => JSX.Element
+  rangeItemTemplate?: (props: RangeItemTemplateProps<T>) => JSX.Element
   emptyMessage?: string
 }
 
-const RangeItemTemplate = (props: RangeItemTemplateProps) => {
+const RangeItemTemplate = (props: RangeItemTemplateProps<ModaDataItem>) => {
   return (
     <Text style={{ padding: '5px', color: props.fontColor }}>
       {props.item.content}

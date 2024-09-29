@@ -14,11 +14,11 @@ import { UseQueryResult } from 'react-query'
 import Link from 'next/link'
 import { Card, Flex, Typography } from 'antd'
 import {
-  ModaDataItem,
   ModaTimeline,
   ModaTimelineOptions,
   RangeItemTemplateProps,
 } from '../../components/common/timeline'
+import { ModaDataItem } from '../../components/common/timeline/types'
 
 const { Text } = Typography
 
@@ -37,7 +37,7 @@ export const ObjectiveTimelineTemplate = ({
   item,
   fontColor,
   foregroundColor,
-}: RangeItemTemplateProps) => {
+}: RangeItemTemplateProps<PlanningIntervalObjectiveListDto>) => {
   return (
     <div
       style={{
@@ -64,8 +64,8 @@ const getDataGroups = (
   let groups = []
   if (!teamNames || teamNames.length === 0) {
     groups = objectives.reduce((acc, item) => {
-      if (!acc.includes(item.objectData.group)) {
-        acc.push(item.objectData.group)
+      if (!acc.includes(item.group)) {
+        acc.push(item.group)
       }
       return acc
     }, [])

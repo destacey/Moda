@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  DataGroup,
-  DataItem,
-} from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
+import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import { Card, Divider, Flex, Space, Switch } from 'antd'
 import { RoadmapChildrenDto, RoadmapDetailsDto } from '@/src/services/moda-api'
 import { useEffect, useMemo, useState } from 'react'
@@ -15,6 +12,7 @@ import {
   ModaTimeline,
   ModaTimelineOptions,
 } from '@/src/app/components/common/timeline'
+import { ModaDataItem } from '@/src/app/components/common/timeline/types'
 
 export interface RoadmapsTimelineProps {
   roadmap: RoadmapDetailsDto
@@ -24,15 +22,10 @@ export interface RoadmapsTimelineProps {
   viewSelector?: React.ReactNode | undefined
 }
 
-// TODO: abstract this into a shared component
-interface RoadmapTimelineItem extends DataItem {
+interface RoadmapTimelineItem extends ModaDataItem {
   id: number
-  title?: string
-  content: string
-  start: Date
   end: Date
-  group?: string
-  type?: string
+  type: string
   roadmap?: RoadmapChildrenDto
   order?: number
 }
