@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  DataGroup,
-  DataItem,
-} from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
+import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import { Card, Divider, Flex, Space, Switch } from 'antd'
 import { RoadmapChildrenDto, RoadmapDetailsDto } from '@/src/services/moda-api'
 import { useEffect, useMemo, useState } from 'react'
@@ -15,6 +12,7 @@ import {
   ModaTimeline,
   ModaTimelineOptions,
 } from '@/src/app/components/common/timeline'
+import { ModaDataItem } from '@/src/app/components/common/timeline/types'
 
 export interface RoadmapsTimelineProps {
   roadmap: RoadmapDetailsDto
@@ -24,15 +22,10 @@ export interface RoadmapsTimelineProps {
   viewSelector?: React.ReactNode | undefined
 }
 
-// TODO: abstract this into a shared component
-interface RoadmapTimelineItem extends DataItem {
+interface RoadmapTimelineItem extends ModaDataItem {
   id: number
-  title?: string
-  content: string
-  start: Date
   end: Date
-  group?: string
-  type?: string
+  type: string
   roadmap?: RoadmapChildrenDto
   order?: number
 }
@@ -93,10 +86,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         content: roadmap.name,
         start: dayjs(roadmap.start).toDate(),
         end: dayjs(roadmap.end).toDate(),
-        style:
-          roadmap.color === null
-            ? undefined
-            : `background: ${roadmap.color}; border-color: ${roadmap.color};`,
+        itemColor: roadmap.color,
         group: null,
         type: 'range',
         order: roadmap.order,
@@ -105,21 +95,18 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     })
     setLevelOneRoadmaps(levelOneRoadmaps)
 
-    const levelTwoRoadmaps = roadmapLinksData?.map((roadmapLink) => {
+    const levelTwoRoadmaps = roadmapLinksData?.map((roadmap) => {
       return {
-        id: roadmapLink.key,
-        title: `${roadmapLink.key} - ${roadmapLink.name}`,
-        content: roadmapLink.name,
-        start: dayjs(roadmapLink.start).toDate(),
-        end: dayjs(roadmapLink.end).toDate(),
-        style:
-          roadmapLink.color === null
-            ? undefined
-            : `background: ${roadmapLink.color}; border-color: ${roadmapLink.color};`,
-        group: roadmapLink.parent.id,
+        id: roadmap.key,
+        title: `${roadmap.key} - ${roadmap.name}`,
+        content: roadmap.name,
+        start: dayjs(roadmap.start).toDate(),
+        end: dayjs(roadmap.end).toDate(),
+        itemColor: roadmap.color,
+        group: roadmap.parent.id,
         type: 'range',
-        order: roadmapLink.order,
-        roadmap: roadmapLink,
+        order: roadmap.order,
+        roadmap: roadmap,
       } as RoadmapTimelineItem
     })
     setLevelTwoRoadmaps(levelTwoRoadmaps)

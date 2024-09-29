@@ -15,21 +15,26 @@ import useTheme from '../../contexts/theme'
 import { createRoot } from 'react-dom/client'
 import { ModaDataItem, ModaTimelineOptions, RangeItemTemplateProps } from '.'
 import { ModaEmpty } from '..'
+import { getLuminance } from '@/src/utils/color-helper'
 
 const { Text } = Typography
 
-export type ModaTimelineProps = {
-  data: ModaDataItem[]
+export type ModaTimelineProps<T = any> = {
+  data: ModaDataItem<T>[]
   groups?: DataGroup[]
   isLoading: boolean
   options: ModaTimelineOptions
-  rangeItemTemplate?: (RangeItemTemplateProps) => JSX.Element
+  rangeItemTemplate?: (props: RangeItemTemplateProps<T>) => JSX.Element
   emptyMessage?: string
 }
 
-const RangeItemTemplate = (props: RangeItemTemplateProps) => {
+const RangeItemTemplate = (props: RangeItemTemplateProps<ModaDataItem>) => {
+  // TODO: the 0.6 needs to be tested with some of the other colors
+  const fontColor =
+    getLuminance(props.item.itemColor) > 0.6 ? '#4d4d4d' : '#FFFFFF'
+
   return (
-    <Text style={{ padding: '5px', color: props.fontColor }}>
+    <Text style={{ padding: '5px', color: fontColor }}>
       {props.item.content}
     </Text>
   )
@@ -174,12 +179,14 @@ const ModaTimeline = (props: ModaTimelineProps) => {
 
     const datasetItems = new DataSet([])
     props.data.map((item) => {
+      const backgroundColor = item.itemColor ?? itemBackgroundColor
       const newItem = {
         ...item,
+        itemColor: backgroundColor,
         style: item.style
           ? item.style
           : item.type === 'range'
-            ? `background: ${itemBackgroundColor}; border-color: ${itemBackgroundColor};`
+            ? `background: ${backgroundColor}; border-color: ${backgroundColor};`
             : item.type === 'background'
               ? `background: ${backgroundBackgroundColor}; border-style: inset; border-width: 1px;`
               : undefined,
