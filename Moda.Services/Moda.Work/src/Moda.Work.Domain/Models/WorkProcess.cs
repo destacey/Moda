@@ -11,7 +11,7 @@ namespace Moda.Work.Domain.Models;
 /// </summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
-public sealed class WorkProcess : BaseSoftDeletableEntity<Guid>, IActivatable
+public sealed class WorkProcess : BaseSoftDeletableEntity<Guid>, IActivatable, HasIdAndKey
 {
     private string _name = null!;
     private string? _description;

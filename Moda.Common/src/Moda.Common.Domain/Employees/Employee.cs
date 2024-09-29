@@ -6,7 +6,7 @@ using Moda.Common.Models;
 using NodaTime;
 
 namespace Moda.Common.Domain.Employees;
-public sealed class Employee : BaseSoftDeletableEntity<Guid>, IActivatable
+public sealed class Employee : BaseSoftDeletableEntity<Guid>, IActivatable, HasIdAndKey
 {
     private readonly List<Employee> _directReports = new();
     private PersonName _name = null!;
@@ -33,7 +33,7 @@ public sealed class Employee : BaseSoftDeletableEntity<Guid>, IActivatable
 
     /// <summary>Gets the key.</summary>
     /// <value>The key.</value>
-    public int Key { get; private set; }
+    public int Key { get; private init; }
 
     /// <summary>Gets the employee name.</summary>
     /// <value>The employee name.</value>

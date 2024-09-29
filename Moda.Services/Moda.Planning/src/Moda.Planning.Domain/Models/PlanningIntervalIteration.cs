@@ -1,11 +1,12 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, ILocalSchedule
+public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, ILocalSchedule, HasIdAndKey
 {
     private string _name = default!;
     private LocalDateRange _dateRange = default!;
@@ -23,11 +24,11 @@ public sealed class PlanningIntervalIteration : BaseSoftDeletableEntity<Guid>, I
 
     /// <summary>Gets the key.</summary>
     /// <value>The key.</value>
-    public int Key { get; init; }
+    public int Key { get; private init; }
 
     /// <summary>Gets the planning interval identifier.</summary>
     /// <value>The planning interval identifier.</value>
-    public Guid PlanningIntervalId { get; init; }
+    public Guid PlanningIntervalId { get; private init; }
 
     /// <summary>
     /// The name of the Planning Interval.

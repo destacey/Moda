@@ -1,9 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Enums.Goals;
+using Moda.Common.Domain.Interfaces;
 using Moda.Goals.Domain.Enums;
 
 namespace Moda.Goals.Domain.Models;
-public class Objective : BaseSoftDeletableEntity<Guid>
+public class Objective : BaseSoftDeletableEntity<Guid>, HasIdAndKey
 {
     private string _name = default!;
     private string? _description;
@@ -28,7 +29,7 @@ public class Objective : BaseSoftDeletableEntity<Guid>
 
     /// <summary>Gets the key.</summary>
     /// <value>The key.</value>
-    public int Key { get; init; }
+    public int Key { get; private init; }
 
     /// <summary>
     /// The name of the Objective.

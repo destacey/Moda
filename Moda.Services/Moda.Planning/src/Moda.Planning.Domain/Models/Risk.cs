@@ -1,11 +1,12 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Employees;
+using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public class Risk : BaseSoftDeletableEntity<Guid>
+public class Risk : BaseSoftDeletableEntity<Guid>, HasIdAndKey
 {
     private string _summary = default!;
     private string? _description;
@@ -32,7 +33,7 @@ public class Risk : BaseSoftDeletableEntity<Guid>
 
     /// <summary>Gets the key.</summary>
     /// <value>The key.</value>
-    public int Key { get; private set; }
+    public int Key { get; private init; }
 
     /// <summary>
     /// The summary of the Risk.
@@ -55,7 +56,7 @@ public class Risk : BaseSoftDeletableEntity<Guid>
     // TODO: switch TeamId to ObjectId and Context
     public Guid? TeamId { get; private set; }
 
-    public PlanningTeam? Team { get; set; }
+    public PlanningTeam? Team { get; private set; }
 
     public Instant ReportedOn { get; private set; }
 
