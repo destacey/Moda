@@ -34,30 +34,15 @@ public class RisksController : ControllerBase
         return Ok(risks);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{idOrKey}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get risk details by Id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult<RiskDetailsDto>> GetById(Guid id)
+    public async Task<ActionResult<RiskDetailsDto>> GetRisk(string idOrKey, CancellationToken cancellationToken)
     {
-        var risk = await _sender.Send(new GetRiskQuery(id));
-
-        return risk is not null
-            ? Ok(risk)
-            : NotFound();
-    }
-
-    [HttpGet("key/{id}")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
-    [OpenApiOperation("Get risk details using the key.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult<RiskDetailsDto>> GetByKey(int id)
-    {
-        var risk = await _sender.Send(new GetRiskQuery(id));
+        var risk = await _sender.Send(new GetRiskQuery(idOrKey), cancellationToken);
 
         return risk is not null
             ? Ok(risk)
@@ -98,7 +83,7 @@ public class RisksController : ControllerBase
             return BadRequest(error);
         }
 
-        return CreatedAtAction(nameof(GetByKey), new { id = result.Value }, result.Value);
+        return CreatedAtAction(nameof(GetRisk), new { idOrKey = result.Value.Id.ToString() }, result.Value);
     }
 
     [HttpPut("{id}")]

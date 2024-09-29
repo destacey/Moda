@@ -237,19 +237,19 @@ public class TeamsController : ControllerBase
         return Ok(risks);
     }
 
-    [HttpGet("{id}/risks/{riskId}")]
+    [HttpGet("{id}/risks/{riskIdOrKey}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
     [OpenApiOperation("Get a team risk by Id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<RiskDetailsDto>> GetRiskById(Guid id, Guid riskId, CancellationToken cancellationToken)
+    public async Task<ActionResult<RiskDetailsDto>> GetRiskById(Guid id, string riskIdOrKey, CancellationToken cancellationToken)
     {
         var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
         if (!teamExists)
             return NotFound();
 
-        var risk = await _sender.Send(new GetRiskQuery(riskId));
+        var risk = await _sender.Send(new GetRiskQuery(riskIdOrKey), cancellationToken);
 
         return risk is not null && risk.Team?.Id == id
             ? Ok(risk)
