@@ -8,7 +8,7 @@ import TeamPlanReview from './team-plan-review'
 import { notFound, useRouter } from 'next/navigation'
 import { ModaEmpty, PageTitle } from '@/src/app/components/common'
 import {
-  useGetPlanningIntervalByKey,
+  useGetPlanningInterval,
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
 import PlanningIntervalPlanReviewLoading from './loading'
@@ -27,7 +27,7 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
     isLoading,
     isFetching,
     refetch: refetchPlanningInterval,
-  } = useGetPlanningIntervalByKey(params.key)
+  } = useGetPlanningInterval(params.key)
 
   const { data: teamData, isLoading: teamsIsLoading } =
     useGetPlanningIntervalTeams(planningIntervalData?.id, true)

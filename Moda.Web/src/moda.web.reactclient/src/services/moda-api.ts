@@ -1338,7 +1338,7 @@ export class PlanningIntervalsClient {
     /**
      * Get planning interval details.
      */
-    getById(idOrKey: string, cancelToken?: CancelToken): Promise<PlanningIntervalDetailsDto> {
+    getPlanningInterval(idOrKey: string, cancelToken?: CancelToken): Promise<PlanningIntervalDetailsDto> {
         let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}";
         if (idOrKey === undefined || idOrKey === null)
             throw new Error("The parameter 'idOrKey' must be defined.");
@@ -1361,11 +1361,11 @@ export class PlanningIntervalsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetById(_response);
+            return this.processGetPlanningInterval(_response);
         });
     }
 
-    protected processGetById(response: AxiosResponse): Promise<PlanningIntervalDetailsDto> {
+    protected processGetPlanningInterval(response: AxiosResponse): Promise<PlanningIntervalDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {

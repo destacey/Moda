@@ -20,7 +20,7 @@ import {
 } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import {
-  useGetPlanningIntervalById,
+  useGetPlanningInterval,
   useGetPlanningIntervalIterationTypeOptions,
   useGetPlanningIntervalIterations,
   useManagePlanningIntervalDatesMutation,
@@ -79,7 +79,7 @@ const ManagePlanningIntervalDatesForm = ({
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const { data: planningIntervalData } = useGetPlanningIntervalById(id)
+  const { data: planningIntervalData } = useGetPlanningInterval(id)
   const { data: iterationsData } = useGetPlanningIntervalIterations(id)
   const { data: iterationTypesOptions } =
     useGetPlanningIntervalIterationTypeOptions()

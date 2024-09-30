@@ -53,7 +53,7 @@ public class PlanningIntervalsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult<PlanningIntervalDetailsDto>> GetById(string idOrKey, CancellationToken cancellationToken)
+    public async Task<ActionResult<PlanningIntervalDetailsDto>> GetPlanningInterval(string idOrKey, CancellationToken cancellationToken)
     {
         var planningInterval = await _sender.Send(new GetPlanningIntervalQuery(idOrKey), cancellationToken);
 
@@ -101,7 +101,7 @@ public class PlanningIntervalsController : ControllerBase
         var result = await _sender.Send(request.ToCreatePlanningIntervalCommand(), cancellationToken);
 
         return result.IsSuccess
-            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
+            ? CreatedAtAction(nameof(GetPlanningInterval), new { id = result.Value }, result.Value)
             : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.Create"));
     }
 

@@ -5,7 +5,7 @@ import { useCallback, useMemo } from 'react'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import { authorizePage } from '@/src/app/components/hoc'
 import {
-  useGetPlanningIntervalByKey,
+  useGetPlanningInterval,
   useGetPlanningIntervalObjectivesHealthReport,
 } from '@/src/services/queries/planning-queries'
 import { notFound } from 'next/navigation'
@@ -45,7 +45,7 @@ const ObjectiveHealthReportPage = ({ params }) => {
     isLoading: piIsLoading,
     isFetching: piIsFetching,
     refetch: refetchPlanningInterval,
-  } = useGetPlanningIntervalByKey(params.key)
+  } = useGetPlanningInterval(params.key)
 
   const {
     data: healthReport,

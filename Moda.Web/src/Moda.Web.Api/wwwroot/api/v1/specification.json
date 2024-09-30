@@ -975,7 +975,7 @@
           "PlanningIntervals"
         ],
         "summary": "Get planning interval details.",
-        "operationId": "PlanningIntervals_GetById",
+        "operationId": "PlanningIntervals_GetPlanningInterval",
         "parameters": [
           {
             "name": "idOrKey",

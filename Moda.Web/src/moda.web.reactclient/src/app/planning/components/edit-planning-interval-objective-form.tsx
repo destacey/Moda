@@ -23,7 +23,7 @@ import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
 import {
   UpdatePlanningIntervalObjectiveMutationRequest,
-  useGetPlanningIntervalById,
+  useGetPlanningInterval,
   useGetPlanningIntervalObjectiveById,
   useGetPlanningIntervalObjectiveStatusOptions,
   useUpdatePlanningIntervalObjectiveMutation,
@@ -92,7 +92,7 @@ const EditPlanningIntervalObjectiveForm = ({
   const [messageApi, contextHolder] = message.useMessage()
 
   const { data: planningIntervalData } =
-    useGetPlanningIntervalById(planningIntervalId)
+    useGetPlanningInterval(planningIntervalId)
   const { data: objectiveData } = useGetPlanningIntervalObjectiveById(
     planningIntervalId,
     objectiveId,

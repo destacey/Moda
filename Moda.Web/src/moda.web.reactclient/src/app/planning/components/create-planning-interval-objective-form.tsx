@@ -10,7 +10,7 @@ import { RangePickerProps } from 'antd/es/date-picker'
 import {
   CreatePlanningIntervalObjectiveMutationRequest,
   useCreatePlanningIntervalObjectiveMutation,
-  useGetPlanningIntervalById,
+  useGetPlanningInterval,
   useGetPlanningIntervalObjectiveStatuses,
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
@@ -83,7 +83,7 @@ const CreatePlanningIntervalObjectiveForm = ({
   const [defaultStatusId, setDefaultStatusId] = useState<number>(null)
 
   const { data: planningIntervalData } =
-    useGetPlanningIntervalById(planningIntervalId)
+    useGetPlanningInterval(planningIntervalId)
   const { data: teamData } = useGetPlanningIntervalTeams(planningIntervalId)
   const { data: statusData } = useGetPlanningIntervalObjectiveStatuses()
 

@@ -12,7 +12,7 @@ import useAuth from '@/src/app/components/contexts/auth'
 import ManagePlanningIntervalTeamsForm from './manage-planning-interval-teams-form'
 import { EditPlanningIntervalForm } from '../../components'
 import {
-  useGetPlanningIntervalByKey,
+  useGetPlanningInterval,
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
 import { authorizePage } from '@/src/app/components/hoc'
@@ -55,7 +55,7 @@ const PlanningIntervalDetailsPage = ({ params }) => {
     isLoading,
     isFetching,
     refetch: refetchPlanningInterval,
-  } = useGetPlanningIntervalByKey(params.key)
+  } = useGetPlanningInterval(params.key)
 
   const teamsQuery = useGetPlanningIntervalTeams(
     planningIntervalData?.id,
