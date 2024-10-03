@@ -188,6 +188,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
           }
           isLoading={isLoading}
           options={timelineOptions}
+          emptyMessage="No roadmaps to display"
         />
       </Card>
     </>
