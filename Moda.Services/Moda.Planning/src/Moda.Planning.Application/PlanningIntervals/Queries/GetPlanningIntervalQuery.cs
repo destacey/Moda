@@ -1,16 +1,13 @@
 ﻿using System.Linq.Expressions;
+using Moda.Common.Application.Models;
 using Moda.Planning.Application.PlanningIntervals.Dtos;
-using OneOf;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;
 public sealed record GetPlanningIntervalQuery : IQuery<PlanningIntervalDetailsDto?>
 {
-    public GetPlanningIntervalQuery(OneOf<Guid, int> idOrKey)
+    public GetPlanningIntervalQuery(IdOrKey idOrKey)
     {
-        IdOrKeyFilter = idOrKey.Match(
-            id => (Expression<Func<PlanningInterval, bool>>)(r => r.Id == id),
-            key => (Expression<Func<PlanningInterval, bool>>)(r => r.Key == key)
-        );
+        IdOrKeyFilter = idOrKey.CreateFilter<PlanningInterval>();
     }
 
     public Expression<Func<PlanningInterval, bool>> IdOrKeyFilter { get; }

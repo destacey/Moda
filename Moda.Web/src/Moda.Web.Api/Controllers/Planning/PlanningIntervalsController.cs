@@ -47,30 +47,15 @@ public class PlanningIntervalsController : ControllerBase
         return Ok(planningIntervals);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{idOrKey}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Get planning interval details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult<PlanningIntervalDetailsDto>> GetById(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<PlanningIntervalDetailsDto>> GetPlanningInterval(string idOrKey, CancellationToken cancellationToken)
     {
-        var planningInterval = await _sender.Send(new GetPlanningIntervalQuery(id), cancellationToken);
-
-        return planningInterval is not null
-            ? Ok(planningInterval)
-            : NotFound();
-    }
-
-    [HttpGet("key/{id}")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
-    [OpenApiOperation("Get planning interval details using the key.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
-    public async Task<ActionResult<PlanningIntervalDetailsDto>> GetByKey(int id, CancellationToken cancellationToken)
-    {
-        var planningInterval = await _sender.Send(new GetPlanningIntervalQuery(id), cancellationToken);
+        var planningInterval = await _sender.Send(new GetPlanningIntervalQuery(idOrKey), cancellationToken);
 
         return planningInterval is not null
             ? Ok(planningInterval)
@@ -85,21 +70,7 @@ public class PlanningIntervalsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PlanningIntervalCalendarDto>> GetCalendar(string idOrKey, CancellationToken cancellationToken)
     {
-        GetPlanningIntervalCalendarQuery query;
-        if (Guid.TryParse(idOrKey, out Guid guidId))
-        {
-            query = new GetPlanningIntervalCalendarQuery(guidId);
-        }
-        else if (int.TryParse(idOrKey, out int intId))
-        {
-            query = new GetPlanningIntervalCalendarQuery(intId);
-        }
-        else
-        {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("PlanningIntervalsController.GetCalendar"));
-        }
-
-        var calendar = await _sender.Send(query, cancellationToken);
+        var calendar = await _sender.Send(new GetPlanningIntervalCalendarQuery(idOrKey), cancellationToken);
 
         return calendar is not null
             ? Ok(calendar)
@@ -130,7 +101,7 @@ public class PlanningIntervalsController : ControllerBase
         var result = await _sender.Send(request.ToCreatePlanningIntervalCommand(), cancellationToken);
 
         return result.IsSuccess
-            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
+            ? CreatedAtAction(nameof(GetPlanningInterval), new { id = result.Value }, result.Value)
             : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.Create"));
     }
 
@@ -222,14 +193,14 @@ public class PlanningIntervalsController : ControllerBase
 
     #region Iterations
 
-    [HttpGet("{id}/iterations")]
+    [HttpGet("{idOrKey}/iterations")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Get a list of planning interval iterations.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<PlanningIntervalIterationListDto>>> GetIterations(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<PlanningIntervalIterationListDto>>> GetIterations(string idOrKey, CancellationToken cancellationToken)
     {
-        var iterations = await _sender.Send(new GetPlanningIntervalIterationsQuery(id), cancellationToken);
+        var iterations = await _sender.Send(new GetPlanningIntervalIterationsQuery(idOrKey), cancellationToken);
 
         return Ok(iterations);
     }

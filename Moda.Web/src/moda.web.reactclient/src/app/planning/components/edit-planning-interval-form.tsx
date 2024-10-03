@@ -9,7 +9,7 @@ import {
 } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import {
-  useGetPlanningIntervalById,
+  useGetPlanningInterval,
   useUpdatePlanningIntervalMutation,
 } from '@/src/services/queries/planning-queries'
 
@@ -52,7 +52,7 @@ const EditPlanningIntervalForm = ({
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const { data: planningIntervalData } = useGetPlanningIntervalById(id)
+  const { data: planningIntervalData } = useGetPlanningInterval(id)
   const updatePlanningInterval = useUpdatePlanningIntervalMutation()
 
   const { hasClaim } = useAuth()

@@ -1,19 +1,16 @@
-﻿using Moda.Planning.Application.PlanningIntervals.Dtos;
+﻿using Moda.Common.Application.Models;
+using System.Linq.Expressions;
+using Moda.Planning.Application.PlanningIntervals.Dtos;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;
 public sealed record GetPlanningIntervalCalendarQuery : IQuery<PlanningIntervalCalendarDto?>
 {
-    public GetPlanningIntervalCalendarQuery(Guid planningIntervalId)
+    public GetPlanningIntervalCalendarQuery(IdOrKey idOrKey)
     {
-        Id = planningIntervalId;
-    }
-    public GetPlanningIntervalCalendarQuery(int planningIntervalKey)
-    {
-        Key = planningIntervalKey;
+        IdOrKeyFilter = idOrKey.CreateFilter<PlanningInterval>();
     }
 
-    public Guid? Id { get; }
-    public int? Key { get; }
+    public Expression<Func<PlanningInterval, bool>> IdOrKeyFilter { get; }
 }
 
 internal sealed class GetPlanningIntervalCalendarQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalCalendarQueryHandler> logger) : IQueryHandler<GetPlanningIntervalCalendarQuery, PlanningIntervalCalendarDto?>
@@ -25,27 +22,9 @@ internal sealed class GetPlanningIntervalCalendarQueryHandler(IPlanningDbContext
 
     public async Task<PlanningIntervalCalendarDto?> Handle(GetPlanningIntervalCalendarQuery request, CancellationToken cancellationToken)
     {
-        var query = _planningDbContext.PlanningIntervals
+        var planningInterval = await _planningDbContext.PlanningIntervals
             .Include(p => p.Iterations)
-            .AsQueryable();
-
-        if (request.Id.HasValue)
-        {
-            query = query.Where(e => e.Id == request.Id.Value);
-        }
-        else if (request.Key.HasValue)
-        {
-            query = query.Where(e => e.Key == request.Key.Value);
-        }
-        else
-        {
-            var exception = new InternalServerException("No planning interval id or key provided.");
-
-            _logger.LogError(exception, "{AppRequestName}: Exception for request {@Request}", AppRequestName, request);
-            throw exception;
-        }
-
-        var planningInterval = await query
+            .Where(request.IdOrKeyFilter)
             .AsNoTracking()
             .FirstOrDefaultAsync(cancellationToken);
 

@@ -6,7 +6,7 @@ using Moda.Common.Extensions;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
-public abstract class BaseTeam : BaseSoftDeletableEntity<Guid>, ISimpleTeam
+public abstract class BaseTeam : BaseSoftDeletableEntity<Guid>, ISimpleTeam, HasIdAndKey
 {
     private string _name = null!;
     private TeamCode _code = null!;
@@ -16,7 +16,7 @@ public abstract class BaseTeam : BaseSoftDeletableEntity<Guid>, ISimpleTeam
 
     /// <summary>Gets the key.</summary>
     /// <value>The key.</value>
-    public int Key { get; protected set; }
+    public int Key { get; protected init; }
 
     /// <summary>
     /// The name of the team.

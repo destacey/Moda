@@ -16,7 +16,7 @@ import { RiskDetailsDto, UpdateRiskRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import {
-  useGetRiskById,
+  useGetRisk,
   useGetRiskCategoryOptions,
   useGetRiskGradeOptions,
   useGetRiskStatusOptions,
@@ -79,7 +79,7 @@ const EditRiskForm = ({
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const { data: riskData } = useGetRiskById(riskId)
+  const { data: riskData } = useGetRisk(riskId)
   const [riskNumber, setRiskNumber] = useState<number>(undefined)
   const [teamName, setTeamName] = useState<string>('')
   const updateRisk = useUpdateRiskMutation()

@@ -1,8 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Domain.Models;
-public class PlanningIntervalObjective : BaseSoftDeletableEntity<Guid>
+public class PlanningIntervalObjective : BaseSoftDeletableEntity<Guid>, HasIdAndKey
 {
     private PlanningIntervalObjective() { }
 
@@ -19,15 +20,15 @@ public class PlanningIntervalObjective : BaseSoftDeletableEntity<Guid>
 
     /// <summary>Gets the key.</summary>
     /// <value>The key.</value>
-    public int Key { get; init; }
+    public int Key { get; private init; }
 
     /// <summary>Gets the planning interval identifier.</summary>
     /// <value>The planning interval identifier.</value>
-    public Guid PlanningIntervalId { get; init; }
+    public Guid PlanningIntervalId { get; private init; }
 
     /// <summary>Gets the team identifier.</summary>
     /// <value>The team identifier.</value>
-    public Guid TeamId { get; init; }
+    public Guid TeamId { get; private init; }
 
     /// <summary>Gets the team.</summary>
     /// <value>The team.</value>
@@ -39,7 +40,7 @@ public class PlanningIntervalObjective : BaseSoftDeletableEntity<Guid>
 
     /// <summary>Gets or sets the type.</summary>
     /// <value>The PI objective type.</value>
-    public PlanningIntervalObjectiveType Type { get; init; }
+    public PlanningIntervalObjectiveType Type { get; private init; }
 
     /// <summary>Gets or sets the status.</summary>
     /// <value>The status.</value>

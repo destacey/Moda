@@ -2,7 +2,7 @@
 import PlanningIntervalObjectivesGrid from '@/src/app/components/common/planning/planning-interval-objectives-grid'
 import { useDocumentTitle } from '@/src/app/hooks'
 import {
-  useGetPlanningIntervalByKey,
+  useGetPlanningInterval,
   useGetPlanningIntervalCalendar,
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
@@ -42,7 +42,7 @@ const PlanningIntervalObjectivesPage = ({ params }) => {
     isLoading,
     isFetching,
     refetch: refetchPlanningInterval,
-  } = useGetPlanningIntervalByKey(params.key)
+  } = useGetPlanningInterval(params.key)
 
   const {
     data: objectivesData,

@@ -2,7 +2,7 @@
 
 import { useDocumentTitle } from '@/src/app/hooks'
 import {
-  useGetPlanningIntervalByKey,
+  useGetPlanningInterval,
   useGetPlanningIntervalRisks,
 } from '@/src/services/queries/planning-queries'
 import { useCallback, useState } from 'react'
@@ -19,7 +19,7 @@ const PlanningIntervalRisksPage = ({ params }) => {
     data: planningIntervalData,
     isLoading,
     isFetching,
-  } = useGetPlanningIntervalByKey(params.key)
+  } = useGetPlanningInterval(params.key)
 
   const risksQuery = useGetPlanningIntervalRisks(
     planningIntervalData?.id,

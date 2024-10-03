@@ -969,144 +969,20 @@
         ]
       }
     },
-    "/api/planning/planning-intervals/{id}": {
+    "/api/planning/planning-intervals/{idOrKey}": {
       "get": {
         "tags": [
           "PlanningIntervals"
         ],
         "summary": "Get planning interval details.",
-        "operationId": "PlanningIntervals_GetById",
+        "operationId": "PlanningIntervals_GetPlanningInterval",
         "parameters": [
           {
-            "name": "id",
+            "name": "idOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlanningIntervalDetailsDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "PlanningIntervals"
-        ],
-        "summary": "Update a planning interval.",
-        "operationId": "PlanningIntervals_Update",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdatePlanningIntervalRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      }
-    },
-    "/api/planning/planning-intervals/key/{id}": {
-      "get": {
-        "tags": [
-          "PlanningIntervals"
-        ],
-        "summary": "Get planning interval details using the key.",
-        "operationId": "PlanningIntervals_GetByKey",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             },
             "x-position": 1
           }
@@ -1255,6 +1131,71 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/planning-intervals/{id}": {
+      "put": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Update a planning interval.",
+        "operationId": "PlanningIntervals_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlanningIntervalRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -1492,7 +1433,7 @@
         ]
       }
     },
-    "/api/planning/planning-intervals/{id}/iterations": {
+    "/api/planning/planning-intervals/{idOrKey}/iterations": {
       "get": {
         "tags": [
           "PlanningIntervals"
@@ -1501,14 +1442,11 @@
         "operationId": "PlanningIntervals_GetIterations",
         "parameters": [
           {
-            "name": "id",
+            "name": "idOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
+              "type": "string"
             },
             "x-position": 1
           }
@@ -2701,144 +2639,20 @@
         ]
       }
     },
-    "/api/planning/risks/{id}": {
+    "/api/planning/risks/{idOrKey}": {
       "get": {
         "tags": [
           "Risks"
         ],
         "summary": "Get risk details by Id.",
-        "operationId": "Risks_GetById",
+        "operationId": "Risks_GetRisk",
         "parameters": [
           {
-            "name": "id",
+            "name": "idOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RiskDetailsDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "Risks"
-        ],
-        "summary": "Update a risk.",
-        "operationId": "Risks_Update",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateRiskRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResult"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      }
-    },
-    "/api/planning/risks/key/{id}": {
-      "get": {
-        "tags": [
-          "Risks"
-        ],
-        "summary": "Get risk details using the key.",
-        "operationId": "Risks_GetByKey",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             },
             "x-position": 1
           }
@@ -2919,6 +2733,71 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/risks/{id}": {
+      "put": {
+        "tags": [
+          "Risks"
+        ],
+        "summary": "Update a risk.",
+        "operationId": "Risks_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRiskRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -6137,7 +6016,7 @@
         ]
       }
     },
-    "/api/organization/teams/{id}/risks/{riskId}": {
+    "/api/organization/teams/{id}/risks/{riskIdOrKey}": {
       "get": {
         "tags": [
           "Teams"
@@ -6158,14 +6037,11 @@
             "x-position": 1
           },
           {
-            "name": "riskId",
+            "name": "riskIdOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
+              "type": "string"
             },
             "x-position": 2
           }
@@ -6207,7 +6083,9 @@
             "Bearer": []
           }
         ]
-      },
+      }
+    },
+    "/api/organization/teams/{id}/risks/{riskId}": {
       "put": {
         "tags": [
           "Teams"
@@ -6923,7 +6801,7 @@
         ]
       }
     },
-    "/api/organization/teams-of-teams/{id}/risks/{riskId}": {
+    "/api/organization/teams-of-teams/{id}/risks/{riskIdOrKey}": {
       "get": {
         "tags": [
           "TeamsOfTeams"
@@ -6944,14 +6822,11 @@
             "x-position": 1
           },
           {
-            "name": "riskId",
+            "name": "riskIdOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
+              "type": "string"
             },
             "x-position": 2
           }
@@ -6993,7 +6868,9 @@
             "Bearer": []
           }
         ]
-      },
+      }
+    },
+    "/api/organization/teams-of-teams/{id}/risks/{riskId}": {
       "put": {
         "tags": [
           "TeamsOfTeams"

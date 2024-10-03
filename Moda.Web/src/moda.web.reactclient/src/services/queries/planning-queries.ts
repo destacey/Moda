@@ -35,21 +35,13 @@ export const useGetPlanningIntervals = () => {
   })
 }
 
-export const useGetPlanningIntervalById = (id: string) => {
+export const useGetPlanningInterval = (idOrKey: string) => {
   return useQuery({
-    queryKey: [QK.PLANNING_INTERVALS, id],
-    queryFn: async () => (await getPlanningIntervalsClient()).getById(id),
+    queryKey: [QK.PLANNING_INTERVALS, idOrKey],
+    queryFn: async () =>
+      (await getPlanningIntervalsClient()).getPlanningInterval(idOrKey),
     // staleTime: 60000,
-    enabled: !!id,
-  })
-}
-
-export const useGetPlanningIntervalByKey = (key: number) => {
-  return useQuery({
-    queryKey: [QK.PLANNING_INTERVALS, key],
-    queryFn: async () => (await getPlanningIntervalsClient()).getByKey(key),
-    // staleTime: 60000,
-    enabled: !!key,
+    enabled: !!idOrKey,
   })
 }
 
@@ -368,21 +360,12 @@ export const useGetPlanningIntervalRisksByTeamId = (
 }
 
 // RISKS
-export const useGetRiskById = (id: string) => {
+export const useGetRisk = (idOrKey: string) => {
   return useQuery({
-    queryKey: [QK.RISKS, id],
-    queryFn: async () => (await getRisksClient()).getById(id),
+    queryKey: [QK.RISKS, idOrKey],
+    queryFn: async () => (await getRisksClient()).getRisk(idOrKey),
     // staleTime: 10000,
-    enabled: !!id,
-  })
-}
-
-export const useGetRiskByKey = (key: number) => {
-  return useQuery({
-    queryKey: [QK.RISKS, key],
-    queryFn: async () => (await getRisksClient()).getByKey(key),
-    // staleTime: 10000,
-    enabled: !!key,
+    enabled: !!idOrKey,
   })
 }
 

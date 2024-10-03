@@ -45,9 +45,11 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
       ],
     }),
     getPlanningInterval: builder.query<PlanningIntervalDetailsDto, string>({
-      queryFn: async (id: string) => {
+      queryFn: async (idOrKey: string) => {
         try {
-          const data = await (await getPlanningIntervalsClient()).getById(id)
+          const data = await (
+            await getPlanningIntervalsClient()
+          ).getPlanningInterval(idOrKey)
           return { data }
         } catch (error) {
           console.error('API Error:', error)

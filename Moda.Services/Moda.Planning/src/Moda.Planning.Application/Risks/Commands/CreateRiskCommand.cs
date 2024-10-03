@@ -1,11 +1,11 @@
 ﻿using Ardalis.GuardClauses;
-using Moda.Common.Application.Interfaces;
+using Moda.Common.Application.Models;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.Risks.Commands;
 public sealed record CreateRiskCommand(string Summary, string? Description, Guid TeamId,
     RiskCategory Category, RiskGrade Impact, RiskGrade Likelihood, Guid? AssigneeId,
-    LocalDate? FollowUpDate, string? Response) : ICommand<int>;
+    LocalDate? FollowUpDate, string? Response) : ICommand<ObjectIdAndKey>;
 
 public sealed class CreateRiskCommandValidator : CustomValidator<CreateRiskCommand>
 {
@@ -40,14 +40,14 @@ public sealed class CreateRiskCommandValidator : CustomValidator<CreateRiskComma
     }
 }
 
-internal sealed class CreateRiskCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateRiskCommandHandler> logger, ICurrentUser currentUser) : ICommandHandler<CreateRiskCommand, int>
+internal sealed class CreateRiskCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreateRiskCommandHandler> logger, ICurrentUser currentUser) : ICommandHandler<CreateRiskCommand, ObjectIdAndKey>
 {
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger<CreateRiskCommandHandler> _logger = logger;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
 
-    public async Task<Result<int>> Handle(CreateRiskCommand request, CancellationToken cancellationToken)
+    public async Task<Result<ObjectIdAndKey>> Handle(CreateRiskCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -69,7 +69,7 @@ internal sealed class CreateRiskCommandHandler(IPlanningDbContext planningDbCont
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(risk.Key);
+            return new ObjectIdAndKey(risk.Id, risk.Key);
         }
         catch (Exception ex)
         {
@@ -77,7 +77,7 @@ internal sealed class CreateRiskCommandHandler(IPlanningDbContext planningDbCont
 
             _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
 
-            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<ObjectIdAndKey>($"Moda Request: Exception for Request {requestName} {request}");
         }
     }
 }

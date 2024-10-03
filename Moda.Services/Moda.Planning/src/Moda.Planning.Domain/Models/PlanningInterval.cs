@@ -1,12 +1,13 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Enums.Organization;
+using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule
+public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, HasIdAndKey
 {
     private string _name = default!;
     private string? _description;

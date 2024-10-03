@@ -1,7 +1,8 @@
-﻿using Moda.Planning.Domain.Interfaces;
+﻿using Moda.Common.Domain.Interfaces;
+using Moda.Planning.Domain.Interfaces;
 
 namespace Moda.Planning.Domain.Models;
-public sealed record PlanningIntervalCalendar
+public sealed record PlanningIntervalCalendar : HasIdAndKey
 {
     private readonly List<ILocalSchedule> _iterationSchedules = new();
 

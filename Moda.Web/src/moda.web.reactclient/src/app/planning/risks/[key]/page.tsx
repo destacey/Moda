@@ -9,7 +9,7 @@ import useAuth from '@/src/app/components/contexts/auth'
 import EditRiskForm from '@/src/app/components/common/planning/edit-risk-form'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
-import { useGetRiskByKey } from '@/src/services/queries/planning-queries'
+import { useGetRisk } from '@/src/services/queries/planning-queries'
 import { useAppDispatch } from '@/src/app/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 
@@ -20,7 +20,7 @@ const RiskDetailsPage = ({ params }) => {
     isLoading,
     isFetching,
     refetch,
-  } = useGetRiskByKey(params.key)
+  } = useGetRisk(params.key)
   const [activeTab, setActiveTab] = useState('details')
   const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
   const dispatch = useAppDispatch()
