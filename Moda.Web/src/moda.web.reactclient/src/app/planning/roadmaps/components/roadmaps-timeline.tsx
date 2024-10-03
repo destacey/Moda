@@ -1,7 +1,7 @@
 'use client'
 
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
-import { Card, Divider, Flex, Space, Switch } from 'antd'
+import { Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { RoadmapChildrenDto, RoadmapDetailsDto } from '@/src/services/moda-api'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
@@ -12,7 +12,15 @@ import {
   ModaTimeline,
   ModaTimelineOptions,
 } from '@/src/app/components/common/timeline'
-import { ModaDataItem } from '@/src/app/components/common/timeline/types'
+import {
+  GroupTemplateProps,
+  ModaDataGroup,
+  ModaDataItem,
+  RangeItemTemplateProps,
+} from '@/src/app/components/common/timeline/types'
+import Link from 'next/link'
+
+const { Text } = Typography
 
 export interface RoadmapsTimelineProps {
   roadmap: RoadmapDetailsDto
@@ -22,18 +30,29 @@ export interface RoadmapsTimelineProps {
   viewSelector?: React.ReactNode | undefined
 }
 
-interface RoadmapTimelineItem extends ModaDataItem {
+interface RoadmapTimelineItem extends ModaDataItem<RoadmapChildrenDto> {
   id: number
   end: Date
   type: string
-  roadmap?: RoadmapChildrenDto
+  //roadmap?: RoadmapChildrenDto
   order?: number
+}
+
+const GroupTemplate = (props: GroupTemplateProps<RoadmapChildrenDto>) => {
+  if (!props.item.objectData) return null
+  return (
+    <Text style={{ padding: '5px', color: props.fontColor }}>
+      <Link href={`/planning/roadmaps/${props.item.objectData.key}`}>
+        {props.item.content}
+      </Link>
+    </Text>
+  )
 }
 
 const getDataGroups = (
   groupItems: RoadmapTimelineItem[],
   roadmaps: RoadmapTimelineItem[],
-): DataGroup[] => {
+): ModaDataGroup<RoadmapChildrenDto>[] => {
   let groups = []
   if (!groupItems || groupItems.length === 0) {
     groups = roadmaps.reduce((acc, roadmap) => {
@@ -50,7 +69,8 @@ const getDataGroups = (
     return {
       id: group.roadmap.id,
       content: group.roadmap.name,
-    } as DataGroup
+      objectData: group.roadmap,
+    } as ModaDataGroup<RoadmapChildrenDto>
   })
 }
 
@@ -214,6 +234,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
           }
           isLoading={isLoading}
           options={timelineOptions}
+          groupTemplate={drillDown ? GroupTemplate : undefined}
           emptyMessage="No roadmaps to display"
         />
       </Card>
