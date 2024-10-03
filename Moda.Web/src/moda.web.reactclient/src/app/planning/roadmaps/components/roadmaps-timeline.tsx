@@ -3,7 +3,7 @@
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import { Card, Divider, Flex, Space, Switch } from 'antd'
 import { RoadmapChildrenDto, RoadmapDetailsDto } from '@/src/services/moda-api'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { ItemType } from 'antd/es/menu/interface'
 import { useGetRoadmapChildrenQuery } from '@/src/store/features/planning/roadmaps-api'
@@ -66,20 +66,27 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   >([])
 
   const [drillDown, setDrillDown] = useState<boolean>(false)
+  const [userChangedDrillDown, setUserChangedDrillDown] =
+    useState<boolean>(false)
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
 
-  const { data: roadmapLinksData, isLoading: isLoadingRoadmapLinks } =
-    useGetRoadmapChildrenQuery(props.roadmapChildren?.map((r) => r.id) || [], {
+  const {
+    data: roadmapGrandChildren,
+    isFetching: isLoadingRoadmapGrandChildren,
+  } = useGetRoadmapChildrenQuery(
+    props.roadmapChildren?.map((r) => r.id) || [],
+    {
       skip: !props.roadmapChildren && props.roadmapChildren.length === 0,
-    })
+    },
+  )
 
   useEffect(() => {
-    if (!props.roadmapChildren) return
+    if (props.isChildrenLoading || !props.roadmapChildren) return
 
     setTimelineStart(props.roadmap.start)
     setTimelineEnd(props.roadmap.end)
 
-    const levelOneRoadmaps = props.roadmapChildren.map((roadmap) => {
+    const updatedLevelOneRoadmaps = props.roadmapChildren.map((roadmap) => {
       return {
         id: roadmap.key,
         title: `${roadmap.key} - ${roadmap.name}`,
@@ -93,26 +100,37 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         roadmap: roadmap,
       } as RoadmapTimelineItem
     })
-    setLevelOneRoadmaps(levelOneRoadmaps)
+    setLevelOneRoadmaps(updatedLevelOneRoadmaps)
 
-    const levelTwoRoadmaps = roadmapLinksData?.map((roadmap) => {
-      return {
-        id: roadmap.key,
-        title: `${roadmap.key} - ${roadmap.name}`,
-        content: roadmap.name,
-        start: dayjs(roadmap.start).toDate(),
-        end: dayjs(roadmap.end).toDate(),
-        itemColor: roadmap.color,
-        group: roadmap.parent.id,
-        type: 'range',
-        order: roadmap.order,
-        roadmap: roadmap,
-      } as RoadmapTimelineItem
-    })
-    setLevelTwoRoadmaps(levelTwoRoadmaps)
+    if (updatedLevelOneRoadmaps.length > 0 && !isLoadingRoadmapGrandChildren) {
+      const updatedLevelTwoRoadmaps = roadmapGrandChildren?.map((roadmap) => {
+        return {
+          id: roadmap.key,
+          title: `${roadmap.key} - ${roadmap.name}`,
+          content: roadmap.name,
+          start: dayjs(roadmap.start).toDate(),
+          end: dayjs(roadmap.end).toDate(),
+          itemColor: roadmap.color,
+          group: roadmap.parent.id,
+          type: 'range',
+          order: roadmap.order,
+          roadmap: roadmap,
+        } as RoadmapTimelineItem
+      })
+      setLevelTwoRoadmaps(updatedLevelTwoRoadmaps)
 
-    setIsLoading(props.isChildrenLoading || isLoadingRoadmapLinks)
-  }, [drillDown, isLoadingRoadmapLinks, props, roadmapLinksData])
+      if (!userChangedDrillDown && updatedLevelTwoRoadmaps.length > 0) {
+        setDrillDown(true)
+      }
+    }
+
+    setIsLoading(props.isChildrenLoading || isLoadingRoadmapGrandChildren)
+  }, [
+    isLoadingRoadmapGrandChildren,
+    props,
+    roadmapGrandChildren,
+    userChangedDrillDown,
+  ])
 
   const timelineOptions = useMemo((): ModaTimelineOptions => {
     return {
@@ -125,18 +143,22 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     }
   }, [showCurrentTime, timelineEnd, timelineStart])
 
-  const onDrillDownChange = (checked: boolean) => {
-    setDrillDown(checked)
-  }
+  const onDrillDownChange = useCallback(
+    (checked: boolean) => {
+      setDrillDown(checked)
+      if (!userChangedDrillDown) setUserChangedDrillDown(true)
+    },
+    [userChangedDrillDown],
+  )
 
   const onShowCurrentTimeChange = (checked: boolean) => {
     setShowCurrentTime(checked)
   }
 
-  const controlItems = (): ItemType[] => {
+  const controlItems = useMemo((): ItemType[] => {
     const items: ItemType[] = []
 
-    if (levelTwoRoadmaps && levelTwoRoadmaps.length > 0) {
+    if (levelOneRoadmaps.length > 0) {
       items.push({
         label: (
           <Space>
@@ -151,31 +173,35 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         key: 'drill-down',
         onClick: () => onDrillDownChange(!drillDown),
       })
+
+      items.push({
+        label: (
+          <Space>
+            <Switch
+              size="small"
+              checked={showCurrentTime}
+              onChange={onShowCurrentTimeChange}
+            />
+            Show Current Time
+          </Space>
+        ),
+        key: 'show-current-time',
+        onClick: () => setShowCurrentTime(!showCurrentTime),
+      })
     }
 
-    items.push({
-      label: (
-        <Space>
-          <Switch
-            size="small"
-            checked={showCurrentTime}
-            onChange={onShowCurrentTimeChange}
-          />
-          Show Current Time
-        </Space>
-      ),
-      key: 'show-current-time',
-      onClick: () => setShowCurrentTime(!showCurrentTime),
-    })
-
     return items
-  }
+  }, [drillDown, levelOneRoadmaps.length, onDrillDownChange, showCurrentTime])
 
   return (
     <>
       <Flex justify="end" align="center" style={{ paddingBottom: '16px' }}>
-        <ControlItemsMenu items={controlItems()} />
-        <Divider type="vertical" style={{ height: '30px' }} />
+        {controlItems.length > 0 && (
+          <>
+            <ControlItemsMenu items={controlItems} />
+            <Divider type="vertical" style={{ height: '30px' }} />
+          </>
+        )}
         {props.viewSelector}
       </Flex>
       <Card size="small" bordered={false}>

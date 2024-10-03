@@ -44,13 +44,6 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
       },
     ]
 
-    // if (children.length > 0) {
-    //   options.push({
-    //     value: 'Timeline',
-    //     icon: <BuildOutlined alt="Timeline" title="Timeline" />,
-    //   })
-    // }
-
     return options
   }, [])
 

@@ -230,14 +230,13 @@ const ModaTimeline = (props: ModaTimelineProps) => {
     props.isLoading,
   ])
 
+  const isLoading = props.isLoading || isTimelineLoading
+
   return (
-    <Spin
-      spinning={props.isLoading || isTimelineLoading}
-      tip="Loading timeline..."
-      size="large"
-    >
+    <Spin spinning={isLoading} tip="Loading timeline..." size="large">
       <div ref={timelineRef} />
-      {(!props.data || props.data.length === 0) &&
+      {!isLoading &&
+        (!props.data || props.data.length === 0) &&
         (!props.groups || props.groups.length === 0) && (
           <ModaEmpty message={props.emptyMessage ?? 'No timeline data'} />
         )}

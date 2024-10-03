@@ -60,7 +60,7 @@ const RoadmapDetailsPage = ({ params }) => {
 
   const {
     data: roadmapChildren,
-    isLoading: isChildrenLoading,
+    isFetching: isChildrenLoading,
     refetch: refetchChildren,
   } = useGetRoadmapChildrenQuery([roadmapData?.id], {
     skip: !roadmapData,
@@ -151,7 +151,7 @@ const RoadmapDetailsPage = ({ params }) => {
     return <RoadmapDetailsLoading />
   }
 
-  if (!isLoading && !roadmapData) {
+  if (!roadmapData) {
     notFound()
   }
 
