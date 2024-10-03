@@ -13,18 +13,25 @@ import './moda-timeline.css'
 import { Spin, Typography } from 'antd'
 import useTheme from '../../contexts/theme'
 import { createRoot } from 'react-dom/client'
-import { ModaDataItem, ModaTimelineOptions, RangeItemTemplateProps } from '.'
+import {
+  GroupTemplateProps,
+  ModaDataGroup,
+  ModaDataItem,
+  ModaTimelineOptions,
+  RangeItemTemplateProps,
+} from '.'
 import { ModaEmpty } from '..'
 import { getLuminance } from '@/src/utils/color-helper'
 
 const { Text } = Typography
 
-export type ModaTimelineProps<T = any> = {
-  data: ModaDataItem<T>[]
-  groups?: DataGroup[]
+export type ModaTimelineProps<TI = any, TG = any> = {
+  data: ModaDataItem<TI>[]
+  groups?: ModaDataGroup<TG>[]
   isLoading: boolean
   options: ModaTimelineOptions
-  rangeItemTemplate?: (props: RangeItemTemplateProps<T>) => JSX.Element
+  rangeItemTemplate?: (props: RangeItemTemplateProps<TI>) => JSX.Element
+  groupTemplate?: (props: GroupTemplateProps<TG>) => JSX.Element
   emptyMessage?: string
 }
 
@@ -35,6 +42,14 @@ const RangeItemTemplate = (props: RangeItemTemplateProps<ModaDataItem>) => {
 
   return (
     <Text style={{ padding: '5px', color: fontColor }}>
+      {props.item.content}
+    </Text>
+  )
+}
+
+const GroupTemplate = (props: GroupTemplateProps<ModaDataGroup>) => {
+  return (
+    <Text style={{ padding: '5px', color: props.fontColor }}>
       {props.item.content}
     </Text>
   )
@@ -120,11 +135,19 @@ const ModaTimeline = (props: ModaTimelineProps) => {
       // Create a container for the react element (prevents DOM node errors)
       const container = document.createElement('div')
       element.appendChild(container)
-      createRoot(container).render(
-        <Text style={{ padding: '5px', color: itemFontColor }}>
-          {item.content}
-        </Text>,
-      )
+
+      const root = createRoot(container)
+
+      if (props.groupTemplate) {
+        root.render(
+          props.groupTemplate({
+            item: item,
+            fontColor: itemFontColor,
+          }),
+        )
+      } else {
+        root.render(<GroupTemplate item={item} fontColor={itemFontColor} />)
+      }
 
       // Store the rendered element container to reference later
       elementMapRef.current[mapId] = container
@@ -132,7 +155,7 @@ const ModaTimeline = (props: ModaTimelineProps) => {
       // Return the new container
       return container
     },
-    [itemFontColor],
+    [itemFontColor, props],
   )
 
   const options = useMemo((): TimelineOptions => {
@@ -230,14 +253,13 @@ const ModaTimeline = (props: ModaTimelineProps) => {
     props.isLoading,
   ])
 
+  const isLoading = props.isLoading || isTimelineLoading
+
   return (
-    <Spin
-      spinning={props.isLoading || isTimelineLoading}
-      tip="Loading timeline..."
-      size="large"
-    >
+    <Spin spinning={isLoading} tip="Loading timeline..." size="large">
       <div ref={timelineRef} />
-      {(!props.data || props.data.length === 0) &&
+      {!isLoading &&
+        (!props.data || props.data.length === 0) &&
         (!props.groups || props.groups.length === 0) && (
           <ModaEmpty message={props.emptyMessage ?? 'No timeline data'} />
         )}

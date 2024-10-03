@@ -21,7 +21,7 @@ interface RoadmapViewManagerProps {
 }
 
 const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
-  const [currentView, setCurrentView] = useState<string | number>('List')
+  const [currentView, setCurrentView] = useState<string | number>('Timeline')
   const [children, setChildren] = useState<RoadmapListDto[]>([])
 
   useEffect(() => {
@@ -35,20 +35,17 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
   const viewSelectorOptions: SegmentedLabeledOption[] = useMemo(() => {
     const options = [
       {
+        value: 'Timeline',
+        icon: <BuildOutlined alt="Timeline" title="Timeline" />,
+      },
+      {
         value: 'List',
         icon: <MenuOutlined alt="List" title="List" />,
       },
     ]
 
-    if (children.length > 0) {
-      options.push({
-        value: 'Timeline',
-        icon: <BuildOutlined alt="Timeline" title="Timeline" />,
-      })
-    }
-
     return options
-  }, [children])
+  }, [])
 
   const viewSelector = useMemo(
     () => (
@@ -63,6 +60,15 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
 
   return (
     <>
+      {currentView === 'Timeline' && (
+        <RoadmapsTimeline
+          roadmap={props.roadmap}
+          roadmapChildren={children}
+          isChildrenLoading={props.isChildrenLoading}
+          refreshChildren={props.refreshChildren}
+          viewSelector={viewSelector}
+        />
+      )}
       {currentView === 'List' && (
         <RoadmapsGrid
           roadmapsData={children}
@@ -73,15 +79,6 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
           enableRowDrag={props.canUpdateRoadmap}
           parentRoadmapId={props.roadmap.id}
           messageApi={props.messageApi}
-        />
-      )}
-      {currentView === 'Timeline' && (
-        <RoadmapsTimeline
-          roadmap={props.roadmap}
-          roadmapChildren={children}
-          isChildrenLoading={props.isChildrenLoading}
-          refreshChildren={props.refreshChildren}
-          viewSelector={viewSelector}
         />
       )}
     </>

@@ -5,6 +5,10 @@ export type ModaDataItem<T = any> = DataItem & {
   objectData?: T
 }
 
+export type ModaDataGroup<T = any> = DataGroup & {
+  objectData?: T
+}
+
 export interface ModaTimelineOptions {
   maxHeight?: number | undefined
   minHeight?: number | undefined
@@ -21,4 +25,9 @@ export interface RangeItemTemplateProps<T = any> {
   item: ModaDataItem<T>
   fontColor: string
   foregroundColor?: string | undefined
+}
+
+export interface GroupTemplateProps<T = any> {
+  item: ModaDataGroup<T>
+  fontColor: string
 }
