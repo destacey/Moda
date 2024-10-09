@@ -3,6 +3,8 @@ export type {
   ModaDataItem,
   ModaDataGroup,
   ModaTimelineOptions,
+  ItemTemplateProps,
+  ItemTemplate,
   RangeItemTemplateProps,
   GroupTemplateProps,
 } from './types'

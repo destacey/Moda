@@ -16,7 +16,7 @@ import { Card, Flex, Typography } from 'antd'
 import {
   ModaTimeline,
   ModaTimelineOptions,
-  RangeItemTemplateProps,
+  ItemTemplate
 } from '../../components/common/timeline'
 import { ModaDataItem } from '../../components/common/timeline/types'
 
@@ -33,25 +33,25 @@ interface PlanningIntervalObjectivesTimelineProps {
   viewSelector?: React.ReactNode
 }
 
-export const ObjectiveTimelineTemplate = ({
+export const ObjectiveTimelineTemplate: ItemTemplate<PlanningIntervalObjectiveListDto> = ({
   item,
   fontColor,
   foregroundColor,
-}: RangeItemTemplateProps<PlanningIntervalObjectiveListDto>) => {
+}) => {
   return (
     <div
       style={{
-        width: `${item.objectData.progress}%`,
+        width: `${item.objectData?.progress}%`,
         backgroundColor: foregroundColor,
       }}
     >
       <Text style={{ padding: '5px', color: fontColor }}>
         <Link
-          href={`/planning/planning-intervals/${item.objectData.planningInterval.key}/objectives/${item.objectData.key}`}
+          href={`/planning/planning-intervals/${item.objectData?.planningInterval?.key}/objectives/${item.objectData?.key}`}
         >
-          {item.objectData.key}
+          {item.objectData?.key}
         </Link>
-        <span> - </span> {item.objectData.name}
+        <span> - </span> {item.objectData?.name}
       </Text>
     </div>
   )
@@ -91,7 +91,7 @@ const PlanningIntervalObjectivesTimeline = ({
   const [isLoading, setIsLoading] = useState(true)
   const [piStart, setPiStart] = useState<Date>(undefined)
   const [piEnd, setPiEnd] = useState<Date>(undefined)
-  const [iterations, setIterations] = useState<DataItem[]>([])
+  const [iterations, setIterations] = useState<ModaDataItem<PlanningIntervalObjectiveListDto>[]>([])
   const [objectives, setObjectives] = useState<
     ModaDataItem<PlanningIntervalObjectiveListDto>[]
   >([])
@@ -164,7 +164,7 @@ const PlanningIntervalObjectivesTimeline = ({
         </Flex>
       )}
       <Card size="small" bordered={false}>
-        <ModaTimeline
+        <ModaTimeline<PlanningIntervalObjectiveListDto>
           data={[...iterations, ...objectives]}
           groups={
             enableGroups ? getDataGroups(teamNames, objectives) : undefined
