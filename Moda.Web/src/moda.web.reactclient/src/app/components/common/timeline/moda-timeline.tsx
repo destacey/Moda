@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   DataGroup,
-  DataItem,
+  DataItemEnhanced,
   DataSet,
   Timeline,
   TimelineOptions,
@@ -18,39 +18,28 @@ import {
   ModaDataGroup,
   ModaDataItem,
   ModaTimelineOptions,
-  RangeItemTemplateProps,
 } from '.'
 import { ModaEmpty } from '..'
 import { getLuminance } from '@/src/utils/color-helper'
 import { ItemTemplate } from '@/src/app/components/common/timeline/types'
+import { ThemeName } from '@/src/app/components/contexts/theme/types'
 
 const { Text } = Typography
 
-/**
- * export type ModaTimelineProps<TI = any, TG = any> = {
- *   data: ModaDataItem<TI>[]
- *   groups?: ModaDataGroup<TG>[]
- *   isLoading: boolean
- *   options: ModaTimelineOptions
- *   rangeItemTemplate?: (props: RangeItemTemplateProps<TI>) => JSX.Element
- *   groupTemplate?: (props: GroupTemplateProps<TG>) => JSX.Element
- *   emptyMessage?: string
- * }
- */
-
-export type ModaTimelineProps<T = unknown, TData extends ModaDataItem<unknown> = ModaDataItem<T>> = {
-  data: TData[]
-  groups?: DataGroup[]
+export type ModaTimelineProps<T> = {
+  data: ModaDataItem<T>[]
+  groups?: ModaDataGroup<T>[]
   isLoading: boolean
-  options: ModaTimelineOptions
-  rangeItemTemplate?: ItemTemplate<T, TData>
+  options: ModaTimelineOptions<T>
+  rangeItemTemplate?: ItemTemplate<T>
+  groupTemplate?: ItemTemplate<T>
   emptyMessage?: string
 }
 
-const RangeItemTemplate: ItemTemplate = (props) => {
-  // TODO: the 0.6 needs to be tested with some of the other colors
+const RangeItemTemplate: ItemTemplate<unknown> = (props) => {
+  // TODO: The 0.6 needs to be tested with some of the other colors
   const fontColor =
-    getLuminance(props.item.itemColor) > 0.6 ? '#4d4d4d' : '#FFFFFF'
+    getLuminance((props.item as ModaDataItem).itemColor ?? props.foregroundColor ?? '') > 0.6 ? '#4d4d4d' : '#FFFFFF'
 
   return (
     <Text style={{ padding: '5px', color: fontColor }}>
@@ -59,7 +48,7 @@ const RangeItemTemplate: ItemTemplate = (props) => {
   )
 }
 
-const GroupTemplate = (props: GroupTemplateProps<ModaDataGroup>) => {
+const GroupTemplate: ItemTemplate<unknown> = (props) => {
   return (
     <Text style={{ padding: '5px', color: props.fontColor }}>
       {props.item.content}
@@ -67,10 +56,10 @@ const GroupTemplate = (props: GroupTemplateProps<ModaDataGroup>) => {
   )
 }
 
-  return <Text style={{ padding: '5px', color: fontColor }}>{props.item.content}</Text>
-}
+//   return <Text style={{ padding: '5px', color: fontColor }}>{props.item.content}</Text>
+// }
 
-const BackgroundItemTemplate: ItemTemplate = (props) => {
+const BackgroundItemTemplate: ItemTemplate<unknown> = (props) => {
   return (
     <div>
       <Text>{props.item.content}</Text>
@@ -78,9 +67,59 @@ const BackgroundItemTemplate: ItemTemplate = (props) => {
   )
 }
 
-const ModaTimeline = <TObject = unknown, TData extends ModaDataItem<unknown> = ModaDataItem<TObject>>(
-  props: ModaTimelineProps<TObject, TData>,
-) => {
+type TimeLineColorData = {
+  item: {
+    background: string
+    foreground: string
+    font: string
+  }
+  background: {
+    background: string
+  }
+}
+
+const DefaultTimeLineColors: Record<ThemeName, TimeLineColorData> = {
+  light: {
+    item: {
+      background: '#ecf0f1',
+      foreground: '#c7edff',
+      font: '#4d4d4d',
+    },
+    background: {
+      background: '#d0d3d4',
+    },
+  },
+  dark: {
+    item: {
+      background: '#303030',
+      foreground: '#17354d',
+      font: '#FFFFFF',
+    },
+    background: {
+      background: '#61646e',
+    },
+  },
+}
+
+const getDefaultTemplate = <T,>(
+  type: DataItemEnhanced['type'] | 'group',
+  props: ModaTimelineProps<T>,
+): ItemTemplate<T> | ItemTemplate<unknown> | undefined => {
+  switch (type) {
+    case 'range':
+      return props.rangeItemTemplate ?? RangeItemTemplate
+    case 'background':
+      return BackgroundItemTemplate
+    case 'group':
+      return props.groupTemplate ?? GroupTemplate
+    case 'box':
+    case 'point':
+    default:
+      return undefined
+  }
+}
+
+const ModaTimeline = <T,>(props: ModaTimelineProps<T>) => {
   const [isTimelineLoading, setIsTimelineLoading] = useState(false)
 
   const elementMapRef = useRef<Record<string | number, HTMLElement>>({})
@@ -89,62 +128,36 @@ const ModaTimeline = <TObject = unknown, TData extends ModaDataItem<unknown> = M
   const { currentThemeName } = useTheme()
 
   const colors = useMemo(
-    () =>
-      currentThemeName === 'light'
-        ? ({
-            item: {
-              background: '#ecf0f1',
-              foreground: '#c7edff',
-              font: '#4d4d4d',
-            },
-            background: {
-              background: '#d0d3d4',
-            },
-          } as const)
-        : ({
-            item: {
-              background: '#303030',
-              foreground: '#17354d',
-              font: '#FFFFFF',
-            },
-            background: {
-              background: '#61646e',
-            },
-          } as const),
+    () => DefaultTimeLineColors[currentThemeName],
     [currentThemeName],
   )
 
-  const itemTemplateManager = useCallback<TimelineOptionsTemplateFunction<TData>>(
+  const itemTemplateManager = useCallback<
+    TimelineOptionsTemplateFunction<ModaDataItem<T>>
+  >(
     (item, element, data) => {
-      // TODO: vis is expecting an htmlElement or string be returned. What happens when an empty string gets returned?
       if (!item) return ''
 
-      const mapId = item.id ?? 0 // TODO: When is item id ever undefined?
+      const mapId = item.id ?? 0
       if (elementMapRef.current?.[mapId]) return elementMapRef.current[mapId]
 
       // Create a container for the react element (prevents DOM node errors)
       const container = document.createElement('div')
 
-      // TODO: When is it possible for element to be undefined?
       if (element) element.appendChild(container)
 
       const root = createRoot(container)
 
-      if (item.type === 'range') {
-        if (props.rangeItemTemplate) {
-          root.render(
-            props.rangeItemTemplate({
-              item: item,
-              fontColor: colors.item.font,
-              foregroundColor: colors.item.foreground,
-            }),
-          )
-        } else {
-          root.render(<RangeItemTemplate item={item} fontColor={colors.item.font} />)
-        }
-      } else if (item.type === 'background') {
-        root.render(<BackgroundItemTemplate item={item} fontColor={colors.item.font} />)
-      }
+      const Template = getDefaultTemplate<T>(item.type, props)
+
+      if (Template)
+        root.render(
+          <Template
+            item={item}
+            fontColor={colors.item.font}
+            foregroundColor={colors.item.foreground}
+          />,
+        )
 
       // Store the rendered element container to reference later
       elementMapRef.current[mapId] = container
@@ -155,7 +168,9 @@ const ModaTimeline = <TObject = unknown, TData extends ModaDataItem<unknown> = M
     [colors.item.font, colors.item.foreground, props],
   )
 
-  const groupTemplateManager = useCallback<TimelineOptionsTemplateFunction<TData>>(
+  const groupTemplateManager = useCallback<
+    TimelineOptionsTemplateFunction<ModaDataGroup<T>>
+  >(
     (item, element, data) => {
       if (!item) return ''
 
@@ -164,28 +179,28 @@ const ModaTimeline = <TObject = unknown, TData extends ModaDataItem<unknown> = M
 
       // Create a container for the react element (prevents DOM node errors)
       const container = document.createElement('div')
-      element.appendChild(container)
+      element?.appendChild(container)
 
       const root = createRoot(container)
 
-      if (props.groupTemplate) {
-        root.render(
-          props.groupTemplate({
-            item: item,
-            fontColor: colors.item.font,
-          }),
-        )
-      } else {
-        root.render(<GroupTemplate item={item} fontColor={itemFontColor} />)
-      }
+      const Template = getDefaultTemplate<T>('group', props)
 
+      if (Template)
+        root.render(
+          <Template
+            item={item}
+            fontColor={colors.item.font}
+            foregroundColor={colors.item.foreground}
+          />,
+        )
+      
       // Store the rendered element container to reference later
       elementMapRef.current[mapId] = container
 
       // Return the new container
       return container
     },
-    [colors.item.font, props],
+    [colors.item.font, colors.item.foreground, props],
   )
 
   const options = useMemo((): TimelineOptions => {
@@ -222,14 +237,18 @@ const ModaTimeline = <TObject = unknown, TData extends ModaDataItem<unknown> = M
   ])
 
   useEffect(() => {
-    if (props.isLoading || (props.data.length === 0 && (!props.groups || props.groups?.length === 0))) return
+    if (
+      props.isLoading ||
+      (props.data.length === 0 && (!props.groups || props.groups?.length === 0))
+    )
+      return
 
     setIsTimelineLoading(true)
 
     const datasetItems = new DataSet([])
     props.data.map((item) => {
       const backgroundColor = item.itemColor ?? colors.item.background
-      const newItem = {
+      const newItem: ModaDataItem<T> = {
         ...item,
         itemColor: backgroundColor,
         style: item.style
@@ -240,14 +259,22 @@ const ModaTimeline = <TObject = unknown, TData extends ModaDataItem<unknown> = M
               ? `background: ${colors.background.background}; border-style: inset; border-width: 1px;`
               : undefined,
       }
+
+      // TODO: Looks like visjs DataSet generic type has no overlap with visJs DataItem.
+      //  Further investigation needed in order to fix this type error
       datasetItems.add(newItem)
     })
 
     let timeline: Timeline
 
     if (timelineRef.current) {
-      if (props.groups?.length > 0) {
-        timeline = new Timeline(timelineRef.current, datasetItems, new DataSet(props.groups), options)
+      if (props.groups?.length && props.groups?.length > 0) {
+        timeline = new Timeline(
+          timelineRef.current,
+          datasetItems,
+          new DataSet(props.groups),
+          options,
+        )
       } else {
         timeline = new Timeline(timelineRef.current, datasetItems, options)
       }
@@ -265,7 +292,14 @@ const ModaTimeline = <TObject = unknown, TData extends ModaDataItem<unknown> = M
         timeline.destroy()
       }
     }
-  }, [colors.background.background, colors.item.background, options, props.data, props.groups, props.isLoading])
+  }, [
+    colors.background.background,
+    colors.item.background,
+    options,
+    props.data,
+    props.groups,
+    props.isLoading,
+  ])
 
   const isLoading = props.isLoading || isTimelineLoading
 

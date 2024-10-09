@@ -164,7 +164,7 @@ const PlanningIntervalObjectivesTimeline = ({
         </Flex>
       )}
       <Card size="small" bordered={false}>
-        <ModaTimeline
+        <ModaTimeline<PlanningIntervalObjectiveListDto>
           data={[...iterations, ...objectives]}
           groups={
             enableGroups ? getDataGroups(teamNames, objectives) : undefined

@@ -1,6 +1,5 @@
 'use client'
 
-import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import { Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { RoadmapChildrenDto, RoadmapDetailsDto } from '@/src/services/moda-api'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -9,14 +8,13 @@ import { ItemType } from 'antd/es/menu/interface'
 import { useGetRoadmapChildrenQuery } from '@/src/store/features/planning/roadmaps-api'
 import { ControlItemsMenu } from '@/src/app/components/common/control-items-menu'
 import {
+  ItemTemplate,
   ModaTimeline,
-  ModaTimelineOptions,
+  ModaTimelineOptions
 } from '@/src/app/components/common/timeline'
 import {
-  GroupTemplateProps,
   ModaDataGroup,
   ModaDataItem,
-  RangeItemTemplateProps,
 } from '@/src/app/components/common/timeline/types'
 import Link from 'next/link'
 
@@ -30,15 +28,12 @@ export interface RoadmapsTimelineProps {
   viewSelector?: React.ReactNode | undefined
 }
 
-interface RoadmapTimelineItem extends ModaDataItem<RoadmapChildrenDto> {
-  id: number
-  end: Date
-  type: string
-  //roadmap?: RoadmapChildrenDto
+type RoadmapTimelineObject = RoadmapChildrenDto & {
+  roadmap?: RoadmapChildrenDto
   order?: number
 }
 
-const GroupTemplate = (props: GroupTemplateProps<RoadmapChildrenDto>) => {
+const GroupTemplate: ItemTemplate<RoadmapTimelineObject> = (props) => {
   if (!props.item.objectData) return null
   return (
     <Text style={{ padding: '5px', color: props.fontColor }}>
@@ -50,11 +45,14 @@ const GroupTemplate = (props: GroupTemplateProps<RoadmapChildrenDto>) => {
 }
 
 const getDataGroups = (
-  groupItems: RoadmapTimelineItem[],
-  roadmaps: RoadmapTimelineItem[],
-): ModaDataGroup<RoadmapChildrenDto>[] => {
+  groupItems: ModaDataItem<RoadmapTimelineObject>[],
+  roadmaps: ModaDataItem<RoadmapTimelineObject>[],
+): ModaDataGroup<RoadmapTimelineObject>[] => {
   let groups = []
   if (!groupItems || groupItems.length === 0) {
+
+    // If groupItems (levelOneRoadmaps) is empty, then we will use the roadmaps (levelTwoRoadmaps) to get the groups
+    //  levelTwoRoadmaps.group seems to be a string
     groups = roadmaps.reduce((acc, roadmap) => {
       if (!acc.includes(roadmap.group)) {
         acc.push(roadmap.group)
@@ -62,6 +60,8 @@ const getDataGroups = (
       return acc
     }, [])
   } else {
+
+    // above we are pushing strings to the groups array, but here we would be pushing ModaDataItem<RoadmapTimelineObject> to the groups array?
     groups = groupItems
   }
 
@@ -79,10 +79,10 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [timelineStart, setTimelineStart] = useState<Date>(undefined)
   const [timelineEnd, setTimelineEnd] = useState<Date>(undefined)
   const [levelOneRoadmaps, setLevelOneRoadmaps] = useState<
-    RoadmapTimelineItem[]
+    ModaDataItem<RoadmapTimelineObject>[]
   >([])
   const [levelTwoRoadmaps, setLevelTwoRoadmaps] = useState<
-    RoadmapTimelineItem[]
+    ModaDataItem<RoadmapTimelineObject>[]
   >([])
 
   const [drillDown, setDrillDown] = useState<boolean>(false)
@@ -106,37 +106,41 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     setTimelineStart(props.roadmap.start)
     setTimelineEnd(props.roadmap.end)
 
-    const updatedLevelOneRoadmaps = props.roadmapChildren.map((roadmap) => {
+    const updatedLevelOneRoadmaps = props.roadmapChildren.map((roadmap): ModaDataItem<RoadmapTimelineObject> => {
       return {
         id: roadmap.key,
         title: `${roadmap.key} - ${roadmap.name}`,
-        content: roadmap.name,
+        content: roadmap.name ?? '',
         start: dayjs(roadmap.start).toDate(),
         end: dayjs(roadmap.end).toDate(),
         itemColor: roadmap.color,
         group: null,
         type: 'range',
-        order: roadmap.order,
-        roadmap: roadmap,
-      } as RoadmapTimelineItem
+        objectData: {
+          order: roadmap.order,
+          roadmap: roadmap,
+        }
+      }
     })
     setLevelOneRoadmaps(updatedLevelOneRoadmaps)
 
     if (updatedLevelOneRoadmaps.length > 0 && !isLoadingRoadmapGrandChildren) {
-      const updatedLevelTwoRoadmaps = roadmapGrandChildren?.map((roadmap) => {
+      const updatedLevelTwoRoadmaps = roadmapGrandChildren?.map((roadmap): ModaDataItem<RoadmapTimelineObject> => {
         return {
           id: roadmap.key,
           title: `${roadmap.key} - ${roadmap.name}`,
-          content: roadmap.name,
+          content: roadmap.name ?? '',
           start: dayjs(roadmap.start).toDate(),
           end: dayjs(roadmap.end).toDate(),
           itemColor: roadmap.color,
-          group: roadmap.parent.id,
+          group: roadmap.parent?.id,
           type: 'range',
-          order: roadmap.order,
-          roadmap: roadmap,
-        } as RoadmapTimelineItem
-      })
+          objectData: {
+            order: roadmap.order,
+            roadmap: roadmap,
+          }
+        }
+      }) ?? []
       setLevelTwoRoadmaps(updatedLevelTwoRoadmaps)
 
       if (!userChangedDrillDown && updatedLevelTwoRoadmaps.length > 0) {
@@ -152,7 +156,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     userChangedDrillDown,
   ])
 
-  const timelineOptions = useMemo((): ModaTimelineOptions => {
+  const timelineOptions = useMemo((): ModaTimelineOptions<RoadmapTimelineObject> => {
     return {
       showCurrentTime: showCurrentTime,
       maxHeight: 650,
