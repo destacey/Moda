@@ -1,17 +1,12 @@
 'use client'
 
 import { ModaGrid } from '@/src/app/components/common'
-import {
-  RoadmapListDto,
-  UpdateRoadmapChildOrderRequest,
-} from '@/src/services/moda-api'
-import { useUpdateChildOrderMutation } from '@/src/store/features/planning/roadmaps-api'
-import { ColDef, RowDragEndEvent } from 'ag-grid-community'
-import { ColorPicker } from 'antd'
+import { RoadmapListDto } from '@/src/services/moda-api'
+import { ColDef } from 'ag-grid-community'
 import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
 export interface RoadmapsGridProps {
   roadmapsData: RoadmapListDto[]
@@ -20,7 +15,6 @@ export interface RoadmapsGridProps {
   messageApi: MessageInstance
   gridHeight?: number | undefined
   viewSelector?: React.ReactNode | undefined
-  enableRowDrag?: boolean | undefined
   parentRoadmapId?: string | undefined
 }
 
@@ -32,18 +26,10 @@ const RoadmapCellRenderer = ({ value, data }) => {
 const RoadmapsGrid: React.FC<RoadmapsGridProps> = (
   props: RoadmapsGridProps,
 ) => {
-  const [enableRowDrag, setEnableRowDrag] = useState(
-    props.enableRowDrag ?? false,
-  )
-
-  const [updateChildOrder, { error: mutationError }] =
-    useUpdateChildOrderMutation()
-
   // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
   const columnDefs = useMemo<ColDef<RoadmapListDto>[]>(
     () => [
-      // rowDrag is typically set on the first column
-      { field: 'key', width: enableRowDrag ? 110 : 90, rowDrag: enableRowDrag },
+      { field: 'key', width: 90 },
       { field: 'name', width: 350, cellRenderer: RoadmapCellRenderer },
       {
         field: 'start',
@@ -69,40 +55,8 @@ const RoadmapsGrid: React.FC<RoadmapsGridProps> = (
         headerName: 'Visibility',
         width: 125,
       },
-      {
-        field: 'color',
-        width: 125,
-        cellRenderer: (params) =>
-          params.value && (
-            <ColorPicker
-              defaultValue={params.value}
-              size="small"
-              showText
-              disabled
-            />
-          ),
-      },
     ],
-    [enableRowDrag],
-  )
-
-  const onRowDragEnd = useCallback(
-    async (e: RowDragEndEvent) => {
-      updateChildOrder({
-        roadmapId: props.parentRoadmapId,
-        childRoadmapId: e.api.getRowNode(e.node.id).data.id,
-        order: e.node.rowIndex + 1,
-      } as UpdateRoadmapChildOrderRequest)
-        .unwrap()
-        .then(() => {
-          props.messageApi.success(`Roadmap order updated successfully.`)
-        })
-        .catch((error) => {
-          props.messageApi.success(`Error updating roadmap order.`)
-          console.error('Error updating roadmap order:', error)
-        })
-    },
-    [props, updateChildOrder],
+    [],
   )
 
   return (
@@ -113,8 +67,6 @@ const RoadmapsGrid: React.FC<RoadmapsGridProps> = (
       loadData={props.refreshRoadmaps}
       loading={props.roadmapsLoading}
       toolbarActions={props.viewSelector}
-      rowDragManaged={true}
-      onRowDragEnd={onRowDragEnd}
     />
   )
 }

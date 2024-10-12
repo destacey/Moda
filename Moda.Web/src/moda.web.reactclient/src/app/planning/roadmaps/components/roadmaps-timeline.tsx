@@ -5,8 +5,7 @@ import { Card, Divider, Flex, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
-import { RoadmapChildrenDto, RoadmapDetailsDto } from '@/src/services/moda-api'
-import { useGetRoadmapChildrenQuery } from '@/src/store/features/planning/roadmaps-api'
+import { RoadmapDetailsDto, RoadmapItemDto } from '@/src/services/moda-api'
 import { ControlItemsMenu } from '@/src/app/components/common/control-items-menu'
 import {
   ModaDataGroup,
@@ -17,13 +16,13 @@ import { ModaDataItem } from '@/src/app/components/common/timeline/types'
 
 export interface RoadmapsTimelineProps {
   roadmap: RoadmapDetailsDto
-  roadmapChildren: RoadmapChildrenDto[]
-  isChildrenLoading: boolean
-  refreshChildren: () => void
+  roadmapItems: RoadmapItemDto[]
+  isRoadmapItemsLoading: boolean
+  refreshRoadmapItems: () => void
   viewSelector?: ReactNode | undefined
 }
 
-interface RoadmapTimelineItem extends ModaDataItem<RoadmapChildrenDto, string> {
+interface RoadmapTimelineItem extends ModaDataItem<RoadmapItemDto, string> {
   id: number
   end: Date
   order?: number
@@ -80,57 +79,54 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [drillDown, setDrillDown] = useState<boolean>(false)
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
 
-  const { data: roadmapLinksData, isLoading: isLoadingRoadmapLinks } =
-    useGetRoadmapChildrenQuery(
-      props.roadmapChildren?.map((r) => r.id ?? '') ?? [],
-      {
-        skip: !props.roadmapChildren || props.roadmapChildren.length === 0,
-      },
-    )
+  // const { data: roadmapLinksData, isLoading: isLoadingRoadmapLinks } =
+  //   useGetRoadmapItemsQuery(props.roadmapItems?.map((r) => r.id ?? '') ?? [], {
+  //     skip: !props.roadmapItems || props.roadmapItems.length === 0,
+  //   })
 
   useEffect(() => {
-    if (!props.roadmapChildren) return
+    if (!props.roadmapItems) return
 
     setTimelineStart(props.roadmap.start)
     setTimelineEnd(props.roadmap.end)
 
-    const levelOneRoadmaps = props.roadmapChildren.map(
-      (roadmap): RoadmapTimelineItem => {
-        return {
-          id: roadmap.key ?? 0,
-          title: `${roadmap.key} - ${roadmap.name}`,
-          content: roadmap.name ?? '',
-          start: dayjs(roadmap.start).toDate(),
-          end: dayjs(roadmap.end).toDate(),
-          itemColor: roadmap.color,
-          group: undefined,
-          type: 'range',
-          order: roadmap.order,
-          objectData: roadmap,
-        }
-      },
-    )
-    setLevelOneRoadmaps(levelOneRoadmaps)
+    // const levelOneRoadmaps = props.roadmapItems.map(
+    //   (roadmap): RoadmapTimelineItem => {
+    //     return {
+    //       id: roadmap.key ?? 0,
+    //       title: `${roadmap.key} - ${roadmap.name}`,
+    //       content: roadmap.name ?? '',
+    //       start: dayjs(roadmap.start).toDate(),
+    //       end: dayjs(roadmap.end).toDate(),
+    //       itemColor: roadmap.color,
+    //       group: undefined,
+    //       type: 'range',
+    //       order: roadmap.order,
+    //       objectData: roadmap,
+    //     }
+    //   },
+    // )
+    // setLevelOneRoadmaps(levelOneRoadmaps)
 
-    const levelTwoRoadmaps =
-      roadmapLinksData?.map((roadmap): RoadmapTimelineItem => {
-        return {
-          id: roadmap.key ?? 0,
-          title: `${roadmap.key} - ${roadmap.name}`,
-          content: roadmap.name ?? '',
-          start: dayjs(roadmap.start).toDate(),
-          end: dayjs(roadmap.end).toDate(),
-          itemColor: roadmap.color,
-          group: roadmap.parent?.id,
-          type: 'range',
-          order: roadmap.order,
-          objectData: roadmap,
-        }
-      }) ?? []
-    setLevelTwoRoadmaps(levelTwoRoadmaps)
+    // const levelTwoRoadmaps =
+    //   roadmapLinksData?.map((roadmap): RoadmapTimelineItem => {
+    //     return {
+    //       id: roadmap.key ?? 0,
+    //       title: `${roadmap.key} - ${roadmap.name}`,
+    //       content: roadmap.name ?? '',
+    //       start: dayjs(roadmap.start).toDate(),
+    //       end: dayjs(roadmap.end).toDate(),
+    //       itemColor: roadmap.color,
+    //       group: roadmap.parent?.id,
+    //       type: 'range',
+    //       order: roadmap.order,
+    //       objectData: roadmap,
+    //     }
+    //   }) ?? []
+    // setLevelTwoRoadmaps(levelTwoRoadmaps)
 
-    setIsLoading(props.isChildrenLoading || isLoadingRoadmapLinks)
-  }, [drillDown, isLoadingRoadmapLinks, props, roadmapLinksData])
+    setIsLoading(props.isRoadmapItemsLoading) // || isLoadingRoadmapLinks)
+  }, [drillDown, props])
 
   const timelineOptions = useMemo(
     (): ModaTimelineOptions<RoadmapTimelineItem> =>
