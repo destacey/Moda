@@ -1,10 +1,10 @@
-﻿using System.Runtime.Intrinsics.Arm;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Enums.Organization;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Models;
+using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
@@ -49,6 +49,8 @@ public class PlanningTeamConfig : IEntityTypeConfiguration<PlanningTeam>
         // Ignore
     }
 }
+
+#region Planning Intervals
 
 public class PlanningIntervalConfig : IEntityTypeConfiguration<PlanningInterval>
 {
@@ -229,6 +231,8 @@ public class PlanningIntervalTeamConfig : IEntityTypeConfiguration<PlanningInter
     }
 }
 
+#endregion Planning Intervals
+
 public class RiskConfig : IEntityTypeConfiguration<Risk>
 {
     public void Configure(EntityTypeBuilder<Risk> builder)
@@ -299,6 +303,8 @@ public class RiskConfig : IEntityTypeConfiguration<Risk>
     }
 }
 
+#region Roadmaps
+
 public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
 {
     public void Configure(EntityTypeBuilder<Roadmap> builder)
@@ -309,15 +315,12 @@ public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
         builder.HasAlternateKey(r => r.Key);
 
         builder.HasIndex(r => new { r.Id, r.Visibility })
-            .IncludeProperties(r => new { r.Key, r.Name, r.ParentId });
+            .IncludeProperties(r => new { r.Key, r.Name });
 
         builder.HasIndex(r => new { r.Key, r.Visibility })
-            .IncludeProperties(r => new { r.Id, r.Name, r.ParentId });
+            .IncludeProperties(r => new { r.Id, r.Name });
 
         builder.HasIndex(r => r.Visibility)
-            .IncludeProperties(r => new { r.Id, r.Key, r.Name, r.ParentId });
-
-        builder.HasIndex(r => new { r.ParentId, r.Visibility })
             .IncludeProperties(r => new { r.Id, r.Key, r.Name });
 
         builder.Property(r => r.Key).ValueGeneratedOnAdd();
@@ -329,12 +332,6 @@ public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
             .HasConversion<EnumConverter<Visibility>>()
             .HasMaxLength(32)
             .HasColumnType("varchar");
-
-        builder.Property(r => r.Color)
-            .HasMaxLength(7)
-            .HasColumnType("varchar");
-
-        builder.Property(r => r.Order);
 
         // Value Objects
         builder.ComplexProperty(r => r.DateRange, options =>
@@ -355,10 +352,10 @@ public class RoadmapConfig : IEntityTypeConfiguration<Roadmap>
             .HasForeignKey(rm => rm.RoadmapId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(r => r.Parent)
-            .WithMany(p => p.Children)
-            .HasForeignKey(r => r.ParentId)
-            .OnDelete(DeleteBehavior.NoAction);
+        builder.HasMany(r => r.Items)
+            .WithOne()
+            .HasForeignKey(i => i.RoadmapId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
@@ -387,6 +384,89 @@ public class RoadmapManagerConfiguration : IEntityTypeConfiguration<RoadmapManag
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
+
+public class BaseRoadmapItemConfiguration : IEntityTypeConfiguration<BaseRoadmapItem>
+{
+    public void Configure(EntityTypeBuilder<BaseRoadmapItem> builder)
+    {
+        builder.ToTable("RoadmapItems", SchemaNames.Planning);
+
+        builder.HasKey(ri => ri.Id);
+
+        builder.HasDiscriminator(ri => ri.Type)
+            .HasValue<RoadmapActivity>(RoadmapItemType.Activity)
+            .HasValue<RoadmapMilestone>(RoadmapItemType.Milestone)
+            .HasValue<RoadmapTimebox>(RoadmapItemType.Timebox);
+
+        builder.HasIndex(ri => ri.RoadmapId);
+
+        // Properties
+        builder.Property(ri => ri.Name).HasMaxLength(128).IsRequired();
+        builder.Property(ri => ri.Description).HasMaxLength(2048);
+
+        builder.Property(ri => ri.Type);
+
+        builder.Property(ri => ri.Color)
+            .HasMaxLength(7)
+            .HasColumnType("varchar");
+    }
+}
+
+public class RoadmapActivityConfiguration : IEntityTypeConfiguration<RoadmapActivity>
+{
+    public void Configure(EntityTypeBuilder<RoadmapActivity> builder)
+    {
+        // Properties
+        builder.Property(a => a.Order).IsRequired();
+
+        // Value Objects
+        builder.ComplexProperty(a => a.DateRange, options =>
+        {
+            options.Property(a => a.Start)
+                .HasColumnName("Start")
+                .IsRequired();
+            options.Property(a => a.End)
+                .HasColumnName("End")
+                .IsRequired();
+        });
+
+        // Relationships
+        builder.HasMany(a => a.Children)
+            .WithOne(ri => ri.Parent)
+            .HasForeignKey(a => a.ParentId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}
+
+public class RoadmapTimeboxConfiguration : IEntityTypeConfiguration<RoadmapTimebox>
+{
+    public void Configure(EntityTypeBuilder<RoadmapTimebox> builder)
+    {
+        // Value Objects
+        builder.ComplexProperty(a => a.DateRange, options =>
+        {
+            options.Property(a => a.Start)
+                .HasColumnName("Start")
+                .IsRequired();
+            options.Property(a => a.End)
+                .HasColumnName("End")
+                .IsRequired();
+        });
+    }
+}
+
+public class RoadmapMilestoneConfiguration : IEntityTypeConfiguration<RoadmapMilestone>
+{
+    public void Configure(EntityTypeBuilder<RoadmapMilestone> builder)
+    {
+        // Properties
+        builder.Property(e => e.Date)
+            .HasColumnName("Start")
+            .IsRequired();
+    }
+}
+
+#endregion Roadmaps
 
 
 public class SimpleHealthCheckConfig : IEntityTypeConfiguration<SimpleHealthCheck>

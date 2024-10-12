@@ -25,10 +25,12 @@ internal sealed class GetRoadmapChildrenQueryHandler(IPlanningDbContext planning
     {
         var publicVisibility = Visibility.Public;
 
-        return await _planningDbContext.Roadmaps
-            .Where(r => r.ParentId != null && request.RoadmapIds.Contains(r.ParentId.Value))
-            .Where(r => r.Visibility == publicVisibility || r.RoadmapManagers.Any(m => m.ManagerId == _currentUserEmployeeId))
-            .ProjectToType<RoadmapChildrenDto>()
-            .ToListAsync(cancellationToken);
+        return [];
+
+        //return await _planningDbContext.Roadmaps
+        //    .Where(r => r.ParentId != null && request.RoadmapIds.Contains(r.ParentId.Value))
+        //    .Where(r => r.Visibility == publicVisibility || r.RoadmapManagers.Any(m => m.ManagerId == _currentUserEmployeeId))
+        //    .ProjectToType<RoadmapChildrenDto>()
+        //    .ToListAsync(cancellationToken);
     }
 }

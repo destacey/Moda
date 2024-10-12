@@ -3,21 +3,21 @@ using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Interfaces;
+using Moda.Planning.Domain.Interfaces.Roadmaps;
 
-namespace Moda.Planning.Domain.Models;
+namespace Moda.Planning.Domain.Models.Roadmaps;
 public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
 {
     private readonly bool _objectConstruction = false;
     private string _name = default!;
     private string? _description;
     private LocalDateRange _dateRange = default!;
-    private string? _color;
     private readonly List<RoadmapManager> _roadmapManagers = [];
-    private readonly List<Roadmap> _children = [];
+    private readonly List<BaseRoadmapItem> _items = [];
 
     private Roadmap() { }
 
-    private Roadmap(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds, Guid? parentId, int? orderId, string? color)
+    private Roadmap(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds)
     {
         _objectConstruction = true;
 
@@ -27,10 +27,6 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         Description = description;
         DateRange = dateRange;
         Visibility = visibility;
-        Color = color;
-
-        ParentId = parentId;
-        Order = orderId;
 
         foreach (var managerId in roadmapManagerIds)
         {
@@ -78,34 +74,16 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     public Visibility Visibility { get; private set; }
 
     /// <summary>
-    /// The color of the Roadmap. This is used to display the Roadmap in the UI.
-    /// </summary>
-    public string? Color { get => _color; private set => _color = value.NullIfWhiteSpacePlusTrim(); }
-
-    /// <summary>
-    /// The parent Roadmap Id. This is used to connect Roadmaps together.
-    /// </summary>
-    public Guid? ParentId { get; private set; }
-
-    /// <summary>
-    /// The parent Roadmap. This is used to connect Roadmaps together.
-    /// </summary>
-    public Roadmap? Parent { get; private set; }
-
-    /// <summary>
-    /// The order of the Roadmap within the parent Roadmap.
-    /// </summary>
-    public int? Order { get; private set; }
-
-    /// <summary>
-    /// The children of the Roadmap. Children are used to connect Roadmaps together.
-    /// </summary>
-    public IReadOnlyList<Roadmap> Children => _children.AsReadOnly();
-
-    /// <summary>
     /// The managers of the Roadmap. Managers have full control over the Roadmap.
     /// </summary>
     public IReadOnlyList<RoadmapManager> RoadmapManagers => _roadmapManagers.AsReadOnly();
+
+    /// <summary>
+    /// The items on the Roadmap.
+    /// </summary>
+    public IReadOnlyList<BaseRoadmapItem> Items => _items.AsReadOnly();
+
+    private IReadOnlyList<RoadmapActivity> RootActivities => _items.OfType<RoadmapActivity>().Where(x => x.ParentId is null).ToList();
 
     /// <summary>
     /// Updates the Roadmap.
@@ -117,7 +95,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <param name="color"></param>
     /// <param name="currentUserEmployeeId"
     /// <returns></returns>
-    public Result Update(string name, string? description, LocalDateRange dateRange, IEnumerable<Guid> roadmapManagerIds, Visibility visibility, string? color, Guid currentUserEmployeeId)
+    public Result Update(string name, string? description, LocalDateRange dateRange, IEnumerable<Guid> roadmapManagerIds, Visibility visibility, Guid currentUserEmployeeId)
     {
         var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
@@ -140,7 +118,6 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         Description = description;
         DateRange = dateRange;
         Visibility = visibility;
-        Color = color;
 
         return Result.Success();
     }
@@ -217,10 +194,10 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         _roadmapManagers.Remove(manager);
         return Result.Success();
     }
-    
+
 
     /// <summary>
-    /// Removes a child Roadmap from the Roadmap.
+    /// Removes a root Roadmap Item from the Roadmap.
     /// </summary>
     /// <param name="childId"></param>
     /// <param name="currentUserEmployeeId"></param>
@@ -233,29 +210,26 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
             return isManagerResult;
         }
 
-        var child = _children.FirstOrDefault(x => x.Id == childId);
+        var child = _items.FirstOrDefault(x => x.Id == childId);
         if (child is null)
         {
-            return Result.Failure("Child Roadmap does not exist on this roadmap.");
+            return Result.Failure("Child Roadmap Item does not exist on this roadmap.");
         }
 
-        _children.Remove(child);
+        _items.Remove(child);
 
-        child.ParentId = null;
-        child.Order = null;
-
-        ResetChildrenOrder();
+        ResetRootActivitiesOrder();
 
         return Result.Success();
     }
 
     /// <summary>
-    /// Sets the order of the child Roadmaps. This is used to set the order of all child roadmaps at once.
+    /// Sets the order of the root child Roadmap Items. This is used to set the order of all child roadmap items at once.
     /// </summary>
-    /// <param name="childRoadmaps"></param>
+    /// <param name="childActivities"></param>
     /// <param name="currentUserEmployeeId"></param>
     /// <returns></returns>
-    public Result SetChildrenOrder(Dictionary<Guid, int> childRoadmaps, Guid currentUserEmployeeId)
+    public Result SetChildrenOrder(Dictionary<Guid, int> childActivities, Guid currentUserEmployeeId)
     {
         var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
         if (isManagerResult.IsFailure)
@@ -263,34 +237,34 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
             return isManagerResult;
         }
 
-        if (childRoadmaps.Count != _children.Count)
+        if (childActivities.Count != RootActivities.Count)
         {
-            return Result.Failure("Not all child roadmaps provided were found.");
+            return Result.Failure("Not all root roadmap items provided were found.");
         }
 
-        foreach (var child in _children)
+        foreach (var child in RootActivities)
         {
-            if (!childRoadmaps.ContainsKey(child.Id))
+            if (!childActivities.ContainsKey(child.Id))
             {
                 return Result.Failure("Not all child roadmaps provided were found.");
             }
 
-            var order = childRoadmaps[child.Id];
+            var order = childActivities[child.Id];
             if (order < 1)
             {
                 return Result.Failure("Order must be greater than 0.");
             }
 
-            child.Order = order;
+            child.SetOrder(order);
         }
 
-        ResetChildrenOrder();
+        ResetRootActivitiesOrder();
 
         return Result.Success();
     }
 
     /// <summary>
-    /// Updates the order of the child Roadmap based on a single roadmap changing its order.
+    /// Updates the order of the root Roadmap Activities based on a single Roadmap Activity changing its order.
     /// </summary>
     /// <param name="childRoadmapId"></param>
     /// <param name="order"></param>
@@ -309,48 +283,48 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
             return isManagerResult;
         }
 
-        var childRoadmap = _children.FirstOrDefault(x => x.Id == childRoadmapId);
-        if (childRoadmap is null)
+        var rootActivity = RootActivities
+            .FirstOrDefault(x => x.Id == childRoadmapId);
+        if (rootActivity is null)
         {
-            return Result.Failure("Child roadmap does not exist on this roadmap.");
+            return Result.Failure("Root roadmap activity does not exist on this roadmap.");
         }
-
-        if (childRoadmap.Order == order)
+        else if (rootActivity.Order == order)
         {
             return Result.Success();
         }
 
-        if (childRoadmap.Order < order)
+        if (rootActivity.Order < order)
         {
-            foreach (var child in _children.Where(x => x.Order > childRoadmap.Order && x.Order <= order))
+            foreach (var child in RootActivities.Where(x => x.Order > rootActivity.Order && x.Order <= order))
             {
-                child.Order = child.Order - 1;
+                child.SetOrder(child.Order - 1);
             }
         }
         else
         {
-            foreach (var child in _children.Where(x => x.Order >= order && x.Order < childRoadmap.Order))
+            foreach (var child in RootActivities.Where(x => x.Order >= order && x.Order < rootActivity.Order))
             {
-                child.Order = child.Order + 1;
+                child.SetOrder(child.Order + 1);
             }
         }
 
-        childRoadmap.Order = order;
+        rootActivity.SetOrder(order);
 
-        ResetChildrenOrder();
+        ResetRootActivitiesOrder();
 
         return Result.Success();
     }
 
     /// <summary>
-    /// Resets the order of the child Roadmap links. This is used to remove any gaps in the order.
+    /// Resets the order of the root Roadmap Activities. This is used to remove any gaps in the order.
     /// </summary>
-    private void ResetChildrenOrder()
+    private void ResetRootActivitiesOrder()
     {
         int i = 1;
-        foreach (var roadmap in _children.OrderBy(x => x.Order))
+        foreach (var roadmap in RootActivities)
         {
-            roadmap.Order = i;
+            roadmap.SetOrder(i);
             i++;
         }
     }
@@ -381,38 +355,150 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     }
 
     /// <summary>
-    /// Creates a new Roadmap as a child of this Roadmap.
+    /// Creates a new Roadmap Activity within the Roadmap.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <param name="dateRange"></param>
-    /// <param name="visibility"></param>
-    /// <param name="roadmapManagerIds"></param>
-    /// <param name="color"></param>
+    /// <param name="parentActivityId"></param>
+    /// <param name="roadmapActivity"></param>
     /// <param name="currentUserEmployeeId"></param>
     /// <returns></returns>
-    public Result<Roadmap> CreateChild(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds, string? color, Guid currentUserEmployeeId)
+    public Result<RoadmapActivity> CreateActivity(Guid? parentActivityId, IUpsertRoadmapActivity roadmapActivity, Guid currentUserEmployeeId)
     {
         try
         {
             var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
             if (isManagerResult.IsFailure)
             {
-                return Result.Failure<Roadmap>("User is not a roadmap manager of the parent roadmap.");
+                return Result.Failure<RoadmapActivity>("User is not a roadmap manager of the parent roadmap.");
             }
 
-            var order = _children.Count + 1;
+            RoadmapActivity activity;
+            if (parentActivityId.HasValue)
+            {
+                var parentActivityResult = GetParentRoadmapActivity(parentActivityId.Value);
+                if (parentActivityResult.IsFailure)
+                {
+                    return Result.Failure<RoadmapActivity>(parentActivityResult.Error);
+                }
 
-            var roadmap = new Roadmap(name, description, dateRange, visibility, roadmapManagerIds, Id, order, color);
+                activity = parentActivityResult.Value.CreateChildActivity(roadmapActivity);
+            }
+            else
+            {
+                var order = RootActivities.Count() + 1;
+                activity = RoadmapActivity.CreateRoot(Id, roadmapActivity, order);
+            }
 
-            _children.Add(roadmap);
+            _items.Add(activity);
 
-            return roadmap;
+            return activity;
         }
         catch (Exception ex)
         {
-            return Result.Failure<Roadmap>(ex.Message);
+            return Result.Failure<RoadmapActivity>(ex.Message);
         }
+    }
+
+    public Result<RoadmapActivity> CreateRoadmapActivity(IUpsertRoadmapActivity activity, Guid? parentId)
+    {
+        try
+        {
+            RoadmapActivity newActivity;
+
+            if (parentId.HasValue)
+            {
+                var parentActivityResult = GetParentRoadmapActivity(parentId.Value);
+                if (parentActivityResult.IsFailure)
+                {
+                    return Result.Failure<RoadmapActivity>(parentActivityResult.Error);
+                }
+
+                newActivity = parentActivityResult.Value.CreateChildActivity(activity);
+            }
+            else
+            {
+                var order = Items.Count(i => i.ParentId == null) + 1;
+                newActivity = RoadmapActivity.CreateRoot(Id, activity, order);
+            }
+
+            _items.Add(newActivity); // is this correct? or is it already added in the CreateChildActivity method?
+
+            return newActivity;
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<RoadmapActivity>(ex.Message);
+        }
+    }
+
+    public Result<RoadmapTimebox> CreateRoadmapTimebox(IUpsertRoadmapTimebox timebox, Guid? parentId)
+    {
+        try
+        {
+            RoadmapTimebox newTimebox;
+
+            if (parentId.HasValue)
+            {
+                var parentActivityResult = GetParentRoadmapActivity(parentId.Value);
+                if (parentActivityResult.IsFailure)
+                {
+                    return Result.Failure<RoadmapTimebox>(parentActivityResult.Error);
+                }
+
+                newTimebox = parentActivityResult.Value.CreateChildTimebox(timebox);
+            }
+            else
+            {
+                newTimebox = RoadmapTimebox.Create(Id, null, timebox);
+            }
+
+            _items.Add(newTimebox);
+
+            return newTimebox;
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<RoadmapTimebox>(ex.Message);
+        }
+    }
+
+    public Result<RoadmapMilestone> CreateRoadmapMilestone(IUpsertRoadmapMilestone milestone, Guid? parentId)
+    {
+        try
+        {
+            RoadmapMilestone newMilestone;
+
+            if (parentId.HasValue)
+            {
+                var parentActivityResult = GetParentRoadmapActivity(parentId.Value);
+                if (parentActivityResult.IsFailure)
+                {
+                    return Result.Failure<RoadmapMilestone>(parentActivityResult.Error);
+                }
+
+                newMilestone = parentActivityResult.Value.CreateChildMilestone(milestone);
+            }
+            else
+            {
+                newMilestone = RoadmapMilestone.Create(Id, null, milestone);
+            }
+
+            _items.Add(newMilestone);
+
+            return newMilestone;
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<RoadmapMilestone>(ex.Message);
+        }
+    }
+
+    private Result<RoadmapActivity> GetParentRoadmapActivity(Guid parentId)
+    {
+        var parentActivity = _items.OfType<RoadmapActivity>().FirstOrDefault(x => x.Id == parentId);
+
+        return parentActivity is not null
+            ? parentActivity
+            : Result.Failure<RoadmapActivity>("Parent Roadmap Activity does not exist on this roadmap.");
     }
 
     /// <summary>
@@ -425,13 +511,11 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <param name="roadmapManagerIds"></param>
     /// <param name="color"></param>
     /// <returns></returns>
-    public static Result<Roadmap> CreateRoot(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds, string? color)
+    public static Result<Roadmap> Create(string name, string? description, LocalDateRange dateRange, Visibility visibility, IEnumerable<Guid> roadmapManagerIds)
     {
         try
         {
-            var roadmap = new Roadmap(name, description, dateRange, visibility, roadmapManagerIds, null, null, color);
-
-            return roadmap;
+            return new Roadmap(name, description, dateRange, visibility, roadmapManagerIds);
         }
         catch (Exception ex)
         {

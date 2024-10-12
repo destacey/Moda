@@ -116,7 +116,7 @@ public class RoadmapsController : ControllerBase
         if (id != request.RoadmapId)
             return BadRequest();
 
-        var result = await _sender.Send(new UpdateRoadmapChildrenOrderCommand(request.RoadmapId, request.ChildrenOrder), cancellationToken);
+        var result = await _sender.Send(new UpdateRoadmapRootActivitiesOrderCommand(request.RoadmapId, request.ChildrenOrder), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
@@ -137,7 +137,7 @@ public class RoadmapsController : ControllerBase
             return BadRequest();
 
 
-        var result = await _sender.Send(new UpdateRoadmapChildOrderCommand(request.RoadmapId, request.ChildRoadmapId, request.Order), cancellationToken);
+        var result = await _sender.Send(new UpdateRoadmapRootActivityOrderCommand(request.RoadmapId, request.ChildRoadmapId, request.Order), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

@@ -17,7 +17,6 @@ internal sealed class GetRoadmapsQueryHandler(IPlanningDbContext planningDbConte
         var publicVisibility = Visibility.Public;
 
         return await _planningDbContext.Roadmaps
-            .Where(r => r.ParentId == null)
             .Where(r => r.Visibility == publicVisibility || r.RoadmapManagers.Any(m => m.ManagerId == _currentUserEmployeeId))
             .ProjectToType<RoadmapListDto>()
             .ToListAsync(cancellationToken);

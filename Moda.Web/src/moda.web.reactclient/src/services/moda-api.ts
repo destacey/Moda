@@ -10508,9 +10508,7 @@ export interface RoadmapDetailsDto {
     start?: Date;
     end?: Date;
     visibility?: SimpleNavigationDto;
-    color?: string | undefined;
     roadmapManagers?: EmployeeNavigationDto[];
-    parent?: NavigationDto | undefined;
 }
 
 export interface ObjectIdAndKey {
@@ -10531,10 +10529,6 @@ export interface CreateRoadmapRequest {
     roadmapManagerIds: string[];
     /** The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap. */
     visibilityId?: number;
-    /** The color of the Roadmap. Must be a valid hex color code. */
-    color?: string | undefined;
-    /** Informs the API to link the Roadmap to the Roadmap with the provided parentId after creation. */
-    parentId?: string | undefined;
 }
 
 export interface UpdateRoadmapRequest {
@@ -10552,8 +10546,6 @@ export interface UpdateRoadmapRequest {
     roadmapManagerIds: string[];
     /** The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap. */
     visibilityId?: number;
-    /** The color of the Roadmap. Must be a valid hex color code. */
-    color?: string | undefined;
 }
 
 export interface RoadmapChildrenDto {
@@ -10566,7 +10558,6 @@ export interface RoadmapChildrenDto {
     color?: string | undefined;
     roadmapManagers?: EmployeeNavigationDto[];
     order?: number;
-    parent?: NavigationDto;
 }
 
 export interface UpdateRoadmapChildrenOrderRequest {

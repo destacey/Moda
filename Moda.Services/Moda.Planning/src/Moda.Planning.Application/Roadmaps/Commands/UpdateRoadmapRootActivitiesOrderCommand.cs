@@ -1,11 +1,12 @@
 ﻿using Ardalis.GuardClauses;
+using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
-public sealed record UpdateRoadmapChildrenOrderCommand(Guid RoadmapId, Dictionary<Guid,int> ChildrenOrder) : ICommand;
+public sealed record UpdateRoadmapRootActivitiesOrderCommand(Guid RoadmapId, Dictionary<Guid,int> ChildrenOrder) : ICommand;
 
-public sealed class UpdateRoadmapChildrenOrderCommandValidator : CustomValidator<UpdateRoadmapChildrenOrderCommand>
+public sealed class UpdateRoadmapRootActivitiesOrderCommandValidator : CustomValidator<UpdateRoadmapRootActivitiesOrderCommand>
 {
-    public UpdateRoadmapChildrenOrderCommandValidator()
+    public UpdateRoadmapRootActivitiesOrderCommandValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -15,35 +16,37 @@ public sealed class UpdateRoadmapChildrenOrderCommandValidator : CustomValidator
 
         RuleFor(o => o.ChildrenOrder)
             .NotEmpty()
-            .WithMessage("At least one child roadmap must be provided.");
+            .WithMessage("At least one root roadmap activity must be provided.");
     }
 }
 
-internal sealed class UpdateRoadmapChildrenOrderCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<UpdateRoadmapChildrenOrderCommandHandler> logger) : ICommandHandler<UpdateRoadmapChildrenOrderCommand>
+internal sealed class UpdateRoadmapRootActivitiesOrderCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<UpdateRoadmapRootActivitiesOrderCommandHandler> logger) : ICommandHandler<UpdateRoadmapRootActivitiesOrderCommand>
 {
-    private const string AppRequestName = nameof(UpdateRoadmapChildrenOrderCommand);
+    private const string AppRequestName = nameof(UpdateRoadmapRootActivitiesOrderCommand);
 
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
-    private readonly ILogger<UpdateRoadmapChildrenOrderCommandHandler> _logger = logger;
+    private readonly ILogger<UpdateRoadmapRootActivitiesOrderCommandHandler> _logger = logger;
 
-    public async Task<Result> Handle(UpdateRoadmapChildrenOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateRoadmapRootActivitiesOrderCommand request, CancellationToken cancellationToken)
     {
         try
         {
             var roadmap = await _planningDbContext.Roadmaps
                 .Include(x => x.RoadmapManagers)
-                .Include(x => x.Children)
+                .Include(x => x.Items)
                 .FirstOrDefaultAsync(r => r.Id == request.RoadmapId, cancellationToken);
 
             if (roadmap is null)
                 return Result.Failure($"Roadmap with id {request.RoadmapId} not found");
 
-            if (roadmap.Children.Count != request.ChildrenOrder.Count)
+
+            var rootActivities = roadmap.Items.OfType<RoadmapActivity>().Where(x => x.ParentId is null).ToList();
+            if (rootActivities.Count != request.ChildrenOrder.Count)
             {
-                var missingRoadmapLinks = request.ChildrenOrder.Keys.Except(roadmap.Children.Select(o => o.Id));
-                _logger.LogWarning("Not all roadmap links provided were found for roadmap {RoadmapId}. The following roadmap links were not found: {RoadmapLinkIds}", roadmap.Id, missingRoadmapLinks);
-                return Result.Failure("Not all roadmap links provided were found.");
+                var missingRoadmapActivities = request.ChildrenOrder.Keys.Except(rootActivities.Select(o => o.Id));
+                _logger.LogWarning("Not all root roadmap activities provided were found for roadmap {RoadmapId}. The following root roadmap activities were not found: {RoadmapActivityIds}", roadmap.Id, missingRoadmapActivities);
+                return Result.Failure("Not all root roadmap activities provided were found.");
             }
 
             var updateResult = roadmap.SetChildrenOrder(request.ChildrenOrder, _currentUserEmployeeId);

@@ -1,4 +1,6 @@
-﻿namespace Moda.Planning.Application.Persistence;
+﻿using Moda.Planning.Domain.Models.Roadmaps;
+
+namespace Moda.Planning.Application.Persistence;
 public interface IPlanningDbContext : IModaDbContext
 {
     DbSet<PlanningInterval> PlanningIntervals { get; }
