@@ -24,7 +24,7 @@
             "generateKnownTypes": true,
             "generateEnumMappingDescription": false,
             "generateXmlObjects": false,
-            "generateAbstractProperties": false,
+            "generateAbstractProperties": true,
             "generateAbstractSchemas": true,
             "ignoreObsoleteProperties": false,
             "allowReferencesWithProperties": false,
@@ -38,7 +38,9 @@
             "infoDescription": null,
             "infoVersion": "1.0.0",
             "documentTemplate": null,
-            "documentProcessorTypes": [],
+            "documentProcessorTypes": [
+                "NSwag.Generation.Processors.SchemaProcessors.JsonInheritanceProcessor, NSwag.Generation.AspNetCore"
+            ],
             "operationProcessorTypes": [],
             "typeNameGeneratorType": null,
             "schemaNameGeneratorType": null,
@@ -65,7 +67,7 @@
             "className": "{controller}Client",
             "moduleName": "",
             "namespace": "",
-            "typeScriptVersion": 5.3,
+            "typeScriptVersion": 5.6,
             "template": "Axios",
             "promiseType": "Promise",
             "httpClass": "HttpClient",
