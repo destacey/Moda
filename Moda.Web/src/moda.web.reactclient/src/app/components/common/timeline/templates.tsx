@@ -29,7 +29,7 @@ export const GroupTemplate: TimelineTemplate<ModaDataGroup> = (props) => {
       {
         // TODO: Fix TS Error. VisJS DataGroup.content is either `string` or `HTMLElement`, and `HTMLElement` is not a valid reactNode.
       }
-      {props.item.content}
+      {props.item.content as string}
     </Text>
   )
 }
