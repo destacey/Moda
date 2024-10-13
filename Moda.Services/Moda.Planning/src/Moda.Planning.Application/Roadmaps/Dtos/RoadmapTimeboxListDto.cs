@@ -1,27 +1,22 @@
 ﻿using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Dtos;
-public sealed record RoadmapActivityDto : RoadmapItemDto, IMapFrom<RoadmapActivity>
+public sealed record RoadmapTimeboxListDto : RoadmapItemListDto, IMapFrom<RoadmapTimebox>
 {
     /// <summary>
-    /// The Roadmap Activity start date.
+    /// The Roadmap Timebox start date.
     /// </summary>
     public required LocalDate Start { get; set; }
 
     /// <summary>
-    /// The Roadmap Activity end date.
+    /// The Roadmap Timebox end date.
     /// </summary>
     public required LocalDate End { get; set; }
 
-    /// <summary>
-    /// The order of the Roadmap Activity within its parent.
-    /// </summary>
-    public int Order { get; set; }
-
     public override void ConfigureMapping(TypeAdapterConfig config)
     {
-        config.NewConfig<RoadmapActivity, RoadmapActivityDto>()
-            .Inherits<BaseRoadmapItem, RoadmapItemDto>()
+        base.ConfigureMapping(config);
+        config.NewConfig<RoadmapTimebox, RoadmapTimeboxListDto>()
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End);
     }

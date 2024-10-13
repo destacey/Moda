@@ -2,20 +2,19 @@
 
 import { ModaGrid } from '@/src/app/components/common'
 import {
-  RoadmapActivityDto,
-  RoadmapItemDto,
-  RoadmapMilestoneDto,
-  RoadmapTimeboxDto,
+  RoadmapActivityListDto,
+  RoadmapItemListDto,
+  RoadmapMilestoneListDto,
+  RoadmapTimeboxListDto,
 } from '@/src/services/moda-api'
 import { ColDef, RowDragEndEvent } from 'ag-grid-community'
 import { ColorPicker } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
-import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 
 export interface RoadmapItemsGridProps {
-  roadmapItemsData: RoadmapItemDto[]
+  roadmapItemsData: RoadmapItemListDto[]
   roadmapItemsLoading: boolean
   isRoadmapItemsLoading: () => void
   messageApi: MessageInstance
@@ -26,10 +25,10 @@ export interface RoadmapItemsGridProps {
 }
 
 type RoadmapItemUnion =
-  | RoadmapItemDto
-  | RoadmapActivityDto
-  | RoadmapMilestoneDto
-  | RoadmapTimeboxDto
+  | RoadmapItemListDto
+  | RoadmapActivityListDto
+  | RoadmapMilestoneListDto
+  | RoadmapTimeboxListDto
 
 const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
   props: RoadmapItemsGridProps,

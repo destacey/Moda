@@ -1,16 +1,17 @@
 'use client'
 
-import { RoadmapDetailsDto, RoadmapItemDto } from '@/src/services/moda-api'
+import { RoadmapDetailsDto, RoadmapItemListDto } from '@/src/services/moda-api'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { useEffect, useMemo, useState } from 'react'
 import { MessageInstance } from 'antd/es/message/interface'
 import { RoadmapsTimeline } from '../components'
 import RoadmapItemsGrid from '../components/roadmap-items-grid'
+import RoadmapItemsGrid2 from '../components/roadmap-items-grid2'
 
 interface RoadmapViewManagerProps {
   roadmap: RoadmapDetailsDto
-  roadmapItems: RoadmapItemDto[]
+  roadmapItems: RoadmapItemListDto[]
   isRoadmapItemsLoading: boolean
   refreshRoadmapItems: () => void
   canUpdateRoadmap: boolean
@@ -19,7 +20,7 @@ interface RoadmapViewManagerProps {
 
 const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
   const [currentView, setCurrentView] = useState<string | number>('Timeline')
-  const [roadmapItems, setRoadmapItems] = useState<RoadmapItemDto[]>([])
+  const [roadmapItems, setRoadmapItems] = useState<RoadmapItemListDto[]>([])
 
   useEffect(() => {
     setRoadmapItems(props.roadmapItems)
@@ -63,7 +64,7 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
         />
       )}
       {currentView === 'List' && (
-        <RoadmapItemsGrid
+        <RoadmapItemsGrid2
           roadmapItemsData={roadmapItems}
           roadmapItemsLoading={props.isRoadmapItemsLoading}
           isRoadmapItemsLoading={props.refreshRoadmapItems}

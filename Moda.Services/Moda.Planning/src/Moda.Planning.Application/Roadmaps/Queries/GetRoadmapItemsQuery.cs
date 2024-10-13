@@ -6,7 +6,7 @@ using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Queries;
-public sealed record GetRoadmapItemsQuery : IQuery<List<RoadmapItemDto>>
+public sealed record GetRoadmapItemsQuery : IQuery<List<RoadmapItemListDto>>
 {
     public GetRoadmapItemsQuery(IdOrKey idOrKey)
     {
@@ -16,12 +16,12 @@ public sealed record GetRoadmapItemsQuery : IQuery<List<RoadmapItemDto>>
     public Expression<Func<Roadmap, bool>> IdOrKeyFilter { get; }
 }
 
-internal sealed class GetRoadmapItemsQueryHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser) : IQueryHandler<GetRoadmapItemsQuery, List<RoadmapItemDto>>
+internal sealed class GetRoadmapItemsQueryHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser) : IQueryHandler<GetRoadmapItemsQuery, List<RoadmapItemListDto>>
 {
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
 
-    public async Task<List<RoadmapItemDto>> Handle(GetRoadmapItemsQuery request, CancellationToken cancellationToken)
+    public async Task<List<RoadmapItemListDto>> Handle(GetRoadmapItemsQuery request, CancellationToken cancellationToken)
     {
         var publicVisibility = Visibility.Public;
 
@@ -32,6 +32,8 @@ internal sealed class GetRoadmapItemsQueryHandler(IPlanningDbContext planningDbC
             //.ProjectToType<RoadmapItemDto>() // not working, it's always returning only the BaseRoadmapItem properties
             .ToListAsync(cancellationToken);
 
-        return items.Adapt<List<RoadmapItemDto>>();
+        return items
+            .Where(r => r.ParentId == null)
+            .Adapt<List<RoadmapItemListDto>>();
     }
 }

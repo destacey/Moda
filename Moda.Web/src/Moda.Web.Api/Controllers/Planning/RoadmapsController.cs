@@ -99,7 +99,7 @@ public class RoadmapsController : ControllerBase
     [OpenApiOperation("Get roadmap items", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<RoadmapItemDto>>> GetItems(string idOrKey, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<RoadmapItemListDto>>> GetItems(string idOrKey, CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetRoadmapItemsQuery(idOrKey), cancellationToken);
         return Ok(items);

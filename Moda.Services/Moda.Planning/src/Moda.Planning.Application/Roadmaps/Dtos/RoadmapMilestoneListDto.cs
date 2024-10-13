@@ -1,7 +1,7 @@
 ﻿using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Dtos;
-public sealed record RoadmapMilestoneDto : RoadmapItemDto, IMapFrom<RoadmapMilestone>
+public sealed record RoadmapMilestoneListDto : RoadmapItemListDto, IMapFrom<RoadmapMilestone>
 {
     /// <summary>
     /// The Roadmap Milestone date.
@@ -11,7 +11,7 @@ public sealed record RoadmapMilestoneDto : RoadmapItemDto, IMapFrom<RoadmapMiles
     public override void ConfigureMapping(TypeAdapterConfig config)
     {
         base.ConfigureMapping(config);
-        config.NewConfig<RoadmapMilestone, RoadmapMilestoneDto>()
+        config.NewConfig<RoadmapMilestone, RoadmapMilestoneListDto>()
             .Map(dest => dest.Date, src => src.Date);
     }
 }

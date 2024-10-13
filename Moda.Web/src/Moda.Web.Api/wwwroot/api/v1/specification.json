@@ -3285,7 +3285,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RoadmapItemDto"
+                    "$ref": "#/components/schemas/RoadmapItemListDto"
                   }
                 }
               }
@@ -10269,14 +10269,14 @@
           }
         }
       },
-      "RoadmapItemDto": {
+      "RoadmapItemListDto": {
         "type": "object",
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "RoadmapActivityDto": "#/components/schemas/RoadmapActivityDto",
-            "RoadmapMilestoneDto": "#/components/schemas/RoadmapMilestoneDto",
-            "RoadmapTimeboxDto": "#/components/schemas/RoadmapTimeboxDto"
+            "RoadmapActivityDto": "#/components/schemas/RoadmapActivityListDto",
+            "RoadmapMilestoneDto": "#/components/schemas/RoadmapMilestoneListDto",
+            "RoadmapTimeboxDto": "#/components/schemas/RoadmapTimeboxListDto"
           }
         },
         "additionalProperties": false,
@@ -10334,10 +10334,10 @@
           }
         }
       },
-      "RoadmapActivityDto": {
+      "RoadmapActivityListDto": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/RoadmapItemDto"
+            "$ref": "#/components/schemas/RoadmapItemListDto"
           },
           {
             "type": "object",
@@ -10354,15 +10354,21 @@
               "order": {
                 "type": "integer",
                 "format": "int32"
+              },
+              "children": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RoadmapItemListDto"
+                }
               }
             }
           }
         ]
       },
-      "RoadmapMilestoneDto": {
+      "RoadmapMilestoneListDto": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/RoadmapItemDto"
+            "$ref": "#/components/schemas/RoadmapItemListDto"
           },
           {
             "type": "object",
@@ -10376,10 +10382,10 @@
           }
         ]
       },
-      "RoadmapTimeboxDto": {
+      "RoadmapTimeboxListDto": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/RoadmapItemDto"
+            "$ref": "#/components/schemas/RoadmapItemListDto"
           },
           {
             "type": "object",

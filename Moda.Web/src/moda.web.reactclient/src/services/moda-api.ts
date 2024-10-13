@@ -3901,7 +3901,7 @@ export class RoadmapsClient {
     /**
      * Get roadmap items
      */
-    getItems(idOrKey: string, cancelToken?: CancelToken): Promise<RoadmapItemDto[]> {
+    getItems(idOrKey: string, cancelToken?: CancelToken): Promise<RoadmapItemListDto[]> {
         let url_ = this.baseUrl + "/api/planning/roadmaps/{idOrKey}/items";
         if (idOrKey === undefined || idOrKey === null)
             throw new Error("The parameter 'idOrKey' must be defined.");
@@ -3928,7 +3928,7 @@ export class RoadmapsClient {
         });
     }
 
-    protected processGetItems(response: AxiosResponse): Promise<RoadmapItemDto[]> {
+    protected processGetItems(response: AxiosResponse): Promise<RoadmapItemListDto[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -3943,7 +3943,7 @@ export class RoadmapsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<RoadmapItemDto[]>(result200);
+            return Promise.resolve<RoadmapItemListDto[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -3956,7 +3956,7 @@ export class RoadmapsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<RoadmapItemDto[]>(null as any);
+        return Promise.resolve<RoadmapItemListDto[]>(null as any);
     }
 
     /**
@@ -10422,7 +10422,7 @@ export interface UpdateRoadmapRequest {
     visibilityId?: number;
 }
 
-export interface RoadmapItemDto {
+export interface RoadmapItemListDto {
     id?: string;
     roadmapId?: string;
     name?: string;
@@ -10437,17 +10437,18 @@ export interface RoadmapActivityNavigationDto {
     name?: string;
 }
 
-export interface RoadmapActivityDto extends RoadmapItemDto {
+export interface RoadmapActivityListDto extends RoadmapItemListDto {
     start?: Date;
     end?: Date;
     order?: number;
+    children?: RoadmapItemListDto[];
 }
 
-export interface RoadmapMilestoneDto extends RoadmapItemDto {
+export interface RoadmapMilestoneListDto extends RoadmapItemListDto {
     date?: Date;
 }
 
-export interface RoadmapTimeboxDto extends RoadmapItemDto {
+export interface RoadmapTimeboxListDto extends RoadmapItemListDto {
     start?: Date;
     end?: Date;
 }

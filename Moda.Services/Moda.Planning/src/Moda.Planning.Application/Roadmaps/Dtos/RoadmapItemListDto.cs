@@ -4,11 +4,11 @@ using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Dtos;
 
-[JsonDerivedType(typeof(RoadmapItemDto), typeDiscriminator: "RoadmapItemDto")]
-[JsonDerivedType(typeof(RoadmapActivityDto), typeDiscriminator: "RoadmapActivityDto")]
-[JsonDerivedType(typeof(RoadmapMilestoneDto), typeDiscriminator: "RoadmapMilestoneDto")]
-[JsonDerivedType(typeof(RoadmapTimeboxDto), typeDiscriminator: "RoadmapTimeboxDto")]
-public record RoadmapItemDto : IMapFrom<BaseRoadmapItem>
+[JsonDerivedType(typeof(RoadmapItemListDto), typeDiscriminator: "RoadmapItemDto")]
+[JsonDerivedType(typeof(RoadmapActivityListDto), typeDiscriminator: "RoadmapActivityDto")]
+[JsonDerivedType(typeof(RoadmapMilestoneListDto), typeDiscriminator: "RoadmapMilestoneDto")]
+[JsonDerivedType(typeof(RoadmapTimeboxListDto), typeDiscriminator: "RoadmapTimeboxDto")]
+public record RoadmapItemListDto : IMapFrom<BaseRoadmapItem>
 {
     /// <summary>
     /// The roadmap item Id.
@@ -42,10 +42,10 @@ public record RoadmapItemDto : IMapFrom<BaseRoadmapItem>
 
     public virtual void ConfigureMapping(TypeAdapterConfig config)
     {
-        config.NewConfig<BaseRoadmapItem, RoadmapItemDto>()
-            .Include<RoadmapActivity, RoadmapActivityDto>()
-            .Include<RoadmapMilestone, RoadmapMilestoneDto>()
-            .Include<RoadmapTimebox, RoadmapTimeboxDto>()
+        config.NewConfig<BaseRoadmapItem, RoadmapItemListDto>()
+            .Include<RoadmapActivity, RoadmapActivityListDto>()
+            .Include<RoadmapMilestone, RoadmapMilestoneListDto>()
+            .Include<RoadmapTimebox, RoadmapTimeboxListDto>()
             .Map(dest => dest.Type, src => SimpleNavigationDto.FromEnum(src.Type));
     }
 }
