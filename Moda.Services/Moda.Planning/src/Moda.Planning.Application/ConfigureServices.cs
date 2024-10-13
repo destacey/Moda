@@ -12,9 +12,18 @@ public static class ConfigureServices
         services.AddValidatorsFromAssembly(assembly);
         services.AddMediatR(options => options.RegisterServicesFromAssembly(assembly));
 
-        TypeAdapterConfig.GlobalSettings.Scan(assembly);
-        TypeAdapterConfig.GlobalSettings.ScanInheritedTypes(assembly);
+        ConfigureMapster(assembly);
 
         return services;
+    }
+
+    private static void ConfigureMapster(Assembly assembly)
+    {
+        // Global Mapster settings
+        TypeAdapterConfig.GlobalSettings.Scan(assembly);
+        TypeAdapterConfig.GlobalSettings.ScanInheritedTypes(assembly);
+        TypeAdapterConfig.GlobalSettings.Default.PreserveReference(true);
+        TypeAdapterConfig.GlobalSettings.AllowImplicitSourceInheritance = true;
+        TypeAdapterConfig.GlobalSettings.AllowImplicitDestinationInheritance = true;
     }
 }

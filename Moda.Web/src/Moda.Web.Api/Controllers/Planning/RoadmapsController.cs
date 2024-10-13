@@ -94,7 +94,7 @@ public class RoadmapsController : ControllerBase
 
     #region Roadmap Items
 
-    [HttpPost("{idOrKey}/items")]
+    [HttpGet("{idOrKey}/items")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Roadmaps)]
     [OpenApiOperation("Get roadmap items", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]

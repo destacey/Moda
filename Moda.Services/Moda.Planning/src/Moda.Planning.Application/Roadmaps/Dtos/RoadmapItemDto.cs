@@ -43,6 +43,9 @@ public record RoadmapItemDto : IMapFrom<BaseRoadmapItem>
     public virtual void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<BaseRoadmapItem, RoadmapItemDto>()
+            .Include<RoadmapActivity, RoadmapActivityDto>()
+            .Include<RoadmapMilestone, RoadmapMilestoneDto>()
+            .Include<RoadmapTimebox, RoadmapTimeboxDto>()
             .Map(dest => dest.Type, src => SimpleNavigationDto.FromEnum(src.Type));
     }
 }

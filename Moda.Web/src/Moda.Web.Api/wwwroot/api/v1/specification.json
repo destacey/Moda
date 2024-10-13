@@ -3260,7 +3260,7 @@
       }
     },
     "/api/planning/roadmaps/{idOrKey}/items": {
-      "post": {
+      "get": {
         "tags": [
           "Roadmaps"
         ],

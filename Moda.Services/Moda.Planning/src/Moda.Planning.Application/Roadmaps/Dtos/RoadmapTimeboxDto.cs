@@ -1,5 +1,4 @@
-﻿using Moda.Common.Application.Dtos;
-using Moda.Planning.Domain.Models.Roadmaps;
+﻿using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Dtos;
 public sealed record RoadmapTimeboxDto : RoadmapItemDto, IMapFrom<RoadmapTimebox>
@@ -16,9 +15,9 @@ public sealed record RoadmapTimeboxDto : RoadmapItemDto, IMapFrom<RoadmapTimebox
 
     public override void ConfigureMapping(TypeAdapterConfig config)
     {
+        base.ConfigureMapping(config);
         config.NewConfig<RoadmapTimebox, RoadmapTimeboxDto>()
             .Map(dest => dest.Start, src => src.DateRange.Start)
-            .Map(dest => dest.End, src => src.DateRange.End)
-            .Map(dest => dest.Type, src => SimpleNavigationDto.FromEnum(src.Type));
+            .Map(dest => dest.End, src => src.DateRange.End);
     }
 }

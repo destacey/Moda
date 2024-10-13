@@ -1,7 +1,12 @@
 'use client'
 
 import { ModaGrid } from '@/src/app/components/common'
-import { RoadmapItemDto } from '@/src/services/moda-api'
+import {
+  RoadmapActivityDto,
+  RoadmapItemDto,
+  RoadmapMilestoneDto,
+  RoadmapTimeboxDto,
+} from '@/src/services/moda-api'
 import { ColDef, RowDragEndEvent } from 'ag-grid-community'
 import { ColorPicker } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
@@ -20,6 +25,12 @@ export interface RoadmapItemsGridProps {
   parentRoadmapId?: string | undefined
 }
 
+type RoadmapItemUnion =
+  | RoadmapItemDto
+  | RoadmapActivityDto
+  | RoadmapMilestoneDto
+  | RoadmapTimeboxDto
+
 const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
   props: RoadmapItemsGridProps,
 ) => {
@@ -30,23 +41,37 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
   //const [updateChildOrder, { error: mutationError }] = useUpdateChildOrderMutation()
 
   // TODO: dates are formatted correctly and filter, but the filter is string based, not date based
-  const columnDefs = useMemo<ColDef<RoadmapItemDto>[]>(
+  const columnDefs = useMemo<ColDef<RoadmapItemUnion>[]>(
     () => [
       // rowDrag is typically set on the first column
       // { field: 'id', width: enableRowDrag ? 110 : 90, rowDrag: enableRowDrag },
       { field: 'name', width: 350 },
       { field: 'type.name' },
       { field: 'parent.name' },
-      // {
-      //   field: 'start',
-      //   width: 125,
-      //   valueGetter: (params) => dayjs(params.data.start).format('M/D/YYYY'),
-      // },
-      // {
-      //   field: 'end',
-      //   width: 125,
-      //   valueGetter: (params) => dayjs(params.data.end).format('M/D/YYYY'),
-      // },
+      {
+        field: 'start',
+        width: 125,
+        valueGetter: (params) => {
+          const data = params.data as RoadmapItemUnion
+          if ('date' in data && data.date) {
+            return dayjs(data.date).format('M/D/YYYY')
+          } else if ('start' in data && data.start) {
+            return dayjs(data.start).format('M/D/YYYY')
+          }
+          return ''
+        },
+      },
+      {
+        field: 'end',
+        width: 125,
+        valueGetter: (params) => {
+          const data = params.data as RoadmapItemUnion
+          if ('end' in data && data.end) {
+            return dayjs(data.end).format('M/D/YYYY')
+          }
+          return ''
+        },
+      },
       {
         field: 'color',
         width: 125,

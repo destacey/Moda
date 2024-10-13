@@ -25,11 +25,13 @@ internal sealed class GetRoadmapItemsQueryHandler(IPlanningDbContext planningDbC
     {
         var publicVisibility = Visibility.Public;
 
-        return await _planningDbContext.Roadmaps
+        var items = await _planningDbContext.Roadmaps
             .Where(request.IdOrKeyFilter)
             .Where(r => r.Visibility == publicVisibility || r.RoadmapManagers.Any(m => m.ManagerId == _currentUserEmployeeId))
             .SelectMany(r => r.Items)
-            .ProjectToType<RoadmapItemDto>()
+            //.ProjectToType<RoadmapItemDto>() // not working, it's always returning only the BaseRoadmapItem properties
             .ToListAsync(cancellationToken);
+
+        return items.Adapt<List<RoadmapItemDto>>();
     }
 }
