@@ -1,5 +1,6 @@
 'use client'
 
+import { ModaEmpty } from '@/src/app/components/common'
 import {
   RoadmapActivityListDto,
   RoadmapActivityNavigationDto,
@@ -19,7 +20,7 @@ import {
 } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 const { Text } = Typography
 
@@ -46,8 +47,8 @@ interface RoadmapItemDataType {
   name: string
   type: string
   parent?: RoadmapActivityNavigationDto
-  start: string
-  end?: string
+  start: string // TODO: Change to Date
+  end?: string // TODO: Change to Date
   color?: string
   children?: RoadmapItemDataType[]
 }
@@ -63,37 +64,46 @@ const columnDefs: TableColumnsType<RoadmapItemDataType> = [
     key: 'name',
     dataIndex: 'name',
     title: 'Name',
+    sorter: (a, b) => a.name.localeCompare(b.name),
     width: 350,
   },
   {
     key: 'type',
     dataIndex: 'type',
     title: 'Type',
+    sorter: (a, b) => a.type.localeCompare(b.type),
+    width: 100,
   },
-  {
-    key: 'parent',
-    dataIndex: 'parent',
-    title: 'Parent',
-    render: (value) => value?.name && <Text>{value.name}</Text>,
-  },
+  // {
+  //   key: 'parent',
+  //   dataIndex: 'parent',
+  //   title: 'Parent',
+  //   render: (value) => value?.name && <Text>{value.name}</Text>,
+  // },
   {
     key: 'start',
     dataIndex: 'start',
     title: 'Start',
+    sorter: (a, b) => dayjs(a.start).unix() - dayjs(b.start).unix(),
+    width: 100,
   },
   {
     key: 'end',
     dataIndex: 'end',
     title: 'End',
+    sorter: (a, b) => dayjs(a.end).unix() - dayjs(b.end).unix(),
+    width: 100,
   },
   {
     key: 'color',
     dataIndex: 'color',
     title: 'Color',
+    sorter: (a, b) => a.color.localeCompare(b.color),
     render: (value) =>
       value && (
         <ColorPicker defaultValue={value} size="small" showText disabled />
       ),
+    width: 100,
   },
 ]
 
@@ -105,7 +115,11 @@ const MapRoadmapItem = (item: RoadmapItemUnion): RoadmapItemDataType => {
     type: item.type.name,
     parent: item.parent,
     start:
-      'start' in item && item.start ? dayjs(item.start).format('M/D/YYYY') : '',
+      'start' in item && item.start // activity and timebox
+        ? dayjs(item.start).format('M/D/YYYY')
+        : 'date' in item && item.date // milestone
+          ? dayjs(item.date).format('M/D/YYYY')
+          : undefined,
     end: 'end' in item && item.end ? dayjs(item.start).format('M/D/YYYY') : '',
     color: item.color,
   }
@@ -115,6 +129,7 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
   props: RoadmapItemsGrid2Props,
 ) => {
   const [data, setData] = useState<RoadmapItemDataType[]>([])
+  const tblRef: Parameters<typeof Table>[0]['ref'] = useRef(null)
 
   useEffect(() => {
     if (props.roadmapItemsLoading) return
@@ -139,7 +154,16 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
       <Flex justify="end" align="center" style={{ paddingBottom: '16px' }}>
         {props.viewSelector}
       </Flex>
-      <Table<RoadmapItemDataType> columns={columnDefs} dataSource={data} />
+      <Table<RoadmapItemDataType>
+        virtual
+        ref={tblRef}
+        //scroll={{ x: 2000, y: 400 }}
+        columns={columnDefs}
+        dataSource={data}
+        size="small"
+        pagination={false}
+        locale={{ emptyText: <ModaEmpty message="No Roadmap Items" /> }}
+      />
     </>
   )
 }

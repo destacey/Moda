@@ -34,6 +34,7 @@ internal sealed class GetRoadmapItemsQueryHandler(IPlanningDbContext planningDbC
 
         return items
             .Where(r => r.ParentId == null)
+            .OrderBy(r => r is RoadmapActivity activity ? activity.Order : int.MaxValue)
             .Adapt<List<RoadmapItemListDto>>();
     }
 }

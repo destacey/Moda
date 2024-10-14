@@ -5,7 +5,7 @@ import { Card, Divider, Flex, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
-import { RoadmapDetailsDto, RoadmapItemDto } from '@/src/services/moda-api'
+import { RoadmapDetailsDto, RoadmapItemListDto } from '@/src/services/moda-api'
 import { ControlItemsMenu } from '@/src/app/components/common/control-items-menu'
 import {
   ModaDataGroup,
@@ -16,13 +16,13 @@ import { ModaDataItem } from '@/src/app/components/common/timeline/types'
 
 export interface RoadmapsTimelineProps {
   roadmap: RoadmapDetailsDto
-  roadmapItems: RoadmapItemDto[]
+  roadmapItems: RoadmapItemListDto[]
   isRoadmapItemsLoading: boolean
   refreshRoadmapItems: () => void
   viewSelector?: ReactNode | undefined
 }
 
-interface RoadmapTimelineItem extends ModaDataItem<RoadmapItemDto, string> {
+interface RoadmapTimelineItem extends ModaDataItem<RoadmapItemListDto, string> {
   id: number
   end: Date
   order?: number
