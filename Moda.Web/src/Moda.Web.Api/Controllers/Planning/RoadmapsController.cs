@@ -105,6 +105,34 @@ public class RoadmapsController : ControllerBase
         return Ok(items);
     }
 
+    [HttpGet("{roadmapIdOrKey}/items/{itemId}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Get roadmap item details", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<RoadmapItemListDto>> GetItem(string roadmapIdOrKey, Guid itemId, CancellationToken cancellationToken)
+    {
+        var item = await _sender.Send(new GetRoadmapItemQuery(roadmapIdOrKey, itemId), cancellationToken);
+        return Ok(item);
+    }
+
+    // TODO: update this to be generic for all roadmap items
+    [HttpPost("{roadmapId}/items/activity")]
+    [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Create a roadmap activity.", "")]
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    public async Task<ActionResult<ObjectIdAndKey>> CreateActivity(Guid roadmapId, [FromBody] CreateRoadmapItemRequest request, CancellationToken cancellationToken)
+    {
+        if (roadmapId != request.RoadmapId)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToCreateRoadmapItemCommand(), cancellationToken);
+        if (result.IsFailure)
+            return BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.CreateActivity"));
+
+        return CreatedAtAction(nameof(GetItem), new { roadmapIdOrKey = roadmapId, itemId = result.Value.ToString() }, result.Value);
+    }
+
     //[HttpPost("{id}/children/order")]
     //[MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
     //[OpenApiOperation("Update the order of child roadmaps.", "")]

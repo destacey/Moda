@@ -3309,6 +3309,137 @@
         ]
       }
     },
+    "/api/planning/roadmaps/{roadmapIdOrKey}/items/{itemId}": {
+      "get": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Get roadmap item details",
+        "operationId": "Roadmaps_GetItem",
+        "parameters": [
+          {
+            "name": "roadmapIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoadmapItemListDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/roadmaps/{roadmapId}/items/activity": {
+      "post": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Create a roadmap activity.",
+        "operationId": "Roadmaps_CreateActivity",
+        "parameters": [
+          {
+            "name": "roadmapId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoadmapItemRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectIdAndKey"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/roadmaps/visibility-options": {
       "get": {
         "tags": [
@@ -10402,6 +10533,64 @@
             }
           }
         ]
+      },
+      "CreateRoadmapItemRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "roadmapId",
+          "name",
+          "start",
+          "end"
+        ],
+        "properties": {
+          "roadmapId": {
+            "type": "string",
+            "description": "The Roadmap Id the Roadmap Item belongs to.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the Roadmap Item.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the Roadmap Item.",
+            "maxLength": 2048,
+            "minLength": 0,
+            "nullable": true
+          },
+          "parentId": {
+            "type": "string",
+            "description": "The parent Roadmap Item Id. This is used to connect Roadmap Items together.",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "start": {
+            "type": "string",
+            "description": "The Roadmap Item start date.",
+            "format": "date",
+            "nullable": false
+          },
+          "end": {
+            "type": "string",
+            "description": "The Roadmap Item end date.",
+            "format": "date",
+            "nullable": false
+          },
+          "color": {
+            "type": "string",
+            "description": "The color of the Roadmap Item. This is used to display the Roadmap Item in the UI.",
+            "nullable": true
+          }
+        }
       },
       "VisibilityDto": {
         "allOf": [
