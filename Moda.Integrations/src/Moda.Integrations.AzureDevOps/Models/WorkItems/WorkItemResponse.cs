@@ -23,6 +23,10 @@ internal static class WorkItemResponseExtensions
 
     public static AzdoWorkItem ToAzdoWorkItem(this WorkItemResponse workItem, IterationDto iteration)
     {
+        var created = Instant.FromDateTimeOffset(workItem.Fields.CreatedDate);
+        Instant? activated = workItem.Fields.ActivatedDate.HasValue ? Instant.FromDateTimeUtc(workItem.Fields.ActivatedDate.Value) : null;
+        Instant? closed = workItem.Fields.ClosedDate.HasValue ? Instant.FromDateTimeUtc(workItem.Fields.ClosedDate.Value) : null;
+
         return new AzdoWorkItem()
         {
             Id = workItem.Id,
@@ -37,8 +41,12 @@ internal static class WorkItemResponseExtensions
             LastModifiedBy = workItem.Fields.ChangedBy?.UniqueName,
             Priority = workItem.Fields.Priority,
             StackRank = workItem.Fields.StackRank > 0 ? workItem.Fields.StackRank : _defaultStackRank,
-            ActivatedTimestamp = workItem.Fields.ActivatedDate.HasValue ? Instant.FromDateTimeUtc(workItem.Fields.ActivatedDate.Value) : null,
-            DoneTimestamp = workItem.Fields.ClosedDate.HasValue ? Instant.FromDateTimeUtc(workItem.Fields.ClosedDate.Value) : null,
+            ActivatedTimestamp = activated.HasValue 
+                ? activated < created ? created : activated
+                : null,
+            DoneTimestamp = closed.HasValue 
+                ? closed < created ? created : closed
+                : null,
             TeamId = iteration.TeamId,
             ExternalTeamIdentifier = iteration.Identifier.ToString()
         };
