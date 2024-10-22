@@ -3309,6 +3309,56 @@
         ]
       }
     },
+    "/api/planning/roadmaps/{idOrKey}/items/activities": {
+      "get": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Get roadmap activities",
+        "operationId": "Roadmaps_GetActivities",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoadmapActivityListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/roadmaps/{roadmapIdOrKey}/items/{itemId}": {
       "get": {
         "tags": [

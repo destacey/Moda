@@ -1,4 +1,8 @@
-import { ObjectIdAndKey, RoadmapItemDto } from './../../../services/moda-api'
+import {
+  CreateRoadmapItemRequest,
+  ObjectIdAndKey,
+  RoadmapItemDto,
+} from './../../../services/moda-api'
 import {
   CreateRoadmapRequest,
   RoadmapDetailsDto,
@@ -105,6 +109,25 @@ export const roadmapApi = apiSlice.injectEndpoints({
         { type: QueryTags.RoadmapItems, id: arg },
       ],
     }),
+    createRoadmapActivity: builder.mutation<
+      ObjectIdAndKey,
+      CreateRoadmapItemRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await (
+            await getRoadmapsClient()
+          ).createActivity(request.roadmapId, request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [{ type: QueryTags.RoadmapItems, id: arg.roadmapId }] // TODO: add a cache key to invalidate only the specific roadmap by the key instead of id
+      },
+    }),
     // updateChildrenOrder: builder.mutation<
     //   void,
     //   UpdateRoadmapChildrenOrderRequest
@@ -176,6 +199,7 @@ export const {
   useUpdateRoadmapMutation,
   useDeleteRoadmapMutation,
   useGetRoadmapItemsQuery,
+  useCreateRoadmapActivityMutation,
   // useUpdateChildrenOrderMutation,
   // useUpdateChildOrderMutation,
   useGetVisibilityOptionsQuery,

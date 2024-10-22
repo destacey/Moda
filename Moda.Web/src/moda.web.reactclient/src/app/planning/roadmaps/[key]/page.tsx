@@ -22,7 +22,8 @@ import { ItemType } from 'antd/es/menu/interface'
 import EditRoadmapForm from '../components/edit-roadmap-form'
 import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
 import RoadmapViewManager from './roadmap-view-manager'
-import { CreateRoadmapForm, DeleteRoadmapForm } from '../components'
+import { DeleteRoadmapForm } from '../components'
+import CreateRoadmapActivityForm from '../components/create-roadmap-activity-form'
 
 const { Item } = Descriptions
 
@@ -207,12 +208,9 @@ const RoadmapDetailsPage = ({ params }) => {
         messageApi={messageApi}
       />
       {openCreateActivityForm && (
-        <CreateRoadmapForm
+        <CreateRoadmapActivityForm
           showForm={openCreateActivityForm}
-          parentRoadmapId={roadmapData?.id}
-          parentRoadmapManagerIds={roadmapData.roadmapManagers.map(
-            (rm) => rm.id,
-          )}
+          roadmapId={roadmapData?.id}
           onFormComplete={() => onCreateRoadmapFormClosed(true)}
           onFormCancel={() => onCreateRoadmapFormClosed(false)}
           messageApi={messageApi}

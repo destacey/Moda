@@ -105,6 +105,17 @@ public class RoadmapsController : ControllerBase
         return Ok(items);
     }
 
+    [HttpGet("{idOrKey}/items/activities")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Get roadmap activities", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<RoadmapActivityListDto>>> GetActivities(string idOrKey, CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetRoadmapActivitiesQuery(idOrKey), cancellationToken);
+        return Ok(items);
+    }
+
     [HttpGet("{roadmapIdOrKey}/items/{itemId}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Roadmaps)]
     [OpenApiOperation("Get roadmap item details", "")]
