@@ -31,14 +31,14 @@ internal sealed class GetRoadmapActivitiesQueryHandler(IPlanningDbContext planni
             .Where(r => r.Visibility == publicVisibility || r.RoadmapManagers.Any(m => m.ManagerId == _currentUserEmployeeId))
             .SelectMany(r => r.Items)
             .Where(ri => ri.Type == RoadmapItemType.Activity)
-            //.OfType<RoadmapActivity>()
-            .ProjectToType<RoadmapActivityListDto>() // not working, it's always returning only the BaseRoadmapItem properties
+            .OfType<RoadmapActivity>()
+            //.ProjectToType<RoadmapActivityListDto>() // not working, it's always returning only the BaseRoadmapItem properties
             .ToListAsync(cancellationToken);
 
         return items
             .Where(ri => ri.Parent == null)
             .OrderBy(ri => ri.Order)
-            .ToList();
-            //.Adapt<List<RoadmapActivityListDto>>();
+            //.ToList();
+            .Adapt<List<RoadmapActivityListDto>>();
     }
 }

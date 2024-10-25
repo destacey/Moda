@@ -4,9 +4,12 @@ import {
   CreateRoadmapItemRequest,
   RoadmapActivityListDto,
 } from '@/src/services/moda-api'
-import { useCreateRoadmapActivityMutation } from '@/src/store/features/planning/roadmaps-api'
+import {
+  useCreateRoadmapActivityMutation,
+  useGetRoadmapActivitiesQuery,
+} from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
+import { DatePicker, Form, Input, Modal, Radio, Select, TreeSelect } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -51,6 +54,12 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreateRoadmapActivityFormValues>()
   const formValues = Form.useWatch([], form)
+
+  const {
+    data: activities,
+    isLoading: activitiesIsLoading,
+    error: activitiesError,
+  } = useGetRoadmapActivitiesQuery(props.roadmapId)
 
   const [createRoadmapActivity, { error: mutationError }] =
     useCreateRoadmapActivityMutation()
@@ -129,6 +138,14 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
     )
   }, [form, formValues])
 
+  useEffect(() => {
+    if (activitiesError) {
+      props.messageApi.error(
+        'An error occurred while loading roadmap activities. Please try again.',
+      )
+    }
+  }, [activitiesError, props.messageApi])
+
   const onColorChange = (color: string) => {
     form.setFieldsValue({ color })
   }
@@ -153,6 +170,17 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
           layout="vertical"
           name="create-roadmap-activity-form"
         >
+          <Item name="parentActivityId" label="Parent Activity">
+            <TreeSelect
+              //showSearch // TODO: not working
+              treeLine={true}
+              placeholder="Please select parent activity"
+              allowClear
+              treeDefaultExpandAll
+              treeData={activities}
+              fieldNames={{ label: 'name', value: 'id', children: 'children' }}
+            />
+          </Item>
           <Item label="Name" name="name" rules={[{ required: true }]}>
             <TextArea
               autoSize={{ minRows: 1, maxRows: 2 }}

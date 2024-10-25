@@ -136,13 +136,19 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
 
     const roadmapItemsData: RoadmapItemDataType[] = props.roadmapItemsData.map(
       (item: RoadmapItemUnion) => {
-        const roadmapItem = MapRoadmapItem(item)
-        if ('children' in item && item.children.length > 0) {
-          roadmapItem.children = item.children.map((child) =>
-            MapRoadmapItem(child),
-          )
+        const mapItemWithChildren = (
+          item: RoadmapItemUnion,
+        ): RoadmapItemDataType => {
+          const roadmapItem = MapRoadmapItem(item)
+          if ('children' in item && item.children.length > 0) {
+            roadmapItem.children = item.children.map((child) =>
+              mapItemWithChildren(child),
+            )
+          }
+          return roadmapItem
         }
-        return roadmapItem
+
+        return mapItemWithChildren(item)
       },
     )
 

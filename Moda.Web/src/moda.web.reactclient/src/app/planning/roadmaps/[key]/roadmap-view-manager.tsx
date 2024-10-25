@@ -6,7 +6,6 @@ import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { useEffect, useMemo, useState } from 'react'
 import { MessageInstance } from 'antd/es/message/interface'
 import { RoadmapsTimeline } from '../components'
-import RoadmapItemsGrid from '../components/roadmap-items-grid'
 import RoadmapItemsGrid2 from '../components/roadmap-items-grid2'
 
 interface RoadmapViewManagerProps {

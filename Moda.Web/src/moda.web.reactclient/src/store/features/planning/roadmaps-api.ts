@@ -1,7 +1,8 @@
 import {
   CreateRoadmapItemRequest,
   ObjectIdAndKey,
-  RoadmapItemDto,
+  RoadmapActivityListDto,
+  RoadmapItemListDto,
 } from './../../../services/moda-api'
 import {
   CreateRoadmapRequest,
@@ -95,10 +96,26 @@ export const roadmapApi = apiSlice.injectEndpoints({
         return [{ type: QueryTags.Roadmap, id: 'LIST' }]
       },
     }),
-    getRoadmapItems: builder.query<RoadmapItemDto[], string>({
+    getRoadmapItems: builder.query<RoadmapItemListDto[], string>({
       queryFn: async (roadmapId: string) => {
         try {
           const data = await (await getRoadmapsClient()).getItems(roadmapId)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.RoadmapItems, id: arg },
+      ],
+    }),
+    getRoadmapActivities: builder.query<RoadmapActivityListDto[], string>({
+      queryFn: async (roadmapId: string) => {
+        try {
+          const data = await (
+            await getRoadmapsClient()
+          ).getActivities(roadmapId)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -199,6 +216,7 @@ export const {
   useUpdateRoadmapMutation,
   useDeleteRoadmapMutation,
   useGetRoadmapItemsQuery,
+  useGetRoadmapActivitiesQuery,
   useCreateRoadmapActivityMutation,
   // useUpdateChildrenOrderMutation,
   // useUpdateChildOrderMutation,
