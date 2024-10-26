@@ -4023,7 +4023,7 @@ export class RoadmapsClient {
     /**
      * Get roadmap item details
      */
-    getItem(roadmapIdOrKey: string, itemId: string, cancelToken?: CancelToken): Promise<RoadmapItemListDto> {
+    getItem(roadmapIdOrKey: string, itemId: string, cancelToken?: CancelToken): Promise<RoadmapItemDetailsDto> {
         let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapIdOrKey}/items/{itemId}";
         if (roadmapIdOrKey === undefined || roadmapIdOrKey === null)
             throw new Error("The parameter 'roadmapIdOrKey' must be defined.");
@@ -4053,7 +4053,7 @@ export class RoadmapsClient {
         });
     }
 
-    protected processGetItem(response: AxiosResponse): Promise<RoadmapItemListDto> {
+    protected processGetItem(response: AxiosResponse): Promise<RoadmapItemDetailsDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -4068,7 +4068,7 @@ export class RoadmapsClient {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<RoadmapItemListDto>(result200);
+            return Promise.resolve<RoadmapItemDetailsDto>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -4081,7 +4081,7 @@ export class RoadmapsClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<RoadmapItemListDto>(null as any);
+        return Promise.resolve<RoadmapItemDetailsDto>(null as any);
     }
 
     /**
@@ -4150,6 +4150,77 @@ export class RoadmapsClient {
             return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
 
         }
+    }
+
+    /**
+     * Update a roadmap activity.
+     */
+    updateActivity(roadmapId: string, activityId: string, request: UpdateRoadmapActivityRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapId}/items/activity/{activityId}";
+        if (roadmapId === undefined || roadmapId === null)
+            throw new Error("The parameter 'roadmapId' must be defined.");
+        url_ = url_.replace("{roadmapId}", encodeURIComponent("" + roadmapId));
+        if (activityId === undefined || activityId === null)
+            throw new Error("The parameter 'activityId' must be defined.");
+        url_ = url_.replace("{activityId}", encodeURIComponent("" + activityId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateActivity(_response);
+        });
+    }
+
+    protected processUpdateActivity(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
     }
 
     /**
@@ -10646,9 +10717,54 @@ export interface RoadmapTimeboxListDto extends RoadmapItemListDto {
     end?: Date;
 }
 
+export interface RoadmapItemDetailsDto {
+    id?: string;
+    roadmapId?: string;
+    name?: string;
+    description?: string | undefined;
+    type?: SimpleNavigationDto;
+    parent?: RoadmapActivityNavigationDto | undefined;
+    color?: string | undefined;
+    $type: string;
+}
+
+export interface RoadmapActivityDetailsDto extends RoadmapItemDetailsDto {
+    start?: Date;
+    end?: Date;
+    order?: number;
+    children?: RoadmapItemDetailsDto[];
+}
+
+export interface RoadmapMilestoneDetailsDto extends RoadmapItemDetailsDto {
+    date?: Date;
+}
+
+export interface RoadmapTimeboxDetailsDto extends RoadmapItemDetailsDto {
+    start?: Date;
+    end?: Date;
+}
+
 export interface CreateRoadmapItemRequest {
     /** The Roadmap Id the Roadmap Item belongs to. */
     roadmapId: string;
+    /** The name of the Roadmap Item. */
+    name: string;
+    /** The description of the Roadmap Item. */
+    description?: string | undefined;
+    /** The parent Roadmap Item Id. This is used to connect Roadmap Items together. */
+    parentId?: string | undefined;
+    /** The Roadmap Item start date. */
+    start: Date;
+    /** The Roadmap Item end date. */
+    end: Date;
+    /** The color of the Roadmap Item. This is used to display the Roadmap Item in the UI. */
+    color?: string | undefined;
+}
+
+export interface UpdateRoadmapActivityRequest {
+    /** The Roadmap Id the Roadmap Item belongs to. */
+    roadmapId: string;
+    activityId: string;
     /** The name of the Roadmap Item. */
     name: string;
     /** The description of the Roadmap Item. */

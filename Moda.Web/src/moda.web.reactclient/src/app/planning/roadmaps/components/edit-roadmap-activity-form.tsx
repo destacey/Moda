@@ -1,30 +1,34 @@
 import { ModaColorPicker } from '@/src/app/components/common'
 import useAuth from '@/src/app/components/contexts/auth'
 import {
-  CreateRoadmapItemRequest,
+  RoadmapActivityDetailsDto,
   RoadmapActivityListDto,
+  UpdateRoadmapActivityRequest,
 } from '@/src/services/moda-api'
 import {
-  useCreateRoadmapActivityMutation,
   useGetRoadmapActivitiesQuery,
+  useGetRoadmapItemQuery,
+  useUpdateRoadmapActivityMutation,
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Input, Modal, Radio, Select, TreeSelect } from 'antd'
+import { DatePicker, Form, Input, Modal, TreeSelect } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
+import dayjs from 'dayjs'
 
 const { Item } = Form
 const { TextArea } = Input
 
-export interface CreateRoadmapActivityFormProps {
+export interface EditRoadmapActivityFormProps {
   showForm: boolean
+  activityId: string
   roadmapId: string
   onFormComplete: () => void
   onFormCancel: () => void
   messageApi: MessageInstance
 }
 
-interface CreateRoadmapActivityFormValues {
+interface EditRoadmapActivityFormValues {
   parentActivityId?: string
   name: string
   description?: string
@@ -34,26 +38,49 @@ interface CreateRoadmapActivityFormValues {
 }
 
 const mapToRequestValues = (
-  values: CreateRoadmapActivityFormValues,
+  values: EditRoadmapActivityFormValues,
+  activityId: string,
   roadmapId: string,
-): CreateRoadmapItemRequest => {
+): UpdateRoadmapActivityRequest => {
   return {
     roadmapId: roadmapId,
+    activityId: activityId,
     parentId: values.parentActivityId,
     name: values.name,
     description: values.description,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
     color: values.color,
-  } as CreateRoadmapItemRequest
+  } as UpdateRoadmapActivityRequest
 }
 
-const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
+const filterActivities = (activities: RoadmapActivityListDto[], activityId) => {
+  return activities
+    .filter((a) => a.id !== activityId)
+    .map((a) => ({
+      ...a,
+      children: a.children ? filterActivities(a.children, activityId) : [],
+    }))
+}
+
+const EditRoadmapActivityForm = (props: EditRoadmapActivityFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateRoadmapActivityFormValues>()
+  const [form] = Form.useForm<EditRoadmapActivityFormValues>()
   const formValues = Form.useWatch([], form)
+  const [activitiesTree, setActivitiesTree] = useState<
+    RoadmapActivityListDto[]
+  >([])
+
+  const {
+    data: activityData,
+    isLoading: activityDataIsLoading,
+    error: activityDataError,
+  } = useGetRoadmapItemQuery({
+    roadmapId: props.roadmapId,
+    itemId: props.activityId,
+  })
 
   const {
     data: activities,
@@ -61,23 +88,48 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
     error: activitiesError,
   } = useGetRoadmapActivitiesQuery(props.roadmapId)
 
-  const [createRoadmapActivity, { error: mutationError }] =
-    useCreateRoadmapActivityMutation()
+  const [updateRoadmapActivity, { error: mutationError }] =
+    useUpdateRoadmapActivityMutation()
 
   const { hasPermissionClaim } = useAuth()
   const canManageRoadmapItems = hasPermissionClaim(
     'Permissions.Roadmaps.Update',
   )
 
-  const create = async (values: CreateRoadmapActivityFormValues, roadmapId) => {
+  const mapToFormValues = useCallback(
+    (activity: RoadmapActivityDetailsDto) => {
+      if (!activity) return
+
+      console.log('activity', activity)
+
+      form.setFieldsValue({
+        parentActivityId: activity.parent?.id,
+        name: activity.name,
+        description: activity.description,
+        start: dayjs(activity.start),
+        end: dayjs(activity.end),
+        color: activity.color,
+      })
+    },
+    [form],
+  )
+
+  const update = async (
+    values: EditRoadmapActivityFormValues,
+    activityId: string,
+    roadmapId: string,
+  ) => {
     try {
-      const request = mapToRequestValues(values, roadmapId)
-      const response = await createRoadmapActivity(request)
+      const request = mapToRequestValues(values, activityId, roadmapId)
+      const response = await updateRoadmapActivity({
+        request,
+        cacheKey: props.roadmapId,
+      })
       if (response.error) {
         throw response.error
       }
 
-      props.messageApi.success('Roadmap Activity created successfully.')
+      props.messageApi.success('Roadmap Activity updated successfully.')
 
       return true
     } catch (error) {
@@ -88,7 +140,7 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
       } else {
         props.messageApi.error(
           error.supportMessage ??
-            'An error occurred while creating the roadmap activity. Please try again.',
+            'An error occurred while updating the roadmap activity. Please try again.',
         )
       }
       return false
@@ -99,7 +151,7 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values, props.roadmapId)) {
+      if (await update(values, props.activityId, props.roadmapId)) {
         setIsOpen(false)
         form.resetFields()
         props.onFormComplete()
@@ -107,7 +159,7 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
     } catch (error) {
       console.error('handleOk error', error)
       props.messageApi.error(
-        'An error occurred while creating the roadmap activity. Please try again.',
+        'An error occurred while updating the roadmap activity. Please try again.',
       )
     } finally {
       setIsSaving(false)
@@ -121,15 +173,30 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
   }, [form, props])
 
   useEffect(() => {
+    if (!activityData || !activities || activitiesIsLoading) return
+
+    const filteredActivities = filterActivities(activities, props.activityId)
+    setActivitiesTree(filteredActivities)
+
     if (canManageRoadmapItems) {
       setIsOpen(props.showForm)
+      if (props.showForm) {
+        mapToFormValues(activityData)
+      }
     } else {
       props.onFormCancel()
       props.messageApi.error(
-        'You do not have permission to create roadmap items.',
+        'You do not have permission to update roadmap items.',
       )
     }
-  }, [canManageRoadmapItems, props])
+  }, [
+    activities,
+    activitiesIsLoading,
+    activityData,
+    canManageRoadmapItems,
+    mapToFormValues,
+    props,
+  ])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -139,13 +206,19 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
   }, [form, formValues])
 
   useEffect(() => {
+    if (activityDataError) {
+      props.messageApi.error(
+        activityDataError.supportMessage ??
+          'An error occurred while loading roadmap activity. Please try again.',
+      )
+    }
     if (activitiesError) {
       props.messageApi.error(
         activitiesError.supportMessage ??
           'An error occurred while loading roadmap activities. Please try again.',
       )
     }
-  }, [activitiesError, props.messageApi])
+  }, [activitiesError, activityDataError, props.messageApi])
 
   const onColorChange = (color: string) => {
     form.setFieldsValue({ color })
@@ -154,11 +227,11 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
   return (
     <>
       <Modal
-        title="Create Roadmap Activity"
+        title="Edit Roadmap Activity"
         open={isOpen}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
-        okText="Create"
+        okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
@@ -169,17 +242,19 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
           form={form}
           size="small"
           layout="vertical"
-          name="create-roadmap-activity-form"
+          name="update-roadmap-activity-form"
         >
           <Item name="parentActivityId" label="Parent Activity">
             <TreeSelect
               //showSearch // TODO: not working
+              loading={activitiesIsLoading}
               treeLine={true}
               placeholder="Please select parent activity"
               allowClear
               treeDefaultExpandAll
-              treeData={activities}
+              treeData={activitiesTree}
               fieldNames={{ label: 'name', value: 'id', children: 'children' }}
+              value={form.getFieldValue('parentActivityId')}
             />
           </Item>
           <Item label="Name" name="name" rules={[{ required: true }]}>
@@ -214,4 +289,4 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
   )
 }
 
-export default CreateRoadmapActivityForm
+export default EditRoadmapActivityForm

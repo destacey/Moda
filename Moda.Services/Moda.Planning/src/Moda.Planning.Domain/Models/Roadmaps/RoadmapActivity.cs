@@ -49,21 +49,18 @@ public sealed class RoadmapActivity : BaseRoadmapItem
     /// <summary>
     /// Updates the Roadmap Activity.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <param name="dateRange"></param>
-    /// <param name="color"></param>
-    /// <param name="order"></param>
+    /// <param name="roadmapActivity"></param>
     /// <returns></returns>
-    internal Result Update(string name, string? description, LocalDateRange dateRange, string? color, int order)
+    internal Result Update(IUpsertRoadmapActivity roadmapActivity)
     {
         // TODO: this initial implementation requires going through the Roadmap to update the Roadmap Activity. This is needed to verify permissions against the Roadmap within the Domain layer.
 
-        Name = name;
-        Description = description;
-        DateRange = dateRange;
-        Color = color;
-        Order = order;
+        ParentId = roadmapActivity.ParentId;
+
+        Name = roadmapActivity.Name;
+        Description = roadmapActivity.Description;
+        DateRange = roadmapActivity.DateRange;
+        Color = roadmapActivity.Color;
 
         return Result.Success();
     }
@@ -75,6 +72,19 @@ public sealed class RoadmapActivity : BaseRoadmapItem
     internal void SetOrder(int order)
     {
         Order = order;
+    }
+
+    /// <summary>
+    /// Resets the order of the child Roadmap Activities. This is used to remove any gaps in the order.
+    /// </summary>
+    internal void ResetChildActivitiesOrder()
+    {
+        int i = 1;
+        foreach (var activity in _children.OfType<RoadmapActivity>().OrderBy(x => x.Order).ToArray())
+        {
+            activity.SetOrder(i);
+            i++;
+        }
     }
 
     /// <summary>
@@ -121,6 +131,58 @@ public sealed class RoadmapActivity : BaseRoadmapItem
         _children.Add(newMilestone);
 
         return newMilestone;
+    }
+
+    /// <summary>
+    /// Adds an existing child Roadmap Item to the Roadmap Activity.
+    /// </summary>
+    /// <param name="child"></param>
+    /// <returns></returns>
+    internal Result AddChild(BaseRoadmapItem child)
+    {
+        if (_children.Any(x => x.Id == child.Id))
+        {
+            return Result.Failure("Child already exists under this Roadmap Activity.");
+        }
+
+        switch (child)
+        {
+            case RoadmapActivity roadmapActivity:
+                _children.Add(roadmapActivity);
+                roadmapActivity.SetOrder(_children.Count);
+                break;
+            case RoadmapTimebox roadmapTimebox:
+                _children.Add(roadmapTimebox);
+                break;
+            case RoadmapMilestone roadmapMilestone:
+                _children.Add(roadmapMilestone);
+                break;
+            default:
+                return Result.Failure("Child type not supported.");
+        }
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Removes a child Roadmap Item from the Roadmap Activity.
+    /// </summary>
+    /// <param name="roadmapId"></param>
+    /// <returns></returns>
+    internal Result RemoveChild(Guid roadmapId)
+    {
+        var child = _children.FirstOrDefault(x => x.Id == roadmapId);
+
+        if (child == null)
+        {
+            return Result.Failure("Child not found.");
+        }
+
+        _children.Remove(child);
+
+        ResetChildActivitiesOrder();
+
+        return Result.Success();
     }
 
     /// <summary>

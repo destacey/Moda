@@ -1,4 +1,5 @@
 ﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 
@@ -51,4 +52,30 @@ public abstract class BaseRoadmapItem : BaseEntity<Guid>, ISystemAuditable
     /// The color of the Roadmap. This is used to display the Roadmap in the UI.
     /// </summary>
     public string? Color { get => _color; protected set => _color = value.NullIfWhiteSpacePlusTrim(); }
+
+    /// <summary>
+    /// Remove the parent Roadmap Activity from the Roadmap Item.
+    /// </summary>
+    internal Result ChangeParent(RoadmapActivity? newParentActivity)
+    {
+        if (ParentId == newParentActivity?.Id)
+            return Result.Failure("Unable to change the parent because the new parent is the same as the current parent.");
+
+        if (Id == newParentActivity?.Id)
+            return Result.Failure("Unable to make the Roadmap Item a child of itself.");
+
+        if (ParentId.HasValue)
+        {
+            if (Parent is null)
+                return Result.Failure("Unable to change the parent because the current parent data has not been loaded.");
+
+            Parent.RemoveChild(Id);
+        }
+
+        ParentId = newParentActivity?.Id;
+        Parent = newParentActivity;
+        newParentActivity?.AddChild(this);
+
+        return Result.Success();
+    }
 }

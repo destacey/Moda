@@ -2,7 +2,9 @@ import {
   CreateRoadmapItemRequest,
   ObjectIdAndKey,
   RoadmapActivityListDto,
+  RoadmapItemDetailsDto,
   RoadmapItemListDto,
+  UpdateRoadmapActivityRequest,
 } from './../../../services/moda-api'
 import {
   CreateRoadmapRequest,
@@ -110,6 +112,25 @@ export const roadmapApi = apiSlice.injectEndpoints({
         { type: QueryTags.RoadmapItems, id: arg },
       ],
     }),
+    getRoadmapItem: builder.query<
+      RoadmapItemDetailsDto,
+      { roadmapId: string; itemId: string }
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await (
+            await getRoadmapsClient()
+          ).getItem(request.roadmapId, request.itemId)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.RoadmapItems, id: arg.itemId },
+      ],
+    }),
     getRoadmapActivities: builder.query<RoadmapActivityListDto[], string>({
       queryFn: async (roadmapId: string) => {
         try {
@@ -143,6 +164,35 @@ export const roadmapApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: (result, error, arg) => {
         return [{ type: QueryTags.RoadmapItems, id: arg.roadmapId }] // TODO: add a cache key to invalidate only the specific roadmap by the key instead of id
+      },
+    }),
+    updateRoadmapActivity: builder.mutation<
+      void,
+      {
+        request: UpdateRoadmapActivityRequest
+        cacheKey: string // roadmapId
+      }
+    >({
+      queryFn: async (mutationRequest) => {
+        try {
+          const data = await (
+            await getRoadmapsClient()
+          ).updateActivity(
+            mutationRequest.request.roadmapId,
+            mutationRequest.request.activityId,
+            mutationRequest.request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          { type: QueryTags.RoadmapItems, id: arg.cacheKey },
+          { type: QueryTags.RoadmapItems, id: arg.request.activityId },
+        ]
       },
     }),
     // updateChildrenOrder: builder.mutation<
@@ -216,8 +266,10 @@ export const {
   useUpdateRoadmapMutation,
   useDeleteRoadmapMutation,
   useGetRoadmapItemsQuery,
+  useGetRoadmapItemQuery,
   useGetRoadmapActivitiesQuery,
   useCreateRoadmapActivityMutation,
+  useUpdateRoadmapActivityMutation,
   // useUpdateChildrenOrderMutation,
   // useUpdateChildOrderMutation,
   useGetVisibilityOptionsQuery,

@@ -38,7 +38,7 @@ interface EditRoadmapFormValues {
   end: Date
   roadmapManagerIds: string[]
   visibilityId: number
-  color?: string | undefined
+  color?: string
 }
 
 const mapToRequestValues = (
@@ -103,7 +103,6 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
         start: dayjs(roadmap.start),
         end: dayjs(roadmap.end),
         visibilityId: roadmap.visibility.id,
-        color: roadmap.color,
         roadmapManagerIds: roadmap.roadmapManagers.map((rm) => rm.id),
       })
     },
@@ -119,7 +118,6 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
       const response = await updateRoadmap({
         request,
         cacheKey: roadmap.key,
-        parentCacheKey: roadmap.parent?.id,
       })
       if (response.error) {
         throw response.error

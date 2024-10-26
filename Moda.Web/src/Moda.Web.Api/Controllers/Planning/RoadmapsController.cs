@@ -121,7 +121,7 @@ public class RoadmapsController : ControllerBase
     [OpenApiOperation("Get roadmap item details", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<RoadmapItemListDto>> GetItem(string roadmapIdOrKey, Guid itemId, CancellationToken cancellationToken)
+    public async Task<ActionResult<RoadmapItemDetailsDto>> GetItem(string roadmapIdOrKey, Guid itemId, CancellationToken cancellationToken)
     {
         var item = await _sender.Send(new GetRoadmapItemQuery(roadmapIdOrKey, itemId), cancellationToken);
         return Ok(item);
@@ -143,6 +143,29 @@ public class RoadmapsController : ControllerBase
 
         return CreatedAtAction(nameof(GetItem), new { roadmapIdOrKey = roadmapId, itemId = result.Value.ToString() }, result.Value);
     }
+
+    // TODO: update this to be generic for all roadmap items
+    [HttpPut("{roadmapId}/items/activity/{activityId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Update a roadmap activity.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> UpdateActivity(Guid roadmapId, Guid activityId, [FromBody] UpdateRoadmapActivityRequest request, CancellationToken cancellationToken)
+    {
+        if (roadmapId != request.RoadmapId)
+            return BadRequest();
+
+        if (activityId != request.ActivityId)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToUpdateRoadmapActivityCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateActivity"));
+    }
+
 
     //[HttpPost("{id}/children/order")]
     //[MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]

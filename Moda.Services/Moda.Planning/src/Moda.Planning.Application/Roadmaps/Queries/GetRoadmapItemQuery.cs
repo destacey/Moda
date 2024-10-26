@@ -6,7 +6,7 @@ using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Queries;
-public sealed record GetRoadmapItemQuery : IQuery<RoadmapItemListDto>
+public sealed record GetRoadmapItemQuery : IQuery<RoadmapItemDetailsDto>
 {
     public GetRoadmapItemQuery(IdOrKey roadmapIdOrKey, Guid itemId)
     {
@@ -18,12 +18,12 @@ public sealed record GetRoadmapItemQuery : IQuery<RoadmapItemListDto>
     public Guid ItemId { get; }
 }
 
-internal sealed class GetRoadmapItemQueryHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser) : IQueryHandler<GetRoadmapItemQuery, RoadmapItemListDto>
+internal sealed class GetRoadmapItemQueryHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser) : IQueryHandler<GetRoadmapItemQuery, RoadmapItemDetailsDto>
 {
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
 
-    public async Task<RoadmapItemListDto> Handle(GetRoadmapItemQuery request, CancellationToken cancellationToken)
+    public async Task<RoadmapItemDetailsDto> Handle(GetRoadmapItemQuery request, CancellationToken cancellationToken)
     {
         var publicVisibility = Visibility.Public;
 
@@ -31,9 +31,10 @@ internal sealed class GetRoadmapItemQueryHandler(IPlanningDbContext planningDbCo
             .Where(request.IdOrKeyFilter)
             .Where(r => r.Visibility == publicVisibility || r.RoadmapManagers.Any(m => m.ManagerId == _currentUserEmployeeId))
             .SelectMany(r => r.Items)
+            .Include(r => r.Parent)
             .Where(r => r.Id == request.ItemId)
             .FirstOrDefaultAsync(cancellationToken);
 
-        return item.Adapt<RoadmapItemListDto>();
+        return item.Adapt<RoadmapItemDetailsDto>();
     }
 }

@@ -1,6 +1,8 @@
 'use client'
 
 import { ModaEmpty } from '@/src/app/components/common'
+import { RowMenuCellRenderer } from '@/src/app/components/common/moda-grid-cell-renderers'
+import useAuth from '@/src/app/components/contexts/auth'
 import {
   RoadmapActivityListDto,
   RoadmapActivityNavigationDto,
@@ -10,29 +12,29 @@ import {
 } from '@/src/services/moda-api'
 import {
   ColorPicker,
-  Divider,
   Flex,
-  Space,
+  MenuProps,
   Table,
   TableColumnsType,
-  TableProps,
   Typography,
 } from 'antd'
+import { ItemType } from 'antd/es/menu/interface'
 import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import EditRoadmapActivityForm from './edit-roadmap-activity-form'
 
 const { Text } = Typography
 
 export interface RoadmapItemsGrid2Props {
+  roadmapId: string
   roadmapItemsData: RoadmapItemListDto[]
-  roadmapItemsLoading: boolean
-  isRoadmapItemsLoading: () => void
+  roadmapItemsIsLoading: boolean
+  refreshRoadmapItems: () => void
   messageApi: MessageInstance
   gridHeight?: number | undefined
   viewSelector?: React.ReactNode | undefined
   enableRowDrag?: boolean | undefined
-  parentRoadmapId?: string | undefined
 }
 
 type RoadmapItemUnion =
@@ -53,59 +55,29 @@ interface RoadmapItemDataType {
   children?: RoadmapItemDataType[]
 }
 
-const columnDefs: TableColumnsType<RoadmapItemDataType> = [
-  {
-    key: 'id',
-    dataIndex: 'id',
-    title: 'Id',
-    hidden: true,
-  },
-  {
-    key: 'name',
-    dataIndex: 'name',
-    title: 'Name',
-    sorter: (a, b) => a.name.localeCompare(b.name),
-    width: 350,
-  },
-  {
-    key: 'type',
-    dataIndex: 'type',
-    title: 'Type',
-    sorter: (a, b) => a.type.localeCompare(b.type),
-    width: 100,
-  },
-  // {
-  //   key: 'parent',
-  //   dataIndex: 'parent',
-  //   title: 'Parent',
-  //   render: (value) => value?.name && <Text>{value.name}</Text>,
-  // },
-  {
-    key: 'start',
-    dataIndex: 'start',
-    title: 'Start',
-    sorter: (a, b) => dayjs(a.start).unix() - dayjs(b.start).unix(),
-    width: 100,
-  },
-  {
-    key: 'end',
-    dataIndex: 'end',
-    title: 'End',
-    sorter: (a, b) => dayjs(a.end).unix() - dayjs(b.end).unix(),
-    width: 100,
-  },
-  {
-    key: 'color',
-    dataIndex: 'color',
-    title: 'Color',
-    sorter: (a, b) => a.color.localeCompare(b.color),
-    render: (value) =>
-      value && (
-        <ColorPicker defaultValue={value} size="small" showText disabled />
-      ),
-    width: 100,
-  },
-]
+interface RowMenuProps extends MenuProps {
+  itemId: string
+  canUpdateRoadmap: boolean
+  onEditItemMenuClicked: (id: string) => void
+}
+
+const getRowMenuItems = (props: RowMenuProps) => {
+  if (
+    !props.canUpdateRoadmap ||
+    !props.itemId ||
+    !props.onEditItemMenuClicked
+  ) {
+    return null
+  }
+  return [
+    {
+      key: 'editItem',
+      label: 'Edit Roadmap Item',
+      disabled: !props.canUpdateRoadmap,
+      onClick: () => props.onEditItemMenuClicked(props.itemId),
+    },
+  ] as ItemType[]
+}
 
 const MapRoadmapItem = (item: RoadmapItemUnion): RoadmapItemDataType => {
   return {
@@ -129,10 +101,94 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
   props: RoadmapItemsGrid2Props,
 ) => {
   const [data, setData] = useState<RoadmapItemDataType[]>([])
+  const [openUpdateRoadmapActivityForm, setOpenUpdateRoadmapActivityForm] =
+    useState<boolean>(false)
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const tblRef: Parameters<typeof Table>[0]['ref'] = useRef(null)
 
+  const { hasPermissionClaim } = useAuth()
+  const canManageRoadmapItems = hasPermissionClaim(
+    'Permissions.Roadmaps.Update',
+  )
+
+  const onEditItemMenuClicked = useCallback((id: string) => {
+    setSelectedItemId(id)
+    setOpenUpdateRoadmapActivityForm(true)
+  }, [])
+
+  const columnDefs = useMemo(() => {
+    return [
+      {
+        key: 'id',
+        dataIndex: 'id',
+        title: 'Id',
+        hidden: true,
+      },
+      {
+        key: 'name',
+        dataIndex: 'name',
+        title: 'Name',
+        sorter: (a, b) => a.name.localeCompare(b.name),
+        width: 350,
+      },
+      {
+        //title: 'Action',
+        dataIndex: '',
+        key: 'x',
+        width: 25,
+        render: (_: any, record: RoadmapItemDataType) => {
+          const menuItems = getRowMenuItems({
+            itemId: record.id,
+            canUpdateRoadmap: canManageRoadmapItems,
+            onEditItemMenuClicked: () => onEditItemMenuClicked(record.id),
+          })
+
+          return RowMenuCellRenderer({ menuItems })
+        },
+      },
+      {
+        key: 'type',
+        dataIndex: 'type',
+        title: 'Type',
+        sorter: (a, b) => a.type.localeCompare(b.type),
+        width: 100,
+      },
+      // {
+      //   key: 'parent',
+      //   dataIndex: 'parent',
+      //   title: 'Parent',
+      //   render: (value) => value?.name && <Text>{value.name}</Text>,
+      // },
+      {
+        key: 'start',
+        dataIndex: 'start',
+        title: 'Start',
+        sorter: (a, b) => dayjs(a.start).unix() - dayjs(b.start).unix(),
+        width: 100,
+      },
+      {
+        key: 'end',
+        dataIndex: 'end',
+        title: 'End',
+        sorter: (a, b) => dayjs(a.end).unix() - dayjs(b.end).unix(),
+        width: 100,
+      },
+      {
+        key: 'color',
+        dataIndex: 'color',
+        title: 'Color',
+        sorter: (a, b) => a.color.localeCompare(b.color),
+        render: (value) =>
+          value && (
+            <ColorPicker defaultValue={value} size="small" showText disabled />
+          ),
+        width: 100,
+      },
+    ] as TableColumnsType<RoadmapItemDataType>
+  }, [canManageRoadmapItems, onEditItemMenuClicked])
+
   useEffect(() => {
-    if (props.roadmapItemsLoading) return
+    if (props.roadmapItemsIsLoading) return
 
     const roadmapItemsData: RoadmapItemDataType[] = props.roadmapItemsData.map(
       (item: RoadmapItemUnion) => {
@@ -153,7 +209,15 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
     )
 
     setData(roadmapItemsData)
-  }, [props.roadmapItemsData, props.roadmapItemsLoading])
+  }, [props.roadmapItemsData, props.roadmapItemsIsLoading])
+
+  const onUpdateRoadmapActivityFormClosed = (wasSaved: boolean) => {
+    setOpenUpdateRoadmapActivityForm(false)
+    setSelectedItemId(null)
+    if (wasSaved) {
+      props.refreshRoadmapItems()
+    }
+  }
 
   return (
     <>
@@ -161,15 +225,23 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
         {props.viewSelector}
       </Flex>
       <Table<RoadmapItemDataType>
-        virtual
         ref={tblRef}
-        //scroll={{ x: 2000, y: 400 }}
         columns={columnDefs}
         dataSource={data}
         size="small"
         pagination={false}
         locale={{ emptyText: <ModaEmpty message="No Roadmap Items" /> }}
       />
+      {openUpdateRoadmapActivityForm && (
+        <EditRoadmapActivityForm
+          showForm={openUpdateRoadmapActivityForm}
+          activityId={selectedItemId}
+          roadmapId={props.roadmapId}
+          onFormComplete={() => onUpdateRoadmapActivityFormClosed(true)}
+          onFormCancel={() => onUpdateRoadmapActivityFormClosed(false)}
+          messageApi={props.messageApi}
+        />
+      )}
     </>
   )
 }

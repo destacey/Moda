@@ -4,11 +4,11 @@ using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Dtos;
 
-[JsonDerivedType(typeof(RoadmapItemListDto), typeDiscriminator: nameof(RoadmapItemListDto))]
-[JsonDerivedType(typeof(RoadmapActivityListDto), typeDiscriminator: nameof(RoadmapActivityListDto))]
-[JsonDerivedType(typeof(RoadmapMilestoneListDto), typeDiscriminator: nameof(RoadmapMilestoneListDto))]
-[JsonDerivedType(typeof(RoadmapTimeboxListDto), typeDiscriminator: nameof(RoadmapTimeboxListDto))]
-public record RoadmapItemListDto : IMapFrom<BaseRoadmapItem>
+[JsonDerivedType(typeof(RoadmapItemDetailsDto), typeDiscriminator: nameof(RoadmapItemDetailsDto))]
+[JsonDerivedType(typeof(RoadmapActivityDetailsDto), typeDiscriminator: nameof(RoadmapActivityDetailsDto))]
+[JsonDerivedType(typeof(RoadmapMilestoneDetailsDto), typeDiscriminator: nameof(RoadmapMilestoneDetailsDto))]
+[JsonDerivedType(typeof(RoadmapTimeboxDetailsDto), typeDiscriminator: nameof(RoadmapTimeboxDetailsDto))]
+public record RoadmapItemDetailsDto : IMapFrom<BaseRoadmapItem>
 {
     /// <summary>
     /// The roadmap item Id.
@@ -24,6 +24,11 @@ public record RoadmapItemListDto : IMapFrom<BaseRoadmapItem>
     /// The name of the roadmap item.
     /// </summary>
     public required string Name { get; set; }
+
+    /// <summary>
+    /// The description of the roadmap item.
+    /// </summary>
+    public string? Description { get; set; }
 
     /// <summary>
     /// The type of roadmap item.
@@ -42,10 +47,10 @@ public record RoadmapItemListDto : IMapFrom<BaseRoadmapItem>
 
     public virtual void ConfigureMapping(TypeAdapterConfig config)
     {
-        config.NewConfig<BaseRoadmapItem, RoadmapItemListDto>()
-            .Include<RoadmapActivity, RoadmapActivityListDto>()
-            .Include<RoadmapMilestone, RoadmapMilestoneListDto>()
-            .Include<RoadmapTimebox, RoadmapTimeboxListDto>()
+        config.NewConfig<BaseRoadmapItem, RoadmapItemDetailsDto>()
+            .Include<RoadmapActivity, RoadmapActivityDetailsDto>()
+            .Include<RoadmapMilestone, RoadmapMilestoneDetailsDto>()
+            .Include<RoadmapTimebox, RoadmapTimeboxDetailsDto>()
             .Map(dest => dest.Type, src => SimpleNavigationDto.FromEnum(src.Type));
     }
 }

@@ -2,6 +2,7 @@
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Interfaces;
+using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Interfaces;
 using Moda.Planning.Domain.Interfaces.Roadmaps;
 
@@ -83,7 +84,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// </summary>
     public IReadOnlyList<BaseRoadmapItem> Items => _items.AsReadOnly();
 
-    private IReadOnlyList<RoadmapActivity> RootActivities => _items.OfType<RoadmapActivity>().Where(x => x.ParentId is null).ToList();
+    private IReadOnlyList<RoadmapActivity> RootActivities => [.. _items.OfType<RoadmapActivity>().Where(x => x.ParentId is null).OrderBy(x => x.Order)];
 
     /// <summary>
     /// Updates the Roadmap.
@@ -490,6 +491,59 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         {
             return Result.Failure<RoadmapMilestone>(ex.Message);
         }
+    }
+
+    public Result UpdateRoadmapActivity(Guid id, IUpsertRoadmapActivity activity, Guid currentUserEmployeeId)
+    {
+        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        if (isManagerResult.IsFailure)
+        {
+            return isManagerResult;
+        }
+
+        var roadmapActivity = _items.OfType<RoadmapActivity>().FirstOrDefault(x => x.Id == id);
+        if (roadmapActivity is null)
+        {
+            return Result.Failure("Roadmap Activity does not exist on this roadmap.");
+        }
+
+        var updateResult = roadmapActivity.Update(activity);
+        if (updateResult.IsFailure)
+        {
+            return updateResult;
+        }
+
+        if (activity.ParentId == roadmapActivity.ParentId)
+        {
+            return updateResult;
+        }
+
+        // handle changing parent
+        RoadmapActivity? newParentActivity = null;
+        if (activity.ParentId.HasValue)
+        {
+            var newParentActivityResult = GetParentRoadmapActivity(activity.ParentId.Value);
+            if (newParentActivityResult.IsFailure)
+            {
+                return Result.Failure(newParentActivityResult.Error);
+            }
+
+            newParentActivity = newParentActivityResult.Value;
+        }
+
+        var updateRootActivitiesOrder = !roadmapActivity.ParentId.HasValue || newParentActivity is null;
+        var changeParentResult = roadmapActivity.ChangeParent(newParentActivity);
+        if (changeParentResult.IsFailure)
+        {
+            return changeParentResult;
+        }
+
+        if (updateRootActivitiesOrder)
+        {
+            ResetRootActivitiesOrder();
+        }
+
+        return Result.Success();        
     }
 
     private Result<RoadmapActivity> GetParentRoadmapActivity(Guid parentId)

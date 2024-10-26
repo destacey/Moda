@@ -65,12 +65,12 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
       {currentView === 'List' && (
         <RoadmapItemsGrid2
           roadmapItemsData={roadmapItems}
-          roadmapItemsLoading={props.isRoadmapItemsLoading}
-          isRoadmapItemsLoading={props.refreshRoadmapItems}
+          roadmapItemsIsLoading={props.isRoadmapItemsLoading}
+          refreshRoadmapItems={props.refreshRoadmapItems}
           gridHeight={550}
           viewSelector={viewSelector}
           enableRowDrag={props.canUpdateRoadmap}
-          parentRoadmapId={props.roadmap.id}
+          roadmapId={props.roadmap.id}
           messageApi={props.messageApi}
         />
       )}
