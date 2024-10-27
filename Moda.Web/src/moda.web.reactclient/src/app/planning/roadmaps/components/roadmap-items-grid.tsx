@@ -236,7 +236,11 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
 
   return (
     <>
-      <Flex justify="end" align="center" style={{ paddingBottom: '16px' }}>
+      <Flex
+        justify="end"
+        align="center"
+        style={{ paddingTop: '8px', paddingBottom: '4px' }}
+      >
         {props.viewSelector}
       </Flex>
       <Table<RoadmapItemDataType>

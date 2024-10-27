@@ -171,7 +171,11 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
           layout="vertical"
           name="create-roadmap-activity-form"
         >
-          <Item name="parentActivityId" label="Parent Activity">
+          <Item
+            name="parentActivityId"
+            label="Parent Activity"
+            hidden={activities?.length < 1}
+          >
             <TreeSelect
               //showSearch // TODO: not working
               treeLine={true}
