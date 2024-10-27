@@ -15,8 +15,8 @@ public sealed record RoadmapTimeboxListDto : RoadmapItemListDto, IMapFrom<Roadma
 
     public override void ConfigureMapping(TypeAdapterConfig config)
     {
-        base.ConfigureMapping(config);
         config.NewConfig<RoadmapTimebox, RoadmapTimeboxListDto>()
+            .Inherits<BaseRoadmapItem, RoadmapItemListDto>()
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End);
     }

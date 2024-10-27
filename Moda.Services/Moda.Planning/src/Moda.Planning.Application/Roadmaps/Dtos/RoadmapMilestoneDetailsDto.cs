@@ -10,8 +10,8 @@ public sealed record RoadmapMilestoneDetailsDto : RoadmapItemDetailsDto, IMapFro
 
     public override void ConfigureMapping(TypeAdapterConfig config)
     {
-        base.ConfigureMapping(config);
         config.NewConfig<RoadmapMilestone, RoadmapMilestoneDetailsDto>()
+            .Inherits<BaseRoadmapItem, RoadmapItemDetailsDto>()
             .Map(dest => dest.Date, src => src.Date);
     }
 }
