@@ -79,15 +79,10 @@ export const roadmapApi = apiSlice.injectEndpoints({
         return [{ type: QueryTags.Roadmap, id: 'LIST' }]
       },
     }),
-    deleteRoadmap: builder.mutation<
-      void,
-      {
-        id: string
-      }
-    >({
-      queryFn: async (request) => {
+    deleteRoadmap: builder.mutation<void, string>({
+      queryFn: async (roadmapId) => {
         try {
-          const data = await (await getRoadmapsClient()).delete(request.id)
+          const data = await (await getRoadmapsClient()).delete(roadmapId)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -166,35 +161,31 @@ export const roadmapApi = apiSlice.injectEndpoints({
         return [{ type: QueryTags.RoadmapItems, id: arg.roadmapId }] // TODO: add a cache key to invalidate only the specific roadmap by the key instead of id
       },
     }),
-    updateRoadmapActivity: builder.mutation<
-      void,
+    updateRoadmapActivity: builder.mutation<void, UpdateRoadmapActivityRequest>(
       {
-        request: UpdateRoadmapActivityRequest
-        cacheKey: string // roadmapId
-      }
-    >({
-      queryFn: async (mutationRequest) => {
-        try {
-          const data = await (
-            await getRoadmapsClient()
-          ).updateActivity(
-            mutationRequest.request.roadmapId,
-            mutationRequest.request.activityId,
-            mutationRequest.request,
-          )
-          return { data }
-        } catch (error) {
-          console.error('API Error:', error)
-          return { error }
-        }
+        queryFn: async (mutationRequest) => {
+          try {
+            const data = await (
+              await getRoadmapsClient()
+            ).updateActivity(
+              mutationRequest.roadmapId,
+              mutationRequest.activityId,
+              mutationRequest,
+            )
+            return { data }
+          } catch (error) {
+            console.error('API Error:', error)
+            return { error }
+          }
+        },
+        invalidatesTags: (result, error, arg) => {
+          return [
+            { type: QueryTags.RoadmapItems, id: arg.roadmapId },
+            { type: QueryTags.RoadmapItems, id: arg.activityId },
+          ]
+        },
       },
-      invalidatesTags: (result, error, arg) => {
-        return [
-          { type: QueryTags.RoadmapItems, id: arg.cacheKey },
-          { type: QueryTags.RoadmapItems, id: arg.request.activityId },
-        ]
-      },
-    }),
+    ),
     // updateChildrenOrder: builder.mutation<
     //   void,
     //   UpdateRoadmapChildrenOrderRequest
@@ -236,6 +227,31 @@ export const roadmapApi = apiSlice.injectEndpoints({
     //     },
     //   ],
     // }),
+    deleteRoadmapItem: builder.mutation<
+      void,
+      {
+        roadmapId: string
+        itemId: string
+      }
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await (
+            await getRoadmapsClient()
+          ).deleteItem(request.roadmapId, request.itemId)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          { type: QueryTags.RoadmapItems, id: arg.roadmapId },
+          { type: QueryTags.RoadmapItems, id: arg.itemId },
+        ]
+      },
+    }),
     getVisibilityOptions: builder.query<OptionModel<number>[], void>({
       queryFn: async () => {
         try {
@@ -272,5 +288,6 @@ export const {
   useUpdateRoadmapActivityMutation,
   // useUpdateChildrenOrderMutation,
   // useUpdateChildOrderMutation,
+  useDeleteRoadmapItemMutation,
   useGetVisibilityOptionsQuery,
 } = roadmapApi

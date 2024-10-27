@@ -121,10 +121,7 @@ const EditRoadmapActivityForm = (props: EditRoadmapActivityFormProps) => {
   ) => {
     try {
       const request = mapToRequestValues(values, activityId, roadmapId)
-      const response = await updateRoadmapActivity({
-        request,
-        cacheKey: props.roadmapId,
-      })
+      const response = await updateRoadmapActivity(request)
       if (response.error) {
         throw response.error
       }
@@ -249,7 +246,7 @@ const EditRoadmapActivityForm = (props: EditRoadmapActivityFormProps) => {
               //showSearch // TODO: not working
               loading={activitiesIsLoading}
               treeLine={true}
-              placeholder="Please select parent activity"
+              placeholder="Select parent activity"
               allowClear
               treeDefaultExpandAll
               treeData={activitiesTree}

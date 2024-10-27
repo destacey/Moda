@@ -205,6 +205,20 @@ public class RoadmapsController : ControllerBase
     //        : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildOrder"));
     //}
 
+    [HttpDelete("{roadmapId}/items/{itemId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Delete a roadmap item.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> DeleteItem(Guid roadmapId, Guid itemId, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeleteRoadmapItemCommand(roadmapId, itemId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.DeleteItem"));
+    }
+
     #endregion Roadmap Items
 
     [HttpGet("visibility-options")]

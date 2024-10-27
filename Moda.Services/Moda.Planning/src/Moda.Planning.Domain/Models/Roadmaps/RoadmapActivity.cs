@@ -186,6 +186,29 @@ public sealed class RoadmapActivity : BaseRoadmapItem
     }
 
     /// <summary>
+    /// Gets the Roadmap Activity and all of its descendants.
+    /// </summary>
+    /// <returns></returns>
+    internal List<Guid> GetSelfAndDescendants()
+    {
+        var ids = new List<Guid> { Id };
+
+        foreach (var child in _children)
+        {
+            if (child is RoadmapActivity roadmapActivity)
+            {
+                ids.AddRange(roadmapActivity.GetSelfAndDescendants());
+            }
+            else
+            {
+                ids.Add(child.Id);
+            }
+        }
+
+        return ids;
+    }
+
+    /// <summary>
     /// Creates a new Roadmap Activity at the root of the Roadmap.
     /// </summary>
     /// <param name="roadmapId"></param>

@@ -23,6 +23,7 @@ import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import EditRoadmapActivityForm from './edit-roadmap-activity-form'
+import DeleteRoadmapItemForm from './delete-roadmap-item-form'
 
 const { Text } = Typography
 
@@ -59,6 +60,7 @@ interface RowMenuProps extends MenuProps {
   itemId: string
   canUpdateRoadmap: boolean
   onEditItemMenuClicked: (id: string) => void
+  onDeleteItemMenuClicked: (id: string) => void
 }
 
 const getRowMenuItems = (props: RowMenuProps) => {
@@ -72,9 +74,13 @@ const getRowMenuItems = (props: RowMenuProps) => {
   return [
     {
       key: 'editItem',
-      label: 'Edit Roadmap Item',
-      disabled: !props.canUpdateRoadmap,
+      label: 'Edit',
       onClick: () => props.onEditItemMenuClicked(props.itemId),
+    },
+    {
+      key: 'deleteItem',
+      label: 'Delete',
+      onClick: () => props.onDeleteItemMenuClicked(props.itemId),
     },
   ] as ItemType[]
 }
@@ -103,6 +109,8 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
   const [data, setData] = useState<RoadmapItemDataType[]>([])
   const [openUpdateRoadmapActivityForm, setOpenUpdateRoadmapActivityForm] =
     useState<boolean>(false)
+  const [openDeleteRoadmapItemForm, setOpenDeleteRoadmapItemForm] =
+    useState<boolean>(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const tblRef: Parameters<typeof Table>[0]['ref'] = useRef(null)
 
@@ -114,6 +122,11 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
   const onEditItemMenuClicked = useCallback((id: string) => {
     setSelectedItemId(id)
     setOpenUpdateRoadmapActivityForm(true)
+  }, [])
+
+  const onDeleteItemMenuClicked = useCallback((id: string) => {
+    setSelectedItemId(id)
+    setOpenDeleteRoadmapItemForm(true)
   }, [])
 
   const columnDefs = useMemo(() => {
@@ -132,7 +145,6 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
         width: 350,
       },
       {
-        //title: 'Action',
         dataIndex: '',
         key: 'x',
         width: 25,
@@ -141,6 +153,7 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
             itemId: record.id,
             canUpdateRoadmap: canManageRoadmapItems,
             onEditItemMenuClicked: () => onEditItemMenuClicked(record.id),
+            onDeleteItemMenuClicked: () => onDeleteItemMenuClicked(record.id),
           })
 
           return RowMenuCellRenderer({ menuItems })
@@ -153,12 +166,6 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
         sorter: (a, b) => a.type.localeCompare(b.type),
         width: 100,
       },
-      // {
-      //   key: 'parent',
-      //   dataIndex: 'parent',
-      //   title: 'Parent',
-      //   render: (value) => value?.name && <Text>{value.name}</Text>,
-      // },
       {
         key: 'start',
         dataIndex: 'start',
@@ -185,7 +192,7 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
         width: 100,
       },
     ] as TableColumnsType<RoadmapItemDataType>
-  }, [canManageRoadmapItems, onEditItemMenuClicked])
+  }, [canManageRoadmapItems, onDeleteItemMenuClicked, onEditItemMenuClicked])
 
   useEffect(() => {
     if (props.roadmapItemsIsLoading) return
@@ -219,6 +226,14 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
     }
   }
 
+  const onDeleteRoadmapItemFormClosed = (wasSaved: boolean) => {
+    setOpenDeleteRoadmapItemForm(false)
+    setSelectedItemId(null)
+    if (wasSaved) {
+      props.refreshRoadmapItems()
+    }
+  }
+
   return (
     <>
       <Flex justify="end" align="center" style={{ paddingBottom: '16px' }}>
@@ -239,6 +254,16 @@ const RoadmapItemsGrid2: React.FC<RoadmapItemsGrid2Props> = (
           roadmapId={props.roadmapId}
           onFormComplete={() => onUpdateRoadmapActivityFormClosed(true)}
           onFormCancel={() => onUpdateRoadmapActivityFormClosed(false)}
+          messageApi={props.messageApi}
+        />
+      )}
+      {openDeleteRoadmapItemForm && (
+        <DeleteRoadmapItemForm
+          roadmapId={props.roadmapId}
+          roadmapItemId={selectedItemId}
+          showForm={openDeleteRoadmapItemForm}
+          onFormComplete={() => onDeleteRoadmapItemFormClosed(true)}
+          onFormCancel={() => onDeleteRoadmapItemFormClosed(false)}
           messageApi={props.messageApi}
         />
       )}
