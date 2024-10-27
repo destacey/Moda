@@ -6,7 +6,7 @@ import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { useEffect, useMemo, useState } from 'react'
 import { MessageInstance } from 'antd/es/message/interface'
 import { RoadmapsTimeline } from '../components'
-import RoadmapItemsGrid2 from '../components/roadmap-items-grid2'
+import RoadmapItemsGrid from '../components/roadmap-items-grid'
 
 interface RoadmapViewManagerProps {
   roadmap: RoadmapDetailsDto
@@ -63,7 +63,7 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
         />
       )}
       {currentView === 'List' && (
-        <RoadmapItemsGrid2
+        <RoadmapItemsGrid
           roadmapItemsData={roadmapItems}
           roadmapItemsIsLoading={props.isRoadmapItemsLoading}
           refreshRoadmapItems={props.refreshRoadmapItems}
