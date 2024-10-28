@@ -6,7 +6,7 @@ using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Queries;
-public sealed record GetRoadmapItemQuery : IQuery<RoadmapItemDetailsDto>
+public sealed record GetRoadmapItemQuery : IQuery<RoadmapItemDetailsDto?>
 {
     public GetRoadmapItemQuery(IdOrKey roadmapIdOrKey, Guid itemId)
     {
@@ -18,12 +18,12 @@ public sealed record GetRoadmapItemQuery : IQuery<RoadmapItemDetailsDto>
     public Guid ItemId { get; }
 }
 
-internal sealed class GetRoadmapItemQueryHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser) : IQueryHandler<GetRoadmapItemQuery, RoadmapItemDetailsDto>
+internal sealed class GetRoadmapItemQueryHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser) : IQueryHandler<GetRoadmapItemQuery, RoadmapItemDetailsDto?>
 {
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
 
-    public async Task<RoadmapItemDetailsDto> Handle(GetRoadmapItemQuery request, CancellationToken cancellationToken)
+    public async Task<RoadmapItemDetailsDto?> Handle(GetRoadmapItemQuery request, CancellationToken cancellationToken)
     {
         var publicVisibility = Visibility.Public;
 
@@ -35,6 +35,22 @@ internal sealed class GetRoadmapItemQueryHandler(IPlanningDbContext planningDbCo
             .Where(r => r.Id == request.ItemId)
             .FirstOrDefaultAsync(cancellationToken);
 
-        return item.Adapt<RoadmapItemDetailsDto>();
+        if (item == null) {
+            return null;
+        }
+
+        switch (item)
+        {
+            case RoadmapActivity activity:
+                return activity.Adapt<RoadmapActivityDetailsDto>();
+            case RoadmapMilestone milestone:
+                return milestone.Adapt<RoadmapMilestoneDetailsDto>();
+            case RoadmapTimebox timebox:
+                return timebox.Adapt<RoadmapTimeboxDetailsDto>();
+            default:
+                return item.Adapt<RoadmapItemDetailsDto>();
+        }
+
+        //return item.Adapt<RoadmapItemDetailsDto>();  // TODO: this is not working, it's always returning only the BaseRoadmapItem properties
     }
 }
