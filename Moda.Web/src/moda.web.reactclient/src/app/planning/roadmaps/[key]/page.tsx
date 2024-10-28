@@ -9,7 +9,7 @@ import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/app/hooks'
 import {
-  useGetRoadmapChildrenQuery,
+  useGetRoadmapItemsQuery,
   useGetRoadmapQuery,
 } from '@/src/store/features/planning/roadmaps-api'
 import { notFound, usePathname, useRouter } from 'next/navigation'
@@ -22,7 +22,8 @@ import { ItemType } from 'antd/es/menu/interface'
 import EditRoadmapForm from '../components/edit-roadmap-form'
 import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
 import RoadmapViewManager from './roadmap-view-manager'
-import { CreateRoadmapForm, DeleteRoadmapForm } from '../components'
+import { DeleteRoadmapForm } from '../components'
+import CreateRoadmapActivityForm from '../components/create-roadmap-activity-form'
 
 const { Item } = Descriptions
 
@@ -34,7 +35,7 @@ const RoadmapDetailsPage = ({ params }) => {
   useDocumentTitle('Roadmap Details')
   const [managersInfo, setManagersInfo] = useState('Unknown')
   const [children, setChildren] = useState([])
-  const [openCreateRoadmapForm, setOpenCreateRoadmapForm] =
+  const [openCreateActivityForm, setOpenCreateActivityForm] =
     useState<boolean>(false)
   const [openEditRoadmapForm, setOpenEditRoadmapForm] = useState<boolean>(false)
   const [openDeleteRoadmapForm, setOpenDeleteRoadmapForm] =
@@ -59,10 +60,10 @@ const RoadmapDetailsPage = ({ params }) => {
   } = useGetRoadmapQuery(params.key)
 
   const {
-    data: roadmapChildren,
-    isFetching: isChildrenLoading,
-    refetch: refetchChildren,
-  } = useGetRoadmapChildrenQuery([roadmapData?.id], {
+    data: roadmapItems,
+    isFetching: isRoadmapItemsLoading,
+    refetch: refetchRoadmapItems,
+  } = useGetRoadmapItemsQuery(params.key, {
     skip: !roadmapData,
   })
 
@@ -78,13 +79,6 @@ const RoadmapDetailsPage = ({ params }) => {
         title: 'Roadmaps',
       },
     ]
-
-    if (roadmapData.parent) {
-      breadcrumbRoute.push({
-        href: `/planning/roadmaps/${roadmapData.parent.key}`,
-        title: roadmapData.parent.name,
-      })
-    }
 
     breadcrumbRoute.push({
       title: 'Details',
@@ -102,13 +96,8 @@ const RoadmapDetailsPage = ({ params }) => {
       .join(', ')
     setManagersInfo(managers)
 
-    if (roadmapChildren) {
-      const children = roadmapChildren.slice().sort((a, b) => a.order - b.order)
-      setChildren(children)
-    } else {
-      setChildren([])
-    }
-  }, [roadmapChildren, roadmapData])
+    setChildren(roadmapItems)
+  }, [roadmapItems, roadmapData])
 
   useEffect(() => {
     error && console.error(error)
@@ -137,9 +126,9 @@ const RoadmapDetailsPage = ({ params }) => {
           type: 'divider',
         },
         {
-          key: 'create-child',
-          label: 'Create Child Roadmap',
-          onClick: () => setOpenCreateRoadmapForm(true),
+          key: 'create-activity',
+          label: 'Create Activity',
+          onClick: () => setOpenCreateActivityForm(true),
         },
       )
     }
@@ -156,9 +145,9 @@ const RoadmapDetailsPage = ({ params }) => {
   }
 
   const onCreateRoadmapFormClosed = (wasCreated: boolean) => {
-    setOpenCreateRoadmapForm(false)
+    setOpenCreateActivityForm(false)
     if (wasCreated) {
-      refetchChildren()
+      refetchRoadmapItems()
     }
   }
 
@@ -172,11 +161,7 @@ const RoadmapDetailsPage = ({ params }) => {
   const onDeleteFormClosed = (wasDeleted: boolean) => {
     setOpenDeleteRoadmapForm(false)
     if (wasDeleted) {
-      if (roadmapData.parent) {
-        router.push(`/planning/roadmaps/${roadmapData.parent.key}`)
-      } else {
-        router.push('/planning/roadmaps/')
-      }
+      router.push('/planning/roadmaps/')
     }
   }
 
@@ -216,19 +201,16 @@ const RoadmapDetailsPage = ({ params }) => {
       )}
       <RoadmapViewManager
         roadmap={roadmapData}
-        roadmapChildren={children}
-        isChildrenLoading={isChildrenLoading}
-        refreshChildren={refetchChildren}
+        roadmapItems={children}
+        isRoadmapItemsLoading={isRoadmapItemsLoading}
+        refreshRoadmapItems={refetchRoadmapItems}
         canUpdateRoadmap={canUpdateRoadmap}
         messageApi={messageApi}
       />
-      {openCreateRoadmapForm && (
-        <CreateRoadmapForm
-          showForm={openCreateRoadmapForm}
-          parentRoadmapId={roadmapData?.id}
-          parentRoadmapManagerIds={roadmapData.roadmapManagers.map(
-            (rm) => rm.id,
-          )}
+      {openCreateActivityForm && (
+        <CreateRoadmapActivityForm
+          showForm={openCreateActivityForm}
+          roadmapId={roadmapData?.id}
           onFormComplete={() => onCreateRoadmapFormClosed(true)}
           onFormCancel={() => onCreateRoadmapFormClosed(false)}
           messageApi={messageApi}

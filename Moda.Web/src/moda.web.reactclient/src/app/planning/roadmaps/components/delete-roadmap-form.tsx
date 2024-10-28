@@ -25,11 +25,7 @@ const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
 
   const deleteRoadmap = async (roadmap: RoadmapDetailsDto) => {
     try {
-      await deleteRoadmapMutation({
-        id: roadmap.id,
-        cacheKey: roadmap.key,
-        parentCacheKey: roadmap.parent?.id,
-      })
+      await deleteRoadmapMutation(roadmap.id)
       return true
     } catch (error) {
       props.messageApi.error(

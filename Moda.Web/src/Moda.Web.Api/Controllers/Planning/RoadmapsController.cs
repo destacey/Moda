@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using Ardalis.GuardClauses;
-using Moda.Common.Application.Interfaces;
-using Moda.Common.Application.Models;
+﻿using Moda.Common.Application.Models;
 using Moda.Common.Application.Requests;
 using Moda.Planning.Application.Roadmaps.Commands;
 using Moda.Planning.Application.Roadmaps.Dtos;
@@ -29,7 +26,7 @@ public class RoadmapsController : ControllerBase
     [OpenApiOperation("Get a list of roadmaps.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<List<RoadmapListDto>>> GetRoadmaps(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<RoadmapListDto>>> GetRoadmaps(CancellationToken cancellationToken)
     {
         var roadmaps = await _sender.Send(new GetRoadmapsQuery(), cancellationToken);
         return Ok(roadmaps);
@@ -95,61 +92,141 @@ public class RoadmapsController : ControllerBase
             : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Delete"));
     }
 
-    [HttpPost("children")]
+    #region Roadmap Items
+
+    [HttpGet("{idOrKey}/items")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Roadmaps)]
-    [OpenApiOperation("Retrieve child roadmaps for specified roadmap Ids.", "")]
+    [OpenApiOperation("Get roadmap items", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<List<RoadmapChildrenDto>>> GetChildren([FromBody] List<Guid> roadmapIds, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<RoadmapItemListDto>>> GetItems(string idOrKey, CancellationToken cancellationToken)
     {
-        var roadmaps = await _sender.Send(new GetRoadmapChildrenQuery(roadmapIds), cancellationToken);
-        return Ok(roadmaps);
+        var items = await _sender.Send(new GetRoadmapItemsQuery(idOrKey), cancellationToken);
+        return Ok(items);
     }
 
-    [HttpPost("{id}/children/order")]
-    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
-    [OpenApiOperation("Update the order of child roadmaps.", "")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [HttpGet("{idOrKey}/items/activities")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Get roadmap activities", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> UpdateChildrenOrder(Guid id, [FromBody] UpdateRoadmapChildrenOrderRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<RoadmapActivityListDto>>> GetActivities(string idOrKey, CancellationToken cancellationToken)
     {
-        if (id != request.RoadmapId)
+        var items = await _sender.Send(new GetRoadmapActivitiesQuery(idOrKey), cancellationToken);
+        return Ok(items);
+    }
+
+    [HttpGet("{roadmapIdOrKey}/items/{itemId}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Get roadmap item details", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<RoadmapItemDetailsDto>> GetItem(string roadmapIdOrKey, Guid itemId, CancellationToken cancellationToken)
+    {
+        var item = await _sender.Send(new GetRoadmapItemQuery(roadmapIdOrKey, itemId), cancellationToken);
+        return Ok(item);
+    }
+
+    // TODO: update this to be generic for all roadmap items
+    [HttpPost("{roadmapId}/items/activity")]
+    [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Create a roadmap activity.", "")]
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    public async Task<ActionResult<ObjectIdAndKey>> CreateActivity(Guid roadmapId, [FromBody] CreateRoadmapItemRequest request, CancellationToken cancellationToken)
+    {
+        if (roadmapId != request.RoadmapId)
             return BadRequest();
 
-        var result = await _sender.Send(new UpdateRoadmapChildrenOrderCommand(request.RoadmapId, request.ChildrenOrder), cancellationToken);
+        var result = await _sender.Send(request.ToCreateRoadmapItemCommand(), cancellationToken);
+        if (result.IsFailure)
+            return BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.CreateActivity"));
+
+        return CreatedAtAction(nameof(GetItem), new { roadmapIdOrKey = roadmapId, itemId = result.Value.ToString() }, result.Value);
+    }
+
+    // TODO: update this to be generic for all roadmap items
+    [HttpPut("{roadmapId}/items/activity/{activityId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Update a roadmap activity.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> UpdateActivity(Guid roadmapId, Guid activityId, [FromBody] UpdateRoadmapActivityRequest request, CancellationToken cancellationToken)
+    {
+        if (roadmapId != request.RoadmapId)
+            return BadRequest();
+
+        if (activityId != request.ActivityId)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToUpdateRoadmapActivityCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildrenOrder"));
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateActivity"));
     }
 
-    [HttpPost("{id}/children/{childRoadmapId}/order")]
+
+    //[HttpPost("{id}/children/order")]
+    //[MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    //[OpenApiOperation("Update the order of child roadmaps.", "")]
+    //[ProducesResponseType(StatusCodes.Status204NoContent)]
+    //[ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    //public async Task<ActionResult> UpdateChildrenOrder(Guid id, [FromBody] UpdateRoadmapChildrenOrderRequest request, CancellationToken cancellationToken)
+    //{
+    //    if (id != request.RoadmapId)
+    //        return BadRequest();
+
+    //    var result = await _sender.Send(new UpdateRoadmapRootActivitiesOrderCommand(request.RoadmapId, request.ChildrenOrder), cancellationToken);
+
+    //    return result.IsSuccess
+    //        ? NoContent()
+    //        : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildrenOrder"));
+    //}
+
+    //[HttpPost("{id}/children/{childRoadmapId}/order")]
+    //[MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    //[OpenApiOperation("Update the order of child roadmaps based on a single change.", "")]
+    //[ProducesResponseType(StatusCodes.Status204NoContent)]
+    //[ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    //public async Task<ActionResult> UpdateChildOrder(Guid id, Guid childRoadmapId, [FromBody] UpdateRoadmapChildOrderRequest request, CancellationToken cancellationToken)
+    //{
+    //    if (id != request.RoadmapId)
+    //        return BadRequest();
+
+    //    if (childRoadmapId != request.ChildRoadmapId)
+    //        return BadRequest();
+
+
+    //    var result = await _sender.Send(new UpdateRoadmapRootActivityOrderCommand(request.RoadmapId, request.ChildRoadmapId, request.Order), cancellationToken);
+
+    //    return result.IsSuccess
+    //        ? NoContent()
+    //        : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildOrder"));
+    //}
+
+    [HttpDelete("{roadmapId}/items/{itemId}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
-    [OpenApiOperation("Update the order of child roadmaps based on a single change.", "")]
+    [OpenApiOperation("Delete a roadmap item.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> UpdateChildOrder(Guid id, Guid childRoadmapId, [FromBody] UpdateRoadmapChildOrderRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteItem(Guid roadmapId, Guid itemId, CancellationToken cancellationToken)
     {
-        if (id != request.RoadmapId)
-            return BadRequest();
-
-        if (childRoadmapId != request.ChildRoadmapId)
-            return BadRequest();
-
-
-        var result = await _sender.Send(new UpdateRoadmapChildOrderCommand(request.RoadmapId, request.ChildRoadmapId, request.Order), cancellationToken);
+        var result = await _sender.Send(new DeleteRoadmapItemCommand(roadmapId, itemId), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildOrder"));
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.DeleteItem"));
     }
+
+    #endregion Roadmap Items
 
     [HttpGet("visibility-options")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get a list of all visibility.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<VisibilityDto>>> GetVisibilityOptions(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<VisibilityDto>>> GetVisibilityOptions(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetVisibilitiesQuery(), cancellationToken);
         return Ok(items.OrderBy(c => c.Order));

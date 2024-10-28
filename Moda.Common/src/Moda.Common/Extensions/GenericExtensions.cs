@@ -24,9 +24,9 @@ public static class GenericExtensions
         }
     }
 
-    public static IEnumerable<TOut> FlattenHierarchy<TIn,TOut>(
-        this TIn root, 
-        Func<TIn, IEnumerable<TIn>?> branchSelector, 
+    public static IEnumerable<TOut> FlattenHierarchy<TIn, TOut>(
+        this TIn root,
+        Func<TIn, IEnumerable<TIn>?> branchSelector,
         Func<TIn, TOut> projection)
     {
         ArgumentNullException.ThrowIfNull(branchSelector);
@@ -45,6 +45,35 @@ public static class GenericExtensions
             foreach (var child in branchSelector(current) ?? [])
             {
                 stack.Push(child);
+            }
+        }
+    }
+
+    public static IEnumerable<TOut> FlattenHierarchy<TIn, TOut>(
+        this TIn root,
+        Func<TIn, IEnumerable<TIn>?> branchSelector,
+        Func<TIn, TOut> projection,
+        Action<TOut, int> setLevel)
+    {
+        ArgumentNullException.ThrowIfNull(branchSelector);
+        ArgumentNullException.ThrowIfNull(setLevel);
+
+        var stack = new Stack<(TIn Item, int Level)>();
+        stack.Push((root, 1));
+
+        while (stack.Count > 0)
+        {
+            var (current, level) = stack.Pop();
+            var projectedItem = projection(current);
+            setLevel(projectedItem, level);
+            yield return projectedItem;
+
+            if (current is null)
+                continue;
+
+            foreach (var child in branchSelector(current)?.Reverse() ?? [])
+            {
+                stack.Push((child, level + 1));
             }
         }
     }

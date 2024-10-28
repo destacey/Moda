@@ -4,8 +4,8 @@ import { PlanningIntervalObjectiveDetailsDto } from '@/src/services/moda-api'
 import { Card, Col, Descriptions, Progress, Row, Space, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import ReactMarkdown from 'react-markdown'
 import PlanningIntervalObjectiveWorkItemsCard from './planning-interval-objective-work-items-card'
+import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
 
 const { Item } = Descriptions
 
@@ -55,21 +55,24 @@ const PlanningIntervalObjectiveDetails = ({
             <Item label="Is Stretch?">{objective.isStretch?.toString()}</Item>
             <Item label="Start">
               {objective.startDate &&
-                dayjs(objective.startDate).format('M/D/YYYY')}
+                dayjs(objective.startDate).format('MMM D, YYYY')}
             </Item>
             <Item label="Target">
               {objective.targetDate &&
-                dayjs(objective.targetDate).format('M/D/YYYY')}
+                dayjs(objective.targetDate).format('MMM D, YYYY')}
             </Item>
+            {objective?.closedDate && (
+              <Item label="Closed Date">
+                {dayjs(objective?.closedDate).format('MMM D, YYYY')}
+              </Item>
+            )}
             <Item label="Type">{objective.type?.name}</Item>
           </Descriptions>
         </Col>
         <Col xs={24} md={12}>
           <Descriptions layout="vertical">
             <Item label="Description">
-              <Space direction="vertical">
-                <ReactMarkdown>{objective.description}</ReactMarkdown>
-              </Space>
+              <ModaMarkdownDescription content={objective?.description} />
             </Item>
           </Descriptions>
         </Col>

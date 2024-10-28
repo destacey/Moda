@@ -15,7 +15,8 @@ export enum QueryTags {
   PlanningIntervalObjectiveWorkItemsSummary = 'Planning.PlanningIntervalObjective.WorkItemsSummary',
   PlanningIntervalObjectiveWorkItemMetrics = 'Planning.PlanningIntervalObjective.WorkItemMetrics',
   Roadmap = 'Planning.Roadmap',
-  RoadmapChildren = 'Planning.RoadmapChildren',
+  RoadmapItems = 'Planning.RoadmapItems',
+  RoadmapActivities = 'Planning.RoadmapActivities',
   RoadmapVisibility = 'Planning.RoadmapVisibility',
   // WORK MANAGEMENT
   WorkItem = 'Work.WorkItem',

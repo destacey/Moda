@@ -1268,7 +1268,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Risks", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmap", b =>
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.BaseRoadmapItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1277,6 +1277,55 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<string>("Color")
                         .HasMaxLength(7)
                         .HasColumnType("varchar");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RoadmapId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("RoadmapId");
+
+                    b.ToTable("RoadmapItems", "Planning");
+
+                    b.HasDiscriminator<int>("Type");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.Roadmap", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -1305,18 +1354,12 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<int?>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("ParentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Visibility")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("varchar");
 
-                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.Roadmap.DateRange#LocalDateRange", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.Roadmaps.Roadmap.DateRange#LocalDateRange", b1 =>
                         {
                             b1.IsRequired();
 
@@ -1335,24 +1378,20 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasIndex("Visibility");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Visibility"), new[] { "Id", "Key", "Name", "ParentId" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Visibility"), new[] { "Id", "Key", "Name" });
 
                     b.HasIndex("Id", "Visibility");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "Visibility"), new[] { "Key", "Name", "ParentId" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "Visibility"), new[] { "Key", "Name" });
 
                     b.HasIndex("Key", "Visibility");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "Visibility"), new[] { "Id", "Name", "ParentId" });
-
-                    b.HasIndex("ParentId", "Visibility");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ParentId", "Visibility"), new[] { "Id", "Key", "Name" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "Visibility"), new[] { "Id", "Name" });
 
                     b.ToTable("Roadmaps", "Planning");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.RoadmapManager", b =>
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.RoadmapManager", b =>
                 {
                     b.Property<Guid>("RoadmapId")
                         .HasColumnType("uniqueidentifier");
@@ -2186,6 +2225,65 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasDiscriminator().HasValue("TeamOfTeams");
                 });
 
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.RoadmapActivity", b =>
+                {
+                    b.HasBaseType("Moda.Planning.Domain.Models.Roadmaps.BaseRoadmapItem");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.Roadmaps.RoadmapActivity.DateRange#LocalDateRange", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<DateTime>("End")
+                                .ValueGeneratedOnUpdateSometimes()
+                                .HasColumnType("date")
+                                .HasColumnName("End");
+
+                            b1.Property<DateTime>("Start")
+                                .ValueGeneratedOnUpdateSometimes()
+                                .HasColumnType("date")
+                                .HasColumnName("Start");
+                        });
+
+                    b.HasDiscriminator().HasValue(1);
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.RoadmapMilestone", b =>
+                {
+                    b.HasBaseType("Moda.Planning.Domain.Models.Roadmaps.BaseRoadmapItem");
+
+                    b.Property<DateTime>("Date")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("date")
+                        .HasColumnName("Start");
+
+                    b.HasDiscriminator().HasValue(2);
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.RoadmapTimebox", b =>
+                {
+                    b.HasBaseType("Moda.Planning.Domain.Models.Roadmaps.BaseRoadmapItem");
+
+                    b.ComplexProperty<Dictionary<string, object>>("DateRange", "Moda.Planning.Domain.Models.Roadmaps.RoadmapTimebox.DateRange#LocalDateRange", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<DateTime>("End")
+                                .ValueGeneratedOnUpdateSometimes()
+                                .HasColumnType("date")
+                                .HasColumnName("End");
+
+                            b1.Property<DateTime>("Start")
+                                .ValueGeneratedOnUpdateSometimes()
+                                .HasColumnType("date")
+                                .HasColumnName("Start");
+                        });
+
+                    b.HasDiscriminator().HasValue(3);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.HasOne("Moda.Infrastructure.Identity.ApplicationUser", null)
@@ -2355,17 +2453,23 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmap", b =>
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.BaseRoadmapItem", b =>
                 {
-                    b.HasOne("Moda.Planning.Domain.Models.Roadmap", "Parent")
+                    b.HasOne("Moda.Planning.Domain.Models.Roadmaps.RoadmapActivity", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Moda.Planning.Domain.Models.Roadmaps.Roadmap", null)
+                        .WithMany("Items")
+                        .HasForeignKey("RoadmapId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.RoadmapManager", b =>
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.RoadmapManager", b =>
                 {
                     b.HasOne("Moda.Common.Domain.Employees.Employee", "Manager")
                         .WithMany()
@@ -2373,7 +2477,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Moda.Planning.Domain.Models.Roadmap", null)
+                    b.HasOne("Moda.Planning.Domain.Models.Roadmaps.Roadmap", null)
                         .WithMany("RoadmapManagers")
                         .HasForeignKey("RoadmapId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2763,9 +2867,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("PlanningIntervalTeams");
                 });
 
-            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmap", b =>
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.Roadmap", b =>
                 {
-                    b.Navigation("Children");
+                    b.Navigation("Items");
 
                     b.Navigation("RoadmapManagers");
                 });
@@ -2804,6 +2908,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.Organization.Domain.Models.TeamOfTeams", b =>
                 {
                     b.Navigation("ChildMemberships");
+                });
+
+            modelBuilder.Entity("Moda.Planning.Domain.Models.Roadmaps.RoadmapActivity", b =>
+                {
+                    b.Navigation("Children");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
+using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Dtos;
 public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
@@ -38,19 +39,9 @@ public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
     public required SimpleNavigationDto Visibility { get; set; }
 
     /// <summary>
-    /// The color of the Roadmap. Must be a valid hex color code.
-    /// </summary>
-    public string? Color { get; set; }
-
-    /// <summary>
     /// The managers of the Roadmap.
     /// </summary>
     public required List<EmployeeNavigationDto> RoadmapManagers { get; set; }
-
-    /// <summary>
-    /// The parent Roadmap.
-    /// </summary>
-    public NavigationDto? Parent { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
@@ -58,7 +49,6 @@ public sealed record RoadmapDetailsDto : IMapFrom<Roadmap>
             .Map(dest => dest.Start, src => src.DateRange.Start)
             .Map(dest => dest.End, src => src.DateRange.End)
             .Map(dest => dest.Visibility, src => SimpleNavigationDto.FromEnum(src.Visibility))
-            .Map(dest => dest.RoadmapManagers, src => src.RoadmapManagers.Select(m => EmployeeNavigationDto.From(m.Manager!)))
-            .Map(dest => dest.Parent, src => src.Parent == null ? null : NavigationDto.Create(src.Parent.Id, src.Parent.Key, src.Parent.Name));
+            .Map(dest => dest.RoadmapManagers, src => src.RoadmapManagers.Select(m => EmployeeNavigationDto.From(m.Manager!)));
     }
 }

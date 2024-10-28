@@ -1,4 +1,4 @@
-﻿using Moda.Planning.Domain.Models;
+﻿using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Tests.Shared.Data;
 
 namespace Moda.Planning.Domain.Tests.Data;

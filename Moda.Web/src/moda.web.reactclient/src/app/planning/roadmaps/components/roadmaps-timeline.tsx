@@ -1,12 +1,15 @@
 'use client'
 
 import { ReactNode, useEffect, useMemo, useState } from 'react'
-import { Card, Divider, Flex, Space, Switch } from 'antd'
+import { Button, Card, Divider, Flex, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import dayjs from 'dayjs'
-import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
-import { RoadmapChildrenDto, RoadmapDetailsDto } from '@/src/services/moda-api'
-import { useGetRoadmapChildrenQuery } from '@/src/store/features/planning/roadmaps-api'
+import {
+  RoadmapActivityListDto,
+  RoadmapDetailsDto,
+  RoadmapItemListDto,
+  RoadmapMilestoneListDto,
+  RoadmapTimeboxListDto,
+} from '@/src/services/moda-api'
 import { ControlItemsMenu } from '@/src/app/components/common/control-items-menu'
 import {
   ModaDataGroup,
@@ -14,53 +17,156 @@ import {
   ModaTimelineOptions,
 } from '@/src/app/components/common/timeline'
 import { ModaDataItem } from '@/src/app/components/common/timeline/types'
+import dayjs from 'dayjs'
+import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons'
 
 export interface RoadmapsTimelineProps {
   roadmap: RoadmapDetailsDto
-  roadmapChildren: RoadmapChildrenDto[]
-  isChildrenLoading: boolean
-  refreshChildren: () => void
+  roadmapItems: RoadmapItemListDto[]
+  isRoadmapItemsLoading: boolean
+  refreshRoadmapItems: () => void
   viewSelector?: ReactNode | undefined
 }
 
-interface RoadmapTimelineItem extends ModaDataItem<RoadmapChildrenDto, string> {
-  id: number
+interface RoadmapTimelineItem extends ModaDataItem<RoadmapItemListDto, string> {
+  id: string
   end: Date
   order?: number
+  level: number
 }
 
-const getDataGroups = (
-  groupItems: RoadmapTimelineItem[],
-  roadmaps: RoadmapTimelineItem[],
-): DataGroup[] => {
-  let groups: Array<string | RoadmapTimelineItem>
-  if (!groupItems || groupItems.length === 0) {
-    groups = roadmaps.reduce(
-      (acc, roadmap) => {
-        if (!roadmap.group) return acc
+enum RoadmapItemType {
+  Activity = 'RoadmapActivityListDto',
+  Milestone = 'RoadmapMilestoneListDto',
+  Timebox = 'RoadmapTimeboxListDto',
+}
 
-        if (!acc.includes(roadmap.group)) {
-          acc.push(roadmap.group)
+interface ProcessedRoadmapData {
+  items: RoadmapTimelineItem[]
+  maxLevel: number
+}
+
+function flattenRoadmapItems(
+  items: RoadmapItemListDto[],
+  level: number = 1,
+): RoadmapTimelineItem[] {
+  return items.reduce<RoadmapTimelineItem[]>((acc, item) => {
+    const baseTimelineItem: Partial<RoadmapTimelineItem> = {
+      id: item.id,
+      title: item.name,
+      content: item.name,
+      itemColor: item.color,
+      group: item.parent?.id,
+      level,
+      objectData: item,
+    }
+
+    switch (item.$type) {
+      case RoadmapItemType.Activity: {
+        const activityItem = item as RoadmapActivityListDto
+        const timelineItem: RoadmapTimelineItem = {
+          ...baseTimelineItem,
+          type: 'range',
+          start: dayjs(activityItem.start).toDate(),
+          end: dayjs(activityItem.end).toDate(),
+          order: activityItem.order,
+        } as RoadmapTimelineItem
+
+        acc.push(timelineItem)
+
+        if (activityItem.children?.length > 0) {
+          acc.push(...flattenRoadmapItems(activityItem.children, level + 1))
         }
-        return acc
-      },
-      [] as NonNullable<RoadmapTimelineItem['group']>[],
-    )
-  } else {
-    groups = groupItems
+        break
+      }
+
+      case RoadmapItemType.Milestone: {
+        const milestoneItem = item as RoadmapMilestoneListDto
+        acc.push({
+          ...baseTimelineItem,
+          type: 'point',
+          start: dayjs(milestoneItem.date).toDate(),
+        } as RoadmapTimelineItem)
+        break
+      }
+
+      case RoadmapItemType.Timebox: {
+        const timeboxItem = item as RoadmapTimeboxListDto
+        acc.push({
+          ...baseTimelineItem,
+          type: 'background',
+          start: dayjs(timeboxItem.start).toDate(),
+          end: dayjs(timeboxItem.end).toDate(),
+        } as RoadmapTimelineItem)
+        break
+      }
+    }
+
+    return acc
+  }, [])
+}
+
+function createNestedGroups(
+  items: RoadmapTimelineItem[],
+  currentLevel: number,
+): ModaDataGroup<RoadmapItemListDto>[] {
+  // Get all items up to but not including current level
+  const groupItems = items.filter((item) => item.level < currentLevel)
+
+  // Create a map to store parent-child relationships
+  const parentChildMap = new Map<string, string[]>()
+
+  // Build the parent-child relationships
+  groupItems.forEach((item) => {
+    if (item.group) {
+      const parentChildren = parentChildMap.get(item.group) || []
+      parentChildren.push(item.id)
+      parentChildMap.set(item.group, parentChildren)
+    }
+  })
+
+  // Create the nested groups structure - include all items
+  const groups: ModaDataGroup<RoadmapItemListDto>[] = groupItems.map(
+    (item) => ({
+      id: item.id,
+      content: item.objectData?.name || '',
+      nestedGroups: parentChildMap.get(item.id) || undefined,
+    }),
+  )
+
+  return groups
+}
+
+export const DrillThroughControl = (props: {
+  currentLevel: number
+  maxLevel: number
+  onLevelChange: (level: number) => void
+}) => {
+  const onLevelDown = () => {
+    props.onLevelChange(props.currentLevel - 1)
   }
 
-  return groups.map(
-    (group): ModaDataGroup =>
-      typeof group === 'string'
-        ? {
-            id: group ?? '',
-            content: group ?? '',
-          }
-        : {
-            id: group.objectData?.id ?? '',
-            content: group.objectData?.name ?? '',
-          },
+  const onLevelUp = () => {
+    props.onLevelChange(props.currentLevel + 1)
+  }
+
+  return (
+    <div>
+      <Button
+        type="text"
+        shape="circle"
+        icon={<MinusSquareOutlined />}
+        disabled={props.currentLevel === 1}
+        onClick={onLevelDown}
+      />
+      <Button
+        type="text"
+        shape="circle"
+        icon={<PlusSquareOutlined />}
+        disabled={props.currentLevel === props.maxLevel || props.maxLevel === 0}
+        onClick={onLevelUp}
+      />
+    </div>
   )
 }
 
@@ -70,67 +176,41 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     undefined,
   )
   const [timelineEnd, setTimelineEnd] = useState<Date | undefined>(undefined)
-  const [levelOneRoadmaps, setLevelOneRoadmaps] = useState<
-    RoadmapTimelineItem[]
-  >([])
-  const [levelTwoRoadmaps, setLevelTwoRoadmaps] = useState<
-    RoadmapTimelineItem[]
-  >([])
+  const [currentLevel, setCurrentLevel] = useState<number | undefined>(1)
+  const [hasUserChangedLevel, setHasUserChangedLevel] = useState(false)
 
-  const [drillDown, setDrillDown] = useState<boolean>(false)
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
 
-  const { data: roadmapLinksData, isLoading: isLoadingRoadmapLinks } =
-    useGetRoadmapChildrenQuery(
-      props.roadmapChildren?.map((r) => r.id ?? '') ?? [],
-      {
-        skip: !props.roadmapChildren || props.roadmapChildren.length === 0,
-      },
-    )
+  const processedData: ProcessedRoadmapData = useMemo(() => {
+    if (props.isRoadmapItemsLoading || !props.roadmapItems) {
+      return null
+    }
+
+    const items = flattenRoadmapItems(props.roadmapItems)
+    const maxLevel = items.reduce((max, item) => Math.max(max, item.level), 0)
+
+    return { items, maxLevel }
+  }, [props.isRoadmapItemsLoading, props.roadmapItems])
+
+  const processedGroups = useMemo(() => {
+    if (!processedData || currentLevel <= 1) return undefined
+    return createNestedGroups(processedData.items, currentLevel)
+  }, [processedData, currentLevel])
 
   useEffect(() => {
-    if (!props.roadmapChildren) return
+    if (processedData && processedData.maxLevel > 1 && !hasUserChangedLevel) {
+      setCurrentLevel(2) // TODO: make this configurable
+    }
+  }, [processedData, hasUserChangedLevel])
+
+  useEffect(() => {
+    if (props.isRoadmapItemsLoading) return
 
     setTimelineStart(props.roadmap.start)
     setTimelineEnd(props.roadmap.end)
 
-    const levelOneRoadmaps = props.roadmapChildren.map(
-      (roadmap): RoadmapTimelineItem => {
-        return {
-          id: roadmap.key ?? 0,
-          title: `${roadmap.key} - ${roadmap.name}`,
-          content: roadmap.name ?? '',
-          start: dayjs(roadmap.start).toDate(),
-          end: dayjs(roadmap.end).toDate(),
-          itemColor: roadmap.color,
-          group: undefined,
-          type: 'range',
-          order: roadmap.order,
-          objectData: roadmap,
-        }
-      },
-    )
-    setLevelOneRoadmaps(levelOneRoadmaps)
-
-    const levelTwoRoadmaps =
-      roadmapLinksData?.map((roadmap): RoadmapTimelineItem => {
-        return {
-          id: roadmap.key ?? 0,
-          title: `${roadmap.key} - ${roadmap.name}`,
-          content: roadmap.name ?? '',
-          start: dayjs(roadmap.start).toDate(),
-          end: dayjs(roadmap.end).toDate(),
-          itemColor: roadmap.color,
-          group: roadmap.parent?.id,
-          type: 'range',
-          order: roadmap.order,
-          objectData: roadmap,
-        }
-      }) ?? []
-    setLevelTwoRoadmaps(levelTwoRoadmaps)
-
-    setIsLoading(props.isChildrenLoading || isLoadingRoadmapLinks)
-  }, [drillDown, isLoadingRoadmapLinks, props, roadmapLinksData])
+    setIsLoading(props.isRoadmapItemsLoading)
+  }, [props])
 
   const timelineOptions = useMemo(
     (): ModaTimelineOptions<RoadmapTimelineItem> =>
@@ -146,33 +226,12 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     [showCurrentTime, timelineEnd, timelineStart],
   )
 
-  const onDrillDownChange = (checked: boolean) => {
-    setDrillDown(checked)
-  }
-
   const onShowCurrentTimeChange = (checked: boolean) => {
     setShowCurrentTime(checked)
   }
 
   const controlItems = (): ItemType[] => {
     const items: ItemType[] = []
-
-    if (levelTwoRoadmaps && levelTwoRoadmaps.length > 0) {
-      items.push({
-        label: (
-          <Space>
-            <Switch
-              size="small"
-              checked={drillDown}
-              onChange={onDrillDownChange}
-            />
-            Drill Down
-          </Space>
-        ),
-        key: 'drill-down',
-        onClick: () => onDrillDownChange(!drillDown),
-      })
-    }
 
     items.push({
       label: (
@@ -192,19 +251,42 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     return items
   }
 
+  const onLevelChange = (level: number) => {
+    setCurrentLevel(level)
+    setHasUserChangedLevel(true)
+  }
+
   return (
     <>
-      <Flex justify="end" align="center" style={{ paddingBottom: '16px' }}>
-        <ControlItemsMenu items={controlItems()} />
-        <Divider type="vertical" style={{ height: '30px' }} />
-        {props.viewSelector}
+      <Flex
+        justify="space-between"
+        align="center"
+        style={{ paddingTop: '8px', paddingBottom: '4px' }}
+      >
+        <DrillThroughControl
+          currentLevel={currentLevel}
+          maxLevel={processedData?.maxLevel ?? 0}
+          onLevelChange={onLevelChange}
+        />
+        <Flex justify="end" align="center">
+          <ControlItemsMenu items={controlItems()} />
+          <Divider type="vertical" style={{ height: '30px' }} />
+          {props.viewSelector}
+        </Flex>
       </Flex>
       <Card size="small" bordered={false}>
         <ModaTimeline
-          data={drillDown ? levelTwoRoadmaps : levelOneRoadmaps}
+          data={
+            processedData?.items.filter(
+              (item) => item.level === currentLevel,
+            ) ?? []
+          }
+          //groups={processedGroups}  // TODO: need to work on the nested groups styling
           groups={
-            drillDown
-              ? getDataGroups(levelOneRoadmaps, levelTwoRoadmaps)
+            processedData?.maxLevel > 0
+              ? (processedData?.items.filter(
+                  (item) => item.level === currentLevel - 1,
+                ) ?? [])
               : undefined
           }
           isLoading={isLoading}
