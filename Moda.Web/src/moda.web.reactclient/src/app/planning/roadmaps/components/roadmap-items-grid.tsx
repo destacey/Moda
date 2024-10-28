@@ -98,7 +98,7 @@ const MapRoadmapItem = (item: RoadmapItemUnion): RoadmapItemDataType => {
         : 'date' in item && item.date // milestone
           ? dayjs(item.date).format('M/D/YYYY')
           : undefined,
-    end: 'end' in item && item.end ? dayjs(item.start).format('M/D/YYYY') : '',
+    end: 'end' in item && item.end ? dayjs(item.end).format('M/D/YYYY') : '',
     color: item.color,
   }
 }
@@ -184,7 +184,7 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
         key: 'color',
         dataIndex: 'color',
         title: 'Color',
-        sorter: (a, b) => a.color.localeCompare(b.color),
+        sorter: (a, b) => a.color?.localeCompare(b.color),
         render: (value) =>
           value && (
             <ColorPicker defaultValue={value} size="small" showText disabled />

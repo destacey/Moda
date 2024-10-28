@@ -3,7 +3,6 @@
 import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { Button, Card, Divider, Flex, Space, Switch } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import {
   RoadmapActivityListDto,
   RoadmapDetailsDto,
@@ -42,6 +41,11 @@ enum RoadmapItemType {
   Timebox = 'RoadmapTimeboxListDto',
 }
 
+interface ProcessedRoadmapData {
+  items: RoadmapTimelineItem[]
+  maxLevel: number
+}
+
 function flattenRoadmapItems(
   items: RoadmapItemListDto[],
   level: number = 1,
@@ -70,8 +74,7 @@ function flattenRoadmapItems(
 
         acc.push(timelineItem)
 
-        // Recursively process children if they exist
-        if (activityItem.children && activityItem.children.length > 0) {
+        if (activityItem.children?.length > 0) {
           acc.push(...flattenRoadmapItems(activityItem.children, level + 1))
         }
         break
@@ -97,49 +100,41 @@ function flattenRoadmapItems(
         } as RoadmapTimelineItem)
         break
       }
-
-      default: {
-        console.warn(`Unknown roadmap item type: ${item.$type}`)
-      }
     }
 
     return acc
   }, [])
 }
 
-function getDataGroups(
-  groupItems: RoadmapTimelineItem[],
-  roadmaps: RoadmapTimelineItem[],
-): DataGroup[] {
-  let groups: Array<string | RoadmapTimelineItem>
-  if (!groupItems || groupItems.length === 0) {
-    groups = roadmaps.reduce(
-      (acc, roadmap) => {
-        if (!roadmap.group) return acc
+function createNestedGroups(
+  items: RoadmapTimelineItem[],
+  currentLevel: number,
+): ModaDataGroup<RoadmapItemListDto>[] {
+  // Get all items up to but not including current level
+  const groupItems = items.filter((item) => item.level < currentLevel)
 
-        if (!acc.includes(roadmap.group)) {
-          acc.push(roadmap.group)
-        }
-        return acc
-      },
-      [] as NonNullable<RoadmapTimelineItem['group']>[],
-    )
-  } else {
-    groups = groupItems
-  }
+  // Create a map to store parent-child relationships
+  const parentChildMap = new Map<string, string[]>()
 
-  return groups.map(
-    (group): ModaDataGroup =>
-      typeof group === 'string'
-        ? {
-            id: group ?? '',
-            content: group ?? '',
-          }
-        : {
-            id: group.objectData?.id ?? '',
-            content: group.objectData?.name ?? '',
-          },
+  // Build the parent-child relationships
+  groupItems.forEach((item) => {
+    if (item.group) {
+      const parentChildren = parentChildMap.get(item.group) || []
+      parentChildren.push(item.id)
+      parentChildMap.set(item.group, parentChildren)
+    }
+  })
+
+  // Create the nested groups structure - include all items
+  const groups: ModaDataGroup<RoadmapItemListDto>[] = groupItems.map(
+    (item) => ({
+      id: item.id,
+      content: item.objectData?.name || '',
+      nestedGroups: parentChildMap.get(item.id) || undefined,
+    }),
   )
+
+  return groups
 }
 
 export const DrillThroughControl = (props: {
@@ -182,25 +177,31 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   )
   const [timelineEnd, setTimelineEnd] = useState<Date | undefined>(undefined)
   const [currentLevel, setCurrentLevel] = useState<number | undefined>(1)
-  const [maxLevel, setMaxLevel] = useState<number>(0)
   const [hasUserChangedLevel, setHasUserChangedLevel] = useState(false)
 
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
 
-  const roadmapItems = useMemo(() => {
-    if (props.isRoadmapItemsLoading || !props.roadmapItems) return []
+  const processedData: ProcessedRoadmapData = useMemo(() => {
+    if (props.isRoadmapItemsLoading || !props.roadmapItems) {
+      return null
+    }
 
     const items = flattenRoadmapItems(props.roadmapItems)
+    const maxLevel = items.reduce((max, item) => Math.max(max, item.level), 0)
 
-    // get max level
-    const itemsMaxLevel = items.reduce((acc, item) => {
-      return Math.max(acc, item.level)
-    }, 0)
-    if (!hasUserChangedLevel && itemsMaxLevel > 1) setCurrentLevel(2) // TODO: make this configurable
-    setMaxLevel(itemsMaxLevel)
+    return { items, maxLevel }
+  }, [props.isRoadmapItemsLoading, props.roadmapItems])
 
-    return items
-  }, [hasUserChangedLevel, props.isRoadmapItemsLoading, props.roadmapItems])
+  const processedGroups = useMemo(() => {
+    if (!processedData || currentLevel <= 1) return undefined
+    return createNestedGroups(processedData.items, currentLevel)
+  }, [processedData, currentLevel])
+
+  useEffect(() => {
+    if (processedData && processedData.maxLevel > 1 && !hasUserChangedLevel) {
+      setCurrentLevel(2) // TODO: make this configurable
+    }
+  }, [processedData, hasUserChangedLevel])
 
   useEffect(() => {
     if (props.isRoadmapItemsLoading) return
@@ -264,7 +265,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       >
         <DrillThroughControl
           currentLevel={currentLevel}
-          maxLevel={maxLevel}
+          maxLevel={processedData?.maxLevel ?? 0}
           onLevelChange={onLevelChange}
         />
         <Flex justify="end" align="center">
@@ -275,15 +276,17 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       </Flex>
       <Card size="small" bordered={false}>
         <ModaTimeline
-          data={roadmapItems.filter((item) => item.level === currentLevel)}
+          data={
+            processedData?.items.filter(
+              (item) => item.level === currentLevel,
+            ) ?? []
+          }
+          //groups={processedGroups}  // TODO: need to work on the nested groups styling
           groups={
-            maxLevel > 0
-              ? getDataGroups(
-                  roadmapItems.filter(
-                    (item) => item.level === currentLevel - 1,
-                  ),
-                  roadmapItems.filter((item) => item.level === currentLevel),
-                )
+            processedData?.maxLevel > 0
+              ? (processedData?.items.filter(
+                  (item) => item.level === currentLevel - 1,
+                ) ?? [])
               : undefined
           }
           isLoading={isLoading}
