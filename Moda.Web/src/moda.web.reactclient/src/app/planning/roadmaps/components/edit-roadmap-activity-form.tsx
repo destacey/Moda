@@ -100,8 +100,6 @@ const EditRoadmapActivityForm = (props: EditRoadmapActivityFormProps) => {
     (activity: RoadmapActivityDetailsDto) => {
       if (!activity) return
 
-      console.log('activity', activity)
-
       form.setFieldsValue({
         parentActivityId: activity.parent?.id,
         name: activity.name,
