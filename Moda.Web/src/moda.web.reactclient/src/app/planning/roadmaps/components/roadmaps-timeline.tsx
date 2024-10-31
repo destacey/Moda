@@ -131,6 +131,8 @@ function createNestedGroups(
       id: item.id,
       content: item.objectData?.name || '',
       nestedGroups: parentChildMap.get(item.id) || undefined,
+      level: item.level,
+      objectData: item.objectData,
     }),
   )
 
@@ -281,14 +283,14 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
               (item) => item.level === currentLevel,
             ) ?? []
           }
-          //groups={processedGroups}  // TODO: need to work on the nested groups styling
-          groups={
-            processedData?.maxLevel > 0
-              ? (processedData?.items.filter(
-                  (item) => item.level === currentLevel - 1,
-                ) ?? [])
-              : undefined
-          }
+          groups={processedGroups} // TODO: need to work on the nested groups styling
+          // groups={
+          //   processedData?.maxLevel > 0
+          //     ? (processedData?.items.filter(
+          //         (item) => item.level === currentLevel - 1,
+          //       ) ?? [])
+          //     : undefined
+          // }
           isLoading={isLoading}
           options={timelineOptions}
         />

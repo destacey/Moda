@@ -1,14 +1,27 @@
 'use client'
 
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { DataSet, Timeline, TimelineOptions, TimelineOptionsTemplateFunction } from 'vis-timeline/standalone'
+import {
+  DataSet,
+  Timeline,
+  TimelineOptions,
+  TimelineOptionsTemplateFunction,
+} from 'vis-timeline/standalone'
 import { Spin } from 'antd'
 import useTheme from '../../contexts/theme'
 import { ModaEmpty } from '..'
 import './moda-timeline.css'
-import { DefaultTimeLineColors, getDefaultTemplate } from './moda-timeline.utils'
-import { ModaDataGroup, ModaDataItem, ModaTimelineProps, TimelineTemplate } from '.'
+import {
+  DefaultTimeLineColors,
+  getDefaultTemplate,
+} from './moda-timeline.utils'
+import {
+  ModaDataGroup,
+  ModaDataItem,
+  ModaTimelineProps,
+  TimelineTemplate,
+} from '.'
 
 const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   props: ModaTimelineProps<TItem, TGroup>,
@@ -43,7 +56,10 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 
       // Unfortunately, typescript doesn't seem to handle nested constrained generics very well (see: https://github.com/microsoft/TypeScript/issues/23132)
       //  so we must add the type annotation here to avoid the error
-      const Template: TimelineTemplate<ModaDataItem> = getDefaultTemplate(item.type, props)
+      const Template: TimelineTemplate<ModaDataItem> = getDefaultTemplate(
+        item.type,
+        props,
+      )
 
       if (Template)
         root.render(
@@ -80,16 +96,21 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 
       // Unfortunately, typescript doesn't seem to handle nested constrained generics very well (see: https://github.com/microsoft/TypeScript/issues/23132)
       //  so we must add the type annotation here to avoid the error
-      const Template: TimelineTemplate<ModaDataGroup> = getDefaultTemplate('group', props)
+      const Template: TimelineTemplate<ModaDataGroup> = getDefaultTemplate(
+        'group',
+        props,
+      )
 
-      if (Template)
+      if (Template) {
         root.render(
           <Template
             item={item}
             fontColor={colors.item.font}
             foregroundColor={colors.item.foreground}
+            parentElement={element}
           />,
         )
+      }
 
       // Store the rendered element container to reference later
       elementMapRef.current[mapId] = container
@@ -116,6 +137,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
       min: props.options.min,
       max: props.options.max,
       groupOrder: props.options.groupOrder ?? 'order',
+      groupHeightMode: 'auto',
       xss: { disabled: false },
       template: props.options.template ?? itemTemplateManager,
       groupTemplate: groupTemplateManager,
@@ -164,6 +186,15 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 
     if (timelineRef.current) {
       if (props.groups?.length && props.groups?.length > 0) {
+        // const datasetGroups = new DataSet([] as TGroup[])
+        // props.groups.map((group) => {
+        //   const newGroup: TGroup = {
+        //     ...group,
+        //   }
+
+        //   datasetGroups.add(newGroup)
+        // })
+
         timeline = new Timeline(
           timelineRef.current,
           datasetItems,
@@ -176,9 +207,9 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     }
 
     setTimeout(() => {
-      // it takes about 1 second to render the timeline
+      // it takes just under a second to render the timeline
       setIsTimelineLoading(false)
-    }, 1000)
+    }, 800)
 
     // cleanup function to remove the timeline when the component is unmounted
     return () => {

@@ -11,9 +11,7 @@ export const RangeItemTemplate: TimelineTemplate<ModaDataItem> = (props) => {
   // TODO: The 0.6 needs to be tested with some of the other colors
   // TODO: ItemColor is optional,
   const fontColor =
-    getLuminance(props.item.itemColor ?? '') > 0.6
-      ? '#4d4d4d'
-      : '#FFFFFF'
+    getLuminance(props.item.itemColor ?? '') > 0.6 ? '#4d4d4d' : '#FFFFFF'
 
   return (
     <Text style={{ padding: '5px', color: fontColor }}>
@@ -23,9 +21,19 @@ export const RangeItemTemplate: TimelineTemplate<ModaDataItem> = (props) => {
 }
 
 export const GroupTemplate: TimelineTemplate<ModaDataGroup> = (props) => {
+  // set the property on the parent element
+  if (props.item.level > 1 && props.parentElement) {
+    const expandPadding = props.item.nestedGroups ? -15 : 0
+    props.parentElement.style.paddingLeft = `${15 * props.item.level + expandPadding}px`
+  }
 
   return (
-    <Text style={{ padding: '5px', color: props.fontColor }}>
+    <Text
+      style={{
+        padding: '5px',
+        color: props.fontColor,
+      }}
+    >
       {
         // TODO: Fix TS Error. VisJS DataGroup.content is either `string` or `HTMLElement`, and `HTMLElement` is not a valid reactNode.
       }

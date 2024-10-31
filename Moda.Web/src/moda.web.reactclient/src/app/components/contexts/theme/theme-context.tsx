@@ -40,7 +40,9 @@ export const ThemeProvider = ({ children }) => {
         antDesignChartsTheme,
       }}
     >
-      <ConfigProvider theme={currentTheme}>{children}</ConfigProvider>
+      <ConfigProvider theme={currentTheme}>
+        <div data-theme={currentThemeName}>{children}</div>
+      </ConfigProvider>
     </ThemeContext.Provider>
   )
 }

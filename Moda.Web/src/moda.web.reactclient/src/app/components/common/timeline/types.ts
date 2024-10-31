@@ -11,6 +11,7 @@ export type ModaDataItem<T = unknown, G = unknown> = DataItemEnhanced<G> & {
 }
 
 export type ModaDataGroup<T = unknown> = DataGroup & {
+  level?: number
   objectData?: T
 }
 
@@ -26,7 +27,10 @@ export type ModaTimelineOptions<T> = {
   template?: TimelineOptionsTemplateFunction<T>
 }
 
-export type ModaTimelineProps<TItem extends ModaDataItem, TGroup extends ModaDataGroup> = {
+export type ModaTimelineProps<
+  TItem extends ModaDataItem,
+  TGroup extends ModaDataGroup,
+> = {
   data: TItem[]
   groups?: TGroup[]
   isLoading: boolean
@@ -40,6 +44,7 @@ export type GroupTemplateProps<T extends ModaDataGroup> = {
   item: T
   fontColor: string
   foregroundColor?: string
+  parentElement?: HTMLElement
 }
 
 export type ItemTemplateProps<T extends ModaDataItem> = {
@@ -49,6 +54,8 @@ export type ItemTemplateProps<T extends ModaDataItem> = {
 }
 
 export type TimelineTemplate<T extends ModaDataItem | ModaDataGroup> =
-  T extends ModaDataItem ? FC<ItemTemplateProps<T>> :
-  T extends ModaDataGroup ? FC<GroupTemplateProps<T>> :
-    never
+  T extends ModaDataItem
+    ? FC<ItemTemplateProps<T>>
+    : T extends ModaDataGroup
+      ? FC<GroupTemplateProps<T>>
+      : never
