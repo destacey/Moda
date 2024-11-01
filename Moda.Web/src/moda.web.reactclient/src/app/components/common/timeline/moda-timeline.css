@@ -16,9 +16,9 @@
   padding: 0 !important;
 }
 
-.vis-nested-group {
+/* .vis-nested-group {
   background: inherit;
-}
+} */
 
 /* Ensure text is visible in both modes */
 .vis-label .vis-inner {
@@ -27,23 +27,61 @@
 }
 
 /* Group background colors should match parent */
-.vis-labelset .vis-label {
+/* .vis-labelset .vis-label {
+  background: inherit !important;
+} */
+.vis-labelset .vis-label,
+.vis-labelset .vis-label.vis-nesting-group.expanded {
   background: inherit !important;
 }
 
+/* Ensure nested groups maintain styling */
+.vis-label.vis-nested-group .vis-inner {
+  background: inherit !important;
+}
+
+/* Override any default group styling */
+.vis-label.vis-group-level-0,
+.vis-label.vis-group-level-unknown-but-gte1 {
+  background: inherit !important;
+}
+
+/* Remove default border */
 .vis-label.vis-nested-group:not(.vis-group-level-0) {
-  border-top-style: none;
+  border-style: none;
+  border-bottom-style: none;
   border-left-style: none;
   border-right-style: none;
 }
 
 /* Theme-specific borders */
-[data-theme='light'] .vis-label.vis-nested-group:not(.vis-group-level-0) {
-  border-bottom: 1px solid #bfbfbf;
+[data-theme='light'] .vis-label.vis-nesting-group {
+  border-bottom: 1px solid #bfbfbf !important;
+}
+[data-theme='light'] .vis-label.vis-nested-group {
+  border-bottom: 1px solid #bfbfbf !important;
 }
 
-[data-theme='dark'] .vis-label.vis-nested-group:not(.vis-group-level-0) {
-  border-bottom: 1px solid #e5e7eb;
+[data-theme='dark'] .vis-label.vis-nesting-group {
+  border-bottom: 1px solid #e5e7eb !important;
+}
+[data-theme='dark'] .vis-label.vis-nested-group {
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* Remove expansion icons and click behavior */
+.vis-label.vis-nesting-group::before,
+.vis-label.vis-nested-group::before {
+  display: none !important;
+}
+
+/* Remove default hover effect */
+.vis-label:hover {
+  background-color: inherit !important;
+}
+
+.vis-nesting-group {
+  cursor: default !important;
 }
 
 /* Scrollbar Styling */

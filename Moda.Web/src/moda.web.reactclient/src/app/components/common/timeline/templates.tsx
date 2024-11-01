@@ -21,11 +21,11 @@ export const RangeItemTemplate: TimelineTemplate<ModaDataItem> = (props) => {
 }
 
 export const GroupTemplate: TimelineTemplate<ModaDataGroup> = (props) => {
-  // set the property on the parent element
-  if (props.item.level > 1 && props.parentElement) {
-    const expandPadding = props.item.nestedGroups ? -15 : 0
-    props.parentElement.style.paddingLeft = `${15 * props.item.level + expandPadding}px`
-  }
+  // Calculate the padding based on group level
+  const padding = 15 * (props.item.level - 1)
+
+  // Set padding and prevent default group behavior
+  props.parentElement.style.paddingLeft = `${padding}px`
 
   return (
     <Text
