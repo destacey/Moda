@@ -128,18 +128,26 @@ public class RoadmapsController : ControllerBase
     }
 
     // TODO: update this to be generic for all roadmap items
-    [HttpPost("{roadmapId}/items/activity")]
+    [HttpPost("{roadmapId}/items")]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Roadmaps)]
-    [OpenApiOperation("Create a roadmap activity.", "")]
+    [OpenApiOperation("Create a roadmap item of type: Activity, Timebox, Milestone.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
-    public async Task<ActionResult<ObjectIdAndKey>> CreateActivity(Guid roadmapId, [FromBody] CreateRoadmapItemRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<ObjectIdAndKey>> CreateItem(Guid roadmapId, [FromBody] CreateRoadmapItemRequest request, CancellationToken cancellationToken)
     {
         if (roadmapId != request.RoadmapId)
             return BadRequest();
 
-        var result = await _sender.Send(request.ToCreateRoadmapItemCommand(), cancellationToken);
+        var command = request switch
+        {
+            CreateRoadmapActivityRequest activity => activity.ToCreateRoadmapItemCommand(),
+            CreateRoadmapTimeboxRequest timebox => timebox.ToCreateRoadmapItemCommand(),
+            CreateRoadmapMilestoneRequest milestone => milestone.ToCreateRoadmapItemCommand(),
+            _ => throw new ArgumentException("Invalid roadmap item type", nameof(request))
+        };
+
+        var result = await _sender.Send(command, cancellationToken);
         if (result.IsFailure)
-            return BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.CreateActivity"));
+            return BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.CreateItem"));
 
         return CreatedAtAction(nameof(GetItem), new { roadmapIdOrKey = roadmapId, itemId = result.Value.ToString() }, result.Value);
     }

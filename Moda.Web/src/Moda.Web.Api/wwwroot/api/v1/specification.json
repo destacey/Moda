@@ -3418,13 +3418,13 @@
         ]
       }
     },
-    "/api/planning/roadmaps/{roadmapId}/items/activity": {
+    "/api/planning/roadmaps/{roadmapId}/items": {
       "post": {
         "tags": [
           "Roadmaps"
         ],
-        "summary": "Create a roadmap activity.",
-        "operationId": "Roadmaps_CreateActivity",
+        "summary": "Create a roadmap item of type: Activity, Timebox, Milestone.",
+        "operationId": "Roadmaps_CreateItem",
         "parameters": [
           {
             "name": "roadmapId",
@@ -10587,9 +10587,9 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "RoadmapActivityListDto": "#/components/schemas/RoadmapActivityListDto",
-            "RoadmapMilestoneListDto": "#/components/schemas/RoadmapMilestoneListDto",
-            "RoadmapTimeboxListDto": "#/components/schemas/RoadmapTimeboxListDto"
+            "activity": "#/components/schemas/RoadmapActivityListDto",
+            "milestone": "#/components/schemas/RoadmapMilestoneListDto",
+            "timebox": "#/components/schemas/RoadmapTimeboxListDto"
           }
         },
         "additionalProperties": false,
@@ -10721,9 +10721,9 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "RoadmapActivityDetailsDto": "#/components/schemas/RoadmapActivityDetailsDto",
-            "RoadmapMilestoneDetailsDto": "#/components/schemas/RoadmapMilestoneDetailsDto",
-            "RoadmapTimeboxDetailsDto": "#/components/schemas/RoadmapTimeboxDetailsDto"
+            "activity": "#/components/schemas/RoadmapActivityDetailsDto",
+            "milestone": "#/components/schemas/RoadmapMilestoneDetailsDto",
+            "timebox": "#/components/schemas/RoadmapTimeboxDetailsDto"
           }
         },
         "additionalProperties": false,
@@ -10841,12 +10841,20 @@
       },
       "CreateRoadmapItemRequest": {
         "type": "object",
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "activity": "#/components/schemas/CreateRoadmapActivityRequest",
+            "milestone": "#/components/schemas/CreateRoadmapMilestoneRequest",
+            "timebox": "#/components/schemas/CreateRoadmapTimeboxRequest"
+          }
+        },
+        "x-abstract": true,
         "additionalProperties": false,
         "required": [
+          "$type",
           "roadmapId",
-          "name",
-          "start",
-          "end"
+          "name"
         ],
         "properties": {
           "roadmapId": {
@@ -10878,24 +10886,79 @@
             "nullable": true,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "start": {
-            "type": "string",
-            "description": "The Roadmap Item start date.",
-            "format": "date",
-            "nullable": false
-          },
-          "end": {
-            "type": "string",
-            "description": "The Roadmap Item end date.",
-            "format": "date",
-            "nullable": false
-          },
           "color": {
             "type": "string",
             "description": "The color of the Roadmap Item. This is used to display the Roadmap Item in the UI.",
             "nullable": true
+          },
+          "$type": {
+            "type": "string"
           }
         }
+      },
+      "CreateRoadmapActivityRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateRoadmapItemRequest"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "start": {
+                "type": "string",
+                "description": "The Roadmap Item start date.",
+                "format": "date"
+              },
+              "end": {
+                "type": "string",
+                "description": "The Roadmap Item end date.",
+                "format": "date"
+              }
+            }
+          }
+        ]
+      },
+      "CreateRoadmapMilestoneRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateRoadmapItemRequest"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "date": {
+                "type": "string",
+                "description": "The Milestone date.",
+                "format": "date"
+              }
+            }
+          }
+        ]
+      },
+      "CreateRoadmapTimeboxRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateRoadmapItemRequest"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "start": {
+                "type": "string",
+                "description": "The Roadmap Item start date.",
+                "format": "date"
+              },
+              "end": {
+                "type": "string",
+                "description": "The Roadmap Item end date.",
+                "format": "date"
+              }
+            }
+          }
+        ]
       },
       "UpdateRoadmapActivityRequest": {
         "type": "object",

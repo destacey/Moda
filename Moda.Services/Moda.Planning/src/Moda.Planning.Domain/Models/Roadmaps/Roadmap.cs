@@ -347,117 +347,185 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     /// <returns></returns>
     private Result CanEmployeeManage(Guid employeeId)
     {
-        if (!_roadmapManagers.Any(x => x.ManagerId == employeeId))
-        {
-            return Result.Failure("User is not a roadmap manager of this roadmap.");
-        }
-
-        return Result.Success();
+        return _roadmapManagers.Any(x => x.ManagerId == employeeId)
+            ? Result.Success()
+            : Result.Failure("User is not a roadmap manager of this roadmap.");
     }
 
-    /// <summary>
-    /// Creates a new Roadmap Activity within the Roadmap.
-    /// </summary>
-    /// <param name="parentActivityId"></param>
-    /// <param name="roadmapActivity"></param>
-    /// <param name="currentUserEmployeeId"></param>
-    /// <returns></returns>
-    public Result<RoadmapActivity> CreateActivity(Guid? parentActivityId, IUpsertRoadmapActivity roadmapActivity, Guid currentUserEmployeeId)
+    public Result<T> CreateRoadmapItem<T>(
+        IUpsertRoadmapItem newItem,
+        Guid currentUserEmployeeId,
+        Func<Guid, IUpsertRoadmapItem, T> createRootFunc,
+        Func<RoadmapActivity, IUpsertRoadmapItem, T> createChildFunc)
+        where T : BaseRoadmapItem
     {
         try
         {
             var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
             if (isManagerResult.IsFailure)
             {
-                return Result.Failure<RoadmapActivity>("User is not a roadmap manager of the parent roadmap.");
+                return Result.Failure<T>(isManagerResult.Error);
             }
 
-            RoadmapActivity activity;
-            if (parentActivityId.HasValue)
+            T item;
+            if (newItem.ParentId.HasValue)
             {
-                var parentActivityResult = GetParentRoadmapActivity(parentActivityId.Value);
+                var parentActivityResult = GetParentRoadmapActivity(newItem.ParentId.Value);
                 if (parentActivityResult.IsFailure)
                 {
-                    return Result.Failure<RoadmapActivity>(parentActivityResult.Error);
+                    return Result.Failure<T>(parentActivityResult.Error);
                 }
-
-                activity = parentActivityResult.Value.CreateChildActivity(roadmapActivity);
+                item = createChildFunc(parentActivityResult.Value, newItem);
             }
             else
             {
-                var order = RootActivities.Count() + 1;
-                activity = RoadmapActivity.CreateRoot(Id, roadmapActivity, order);
+                item = createRootFunc(Id, newItem);
             }
 
-            _items.Add(activity);
-
-            return activity;
+            _items.Add(item);
+            return item;
         }
         catch (Exception ex)
         {
-            return Result.Failure<RoadmapActivity>(ex.Message);
+            return Result.Failure<T>(ex.Message);
         }
     }
 
-    //public Result<RoadmapTimebox> CreateRoadmapTimebox(IUpsertRoadmapTimebox timebox, Guid? parentId)
+    public Result<RoadmapActivity> CreateActivity(IUpsertRoadmapActivity newActivity, Guid currentUserEmployeeId)
+    {
+        return CreateRoadmapItem<RoadmapActivity>(
+            newActivity,
+            currentUserEmployeeId,
+            (roadmapId, item) => RoadmapActivity.CreateRoot(roadmapId, (IUpsertRoadmapActivity)item, RootActivities.Count() + 1),
+            (parent, item) => parent.CreateChildActivity((IUpsertRoadmapActivity)item)
+        );
+    }
+
+    public Result<RoadmapMilestone> CreateMilestone(IUpsertRoadmapMilestone newMilestone, Guid currentUserEmployeeId)
+    {
+        return CreateRoadmapItem<RoadmapMilestone>(
+            newMilestone,
+            currentUserEmployeeId,
+            (roadmapId, item) => RoadmapMilestone.Create(roadmapId, null, (IUpsertRoadmapMilestone)item),
+            (parent, item) => parent.CreateChildMilestone((IUpsertRoadmapMilestone)item)
+        );
+    }
+
+    public Result<RoadmapTimebox> CreateTimebox(IUpsertRoadmapTimebox newTimebox, Guid currentUserEmployeeId)
+    {
+        return CreateRoadmapItem<RoadmapTimebox>(
+            newTimebox,
+            currentUserEmployeeId,
+            (roadmapId, item) => RoadmapTimebox.Create(roadmapId, null, (IUpsertRoadmapTimebox)item),
+            (parent, item) => parent.CreateChildTimebox((IUpsertRoadmapTimebox)item)
+        );
+    }
+
+
+
+
+    ///// <summary>
+    ///// Creates a new Roadmap Activity within the Roadmap.
+    ///// </summary>
+    ///// <param name="newActivity"></param>
+    ///// <param name="currentUserEmployeeId"></param>
+    ///// <returns></returns>
+    //public Result<RoadmapActivity> CreateActivity(IUpsertRoadmapActivity newActivity, Guid currentUserEmployeeId)
     //{
     //    try
     //    {
-    //        RoadmapTimebox newTimebox;
-
-    //        if (parentId.HasValue)
+    //        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+    //        if (isManagerResult.IsFailure)
     //        {
-    //            var parentActivityResult = GetParentRoadmapActivity(parentId.Value);
+    //            return Result.Failure<RoadmapActivity>("User is not a roadmap manager of the parent roadmap.");
+    //        }
+
+    //        RoadmapActivity activity;
+    //        if (newActivity.ParentId.HasValue)
+    //        {
+    //            var parentActivityResult = GetParentRoadmapActivity(newActivity.ParentId.Value);
     //            if (parentActivityResult.IsFailure)
     //            {
-    //                return Result.Failure<RoadmapTimebox>(parentActivityResult.Error);
+    //                return Result.Failure<RoadmapActivity>(parentActivityResult.Error);
     //            }
 
-    //            newTimebox = parentActivityResult.Value.CreateChildTimebox(timebox);
+    //            activity = parentActivityResult.Value.CreateChildActivity(newActivity);
     //        }
     //        else
     //        {
-    //            newTimebox = RoadmapTimebox.Create(Id, null, timebox);
+    //            var order = RootActivities.Count() + 1;
+    //            activity = RoadmapActivity.CreateRoot(Id, newActivity, order);
     //        }
 
-    //        _items.Add(newTimebox);
+    //        _items.Add(activity);
 
-    //        return newTimebox;
+    //        return activity;
     //    }
     //    catch (Exception ex)
     //    {
-    //        return Result.Failure<RoadmapTimebox>(ex.Message);
+    //        return Result.Failure<RoadmapActivity>(ex.Message);
     //    }
     //}
 
-    //public Result<RoadmapMilestone> CreateRoadmapMilestone(IUpsertRoadmapMilestone milestone, Guid? parentId)
+    //public Result<RoadmapMilestone> CreateMilestone(IUpsertRoadmapMilestone newMilestone, Guid currentUserEmployeeId)
     //{
     //    try
     //    {
-    //        RoadmapMilestone newMilestone;
+    //        RoadmapMilestone milestone;
 
-    //        if (parentId.HasValue)
+    //        if (newMilestone.ParentId.HasValue)
     //        {
-    //            var parentActivityResult = GetParentRoadmapActivity(parentId.Value);
+    //            var parentActivityResult = GetParentRoadmapActivity(newMilestone.ParentId.Value);
     //            if (parentActivityResult.IsFailure)
     //            {
     //                return Result.Failure<RoadmapMilestone>(parentActivityResult.Error);
     //            }
 
-    //            newMilestone = parentActivityResult.Value.CreateChildMilestone(milestone);
+    //            milestone = parentActivityResult.Value.CreateChildMilestone(newMilestone);
     //        }
     //        else
     //        {
-    //            newMilestone = RoadmapMilestone.Create(Id, null, milestone);
+    //            milestone = RoadmapMilestone.Create(Id, null, newMilestone);
     //        }
 
-    //        _items.Add(newMilestone);
+    //        _items.Add(milestone);
 
-    //        return newMilestone;
+    //        return milestone;
     //    }
     //    catch (Exception ex)
     //    {
     //        return Result.Failure<RoadmapMilestone>(ex.Message);
+    //    }
+    //}
+
+    //public Result<RoadmapTimebox> CreateTimebox(IUpsertRoadmapTimebox newTimebox, Guid currentUserEmployeeId)
+    //{
+    //    try
+    //    {
+    //        RoadmapTimebox timebox;
+
+    //        if (newTimebox.ParentId.HasValue)
+    //        {
+    //            var parentActivityResult = GetParentRoadmapActivity(newTimebox.ParentId.Value);
+    //            if (parentActivityResult.IsFailure)
+    //            {
+    //                return Result.Failure<RoadmapTimebox>(parentActivityResult.Error);
+    //            }
+
+    //            timebox = parentActivityResult.Value.CreateChildTimebox(newTimebox);
+    //        }
+    //        else
+    //        {
+    //            timebox = RoadmapTimebox.Create(Id, null, newTimebox);
+    //        }
+
+    //        _items.Add(timebox);
+
+    //        return timebox;
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return Result.Failure<RoadmapTimebox>(ex.Message);
     //    }
     //}
 

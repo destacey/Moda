@@ -1,10 +1,6 @@
 ﻿namespace Moda.Planning.Domain.Interfaces.Roadmaps;
 
-public interface IUpsertRoadmapActivity
+public interface IUpsertRoadmapActivity : IUpsertRoadmapItem
 {
-    string Name { get; }
-    string? Description { get; }
-    Guid? ParentId { get; }
     LocalDateRange DateRange { get; }
-    string? Color { get; }
 }

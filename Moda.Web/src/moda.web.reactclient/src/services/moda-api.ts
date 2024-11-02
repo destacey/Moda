@@ -4085,10 +4085,10 @@ export class RoadmapsClient {
     }
 
     /**
-     * Create a roadmap activity.
+     * Create a roadmap item of type: Activity, Timebox, Milestone.
      */
-    createActivity(roadmapId: string, request: CreateRoadmapItemRequest, cancelToken?: CancelToken): Promise<ObjectIdAndKey> {
-        let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapId}/items/activity";
+    createItem(roadmapId: string, request: CreateRoadmapItemRequest, cancelToken?: CancelToken): Promise<ObjectIdAndKey> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapId}/items";
         if (roadmapId === undefined || roadmapId === null)
             throw new Error("The parameter 'roadmapId' must be defined.");
         url_ = url_.replace("{roadmapId}", encodeURIComponent("" + roadmapId));
@@ -4114,11 +4114,11 @@ export class RoadmapsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processCreateActivity(_response);
+            return this.processCreateItem(_response);
         });
     }
 
-    protected processCreateActivity(response: AxiosResponse): Promise<ObjectIdAndKey> {
+    protected processCreateItem(response: AxiosResponse): Promise<ObjectIdAndKey> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -10813,12 +10813,28 @@ export interface CreateRoadmapItemRequest {
     description?: string | undefined;
     /** The parent Roadmap Item Id. This is used to connect Roadmap Items together. */
     parentId?: string | undefined;
-    /** The Roadmap Item start date. */
-    start: Date;
-    /** The Roadmap Item end date. */
-    end: Date;
     /** The color of the Roadmap Item. This is used to display the Roadmap Item in the UI. */
     color?: string | undefined;
+    $type: string;
+}
+
+export interface CreateRoadmapActivityRequest extends CreateRoadmapItemRequest {
+    /** The Roadmap Item start date. */
+    start?: Date;
+    /** The Roadmap Item end date. */
+    end?: Date;
+}
+
+export interface CreateRoadmapMilestoneRequest extends CreateRoadmapItemRequest {
+    /** The Milestone date. */
+    date?: Date;
+}
+
+export interface CreateRoadmapTimeboxRequest extends CreateRoadmapItemRequest {
+    /** The Roadmap Item start date. */
+    start?: Date;
+    /** The Roadmap Item end date. */
+    end?: Date;
 }
 
 export interface UpdateRoadmapActivityRequest {

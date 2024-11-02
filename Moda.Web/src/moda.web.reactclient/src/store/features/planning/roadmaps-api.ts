@@ -1,5 +1,8 @@
 import {
+  CreateRoadmapActivityRequest,
   CreateRoadmapItemRequest,
+  CreateRoadmapMilestoneRequest,
+  CreateRoadmapTimeboxRequest,
   ObjectIdAndKey,
   RoadmapActivityListDto,
   RoadmapItemDetailsDto,
@@ -144,13 +147,16 @@ export const roadmapApi = apiSlice.injectEndpoints({
     }),
     createRoadmapActivity: builder.mutation<
       ObjectIdAndKey,
-      CreateRoadmapItemRequest
+      CreateRoadmapActivityRequest
+      // | CreateRoadmapActivityRequest
+      // | CreateRoadmapMilestoneRequest
+      // | CreateRoadmapTimeboxRequest
     >({
       queryFn: async (request) => {
         try {
           const data = await (
             await getRoadmapsClient()
-          ).createActivity(request.roadmapId, request)
+          ).createItem(request.roadmapId, request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)

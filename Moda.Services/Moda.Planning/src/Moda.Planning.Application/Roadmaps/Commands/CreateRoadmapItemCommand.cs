@@ -1,35 +1,53 @@
 ﻿using Ardalis.GuardClauses;
 using Moda.Planning.Domain.Interfaces.Roadmaps;
+using Moda.Planning.Domain.Models.Roadmaps;
+using OneOf;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
-public sealed record CreateRoadmapItemCommand(Guid RoadmapId, string Name, string? Description, Guid? ParentId, LocalDateRange DateRange, string? Color) : ICommand<Guid>, IUpsertRoadmapActivity;
+
+public sealed record CreateRoadmapItemCommand(Guid RoadmapId, OneOf<IUpsertRoadmapActivity, IUpsertRoadmapMilestone, IUpsertRoadmapTimebox> item) : ICommand<Guid>;
 
 public sealed class CreateRoadmapItemCommandValidator : AbstractValidator<CreateRoadmapItemCommand>
 {
-    public CreateRoadmapItemCommandValidator()
+
+    private readonly IValidator<IUpsertRoadmapActivity> _activityValidator;
+    private readonly IValidator<IUpsertRoadmapMilestone> _milestoneValidator;
+    private readonly IValidator<IUpsertRoadmapTimebox> _timeboxValidator;
+
+    public CreateRoadmapItemCommandValidator(
+        IValidator<IUpsertRoadmapActivity> activityValidator,
+        IValidator<IUpsertRoadmapMilestone> milestoneValidator,
+        IValidator<IUpsertRoadmapTimebox> timeboxValidator)
     {
+        _activityValidator = activityValidator;
+        _milestoneValidator = milestoneValidator;
+        _timeboxValidator = timeboxValidator;
+
         RuleFor(x => x.RoadmapId)
             .NotEmpty();
 
-        RuleFor(x => x.Name)
-            .NotEmpty()
-            .MaximumLength(128);
+        RuleFor(x => x.item)
+            .NotNull()
+            .Custom((item, context) =>
+            {
+                item.Switch(
+                    activity => ValidateWithValidator(activity, _activityValidator, context),
+                    milestone => ValidateWithValidator(milestone, _milestoneValidator, context),
+                    timebox => ValidateWithValidator(timebox, _timeboxValidator, context)
+                );
+            });
+    }
 
-        RuleFor(x => x.Description)
-            .MaximumLength(2048);
-
-        When(x => x.ParentId.HasValue, () =>
+    private void ValidateWithValidator<T>(T item, IValidator<T> validator, ValidationContext<CreateRoadmapItemCommand> context)
+    {
+        var validationResult = validator.Validate(item);
+        if (!validationResult.IsValid)
         {
-            RuleFor(x => x.ParentId)
-                .NotEmpty();
-        });
-
-        RuleFor(x => x.DateRange)
-            .NotNull();
-
-        When(x => x.Color != null, () => RuleFor(x => x.Color)
-            .Matches("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
-            .WithMessage("Color must be a valid hex color code."));
+            foreach (var error in validationResult.Errors)
+            {
+                context.AddFailure(error);
+            }
+        }
     }
 }
 
@@ -51,11 +69,11 @@ internal sealed class CreateRoadmapItemCommandHandler(IPlanningDbContext plannin
             if (roadmap is null)
                 return Result.Failure<Guid>($"Roadmap with id {request.RoadmapId} not found");
 
-            var result = roadmap.CreateActivity(
-                request.ParentId,
-                request,
-                _currentUserEmployeeId
-                );
+            Result<BaseRoadmapItem> result = request.item.Match(
+               activity => roadmap.CreateActivity(activity, _currentUserEmployeeId).Map(x => (BaseRoadmapItem)x),
+               milestone => roadmap.CreateMilestone(milestone, _currentUserEmployeeId).Map(x => (BaseRoadmapItem)x),
+               timebox => roadmap.CreateTimebox(timebox, _currentUserEmployeeId).Map(x => (BaseRoadmapItem)x)
+            );
 
             if (result.IsFailure)
             {

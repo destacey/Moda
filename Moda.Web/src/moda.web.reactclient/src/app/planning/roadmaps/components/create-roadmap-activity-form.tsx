@@ -1,9 +1,6 @@
 import { ModaColorPicker } from '@/src/app/components/common'
 import useAuth from '@/src/app/components/contexts/auth'
-import {
-  CreateRoadmapItemRequest,
-  RoadmapActivityListDto,
-} from '@/src/services/moda-api'
+import { CreateRoadmapActivityRequest } from '@/src/services/moda-api'
 import {
   useCreateRoadmapActivityMutation,
   useGetRoadmapActivitiesQuery,
@@ -36,8 +33,9 @@ interface CreateRoadmapActivityFormValues {
 const mapToRequestValues = (
   values: CreateRoadmapActivityFormValues,
   roadmapId: string,
-): CreateRoadmapItemRequest => {
+): CreateRoadmapActivityRequest => {
   return {
+    $type: 'activity',
     roadmapId: roadmapId,
     parentId: values.parentActivityId,
     name: values.name,
@@ -45,7 +43,7 @@ const mapToRequestValues = (
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
     color: values.color,
-  } as CreateRoadmapItemRequest
+  } as CreateRoadmapActivityRequest
 }
 
 const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {

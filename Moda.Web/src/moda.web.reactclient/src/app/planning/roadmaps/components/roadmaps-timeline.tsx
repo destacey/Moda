@@ -36,9 +36,9 @@ interface RoadmapTimelineItem extends ModaDataItem<RoadmapItemListDto, string> {
 }
 
 enum RoadmapItemType {
-  Activity = 'RoadmapActivityListDto',
-  Milestone = 'RoadmapMilestoneListDto',
-  Timebox = 'RoadmapTimeboxListDto',
+  Activity = 'activity',
+  Milestone = 'milestone',
+  Timebox = 'timebox',
 }
 
 interface ProcessedRoadmapData {
