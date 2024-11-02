@@ -21,16 +21,9 @@ export const RangeItemTemplate: TimelineTemplate<ModaDataItem> = (props) => {
 }
 
 export const GroupTemplate: TimelineTemplate<ModaDataGroup> = (props) => {
-  // Calculate the padding based on group level
-  const padding = 15 * (props.item.level - 1)
-
-  // Set padding and prevent default group behavior
-  props.parentElement.style.paddingLeft = `${padding}px`
-
   return (
     <Text
       style={{
-        padding: '5px',
         color: props.fontColor,
       }}
     >

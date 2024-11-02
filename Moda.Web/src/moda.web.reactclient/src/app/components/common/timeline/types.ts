@@ -11,7 +11,7 @@ export type ModaDataItem<T = unknown, G = unknown> = DataItemEnhanced<G> & {
 }
 
 export type ModaDataGroup<T = unknown> = DataGroup & {
-  level?: number
+  treeLevel?: number // undocumented property, that is used for styling
   objectData?: T
 }
 

@@ -32,7 +32,7 @@ interface RoadmapTimelineItem extends ModaDataItem<RoadmapItemListDto, string> {
   id: string
   end: Date
   order?: number
-  level: number
+  treeLevel: number
 }
 
 enum RoadmapItemType {
@@ -48,7 +48,7 @@ interface ProcessedRoadmapData {
 
 function flattenRoadmapItems(
   items: RoadmapItemListDto[],
-  level: number = 1,
+  treeLevel: number = 1,
 ): RoadmapTimelineItem[] {
   return items.reduce<RoadmapTimelineItem[]>((acc, item) => {
     const baseTimelineItem: Partial<RoadmapTimelineItem> = {
@@ -57,7 +57,7 @@ function flattenRoadmapItems(
       content: item.name,
       itemColor: item.color,
       group: item.parent?.id,
-      level,
+      treeLevel: treeLevel,
       objectData: item,
     }
 
@@ -75,7 +75,7 @@ function flattenRoadmapItems(
         acc.push(timelineItem)
 
         if (activityItem.children?.length > 0) {
-          acc.push(...flattenRoadmapItems(activityItem.children, level + 1))
+          acc.push(...flattenRoadmapItems(activityItem.children, treeLevel + 1))
         }
         break
       }
@@ -111,7 +111,7 @@ function createNestedGroups(
   currentLevel: number,
 ): ModaDataGroup<RoadmapItemListDto>[] {
   // Get all items up to but not including current level
-  const groupItems = items.filter((item) => item.level < currentLevel)
+  const groupItems = items.filter((item) => item.treeLevel < currentLevel)
 
   // Create a map to store parent-child relationships
   const parentChildMap = new Map<string, string[]>()
@@ -131,7 +131,7 @@ function createNestedGroups(
       id: item.id,
       content: item.objectData?.name || '',
       nestedGroups: parentChildMap.get(item.id) || undefined,
-      level: item.level,
+      treeLevel: item.treeLevel,
       objectData: item.objectData,
     }),
   )
@@ -142,7 +142,7 @@ function createNestedGroups(
 export const DrillThroughControl = (props: {
   currentLevel: number
   maxLevel: number
-  onLevelChange: (level: number) => void
+  onLevelChange: (treeLevel: number) => void
 }) => {
   const onLevelDown = () => {
     props.onLevelChange(props.currentLevel - 1)
@@ -189,7 +189,10 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     }
 
     const items = flattenRoadmapItems(props.roadmapItems)
-    const maxLevel = items.reduce((max, item) => Math.max(max, item.level), 0)
+    const maxLevel = items.reduce(
+      (max, item) => Math.max(max, item.treeLevel),
+      0,
+    )
 
     return { items, maxLevel }
   }, [props.isRoadmapItemsLoading, props.roadmapItems])
@@ -253,8 +256,8 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     return items
   }
 
-  const onLevelChange = (level: number) => {
-    setCurrentLevel(level)
+  const onLevelChange = (treeLevel: number) => {
+    setCurrentLevel(treeLevel)
     setHasUserChangedLevel(true)
   }
 
@@ -280,17 +283,10 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
         <ModaTimeline
           data={
             processedData?.items.filter(
-              (item) => item.level === currentLevel,
+              (item) => item.treeLevel === currentLevel,
             ) ?? []
           }
-          groups={processedGroups} // TODO: need to work on the nested groups styling
-          // groups={
-          //   processedData?.maxLevel > 0
-          //     ? (processedData?.items.filter(
-          //         (item) => item.level === currentLevel - 1,
-          //       ) ?? [])
-          //     : undefined
-          // }
+          groups={processedGroups}
           isLoading={isLoading}
           options={timelineOptions}
         />
