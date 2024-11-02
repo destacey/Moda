@@ -12,60 +12,24 @@
 }
 
 /* Group styling */
-.vis-label {
-  padding: 0 !important;
+
+.vis-label.vis-nesting-group.expanded:before {
+  color: inherit;
+  font-size: 10px;
+  padding-left: 5px;
 }
 
-.vis-nested-group {
-  background: inherit;
+.vis-label.vis-nesting-group.collapsed:before {
+  color: inherit;
+  font-size: 10px;
+  padding-left: 5px;
 }
 
-/* Ensure text is visible in both modes */
-.vis-label .vis-inner {
-  color: inherit !important;
+/* Override any default group styling */
+.vis-label.vis-nesting-group,
+.vis-label.vis-nested-group {
   background: inherit !important;
 }
-
-/* Group background colors should match parent */
-.vis-labelset .vis-label {
-  background: inherit !important;
-}
-
-.vis-label.vis-nested-group:not(.vis-group-level-0) {
-  border-top-style: none;
-  border-left-style: none;
-  border-right-style: none;
-}
-
-/* Theme-specific borders */
-[data-theme='light'] .vis-label.vis-nested-group:not(.vis-group-level-0) {
-  border-bottom: 1px solid #bfbfbf;
-}
-
-[data-theme='dark'] .vis-label.vis-nested-group:not(.vis-group-level-0) {
-  border-bottom: 1px solid #e5e7eb;
-}
-
-/* Scrollbar Styling */
-/* Light theme scrollbar */
-/* [data-theme='light'] .vis-panel::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-[data-theme='light'] .vis-panel::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 4px;
-}
-
-[data-theme='light'] .vis-panel::-webkit-scrollbar-thumb {
-  background: #bfbfbf;
-  border-radius: 4px;
-}
-
-[data-theme='light'] .vis-panel::-webkit-scrollbar-thumb:hover {
-  background: #a6a6a6;
-} */
 
 /* Dark theme scrollbar */
 [data-theme='dark'] .vis-panel::-webkit-scrollbar {
@@ -84,10 +48,4 @@
 
 [data-theme='dark'] .vis-panel::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
-}
-
-
-/* Hide default vis-shadow elements */
-.vis-shadow {
-  display: none;
 }
