@@ -36,6 +36,7 @@ interface RoadmapTimelineItem extends ModaDataItem<RoadmapItemListDto, string> {
 }
 
 enum RoadmapItemType {
+  Roadmap = 'roadmap',
   Activity = 'activity',
   Milestone = 'milestone',
   Timebox = 'timebox',
@@ -98,6 +99,25 @@ function flattenRoadmapItems(
           start: dayjs(timeboxItem.start).toDate(),
           end: dayjs(timeboxItem.end).toDate(),
         } as RoadmapTimelineItem)
+        break
+      }
+
+      case RoadmapItemType.Roadmap: {
+        const activityItem = item as RoadmapActivityListDto
+        const timelineItem: RoadmapTimelineItem = {
+          ...baseTimelineItem,
+          treeLevel: 0,
+          type: 'range',
+          start: dayjs(activityItem.start).toDate(),
+          end: dayjs(activityItem.end).toDate(),
+          order: 1,
+        } as RoadmapTimelineItem
+
+        acc.push(timelineItem)
+
+        if (activityItem.children?.length > 0) {
+          acc.push(...flattenRoadmapItems(activityItem.children, 1))
+        }
         break
       }
     }
@@ -184,28 +204,60 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
 
   const processedData: ProcessedRoadmapData = useMemo(() => {
-    if (props.isRoadmapItemsLoading || !props.roadmapItems) {
+    if (!props.roadmap || props.isRoadmapItemsLoading || !props.roadmapItems) {
       return null
     }
 
-    const items = flattenRoadmapItems(props.roadmapItems)
+    // TODO: this is a hack to get the roadmap itself as an item
+    const roadmapAsItem: RoadmapActivityListDto = {
+      $type: RoadmapItemType.Roadmap,
+      id: props.roadmap.id,
+      name: props.roadmap.name,
+      type: {
+        id: 1,
+        name: 'Roadmap',
+      },
+      start: props.roadmap.start,
+      end: props.roadmap.end,
+      children: props.roadmapItems.map((item) => ({
+        ...item,
+        parent: props.roadmap,
+      })),
+    }
+
+    const items = flattenRoadmapItems([roadmapAsItem])
+
     const maxLevel = items.reduce(
       (max, item) => Math.max(max, item.treeLevel),
       0,
     )
 
     return { items, maxLevel }
-  }, [props.isRoadmapItemsLoading, props.roadmapItems])
+  }, [props.isRoadmapItemsLoading, props.roadmap, props.roadmapItems])
 
   const processedGroups = useMemo(() => {
     if (!processedData || currentLevel <= 1) return undefined
 
     const potentialGroups = processedData.items.filter(
-      (item) => item.objectData.$type === RoadmapItemType.Activity,
+      (item) =>
+        item.objectData.$type === RoadmapItemType.Activity ||
+        item.objectData.$type === RoadmapItemType.Roadmap,
     )
 
     return createNestedGroups(potentialGroups, currentLevel)
   }, [processedData, currentLevel])
+
+  const filteredItems = useMemo(() => {
+    return (
+      processedData?.items.filter(
+        (item) =>
+          item.treeLevel === currentLevel ||
+          (item.treeLevel < currentLevel &&
+            item.objectData.$type !== RoadmapItemType.Roadmap &&
+            item.objectData.$type !== RoadmapItemType.Activity),
+      ) ?? []
+    )
+  }, [processedData?.items, currentLevel])
 
   useEffect(() => {
     if (processedData && processedData.maxLevel > 1 && !hasUserChangedLevel) {
@@ -286,11 +338,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       </Flex>
       <Card size="small" bordered={false}>
         <ModaTimeline
-          data={
-            processedData?.items.filter(
-              (item) => item.treeLevel === currentLevel,
-            ) ?? []
-          }
+          data={filteredItems}
           groups={processedGroups}
           isLoading={isLoading}
           options={timelineOptions}
