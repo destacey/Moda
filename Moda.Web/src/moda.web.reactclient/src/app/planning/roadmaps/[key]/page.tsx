@@ -24,6 +24,7 @@ import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-d
 import RoadmapViewManager from './roadmap-view-manager'
 import { DeleteRoadmapForm } from '../components'
 import CreateRoadmapActivityForm from '../components/create-roadmap-activity-form'
+import CreateRoadmapTimeboxForm from '../components/create-roadmap-timebox-form'
 
 const { Item } = Descriptions
 
@@ -37,6 +38,8 @@ const RoadmapDetailsPage = ({ params }) => {
   const [children, setChildren] = useState([])
   const [openCreateActivityForm, setOpenCreateActivityForm] =
     useState<boolean>(false)
+  const [openCreateTimeboxForm, setOpenCreateTimeboxForm] =
+    useState<boolean>(false)
   const [openEditRoadmapForm, setOpenEditRoadmapForm] = useState<boolean>(false)
   const [openDeleteRoadmapForm, setOpenDeleteRoadmapForm] =
     useState<boolean>(false)
@@ -48,7 +51,6 @@ const RoadmapDetailsPage = ({ params }) => {
   const router = useRouter()
 
   const { hasPermissionClaim } = useAuth()
-  const canCreateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Create')
   const canUpdateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Update')
   const canDeleteRoadmap = hasPermissionClaim('Permissions.Roadmaps.Delete')
 
@@ -119,7 +121,7 @@ const RoadmapDetailsPage = ({ params }) => {
         onClick: () => setOpenDeleteRoadmapForm(true),
       })
     }
-    if (canCreateRoadmap) {
+    if (canUpdateRoadmap) {
       items.push(
         {
           key: 'divider',
@@ -130,11 +132,16 @@ const RoadmapDetailsPage = ({ params }) => {
           label: 'Create Activity',
           onClick: () => setOpenCreateActivityForm(true),
         },
+        {
+          key: 'create-timebox',
+          label: 'Create Timebox',
+          onClick: () => setOpenCreateTimeboxForm(true),
+        },
       )
     }
 
     return items
-  }, [canCreateRoadmap, canDeleteRoadmap, canUpdateRoadmap])
+  }, [canDeleteRoadmap, canUpdateRoadmap])
 
   if (isLoading) {
     return <RoadmapDetailsLoading />
@@ -142,13 +149,6 @@ const RoadmapDetailsPage = ({ params }) => {
 
   if (!roadmapData) {
     notFound()
-  }
-
-  const onCreateRoadmapFormClosed = (wasCreated: boolean) => {
-    setOpenCreateActivityForm(false)
-    if (wasCreated) {
-      refetchRoadmapItems()
-    }
   }
 
   const onEditRoadmapFormClosed = (wasSaved: boolean) => {
@@ -162,6 +162,20 @@ const RoadmapDetailsPage = ({ params }) => {
     setOpenDeleteRoadmapForm(false)
     if (wasDeleted) {
       router.push('/planning/roadmaps/')
+    }
+  }
+
+  const onCreateRoadmapActivityFormClosed = (wasCreated: boolean) => {
+    setOpenCreateActivityForm(false)
+    if (wasCreated) {
+      refetchRoadmapItems()
+    }
+  }
+
+  const onCreateRoadmapTimeboxFormClosed = (wasCreated: boolean) => {
+    setOpenCreateTimeboxForm(false)
+    if (wasCreated) {
+      refetchRoadmapItems()
     }
   }
 
@@ -229,8 +243,17 @@ const RoadmapDetailsPage = ({ params }) => {
         <CreateRoadmapActivityForm
           showForm={openCreateActivityForm}
           roadmapId={roadmapData?.id}
-          onFormComplete={() => onCreateRoadmapFormClosed(true)}
-          onFormCancel={() => onCreateRoadmapFormClosed(false)}
+          onFormComplete={() => onCreateRoadmapActivityFormClosed(true)}
+          onFormCancel={() => onCreateRoadmapActivityFormClosed(false)}
+          messageApi={messageApi}
+        />
+      )}
+      {openCreateTimeboxForm && (
+        <CreateRoadmapTimeboxForm
+          showForm={openCreateTimeboxForm}
+          roadmapId={roadmapData?.id}
+          onFormComplete={() => onCreateRoadmapTimeboxFormClosed(true)}
+          onFormCancel={() => onCreateRoadmapTimeboxFormClosed(false)}
           messageApi={messageApi}
         />
       )}

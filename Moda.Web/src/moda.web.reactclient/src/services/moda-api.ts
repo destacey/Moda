@@ -10819,9 +10819,9 @@ export interface CreateRoadmapItemRequest {
 }
 
 export interface CreateRoadmapActivityRequest extends CreateRoadmapItemRequest {
-    /** The Roadmap Item start date. */
+    /** The Activity start date. */
     start?: Date;
-    /** The Roadmap Item end date. */
+    /** The Activity end date. */
     end?: Date;
 }
 
@@ -10831,9 +10831,9 @@ export interface CreateRoadmapMilestoneRequest extends CreateRoadmapItemRequest 
 }
 
 export interface CreateRoadmapTimeboxRequest extends CreateRoadmapItemRequest {
-    /** The Roadmap Item start date. */
+    /** The Timebox start date. */
     start?: Date;
-    /** The Roadmap Item end date. */
+    /** The Timebox end date. */
     end?: Date;
 }
 

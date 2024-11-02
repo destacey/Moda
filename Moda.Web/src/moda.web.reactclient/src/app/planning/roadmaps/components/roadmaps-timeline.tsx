@@ -199,7 +199,12 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
 
   const processedGroups = useMemo(() => {
     if (!processedData || currentLevel <= 1) return undefined
-    return createNestedGroups(processedData.items, currentLevel)
+
+    const potentialGroups = processedData.items.filter(
+      (item) => item.objectData.$type === RoadmapItemType.Activity,
+    )
+
+    return createNestedGroups(potentialGroups, currentLevel)
   }, [processedData, currentLevel])
 
   useEffect(() => {

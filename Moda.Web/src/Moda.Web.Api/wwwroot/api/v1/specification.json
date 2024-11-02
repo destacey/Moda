@@ -10907,12 +10907,12 @@
             "properties": {
               "start": {
                 "type": "string",
-                "description": "The Roadmap Item start date.",
+                "description": "The Activity start date.",
                 "format": "date"
               },
               "end": {
                 "type": "string",
-                "description": "The Roadmap Item end date.",
+                "description": "The Activity end date.",
                 "format": "date"
               }
             }
@@ -10948,12 +10948,12 @@
             "properties": {
               "start": {
                 "type": "string",
-                "description": "The Roadmap Item start date.",
+                "description": "The Timebox start date.",
                 "format": "date"
               },
               "end": {
                 "type": "string",
-                "description": "The Roadmap Item end date.",
+                "description": "The Timebox end date.",
                 "format": "date"
               }
             }

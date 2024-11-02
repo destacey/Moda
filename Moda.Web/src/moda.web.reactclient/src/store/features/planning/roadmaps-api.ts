@@ -145,12 +145,12 @@ export const roadmapApi = apiSlice.injectEndpoints({
         { type: QueryTags.RoadmapItems, id: arg },
       ],
     }),
-    createRoadmapActivity: builder.mutation<
+    createRoadmapItem: builder.mutation<
       ObjectIdAndKey,
-      CreateRoadmapActivityRequest
-      // | CreateRoadmapActivityRequest
-      // | CreateRoadmapMilestoneRequest
-      // | CreateRoadmapTimeboxRequest
+      //CreateRoadmapActivityRequest
+      | CreateRoadmapActivityRequest
+      | CreateRoadmapMilestoneRequest
+      | CreateRoadmapTimeboxRequest
     >({
       queryFn: async (request) => {
         try {
@@ -290,7 +290,7 @@ export const {
   useGetRoadmapItemsQuery,
   useGetRoadmapItemQuery,
   useGetRoadmapActivitiesQuery,
-  useCreateRoadmapActivityMutation,
+  useCreateRoadmapItemMutation,
   useUpdateRoadmapActivityMutation,
   // useUpdateChildrenOrderMutation,
   // useUpdateChildOrderMutation,
