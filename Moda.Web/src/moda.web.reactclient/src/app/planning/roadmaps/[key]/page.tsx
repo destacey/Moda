@@ -207,15 +207,6 @@ const RoadmapDetailsPage = ({ params }) => {
         canUpdateRoadmap={canUpdateRoadmap}
         messageApi={messageApi}
       />
-      {openCreateActivityForm && (
-        <CreateRoadmapActivityForm
-          showForm={openCreateActivityForm}
-          roadmapId={roadmapData?.id}
-          onFormComplete={() => onCreateRoadmapFormClosed(true)}
-          onFormCancel={() => onCreateRoadmapFormClosed(false)}
-          messageApi={messageApi}
-        />
-      )}
       {openEditRoadmapForm && (
         <EditRoadmapForm
           roadmapId={roadmapData?.id}
@@ -231,6 +222,15 @@ const RoadmapDetailsPage = ({ params }) => {
           showForm={openDeleteRoadmapForm}
           onFormComplete={() => onDeleteFormClosed(true)}
           onFormCancel={() => onDeleteFormClosed(false)}
+          messageApi={messageApi}
+        />
+      )}
+      {openCreateActivityForm && (
+        <CreateRoadmapActivityForm
+          showForm={openCreateActivityForm}
+          roadmapId={roadmapData?.id}
+          onFormComplete={() => onCreateRoadmapFormClosed(true)}
+          onFormCancel={() => onCreateRoadmapFormClosed(false)}
           messageApi={messageApi}
         />
       )}

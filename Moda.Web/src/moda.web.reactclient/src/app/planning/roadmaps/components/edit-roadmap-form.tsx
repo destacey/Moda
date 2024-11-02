@@ -17,7 +17,6 @@ import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
-import { ModaColorPicker } from '@/src/app/components/common'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -38,7 +37,6 @@ interface EditRoadmapFormValues {
   end: Date
   roadmapManagerIds: string[]
   visibilityId: number
-  color?: string
 }
 
 const mapToRequestValues = (
@@ -53,7 +51,6 @@ const mapToRequestValues = (
     end: (values.end as any)?.format('YYYY-MM-DD'),
     roadmapManagerIds: values.roadmapManagerIds,
     visibilityId: values.visibilityId,
-    color: values.color,
   } as UpdateRoadmapRequest
 }
 
@@ -218,10 +215,6 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
     visibilityError,
   ])
 
-  const onColorChange = (color: string) => {
-    form.setFieldsValue({ color })
-  }
-
   return (
     <>
       <Modal
@@ -306,12 +299,6 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
               options={visibilityData}
               optionType="button"
               buttonStyle="solid"
-            />
-          </Item>
-          <Item name="color" label="Color">
-            <ModaColorPicker
-              color={form.getFieldValue('color')}
-              onChange={onColorChange}
             />
           </Item>
         </Form>

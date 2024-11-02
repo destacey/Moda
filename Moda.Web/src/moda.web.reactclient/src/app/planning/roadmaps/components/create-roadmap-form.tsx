@@ -1,4 +1,3 @@
-import { ModaColorPicker } from '@/src/app/components/common'
 import useAuth from '@/src/app/components/contexts/auth'
 import { CreateRoadmapRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
@@ -18,8 +17,6 @@ const { Group: RadioGroup } = Radio
 
 export interface CreateRoadmapFormProps {
   showForm: boolean
-  parentRoadmapId?: string | null
-  parentRoadmapManagerIds?: string[] | null
   onFormComplete: () => void
   onFormCancel: () => void
   messageApi: MessageInstance
@@ -32,12 +29,10 @@ interface CreateRoadmapFormValues {
   end: Date
   roadmapManagerIds: string[]
   visibilityId: number
-  color?: string | undefined
 }
 
 const mapToRequestValues = (
   values: CreateRoadmapFormValues,
-  parentRoadmapId?: string | null,
 ): CreateRoadmapRequest => {
   return {
     name: values.name,
@@ -46,8 +41,6 @@ const mapToRequestValues = (
     end: (values.end as any)?.format('YYYY-MM-DD'),
     roadmapManagerIds: values.roadmapManagerIds,
     visibilityId: values.visibilityId,
-    color: values.color,
-    parentId: parentRoadmapId,
   } as CreateRoadmapRequest
 }
 
@@ -88,9 +81,9 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
     [form],
   )
 
-  const create = async (values: CreateRoadmapFormValues, parentRoadmapId) => {
+  const create = async (values: CreateRoadmapFormValues) => {
     try {
-      const request = mapToRequestValues(values, parentRoadmapId)
+      const request = mapToRequestValues(values)
       const response = await createRoadmap(request)
       if (response.error) {
         throw response.error
@@ -120,7 +113,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values, props.parentRoadmapId)) {
+      if (await create(values)) {
         setIsOpen(false)
         form.resetFields()
         props.onFormComplete()
@@ -145,11 +138,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
     if (canCreateRoadmap) {
       setIsOpen(props.showForm)
       if (props.showForm) {
-        if (props.parentRoadmapManagerIds) {
-          mapToFormValues(props.parentRoadmapManagerIds)
-        } else {
-          mapToFormValues([currentUserInternalEmployeeId])
-        }
+        mapToFormValues([currentUserInternalEmployeeId])
       }
     } else {
       props.onFormCancel()
@@ -184,10 +173,6 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
       )
     }
   }, [currentUserInternalEmployeeIdError, employeeOptionsError, error, props])
-
-  const onColorChange = (color: string) => {
-    form.setFieldsValue({ color })
-  }
 
   return (
     <>
@@ -273,12 +258,6 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
               options={visibilityData}
               optionType="button"
               buttonStyle="solid"
-            />
-          </Item>
-          <Item name="color" label="Color">
-            <ModaColorPicker
-              color={form.getFieldValue('color')}
-              onChange={onColorChange}
             />
           </Item>
         </Form>
