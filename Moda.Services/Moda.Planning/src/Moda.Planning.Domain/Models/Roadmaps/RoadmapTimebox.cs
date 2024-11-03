@@ -1,4 +1,5 @@
 ﻿using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Interfaces.Roadmaps;
 
@@ -21,12 +22,38 @@ public sealed class RoadmapTimebox : BaseRoadmapItem
     }
 
     /// <summary>
-    /// The date range of the Roadmap Activity.
+    /// The date range of the Roadmap Timebox.
     /// </summary>
     public LocalDateRange DateRange
     {
         get => _dateRange;
         private set => _dateRange = Guard.Against.Null(value, nameof(DateRange));
+    }
+
+    /// <summary>
+    /// Updates the Roadmap Timebox.
+    /// </summary>
+    /// <param name="roadmapTimebox"></param>
+    /// <returns></returns>
+    internal Result Update(IUpsertRoadmapTimebox roadmapTimebox, RoadmapActivity? parentActivity)
+    {
+        // TODO: this initial implementation requires going through the Roadmap to update the Roadmap Timebox. This is needed to verify permissions against the Roadmap within the Domain layer.
+
+        if (ParentId != roadmapTimebox.ParentId)
+        {
+            var changeParentResult = ChangeParent(parentActivity);
+            if (changeParentResult.IsFailure)
+            {
+                return changeParentResult;
+            }
+        }
+
+        Name = roadmapTimebox.Name;
+        Description = roadmapTimebox.Description;
+        DateRange = roadmapTimebox.DateRange;
+        Color = roadmapTimebox.Color;
+
+        return Result.Success();
     }
 
     /// <summary>

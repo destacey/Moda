@@ -5,15 +5,16 @@ using OneOf;
 
 namespace Moda.Planning.Application.Roadmaps.Commands;
 
-public sealed record CreateRoadmapItemCommand(Guid RoadmapId, OneOf<IUpsertRoadmapActivity, IUpsertRoadmapMilestone, IUpsertRoadmapTimebox> item) : ICommand<Guid>;
 
-public sealed class CreateRoadmapItemCommandValidator : AbstractValidator<CreateRoadmapItemCommand>
+public sealed record UpdateRoadmapItemCommand(Guid RoadmapId, Guid ItemId, OneOf<IUpsertRoadmapActivity, IUpsertRoadmapMilestone, IUpsertRoadmapTimebox> item) : ICommand;
+
+public sealed class UpdateRoadmapItemCommandValidator : AbstractValidator<UpdateRoadmapItemCommand>
 {
     private readonly IValidator<IUpsertRoadmapActivity> _activityValidator;
     private readonly IValidator<IUpsertRoadmapMilestone> _milestoneValidator;
     private readonly IValidator<IUpsertRoadmapTimebox> _timeboxValidator;
 
-    public CreateRoadmapItemCommandValidator(
+    public UpdateRoadmapItemCommandValidator(
         IValidator<IUpsertRoadmapActivity> activityValidator,
         IValidator<IUpsertRoadmapMilestone> milestoneValidator,
         IValidator<IUpsertRoadmapTimebox> timeboxValidator)
@@ -23,6 +24,9 @@ public sealed class CreateRoadmapItemCommandValidator : AbstractValidator<Create
         _timeboxValidator = timeboxValidator;
 
         RuleFor(x => x.RoadmapId)
+            .NotEmpty();
+
+        RuleFor(x => x.ItemId)
             .NotEmpty();
 
         RuleFor(x => x.item)
@@ -37,7 +41,7 @@ public sealed class CreateRoadmapItemCommandValidator : AbstractValidator<Create
             });
     }
 
-    private void ValidateWithValidator<T>(T item, IValidator<T> validator, ValidationContext<CreateRoadmapItemCommand> context)
+    private void ValidateWithValidator<T>(T item, IValidator<T> validator, ValidationContext<UpdateRoadmapItemCommand> context)
     {
         var validationResult = validator.Validate(item);
         if (!validationResult.IsValid)
@@ -50,13 +54,13 @@ public sealed class CreateRoadmapItemCommandValidator : AbstractValidator<Create
     }
 }
 
-internal sealed class CreateRoadmapItemCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<CreateRoadmapItemCommandHandler> logger) : ICommandHandler<CreateRoadmapItemCommand, Guid>
+internal sealed class UpdateRoadmapItemCommandHandler(IPlanningDbContext planningDbContext, ICurrentUser currentUser, ILogger<UpdateRoadmapItemCommandHandler> logger) : ICommandHandler<UpdateRoadmapItemCommand>
 {
     private readonly IPlanningDbContext _planningDbContext = planningDbContext;
     private readonly Guid _currentUserEmployeeId = Guard.Against.NullOrEmpty(currentUser.GetEmployeeId());
-    private readonly ILogger<CreateRoadmapItemCommandHandler> _logger = logger;
+    private readonly ILogger<UpdateRoadmapItemCommandHandler> _logger = logger;
 
-    public async Task<Result<Guid>> Handle(CreateRoadmapItemCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateRoadmapItemCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -68,10 +72,10 @@ internal sealed class CreateRoadmapItemCommandHandler(IPlanningDbContext plannin
             if (roadmap is null)
                 return Result.Failure<Guid>($"Roadmap with id {request.RoadmapId} not found");
 
-            Result<BaseRoadmapItem> result = request.item.Match(
-               activity => roadmap.CreateActivity(activity, _currentUserEmployeeId).Map(x => (BaseRoadmapItem)x),
-               milestone => roadmap.CreateMilestone(milestone, _currentUserEmployeeId).Map(x => (BaseRoadmapItem)x),
-               timebox => roadmap.CreateTimebox(timebox, _currentUserEmployeeId).Map(x => (BaseRoadmapItem)x)
+            Result result = request.item.Match(
+               activity => roadmap.UpdateActivity(request.ItemId, activity, _currentUserEmployeeId),
+               milestone => roadmap.UpdateMilestone(request.ItemId, milestone, _currentUserEmployeeId),
+               timebox => roadmap.UpdateTimebox(request.ItemId, timebox, _currentUserEmployeeId)
             );
 
             if (result.IsFailure)
@@ -82,7 +86,7 @@ internal sealed class CreateRoadmapItemCommandHandler(IPlanningDbContext plannin
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
 
-            return result.Value.Id;
+            return Result.Success();
         }
         catch (Exception ex)
         {

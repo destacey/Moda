@@ -4153,16 +4153,16 @@ export class RoadmapsClient {
     }
 
     /**
-     * Update a roadmap activity.
+     * Update a roadmap item of type: Activity, Timebox, Milestone.
      */
-    updateActivity(roadmapId: string, activityId: string, request: UpdateRoadmapActivityRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapId}/items/activity/{activityId}";
+    updateItem(roadmapId: string, itemId: string, request: UpdateRoadmapItemRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/planning/roadmaps/{roadmapId}/items/{itemId}";
         if (roadmapId === undefined || roadmapId === null)
             throw new Error("The parameter 'roadmapId' must be defined.");
         url_ = url_.replace("{roadmapId}", encodeURIComponent("" + roadmapId));
-        if (activityId === undefined || activityId === null)
-            throw new Error("The parameter 'activityId' must be defined.");
-        url_ = url_.replace("{activityId}", encodeURIComponent("" + activityId));
+        if (itemId === undefined || itemId === null)
+            throw new Error("The parameter 'itemId' must be defined.");
+        url_ = url_.replace("{itemId}", encodeURIComponent("" + itemId));
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -4184,11 +4184,11 @@ export class RoadmapsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processUpdateActivity(_response);
+            return this.processUpdateItem(_response);
         });
     }
 
-    protected processUpdateActivity(response: AxiosResponse): Promise<void> {
+    protected processUpdateItem(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -10837,22 +10837,39 @@ export interface CreateRoadmapTimeboxRequest extends CreateRoadmapItemRequest {
     end?: Date;
 }
 
-export interface UpdateRoadmapActivityRequest {
+export interface UpdateRoadmapItemRequest {
     /** The Roadmap Id the Roadmap Item belongs to. */
     roadmapId: string;
-    activityId: string;
+    /** The Roadmap Item Id. */
+    itemId: string;
     /** The name of the Roadmap Item. */
     name: string;
     /** The description of the Roadmap Item. */
     description?: string | undefined;
     /** The parent Roadmap Item Id. This is used to connect Roadmap Items together. */
     parentId?: string | undefined;
-    /** The Roadmap Item start date. */
-    start: Date;
-    /** The Roadmap Item end date. */
-    end: Date;
     /** The color of the Roadmap Item. This is used to display the Roadmap Item in the UI. */
     color?: string | undefined;
+    $type: string;
+}
+
+export interface UpdateRoadmapActivityRequest extends UpdateRoadmapItemRequest {
+    /** The Roadmap Item start date. */
+    start?: Date;
+    /** The Roadmap Item end date. */
+    end?: Date;
+}
+
+export interface UpdateRoadmapMilestoneRequest extends UpdateRoadmapItemRequest {
+    /** The Milestone date. */
+    date?: Date;
+}
+
+export interface UpdateRoadmapTimeboxRequest extends UpdateRoadmapItemRequest {
+    /** The Roadmap Item start date. */
+    start?: Date;
+    /** The Roadmap Item end date. */
+    end?: Date;
 }
 
 export interface CommonEnumDto {

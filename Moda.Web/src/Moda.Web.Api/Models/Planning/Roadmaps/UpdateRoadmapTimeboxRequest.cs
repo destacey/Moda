@@ -4,31 +4,31 @@ using OneOf;
 
 namespace Moda.Web.Api.Models.Planning.Roadmaps;
 
-public sealed record CreateRoadmapActivityRequest : CreateRoadmapItemRequest
+public sealed record UpdateRoadmapTimeboxRequest : UpdateRoadmapItemRequest
 {
     /// <summary>
-    /// The Activity start date.
+    /// The Roadmap Item start date.
     /// </summary>
     public required LocalDate Start { get; set; }
 
     /// <summary>
-    /// The Activity end date.
+    /// The Roadmap Item end date.
     /// </summary>
     public required LocalDate End { get; set; }
 
-    public CreateRoadmapItemCommand ToCreateRoadmapItemCommand()
+    public UpdateRoadmapItemCommand ToUpdateRoadmapItemCommand()
     {
-        return new CreateRoadmapItemCommand(RoadmapId, OneOf<IUpsertRoadmapActivity, IUpsertRoadmapMilestone, IUpsertRoadmapTimebox>.FromT0(new UpsertRoadmapActivityAdapter(this)));
+        return new UpdateRoadmapItemCommand(RoadmapId, ItemId, OneOf<IUpsertRoadmapActivity, IUpsertRoadmapMilestone, IUpsertRoadmapTimebox>.FromT2(new UpsertRoadmapTimeboxAdapter(this)));
     }
 }
 
-public sealed class CreateRoadmapActivityRequestValidator : CustomValidator<CreateRoadmapActivityRequest>
+public sealed class UpdateRoadmapTimeboxRequestValidator : CustomValidator<UpdateRoadmapTimeboxRequest>
 {
-    public CreateRoadmapActivityRequestValidator()
+    public UpdateRoadmapTimeboxRequestValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
-        Include(new CreateRoadmapItemRequestValidator());
+        Include(new UpdateRoadmapItemRequestValidator());
 
         RuleFor(t => t.Start)
             .NotNull();

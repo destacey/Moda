@@ -1,31 +1,11 @@
 ﻿using Moda.Planning.Application.Roadmaps.Commands;
+using Moda.Planning.Domain.Interfaces.Roadmaps;
+using OneOf;
 
 namespace Moda.Web.Api.Models.Planning.Roadmaps;
 
-public sealed record UpdateRoadmapActivityRequest
+public sealed record UpdateRoadmapActivityRequest : UpdateRoadmapItemRequest
 {
-    /// <summary>
-    /// The Roadmap Id the Roadmap Item belongs to.
-    /// </summary>
-    public Guid RoadmapId { get; set; }
-
-    public Guid ActivityId { get; set; }
-
-    /// <summary>
-    /// The name of the Roadmap Item.
-    /// </summary>
-    public required string Name { get; set; }
-
-    /// <summary>
-    /// The description of the Roadmap Item.
-    /// </summary>
-    public string? Description { get; set; }
-
-    /// <summary>
-    /// The parent Roadmap Item Id. This is used to connect Roadmap Items together.
-    /// </summary>
-    public Guid? ParentId { get; set; }
-
     /// <summary>
     /// The Roadmap Item start date.
     /// </summary>
@@ -36,14 +16,9 @@ public sealed record UpdateRoadmapActivityRequest
     /// </summary>
     public required LocalDate End { get; set; }
 
-    /// <summary>
-    /// The color of the Roadmap Item. This is used to display the Roadmap Item in the UI.
-    /// </summary>
-    public string? Color { get; set; }
-
-    public UpdateRoadmapActivityCommand ToUpdateRoadmapActivityCommand()
+    public UpdateRoadmapItemCommand ToUpdateRoadmapItemCommand()
     {
-        return new UpdateRoadmapActivityCommand(RoadmapId, ActivityId, Name, Description, ParentId, new LocalDateRange(Start, End), Color);
+        return new UpdateRoadmapItemCommand(RoadmapId, ItemId, OneOf<IUpsertRoadmapActivity, IUpsertRoadmapMilestone, IUpsertRoadmapTimebox>.FromT0(new UpsertRoadmapActivityAdapter(this)));
     }
 }
 
@@ -53,24 +28,7 @@ public sealed class UpdateRoadmapActivityRequestValidator : CustomValidator<Upda
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
-        RuleFor(t => t.RoadmapId)
-            .NotEmpty();
-
-        RuleFor(t => t.ActivityId)
-            .NotEmpty();
-
-        RuleFor(t => t.Name)
-            .NotEmpty()
-            .MaximumLength(128);
-
-        RuleFor(t => t.Description)
-            .MaximumLength(2048);
-
-        When(x => x.ParentId.HasValue, () =>
-        {
-            RuleFor(x => x.ParentId)
-                .NotEmpty();
-        });
+        Include(new UpdateRoadmapItemRequestValidator());
 
         RuleFor(t => t.Start)
             .NotNull();
@@ -79,9 +37,5 @@ public sealed class UpdateRoadmapActivityRequestValidator : CustomValidator<Upda
             .NotNull()
             .Must((membership, end) => membership.Start <= end)
                 .WithMessage("End date must be greater than or equal to start date");
-
-        When(x => x.Color != null, () => RuleFor(x => x.Color)
-            .Matches("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
-            .WithMessage("Color must be a valid hex color code."));
     }
 }
