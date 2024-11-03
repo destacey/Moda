@@ -1,4 +1,5 @@
-﻿using Moda.Planning.Domain.Enums;
+﻿using CSharpFunctionalExtensions;
+using Moda.Planning.Domain.Enums;
 using Moda.Planning.Domain.Interfaces.Roadmaps;
 using NodaTime;
 
@@ -19,6 +20,32 @@ public sealed class RoadmapMilestone : BaseRoadmapItem
     }
 
     public LocalDate Date { get; private set; }
+
+    /// <summary>
+    /// Updates the Roadmap Milestone.
+    /// </summary>
+    /// <param name="roadmapMilestone"></param>
+    /// <returns></returns>
+    internal Result Update(IUpsertRoadmapMilestone roadmapMilestone, RoadmapActivity? parentActivity)
+    {
+        // TODO: this initial implementation requires going through the Roadmap to update the Roadmap Milestone. This is needed to verify permissions against the Roadmap within the Domain layer.
+
+        if (ParentId != roadmapMilestone.ParentId)
+        {
+            var changeParentResult = ChangeParent(parentActivity);
+            if (changeParentResult.IsFailure)
+            {
+                return changeParentResult;
+            }
+        }
+
+        Name = roadmapMilestone.Name;
+        Description = roadmapMilestone.Description;
+        Date = roadmapMilestone.Date;
+        Color = roadmapMilestone.Color;
+
+        return Result.Success();
+    }
 
     /// <summary>
     /// Creates a new Roadmap RoadmapMilestone.

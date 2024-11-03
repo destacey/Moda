@@ -8,7 +8,7 @@ import {
 import {
   useGetRoadmapActivitiesQuery,
   useGetRoadmapItemQuery,
-  useUpdateRoadmapActivityMutation,
+  useUpdateRoadmapItemMutation,
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, TreeSelect } from 'antd'
@@ -43,8 +43,9 @@ const mapToRequestValues = (
   roadmapId: string,
 ): UpdateRoadmapActivityRequest => {
   return {
+    $type: 'activity',
     roadmapId: roadmapId,
-    activityId: activityId,
+    itemId: activityId,
     parentId: values.parentActivityId,
     name: values.name,
     description: values.description,
@@ -89,7 +90,7 @@ const EditRoadmapActivityForm = (props: EditRoadmapActivityFormProps) => {
   } = useGetRoadmapActivitiesQuery(props.roadmapId)
 
   const [updateRoadmapActivity, { error: mutationError }] =
-    useUpdateRoadmapActivityMutation()
+    useUpdateRoadmapItemMutation()
 
   const { hasPermissionClaim } = useAuth()
   const canManageRoadmapItems = hasPermissionClaim(

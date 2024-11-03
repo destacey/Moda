@@ -24,6 +24,7 @@ import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import EditRoadmapActivityForm from './edit-roadmap-activity-form'
 import DeleteRoadmapItemForm from './delete-roadmap-item-form'
+import EditRoadmapTimeboxForm from './edit-roadmap-timebox-form'
 
 const { Text } = Typography
 
@@ -109,6 +110,8 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
   const [data, setData] = useState<RoadmapItemDataType[]>([])
   const [openUpdateRoadmapActivityForm, setOpenUpdateRoadmapActivityForm] =
     useState<boolean>(false)
+  const [openUpdateRoadmapTimeboxForm, setOpenUpdateRoadmapTimeboxForm] =
+    useState<boolean>(false)
   const [openDeleteRoadmapItemForm, setOpenDeleteRoadmapItemForm] =
     useState<boolean>(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
@@ -119,9 +122,14 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
     'Permissions.Roadmaps.Update',
   )
 
-  const onEditItemMenuClicked = useCallback((id: string) => {
-    setSelectedItemId(id)
-    setOpenUpdateRoadmapActivityForm(true)
+  const onEditItemMenuClicked = useCallback((record: RoadmapItemDataType) => {
+    setSelectedItemId(record.id)
+
+    if (record.type === 'Activity') {
+      setOpenUpdateRoadmapActivityForm(true)
+    } else if (record.type === 'Timebox') {
+      setOpenUpdateRoadmapTimeboxForm(true)
+    }
   }, [])
 
   const onDeleteItemMenuClicked = useCallback((id: string) => {
@@ -152,7 +160,7 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
           const menuItems = getRowMenuItems({
             itemId: record.id,
             canUpdateRoadmap: canManageRoadmapItems,
-            onEditItemMenuClicked: () => onEditItemMenuClicked(record.id),
+            onEditItemMenuClicked: () => onEditItemMenuClicked(record),
             onDeleteItemMenuClicked: () => onDeleteItemMenuClicked(record.id),
           })
 
@@ -226,6 +234,14 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
     }
   }
 
+  const onUpdateRoadmapTimeboxFormClosed = (wasSaved: boolean) => {
+    setOpenUpdateRoadmapTimeboxForm(false)
+    setSelectedItemId(null)
+    if (wasSaved) {
+      props.refreshRoadmapItems()
+    }
+  }
+
   const onDeleteRoadmapItemFormClosed = (wasSaved: boolean) => {
     setOpenDeleteRoadmapItemForm(false)
     setSelectedItemId(null)
@@ -258,6 +274,16 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
           roadmapId={props.roadmapId}
           onFormComplete={() => onUpdateRoadmapActivityFormClosed(true)}
           onFormCancel={() => onUpdateRoadmapActivityFormClosed(false)}
+          messageApi={props.messageApi}
+        />
+      )}
+      {openUpdateRoadmapTimeboxForm && (
+        <EditRoadmapTimeboxForm
+          showForm={openUpdateRoadmapTimeboxForm}
+          timeboxId={selectedItemId}
+          roadmapId={props.roadmapId}
+          onFormComplete={() => onUpdateRoadmapTimeboxFormClosed(true)}
+          onFormCancel={() => onUpdateRoadmapTimeboxFormClosed(false)}
           messageApi={props.messageApi}
         />
       )}

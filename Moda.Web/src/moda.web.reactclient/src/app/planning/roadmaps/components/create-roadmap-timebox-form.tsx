@@ -1,6 +1,6 @@
 import { ModaColorPicker } from '@/src/app/components/common'
 import useAuth from '@/src/app/components/contexts/auth'
-import { CreateRoadmapActivityRequest } from '@/src/services/moda-api'
+import { CreateRoadmapTimeboxRequest } from '@/src/services/moda-api'
 import {
   useCreateRoadmapItemMutation,
   useGetRoadmapActivitiesQuery,
@@ -13,7 +13,7 @@ import { useCallback, useEffect, useState } from 'react'
 const { Item } = Form
 const { TextArea } = Input
 
-export interface CreateRoadmapActivityFormProps {
+export interface CreateRoadmapTimeboxFormProps {
   showForm: boolean
   roadmapId: string
   onFormComplete: () => void
@@ -21,7 +21,7 @@ export interface CreateRoadmapActivityFormProps {
   messageApi: MessageInstance
 }
 
-interface CreateRoadmapActivityFormValues {
+interface CreateRoadmapTimeboxFormValues {
   parentId?: string
   name: string
   description?: string
@@ -31,11 +31,11 @@ interface CreateRoadmapActivityFormValues {
 }
 
 const mapToRequestValues = (
-  values: CreateRoadmapActivityFormValues,
+  values: CreateRoadmapTimeboxFormValues,
   roadmapId: string,
-): CreateRoadmapActivityRequest => {
+): CreateRoadmapTimeboxRequest => {
   return {
-    $type: 'activity',
+    $type: 'timebox',
     roadmapId: roadmapId,
     parentId: values.parentId,
     name: values.name,
@@ -43,14 +43,14 @@ const mapToRequestValues = (
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
     color: values.color,
-  } as CreateRoadmapActivityRequest
+  } as CreateRoadmapTimeboxRequest
 }
 
-const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
+const CreateRoadmapTimeboxForm = (props: CreateRoadmapTimeboxFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateRoadmapActivityFormValues>()
+  const [form] = Form.useForm<CreateRoadmapTimeboxFormValues>()
   const formValues = Form.useWatch([], form)
 
   const {
@@ -59,7 +59,7 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
     error: activitiesError,
   } = useGetRoadmapActivitiesQuery(props.roadmapId)
 
-  const [createRoadmapActivity, { error: mutationError }] =
+  const [createRoadmapTimebox, { error: mutationError }] =
     useCreateRoadmapItemMutation()
 
   const { hasPermissionClaim } = useAuth()
@@ -67,15 +67,15 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
     'Permissions.Roadmaps.Update',
   )
 
-  const create = async (values: CreateRoadmapActivityFormValues, roadmapId) => {
+  const create = async (values: CreateRoadmapTimeboxFormValues, roadmapId) => {
     try {
       const request = mapToRequestValues(values, roadmapId)
-      const response = await createRoadmapActivity(request)
+      const response = await createRoadmapTimebox(request)
       if (response.error) {
         throw response.error
       }
 
-      props.messageApi.success('Roadmap Activity created successfully.')
+      props.messageApi.success('Roadmap Timebox created successfully.')
 
       return true
     } catch (error) {
@@ -86,7 +86,7 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
       } else {
         props.messageApi.error(
           error.supportMessage ??
-            'An error occurred while creating the roadmap activity. Please try again.',
+            'An error occurred while creating the roadmap timebox. Please try again.',
         )
       }
       return false
@@ -105,7 +105,7 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
     } catch (error) {
       console.error('handleOk error', error)
       props.messageApi.error(
-        'An error occurred while creating the roadmap activity. Please try again.',
+        'An error occurred while creating the roadmap timebox. Please try again.',
       )
     } finally {
       setIsSaving(false)
@@ -152,7 +152,7 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
   return (
     <>
       <Modal
-        title="Create Roadmap Activity"
+        title="Create Roadmap Timebox"
         open={isOpen}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
@@ -167,7 +167,7 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
           form={form}
           size="small"
           layout="vertical"
-          name="create-roadmap-activity-form"
+          name="create-roadmap-timebox-form"
         >
           <Item
             name="parentId"
@@ -204,16 +204,17 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
           <Item name="end" label="End" rules={[{ required: true }]}>
             <DatePicker />
           </Item>
-          <Item name="color" label="Color">
+          {/* Hide for now */}
+          {/* <Item name="color" label="Color">
             <ModaColorPicker
               color={form.getFieldValue('color')}
               onChange={onColorChange}
             />
-          </Item>
+          </Item> */}
         </Form>
       </Modal>
     </>
   )
 }
 
-export default CreateRoadmapActivityForm
+export default CreateRoadmapTimeboxForm

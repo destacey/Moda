@@ -4,10 +4,10 @@ using Moda.Planning.Domain.Models.Roadmaps;
 
 namespace Moda.Planning.Application.Roadmaps.Dtos;
 
-[JsonDerivedType(typeof(RoadmapItemDetailsDto), typeDiscriminator: nameof(RoadmapItemDetailsDto))]
-[JsonDerivedType(typeof(RoadmapActivityDetailsDto), typeDiscriminator: nameof(RoadmapActivityDetailsDto))]
-[JsonDerivedType(typeof(RoadmapMilestoneDetailsDto), typeDiscriminator: nameof(RoadmapMilestoneDetailsDto))]
-[JsonDerivedType(typeof(RoadmapTimeboxDetailsDto), typeDiscriminator: nameof(RoadmapTimeboxDetailsDto))]
+[JsonDerivedType(typeof(RoadmapItemDetailsDto), typeDiscriminator: "roadmap-item")]
+[JsonDerivedType(typeof(RoadmapActivityDetailsDto), typeDiscriminator: "activity")]
+[JsonDerivedType(typeof(RoadmapMilestoneDetailsDto), typeDiscriminator: "milestone")]
+[JsonDerivedType(typeof(RoadmapTimeboxDetailsDto), typeDiscriminator: "timebox")]
 public record RoadmapItemDetailsDto : IMapFrom<BaseRoadmapItem>
 {
     /// <summary>

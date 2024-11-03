@@ -1,7 +1,6 @@
-﻿using Moda.Common.Models;
-using Moda.Planning.Domain.Interfaces.Roadmaps;
-using Moda.Planning.Domain.Models.Roadmaps;
+﻿using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Planning.Domain.Tests.Data;
+using Moda.Planning.Domain.Tests.Models;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
@@ -112,23 +111,4 @@ public class BaseRoadmapItemTests
     //    Assert.True(result.IsFailure);
     //    Assert.Equal("Unable to change the parent because the current parent data has not been loaded.", result.Error);
     //}
-
-    private record TestUpsertRoadmapActivity : IUpsertRoadmapActivity
-    {
-
-        public TestUpsertRoadmapActivity(RoadmapActivity activity)
-        {
-            ParentId = activity.ParentId;
-            Name = activity.Name;
-            Description = activity.Description;
-            DateRange = activity.DateRange;
-            Color = activity.Color;
-        }
-
-        public Guid? ParentId { get; set; }
-        public string Name { get; set; } = default!;
-        public string? Description { get; set; }
-        public LocalDateRange DateRange { get; set; } = default!;
-        public string? Color { get; set; }
-    }
 }

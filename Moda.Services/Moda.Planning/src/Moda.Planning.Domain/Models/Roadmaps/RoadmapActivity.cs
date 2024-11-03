@@ -51,11 +51,18 @@ public sealed class RoadmapActivity : BaseRoadmapItem
     /// </summary>
     /// <param name="roadmapActivity"></param>
     /// <returns></returns>
-    internal Result Update(IUpsertRoadmapActivity roadmapActivity)
+    internal Result Update(IUpsertRoadmapActivity roadmapActivity, RoadmapActivity? parentActivity)
     {
         // TODO: this initial implementation requires going through the Roadmap to update the Roadmap Activity. This is needed to verify permissions against the Roadmap within the Domain layer.
 
-        ParentId = roadmapActivity.ParentId;
+        if (ParentId != roadmapActivity.ParentId)
+        {
+            var changeParentResult = ChangeParent(parentActivity);
+            if (changeParentResult.IsFailure)
+            {
+                return changeParentResult;
+            }
+        }
 
         Name = roadmapActivity.Name;
         Description = roadmapActivity.Description;

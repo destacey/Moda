@@ -2,15 +2,20 @@
 
 namespace Moda.Web.Api.Models.Planning.Roadmaps;
 
-[JsonDerivedType(typeof(CreateRoadmapActivityRequest), typeDiscriminator: "activity")]
-[JsonDerivedType(typeof(CreateRoadmapMilestoneRequest), typeDiscriminator: "milestone")]
-[JsonDerivedType(typeof(CreateRoadmapTimeboxRequest), typeDiscriminator: "timebox")]
-public abstract record CreateRoadmapItemRequest
+[JsonDerivedType(typeof(UpdateRoadmapActivityRequest), typeDiscriminator: "activity")]
+[JsonDerivedType(typeof(UpdateRoadmapMilestoneRequest), typeDiscriminator: "milestone")]
+[JsonDerivedType(typeof(UpdateRoadmapTimeboxRequest), typeDiscriminator: "timebox")]
+public abstract record UpdateRoadmapItemRequest
 { 
     /// <summary>
     /// The Roadmap Id the Roadmap Item belongs to.
     /// </summary>
     public Guid RoadmapId { get; set; }
+
+    /// <summary>
+    /// The Roadmap Item Id.
+    /// </summary>
+    public Guid ItemId { get; set; }
 
     /// <summary>
     /// The name of the Roadmap Item.
@@ -33,13 +38,16 @@ public abstract record CreateRoadmapItemRequest
     public string? Color { get; set; }
 }
 
-public sealed class CreateRoadmapItemRequestValidator : CustomValidator<CreateRoadmapItemRequest>
+public sealed class UpdateRoadmapItemRequestValidator : CustomValidator<UpdateRoadmapItemRequest>
 {
-    public CreateRoadmapItemRequestValidator()
+    public UpdateRoadmapItemRequestValidator()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 
         RuleFor(t => t.RoadmapId)
+            .NotEmpty();
+
+        RuleFor(t => t.ItemId)
             .NotEmpty();
 
         RuleFor(t => t.Name)
