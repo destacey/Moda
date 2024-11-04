@@ -101,7 +101,7 @@ public class PlanningIntervalsController : ControllerBase
         var result = await _sender.Send(request.ToCreatePlanningIntervalCommand(), cancellationToken);
 
         return result.IsSuccess
-            ? CreatedAtAction(nameof(GetPlanningInterval), new { id = result.Value }, result.Value)
+            ? CreatedAtAction(nameof(GetPlanningInterval), new { idOrKey = result.Value.ToString() }, result.Value)
             : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.Create"));
     }
 
