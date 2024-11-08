@@ -4,29 +4,18 @@ using Serilog.Context;
 
 namespace Moda.Common.Application.Behaviors;
 
-public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : class, IRequest<TResponse>
+public class PerformanceBehavior<TRequest, TResponse>(ILogger<PerformanceBehavior<TRequest, TResponse>> logger, ISerializerService jsonSerializer) : IPipelineBehavior<TRequest, TResponse> where TRequest : class, IRequest<TResponse>
 {
-    private readonly Stopwatch _timer;
-    private readonly ILogger<PerformanceBehavior<TRequest, TResponse>> _logger;
-    private readonly ISerializerService _jsonSerializer;
-
-    public PerformanceBehavior(ILogger<PerformanceBehavior<TRequest, TResponse>> logger, ISerializerService jsonSerializer)
-    {
-        _timer = new Stopwatch();
-
-        _logger = logger;
-        _jsonSerializer = jsonSerializer;
-    }
+    private readonly ILogger<PerformanceBehavior<TRequest, TResponse>> _logger = logger;
+    private readonly ISerializerService _jsonSerializer = jsonSerializer;
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        _timer.Start();
+        var startTime = Stopwatch.GetTimestamp();
 
         var response = await next();
 
-        _timer.Stop();
-
-        var elapsedMilliseconds = _timer.ElapsedMilliseconds;
+        var elapsedMilliseconds = Stopwatch.GetElapsedTime(startTime).TotalMilliseconds;
 
         if (elapsedMilliseconds > 700)
         {
