@@ -92,6 +92,59 @@ internal sealed class WorkItemClient : BaseClient
         return workItems;
     }
 
+    internal async Task<List<ReportingWorkItemLinkResponse>> GetWorkItemLinkChanges(string projectName, DateTime lastChangedDate, string[] linkTypes, string[] workItemTypes, CancellationToken cancellationToken)
+    {
+        Guard.Against.NullOrWhiteSpace(projectName, nameof(projectName));
+
+        var request = new RestRequest($"/{projectName}/_apis/wit/reporting/workitemlinks", Method.Get);
+        SetupRequest(request);
+
+        if (linkTypes.Length != 0)
+        {
+            request.AddQueryParameter("linkTypes", string.Join(",", linkTypes));
+        }
+        if (workItemTypes.Length != 0)
+        {
+            request.AddQueryParameter("workItemTypes", string.Join(",", workItemTypes));
+        }
+
+        var workItemLinks = new List<ReportingWorkItemLinkResponse>();
+        string? continuationToken = null;
+
+        do
+        {
+            if (continuationToken != null)
+            {
+                // Remove the existing continuationToken parameter if it exists
+                var existingParameter = request.Parameters.FirstOrDefault(p => p.Name == "continuationToken");
+                if (existingParameter != null)
+                {
+                    request.RemoveParameter(existingParameter);
+                }
+
+                // Add the new continuationToken parameter
+                request.AddQueryParameter("continuationToken", continuationToken);
+            }
+
+            var response = await _client.ExecuteAsync<BatchResponse<ReportingWorkItemLinkResponse>>(request, cancellationToken);
+
+            if (!response.IsSuccessful)
+            {
+                throw new Exception($"Error getting work item link changes for project {projectName} from Azure DevOps: {response.ErrorMessage}");
+            }
+
+            if (response.Data?.Values != null)
+            {
+                workItemLinks.AddRange(response.Data.Values);
+            }
+
+            continuationToken = response.Data?.ContinuationToken;
+
+        } while (!string.IsNullOrEmpty(continuationToken));
+
+        return workItemLinks;
+    }
+
     internal async Task<int[]> GetDeletedWorkItemIds(string projectName, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(projectName, nameof(projectName));
