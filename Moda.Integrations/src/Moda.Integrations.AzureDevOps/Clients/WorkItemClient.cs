@@ -99,21 +99,22 @@ internal sealed class WorkItemClient : BaseClient
         var request = new RestRequest($"/{projectName}/_apis/wit/reporting/workitemlinks", Method.Get);
         SetupRequest(request);
 
-        if (linkTypes.Length != 0)
+        if (linkTypes.Length > 0)
         {
             request.AddQueryParameter("linkTypes", string.Join(",", linkTypes));
         }
-        if (workItemTypes.Length != 0)
+        if (workItemTypes.Length > 0)
         {
             request.AddQueryParameter("workItemTypes", string.Join(",", workItemTypes));
         }
+        request.AddQueryParameter("startDateTime", lastChangedDate.ToString("o"));
 
         var workItemLinks = new List<ReportingWorkItemLinkResponse>();
         string? continuationToken = null;
 
-        do
+        while (true)
         {
-            if (continuationToken != null)
+            if (!string.IsNullOrEmpty(continuationToken))
             {
                 // Remove the existing continuationToken parameter if it exists
                 var existingParameter = request.Parameters.FirstOrDefault(p => p.Name == "continuationToken");
@@ -132,15 +133,21 @@ internal sealed class WorkItemClient : BaseClient
             {
                 throw new Exception($"Error getting work item link changes for project {projectName} from Azure DevOps: {response.ErrorMessage}");
             }
-
-            if (response.Data?.Values != null)
+            else if (response.Data?.Values is null)
             {
-                workItemLinks.AddRange(response.Data.Values);
+                break;
             }
 
-            continuationToken = response.Data?.ContinuationToken;
+            workItemLinks.AddRange(response.Data.Values);            
 
-        } while (!string.IsNullOrEmpty(continuationToken));
+            if (response.Data.IsLastBatch)
+            {
+                break;
+            }
+
+            // TODO: does this value change after each continuation?
+            continuationToken = response.Data?.ContinuationToken;
+        }
 
         return workItemLinks;
     }
