@@ -17,12 +17,8 @@ public sealed class IExternalWorkItemLinkValidator : CustomValidator<IExternalWo
         RuleFor(c => c.ChangedDate)
             .NotEmpty();
 
-        RuleFor(c => c.IsActive)
-            .NotEmpty();
-
         RuleFor(c => c.ChangedOperation)
-            .NotEmpty()
-            .MaximumLength(32);
+            .NotEmpty();
 
         RuleFor(c => c.SourceProjectId)
             .NotEmpty();

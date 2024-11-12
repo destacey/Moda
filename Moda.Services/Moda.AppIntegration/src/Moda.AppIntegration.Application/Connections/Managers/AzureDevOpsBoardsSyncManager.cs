@@ -3,6 +3,7 @@ using MediatR;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.Common.Application.Enums;
+using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.Workflows.Dtos;
@@ -12,12 +13,13 @@ using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
 
-public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IAzureDevOpsBoardsInitManager initManager) : IAzureDevOpsBoardsSyncManager
+public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IAzureDevOpsBoardsInitManager initManager, ISerializerService jsonSerializer) : IAzureDevOpsBoardsSyncManager
 {
     private readonly ILogger<AzureDevOpsBoardsSyncManager> _logger = logger;
     private readonly IAzureDevOpsService _azureDevOpsService = azureDevOpsService;
     private readonly ISender _sender = sender;
     private readonly IAzureDevOpsBoardsInitManager _initManager = initManager;
+    private readonly ISerializerService _jsonSerializer = jsonSerializer;
 
     public async Task<Result> Sync(SyncType syncType, CancellationToken cancellationToken)
     {
@@ -167,6 +169,11 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                             }
 
                             _logger.LogInformation("Successfully synced Azure DevOps Boards workspace {WorkspaceId} work items.", workspace.IntegrationState!.InternalId);
+                        }
+                        catch (ValidationException ex)
+                        {
+                            _logger.LogError(ex, "A validation exception occurred while syncing Azure DevOps Boards workspace {WorkspaceId} work items.", workspace.IntegrationState!.InternalId);
+                            continue;
                         }
                         catch (Exception ex)
                         {
