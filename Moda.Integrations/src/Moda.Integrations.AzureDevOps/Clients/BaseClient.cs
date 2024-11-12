@@ -1,6 +1,9 @@
-﻿using Ardalis.GuardClauses;
+﻿using System.Text.Json;
+using Ardalis.GuardClauses;
 using Moda.Integrations.AzureDevOps.Extensions;
+using Moda.Integrations.AzureDevOps.Models.Converters;
 using RestSharp;
+using RestSharp.Serializers.Json;
 
 namespace Moda.Integrations.AzureDevOps.Clients;
 internal abstract class BaseClient : IDisposable
@@ -24,7 +27,13 @@ internal abstract class BaseClient : IDisposable
             Timeout = TimeSpan.FromSeconds(300),
         };
 
-        _client = new RestClient(options);
+        var jsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = { new ReportingWorkItemLinkResponseConverter() }
+        };
+
+        _client = new RestClient(options, configureSerialization: s => s.UseSystemTextJson(jsonSerializerOptions));
     }
 
     protected void SetupRequest(RestRequest request, bool includePreviewTag = false)

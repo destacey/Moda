@@ -3,6 +3,7 @@ using MediatR;
 using Moda.AppIntegration.Application.Connections.Queries;
 using Moda.AppIntegration.Application.Interfaces;
 using Moda.Common.Application.Enums;
+using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Work.Application.Workflows.Dtos;
@@ -12,12 +13,13 @@ using NodaTime;
 
 namespace Moda.AppIntegration.Application.Connections.Managers;
 
-public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IAzureDevOpsBoardsInitManager initManager) : IAzureDevOpsBoardsSyncManager
+public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncManager> logger, IAzureDevOpsService azureDevOpsService, ISender sender, IAzureDevOpsBoardsInitManager initManager, ISerializerService jsonSerializer) : IAzureDevOpsBoardsSyncManager
 {
     private readonly ILogger<AzureDevOpsBoardsSyncManager> _logger = logger;
     private readonly IAzureDevOpsService _azureDevOpsService = azureDevOpsService;
     private readonly ISender _sender = sender;
     private readonly IAzureDevOpsBoardsInitManager _initManager = initManager;
+    private readonly ISerializerService _jsonSerializer = jsonSerializer;
 
     public async Task<Result> Sync(SyncType syncType, CancellationToken cancellationToken)
     {
@@ -149,6 +151,16 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                                 continue;
                             }
 
+                            if (syncType == SyncType.Differential)
+                            {
+                                var syncWorkItemParentChangesResult = await SyncWorkItemParentChanges(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, lastChangedDate, workspace.IntegrationState!.InternalId, workspace.Name, cancellationToken);
+                                if (syncWorkItemParentChangesResult.IsFailure)
+                                {
+                                    _logger.LogError("An error occurred while syncing Azure DevOps Boards workspace {WorkspaceId} work item parent changes. Error: {Error}", workspace.IntegrationState!.InternalId, syncWorkItemParentChangesResult.Error);
+                                    continue;
+                                }
+                            }
+
                             var syncDeletedWorkItemsResult = await SyncDeletedWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workspace.IntegrationState!.InternalId, workspace.Name, lastChangedDate, cancellationToken);
                             if (syncDeletedWorkItemsResult.IsFailure)
                             {
@@ -157,6 +169,11 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                             }
 
                             _logger.LogInformation("Successfully synced Azure DevOps Boards workspace {WorkspaceId} work items.", workspace.IntegrationState!.InternalId);
+                        }
+                        catch (ValidationException ex)
+                        {
+                            _logger.LogError(ex, "A validation exception occurred while syncing Azure DevOps Boards workspace {WorkspaceId} work items.", workspace.IntegrationState!.InternalId);
+                            continue;
                         }
                         catch (Exception ex)
                         {
@@ -316,14 +333,30 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
 
         _logger.LogInformation("Retrieved {WorkItemCount} work items to sync for Azure DevOps project {Project}.", workItemsResult.Value.Count, azdoWorkspaceName);
 
-        if (workItemsResult.Value.Count == 0)
-            return Result.Success();
-
-        var syncWorkItemsResult = await _sender.Send(new SyncExternalWorkItemsCommand(workspaceId, workItemsResult.Value, teamMappings), cancellationToken);
-
-        return syncWorkItemsResult.IsSuccess
+        return workItemsResult.Value.Count == 0
             ? Result.Success()
-            : syncWorkItemsResult;
+            : await _sender.Send(new SyncExternalWorkItemsCommand(workspaceId, workItemsResult.Value, teamMappings), cancellationToken);
+    }
+
+    private async Task<Result> SyncWorkItemParentChanges(string organizationUrl, string personalAccessToken, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, CancellationToken cancellationToken)
+    {
+        Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
+        Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
+        Guard.Against.Default(workspaceId, nameof(workspaceId));
+
+        var workTypesResult = await _sender.Send(new GetWorkspaceWorkTypesQuery(workspaceId), cancellationToken);
+        if (workTypesResult.IsFailure)
+            return workTypesResult.ConvertFailure();
+
+        var parentLinkChangesResult = await _azureDevOpsService.GetParentLinkChanges(organizationUrl, personalAccessToken, azdoWorkspaceName, lastChangedDate, workTypesResult.Value.Select(t => t.Name).ToArray(), cancellationToken);
+        if (parentLinkChangesResult.IsFailure)
+            return parentLinkChangesResult.ConvertFailure();
+
+        _logger.LogInformation("Retrieved {WorkItemParentChangesCount} work item parent changes to sync for Azure DevOps project {Project}.", parentLinkChangesResult.Value.Count, azdoWorkspaceName);
+
+        return parentLinkChangesResult.Value.Count == 0
+            ? Result.Success()
+            : await _sender.Send(new SyncExternalWorkItemParentChangesCommand(workspaceId, parentLinkChangesResult.Value), cancellationToken);
     }
 
     private async Task<Result> SyncDeletedWorkItems(string organizationUrl, string personalAccessToken, Guid workspaceId, string azdoWorkspaceName, DateTime lastChangedDate, CancellationToken cancellationToken)
@@ -336,16 +369,10 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         if (getDeletedWorkItemIdsResult.IsFailure)
             return getDeletedWorkItemIdsResult.ConvertFailure();
 
-        int deletedWorkItemCount = getDeletedWorkItemIdsResult.Value.Length;
-        _logger.LogInformation("Retrieved {WorkItemCount} deleted work items for Azure DevOps project {Project}.", deletedWorkItemCount, azdoWorkspaceName);
+        _logger.LogInformation("Retrieved {WorkItemCount} deleted work items for Azure DevOps project {Project}.", getDeletedWorkItemIdsResult.Value.Length, azdoWorkspaceName);
 
-        if (deletedWorkItemCount > 0)
-        {
-            var deleteWorkItemsResult = await _sender.Send(new DeleteExternalWorkItemsCommand(workspaceId, getDeletedWorkItemIdsResult.Value), cancellationToken);
-            if (deleteWorkItemsResult.IsFailure)
-                return deleteWorkItemsResult;
-        }
-
-        return Result.Success();
+        return getDeletedWorkItemIdsResult.Value.Length == 0
+            ? Result.Success()
+            : await _sender.Send(new DeleteExternalWorkItemsCommand(workspaceId, getDeletedWorkItemIdsResult.Value), cancellationToken);
     }
 }

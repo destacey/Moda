@@ -257,14 +257,6 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
             {
                 _logger.LogDebug("Unable to map missing parent for work item {ExternalId} in workspace {WorkspaceId}.", workItem.ExternalId, workspace.Id);
             }
-            else if (parentInfo.Tier != WorkTypeTier.Portfolio)
-            {
-                _logger.LogDebug("Only portfolio tier work items can be parents. Unable to map parent for work item {ExternalId} in workspace {WorkspaceId}.", workItem.ExternalId, workspace.Id);
-            }
-            else if (workItem.Type!.Level!.Order <= parentInfo.LevelOrder)
-            {
-                _logger.LogDebug("The parent must be a higher level than the work item {ExternalId} in workspace {WorkspaceId}.", workItem.ExternalId, workspace.Id);
-            }
             else
             {
                 var result = workItem.UpdateParent(parentInfo, workItem.Type);
