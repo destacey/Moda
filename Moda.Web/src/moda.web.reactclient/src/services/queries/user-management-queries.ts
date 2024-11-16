@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import { getPermissionsClient, getRolesClient } from '../clients'
+import { getRolesClient } from '../clients'
 import {
   CreateOrUpdateRoleRequest,
   UpdateRolePermissionsRequest,
@@ -56,14 +56,5 @@ export const useDeleteRoleMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(QK.ROLES)
     },
-  })
-}
-
-// PERMISSIONS
-
-export const useGetPermissions = () => {
-  return useQuery({
-    queryKey: [QK.PERMISSIONS],
-    queryFn: async () => (await getPermissionsClient()).getList(),
   })
 }

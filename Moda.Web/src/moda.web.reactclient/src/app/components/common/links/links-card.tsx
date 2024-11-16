@@ -47,7 +47,7 @@ const LinksCard = ({ objectId }: LinksCardProps) => {
 
   const LinksContent = () => {
     if (isLoading) {
-      return <Spin />
+      return <Spin size="small" />
     } else if (!hasLinks) {
       return <ModaEmpty message="No links found" />
     } else {

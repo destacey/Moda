@@ -1,8 +1,6 @@
 import useTheme from '@/src/app/components/contexts/theme'
-import {
-  useGetPermissions,
-  useUpdatePermissionsMutation,
-} from '@/src/services/queries/user-management-queries'
+import { useUpdatePermissionsMutation } from '@/src/services/queries/user-management-queries'
+import { useGetPermissionsQuery } from '@/src/store/features/user-management/permissions-api'
 import {
   Row,
   Col,
@@ -13,6 +11,7 @@ import {
   message,
   Typography,
   Space,
+  Spin,
 } from 'antd'
 import React, { useEffect, useState } from 'react'
 
@@ -35,23 +34,30 @@ interface PermissionItem {
 }
 
 const Permissions = (props: PermissionsProps) => {
-  const availablePermissions = useGetPermissions()
   const [messageApi, contextHolder] = message.useMessage()
   const theme = useTheme()
 
   const [permissions, setPermissions] = useState<string[]>(props.permissions)
-  const [permissionGroups, setPermissionGroups] = useState<PermissionGroup[]>()
+  const [permissionGroups, setPermissionGroups] = useState<PermissionGroup[]>(
+    [],
+  )
   const [activePermissionGroup, setActivePermissionGroup] =
-    useState<PermissionGroup>(null)
+    useState<PermissionGroup | null>(null)
+
+  const {
+    data: permissionsData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetPermissionsQuery()
 
   const updatePermissions = useUpdatePermissionsMutation()
 
-  useEffect(() => setPermissions(props.permissions), [props.permissions])
-
   useEffect(() => {
-    const groups = availablePermissions.data?.reduce(
+    if (!permissionsData) return
+    const groups = permissionsData.reduce(
       (acc: PermissionGroup[], permission) => {
-        const item = {
+        const item: PermissionItem = {
           name: permission.name,
           description: permission.description,
         }
@@ -73,7 +79,7 @@ const Permissions = (props: PermissionsProps) => {
       groups?.sort((a, b) => a.name.localeCompare(b.name)) ?? groups,
     )
     setActivePermissionGroup(groups?.[0])
-  }, [availablePermissions.data])
+  }, [permissionsData])
 
   const handlePermissionChange = (item: PermissionItem) => {
     let updatedPermissions: string[] = [...permissions]
@@ -112,7 +118,7 @@ const Permissions = (props: PermissionsProps) => {
     }
   }
 
-  if (availablePermissions.isLoading) return <div>Loading...</div>
+  if (isLoading) return <Spin size="small" />
 
   function handleSelectAll(select: boolean): void {
     if (activePermissionGroup) {

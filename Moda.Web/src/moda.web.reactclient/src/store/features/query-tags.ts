@@ -22,6 +22,7 @@ export enum QueryTags {
   Users = 'UserManagement.Users',
   UserRoles = 'UserManagement.UserRoles',
   Roles = 'UserManagement.Roles',
+  Permissions = 'UserManagement.Permissions',
   // WORK MANAGEMENT
   WorkItem = 'Work.WorkItem',
   WorkItemChildren = 'Work.WorkItem.Children',
