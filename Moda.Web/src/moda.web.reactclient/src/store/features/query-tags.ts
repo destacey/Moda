@@ -18,6 +18,10 @@ export enum QueryTags {
   RoadmapItems = 'Planning.RoadmapItems',
   RoadmapActivities = 'Planning.RoadmapActivities',
   RoadmapVisibility = 'Planning.RoadmapVisibility',
+  // USER MANAGEMENT
+  Users = 'UserManagement.Users',
+  UserRoles = 'UserManagement.UserRoles',
+  Roles = 'UserManagement.Roles',
   // WORK MANAGEMENT
   WorkItem = 'Work.WorkItem',
   WorkItemChildren = 'Work.WorkItem.Children',

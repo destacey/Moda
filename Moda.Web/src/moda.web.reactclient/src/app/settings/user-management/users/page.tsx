@@ -1,12 +1,13 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import ModaGrid from '@/src/app/components/common/moda-grid'
 import { authorizePage } from '@/src/app/components/hoc'
 import Link from 'next/link'
 import { useDocumentTitle } from '@/src/app/hooks'
-import { useGetUsers } from '@/src/services/queries/user-management-queries'
+import { useGetUsersQuery } from '@/src/store/features/user-management/users-api'
+import { message } from 'antd'
 
 const UserLinkCellRenderer = ({ value, data }) => {
   return <Link href={`users/${data.id}`}>{value}</Link>
@@ -20,8 +21,9 @@ const EmployeeLinkCellRenderer = ({ value, data }) => {
 
 const UsersListPage = () => {
   useDocumentTitle('Users')
+  const [messageApi, contextHolder] = message.useMessage()
 
-  const { data: usersData, isLoading, refetch } = useGetUsers()
+  const { data: usersData, isLoading, error, refetch } = useGetUsersQuery()
 
   const columnDefs = useMemo(
     () => [
@@ -40,12 +42,17 @@ const UsersListPage = () => {
     [],
   )
 
+  useEffect(() => {
+    error && console.error(error)
+  }, [error])
+
   const refresh = useCallback(async () => {
     refetch()
   }, [refetch])
 
   return (
     <>
+      {contextHolder}
       <PageTitle title="Users" />
 
       <ModaGrid
