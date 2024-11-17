@@ -51,9 +51,10 @@ const authorizeMenuItems = (
       acc.push({ ...item, children })
     }
   } else if ('claimValue' in item) {
-    // TODO: fix dev error - Warning: React does not recognize the `claimValue` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `claimvalue` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
     if (claimCheck(item.claimValue)) {
-      acc.push(item)
+      // Filter out claimValue before pushing the item
+      const { claimValue, ...rest } = item
+      acc.push(rest)
     }
   } else {
     acc.push(item)

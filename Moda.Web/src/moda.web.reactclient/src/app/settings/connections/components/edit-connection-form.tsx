@@ -7,10 +7,10 @@ import {
   UpdateAzureDevOpsBoardConnectionRequest,
 } from '@/src/services/moda-api'
 import {
-  testAzdoBoardsConfiguration,
-  useUpdateAzdoBoardsConnectionMutation,
-} from '@/src/services/queries/app-integration-queries'
-import { useGetAzdoConnectionByIdQuery } from '@/src/store/features/app-integration/azdo-integration-api'
+  useGetAzdoConnectionQuery,
+  useTestAzdoConfigurationMutation,
+  useUpdateAzdoConnectionMutation,
+} from '@/src/store/features/app-integration/azdo-integration-api'
 import { toFormErrors } from '@/src/utils'
 import { Button, Divider, Form, Input, Modal, Typography, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
@@ -60,8 +60,9 @@ const EditConnectionForm = ({
     useState<string>()
   const [isTestingConfiguration, setTestingConfiguration] = useState(false)
 
-  const { data: connectionData } = useGetAzdoConnectionByIdQuery(id)
-  const updateConnection = useUpdateAzdoBoardsConnectionMutation()
+  const { data: connectionData } = useGetAzdoConnectionQuery(id)
+  const [updateConnection, { error: updateConnectionError }] =
+    useUpdateAzdoConnectionMutation()
 
   const { hasClaim } = useAuth()
   const canUpdateConnection = hasClaim(
@@ -69,14 +70,21 @@ const EditConnectionForm = ({
     'Permissions.Connections.Update',
   )
 
+  const [testConfig, { error: testConfigError }] =
+    useTestAzdoConfigurationMutation()
+
   const testConnectionConfiguration = useCallback(
     async (configuration: TestAzureDevOpsBoardConnectionRequest) => {
-      setTestConfigurationResult(
-        await testAzdoBoardsConfiguration(configuration),
-      )
+      const response = await testConfig(configuration)
+      console.log('response', response)
+      if (response.error) {
+        setTestConfigurationResult('Failed to test configuration.')
+      } else {
+        setTestConfigurationResult('Successfully tested configuration.')
+      }
       setTestingConfiguration(false)
     },
-    [],
+    [testConfig],
   )
 
   const mapToFormValues = useCallback(
@@ -95,7 +103,8 @@ const EditConnectionForm = ({
   const update = async (values: EditConnectionFormValues): Promise<boolean> => {
     try {
       const request = mapToRequestValues(values)
-      await updateConnection.mutateAsync(request)
+      const response = await updateConnection(request)
+      if (response.error) throw response.error
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {

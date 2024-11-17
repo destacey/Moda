@@ -4,9 +4,9 @@ import {
   TestAzureDevOpsBoardConnectionRequest,
 } from '@/src/services/moda-api'
 import {
-  testAzdoBoardsConfiguration,
-  useCreateAzdoBoardsConnectionMutation,
-} from '@/src/services/queries/app-integration-queries'
+  useCreateAzdoConnectionMutation,
+  useTestAzdoConfigurationMutation,
+} from '@/src/store/features/app-integration/azdo-integration-api'
 import { toFormErrors } from '@/src/utils'
 import { Button, Divider, Form, Input, Modal, Typography, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
@@ -52,7 +52,8 @@ const CreateConnectionForm = ({
     useState<string>()
   const [isTestingConfiguration, setTestingConfiguration] = useState(false)
 
-  const createConnection = useCreateAzdoBoardsConnectionMutation()
+  const [createConnection, { error: createConnectionError }] =
+    useCreateAzdoConnectionMutation()
 
   const { hasClaim } = useAuth()
   const canCreateConnection = hasClaim(
@@ -60,14 +61,20 @@ const CreateConnectionForm = ({
     'Permissions.Connections.Create',
   )
 
+  const [testConfig, { error: testConfigError }] =
+    useTestAzdoConfigurationMutation()
+
   const testConnectionConfiguration = useCallback(
     async (configuration: TestAzureDevOpsBoardConnectionRequest) => {
-      setTestConfigurationResult(
-        await testAzdoBoardsConfiguration(configuration),
-      )
+      const response = await testConfig(configuration)
+      if (response.error) {
+        setTestConfigurationResult('Failed to test configuration.')
+      } else {
+        setTestConfigurationResult('Successfully tested configuration.')
+      }
       setTestingConfiguration(false)
     },
-    [],
+    [testConfig],
   )
 
   const create = async (
@@ -75,7 +82,10 @@ const CreateConnectionForm = ({
   ): Promise<boolean> => {
     try {
       const request = mapToRequestValues(values)
-      await createConnection.mutateAsync(request)
+      const response = await createConnection(request)
+      if (response.error) {
+        throw response.error
+      }
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {

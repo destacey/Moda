@@ -4,8 +4,11 @@ export enum QueryTags {
   BackgroundJobType = 'Admin.BackgroundJobType',
 
   // APP INTEGRATION
-  AzdoConnectionTeams = 'AppIntegration.AzdoConnectionTeams',
   Connections = 'AppIntegration.Connections',
+  ConnectionDetails = 'AppIntegration.ConnectionDetails',
+  AzdoConnectionTeams = 'AppIntegration.AzdoConnectionTeams',
+  AzdoConnectionsConfigurations = 'AppIntegration.AzdoConnectionsConfigurations',
+  AzdoConnectionsConfigurationTest = 'AppIntegration.AzdoConnectionsConfigurationTest',
 
   // COMMON
   Links = 'Common.Links',

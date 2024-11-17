@@ -21,6 +21,7 @@ describe('dates', () => {
   it('should return 1 for tomorrow', () => {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1) // tomorrow
-    expect(daysRemaining(tomorrow)).toEqual(1)
+    // the +0 is to make sure the result is not -0
+    expect(daysRemaining(tomorrow) + 0).toEqual(1)
   })
 })
