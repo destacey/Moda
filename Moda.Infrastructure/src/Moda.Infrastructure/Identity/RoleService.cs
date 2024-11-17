@@ -30,25 +30,31 @@ internal class RoleService : IRoleService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<List<RoleListDto>> GetListAsync(CancellationToken cancellationToken)
+    public async Task<List<RoleListDto>> GetList(CancellationToken cancellationToken)
         => await _roleManager.Roles.ProjectToType<RoleListDto>().ToListAsync(cancellationToken);
 
-    public async Task<int> GetCountAsync(CancellationToken cancellationToken) =>
+    public async Task<int> GetCount(CancellationToken cancellationToken) =>
         await _roleManager.Roles.CountAsync(cancellationToken);
 
-    public async Task<bool> ExistsAsync(string roleName, string? excludeId) =>
+    public async Task<bool> Exists(string roleName, string? excludeId) =>
         await _roleManager.FindByNameAsync(roleName)
             is ApplicationRole existingRole
             && existingRole.Id != excludeId;
 
-    public async Task<RoleDto> GetByIdAsync(string id) =>
-        await _db.Roles.SingleOrDefaultAsync(x => x.Id == id) is { } role
-            ? role.Adapt<RoleDto>()
-            : throw new NotFoundException("Role Not Found");
-
-    public async Task<RoleDto> GetByIdWithPermissionsAsync(string roleId, CancellationToken cancellationToken)
+    public async Task<RoleDto?> GetById(string id, CancellationToken cancellationToken)
     {
-        var role = await GetByIdAsync(roleId);
+        var role = await _db.Roles.SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        return role?.Adapt<RoleDto>();
+    }
+
+    public async Task<RoleDto?> GetByIdWithPermissions(string roleId, CancellationToken cancellationToken)
+    {
+        var role = await GetById(roleId, cancellationToken);
+        if (role == null)
+        {
+            return null;
+        }
 
         role.Permissions = await _db.RoleClaims
             .Where(c => c.RoleId == roleId && c.ClaimType == ApplicationClaims.Permission)
@@ -58,7 +64,7 @@ internal class RoleService : IRoleService
         return role;
     }
 
-    public async Task<string> CreateOrUpdateAsync(CreateOrUpdateRoleCommand request)
+    public async Task<string> CreateOrUpdate(CreateOrUpdateRoleCommand request)
     {
         if (string.IsNullOrEmpty(request.Id))
         {
@@ -105,7 +111,7 @@ internal class RoleService : IRoleService
         }
     }
 
-    public async Task<string> UpdatePermissionsAsync(UpdateRolePermissionsCommand request, CancellationToken cancellationToken)
+    public async Task<string> UpdatePermissions(UpdateRolePermissionsCommand request, CancellationToken cancellationToken)
     {
         var role = await _roleManager.FindByIdAsync(request.RoleId);
         _ = role ?? throw new NotFoundException("Role Not Found");
@@ -153,7 +159,7 @@ internal class RoleService : IRoleService
         return "Permissions Updated.";
     }
 
-    public async Task<string> DeleteAsync(string id)
+    public async Task<string> Delete(string id)
     {
         var role = await _roleManager.FindByIdAsync(id);
 

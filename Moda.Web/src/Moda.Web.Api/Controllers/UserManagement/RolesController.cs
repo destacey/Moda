@@ -23,7 +23,7 @@ public class RolesController : ControllerBase
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<RoleListDto>>> GetList(CancellationToken cancellationToken)
     {
-        var roles = await _roleService.GetListAsync(cancellationToken);
+        var roles = await _roleService.GetList(cancellationToken);
 
         return Ok(roles);
     }
@@ -34,9 +34,9 @@ public class RolesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<RoleDto>> GetById(string id)
+    public async Task<ActionResult<RoleDto>> GetById(string id, CancellationToken cancellationToken)
     {
-        var role = await _roleService.GetByIdAsync(id);
+        var role = await _roleService.GetById(id, cancellationToken);
 
         return role is not null
             ? Ok(role)
@@ -51,7 +51,7 @@ public class RolesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RoleDto>> GetByIdWithPermissions(string id, CancellationToken cancellationToken)
     {
-        var role = await _roleService.GetByIdWithPermissionsAsync(id, cancellationToken);
+        var role = await _roleService.GetByIdWithPermissions(id, cancellationToken);
 
         return role is not null
             ? Ok(role)
@@ -67,7 +67,7 @@ public class RolesController : ControllerBase
     {
         return id != request.RoleId
             ? BadRequest()
-            : Ok(await _roleService.UpdatePermissionsAsync(request.ToUpdateRolePermissionsCommand(), cancellationToken));
+            : Ok(await _roleService.UpdatePermissions(request.ToUpdateRolePermissionsCommand(), cancellationToken));
     }
 
     [HttpPost]
@@ -76,7 +76,7 @@ public class RolesController : ControllerBase
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201String))]
     public async Task<ActionResult<string>> CreateOrUpdate(CreateOrUpdateRoleRequest request)
     {
-        var id = await _roleService.CreateOrUpdateAsync(request.ToCreateOrUpdateRoleCommand());
+        var id = await _roleService.CreateOrUpdate(request.ToCreateOrUpdateRoleCommand());
 
         return CreatedAtAction(nameof(GetById), new { id }, id);
     }
@@ -91,7 +91,7 @@ public class RolesController : ControllerBase
     {
         try
         {
-            await _roleService.DeleteAsync(id);
+            await _roleService.Delete(id);
         }
         catch (ConflictException ex)
         {

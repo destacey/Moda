@@ -2,19 +2,19 @@ namespace Moda.Common.Application.Identity.Roles;
 
 public interface IRoleService : ITransientService
 {
-    Task<List<RoleListDto>> GetListAsync(CancellationToken cancellationToken);
+    Task<List<RoleListDto>> GetList(CancellationToken cancellationToken);
 
-    Task<int> GetCountAsync(CancellationToken cancellationToken);
+    Task<int> GetCount(CancellationToken cancellationToken);
 
-    Task<bool> ExistsAsync(string roleName, string? excludeId);
+    Task<bool> Exists(string roleName, string? excludeId);
 
-    Task<RoleDto> GetByIdAsync(string id);
+    Task<RoleDto?> GetById(string id, CancellationToken cancellationToken);
 
-    Task<RoleDto> GetByIdWithPermissionsAsync(string roleId, CancellationToken cancellationToken);
+    Task<RoleDto?> GetByIdWithPermissions(string roleId, CancellationToken cancellationToken);
 
-    Task<string> CreateOrUpdateAsync(CreateOrUpdateRoleCommand request);
+    Task<string> CreateOrUpdate(CreateOrUpdateRoleCommand request);
 
-    Task<string> UpdatePermissionsAsync(UpdateRolePermissionsCommand request, CancellationToken cancellationToken);
+    Task<string> UpdatePermissions(UpdateRolePermissionsCommand request, CancellationToken cancellationToken);
 
-    Task<string> DeleteAsync(string id);
+    Task<string> Delete(string id);
 }
