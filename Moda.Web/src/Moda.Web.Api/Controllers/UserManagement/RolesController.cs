@@ -61,13 +61,26 @@ public class RolesController : ControllerBase
     [HttpPut("{id}/permissions")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.RoleClaims)]
     [OpenApiOperation("Update a role's permissions.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<string>> UpdatePermissions(string id, UpdateRolePermissionsRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdatePermissions(string id, UpdateRolePermissionsRequest request, CancellationToken cancellationToken)
     {
-        return id != request.RoleId
-            ? BadRequest()
-            : Ok(await _roleService.UpdatePermissions(request.ToUpdateRolePermissionsCommand(), cancellationToken));
+        if (id != request.RoleId)
+        {
+            var error = new ErrorResult
+            {
+                StatusCode = 400,
+                SupportMessage = "The role id on the route and within the request do not match.",
+                Source = "RolesController.UpdatePermissions"
+            };
+            return BadRequest(error);
+        }
+
+        var result = await _roleService.UpdatePermissions(request.ToUpdateRolePermissionsCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RolesController.UpdatePermissions"));
     }
 
     [HttpPost]

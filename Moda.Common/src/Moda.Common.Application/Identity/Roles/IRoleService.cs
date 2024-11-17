@@ -14,7 +14,7 @@ public interface IRoleService : ITransientService
 
     Task<string> CreateOrUpdate(CreateOrUpdateRoleCommand request);
 
-    Task<string> UpdatePermissions(UpdateRolePermissionsCommand request, CancellationToken cancellationToken);
+    Task<Result> UpdatePermissions(UpdateRolePermissionsCommand request, CancellationToken cancellationToken);
 
     Task<string> Delete(string id);
 }

@@ -1,3 +1,4 @@
+using CSharpFunctionalExtensions;
 using FluentValidation.Results;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
@@ -111,13 +112,13 @@ internal class RoleService : IRoleService
         }
     }
 
-    public async Task<string> UpdatePermissions(UpdateRolePermissionsCommand request, CancellationToken cancellationToken)
+    public async Task<Result> UpdatePermissions(UpdateRolePermissionsCommand request, CancellationToken cancellationToken)
     {
         var role = await _roleManager.FindByIdAsync(request.RoleId);
         _ = role ?? throw new NotFoundException("Role Not Found");
         if (role.Name == ApplicationRoles.Admin)
         {
-            throw new ConflictException("Not allowed to modify Permissions for this Role.");
+            return Result.Failure("Not allowed to modify Permissions for this Role.");
         }
 
         //if (_currentTenant.Id != MultitenancyConstants.Root.Id)
@@ -134,7 +135,7 @@ internal class RoleService : IRoleService
             var removeResult = await _roleManager.RemoveClaimAsync(role, claim);
             if (!removeResult.Succeeded)
             {
-                throw new InternalServerException("Update permissions failed.");
+                return Result.Failure("Update permissions failed.");
             }
         }
 
@@ -156,7 +157,7 @@ internal class RoleService : IRoleService
 
         await _events.PublishAsync(new ApplicationRoleUpdatedEvent(role.Id, role.Name!, _dateTimeProvider.Now, true));
 
-        return "Permissions Updated.";
+        return Result.Success();
     }
 
     public async Task<string> Delete(string id)
