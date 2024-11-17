@@ -1,13 +1,13 @@
 'use client'
 
 import useTheme from '@/src/app/components/contexts/theme'
-import { useGetHealthReport } from '@/src/services/queries/health-check-queries'
 import { Spin } from 'antd'
 import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 import dayjs from 'dayjs'
 import { ApexOptions } from 'apexcharts'
+import { useGetHealthReportQuery } from '@/src/store/features/common/health-checks-api'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
@@ -39,15 +39,18 @@ const HealthReportChart = (props: HealthReportChartProps) => {
       : 'rgba(255, 255, 255, 0.45)'
 
   const {
-    data: healthReport,
+    data: healthReportData,
     isLoading,
     isFetching,
-  } = useGetHealthReport(props.objectId)
+    error,
+    refetch,
+  } = useGetHealthReportQuery(props.objectId, { skip: !props.objectId })
 
   useEffect(() => {
-    if (!healthReport) return
+    if (!healthReportData) return
 
-    const chartData = healthReport
+    const chartData = healthReportData
+      .slice()
       .sort((a, b) =>
         dayjs(a.reportedOn).isAfter(dayjs(b.reportedOn)) ? 1 : -1,
       )
@@ -56,7 +59,7 @@ const HealthReportChart = (props: HealthReportChartProps) => {
         y: convertStatusToNumber(report.status?.name),
       }))
     setSeriesData([{ name: 'Health Report', data: chartData }])
-  }, [healthReport])
+  }, [healthReportData])
 
   if (isLoading || isFetching) {
     return <Spin size="small" />

@@ -2,15 +2,22 @@ export enum QueryTags {
   // ADMIN
   BackgroundJob = 'Admin.BackgroundJob',
   BackgroundJobType = 'Admin.BackgroundJobType',
+
   // APP INTEGRATION
   AzdoConnectionTeams = 'AppIntegration.AzdoConnectionTeams',
   Connections = 'AppIntegration.Connections',
+
   // COMMON
   Links = 'Common.Links',
+  HealthChecks = 'Common.HealthChecks',
+  HealthChecksHealthReport = 'Common.HealthChecks.HealthReport',
+  HealthChecksStatusOptions = 'Common.HealthChecks.StatusOptions',
+
   // ORGANIZATIONS
   EmployeeOptions = 'Organizations.EmployeeOptions',
   Team = 'Organizations.Team',
   TeamBacklog = 'Organizations.TeamBacklog',
+
   // PLANNING
   PlanningInterval = 'Planning.PlanningInterval',
   PlanningIntervalObjective = 'Planning.PlanningIntervalObjective',
@@ -20,11 +27,13 @@ export enum QueryTags {
   RoadmapItems = 'Planning.RoadmapItems',
   RoadmapActivities = 'Planning.RoadmapActivities',
   RoadmapVisibility = 'Planning.RoadmapVisibility',
+
   // USER MANAGEMENT
   Users = 'UserManagement.Users',
   UserRoles = 'UserManagement.UserRoles',
   Roles = 'UserManagement.Roles',
   Permissions = 'UserManagement.Permissions',
+
   // WORK MANAGEMENT
   WorkItem = 'Work.WorkItem',
   WorkItemChildren = 'Work.WorkItem.Children',

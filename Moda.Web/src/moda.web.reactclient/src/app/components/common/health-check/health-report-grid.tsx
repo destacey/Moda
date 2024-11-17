@@ -4,13 +4,13 @@ import React, { useCallback, useMemo } from 'react'
 import ModaGrid from '../moda-grid'
 import Link from 'next/link'
 import dayjs from 'dayjs'
-import { useGetHealthReport } from '@/src/services/queries/health-check-queries'
 import {
   HealthCheckStatusCellRenderer,
   MarkdownCellRenderer,
 } from '../moda-grid-cell-renderers'
 import { HealthCheckDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
+import { useGetHealthReportQuery } from '@/src/store/features/common/health-checks-api'
 
 interface HealthReportGridProps {
   objectId: string
@@ -26,11 +26,12 @@ const ReportedByLinkCellRenderer = ({ value, data }) => {
 
 const HealthReportGrid = (props: HealthReportGridProps) => {
   const {
-    data: healthReport,
+    data: healthReportData,
     isLoading,
     isFetching,
+    error,
     refetch,
-  } = useGetHealthReport(props?.objectId)
+  } = useGetHealthReportQuery(props.objectId, { skip: !props.objectId })
 
   const columnDefs = useMemo<ColDef<HealthCheckDto>[]>(
     () => [
@@ -75,7 +76,7 @@ const HealthReportGrid = (props: HealthReportGridProps) => {
       <ModaGrid
         height={550}
         columnDefs={columnDefs}
-        rowData={healthReport}
+        rowData={healthReportData}
         loadData={refresh}
         loading={isLoading}
       />
