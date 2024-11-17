@@ -2,8 +2,8 @@ import useAuth from '@/src/app/components/contexts/auth'
 import { CreateOrUpdateRoleRequest, RoleDto } from '@/src/services/moda-api'
 import {
   useDeleteRoleMutation,
-  useCreateRoleMutation,
-} from '@/src/services/queries/user-management-queries'
+  useUpsertRoleMutation,
+} from '@/src/store/features/user-management/roles-api'
 import { toFormErrors } from '@/src/utils'
 import { Button, Form, Input, Popconfirm, Space, message } from 'antd'
 import { useRouter } from 'next/navigation'
@@ -20,23 +20,24 @@ const RoleDetails = (props: RolesDetailProps) => {
   const [role, setRole] = useState<RoleDto>(props.role)
   const [form] = Form.useForm<CreateOrUpdateRoleRequest>()
   const router = useRouter()
-  const { hasClaim } = useAuth()
-
-  const useDeleteRole = useDeleteRoleMutation()
-  const useCreateRole = useCreateRoleMutation()
-  const canDelete = hasClaim('Permission', 'Permissions.Roles.Delete')
   const [messageApi, contextHolder] = message.useMessage()
+
+  const { hasClaim } = useAuth()
+  const canDelete = hasClaim('Permission', 'Permissions.Roles.Delete')
+
+  const [upsertRole, { error: upsertRoleError }] = useUpsertRoleMutation()
+  const [deleteRole, { error: deleteRoleError }] = useDeleteRoleMutation()
 
   useEffect(() => setRole(props.role), [props.role])
 
   const confirmDelete = async () => {
     try {
-      await useDeleteRole.mutateAsync(role.id)
+      await deleteRole(role.id)
       messageApi.success('Role deleted successfully')
 
       // Allow delay for message to show
       setTimeout(() => {
-        router.push('/settings/roles')
+        router.push('/settings/user-management/roles')
       }, 1500)
     } catch (error) {
       if (error.statusCode === 409 && error.supportMessage) {
@@ -49,7 +50,7 @@ const RoleDetails = (props: RolesDetailProps) => {
 
   const onFinish = async (values: any) => {
     try {
-      await useCreateRole.mutateAsync({
+      await upsertRole({
         id: role?.id,
         name: values.name,
         description: values.description,

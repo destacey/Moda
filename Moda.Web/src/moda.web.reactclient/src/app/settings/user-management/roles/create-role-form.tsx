@@ -4,12 +4,12 @@ import { Form, Input, Modal, Select, message } from 'antd'
 import { useEffect, useState } from 'react'
 import useAuth from '@/src/app/components/contexts/auth'
 import { toFormErrors } from '@/src/utils'
-import { RoleDto } from '@/src/services/moda-api'
+import { RoleDto, UpdateRolePermissionsRequest } from '@/src/services/moda-api'
 import {
-  useCreateRoleMutation,
-  useGetRoleById,
+  useGetRoleQuery,
   useUpdatePermissionsMutation,
-} from '@/src/services/queries/user-management-queries'
+  useUpsertRoleMutation,
+} from '@/src/store/features/user-management/roles-api'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -35,18 +35,28 @@ const CreateRoleForm = ({
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [roleIdToCopyPermissions, setRoleIdToCopyPermissions] =
-    useState<string>('')
+  const [roleIdToCopyPermissions, setRoleIdToCopyPermissions] = useState<
+    string | null
+  >(null)
   const [form] = Form.useForm<CreateRoleFormValues>()
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
   const { hasClaim } = useAuth()
-  const roleData = useGetRoleById(roleIdToCopyPermissions)
   const canCreate = hasClaim('Permission', 'Permissions.Roles.Create')
 
-  const createRole = useCreateRoleMutation()
-  const updatePermissions = useUpdatePermissionsMutation()
+  const {
+    data: roleData,
+    isLoading: roleIsLoading,
+    error: roleError,
+    refetch: roleRefetch,
+  } = useGetRoleQuery(roleIdToCopyPermissions, {
+    skip: !roleIdToCopyPermissions,
+  })
+
+  const [upsertRole, { error: upsertRoleError }] = useUpsertRoleMutation()
+  const [updatePermissions, { error: updatePermissionsError }] =
+    useUpdatePermissionsMutation()
 
   useEffect(() => {
     if (canCreate) {
@@ -64,29 +74,41 @@ const CreateRoleForm = ({
     )
   }, [form, formValues])
 
-  const create = async (values: CreateRoleFormValues): Promise<string> => {
+  const create = async (
+    values: CreateRoleFormValues,
+  ): Promise<string | null> => {
     try {
-      const id = await createRole.mutateAsync({
+      const response = await upsertRole({
         name: values.name,
         description: values.description,
       })
 
-      if (roleIdToCopyPermissions && roleData.data.permissions) {
-        await updatePermissions.mutateAsync({
-          roleId: id,
-          permissions: roleData.data.permissions,
-        })
+      if (response.error) {
+        throw response.error
       }
 
-      return id
-    } catch (error) {
+      if (roleIdToCopyPermissions && roleData.permissions) {
+        const request: UpdateRolePermissionsRequest = {
+          roleId: response.data,
+          permissions: roleData.permissions,
+        }
+        const updatePermissionsResponse = await updatePermissions(request)
+        if (response.error) {
+          console.error(
+            `Role created but an error was thrown while saving the permissions. Error: ${updatePermissionsResponse.error}`,
+          )
+        }
+      }
+
+      return response.data
+    } catch (error: any) {
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          `An unexpected error occurred while creating the role.`,
+          'An unexpected error occurred while creating the role.',
         )
       }
 

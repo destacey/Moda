@@ -6,20 +6,25 @@ import { useState } from 'react'
 import RoleDetails from './components/role-details'
 import Permissions from './components/permissions'
 import useAuth from '@/src/app/components/contexts/auth'
-import { useGetRoleById } from '@/src/services/queries/user-management-queries'
 import { authorizePage } from '@/src/app/components/hoc'
 import { notFound } from 'next/navigation'
 import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
+import { useGetRoleQuery } from '@/src/store/features/user-management/roles-api'
 
 const RoleDetailsPage = ({ params }) => {
-  const { data: roleData, isLoading, isFetching } = useGetRoleById(params.id)
-
   const [activeTab, setActiveTab] = useState('details')
 
   const { hasPermissionClaim } = useAuth()
 
   //const canUpdateRole = hasPermissionClaim('Permissions.Roles.Update')
   const canViewPermissions = hasPermissionClaim('Permissions.Permissions.View')
+
+  const {
+    data: roleData,
+    isLoading: isLoading,
+    error: error,
+    refetch: refetch,
+  } = useGetRoleQuery(params.id)
 
   const tabs = [
     {
@@ -39,7 +44,7 @@ const RoleDetailsPage = ({ params }) => {
     },
   ]
 
-  if (!isLoading && !isFetching && !roleData) {
+  if (!isLoading && !roleData) {
     notFound()
   }
 

@@ -1,6 +1,6 @@
 import useTheme from '@/src/app/components/contexts/theme'
-import { useUpdatePermissionsMutation } from '@/src/services/queries/user-management-queries'
 import { useGetPermissionsQuery } from '@/src/store/features/user-management/permissions-api'
+import { useUpdatePermissionsMutation } from '@/src/store/features/user-management/roles-api'
 import {
   Row,
   Col,
@@ -51,7 +51,8 @@ const Permissions = (props: PermissionsProps) => {
     refetch,
   } = useGetPermissionsQuery()
 
-  const updatePermissions = useUpdatePermissionsMutation()
+  const [updatePermissions, { error: updatePermissionsError }] =
+    useUpdatePermissionsMutation()
 
   useEffect(() => {
     if (!permissionsData) return
@@ -107,7 +108,7 @@ const Permissions = (props: PermissionsProps) => {
 
   const handleSave = async () => {
     try {
-      await updatePermissions.mutateAsync({
+      await updatePermissions({
         roleId: props.roleId,
         permissions: permissions,
       })
