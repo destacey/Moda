@@ -31,9 +31,6 @@ export const rolesApi = apiSlice.injectEndpoints({
     getRole: builder.query<RoleDto, string>({
       queryFn: async (id: string) => {
         try {
-          if (!id) {
-            throw new Error('Role ID is required')
-          }
           const data = await (await getRolesClient()).getByIdWithPermissions(id)
           return { data }
         } catch (error) {

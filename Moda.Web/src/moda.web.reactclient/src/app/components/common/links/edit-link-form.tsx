@@ -4,11 +4,11 @@ import { LinkDto, UpdateLinkRequest } from '@/src/services/moda-api'
 import { Form, Input, Modal, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
-import {
-  useGetLinkById,
-  useUpdateLinkMutation,
-} from '@/src/services/queries/link-queries'
 import { toFormErrors } from '@/src/utils'
+import {
+  useGetLinkQuery,
+  useUpdateLinkMutation,
+} from '@/src/store/features/common/links-api'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -46,11 +46,16 @@ const EditLinkForm = ({
   const formValues = Form.useWatch([], form)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const { hasClaim } = useAuth()
-  const canUpdateLinks = hasClaim('Permission', 'Permissions.Links.Update')
+  const { hasPermissionClaim } = useAuth()
+  const canUpdateLinks = hasPermissionClaim('Permissions.Links.Update')
 
-  const { data: linkData } = useGetLinkById(id)
-  const updateLinkMutation = useUpdateLinkMutation()
+  const {
+    data: linkData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetLinkQuery(id, { skip: !id })
+  const [updateLink, { error: updateLinkError }] = useUpdateLinkMutation()
 
   const mapToFormValues = useCallback(
     (link: LinkDto) => {
@@ -66,7 +71,11 @@ const EditLinkForm = ({
     try {
       const request = mapToRequestValues(values)
       request.id = id
-      await updateLinkMutation.mutateAsync(request)
+      const response = await updateLink({ request, objectId: id })
+      if (response.error) {
+        throw response.error
+      }
+
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -88,10 +97,10 @@ const EditLinkForm = ({
     try {
       const values = await form.validateFields()
       if (await update(values)) {
+        messageApi.success('Successfully updated link.')
         setIsOpen(false)
         form.resetFields()
         onFormUpdate()
-        messageApi.success('Successfully updated link.')
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
