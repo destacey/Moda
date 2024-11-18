@@ -17,8 +17,6 @@ public record SimpleNavigationDto
 
     public static SimpleNavigationDto FromEnum<T>(T value) where T : struct, Enum
     {
-        ArgumentNullException.ThrowIfNull(value);
-
         return new()
         {
             Id = (int)(object)value,
@@ -28,8 +26,6 @@ public record SimpleNavigationDto
 
     public static SimpleNavigationDto FromEnum<T>(int value) where T : struct, Enum
     {
-        ArgumentNullException.ThrowIfNull(value);
-
         return new()
         {
             Id = value,
