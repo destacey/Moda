@@ -24,7 +24,7 @@ import { OptionModel } from '@/src/app/components/types'
 
 export const roadmapApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getRoadmaps: builder.query<RoadmapListDto[], null>({
+    getRoadmaps: builder.query<RoadmapListDto[], void>({
       queryFn: async () => {
         try {
           const data = await (await getRoadmapsClient()).getRoadmaps()

@@ -1,4 +1,3 @@
-import { useGetLinks } from '@/src/services/queries/link-queries'
 import { Button, Card, Space, Spin } from 'antd'
 import useAuth from '../../contexts/auth'
 import { EditOutlined, EditTwoTone, PlusOutlined } from '@ant-design/icons'
@@ -6,6 +5,7 @@ import { useState } from 'react'
 import CreateLinkForm from './create-link-form'
 import LinkItem from './link-item'
 import ModaEmpty from '../moda-empty'
+import { useGetLinksQuery } from '@/src/store/features/common/links-api'
 
 export interface LinksCardProps {
   objectId: string
@@ -15,13 +15,19 @@ const LinksCard = ({ objectId }: LinksCardProps) => {
   const [openCreateLinkForm, setOpenCreateLinkForm] = useState<boolean>(false)
   const [editModeEnabled, setEditModeEnabled] = useState<boolean>(false)
 
-  const { data: linksData, isLoading } = useGetLinks(objectId)
+  const {
+    data: linksData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetLinksQuery(objectId, { skip: !objectId })
+
   const hasLinks = linksData && linksData.length > 0
 
-  const { hasClaim } = useAuth()
-  const canCreateLinks = hasClaim('Permission', 'Permissions.Links.Create')
-  const canUpdateLinks = hasClaim('Permission', 'Permissions.Links.Update')
-  const canDeleteLinks = hasClaim('Permission', 'Permissions.Links.Delete')
+  const { hasPermissionClaim } = useAuth()
+  const canCreateLinks = hasPermissionClaim('Permissions.Links.Create')
+  const canUpdateLinks = hasPermissionClaim('Permissions.Links.Update')
+  const canDeleteLinks = hasPermissionClaim('Permissions.Links.Delete')
 
   const EditModeButton = () => {
     if (editModeEnabled) {
@@ -47,7 +53,7 @@ const LinksCard = ({ objectId }: LinksCardProps) => {
 
   const LinksContent = () => {
     if (isLoading) {
-      return <Spin />
+      return <Spin size="small" />
     } else if (!hasLinks) {
       return <ModaEmpty message="No links found" />
     } else {
@@ -59,6 +65,7 @@ const LinksCard = ({ objectId }: LinksCardProps) => {
           }}
         >
           {linksData
+            .slice()
             .sort((a, b) => a.name.localeCompare(b.name))
             .map((item) => (
               <LinkItem

@@ -21,6 +21,10 @@ internal sealed class ProcessService(string organizationUrl, string token, strin
                 _logger.LogError("Error getting processes from Azure DevOps: {ErrorMessage}.", response.ErrorMessage);
                 return Result.Failure<List<AzdoWorkProcess>>(response.ErrorMessage);
             }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NonAuthoritativeInformation)
+            {
+                return Result.Failure<List<AzdoWorkProcess>>("The request was not authorized with Azure DevOps.");
+            }
 
             var processes = response.Data?.Items.ToAzdoWorkProcesses() ?? [];
 

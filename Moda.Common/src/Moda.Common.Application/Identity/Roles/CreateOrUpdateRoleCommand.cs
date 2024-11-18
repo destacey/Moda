@@ -20,6 +20,6 @@ public sealed class CreateOrUpdateRoleCommandValidator : CustomValidator<CreateO
         RuleFor(r => r.Name).Cascade(CascadeMode.Stop)
             .NotEmpty()
             .MaximumLength(256)
-            .MustAsync(async (role, name, _) => !await roleService.ExistsAsync(name, role.Id))
+            .MustAsync(async (role, name, _) => !await roleService.Exists(name, role.Id))
                 .WithMessage("Similar Role already exists.");
 }

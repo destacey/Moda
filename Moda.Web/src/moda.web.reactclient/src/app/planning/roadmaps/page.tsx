@@ -16,12 +16,7 @@ const RoadmapsPage: React.FC = () => {
     useState<boolean>(false)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const {
-    data: roadmapData,
-    isLoading,
-    error,
-    refetch,
-  } = useGetRoadmapsQuery(null)
+  const { data: roadmapData, isLoading, error, refetch } = useGetRoadmapsQuery()
 
   const { hasPermissionClaim } = useAuth()
   const canCreateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Create')

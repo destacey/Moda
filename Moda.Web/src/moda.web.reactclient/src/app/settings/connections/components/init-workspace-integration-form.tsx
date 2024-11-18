@@ -1,6 +1,6 @@
 import useAuth from '@/src/app/components/contexts/auth'
 import { InitWorkspaceIntegrationRequest } from '@/src/services/moda-api'
-import { useInitAzdoBoardsConnectionWorkspaceMutation } from '@/src/services/queries/app-integration-queries'
+import { useInitAzdoConnectionWorkspaceMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
@@ -47,7 +47,10 @@ const InitWorkspaceIntegrationForm = (
     'Permissions.Connections.Update',
   )
 
-  const initWorkspaceMutation = useInitAzdoBoardsConnectionWorkspaceMutation()
+  const [
+    initAzdoConnectionWorkspace,
+    { error: initAzdoConnectionWorkspaceError },
+  ] = useInitAzdoConnectionWorkspaceMutation()
 
   const mapToFormValues = useCallback(
     (workspaceName: string) => {
@@ -66,7 +69,10 @@ const InitWorkspaceIntegrationForm = (
       request.id = props.connectionId
       request.externalId = props.externalId
 
-      await initWorkspaceMutation.mutateAsync(request)
+      const response = await initAzdoConnectionWorkspace(request)
+      if (response.error) {
+        throw response.error
+      }
       messageApi.success('Successfully initialized workspace.')
       return true
     } catch (error) {

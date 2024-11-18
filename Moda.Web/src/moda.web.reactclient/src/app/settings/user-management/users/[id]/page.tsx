@@ -2,17 +2,24 @@
 
 import PageTitle from '@/src/app/components/common/page-title'
 import { authorizePage } from '@/src/app/components/hoc'
-import { useGetUserById } from '@/src/services/queries/user-management-queries'
 import { notFound } from 'next/navigation'
 import UserDetailsLoading from './loading'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import UserDetails from './user-details'
-import { Card } from 'antd'
+import { Card, message } from 'antd'
 import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
+import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
 
 const UserDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')
-  const { data: userData, isLoading } = useGetUserById(params.id)
+  const [messageApi, contextHolder] = message.useMessage()
+
+  const {
+    data: userData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetUserQuery(params.id)
 
   const tabs = [
     {
@@ -21,6 +28,10 @@ const UserDetailsPage = ({ params }) => {
       content: <UserDetails user={userData} canEdit={true} />,
     },
   ]
+
+  useEffect(() => {
+    error && console.error(error)
+  }, [error])
 
   if (isLoading) {
     return <UserDetailsLoading />
@@ -34,6 +45,7 @@ const UserDetailsPage = ({ params }) => {
 
   return (
     <>
+      {contextHolder}
       <BasicBreadcrumb
         items={[
           { title: 'Settings' },

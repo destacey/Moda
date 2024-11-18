@@ -7,10 +7,6 @@ import { Card, message } from 'antd'
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
 import { authorizePage } from '@/src/app/components/hoc'
-import {
-  useSyncAzdoBoardsConnectionOrganizationMutation,
-  useUpdateAzdoBoardsConnectionSyncStateMutation,
-} from '@/src/services/queries/app-integration-queries'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import EditConnectionForm from '../components/edit-connection-form'
 import AzdoBoardsOrganization from './azdo-boards-organization'
@@ -23,7 +19,11 @@ import DeleteAzdoBoardsConnectionForm from '../components/delete-azdo-boards-con
 import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
 import { PageActions } from '@/src/app/components/common'
 import { ItemType } from 'antd/es/menu/interface'
-import { useGetAzdoConnectionByIdQuery } from '@/src/store/features/app-integration/azdo-integration-api'
+import {
+  useGetAzdoConnectionQuery,
+  useSyncAzdoConnectionOrganizationMutation,
+  useUpdateAzdoConnectionSyncStateMutation,
+} from '@/src/store/features/app-integration/azdo-integration-api'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -58,14 +58,18 @@ const ConnectionDetailsPage = ({ params }) => {
     data: connectionData,
     isLoading,
     refetch,
-  } = useGetAzdoConnectionByIdQuery(params.id)
+  } = useGetAzdoConnectionQuery(params.id)
   const azdoOrgUrl = connectionData?.configuration?.organizationUrl
 
-  const updateSyncStateMutation =
-    useUpdateAzdoBoardsConnectionSyncStateMutation()
+  const [
+    updateAzdoConnectionSyncState,
+    { error: updateAzdoConnectionSyncStateError },
+  ] = useUpdateAzdoConnectionSyncStateMutation()
 
-  const syncOrganizationConfigurationMutation =
-    useSyncAzdoBoardsConnectionOrganizationMutation()
+  const [
+    syncAzdoConnectionOrganization,
+    { error: syncAzdoConnectionOrganizationError },
+  ] = useSyncAzdoConnectionOrganizationMutation()
 
   const tabs = [
     {
@@ -121,13 +125,16 @@ const ConnectionDetailsPage = ({ params }) => {
 
   const updateSyncState = useCallback(async () => {
     try {
-      await updateSyncStateMutation.mutateAsync({
+      const response = await updateAzdoConnectionSyncState({
         connectionId: params.id,
-        isSyncEnabled: !connectionData.isSyncEnabled,
+        isSyncEnabled: !connectionData?.isSyncEnabled,
       })
+      if (response.error) {
+        throw response.error
+      }
       messageApi.success(
         `Sync setting has been ${
-          connectionData.isSyncEnabled ? 'disabled' : 'enabled'
+          connectionData?.isSyncEnabled ? 'disabled' : 'enabled'
         }`,
       )
     } catch (error) {
@@ -136,11 +143,19 @@ const ConnectionDetailsPage = ({ params }) => {
         `Failed to change sync setting. Error: ${error.supportMessage}`,
       )
     }
-  }, [updateSyncStateMutation, messageApi, connectionData, params.id])
+  }, [
+    connectionData?.isSyncEnabled,
+    messageApi,
+    params.id,
+    updateAzdoConnectionSyncState,
+  ])
 
   const syncOrganizationConfiguration = useCallback(async () => {
     try {
-      await syncOrganizationConfigurationMutation.mutateAsync(params.id)
+      const response = await syncAzdoConnectionOrganization(params.id)
+      if (response.error) {
+        throw response.error
+      }
       messageApi.success(
         'Successfully imported organization processes and projects.',
       )
@@ -151,7 +166,7 @@ const ConnectionDetailsPage = ({ params }) => {
       )
     }
     setIsSyncingOrganization(false)
-  }, [syncOrganizationConfigurationMutation, messageApi, params.id])
+  }, [syncAzdoConnectionOrganization, messageApi, params.id])
 
   const actionsMenuItems = useMemo(() => {
     const items = [] as ItemType[]

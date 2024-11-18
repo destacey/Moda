@@ -1,6 +1,6 @@
 import useAuth from '@/src/app/components/contexts/auth'
 import { InitWorkProcessIntegrationRequest } from '@/src/services/moda-api'
-import { useInitAzdoBoardsConnectionWorkProcessMutation } from '@/src/services/queries/app-integration-queries'
+import { useInitAzdoConnectionWorkProcessMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { Modal, Typography, message } from 'antd'
 import { useEffect, useState } from 'react'
 
@@ -27,8 +27,10 @@ const InitWorkProcessIntegrationForm = (
     'Permissions.Connections.Update',
   )
 
-  const initWorkProcessMutation =
-    useInitAzdoBoardsConnectionWorkProcessMutation()
+  const [
+    initAzdoConnectionWorkProcess,
+    { error: initAzdoConnectionWorkProcessError },
+  ] = useInitAzdoConnectionWorkProcessMutation()
 
   const init = async (): Promise<boolean> => {
     try {
@@ -37,7 +39,10 @@ const InitWorkProcessIntegrationForm = (
         externalId: props.externalId,
       } as InitWorkProcessIntegrationRequest
 
-      await initWorkProcessMutation.mutateAsync(request)
+      const response = await initAzdoConnectionWorkProcess(request)
+      if (response.error) {
+        throw response.error
+      }
       messageApi.success('Successfully initialized work process.')
       return true
     } catch (error) {

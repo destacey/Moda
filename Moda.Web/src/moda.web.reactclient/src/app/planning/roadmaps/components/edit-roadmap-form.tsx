@@ -86,7 +86,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
     error: currentUserInternalEmployeeIdError,
   } = useGetInternalEmployeeIdQuery()
 
-  const { hasClaim, hasPermissionClaim } = useAuth()
+  const { hasPermissionClaim } = useAuth()
   const canUpdateRoadmap = hasPermissionClaim('Permissions.Roadmaps.Update')
 
   const mapToFormValues = useCallback(

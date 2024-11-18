@@ -5,9 +5,9 @@ import Link from 'next/link'
 import { useState } from 'react'
 import EditLinkForm from './edit-link-form'
 import {
-  DeleteLinkMutationRequest,
+  StoreDeleteLinkRequest,
   useDeleteLinkMutation,
-} from '@/src/services/queries/link-queries'
+} from '@/src/store/features/common/links-api'
 
 export interface LinkItemProps {
   link: LinkDto
@@ -28,13 +28,22 @@ const LinkItem = ({
     useState<boolean>(false)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const deleteLinkMutation = useDeleteLinkMutation()
+  const [deleteLinkMutation, { error: deleteLinkError }] =
+    useDeleteLinkMutation()
 
   if (!link) return null
 
-  const deleteLink = async (request: DeleteLinkMutationRequest) => {
+  const deleteLink = async (id: string, objectId: string) => {
     try {
-      await deleteLinkMutation.mutateAsync(request)
+      const storeRequest: StoreDeleteLinkRequest = {
+        id: link.id,
+        objectId: link.objectId,
+      }
+      const response = await deleteLinkMutation(storeRequest)
+      if (response.error) {
+        throw response.error
+      }
+
       return true
     } catch (error) {
       messageApi.error('An unexpected error occurred while deleting the Link.')
@@ -46,7 +55,7 @@ const LinkItem = ({
   const handleDeleteConfirm = async () => {
     setDeleteConfirmLoading(true)
     try {
-      if (await deleteLink({ id: link.id, objectId: link.objectId })) {
+      if (await deleteLink(link.id, link.objectId)) {
         messageApi.success('Successfully deleted Link.')
       }
     } catch (errorInfo) {

@@ -2,7 +2,7 @@
 
 import useAuth from '@/src/app/components/contexts/auth'
 import { AzureDevOpsBoardsConnectionDetailsDto } from '@/src/services/moda-api'
-import { useDeleteAzdoBoardsConnectionMutation } from '@/src/services/queries/app-integration-queries'
+import { useDeleteAzdoConnectionMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { Descriptions, Modal, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -22,7 +22,8 @@ const DeleteAzdoBoardsConnectionForm = (
   const [isSaving, setIsSaving] = useState(false)
   const [messageApi, contextHolder] = message.useMessage()
 
-  const deleteConnectionMutation = useDeleteAzdoBoardsConnectionMutation()
+  const [deleteConnectionMutation, { error: deleteConnectionError }] =
+    useDeleteAzdoConnectionMutation()
 
   const { hasClaim } = useAuth()
   const canManageTeamMemberships = hasClaim(
@@ -34,7 +35,10 @@ const DeleteAzdoBoardsConnectionForm = (
     connection: AzureDevOpsBoardsConnectionDetailsDto,
   ) => {
     try {
-      await deleteConnectionMutation.mutateAsync(connection.id)
+      const response = await deleteConnectionMutation(connection.id)
+      if (response.error) {
+        throw response.error
+      }
       return true
     } catch (error) {
       messageApi.error(

@@ -4,8 +4,8 @@ import { CreateLinkRequest } from '@/src/services/moda-api'
 import { Form, Input, Modal, message } from 'antd'
 import { useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
-import { useCreateLinkMutation } from '@/src/services/queries/link-queries'
 import { toFormErrors } from '@/src/utils'
+import { useCreateLinkMutation } from '@/src/store/features/common/links-api'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -46,13 +46,17 @@ const CreateLinkForm = ({
   const { hasClaim } = useAuth()
   const canCreateLinks = hasClaim('Permission', 'Permissions.Links.Create')
 
-  const createLink = useCreateLinkMutation()
+  const [createLink, { error: createLinkError }] = useCreateLinkMutation()
 
   const create = async (values: CreateLinkFormValues): Promise<boolean> => {
     try {
       const request = mapToRequestValues(values)
       request.objectId = objectId
-      await createLink.mutateAsync(request)
+      const response = await createLink(request)
+      if (response.error) {
+        throw response.error
+      }
+
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
