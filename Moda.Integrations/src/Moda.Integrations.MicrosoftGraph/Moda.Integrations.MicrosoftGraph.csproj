@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="CSharpFunctionalExtensions" Version="3.1.0" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="3.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
     <PackageReference Include="Microsoft.Graph" Version="5.62.0" />
-    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="3.3.1" />
+    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="3.4.0" />
     <PackageReference Include="NodaTime" Version="3.2.0" />
   </ItemGroup>
 
