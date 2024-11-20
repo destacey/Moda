@@ -37,6 +37,7 @@ export interface RoadmapItemsGridProps {
   gridHeight?: number | undefined
   viewSelector?: React.ReactNode | undefined
   enableRowDrag?: boolean | undefined
+  openRoadmapItemDrawer: (itemId: string) => void
 }
 
 type RoadmapItemUnion =
@@ -151,6 +152,9 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
         title: 'Name',
         sorter: (a, b) => a.name.localeCompare(b.name),
         width: 350,
+        render: (text, record) => (
+          <a onClick={() => props.openRoadmapItemDrawer(record.id)}>{text}</a>
+        ),
       },
       {
         dataIndex: '',
@@ -200,7 +204,12 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
         width: 100,
       },
     ] as TableColumnsType<RoadmapItemDataType>
-  }, [canManageRoadmapItems, onDeleteItemMenuClicked, onEditItemMenuClicked])
+  }, [
+    canManageRoadmapItems,
+    onDeleteItemMenuClicked,
+    onEditItemMenuClicked,
+    props,
+  ])
 
   useEffect(() => {
     if (props.roadmapItemsIsLoading) return

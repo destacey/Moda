@@ -1,6 +1,5 @@
 import {
   CreateRoadmapActivityRequest,
-  CreateRoadmapItemRequest,
   CreateRoadmapMilestoneRequest,
   CreateRoadmapTimeboxRequest,
   ObjectIdAndKey,
