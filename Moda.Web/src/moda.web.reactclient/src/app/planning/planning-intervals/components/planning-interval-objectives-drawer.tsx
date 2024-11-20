@@ -3,9 +3,10 @@
 import { useGetPlanningIntervalObjectiveQuery } from '@/src/store/features/planning/planning-interval-api'
 import { Descriptions, Drawer, Space } from 'antd'
 import Link from 'next/link'
-import ModaMarkdownDescription from '../../components/common/moda-markdown-description'
+import ModaMarkdownDescription from '../../../components/common/moda-markdown-description'
 import dayjs from 'dayjs'
-import PlanningIntervalObjectiveWorkItemsCard from '../planning-intervals/[key]/objectives/[objectiveKey]/planning-interval-objective-work-items-card'
+import PlanningIntervalObjectiveWorkItemsCard from '../[key]/objectives/[objectiveKey]/planning-interval-objective-work-items-card'
+import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
 
 const { Item: DescriptionsItem } = Descriptions
 
@@ -43,17 +44,7 @@ const PlanningIntervalObjectiveDetailsDrawer = (
       open={props.drawerOpen}
       destroyOnClose={true}
       loading={objectiveDataIsLoading}
-      width={
-        window.innerWidth >= 1500
-          ? '30%'
-          : window.innerWidth >= 1300
-            ? '35%'
-            : window.innerWidth >= 1100
-              ? '40%'
-              : window.innerWidth >= 900
-                ? '50%'
-                : '80%'
-      }
+      width={getDrawerWidthPercentage()}
     >
       <Space direction="vertical">
         <Descriptions column={1}>
@@ -73,7 +64,7 @@ const PlanningIntervalObjectiveDetailsDrawer = (
             {objectiveData?.status.name}
           </DescriptionsItem>
         </Descriptions>
-        <Descriptions column={1} layout="vertical">
+        <Descriptions column={1} layout="vertical" style={{ paddingTop: 8 }}>
           <DescriptionsItem label="Description">
             <ModaMarkdownDescription content={objectiveData?.description} />
           </DescriptionsItem>

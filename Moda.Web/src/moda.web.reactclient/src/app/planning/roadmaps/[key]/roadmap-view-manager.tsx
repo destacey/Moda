@@ -14,6 +14,7 @@ interface RoadmapViewManagerProps {
   isRoadmapItemsLoading: boolean
   refreshRoadmapItems: () => void
   canUpdateRoadmap: boolean
+  openRoadmapItemDrawer: (itemId: string) => void
   messageApi: MessageInstance
 }
 
@@ -60,6 +61,7 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
           isRoadmapItemsLoading={props.isRoadmapItemsLoading}
           refreshRoadmapItems={props.refreshRoadmapItems}
           viewSelector={viewSelector}
+          openRoadmapItemDrawer={props.openRoadmapItemDrawer}
         />
       )}
       {currentView === 'List' && (
@@ -67,11 +69,12 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
           roadmapItemsData={roadmapItems}
           roadmapItemsIsLoading={props.isRoadmapItemsLoading}
           refreshRoadmapItems={props.refreshRoadmapItems}
+          messageApi={props.messageApi}
           gridHeight={550}
           viewSelector={viewSelector}
           enableRowDrag={props.canUpdateRoadmap}
           roadmapId={props.roadmap.id}
-          messageApi={props.messageApi}
+          openRoadmapItemDrawer={props.openRoadmapItemDrawer}
         />
       )}
     </>

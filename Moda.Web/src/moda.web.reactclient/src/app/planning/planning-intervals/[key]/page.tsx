@@ -10,7 +10,7 @@ import TeamsGrid, {
 import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
 import useAuth from '@/src/app/components/contexts/auth'
 import ManagePlanningIntervalTeamsForm from './manage-planning-interval-teams-form'
-import { EditPlanningIntervalForm } from '../../components'
+import { EditPlanningIntervalForm } from '../components'
 import {
   useGetPlanningInterval,
   useGetPlanningIntervalTeams,

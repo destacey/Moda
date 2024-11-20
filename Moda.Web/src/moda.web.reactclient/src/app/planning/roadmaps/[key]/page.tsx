@@ -22,7 +22,7 @@ import { ItemType } from 'antd/es/menu/interface'
 import EditRoadmapForm from '../components/edit-roadmap-form'
 import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
 import RoadmapViewManager from './roadmap-view-manager'
-import { DeleteRoadmapForm } from '../components'
+import { DeleteRoadmapForm, RoadmapItemDrawer } from '../components'
 import CreateRoadmapActivityForm from '../components/create-roadmap-activity-form'
 import CreateRoadmapTimeboxForm from '../components/create-roadmap-timebox-form'
 
@@ -43,6 +43,9 @@ const RoadmapDetailsPage = ({ params }) => {
   const [openEditRoadmapForm, setOpenEditRoadmapForm] = useState<boolean>(false)
   const [openDeleteRoadmapForm, setOpenDeleteRoadmapForm] =
     useState<boolean>(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
+
   const [messageApi, contextHolder] = message.useMessage()
 
   const pathname = usePathname()
@@ -186,6 +189,20 @@ const RoadmapDetailsPage = ({ params }) => {
       <LockOutlined title={visibilityTitle('Private', managersInfo)} />
     )
 
+  const showDrawer = () => {
+    setDrawerOpen(true)
+  }
+
+  const onDrawerClose = () => {
+    setDrawerOpen(false)
+    setSelectedItemId(null)
+  }
+
+  const openRoadmapItemDrawer = (itemId: string) => {
+    setSelectedItemId(itemId)
+    showDrawer()
+  }
+
   return (
     <>
       {contextHolder}
@@ -219,6 +236,7 @@ const RoadmapDetailsPage = ({ params }) => {
         isRoadmapItemsLoading={isRoadmapItemsLoading}
         refreshRoadmapItems={refetchRoadmapItems}
         canUpdateRoadmap={canUpdateRoadmap}
+        openRoadmapItemDrawer={openRoadmapItemDrawer}
         messageApi={messageApi}
       />
       {openEditRoadmapForm && (
@@ -255,6 +273,15 @@ const RoadmapDetailsPage = ({ params }) => {
           onFormComplete={() => onCreateRoadmapTimeboxFormClosed(true)}
           onFormCancel={() => onCreateRoadmapTimeboxFormClosed(false)}
           messageApi={messageApi}
+        />
+      )}
+      {roadmapData?.id && selectedItemId && (
+        <RoadmapItemDrawer
+          roadmapId={roadmapData.id}
+          roadmapItemId={selectedItemId}
+          drawerOpen={drawerOpen}
+          onDrawerClose={onDrawerClose}
+          openRoadmapItemDrawer={openRoadmapItemDrawer}
         />
       )}
     </>

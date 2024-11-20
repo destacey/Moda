@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode, useEffect, useMemo, useState } from 'react'
-import { Button, Card, Divider, Flex, Space, Switch } from 'antd'
+import { Button, Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import {
   RoadmapActivityListDto,
@@ -16,16 +16,23 @@ import {
   ModaTimeline,
   ModaTimelineOptions,
 } from '@/src/app/components/common/timeline'
-import { ModaDataItem } from '@/src/app/components/common/timeline/types'
+import {
+  ModaDataItem,
+  TimelineTemplate,
+} from '@/src/app/components/common/timeline/types'
 import dayjs from 'dayjs'
 import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons'
+import { getLuminance } from '@/src/utils/color-helper'
+
+const { Text } = Typography
 
 export interface RoadmapsTimelineProps {
   roadmap: RoadmapDetailsDto
   roadmapItems: RoadmapItemListDto[]
   isRoadmapItemsLoading: boolean
   refreshRoadmapItems: () => void
-  viewSelector?: ReactNode | undefined
+  viewSelector?: ReactNode
+  openRoadmapItemDrawer: (itemId: string) => void
 }
 
 interface RoadmapTimelineItem extends ModaDataItem<RoadmapItemListDto, string> {
@@ -33,6 +40,7 @@ interface RoadmapTimelineItem extends ModaDataItem<RoadmapItemListDto, string> {
   end: Date
   order?: number
   treeLevel: number
+  openRoadmapItemDrawer: (itemId: string) => void
 }
 
 enum RoadmapItemType {
@@ -49,6 +57,7 @@ interface ProcessedRoadmapData {
 
 function flattenRoadmapItems(
   items: RoadmapItemListDto[],
+  openRoadmapItemDrawer: (itemId: string) => void,
   treeLevel: number = 1,
 ): RoadmapTimelineItem[] {
   return items.reduce<RoadmapTimelineItem[]>((acc, item) => {
@@ -60,6 +69,7 @@ function flattenRoadmapItems(
       group: item.parent?.id,
       treeLevel: treeLevel,
       objectData: item,
+      openRoadmapItemDrawer: openRoadmapItemDrawer,
     }
 
     switch (item.$type) {
@@ -76,7 +86,13 @@ function flattenRoadmapItems(
         acc.push(timelineItem)
 
         if (activityItem.children?.length > 0) {
-          acc.push(...flattenRoadmapItems(activityItem.children, treeLevel + 1))
+          acc.push(
+            ...flattenRoadmapItems(
+              activityItem.children,
+              openRoadmapItemDrawer,
+              treeLevel + 1,
+            ),
+          )
         }
         break
       }
@@ -116,7 +132,13 @@ function flattenRoadmapItems(
         acc.push(timelineItem)
 
         if (activityItem.children?.length > 0) {
-          acc.push(...flattenRoadmapItems(activityItem.children, 1))
+          acc.push(
+            ...flattenRoadmapItems(
+              activityItem.children,
+              openRoadmapItemDrawer,
+              1,
+            ),
+          )
         }
         break
       }
@@ -192,6 +214,28 @@ export const DrillThroughControl = (props: {
   )
 }
 
+export const RoadmapRangeItemTemplate: TimelineTemplate<
+  RoadmapTimelineItem
+> = ({ item, fontColor, foregroundColor }) => {
+  const adjustedfontColor =
+    getLuminance(item.itemColor ?? '') > 0.6 ? '#4d4d4d' : '#FFFFFF'
+
+  return (
+    <Text style={{ padding: '5px', color: adjustedfontColor }}>
+      <a
+        onClick={() => item.openRoadmapItemDrawer(item.id)}
+        style={{ color: adjustedfontColor, textDecoration: 'none' }}
+        onMouseOver={(e) =>
+          (e.currentTarget.style.textDecoration = 'underline')
+        }
+        onMouseOut={(e) => (e.currentTarget.style.textDecoration = 'none')}
+      >
+        {item.content}
+      </a>
+    </Text>
+  )
+}
+
 const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [isLoading, setIsLoading] = useState(true)
   const [timelineStart, setTimelineStart] = useState<Date | undefined>(
@@ -225,7 +269,10 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       })),
     }
 
-    const items = flattenRoadmapItems([roadmapAsItem])
+    const items = flattenRoadmapItems(
+      [roadmapAsItem],
+      props.openRoadmapItemDrawer,
+    )
 
     const maxLevel = items.reduce(
       (max, item) => Math.max(max, item.treeLevel),
@@ -233,7 +280,12 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     )
 
     return { items, maxLevel }
-  }, [props.isRoadmapItemsLoading, props.roadmap, props.roadmapItems])
+  }, [
+    props.isRoadmapItemsLoading,
+    props.openRoadmapItemDrawer,
+    props.roadmap,
+    props.roadmapItems,
+  ])
 
   const processedGroups = useMemo(() => {
     if (!processedData || currentLevel <= 1) return undefined
@@ -342,6 +394,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
           groups={processedGroups}
           isLoading={isLoading}
           options={timelineOptions}
+          rangeItemTemplate={RoadmapRangeItemTemplate}
         />
       </Card>
     </>

@@ -12,7 +12,7 @@ import { useCallback, useMemo, useState } from 'react'
 import {
   CreatePlanningIntervalObjectiveForm,
   PlanningIntervalObjectivesTimeline,
-} from '../../../components'
+} from '../../components'
 import { PageTitle } from '@/src/app/components/common'
 import { notFound } from 'next/navigation'
 import { Button } from 'antd'

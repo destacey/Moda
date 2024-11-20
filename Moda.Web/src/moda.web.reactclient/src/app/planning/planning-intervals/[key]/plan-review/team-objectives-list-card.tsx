@@ -6,7 +6,7 @@ import { Badge, Button, Card, List, Space, message } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/app/components/common/moda-empty'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import CreatePlanningIntervalObjectiveForm from '../../../components/create-planning-interval-objective-form'
+import CreatePlanningIntervalObjectiveForm from '../../components/create-planning-interval-objective-form'
 import useTheme from '@/src/app/components/contexts/theme'
 import {
   DndContext,

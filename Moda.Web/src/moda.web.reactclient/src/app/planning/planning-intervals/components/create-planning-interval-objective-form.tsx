@@ -2,7 +2,7 @@
 
 import { DatePicker, Form, Input, Modal, Select, Switch, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
-import useAuth from '../../components/contexts/auth'
+import useAuth from '../../../components/contexts/auth'
 import { CreatePlanningIntervalObjectiveRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
