@@ -14,7 +14,7 @@ import { SegmentedLabeledOption } from 'antd/es/segmented'
 import {
   PlanningIntervalObjectiveDetailsDrawer,
   PlanningIntervalObjectivesTimeline,
-} from '../../../components'
+} from '../../components'
 import {
   useGetPlanningIntervalCalendar,
   useGetPlanningIntervalRisksByTeamId,

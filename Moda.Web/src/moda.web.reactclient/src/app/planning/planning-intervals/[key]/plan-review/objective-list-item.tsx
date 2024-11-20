@@ -20,7 +20,7 @@ import CreateHealthCheckForm from '@/src/app/components/common/health-check/crea
 import { SystemContext } from '@/src/app/components/constants'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
-import { EditPlanningIntervalObjectiveForm } from '../../../components'
+import { EditPlanningIntervalObjectiveForm } from '../../components'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { getObjectiveStatusColor } from '@/src/utils'

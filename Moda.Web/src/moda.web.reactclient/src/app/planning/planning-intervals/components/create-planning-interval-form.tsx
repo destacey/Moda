@@ -10,7 +10,7 @@ import {
   message,
 } from 'antd'
 import { useEffect, useState } from 'react'
-import useAuth from '../../components/contexts/auth'
+import useAuth from '../../../components/contexts/auth'
 import { CreatePlanningIntervalRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { useCreatePlanningIntervalMutation } from '@/src/services/queries/planning-queries'
