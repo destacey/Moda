@@ -22,7 +22,7 @@ export const ThemeProvider = ({ children }) => {
       currentThemeName === 'light' ? 'ag-theme-balham' : 'ag-theme-balham-dark',
     )
     setBadgeColor(
-      currentThemeName === 'light' ? token.colorPrimary : token.colorBorderBg,
+      currentThemeName === 'light' ? token.colorPrimary : token.colorPrimary, // token.colorBorderBg, // TODO: something broke in and color is not working the same way (see: objective count badge)
     )
     setAntDesignChartsTheme(
       currentThemeName === 'light' ? 'classic' : 'classicDark',
