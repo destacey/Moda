@@ -61,6 +61,7 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
           isRoadmapItemsLoading={props.isRoadmapItemsLoading}
           refreshRoadmapItems={props.refreshRoadmapItems}
           viewSelector={viewSelector}
+          openRoadmapItemDrawer={props.openRoadmapItemDrawer}
         />
       )}
       {currentView === 'List' && (
