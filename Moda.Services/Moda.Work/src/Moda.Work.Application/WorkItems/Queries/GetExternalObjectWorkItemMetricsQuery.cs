@@ -13,7 +13,7 @@ internal sealed class GetExternalObjectWorkItemMetricsQueryHandler(IWorkDbContex
     public async Task<List<WorkItemProgressDailyRollupDto>> Handle(GetExternalObjectWorkItemMetricsQuery request, CancellationToken cancellationToken)
     {
         var query = _workDbContext.WorkItems
-            .Where(e => e.SystemLinks.Any(sl => sl.ObjectId == request.ObjectiveId));
+            .Where(e => e.ReferenceLinks.Any(sl => sl.ObjectId == request.ObjectiveId));
 
         var progress = await new WorkItemProgressStateBuilder(_workDbContext, query).Build(cancellationToken);
 

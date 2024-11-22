@@ -48,11 +48,12 @@ public class WorkTypeLevelConfig : IEntityTypeConfiguration<WorkTypeLevel>
         builder.Property(w => w.Order);
     }
 }
-public class WorkItemLinkConfig : IEntityTypeConfiguration<WorkItemLink>
+
+public class WorkItemReferenceConfig : IEntityTypeConfiguration<WorkItemReference>
 {
-    public void Configure(EntityTypeBuilder<WorkItemLink> builder)
+    public void Configure(EntityTypeBuilder<WorkItemReference> builder)
     {
-        builder.ToTable("WorkItemLinks", SchemaNames.Work);
+        builder.ToTable("WorkItemReferences", SchemaNames.Work);
 
         builder.HasKey(w => new { w.WorkItemId, w.ObjectId });
 
@@ -157,7 +158,7 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .HasForeignKey(w => w.LastModifiedById)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(w => w.SystemLinks)
+        builder.HasMany(w => w.ReferenceLinks)
             .WithOne()
             .HasForeignKey(w => w.WorkItemId)
             .OnDelete(DeleteBehavior.Cascade);

@@ -14,7 +14,7 @@ internal sealed class ManageExternalObjectWorkItemsCommandHandler(IWorkDbContext
     {
         try
         {
-            var workItemLinks = await _workDbContext.WorkItemLinks
+            var workItemLinks = await _workDbContext.WorkItemReferences
                 .Where(w => w.ObjectId == request.ObjectiveId)
                 .ToListAsync(cancellationToken);
 
@@ -26,15 +26,15 @@ internal sealed class ManageExternalObjectWorkItemsCommandHandler(IWorkDbContext
             if (workItemIdsToRemove.Length > 0)
             {
                 var workItemLinksToRemove = workItemLinks.Where(x => workItemIdsToRemove.Contains(x.WorkItemId)).ToArray();
-                _workDbContext.WorkItemLinks.RemoveRange(workItemLinksToRemove);
+                _workDbContext.WorkItemReferences.RemoveRange(workItemLinksToRemove);
             }
 
             var workItemIdsToAdd = newWorkItemIds.Except(existingWorkItemIds).ToArray();
             _logger.LogDebug("Adding {WorkItemsToAddCount} to Objective {ObjectiveId}.", workItemIdsToAdd.Length, request.ObjectiveId);
             if (workItemIdsToAdd.Length > 0)
             {
-                var workItemLinksToAdd = workItemIdsToAdd.Select(x => WorkItemLink.Create(x, request.ObjectiveId, request.Context)).ToArray();
-                await _workDbContext.WorkItemLinks.AddRangeAsync(workItemLinksToAdd, cancellationToken);
+                var workItemLinksToAdd = workItemIdsToAdd.Select(x => WorkItemReference.Create(x, request.ObjectiveId, request.Context)).ToArray();
+                await _workDbContext.WorkItemReferences.AddRangeAsync(workItemLinksToAdd, cancellationToken);
             }
 
             await _workDbContext.SaveChangesAsync(cancellationToken);

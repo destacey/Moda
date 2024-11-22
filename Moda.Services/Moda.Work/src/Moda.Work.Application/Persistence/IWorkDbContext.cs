@@ -3,7 +3,7 @@ public interface IWorkDbContext : IModaDbContext
 {
     DbSet<WorkTypeHierarchy> WorkTypeHierarchies { get; }
     DbSet<Workflow> Workflows { get; }
-    DbSet<WorkItemLink> WorkItemLinks { get; }
+    DbSet<WorkItemReference> WorkItemReferences { get; }
     DbSet<WorkItem> WorkItems { get; }
     DbSet<WorkProcess> WorkProcesses { get; }
     DbSet<Workspace> Workspaces { get; }
