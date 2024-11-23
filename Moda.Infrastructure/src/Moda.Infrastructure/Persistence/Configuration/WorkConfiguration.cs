@@ -158,6 +158,16 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .HasForeignKey(w => w.LastModifiedById)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasMany(w => w.OutboundLinks)
+            .WithOne(ol => ol.Source)
+            .HasForeignKey(ol => ol.SourceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(w => w.InboundLinks)
+            .WithOne(ol => ol.Target)
+            .HasForeignKey(ol => ol.TargetId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasMany(w => w.ReferenceLinks)
             .WithOne()
             .HasForeignKey(w => w.WorkItemId)
@@ -180,6 +190,39 @@ public class WorkItemExtendedConfig : IEntityTypeConfiguration<WorkItemExtended>
 
         // Properties
         builder.Property(w => w.ExternalTeamIdentifier).HasMaxLength(128);
+    }
+}
+
+public class WorkItemLinkConfig : IEntityTypeConfiguration<WorkItemLink>
+{
+    public void Configure(EntityTypeBuilder<WorkItemLink> builder)
+    {
+        builder.ToTable("WorkItemLinks", SchemaNames.Work);
+
+        builder.HasKey(w => w.Id);
+
+        builder.HasIndex(w => new { w.SourceId, w.LinkType })
+            .IncludeProperties(w => new { w.Id, w.TargetId });
+
+        builder.HasIndex(w => new { w.TargetId, w.LinkType })
+            .IncludeProperties(w => new { w.Id, w.SourceId });
+
+        // Properties
+        builder.Property(w => w.LinkType).IsRequired()
+            .HasConversion<EnumConverter<WorkItemLinkType>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        // Relationships
+        builder.HasOne(w => w.CreatedBy)
+            .WithMany()
+            .HasForeignKey(w => w.CreatedById)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(w => w.EndedBy)
+            .WithMany()
+            .HasForeignKey(w => w.EndedById)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
 

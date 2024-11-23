@@ -12,6 +12,8 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
     private WorkItemKey _key = null!;
     private string _title = null!;
     private readonly List<WorkItem> _children = [];
+    private readonly List<WorkItemLink> _outboundLinks = []; // source links
+    private readonly List<WorkItemLink> _inboundLinks = []; // target links
     private readonly List<WorkItemReference> _referenceLinks = [];
 
     //private readonly List<WorkItemRevision> _history = [];
@@ -114,6 +116,8 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
 
     public WorkItemExtended? ExtendedProps { get; private set; }
 
+    public IReadOnlyCollection<WorkItemLink> OutboundLinks => _outboundLinks.AsReadOnly();
+    public IReadOnlyCollection<WorkItemLink> InboundLinks => _inboundLinks.AsReadOnly();
     public IReadOnlyCollection<WorkItemReference> ReferenceLinks => _referenceLinks.AsReadOnly();
 
     /// <summary>

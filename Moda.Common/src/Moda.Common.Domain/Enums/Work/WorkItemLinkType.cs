@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.Common.Domain.Enums.Work;
+
 public enum WorkItemLinkType
 {
+    // Current Db length is set to 32 characters
     [Display(Name = "Hierarchy", Description = "A link that defines a hierarchy between work items.", Order = 1)]
     Hierarchy = 1,
 
