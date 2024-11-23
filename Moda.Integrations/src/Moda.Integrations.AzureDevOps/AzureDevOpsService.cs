@@ -123,6 +123,17 @@ public class AzureDevOpsService(ILogger<AzureDevOpsService> logger, IServiceProv
             : Result.Failure<List<IExternalWorkItemLink>>(result.Error);
     }
 
+    public async Task<Result<List<IExternalWorkItemLink>>> GetDependencyLinkChanges(string organizationUrl, string token, string projectName, DateTime lastChangedDate, string[] workItemTypes, CancellationToken cancellationToken)
+    {
+        var workItemService = GetService<WorkItemService>(organizationUrl, token);
+
+        var result = await workItemService.GetDependencyLinkChanges(projectName, lastChangedDate, workItemTypes, cancellationToken);
+
+        return result.IsSuccess
+            ? Result.Success(result.Value.ToIExternalWorkItemLinks())
+            : Result.Failure<List<IExternalWorkItemLink>>(result.Error);
+    }
+
     public async Task<Result<int[]>> GetDeletedWorkItemIds(string organizationUrl, string token, string projectName, DateTime lastChangedDate, CancellationToken cancellationToken)
     {
         var workItemService = GetService<WorkItemService>(organizationUrl, token);
