@@ -12,8 +12,8 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
     private WorkItemKey _key = null!;
     private string _title = null!;
     private readonly List<WorkItem> _children = [];
-    private readonly List<WorkItemLink> _outboundLinks = []; // source links
-    private readonly List<WorkItemLink> _inboundLinks = []; // target links
+    private readonly List<WorkItemLink> _outboundLinksHistory = []; // source links
+    private readonly List<WorkItemLink> _inboundLinksHistory = []; // target links
     private readonly List<WorkItemReference> _referenceLinks = [];
 
     //private readonly List<WorkItemRevision> _history = [];
@@ -116,8 +116,8 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
 
     public WorkItemExtended? ExtendedProps { get; private set; }
 
-    public IReadOnlyCollection<WorkItemLink> OutboundLinks => _outboundLinks.AsReadOnly();
-    public IReadOnlyCollection<WorkItemLink> InboundLinks => _inboundLinks.AsReadOnly();
+    public IReadOnlyCollection<WorkItemLink> OutboundLinksHistory => _outboundLinksHistory.AsReadOnly();
+    public IReadOnlyCollection<WorkItemLink> InboundLinksHistory => _inboundLinksHistory.AsReadOnly();
     public IReadOnlyCollection<WorkItemReference> ReferenceLinks => _referenceLinks.AsReadOnly();
 
     /// <summary>
@@ -199,6 +199,60 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable
         }
 
         ParentId = parentInfo?.Id;
+        return Result.Success();
+    }
+
+    public Result AddSuccessorLink(Guid targetId, Instant timestamp, Guid? createdById, string? comment)
+    {
+        if (Id == targetId)
+        {
+            return Result.Failure("A work item cannot be linked to itself.");
+        }
+
+        var existingLink = _outboundLinksHistory.FirstOrDefault(x => x.TargetId == targetId 
+            && x.LinkType == WorkItemLinkType.Dependency 
+            && x.CreatedOn == timestamp);
+        if (existingLink is not null)
+        {
+            existingLink.Update(createdById, existingLink.RemovedById, comment);
+        }
+        else
+        {
+            var newLink = WorkItemLink.CreateDependency(Id, targetId, timestamp, createdById, null, null, comment);
+            _outboundLinksHistory.Add(newLink);
+        }
+
+        return Result.Success();
+    }
+
+    public Result RemoveSuccessorLink(Guid targetId, Instant timestamp, Guid? removedById)
+    {
+        if (Id == targetId)
+        {
+            return Result.Failure("A work item cannot be linked to itself.");
+        }
+
+        var existingLink = _outboundLinksHistory.FirstOrDefault(x => x.TargetId == targetId
+            && x.LinkType == WorkItemLinkType.Dependency
+            && x.RemovedOn == timestamp);
+        if (existingLink is not null)
+        {
+            existingLink.Update(existingLink.CreatedById, removedById, existingLink.Comment);
+        }
+        else
+        {
+            var link = _outboundLinksHistory.OrderBy(l => l.CreatedOn).FirstOrDefault(x => x.TargetId == targetId
+                && x.LinkType == WorkItemLinkType.Dependency
+                && x.RemovedOn is null
+                && x.CreatedOn < timestamp);
+            if (link is null)
+            {
+                return Result.Failure("The successor link does not exist.");
+            }
+
+            link.RemoveLink(timestamp, removedById);
+        }
+
         return Result.Success();
     }
 

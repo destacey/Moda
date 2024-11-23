@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Domain.Employees;
 using Moda.Common.Domain.Enums.Work;
 using Moda.Common.Extensions;
+using NodaTime;
 
 namespace Moda.Work.Domain.Models;
 public sealed class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
@@ -9,7 +10,7 @@ public sealed class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
 
     private WorkItemLink() { }
 
-    public WorkItemLink(Guid sourceId, Guid targetId, WorkItemLinkType linkType, DateTime createdOn, Guid? createdById, DateTime? endedOn, Guid? endedById, string? comment)
+    public WorkItemLink(Guid sourceId, Guid targetId, WorkItemLinkType linkType, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
     {
         if (sourceId == targetId)
             throw new ArgumentException("A work item cannot be linked to itself.", nameof(targetId));        
@@ -19,8 +20,8 @@ public sealed class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
         LinkType = linkType;
         CreatedOn = createdOn;
         CreatedById = createdById;
-        EndedOn = endedOn;
-        EndedById = endedById;
+        RemovedOn = removedOn;
+        RemovedById = removedById;
         Comment = comment;
     }
 
@@ -34,17 +35,17 @@ public sealed class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
     
     public WorkItemLinkType LinkType { get; private init; }
     
-    public DateTime CreatedOn { get; private init; }
+    public Instant CreatedOn { get; private init; }
 
     public Guid? CreatedById { get; set; }
 
     public Employee? CreatedBy { get; private set; }
 
-    public DateTime? EndedOn { get; private set; }
+    public Instant? RemovedOn { get; private set; }
 
-    public Guid? EndedById { get; set; }
+    public Guid? RemovedById { get; set; }
 
-    public Employee? EndedBy { get; private set; }
+    public Employee? RemovedBy { get; private set; }
 
     public string? Comment 
     { 
@@ -52,23 +53,31 @@ public sealed class WorkItemLink : BaseEntity<Guid>, ISystemAuditable
         private set => _comment = value.NullIfWhiteSpacePlusTrim(); 
     }
 
-    public void EndLink(DateTime endedOn)
+    public void Update(Guid? createdById, Guid? removedById, string? comment)
     {
-        EndedOn = endedOn;
+        CreatedById = createdById;
+        RemovedById = removedById;
+        Comment = comment;
     }
 
-    public static WorkItemLink Create(Guid sourceId, Guid targetId, WorkItemLinkType linkType, DateTime createdOn, Guid? createdById, DateTime? endedOn, Guid? endedById, string? comment)
+    public void RemoveLink(Instant removedOn, Guid? removedById)
     {
-        return new WorkItemLink(sourceId, targetId, linkType, createdOn, createdById, endedOn, endedById, comment);
+        RemovedOn = removedOn;
+        RemovedById = removedById;
     }
 
-    public static WorkItemLink CreateHierarchy(Guid sourceId, Guid targetId, DateTime createdOn, Guid? createdById, DateTime? endedOn, Guid? endedById, string? comment)
+    public static WorkItemLink Create(Guid sourceId, Guid targetId, WorkItemLinkType linkType, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
     {
-        return Create(sourceId, targetId, WorkItemLinkType.Hierarchy, createdOn, createdById, endedOn, endedById, comment);
+        return new WorkItemLink(sourceId, targetId, linkType, createdOn, createdById, removedOn, removedById, comment);
     }
 
-    public static WorkItemLink CreateDependency(Guid sourceId, Guid targetId, DateTime createdOn, Guid? createdById, DateTime? endedOn, Guid? endedById, string? comment)
+    public static WorkItemLink CreateHierarchy(Guid sourceId, Guid targetId, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
     {
-        return Create(sourceId, targetId, WorkItemLinkType.Dependency, createdOn, createdById, endedOn, endedById, comment);
+        return Create(sourceId, targetId, WorkItemLinkType.Hierarchy, createdOn, createdById, removedOn, removedById, comment);
+    }
+
+    public static WorkItemLink CreateDependency(Guid sourceId, Guid targetId, Instant createdOn, Guid? createdById, Instant? removedOn, Guid? removedById, string? comment)
+    {
+        return Create(sourceId, targetId, WorkItemLinkType.Dependency, createdOn, createdById, removedOn, removedById, comment);
     }
 }

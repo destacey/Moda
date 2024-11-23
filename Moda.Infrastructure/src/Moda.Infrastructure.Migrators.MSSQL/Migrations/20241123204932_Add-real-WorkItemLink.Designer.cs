@@ -13,8 +13,8 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20241123134200_Add-real-WorkItemLinks")]
-    partial class AddrealWorkItemLinks
+    [Migration("20241123204932_Add-real-WorkItemLink")]
+    partial class AddrealWorkItemLink
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1587,7 +1587,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
 
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uniqueidentifier");
@@ -1595,16 +1596,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("EndedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("EndedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("LinkType")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("varchar");
+
+                    b.Property<Guid?>("RemovedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("RemovedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("SourceId")
                         .HasColumnType("uniqueidentifier");
@@ -1628,7 +1629,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.HasIndex("EndedById");
+                    b.HasIndex("RemovedById");
 
                     b.HasIndex("SourceId", "LinkType");
 
@@ -2634,9 +2635,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "EndedBy")
+                    b.HasOne("Moda.Common.Domain.Employees.Employee", "RemovedBy")
                         .WithMany()
-                        .HasForeignKey("EndedById")
+                        .HasForeignKey("RemovedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Moda.Work.Domain.Models.WorkItem", "Source")
@@ -2653,7 +2654,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("EndedBy");
+                    b.Navigation("RemovedBy");
 
                     b.Navigation("Source");
 

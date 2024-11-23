@@ -5,7 +5,7 @@
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations;
 
 /// <inheritdoc />
-public partial class AddrealWorkItemLinks : Migration
+public partial class AddrealWorkItemLink : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,9 +21,9 @@ public partial class AddrealWorkItemLinks : Migration
                 LinkType = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
                 CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                 CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                EndedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                EndedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                RemovedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                RemovedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                Comment = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: true),
                 SystemCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                 SystemCreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 SystemLastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -40,8 +40,8 @@ public partial class AddrealWorkItemLinks : Migration
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Restrict);
                 table.ForeignKey(
-                    name: "FK_WorkItemLinks_Employees_EndedById",
-                    column: x => x.EndedById,
+                    name: "FK_WorkItemLinks_Employees_RemovedById",
+                    column: x => x.RemovedById,
                     principalSchema: "Organization",
                     principalTable: "Employees",
                     principalColumn: "Id",
@@ -69,10 +69,10 @@ public partial class AddrealWorkItemLinks : Migration
             column: "CreatedById");
 
         migrationBuilder.CreateIndex(
-            name: "IX_WorkItemLinks_EndedById",
+            name: "IX_WorkItemLinks_RemovedById",
             schema: "Work",
             table: "WorkItemLinks",
-            column: "EndedById");
+            column: "RemovedById");
 
         migrationBuilder.CreateIndex(
             name: "IX_WorkItemLinks_SourceId_LinkType",

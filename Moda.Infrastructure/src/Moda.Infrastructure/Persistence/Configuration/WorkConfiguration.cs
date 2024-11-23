@@ -158,12 +158,12 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .HasForeignKey(w => w.LastModifiedById)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(w => w.OutboundLinks)
+        builder.HasMany(w => w.OutboundLinksHistory)
             .WithOne(ol => ol.Source)
             .HasForeignKey(ol => ol.SourceId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(w => w.InboundLinks)
+        builder.HasMany(w => w.InboundLinksHistory)
             .WithOne(ol => ol.Target)
             .HasForeignKey(ol => ol.TargetId)
             .OnDelete(DeleteBehavior.Restrict);
@@ -213,15 +213,19 @@ public class WorkItemLinkConfig : IEntityTypeConfiguration<WorkItemLink>
             .HasColumnType("varchar")
             .HasMaxLength(32);
 
+        builder.Property(w => w.CreatedOn);
+        builder.Property(w => w.RemovedOn);
+        builder.Property(w => w.Comment).HasMaxLength(1024);
+
         // Relationships
         builder.HasOne(w => w.CreatedBy)
             .WithMany()
             .HasForeignKey(w => w.CreatedById)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(w => w.EndedBy)
+        builder.HasOne(w => w.RemovedBy)
             .WithMany()
-            .HasForeignKey(w => w.EndedById)
+            .HasForeignKey(w => w.RemovedById)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
