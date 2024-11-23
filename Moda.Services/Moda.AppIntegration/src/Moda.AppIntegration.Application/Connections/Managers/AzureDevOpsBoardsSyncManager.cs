@@ -161,6 +161,13 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
                                 }
                             }
 
+                            var syncWorkItemDependencyChangesResult = await SyncWorkItemDependencyChanges(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, lastChangedDate, workspace.IntegrationState!.InternalId, workspace.Name, cancellationToken);
+                            if (syncWorkItemDependencyChangesResult.IsFailure)
+                            {
+                                _logger.LogError("An error occurred while syncing Azure DevOps Boards workspace {WorkspaceId} work item dependency changes. Error: {Error}", workspace.IntegrationState!.InternalId, syncWorkItemDependencyChangesResult.Error);
+                                continue;
+                            }
+
                             var syncDeletedWorkItemsResult = await SyncDeletedWorkItems(connectionDetails.Configuration.OrganizationUrl, connectionDetails.Configuration.PersonalAccessToken, workspace.IntegrationState!.InternalId, workspace.Name, lastChangedDate, cancellationToken);
                             if (syncDeletedWorkItemsResult.IsFailure)
                             {
@@ -357,6 +364,27 @@ public sealed class AzureDevOpsBoardsSyncManager(ILogger<AzureDevOpsBoardsSyncMa
         return parentLinkChangesResult.Value.Count == 0
             ? Result.Success()
             : await _sender.Send(new SyncExternalWorkItemParentChangesCommand(workspaceId, parentLinkChangesResult.Value), cancellationToken);
+    }
+
+    private async Task<Result> SyncWorkItemDependencyChanges(string organizationUrl, string personalAccessToken, DateTime lastChangedDate, Guid workspaceId, string azdoWorkspaceName, CancellationToken cancellationToken)
+    {
+        Guard.Against.NullOrWhiteSpace(organizationUrl, nameof(organizationUrl));
+        Guard.Against.NullOrWhiteSpace(personalAccessToken, nameof(personalAccessToken));
+        Guard.Against.Default(workspaceId, nameof(workspaceId));
+
+        var workTypesResult = await _sender.Send(new GetWorkspaceWorkTypesQuery(workspaceId), cancellationToken);
+        if (workTypesResult.IsFailure)
+            return workTypesResult.ConvertFailure();
+
+        var dependencyLinkChangesResult = await _azureDevOpsService.GetDependencyLinkChanges(organizationUrl, personalAccessToken, azdoWorkspaceName, lastChangedDate, workTypesResult.Value.Select(t => t.Name).ToArray(), cancellationToken);
+        if (dependencyLinkChangesResult.IsFailure)
+            return dependencyLinkChangesResult.ConvertFailure();
+
+        _logger.LogInformation("Retrieved {WorkItemDependencyChangesCount} work item dependency changes to sync for Azure DevOps project {Project}.", dependencyLinkChangesResult.Value.Count, azdoWorkspaceName);
+
+        return dependencyLinkChangesResult.Value.Count == 0
+            ? Result.Success()
+            : await _sender.Send(new SyncExternalWorkItemDependencyChangesCommand(workspaceId, dependencyLinkChangesResult.Value), cancellationToken);
     }
 
     private async Task<Result> SyncDeletedWorkItems(string organizationUrl, string personalAccessToken, Guid workspaceId, string azdoWorkspaceName, DateTime lastChangedDate, CancellationToken cancellationToken)

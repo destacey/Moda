@@ -26,7 +26,7 @@ internal sealed class SyncExternalWorkItemParentChangesCommandHandler(IWorkDbCon
                 .Distinct().ToList();
 
             var parentWorkItems = await _workDbContext.WorkItems
-                .Where(wi => wi.WorkspaceId == request.WorkspaceId && wi.ExternalId.HasValue && parentIds.Contains(wi.ExternalId.Value))
+                .Where(wi => wi.ExternalId.HasValue && parentIds.Contains(wi.ExternalId.Value))
                 .ProjectToType<WorkItemParentInfo>()
                 .ToListAsync(cancellationToken);
 
@@ -49,7 +49,7 @@ internal sealed class SyncExternalWorkItemParentChangesCommandHandler(IWorkDbCon
 
                 var parent = parentLink.ChangedOperation == "remove" 
                     ? null 
-                    : parentWorkItems.FirstOrDefault(pwi => pwi.ExternalId == parentLink.SourceId);
+                    : parentWorkItems.FirstOrDefault(pwi => pwi.ExternalId == parentLink.SourceId);  // TODO: make sure the workspace id matches
 
                 var updateParentResult = child.UpdateParent(parent, child.Type);
                 if (updateParentResult.IsFailure)
@@ -70,7 +70,5 @@ internal sealed class SyncExternalWorkItemParentChangesCommandHandler(IWorkDbCon
             _logger.LogError(ex, "Exception thrown handling {AppRequestName}", AppRequestName);
             return Result.Failure(ex.ToString());
         }
-
     }
-
 }
