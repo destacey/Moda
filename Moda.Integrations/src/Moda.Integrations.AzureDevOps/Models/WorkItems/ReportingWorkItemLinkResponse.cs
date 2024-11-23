@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Domain.Enums.Work;
 using Moda.Integrations.AzureDevOps.Models.Contracts;
+using NodaTime;
 
 namespace Moda.Integrations.AzureDevOps.Models.WorkItems;
 internal sealed record ReportingWorkItemLinkResponse
@@ -31,14 +32,14 @@ internal static class ReportingWorkItemLinkResponseExtensions
                 _ => (WorkItemLinkType)999 // Unknown
             },
             SourceId = workItemLink.SourceId,   // Parent/Predecessor
-            TargetId = workItemLink.TargetId,   // Child/Successor
-            ChangedDate = workItemLink.ChangedDate,
+            TargetId = workItemLink.TargetId,   // Child/Successor            
+            ChangedDate = Instant.FromDateTimeOffset(workItemLink.ChangedDate),
             ChangedBy = workItemLink.ChangedBy?.UniqueName,
             Comment = workItemLink.Comment,
             IsActive = workItemLink.IsActive,
             ChangedOperation = workItemLink.ChangedOperation,
-            SourceProjectId = workItemLink.SourceProjectId,
-            TargetProjectId = workItemLink.TargetProjectId
+            SourceWorkspaceId = workItemLink.SourceProjectId,
+            TargetWorkspaceId = workItemLink.TargetProjectId
         };
     }
 
