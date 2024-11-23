@@ -8,6 +8,8 @@ public sealed record AzdoWorkItemLink : IExternalWorkItemLink
     public int SourceId { get; set; }
     public int TargetId { get; set; }
     public DateTime ChangedDate { get; set; }
+    public string? ChangedBy { get; set; }
+    public string? Comment { get; set; }
     public bool IsActive { get; set; }
     public required string ChangedOperation { get; set; }
     public Guid SourceProjectId { get; set; }

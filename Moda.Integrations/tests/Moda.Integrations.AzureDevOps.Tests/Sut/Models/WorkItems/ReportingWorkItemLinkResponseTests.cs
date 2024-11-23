@@ -18,6 +18,8 @@ public class ReportingWorkItemLinkResponseTests : CommonResponseOptions
         actualResponse.SourceId.Should().Be(28);
         actualResponse.TargetId.Should().Be(58);
         actualResponse.ChangedDate.ToUniversalTime().Should().Be(DateTime.Parse("2024-11-09T14:28:13.133Z").ToUniversalTime());
+        actualResponse.ChangedBy?.UniqueName.Should().Be("john.doe@test.com");
+        actualResponse.Comment.Should().Be("This is a test comment");
         actualResponse.IsActive.Should().BeTrue();
         actualResponse.ChangedOperation.Should().Be("create");
         actualResponse.SourceProjectId.Should().Be(Guid.Parse("f37284b7-762d-49ea-9b7c-b119849dc57a"));
@@ -41,7 +43,7 @@ public class ReportingWorkItemLinkResponseTests : CommonResponseOptions
                         "uniqueName": "john.doe@test.com",
                         "descriptor": "msa.TESTTESTTEST"
                     },
-                    "comment": null,
+                    "comment": "This is a test comment",
                     "changedOperation": "create",
                     "sourceProjectId": "f37284b7-762d-49ea-9b7c-b119849dc57a",
                     "targetProjectId": "f37284b7-762d-49ea-9b7c-b119849dc57a"

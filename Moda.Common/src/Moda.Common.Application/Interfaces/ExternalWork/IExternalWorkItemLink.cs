@@ -7,6 +7,8 @@ public interface IExternalWorkItemLink
     int SourceId { get; set; }
     int TargetId { get; set; }
     DateTime ChangedDate { get; set; }
+    string? ChangedBy { get; set; }
+    string? Comment { get; set; }
     bool IsActive { get; set; }
     string ChangedOperation { get; set; }
     Guid SourceProjectId { get; set; }

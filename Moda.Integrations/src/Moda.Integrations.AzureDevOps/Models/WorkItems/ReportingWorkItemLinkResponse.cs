@@ -10,6 +10,8 @@ internal sealed record ReportingWorkItemLinkResponse
     public int SourceId { get; init; }
     public int TargetId { get; init; }
     public DateTime ChangedDate { get; init; }
+    public UserResponse? ChangedBy { get; init; }
+    public string? Comment { get; init; }
     public bool IsActive { get; set; }
     public required string ChangedOperation { get; set; }
     public Guid SourceProjectId { get; set; }
@@ -31,6 +33,8 @@ internal static class ReportingWorkItemLinkResponseExtensions
             SourceId = workItemLink.SourceId,   // Parent/Predecessor
             TargetId = workItemLink.TargetId,   // Child/Successor
             ChangedDate = workItemLink.ChangedDate,
+            ChangedBy = workItemLink.ChangedBy?.UniqueName,
+            Comment = workItemLink.Comment,
             IsActive = workItemLink.IsActive,
             ChangedOperation = workItemLink.ChangedOperation,
             SourceProjectId = workItemLink.SourceProjectId,
