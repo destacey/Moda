@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Moda.Infrastructure.Persistence.Context;
 
@@ -12,9 +13,11 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    partial class ModaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241122115608_Rename-WorkItemLink-to-WorkItemReference")]
+    partial class RenameWorkItemLinktoWorkItemReference
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,10 +277,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasAlternateKey("Key");
-
-                    b.HasIndex("Email");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Email"), new[] { "Id" });
 
                     b.HasIndex("EmployeeNumber")
                         .IsUnique();
@@ -1562,11 +1561,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "Title"), new[] { "Id", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp" });
 
-                    b.HasIndex("WorkspaceId", "ExternalId")
-                        .HasFilter("[ExternalId] IS NOT NULL");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("WorkspaceId", "ExternalId"), new[] { "Id", "ParentId", "TypeId" });
-
                     b.ToTable("WorkItems", "Work");
                 });
 
@@ -1584,73 +1578,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("Id", "ExternalTeamIdentifier");
 
                     b.ToTable("WorkItemsExtended", "Work");
-                });
-
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItemLink", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
-
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LinkType")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar");
-
-                    b.Property<Guid?>("RemovedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("RemovedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("SourceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("SystemCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("SystemCreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("SystemLastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("SystemLastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TargetId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("RemovedById");
-
-                    b.HasIndex("LinkType", "RemovedOn")
-                        .HasFilter("[RemovedOn] IS NULL AND [LinkType] = 'Dependency'");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("LinkType", "RemovedOn"), new[] { "SourceId", "TargetId", "CreatedOn", "CreatedById", "Comment" });
-
-                    b.HasIndex("SourceId", "LinkType");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("SourceId", "LinkType"), new[] { "Id", "TargetId" });
-
-                    b.HasIndex("TargetId", "LinkType");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("TargetId", "LinkType"), new[] { "Id", "SourceId" });
-
-                    b.ToTable("WorkItemLinks", "Work");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkItemReference", b =>
@@ -1970,10 +1897,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Id");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "LevelId", "Name" });
-
                     b.HasIndex("LevelId");
 
                     b.HasIndex("Name")
@@ -1988,11 +1911,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasFilter("[IsDeleted] = 0");
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "LevelId", "Name" });
-
-                    b.HasIndex("Name", "IsDeleted")
-                        .HasFilter("[IsDeleted] = 0");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Name", "IsDeleted"), new[] { "Id", "LevelId" });
 
                     b.ToTable("WorkTypes", "Work");
                 });
@@ -2062,7 +1980,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<string>("Tier")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("varchar");
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<int?>("WorkTypeHierarchyId")
                         .HasColumnType("int");
@@ -2072,10 +1990,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("Id");
 
                     b.HasIndex("WorkTypeHierarchyId");
-
-                    b.HasIndex("Id", "Tier");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "Tier"), new[] { "Order" });
 
                     b.ToTable("WorkTypeLevels", "Work");
                 });
@@ -2269,11 +2183,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasAlternateKey("Key");
-
-                    b.HasIndex("ExternalId")
-                        .HasFilter("[ExternalId] IS NOT NULL");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ExternalId"), new[] { "Id" });
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -2657,39 +2566,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.Work.Domain.Models.WorkItemLink", b =>
-                {
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Moda.Common.Domain.Employees.Employee", "RemovedBy")
-                        .WithMany()
-                        .HasForeignKey("RemovedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Moda.Work.Domain.Models.WorkItem", "Source")
-                        .WithMany("OutboundLinksHistory")
-                        .HasForeignKey("SourceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Moda.Work.Domain.Models.WorkItem", "Target")
-                        .WithMany("InboundLinksHistory")
-                        .HasForeignKey("TargetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("RemovedBy");
-
-                    b.Navigation("Source");
-
-                    b.Navigation("Target");
-                });
-
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkItemReference", b =>
                 {
                     b.HasOne("Moda.Work.Domain.Models.WorkItem", null)
@@ -3006,10 +2882,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Children");
 
                     b.Navigation("ExtendedProps");
-
-                    b.Navigation("InboundLinksHistory");
-
-                    b.Navigation("OutboundLinksHistory");
 
                     b.Navigation("ReferenceLinks");
                 });

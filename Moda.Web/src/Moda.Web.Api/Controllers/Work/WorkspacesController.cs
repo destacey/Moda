@@ -166,9 +166,29 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
             : Ok(result.Value.OrderBy(w => w.StackRank));
     }
 
+    [HttpGet("{idOrKey}/work-items/{workItemKey}/dependencies")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
+    [OpenApiOperation("Get a work item's dependencies.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ScopedDependencyDto>>> GetWorkItemDependencies(string idOrKey, string workItemKey, CancellationToken cancellationToken)
+    {
+        var key = new WorkItemKey(workItemKey);
+
+        var result = await _sender.Send(new GetWorkItemDependenciesQuery(idOrKey, key), cancellationToken);
+
+        
+        return result.IsFailure
+            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetWorkItemDependencies"))
+            : result.Value is not null
+                ? Ok(result.Value.OrderBy(w => w.CreatedOn))
+                : NotFound();
+    }
+
     [HttpGet("{idOrKey}/work-items/{workItemKey}/metrics")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
-    [OpenApiOperation("Get metrics for a work item's.", "")]
+    [OpenApiOperation("Get metrics for a work item.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<WorkItemProgressDailyRollupDto>>> GetMetrics(string idOrKey, string workItemKey, CancellationToken cancellationToken)

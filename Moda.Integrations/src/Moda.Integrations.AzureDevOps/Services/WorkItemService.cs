@@ -77,6 +77,25 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
         }
     }
 
+    public async Task<Result<List<ReportingWorkItemLinkResponse>>> GetDependencyLinkChanges(string projectName, DateTime lastChangedDate, string[] workItemTypes, CancellationToken cancellationToken)
+    {
+        try
+        {
+            string[] linkTypes = ["System.LinkTypes.Dependency"];
+
+            var links = await _workItemClient.GetWorkItemLinkChanges(projectName, lastChangedDate, linkTypes, workItemTypes, cancellationToken);
+
+            _logger.LogDebug("{LinkCount} dependency link changes found for project {Project}", links.Count, projectName);
+
+            return Result.Success(links);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception thrown getting parent link changes for project {Project} from Azure DevOps", projectName);
+            return Result.Failure<List<ReportingWorkItemLinkResponse>>(ex.ToString());
+        }
+    }
+
     public async Task<Result<int[]>> GetDeletedWorkItemIds(string projectName, DateTime lastChangedDate, CancellationToken cancellationToken)
     {
         try

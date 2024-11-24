@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Moda.Infrastructure.Persistence.Context;
 
@@ -12,9 +13,11 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    partial class ModaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241124172016_Add-real-WorkItemLink")]
+    partial class AddrealWorkItemLink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,10 +277,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasAlternateKey("Key");
-
-                    b.HasIndex("Email");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Email"), new[] { "Id" });
 
                     b.HasIndex("EmployeeNumber")
                         .IsUnique();
@@ -1562,11 +1561,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "Title"), new[] { "Id", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp" });
 
-                    b.HasIndex("WorkspaceId", "ExternalId")
-                        .HasFilter("[ExternalId] IS NOT NULL");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("WorkspaceId", "ExternalId"), new[] { "Id", "ParentId", "TypeId" });
-
                     b.ToTable("WorkItems", "Work");
                 });
 
@@ -1970,10 +1964,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Id");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "LevelId", "Name" });
-
                     b.HasIndex("LevelId");
 
                     b.HasIndex("Name")
@@ -1988,11 +1978,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasFilter("[IsDeleted] = 0");
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "LevelId", "Name" });
-
-                    b.HasIndex("Name", "IsDeleted")
-                        .HasFilter("[IsDeleted] = 0");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Name", "IsDeleted"), new[] { "Id", "LevelId" });
 
                     b.ToTable("WorkTypes", "Work");
                 });
@@ -2062,7 +2047,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<string>("Tier")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("varchar");
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<int?>("WorkTypeHierarchyId")
                         .HasColumnType("int");
@@ -2072,10 +2057,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("Id");
 
                     b.HasIndex("WorkTypeHierarchyId");
-
-                    b.HasIndex("Id", "Tier");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "Tier"), new[] { "Order" });
 
                     b.ToTable("WorkTypeLevels", "Work");
                 });
@@ -2269,11 +2250,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasAlternateKey("Key");
-
-                    b.HasIndex("ExternalId")
-                        .HasFilter("[ExternalId] IS NOT NULL");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ExternalId"), new[] { "Id" });
 
                     b.HasIndex("Name")
                         .IsUnique();

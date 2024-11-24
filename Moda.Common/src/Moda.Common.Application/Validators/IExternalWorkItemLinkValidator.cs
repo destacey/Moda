@@ -17,13 +17,16 @@ public sealed class IExternalWorkItemLinkValidator : CustomValidator<IExternalWo
         RuleFor(c => c.ChangedDate)
             .NotEmpty();
 
+        RuleFor(c => c.Comment)
+            .MaximumLength(1024);
+
         RuleFor(c => c.ChangedOperation)
             .NotEmpty();
 
-        RuleFor(c => c.SourceProjectId)
+        RuleFor(c => c.SourceWorkspaceId)
             .NotEmpty();
 
-        RuleFor(c => c.TargetProjectId)
+        RuleFor(c => c.TargetWorkspaceId)
             .NotEmpty();
     }
 }

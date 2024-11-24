@@ -2,6 +2,7 @@ import { getWorkspacesClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import {
+  ScopedDependencyDto,
   SetExternalUrlTemplatesRequest,
   WorkItemDetailsDto,
   WorkItemListDto,
@@ -134,6 +135,30 @@ export const workspaceApi = apiSlice.injectEndpoints({
         ...result.map(({ key }) => ({ type: QueryTags.WorkItemChildren, key })),
       ],
     }),
+    getWorkItemDependencies: builder.query<
+      ScopedDependencyDto[],
+      { workspaceIdOrKey: string; workItemKey: string }
+    >({
+      queryFn: async ({ workspaceIdOrKey, workItemKey }) => {
+        try {
+          const data = await (
+            await getWorkspacesClient()
+          ).getWorkItemDependencies(workspaceIdOrKey, workItemKey)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, { workItemKey }) => [
+        QueryTags.WorkItemDependencies,
+        // Use workItemKey instead of id for cache invalidation
+        ...(result?.map(() => ({
+          type: QueryTags.WorkItemDependencies,
+          id: workItemKey,
+        })) ?? []),
+      ],
+    }),
     getWorkItemMetrics: builder.query<
       WorkItemProgressDailyRollupDto[],
       GetMetricsRequest
@@ -179,6 +204,7 @@ export const {
   useGetWorkItemsQuery,
   useGetWorkItemQuery,
   useGetChildWorkItemsQuery,
+  useGetWorkItemDependenciesQuery,
   useGetWorkItemMetricsQuery,
   useSearchWorkItemsQuery,
   useSetWorkspaceExternalUrlTemplatesMutation,

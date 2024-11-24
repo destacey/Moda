@@ -16,11 +16,13 @@ import WorkItemDetails from './work-item-details'
 import ExternalIconLink from '@/src/app/components/common/external-icon-link'
 import { WorkItemsGrid } from '@/src/app/components/common/work'
 import WorkItemDashboard from './work-item-dashboard'
+import WorkItemDependencies from './work-item-dependencies'
 
 enum WorkItemTabs {
   Details = 'details',
   WorkItems = 'workItems',
   Dashboard = 'dashboard',
+  Dependencies = 'dependencies',
 }
 
 const WorkItemDetailsPage = ({ params }) => {
@@ -116,6 +118,11 @@ const WorkItemDetailsPage = ({ params }) => {
           },
         ]
       : []),
+    {
+      key: WorkItemTabs.Dependencies,
+      tab: 'Dependencies',
+      content: <WorkItemDependencies workItem={workItemData} />,
+    },
   ]
 
   return (
@@ -128,7 +135,7 @@ const WorkItemDetailsPage = ({ params }) => {
             tooltip="Open in external system"
           />
         }
-        subtitle="Work Item Details"
+        subtitle={`${workItemData?.type ?? 'Work Item'} Details`}
       />
       <Card
         style={{ width: '100%' }}

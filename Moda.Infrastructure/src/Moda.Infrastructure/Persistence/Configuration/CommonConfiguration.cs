@@ -16,11 +16,17 @@ public class EmployeeConfig : IEntityTypeConfiguration<Employee>
 
         builder.HasIndex(e => new { e.Id, e.IsDeleted})
             .HasFilter("[IsDeleted] = 0");
+        
         builder.HasIndex(e => e.EmployeeNumber)
             .IsUnique()
             .IncludeProperties(e => new { e.Id });
+        
         builder.HasIndex(e => new { e.IsActive, e.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
+
+        // Index for email lookups
+        builder.HasIndex(e => e.Email)
+            .IncludeProperties(e => new { e.Id });
 
         builder.Property(e => e.Key).ValueGeneratedOnAdd();
 

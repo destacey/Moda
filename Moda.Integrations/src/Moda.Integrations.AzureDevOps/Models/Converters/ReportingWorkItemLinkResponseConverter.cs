@@ -18,6 +18,8 @@ internal class ReportingWorkItemLinkResponseConverter : JsonConverter<ReportingW
                 SourceId = attributes.GetProperty("sourceId").GetInt32(),
                 TargetId = attributes.GetProperty("targetId").GetInt32(),
                 ChangedDate = attributes.GetProperty("changedDate").GetDateTime(),
+                ChangedBy = JsonSerializer.Deserialize<UserResponse>(attributes.GetProperty("changedBy").GetRawText(), options),
+                Comment = attributes.GetProperty("comment").GetString(),
                 IsActive = attributes.GetProperty("isActive").GetBoolean(),
                 ChangedOperation = attributes.GetProperty("changedOperation").GetString()!,
                 SourceProjectId = attributes.GetProperty("sourceProjectId").GetGuid(),
@@ -35,6 +37,9 @@ internal class ReportingWorkItemLinkResponseConverter : JsonConverter<ReportingW
         writer.WriteNumber("targetId", value.TargetId);
         writer.WriteBoolean("isActive", value.IsActive);
         writer.WriteString("changedDate", value.ChangedDate.ToString("o"));
+        writer.WritePropertyName("changedBy");
+        JsonSerializer.Serialize(writer, value.ChangedBy, options);
+        writer.WriteString("comment", value.Comment);
         writer.WriteString("changedOperation", value.ChangedOperation);
         writer.WriteString("sourceProjectId", value.SourceProjectId.ToString());
         writer.WriteString("targetProjectId", value.TargetProjectId.ToString());
