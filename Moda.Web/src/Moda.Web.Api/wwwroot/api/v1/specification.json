@@ -4358,7 +4358,7 @@
         "tags": [
           "Workspaces"
         ],
-        "summary": "Get metrics for a work item's.",
+        "summary": "Get metrics for a work item.",
         "operationId": "Workspaces_GetMetrics",
         "parameters": [
           {
@@ -11571,6 +11571,12 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
           "dependency": {
             "$ref": "#/components/schemas/WorkItemDetailsNavigationDto"
           },

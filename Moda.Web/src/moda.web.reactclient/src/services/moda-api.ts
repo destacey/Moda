@@ -5210,7 +5210,7 @@ export class WorkspacesClient {
     }
 
     /**
-     * Get metrics for a work item's.
+     * Get metrics for a work item.
      */
     getMetrics(idOrKey: string, workItemKey: string, cancelToken?: CancelToken): Promise<WorkItemProgressDailyRollupDto[]> {
         let url_ = this.baseUrl + "/api/work/workspaces/{idOrKey}/work-items/{workItemKey}/metrics";
@@ -11062,6 +11062,7 @@ export interface WorkItemDetailsDto {
 }
 
 export interface ScopedDependencyDto {
+    id?: string;
     dependency?: WorkItemDetailsNavigationDto;
     type?: string;
     status?: SimpleNavigationDto;

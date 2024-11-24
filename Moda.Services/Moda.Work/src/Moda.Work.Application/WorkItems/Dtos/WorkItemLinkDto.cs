@@ -4,6 +4,7 @@ using Moda.Common.Application.Employees.Dtos;
 namespace Moda.Work.Application.WorkItems.Dtos;
 public sealed record WorkItemLinkDto : IMapFrom<WorkItemLink>
 {
+    public Guid Id { get; set; }
     public required WorkItemDetailsNavigationDto Source { get; set; }
     public required WorkItemDetailsNavigationDto Target { get; set; }
     public required SimpleNavigationDto LinkType { get; set; }
@@ -12,7 +13,6 @@ public sealed record WorkItemLinkDto : IMapFrom<WorkItemLink>
     public Instant? RemovedOn { get; set; }
     public EmployeeNavigationDto? RemovedBy { get; set; }
     public string? Comment { get; set; }
-
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {

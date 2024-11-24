@@ -40,6 +40,7 @@ export enum QueryTags {
   // WORK MANAGEMENT
   WorkItem = 'Work.WorkItem',
   WorkItemChildren = 'Work.WorkItem.Children',
+  WorkItemDependencies = 'Work.WorkItem.Dependencies',
   WorkItemMetrics = 'Work.WorkItem.Metrics',
   WorkItemSearch = 'Work.WorkItem.Search',
   WorkProcess = 'Work.WorkProcess',

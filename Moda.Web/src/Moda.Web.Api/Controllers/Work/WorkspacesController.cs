@@ -178,6 +178,7 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
 
         var result = await _sender.Send(new GetWorkItemDependenciesQuery(idOrKey, key), cancellationToken);
 
+        
         return result.IsFailure
             ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetWorkItemDependencies"))
             : result.Value is not null
@@ -187,7 +188,7 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
 
     [HttpGet("{idOrKey}/work-items/{workItemKey}/metrics")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
-    [OpenApiOperation("Get metrics for a work item's.", "")]
+    [OpenApiOperation("Get metrics for a work item.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<WorkItemProgressDailyRollupDto>>> GetMetrics(string idOrKey, string workItemKey, CancellationToken cancellationToken)

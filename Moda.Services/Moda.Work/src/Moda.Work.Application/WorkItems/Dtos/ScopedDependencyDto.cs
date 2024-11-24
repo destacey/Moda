@@ -5,6 +5,7 @@ using Moda.Common.Domain.Extensions;
 namespace Moda.Work.Application.WorkItems.Dtos;
 public sealed record ScopedDependencyDto
 {
+    public Guid Id { get; set; }
     public required WorkItemDetailsNavigationDto Dependency { get; set; }
 
     public required string Type { get; set; }
@@ -42,6 +43,7 @@ public sealed record ScopedDependencyDto
 
         return new ScopedDependencyDto
         {
+            Id = link.Id,
             Dependency = dependency,
             Type = isOutbound ? "Successor" : "Predecessor",
             Status = SimpleNavigationDto.FromEnum(dependencyStatus),
