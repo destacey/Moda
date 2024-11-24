@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20241123204932_Add-real-WorkItemLink")]
+    [Migration("20241124172016_Add-real-WorkItemLink")]
     partial class AddrealWorkItemLink
     {
         /// <inheritdoc />
@@ -1631,6 +1631,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasIndex("RemovedById");
 
+                    b.HasIndex("LinkType", "RemovedOn")
+                        .HasFilter("[RemovedOn] IS NULL AND [LinkType] = 'Dependency'");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("LinkType", "RemovedOn"), new[] { "SourceId", "TargetId", "CreatedOn", "CreatedById", "Comment" });
+
                     b.HasIndex("SourceId", "LinkType");
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("SourceId", "LinkType"), new[] { "Id", "TargetId" });
@@ -2641,13 +2646,13 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Moda.Work.Domain.Models.WorkItem", "Source")
-                        .WithMany("OutboundLinks")
+                        .WithMany("OutboundLinksHistory")
                         .HasForeignKey("SourceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Moda.Work.Domain.Models.WorkItem", "Target")
-                        .WithMany("InboundLinks")
+                        .WithMany("InboundLinksHistory")
                         .HasForeignKey("TargetId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -2978,9 +2983,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.Navigation("ExtendedProps");
 
-                    b.Navigation("InboundLinks");
+                    b.Navigation("InboundLinksHistory");
 
-                    b.Navigation("OutboundLinks");
+                    b.Navigation("OutboundLinksHistory");
 
                     b.Navigation("ReferenceLinks");
                 });

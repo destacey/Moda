@@ -207,6 +207,17 @@ public class WorkItemLinkConfig : IEntityTypeConfiguration<WorkItemLink>
         builder.HasIndex(w => new { w.TargetId, w.LinkType })
             .IncludeProperties(w => new { w.Id, w.SourceId });
 
+        builder.HasIndex(w => new { w.LinkType, w.RemovedOn })
+            .IncludeProperties(w => new
+            {
+                w.SourceId,
+                w.TargetId,
+                w.CreatedOn,
+                w.CreatedById,
+                w.Comment
+            })
+            .HasFilter("[RemovedOn] IS NULL AND [LinkType] = 'Dependency'");
+
         // Properties
         builder.Property(w => w.LinkType).IsRequired()
             .HasConversion<EnumConverter<WorkItemLinkType>>()

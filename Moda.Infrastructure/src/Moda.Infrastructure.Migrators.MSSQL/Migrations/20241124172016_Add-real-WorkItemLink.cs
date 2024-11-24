@@ -69,6 +69,14 @@ public partial class AddrealWorkItemLink : Migration
             column: "CreatedById");
 
         migrationBuilder.CreateIndex(
+            name: "IX_WorkItemLinks_LinkType_RemovedOn",
+            schema: "Work",
+            table: "WorkItemLinks",
+            columns: new[] { "LinkType", "RemovedOn" },
+            filter: "[RemovedOn] IS NULL AND [LinkType] = 'Dependency'")
+            .Annotation("SqlServer:Include", new[] { "SourceId", "TargetId", "CreatedOn", "CreatedById", "Comment" });
+
+        migrationBuilder.CreateIndex(
             name: "IX_WorkItemLinks_RemovedById",
             schema: "Work",
             table: "WorkItemLinks",
