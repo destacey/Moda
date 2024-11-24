@@ -100,6 +100,11 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
         builder.HasIndex(w => w.StatusCategory)
             .IncludeProperties(w => new { w.Id, w.Key, w.Title, w.WorkspaceId, w.AssignedToId, w.TypeId, w.StatusId, w.ActivatedTimestamp, w.DoneTimestamp });
 
+        // Index for external ID lookups
+        builder.HasIndex(w => new { w.ExternalId, w.WorkspaceId })
+            .IncludeProperties(w => new { w.Id })
+            .HasFilter("[ExternalId] IS NOT NULL");
+
         // Properties
         builder.Property(w => w.Key).IsRequired()
             .HasConversion(
@@ -350,6 +355,11 @@ public class WorkspaceConfig : IEntityTypeConfiguration<Workspace>
         builder.HasIndex(w => new { w.IsActive, w.IsDeleted })
             .IncludeProperties(w => new { w.Id, w.Key, w.Name, w.Ownership })
             .HasFilter("[IsDeleted] = 0");
+
+        // Index for external workspace lookups
+        builder.HasIndex(w => w.ExternalId)
+            .IncludeProperties(w => new { w.Id })
+            .HasFilter("[ExternalId] IS NOT NULL");
 
         // Properties
         builder.Property(w => w.Key).IsRequired()
