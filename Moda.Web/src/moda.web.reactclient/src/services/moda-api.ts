@@ -5139,6 +5139,77 @@ export class WorkspacesClient {
     }
 
     /**
+     * Get a work item's dependencies.
+     */
+    getWorkItemDependencies(idOrKey: string, workItemKey: string, cancelToken?: CancelToken): Promise<ScopedDependencyDto[]> {
+        let url_ = this.baseUrl + "/api/work/workspaces/{idOrKey}/work-items/{workItemKey}/dependencies";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (workItemKey === undefined || workItemKey === null)
+            throw new Error("The parameter 'workItemKey' must be defined.");
+        url_ = url_.replace("{workItemKey}", encodeURIComponent("" + workItemKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetWorkItemDependencies(_response);
+        });
+    }
+
+    protected processGetWorkItemDependencies(response: AxiosResponse): Promise<ScopedDependencyDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ScopedDependencyDto[]>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ScopedDependencyDto[]>(null as any);
+    }
+
+    /**
      * Get metrics for a work item's.
      */
     getMetrics(idOrKey: string, workItemKey: string, cancelToken?: CancelToken): Promise<WorkItemProgressDailyRollupDto[]> {
@@ -10985,6 +11056,29 @@ export interface WorkItemDetailsDto {
     createdBy?: EmployeeNavigationDto | undefined;
     lastModified?: Date;
     lastModifiedBy?: EmployeeNavigationDto | undefined;
+    activatedTimestamp?: Date | undefined;
+    doneTimestamp?: Date | undefined;
+    externalViewWorkItemUrl?: string | undefined;
+}
+
+export interface ScopedDependencyDto {
+    dependency?: WorkItemDetailsNavigationDto;
+    type?: string;
+    status?: SimpleNavigationDto;
+    createdOn?: Date;
+    createdBy?: EmployeeNavigationDto | undefined;
+    comment?: string | undefined;
+}
+
+export interface WorkItemDetailsNavigationDto {
+    id?: string;
+    key?: string;
+    title?: string;
+    workspaceKey?: string;
+    type?: string;
+    status?: string;
+    statusCategory?: SimpleNavigationDto;
+    team?: WorkTeamNavigationDto | undefined;
     activatedTimestamp?: Date | undefined;
     doneTimestamp?: Date | undefined;
     externalViewWorkItemUrl?: string | undefined;

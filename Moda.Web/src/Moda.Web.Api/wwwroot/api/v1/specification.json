@@ -4284,6 +4284,75 @@
         ]
       }
     },
+    "/api/work/workspaces/{idOrKey}/work-items/{workItemKey}/dependencies": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get a work item's dependencies.",
+        "operationId": "Workspaces_GetWorkItemDependencies",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "workItemKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScopedDependencyDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/work/workspaces/{idOrKey}/work-items/{workItemKey}/metrics": {
       "get": {
         "tags": [
@@ -11479,6 +11548,89 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
+          },
+          "activatedTimestamp": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "doneTimestamp": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "externalViewWorkItemUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ScopedDependencyDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "dependency": {
+            "$ref": "#/components/schemas/WorkItemDetailsNavigationDto"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "WorkItemDetailsNavigationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "workspaceKey": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "statusCategory": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkTeamNavigationDto"
               }
             ]
           },
