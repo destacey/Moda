@@ -38,12 +38,15 @@ public class WorkTypeLevelConfig : IEntityTypeConfiguration<WorkTypeLevel>
 
         builder.HasIndex(w => w.Id);
 
+        // Index for tier lookups
+        builder.HasIndex(w => new { w.Id, w.Tier })
+            .IncludeProperties(w => w.Order);
+
         builder.Property(w => w.Name).IsRequired().HasMaxLength(128);
         builder.Property(w => w.Description).HasMaxLength(1024);
-        builder.Property(w => w.Tier)
-            .HasConversion(
-                w => w.ToString(),
-                w => (WorkTypeTier)Enum.Parse(typeof(WorkTypeTier), w))
+        builder.Property(w => w.Tier).IsRequired()
+            .HasConversion<EnumConverter<WorkTypeTier>>()
+            .HasColumnType("varchar")
             .HasMaxLength(32);
         builder.Property(w => w.Order);
     }
@@ -100,9 +103,34 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
         builder.HasIndex(w => w.StatusCategory)
             .IncludeProperties(w => new { w.Id, w.Key, w.Title, w.WorkspaceId, w.AssignedToId, w.TypeId, w.StatusId, w.ActivatedTimestamp, w.DoneTimestamp });
 
-        // Index for external ID lookups
-        builder.HasIndex(w => new { w.ExternalId, w.WorkspaceId })
-            .IncludeProperties(w => new { w.Id })
+        builder.HasIndex(w => new { w.WorkspaceId, w.ExternalId })
+            .IncludeProperties(w => new
+            {
+                w.Id,
+                w.TypeId,
+                w.Title,
+                w.StatusId,
+                w.StatusCategory,
+                w.TeamId,
+                w.ParentId,
+                w.AssignedToId,
+                w.Priority,
+                w.StackRank,
+                w.ActivatedTimestamp,
+                w.DoneTimestamp,
+                w.LastModified,
+                w.LastModifiedById
+            })
+            .HasFilter("[ExternalId] IS NOT NULL");
+
+        // Index for portfolio parent lookups
+        builder.HasIndex(w => new { w.WorkspaceId, w.ExternalId })
+            .IncludeProperties(w => new
+            {
+                w.Id,
+                w.ParentId,
+                w.TypeId
+            })
             .HasFilter("[ExternalId] IS NOT NULL");
 
         // Properties
@@ -480,9 +508,28 @@ public class WorkTypeConfig : IEntityTypeConfiguration<WorkType>
         builder.HasIndex(w => new { w.Id, w.IsDeleted })
             .IncludeProperties(w => new { w.Name, w.LevelId, w.IsActive })
             .HasFilter("[IsDeleted] = 0");
+
         builder.HasIndex(w => w.Name).IsUnique();
+
         builder.HasIndex(w => new { w.IsActive, w.IsDeleted })
             .IncludeProperties(w => new { w.Id, w.LevelId, w.Name })
+            .HasFilter("[IsDeleted] = 0");
+
+        // Index to help with portfolio tier lookups
+        builder.HasIndex(w => w.Id)
+            .IncludeProperties(w => new
+            {
+                w.LevelId,
+                w.Name
+            });
+
+        // Index for work type lookups by name
+        builder.HasIndex(w => new { w.Name, w.IsDeleted })
+            .IncludeProperties(w => new
+            {
+                w.Id,
+                w.LevelId
+            })
             .HasFilter("[IsDeleted] = 0");
 
         // Properties

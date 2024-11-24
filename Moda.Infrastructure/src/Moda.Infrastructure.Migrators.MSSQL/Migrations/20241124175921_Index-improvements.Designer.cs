@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20241124173351_Index-improvements")]
+    [Migration("20241124175921_Index-improvements")]
     partial class Indeximprovements
     {
         /// <inheritdoc />
@@ -1561,14 +1561,14 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("WorkspaceId"), new[] { "Id", "Key", "Title", "ExternalId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp" });
 
-                    b.HasIndex("ExternalId", "WorkspaceId")
-                        .HasFilter("[ExternalId] IS NOT NULL");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ExternalId", "WorkspaceId"), new[] { "Id" });
-
                     b.HasIndex("Key", "Title");
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "Title"), new[] { "Id", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp" });
+
+                    b.HasIndex("WorkspaceId", "ExternalId")
+                        .HasFilter("[ExternalId] IS NOT NULL");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("WorkspaceId", "ExternalId"), new[] { "Id", "ParentId", "TypeId" });
 
                     b.ToTable("WorkItems", "Work");
                 });
@@ -1973,6 +1973,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Id");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "LevelId", "Name" });
+
                     b.HasIndex("LevelId");
 
                     b.HasIndex("Name")
@@ -1987,6 +1991,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasFilter("[IsDeleted] = 0");
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("IsActive", "IsDeleted"), new[] { "Id", "LevelId", "Name" });
+
+                    b.HasIndex("Name", "IsDeleted")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Name", "IsDeleted"), new[] { "Id", "LevelId" });
 
                     b.ToTable("WorkTypes", "Work");
                 });
@@ -2056,7 +2065,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<string>("Tier")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
+                        .HasColumnType("varchar");
 
                     b.Property<int?>("WorkTypeHierarchyId")
                         .HasColumnType("int");
@@ -2066,6 +2075,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("Id");
 
                     b.HasIndex("WorkTypeHierarchyId");
+
+                    b.HasIndex("Id", "Tier");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "Tier"), new[] { "Order" });
 
                     b.ToTable("WorkTypeLevels", "Work");
                 });
