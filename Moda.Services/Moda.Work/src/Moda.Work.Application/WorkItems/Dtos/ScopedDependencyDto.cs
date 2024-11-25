@@ -34,12 +34,12 @@ public sealed record ScopedDependencyDto
         var isOutbound = link.Source.Key == workItemKey;
         var dependency = isOutbound ? link.Target : link.Source;
 
-        if (dependency.StatusCategory?.Name == null)
+        if (link.Source.StatusCategory?.Name == null)
         {
             throw new InvalidOperationException("Status category is required for dependency");
         }
 
-        var dependencyStatus = DependencyStatusExtensions.FromStatusCategoryString(dependency.StatusCategory.Name);
+        var dependencyStatus = DependencyStatusExtensions.FromStatusCategoryString(link.Source.StatusCategory.Name);
 
         return new ScopedDependencyDto
         {

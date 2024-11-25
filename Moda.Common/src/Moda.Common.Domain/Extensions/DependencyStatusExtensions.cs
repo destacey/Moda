@@ -8,7 +8,7 @@ public static class DependencyStatusExtensions
         return statusCategory switch
         {
             "Proposed" => DependencyStatus.ToDo,
-            "Active" => DependencyStatus.Active,
+            "Active" => DependencyStatus.InProgress,
             "Done" => DependencyStatus.Done,
             _ => throw new ArgumentOutOfRangeException(nameof(statusCategory), statusCategory, null)
         };
