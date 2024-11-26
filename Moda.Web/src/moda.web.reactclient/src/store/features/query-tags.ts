@@ -20,6 +20,7 @@ export enum QueryTags {
   EmployeeOptions = 'Organizations.EmployeeOptions',
   Team = 'Organizations.Team',
   TeamBacklog = 'Organizations.TeamBacklog',
+  TeamDependencies = 'Organizations.TeamDependencies',
 
   // PLANNING
   PlanningInterval = 'Planning.PlanningInterval',

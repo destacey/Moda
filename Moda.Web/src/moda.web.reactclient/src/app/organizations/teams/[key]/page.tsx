@@ -30,10 +30,12 @@ import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import { WorkItemsBacklogGrid } from '@/src/app/components/common/work'
 import { useGetTeamBacklogQuery } from '@/src/store/features/organizations/team-api'
 import { WorkItemsBacklogGridProps } from '@/src/app/components/common/work/work-items-backlog-grid'
+import TeamDependencyManagement from './team-dependency-management'
 
 enum TeamTabs {
   Details = 'details',
   Backlog = 'backlog',
+  DependencyManagement = 'dependency-management',
   RiskManagement = 'risk-management',
   TeamMemberships = 'team-memberships',
 }
@@ -113,6 +115,11 @@ const TeamDetailsPage = ({ params }) => {
         isLoading: backlogQuery.isLoading,
         refetch: backlogQuery.refetch,
       } as WorkItemsBacklogGridProps),
+    },
+    {
+      key: TeamTabs.DependencyManagement,
+      tab: 'Dependency Management',
+      content: <TeamDependencyManagement team={team} />,
     },
     {
       key: TeamTabs.RiskManagement,
