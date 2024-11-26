@@ -1,4 +1,5 @@
-﻿using Moda.Organization.Application.Models;
+﻿using Moda.Common.Domain.Enums.Work;
+using Moda.Organization.Application.Models;
 using Moda.Organization.Application.Teams.Commands;
 using Moda.Organization.Application.Teams.Dtos;
 using Moda.Organization.Application.Teams.Queries;
@@ -187,6 +188,7 @@ public class TeamsController : ControllerBase
 
     #region Backlog
 
+    // TODO: update the claims check for viewing teams and work items
     [HttpGet("{idOrCode}/backlog")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
     [OpenApiOperation("Get the backlog for a team.", "")]
@@ -213,6 +215,21 @@ public class TeamsController : ControllerBase
         return result.IsFailure
             ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "TeamsController.GetTeamBacklog"))
             : Ok(result.Value);
+    }
+
+    [HttpGet("{id}/dependencies")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
+    [OpenApiOperation("Get the active dependencies for a team.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<DependencyDto>>> GetTeamDependencies(Guid id, CancellationToken cancellationToken)
+    {
+        var dependencies = await _sender.Send(new GetTeamDependenciesQuery(id, [DependencyStatus.ToDo, DependencyStatus.InProgress]), cancellationToken);
+
+        return dependencies is null
+            ? NotFound()
+            : Ok(dependencies);
     }
 
     #endregion Backlog

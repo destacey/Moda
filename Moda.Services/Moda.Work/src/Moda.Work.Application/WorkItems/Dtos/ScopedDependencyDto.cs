@@ -1,6 +1,5 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
-using Moda.Common.Domain.Extensions;
 
 namespace Moda.Work.Application.WorkItems.Dtos;
 public sealed record ScopedDependencyDto
@@ -24,7 +23,7 @@ public sealed record ScopedDependencyDto
     /// <param name="link"></param>
     /// <param name="workItemKey">The work item key in which the dependencies are scoped to.</param>
     /// <returns></returns>
-    public static ScopedDependencyDto From(WorkItemLinkDto link, WorkItemKey workItemKey)
+    public static ScopedDependencyDto From(DependencyDto link, WorkItemKey workItemKey)
     {
         ArgumentNullException.ThrowIfNull(link);
         ArgumentNullException.ThrowIfNull(workItemKey);
@@ -32,21 +31,13 @@ public sealed record ScopedDependencyDto
         ArgumentNullException.ThrowIfNull(link.Target);
 
         var isOutbound = link.Source.Key == workItemKey;
-        var dependency = isOutbound ? link.Target : link.Source;
-
-        if (dependency.StatusCategory?.Name == null)
-        {
-            throw new InvalidOperationException("Status category is required for dependency");
-        }
-
-        var dependencyStatus = DependencyStatusExtensions.FromStatusCategoryString(dependency.StatusCategory.Name);
 
         return new ScopedDependencyDto
         {
             Id = link.Id,
-            Dependency = dependency,
+            Dependency = isOutbound ? link.Target : link.Source,
             Type = isOutbound ? "Successor" : "Predecessor",
-            Status = SimpleNavigationDto.FromEnum(dependencyStatus),
+            Status = link.Status,
             CreatedOn = link.CreatedOn,
             CreatedBy = link.CreatedBy,
             Comment = link.Comment

@@ -6,9 +6,9 @@ namespace Moda.Work.Application.WorkItems.Queries;
 
 public sealed record GetTeamBacklogQuery : IQuery<Result<List<WorkItemBacklogItemDto>>>
 {
-    public GetTeamBacklogQuery(Guid workspaceId)
+    public GetTeamBacklogQuery(Guid teamId)
     {
-        Id = Guard.Against.NullOrEmpty(workspaceId);
+        Id = Guard.Against.NullOrEmpty(teamId);
     }
 
     public GetTeamBacklogQuery(TeamCode teamCode)
