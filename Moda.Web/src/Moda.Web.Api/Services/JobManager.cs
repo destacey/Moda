@@ -34,7 +34,12 @@ public class JobManager(ILogger<JobManager> logger, IEmployeeService employeeSer
     public async Task RunSyncAzureDevOpsBoards(SyncType syncType, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Running SyncAzureDevOpsBoards job");
-        await _azdoBoardsSyncManager.Sync(syncType, cancellationToken);
+        var result = await _azdoBoardsSyncManager.Sync(syncType, cancellationToken);
+        if (result.IsFailure)
+        {
+            _logger.LogError("Failed to sync Azure DevOps boards: {Error}", result.Error);
+            throw new InternalServerException($"Failed to sync Azure DevOps boards. Error: {result.Error}");
+        }
         _logger.LogInformation("Completed SyncAzureDevOpsBoards job");
     }
 }
