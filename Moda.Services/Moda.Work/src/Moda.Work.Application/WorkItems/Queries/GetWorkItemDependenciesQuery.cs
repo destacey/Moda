@@ -26,22 +26,22 @@ internal sealed class GetWorkItemDependenciesQueryHandler(IWorkDbContext workDbC
 
     public async Task<Result<List<ScopedDependencyDto>?>> Handle(GetWorkItemDependenciesQuery request, CancellationToken cancellationToken)
     {
-        var exists = await _workDbContext.WorkItems
+        var workItemId = await _workDbContext.WorkItems
             .Where(w => w.Key == request.WorkItemKey)
             .Where(request.WorkspaceIdOrKeyFilter)
-            .AnyAsync(cancellationToken);
+            .Select(w => (Guid?)w.Id)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        if (!exists)
+        if (!workItemId.HasValue)
         {
             _logger.LogInformation("{AppRequestName} - Work item with key {WorkItemKey} not found", AppRequestName, request.WorkItemKey);
             return null;
         }
 
         var dependencyLinks = await _workDbContext.WorkItemLinks
-            .Where(l => l.LinkType == WorkItemLinkType.Dependency)
-            .Where(l => l.RemovedOn == null)  // Only get active links
-            .Where(l => l.Source!.Key == request.WorkItemKey || l.Target!.Key == request.WorkItemKey)
-            .ProjectToType<WorkItemLinkDto>()
+            .Where(l => l.LinkType == WorkItemLinkType.Dependency && l.RemovedOn == null)
+            .Where(l => l.SourceId == workItemId || l.TargetId == workItemId)
+            .ProjectToType<DependencyDto>()
             .ToListAsync(cancellationToken);
 
         _logger.LogDebug("{AppRequestName} - Found {DependencyLinksCount} dependency links for work item {WorkItemKey}", AppRequestName, dependencyLinks.Count, request.WorkItemKey);

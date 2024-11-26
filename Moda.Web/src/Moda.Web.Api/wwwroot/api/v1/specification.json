@@ -6105,6 +6105,69 @@
         ]
       }
     },
+    "/api/organization/teams/{id}/dependencies": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get the active dependencies for a team.",
+        "operationId": "Teams_GetTeamDependencies",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DependencyDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/organization/teams/{id}/risks": {
       "get": {
         "tags": [
@@ -12532,6 +12595,46 @@
           "stackRank": {
             "type": "number",
             "format": "double"
+          }
+        }
+      },
+      "DependencyDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "source": {
+            "$ref": "#/components/schemas/WorkItemDetailsNavigationDto"
+          },
+          "target": {
+            "$ref": "#/components/schemas/WorkItemDetailsNavigationDto"
+          },
+          "linkType": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
