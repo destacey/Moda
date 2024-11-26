@@ -28,6 +28,9 @@ internal sealed class DeleteExternalWorkItemsCommandHandler(IWorkDbContext workD
 
             var workItems = await _workDbContext.WorkItems
                 .Include(w => w.Children)
+                .Include(w => w.OutboundLinksHistory)
+                .Include(w => w.InboundLinksHistory)
+                .Include(w => w.ReferenceLinks)
                 .Where(w => w.WorkspaceId == workspace.Id && request.WorkItemIds.Contains(w.ExternalId!.Value))
                 .ToListAsync(cancellationToken);
 
@@ -38,7 +41,9 @@ internal sealed class DeleteExternalWorkItemsCommandHandler(IWorkDbContext workD
                 return Result.Success();
             }
 
+            _workDbContext.WorkItemLinks.RemoveRange(workItems.SelectMany(w => w.OutboundLinksHistory.Concat(w.InboundLinksHistory)));
             _workDbContext.WorkItems.RemoveRange(workItems);
+
             await _workDbContext.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
