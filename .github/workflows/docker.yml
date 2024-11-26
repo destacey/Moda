@@ -72,6 +72,9 @@ jobs:
                     - dockerfile: ./Moda.Web/src/Moda.Web.Api/Dockerfile
                       image: awaldow/moda-api
                       contextDir: .
+                    - dockerfile: ./Moda.Web/src/Moda.Web.Api/Dockerfile.datadog
+                      image: awaldow/moda-api-datadog
+                      contextDir: .
                     - dockerfile: ./Moda.Web/src/moda.web.reactclient/Dockerfile
                       image: awaldow/moda-client
                       contextDir: .
