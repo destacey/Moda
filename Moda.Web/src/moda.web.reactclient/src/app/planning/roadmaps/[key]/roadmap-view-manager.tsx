@@ -3,7 +3,7 @@
 import { RoadmapDetailsDto, RoadmapItemListDto } from '@/src/services/moda-api'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
-import { useEffect, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import { MessageInstance } from 'antd/es/message/interface'
 import { RoadmapsTimeline } from '../components'
 import RoadmapItemsGrid from '../components/roadmap-items-grid'
@@ -81,4 +81,4 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
   )
 }
 
-export default RoadmapViewManager
+export default memo(RoadmapViewManager)

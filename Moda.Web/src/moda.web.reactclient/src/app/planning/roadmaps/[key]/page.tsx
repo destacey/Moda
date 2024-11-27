@@ -14,7 +14,7 @@ import {
 } from '@/src/store/features/planning/roadmaps-api'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import RoadmapDetailsLoading from './loading'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
 import { Descriptions, MenuProps, message } from 'antd'
@@ -146,61 +146,79 @@ const RoadmapDetailsPage = ({ params }) => {
     return items
   }, [canDeleteRoadmap, canUpdateRoadmap])
 
+  const onEditRoadmapFormClosed = useCallback(
+    (wasSaved: boolean) => {
+      setOpenEditRoadmapForm(false)
+      if (wasSaved) {
+        refetchRoadmap()
+      }
+    },
+    [refetchRoadmap],
+  )
+
+  const onDeleteFormClosed = useCallback(
+    (wasDeleted: boolean) => {
+      setOpenDeleteRoadmapForm(false)
+      if (wasDeleted) {
+        router.push('/planning/roadmaps/')
+      }
+    },
+    [router],
+  )
+
+  const onCreateRoadmapActivityFormClosed = useCallback(
+    (wasCreated: boolean) => {
+      setOpenCreateActivityForm(false)
+      if (wasCreated) {
+        refetchRoadmapItems()
+      }
+    },
+    [refetchRoadmapItems],
+  )
+
+  const onCreateRoadmapTimeboxFormClosed = useCallback(
+    (wasCreated: boolean) => {
+      setOpenCreateTimeboxForm(false)
+      if (wasCreated) {
+        refetchRoadmapItems()
+      }
+    },
+    [refetchRoadmapItems],
+  )
+
+  const visibilityTag = useMemo(
+    () =>
+      roadmapData?.visibility?.name === 'Public' ? (
+        <UnlockOutlined title={visibilityTitle('Public', managersInfo)} />
+      ) : (
+        <LockOutlined title={visibilityTitle('Private', managersInfo)} />
+      ),
+    [managersInfo, roadmapData?.visibility?.name],
+  )
+
+  const showDrawer = useCallback(() => {
+    setDrawerOpen(true)
+  }, [])
+
+  const onDrawerClose = useCallback(() => {
+    setDrawerOpen(false)
+    setSelectedItemId(null)
+  }, [])
+
+  const openRoadmapItemDrawer = useCallback(
+    (itemId: string) => {
+      setSelectedItemId(itemId)
+      showDrawer()
+    },
+    [showDrawer],
+  )
+
   if (isLoading) {
     return <RoadmapDetailsLoading />
   }
 
   if (!roadmapData) {
     notFound()
-  }
-
-  const onEditRoadmapFormClosed = (wasSaved: boolean) => {
-    setOpenEditRoadmapForm(false)
-    if (wasSaved) {
-      refetchRoadmap()
-    }
-  }
-
-  const onDeleteFormClosed = (wasDeleted: boolean) => {
-    setOpenDeleteRoadmapForm(false)
-    if (wasDeleted) {
-      router.push('/planning/roadmaps/')
-    }
-  }
-
-  const onCreateRoadmapActivityFormClosed = (wasCreated: boolean) => {
-    setOpenCreateActivityForm(false)
-    if (wasCreated) {
-      refetchRoadmapItems()
-    }
-  }
-
-  const onCreateRoadmapTimeboxFormClosed = (wasCreated: boolean) => {
-    setOpenCreateTimeboxForm(false)
-    if (wasCreated) {
-      refetchRoadmapItems()
-    }
-  }
-
-  const visibilityTag =
-    roadmapData?.visibility?.name === 'Public' ? (
-      <UnlockOutlined title={visibilityTitle('Public', managersInfo)} />
-    ) : (
-      <LockOutlined title={visibilityTitle('Private', managersInfo)} />
-    )
-
-  const showDrawer = () => {
-    setDrawerOpen(true)
-  }
-
-  const onDrawerClose = () => {
-    setDrawerOpen(false)
-    setSelectedItemId(null)
-  }
-
-  const openRoadmapItemDrawer = (itemId: string) => {
-    setSelectedItemId(itemId)
-    showDrawer()
   }
 
   return (
