@@ -12,6 +12,7 @@ export interface CreateTeamFormValues {
   name: string
   code: string
   description: string
+  activeDate: Date
 }
 
 export interface EditTeamFormValues {
