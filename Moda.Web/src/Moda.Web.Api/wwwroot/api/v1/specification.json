@@ -12360,7 +12360,8 @@
         "additionalProperties": false,
         "required": [
           "name",
-          "code"
+          "code",
+          "activeDate"
         ],
         "properties": {
           "name": {
@@ -12383,6 +12384,13 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
+          },
+          "activeDate": {
+            "type": "string",
+            "description": "The active date for the team.",
+            "format": "date",
+            "minLength": 1,
+            "nullable": false
           }
         }
       },
@@ -12718,7 +12726,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name"
+          "name",
+          "activeDate"
         ],
         "properties": {
           "name": {
@@ -12740,6 +12749,13 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
+          },
+          "activeDate": {
+            "type": "string",
+            "description": "The active date for the team.",
+            "format": "date",
+            "minLength": 1,
+            "nullable": false
           }
         }
       },

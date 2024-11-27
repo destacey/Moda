@@ -11346,6 +11346,8 @@ export interface CreateTeamRequest {
     code: string;
     /** Gets the team description. */
     description?: string | undefined;
+    /** The active date for the team. */
+    activeDate: Date;
 }
 
 export interface UpdateTeamRequest {
@@ -11438,6 +11440,8 @@ export interface CreateTeamOfTeamsRequest {
     code?: string;
     /** Gets the team description. */
     description?: string | undefined;
+    /** The active date for the team. */
+    activeDate: Date;
 }
 
 export interface UpdateTeamOfTeamsRequest {

@@ -1,25 +1,7 @@
-﻿namespace Moda.Organization.Application.TeamsOfTeams.Commands;
-public sealed record CreateTeamOfTeamsCommand : ICommand<int>
-{
-    public CreateTeamOfTeamsCommand(string name, TeamCode code, string? description)
-    {
-        Name = name;
-        Code = code;
-        Description = description;
-    }
+﻿using NodaTime;
 
-    /// <summary>Gets the team name.</summary>
-    /// <value>The team name.</value>
-    public string Name { get; }
-
-    /// <summary>Gets the code.</summary>
-    /// <value>The code.</value>
-    public TeamCode Code { get; }
-
-    /// <summary>Gets the team description.</summary>
-    /// <value>The team description.</value>
-    public string? Description { get; }
-}
+namespace Moda.Organization.Application.TeamsOfTeams.Commands;
+public sealed record CreateTeamOfTeamsCommand(string Name, TeamCode Code, string? Description, LocalDate ActiveDate) : ICommand<int>;
 
 public sealed class CreateTeamOfTeamsCommandValidator : CustomValidator<CreateTeamOfTeamsCommand>
 {
@@ -42,6 +24,9 @@ public sealed class CreateTeamOfTeamsCommandValidator : CustomValidator<CreateTe
 
         RuleFor(t => t.Description)
             .MaximumLength(1024);
+
+        RuleFor(t => t.ActiveDate)
+            .NotEmpty();
     }
 
     public async Task<bool> BeUniqueTeamName(string name, CancellationToken cancellationToken)
@@ -67,7 +52,7 @@ internal sealed class CreateTeamOfTeamsCommandHandler : ICommandHandler<CreateTe
     {
         try
         {
-            var team = TeamOfTeams.Create(request.Name, request.Code, request.Description, _dateTimeProvider.Now);
+            var team = TeamOfTeams.Create(request.Name, request.Code, request.Description, request.ActiveDate, _dateTimeProvider.Now);
             await _organizationDbContext.TeamOfTeams.AddAsync(team, cancellationToken);
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);

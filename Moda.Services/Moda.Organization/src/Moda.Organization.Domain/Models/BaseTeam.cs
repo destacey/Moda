@@ -12,7 +12,7 @@ public abstract class BaseTeam : BaseSoftDeletableEntity<Guid>, ISimpleTeam, Has
     private TeamCode _code = null!;
     private string? _description;
 
-    protected readonly List<TeamMembership> _parentMemberships = new();
+    protected readonly List<TeamMembership> _parentMemberships = [];
 
     /// <summary>Gets the key.</summary>
     /// <value>The key.</value>
@@ -51,7 +51,17 @@ public abstract class BaseTeam : BaseSoftDeletableEntity<Guid>, ISimpleTeam, Has
     public TeamType Type { get; protected set; }
 
     /// <summary>
-    /// Indicates whether the organization is active or not.  
+    /// The date for when the team became active.
+    /// </summary>
+    public LocalDate ActiveDate { get; protected set; }
+
+    /// <summary>
+    /// The date for when the team became inactive.
+    /// </summary>
+    public LocalDate? InactiveDate { get; protected set; }
+
+    /// <summary>
+    /// Indicates whether the team is active or not.  
     /// </summary>
     public bool IsActive { get; protected set; } = true;
 

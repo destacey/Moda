@@ -14,14 +14,15 @@ public class TeamTests
     private Team GenerateTeam(bool isActive)
     {
         int key = RandomNumberGenerator.GetInt32(1, 100000);
+        var created = _now.Minus(Duration.FromDays(10));
 
-        var team = Team.Create("Test Team", _genericTeamCode, "This is a description.", _now);
+        var team = Team.Create("Test Team", _genericTeamCode, "This is a description.", created.InUtc().LocalDateTime.Date, created);
         team.SetPrivate(t => t.Id, Guid.NewGuid());
         team.SetPrivate(t => t.Key, key);
 
         if (!isActive)
         {
-            team.Deactivate(_now);
+            team.Deactivate(TeamDeactivatableArgs.Create(_now.InUtc().LocalDateTime.Date, _now));
         }
 
         team.ClearDomainEvents();
@@ -32,14 +33,15 @@ public class TeamTests
     private TeamOfTeams GenerateTeamOfTeams(bool isActive)
     {
         int key = RandomNumberGenerator.GetInt32(1, 100000);
+        var created = _now.Minus(Duration.FromDays(10));
 
-        var team = TeamOfTeams.Create("Test Team of Teams", new TeamCode("TOT"), null, _now);
+        var team = TeamOfTeams.Create("Test Team of Teams", new TeamCode("TOT"), null, created.InUtc().LocalDateTime.Date, created);
         team.SetPrivate(t => t.Id, Guid.NewGuid());
         team.SetPrivate(t => t.Key, key);
 
         if (!isActive)
         {
-            team.Deactivate(_now);
+            team.Deactivate(TeamDeactivatableArgs.Create(_now.InUtc().LocalDateTime.Date, _now));
         }
 
         team.ClearDomainEvents();
@@ -55,9 +57,10 @@ public class TeamTests
         // Arrange
         var name = "Test Team ";
         var description = "Test Team Description";
+        var created = _now;
 
         // Act
-        var sut = Team.Create(name, _genericTeamCode, description, _now);
+        var sut = Team.Create(name, _genericTeamCode, description, created.InUtc().LocalDateTime.Date, created);
 
         // Assert
         sut.Type.Should().Be(TeamType.Team);
@@ -76,9 +79,10 @@ public class TeamTests
     {
         // Arrange
         string? name = null;
+        var created = _now;
 
         // Act
-        Action action = () => Team.Create(name!, _genericTeamCode, null, _now);
+        Action action = () => Team.Create(name!, _genericTeamCode, null, created.InUtc().LocalDateTime.Date, created);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Value cannot be null. (Parameter 'Name')");
@@ -89,8 +93,11 @@ public class TeamTests
     [InlineData("  ")]
     public void Create_WithInvalidName_Throws(string name)
     {
+        // Arrange
+        var created = _now;
+
         // Act
-        Action action = () => Team.Create(name, _genericTeamCode, null, _now);
+        Action action = () => Team.Create(name, _genericTeamCode, null, created.InUtc().LocalDateTime.Date, created);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Required input Name was empty. (Parameter 'Name')");
@@ -101,9 +108,10 @@ public class TeamTests
     {
         // Arrange
         TeamCode code = null!;
+        var created = _now;
 
         // Act
-        Action action = () => Team.Create("Test", code, null, _now);
+        Action action = () => Team.Create("Test", code, null, created.InUtc().LocalDateTime.Date, created);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Value cannot be null. (Parameter 'Code')");
@@ -115,8 +123,11 @@ public class TeamTests
     [InlineData(null)]
     public void Create_WithInvalidDescription_IsNull(string? description)
     {
+        // Arrange
+        var created = _now;
+
         // Act
-        var sut = Team.Create("Team", _genericTeamCode, description, _now);
+        var sut = Team.Create("Team", _genericTeamCode, description, created.InUtc().LocalDateTime.Date, created);
 
         // Assert
         sut.Description.Should().BeNull();
@@ -235,7 +246,7 @@ public class TeamTests
         var team = GenerateTeam(true);
 
         // Act
-        team.Deactivate(_now);
+        team.Deactivate(TeamDeactivatableArgs.Create(_now.InUtc().LocalDateTime.Date, _now));
 
         // Assert
         team.IsActive.Should().BeFalse();
