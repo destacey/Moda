@@ -9,8 +9,8 @@ public sealed record TeamNode
     public required string Name { get; set; }
     public required string Code { get; set; }
     public TeamType Type { get; set; }
-    public Instant ActiveTimestamp { get; set; }
-    public Instant? InactiveTimestamp { get; set; }
+    public LocalDate ActiveDate { get; set; }
+    public LocalDate? InactiveDate { get; set; }
     public bool IsActive { get; set; }
     public bool IsDeleted { get; set; }
 

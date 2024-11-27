@@ -13,8 +13,8 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20241127143443_Add-Team-graph-tables")]
-    partial class AddTeamgraphtables
+    [Migration("20241127203025_Add-Team-Dates-And-Graph-Tables")]
+    partial class AddTeamDatesAndGraphTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -758,16 +758,16 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ActiveTimestamp")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("ActiveDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("varchar");
 
-                    b.Property<DateTime?>("InactiveTimestamp")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("InactiveDate")
+                        .HasColumnType("date");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -815,8 +815,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "IsDeleted"), new[] { "Id", "Name", "Code", "IsActive" });
 
-                    b.HasIndex("ActiveTimestamp", "InactiveTimestamp", "IsDeleted")
-                        .HasDatabaseName("IX_TeamNodes_ActiveTimestamps")
+                    b.HasIndex("ActiveDate", "InactiveDate", "IsDeleted")
+                        .HasDatabaseName("IX_TeamNodes_ActiveDates")
                         .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("TeamNodes", "Organization");
@@ -827,6 +827,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ActiveDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -848,6 +851,9 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
+
+                    b.Property<DateTime?>("InactiveDate")
+                        .HasColumnType("date");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");

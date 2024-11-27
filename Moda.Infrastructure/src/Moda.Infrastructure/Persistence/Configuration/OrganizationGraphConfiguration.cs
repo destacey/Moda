@@ -24,8 +24,8 @@ public class TeamNodeConfig : IEntityTypeConfiguration<TeamNode>
             .HasConversion<string>()
             .HasColumnType("varchar")
             .HasMaxLength(32);
-        builder.Property(o => o.ActiveTimestamp).IsRequired();
-        builder.Property(o => o.InactiveTimestamp);
+        builder.Property(o => o.ActiveDate).IsRequired();
+        builder.Property(o => o.InactiveDate);
         builder.Property(o => o.IsActive);
         builder.Property(o => o.IsDeleted);
 
@@ -51,8 +51,8 @@ public class TeamNodeConfig : IEntityTypeConfiguration<TeamNode>
         builder.HasIndex(o => new { o.IsActive, o.IsDeleted })
             .HasFilter("[IsDeleted] = 0");
 
-        builder.HasIndex(x => new { x.ActiveTimestamp, x.InactiveTimestamp, x.IsDeleted })
-            .HasDatabaseName("IX_TeamNodes_ActiveTimestamps")
+        builder.HasIndex(x => new { x.ActiveDate, x.InactiveDate, x.IsDeleted })
+            .HasDatabaseName("IX_TeamNodes_ActiveDates")
             .HasFilter("[IsDeleted] = 0");
     }
 }
