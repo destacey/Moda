@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20241128142509_Add-Team-Dates-And-Graph-Tables")]
+    [Migration("20241128155347_Add-Team-Dates-And-Graph-Tables")]
     partial class AddTeamDatesAndGraphTables
     {
         /// <inheritdoc />
@@ -717,13 +717,13 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<Guid>("FromNodeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<Guid>("ToNodeId")
                         .HasColumnType("uniqueidentifier");

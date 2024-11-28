@@ -116,7 +116,7 @@ public partial class AddTeamDatesAndGraphTables : Migration
                 '00000000-0000-0000-0000-000000000000',  -- System UserId for migration
                 'Update',                          -- Type
                 'Team',                           -- TableName
-                SYSUTCDATETIME(),                 -- Current UTC time
+                SYSUTCDATETIME(),
                 JSON_QUERY(                        -- OldValues
                     '{' +
                         '""activeDate"": null' +
@@ -143,8 +143,8 @@ public partial class AddTeamDatesAndGraphTables : Migration
                 JSON_QUERY(                        -- PrimaryKey
                     CONCAT('{""id"":""', t.Id, '""}')
                 ),
-                @CorrelationId,                   -- CorrelationId  
-                'Organization'                     -- SchemaName
+                @CorrelationId,
+                'Organization'
             FROM [Organization].[Teams] t
             WHERE t.ActiveDate <> CAST('0001-01-01' as date);");
 
@@ -212,9 +212,7 @@ public partial class AddTeamDatesAndGraphTables : Migration
             INSERT INTO [Organization].[TeamNodes] 
                 ([Id], [Key], [Name], [Code], [Type], [IsActive], [ActiveDate], [InactiveDate])
             SELECT 
-                t.[Id], t.[Key], t.[Name], t.[Code], t.[Type], t.[IsActive],
-                t.[ActiveDate],                 -- Use the new ActiveDate field
-                t.[InactiveDate]               -- Use the new InactiveDate field
+                t.[Id], t.[Key], t.[Name], t.[Code], t.[Type], t.[IsActive], t.[ActiveDate], t.[InactiveDate]
             FROM [Organization].[Teams] t
 			WHERE t.[IsDeleted] = 0;
 
