@@ -16,7 +16,7 @@ public sealed record TeamNode
     public ICollection<TeamMembershipEdge> ParentMemberships { get; set; } = [];
     public ICollection<TeamMembershipEdge> ChildMemberships { get; set; } = [];
 
-    public static TeamNode Create(BaseTeam team)
+    public static TeamNode From(BaseTeam team)
     {
         return new TeamNode
         {

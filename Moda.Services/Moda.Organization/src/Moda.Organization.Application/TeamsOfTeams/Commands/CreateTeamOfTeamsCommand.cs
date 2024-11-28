@@ -65,7 +65,7 @@ internal sealed class CreateTeamOfTeamsCommandHandler : ICommandHandler<CreateTe
 
             // Sync the new team with the graph database
             // TODO: move to more of an event based approach
-            await _organizationDbContext.UpsertTeamNode(TeamNode.Create(team), cancellationToken);
+            await _organizationDbContext.UpsertTeamNode(TeamNode.From(team), cancellationToken);
 
             return Result.Success(team.Key);
         }
