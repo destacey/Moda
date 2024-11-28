@@ -12,8 +12,22 @@ public sealed record TeamNode
     public LocalDate ActiveDate { get; set; }
     public LocalDate? InactiveDate { get; set; }
     public bool IsActive { get; set; }
-    public bool IsDeleted { get; set; }
 
     public ICollection<TeamMembershipEdge> ParentMemberships { get; set; } = [];
     public ICollection<TeamMembershipEdge> ChildMemberships { get; set; } = [];
+
+    public static TeamNode Create(BaseTeam team)
+    {
+        return new TeamNode
+        {
+            Id = team.Id,
+            Key = team.Key,
+            Name = team.Name,
+            Code = team.Code.Value,
+            Type = team.Type,
+            ActiveDate = team.ActiveDate,
+            InactiveDate = team.InactiveDate,
+            IsActive = team.IsActive
+        };
+    }
 }

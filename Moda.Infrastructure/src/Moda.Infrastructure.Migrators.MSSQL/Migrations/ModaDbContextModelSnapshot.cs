@@ -719,9 +719,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid>("FromNodeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -730,21 +727,17 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EndDate", "StartDate", "IsDeleted")
-                        .HasDatabaseName("IX_TeamMembershipEdges_DateRange")
-                        .HasFilter("[IsDeleted] = 0");
+                    b.HasIndex("EndDate", "StartDate")
+                        .HasDatabaseName("IX_TeamMembershipEdges_DateRange");
 
-                    b.HasIndex("StartDate", "EndDate", "IsDeleted")
-                        .HasDatabaseName("IX_TeamMembershipEdges_Active")
-                        .HasFilter("[IsDeleted] = 0");
+                    b.HasIndex("StartDate", "EndDate")
+                        .HasDatabaseName("IX_TeamMembershipEdges_Active");
 
-                    b.HasIndex("FromNodeId", "StartDate", "EndDate", "IsDeleted")
-                        .HasDatabaseName("IX_TeamMembershipEdges_FromNode")
-                        .HasFilter("[IsDeleted] = 0");
+                    b.HasIndex("FromNodeId", "StartDate", "EndDate")
+                        .HasDatabaseName("IX_TeamMembershipEdges_FromNode");
 
-                    b.HasIndex("ToNodeId", "StartDate", "EndDate", "IsDeleted")
-                        .HasDatabaseName("IX_TeamMembershipEdges_ToNode")
-                        .HasFilter("[IsDeleted] = 0");
+                    b.HasIndex("ToNodeId", "StartDate", "EndDate")
+                        .HasDatabaseName("IX_TeamMembershipEdges_ToNode");
 
                     b.ToTable("TeamMembershipEdges", "Organization");
                 });
@@ -769,9 +762,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("Key")
                         .HasColumnType("int");
 
@@ -790,31 +780,25 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasAlternateKey("Key");
 
                     b.HasIndex("Code")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
+                        .IsUnique();
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Code"), new[] { "Id", "Key", "Name", "IsActive", "IsDeleted" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Code"), new[] { "Id", "Key", "Name", "IsActive" });
+
+                    b.HasIndex("Id");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Key", "Name", "Code", "IsActive" });
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Key");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id", "Name", "Code", "IsActive" });
 
                     b.HasIndex("Name")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
+                        .IsUnique();
 
-                    b.HasIndex("Id", "IsDeleted")
-                        .HasFilter("[IsDeleted] = 0");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id", "IsDeleted"), new[] { "Key", "Name", "Code", "IsActive" });
-
-                    b.HasIndex("IsActive", "IsDeleted")
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.HasIndex("Key", "IsDeleted")
-                        .HasFilter("[IsDeleted] = 0");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "IsDeleted"), new[] { "Id", "Name", "Code", "IsActive" });
-
-                    b.HasIndex("ActiveDate", "InactiveDate", "IsDeleted")
-                        .HasDatabaseName("IX_TeamNodes_ActiveDates")
-                        .HasFilter("[IsDeleted] = 0");
+                    b.HasIndex("ActiveDate", "InactiveDate")
+                        .HasDatabaseName("IX_TeamNodes_ActiveDates");
 
                     b.ToTable("TeamNodes", "Organization");
                 });

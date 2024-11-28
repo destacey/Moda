@@ -159,34 +159,27 @@ public partial class AddTeamDatesAndGraphTables : Migration
                [Code] varchar(10) NOT NULL,
                [Type] varchar(32) NOT NULL,
                [IsActive] bit NOT NULL DEFAULT 1,
-               [IsDeleted] bit NOT NULL DEFAULT 0,
                [ActiveDate] datetime2(7) NOT NULL,
                [InactiveDate] datetime2(7) NULL,
                CONSTRAINT [PK_TeamNodes] PRIMARY KEY ([Id]),
                CONSTRAINT [AK_TeamNodes_Key] UNIQUE ([Key])
            ) AS NODE;
 
-           CREATE INDEX [IX_TeamNodes_Id_IsDeleted] ON [Organization].[TeamNodes] ([Id], [IsDeleted])
-           INCLUDE ([Key], [Name], [Code], [IsActive]) 
-           WHERE [IsDeleted] = 0;
+           CREATE INDEX [IX_TeamNodes_Id] ON [Organization].[TeamNodes] ([Id])
+           INCLUDE ([Key], [Name], [Code], [IsActive]);
 
-           CREATE INDEX [IX_TeamNodes_Key_IsDeleted] ON [Organization].[TeamNodes] ([Key], [IsDeleted])
-           INCLUDE ([Id], [Name], [Code], [IsActive]) 
-           WHERE [IsDeleted] = 0;
+           CREATE INDEX [IX_TeamNodes_Key] ON [Organization].[TeamNodes] ([Key])
+           INCLUDE ([Id], [Name], [Code], [IsActive]);
 
-           CREATE UNIQUE INDEX [IX_TeamNodes_Name] ON [Organization].[TeamNodes] ([Name])
-           WHERE [IsDeleted] = 0;
+           CREATE UNIQUE INDEX [IX_TeamNodes_Name] ON [Organization].[TeamNodes] ([Name]);
 
            CREATE UNIQUE INDEX [IX_TeamNodes_Code] ON [Organization].[TeamNodes] ([Code])
-           INCLUDE ([Id], [Key], [Name], [IsActive], [IsDeleted])
-           WHERE [IsDeleted] = 0;
+           INCLUDE ([Id], [Key], [Name], [IsActive]);
 
-           CREATE INDEX [IX_TeamNodes_IsActive_IsDeleted] ON [Organization].[TeamNodes] ([IsActive], [IsDeleted])
-           WHERE [IsDeleted] = 0;
+           CREATE INDEX [IX_TeamNodes_IsActive] ON [Organization].[TeamNodes] ([IsActive]);
 
            CREATE INDEX [IX_TeamNodes_ActiveDates] ON [Organization].[TeamNodes] 
-           ([ActiveDate], [InactiveDate], [IsDeleted])
-           WHERE [IsDeleted] = 0;");
+           ([ActiveDate], [InactiveDate]);");
 
         // Create the TeamMembershipEdges table as a graph EDGE
         migrationBuilder.Sql(@"
@@ -194,49 +187,46 @@ public partial class AddTeamDatesAndGraphTables : Migration
                [Id] UNIQUEIDENTIFIER NOT NULL,
                [StartDate] datetime2(7) NOT NULL,
                [EndDate] datetime2(7) NULL,
-               [IsDeleted] bit NOT NULL DEFAULT 0,
                CONSTRAINT [PK_TeamMembershipEdges] PRIMARY KEY ([Id])
            ) AS EDGE;
 
            -- Index for finding active memberships as of a date
            CREATE INDEX [IX_TeamMembershipEdges_Active] ON [Organization].[TeamMembershipEdges] 
-           (StartDate, EndDate, IsDeleted)
-           INCLUDE ($from_id, $to_id)
-           WHERE IsDeleted = 0;
+           (StartDate, EndDate)
+           INCLUDE ($from_id, $to_id);
 
            -- Index for temporal range queries
            CREATE INDEX [IX_TeamMembershipEdges_DateRange] ON [Organization].[TeamMembershipEdges] 
-           (EndDate, StartDate, IsDeleted)
-           INCLUDE ($from_id, $to_id)
-           WHERE IsDeleted = 0;
+           (EndDate, StartDate)
+           INCLUDE ($from_id, $to_id);
 
            -- Indexes for graph traversal
            CREATE INDEX [IX_TeamMembershipEdges_FromNode] ON [Organization].[TeamMembershipEdges] 
-           ($from_id, StartDate, EndDate, IsDeleted)
-           WHERE IsDeleted = 0;
+           ($from_id, StartDate, EndDate);
 
            CREATE INDEX [IX_TeamMembershipEdges_ToNode] ON [Organization].[TeamMembershipEdges] 
-           ($to_id, StartDate, EndDate, IsDeleted)
-           WHERE IsDeleted = 0;");
+           ($to_id, StartDate, EndDate);");
 
         //Initial data population with proper temporal alignment
         migrationBuilder.Sql(@"
             INSERT INTO [Organization].[TeamNodes] 
-                ([Id], [Key], [Name], [Code], [Type], [IsActive], [IsDeleted], [ActiveDate], [InactiveDate])
+                ([Id], [Key], [Name], [Code], [Type], [IsActive], [ActiveDate], [InactiveDate])
             SELECT 
-                t.[Id], t.[Key], t.[Name], t.[Code], t.[Type], t.[IsActive], t.[IsDeleted],
+                t.[Id], t.[Key], t.[Name], t.[Code], t.[Type], t.[IsActive],
                 t.[ActiveDate],                 -- Use the new ActiveDate field
                 t.[InactiveDate]               -- Use the new InactiveDate field
-            FROM [Organization].[Teams] t;
+            FROM [Organization].[Teams] t
+			WHERE t.[IsDeleted] = 0;
 
             INSERT INTO [Organization].[TeamMembershipEdges] 
-                ([Id], [StartDate], [EndDate], [IsDeleted], $from_id, $to_id)
+                ([Id], [StartDate], [EndDate], $from_id, $to_id)
             SELECT 
-                m.[Id], m.[Start], m.[End], m.[IsDeleted], 
+                m.[Id], m.[Start], m.[End], 
                 n1.$node_id, n2.$node_id
             FROM [Organization].[TeamMemberships] m
             JOIN [Organization].[TeamNodes] n1 ON m.[SourceId] = n1.[Id]
-            JOIN [Organization].[TeamNodes] n2 ON m.[TargetId] = n2.[Id];");
+            JOIN [Organization].[TeamNodes] n2 ON m.[TargetId] = n2.[Id]
+			WHERE m.[IsDeleted] = 0;");
     }
 
     /// <inheritdoc />
