@@ -1,4 +1,5 @@
-﻿using NodaTime;
+﻿using Moda.Organization.Application.Teams.Models;
+using NodaTime;
 
 namespace Moda.Organization.Application.Teams.Commands;
 public sealed record CreateTeamCommand(string Name, TeamCode Code, string? Description, LocalDate ActiveDate) : ICommand<int>;
@@ -37,6 +38,8 @@ public sealed class CreateTeamCommandValidator : CustomValidator<CreateTeamComma
 
 internal sealed class CreateTeamCommandHandler : ICommandHandler<CreateTeamCommand, int>
 {
+    private const string RequestName = nameof(CreateTeamCommand);
+
     private readonly IOrganizationDbContext _organizationDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<CreateTeamCommandHandler> _logger;
@@ -57,15 +60,19 @@ internal sealed class CreateTeamCommandHandler : ICommandHandler<CreateTeamComma
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);
 
+            _logger.LogDebug("{RequestName}: created Team with Id {TeamId}, Key {TeamKey}, and Code {TeamCode}", RequestName, team.Id, team.Key, team.Code);
+
+            // Sync the new team with the graph database
+            // TODO: move to more of an event based approach
+            await _organizationDbContext.UpsertTeamNode(TeamNode.Create(team), cancellationToken);
+
             return Result.Success(team.Key);
         }
         catch (Exception ex)
         {
-            var requestName = request.GetType().Name;
+            _logger.LogError(ex, "Exception for request {RequestName}: {@Request}", RequestName, request);
 
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-
-            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<int>($"Exception for request {RequestName} {request}");
         }
     }
 }
