@@ -9,4 +9,6 @@ public interface IOrganizationDbContext : IModaDbContext
 
     // Graph Table Syncs
     Task<int> UpsertTeamNode(TeamNode teamNode, CancellationToken cancellationToken);
+    Task<int> UpsertTeamMembershipEdge(TeamMembershipEdge teamMembershipEdge, CancellationToken cancellationToken);
+    Task<int> DeleteTeamMembershipEdge(Guid id, CancellationToken cancellationToken);
 }

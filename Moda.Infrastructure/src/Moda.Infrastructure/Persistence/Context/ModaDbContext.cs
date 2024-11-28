@@ -137,5 +137,41 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
         ", cancellationToken);
     }
 
+    public async Task<int> UpsertTeamMembershipEdge(TeamMembershipEdge membershipEdge, CancellationToken cancellationToken)
+    {
+        return await Database.ExecuteSqlInterpolatedAsync($@"
+           MERGE INTO [Organization].[TeamMembershipEdges] AS target
+           USING (SELECT {membershipEdge.Id} AS Id) AS source (Id)
+           ON target.Id = source.Id
+           WHEN MATCHED THEN
+               UPDATE SET
+                   [StartDate] = {membershipEdge.StartDate},
+                   [EndDate] = {membershipEdge.EndDate}
+           WHEN NOT MATCHED THEN
+               INSERT (
+                   [Id],
+                   [StartDate],
+                   [EndDate],
+                   $from_id,
+                   $to_id
+               )
+               VALUES (
+                   {membershipEdge.Id},
+                   {membershipEdge.StartDate},
+                   {membershipEdge.EndDate},
+                   (SELECT $node_id FROM [Organization].[TeamNodes] WHERE Id = {membershipEdge.FromNode.Id}),
+                   (SELECT $node_id FROM [Organization].[TeamNodes] WHERE Id = {membershipEdge.ToNode.Id})
+               );
+        ", cancellationToken);
+    }
+
+    public async Task<int> DeleteTeamMembershipEdge(Guid id, CancellationToken cancellationToken)
+    {
+        return await Database.ExecuteSqlInterpolatedAsync($@"
+            DELETE FROM [Organization].[TeamMembershipEdges]
+            WHERE Id = {id}
+        ", cancellationToken);
+    }
+
     #endregion Graph Table Sync
 }

@@ -74,7 +74,7 @@ public abstract class BaseTeam : BaseSoftDeletableEntity<Guid>, ISimpleTeam, Has
     /// <param name="dateRange">The date range.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public Result AddTeamMembership(TeamOfTeams parentTeam, MembershipDateRange dateRange, Instant timestamp)
+    public Result<TeamMembership> AddTeamMembership(TeamOfTeams parentTeam, MembershipDateRange dateRange, Instant timestamp)
     {
         try
         {
@@ -82,29 +82,29 @@ public abstract class BaseTeam : BaseSoftDeletableEntity<Guid>, ISimpleTeam, Has
             Guard.Against.Null(dateRange);
 
             if (!IsActive)
-                return Result.Failure($"Memberships can not be added to inactive teams. {Name} is inactive.");
+                return Result.Failure<TeamMembership>($"Memberships can not be added to inactive teams. {Name} is inactive.");
 
             if (!parentTeam.IsActive)
-                return Result.Failure($"Memberships can not be added to inactive teams. {parentTeam.Name} is inactive.");
+                return Result.Failure<TeamMembership>($"Memberships can not be added to inactive teams. {parentTeam.Name} is inactive.");
 
             if (_parentMemberships.Any(m => m.DateRange.Overlaps(dateRange)))
-                return Result.Failure("Teams can only have one active parent Team Membership.  This membership would create an overlapping membership.");
+                return Result.Failure<TeamMembership>("Teams can only have one active parent Team Membership.  This membership would create an overlapping membership.");
 
             if (this is TeamOfTeams teamOfTeams)
             {
                 var descendantIds = teamOfTeams.GetDescendantTeamIdsAsOf(timestamp.InUtc().Date);
                 if (descendantIds.Contains(parentTeam.Id))
-                    return Result.Failure($"The parent team {parentTeam.Name} is a descendant of this team.  This would create a circular reference.");
+                    return Result.Failure<TeamMembership>($"The parent team {parentTeam.Name} is a descendant of this team.  This would create a circular reference.");
             }
 
             var membership = TeamMembership.Create(Id, parentTeam.Id, dateRange);
             _parentMemberships.Add(membership);
 
-            return Result.Success();
+            return membership;
         }
         catch (Exception ex)
         {
-            return Result.Failure(ex.ToString());
+            return Result.Failure<TeamMembership>(ex.ToString());
         }
     }
 
@@ -115,7 +115,7 @@ public abstract class BaseTeam : BaseSoftDeletableEntity<Guid>, ISimpleTeam, Has
     /// <param name="dateRange"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result UpdateTeamMembership(Guid membershipId, MembershipDateRange dateRange, Instant timestamp)
+    public Result<TeamMembership> UpdateTeamMembership(Guid membershipId, MembershipDateRange dateRange, Instant timestamp)
     {
         try
         {
@@ -124,21 +124,21 @@ public abstract class BaseTeam : BaseSoftDeletableEntity<Guid>, ISimpleTeam, Has
             var membership = _parentMemberships.Single(m => m.Id == membershipId);
 
             if (!IsActive)
-                return Result.Failure($"Memberships can not be updated on inactive teams. {Name} is inactive.");
+                return Result.Failure<TeamMembership>($"Memberships can not be updated on inactive teams. {Name} is inactive.");
 
             if (!membership.Target.IsActive)
-                return Result.Failure($"Memberships can not be updated on inactive teams. {membership.Target.IsActive} is inactive.");
+                return Result.Failure<TeamMembership>($"Memberships can not be updated on inactive teams. {membership.Target.IsActive} is inactive.");
 
             if (_parentMemberships.Any(m => m.Id != membershipId && m.DateRange.Overlaps(dateRange)))
-                return Result.Failure("Teams can only have one active parent Team Membership.  This membership would create an overlapping membership.");
+                return Result.Failure<TeamMembership>("Teams can only have one active parent Team Membership.  This membership would create an overlapping membership.");
 
             membership.Update(dateRange);
 
-            return Result.Success();
+            return membership;
         }
         catch (Exception ex)
         {
-            return Result.Failure(ex.ToString());
+            return Result.Failure<TeamMembership>(ex.ToString());
         }
     }
 

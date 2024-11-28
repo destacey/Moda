@@ -67,6 +67,8 @@ internal sealed class CreateTeamOfTeamsCommandHandler : ICommandHandler<CreateTe
             // TODO: move to more of an event based approach
             await _organizationDbContext.UpsertTeamNode(TeamNode.From(team), cancellationToken);
 
+            _logger.LogDebug("{RequestName}: synced TeamNode for Team of Teams with Id {TeamId}, Key {TeamKey}, and Code {TeamCode}", RequestName, team.Id, team.Key, team.Code);
+
             return Result.Success(team.Key);
         }
         catch (Exception ex)
