@@ -45,6 +45,8 @@ public class BaseTeamConfig : IEntityTypeConfiguration<BaseTeam>
             .HasConversion<EnumConverter<TeamType>>()
             .HasColumnType("varchar")
             .HasMaxLength(32);
+        builder.Property(o => o.ActiveDate).IsRequired();
+        builder.Property(o => o.InactiveDate);
         builder.Property(o => o.IsActive);
 
         // Audit

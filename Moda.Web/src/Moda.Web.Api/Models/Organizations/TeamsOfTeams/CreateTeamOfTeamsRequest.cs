@@ -18,11 +18,16 @@ public sealed record CreateTeamOfTeamsRequest
     /// <value>The team description.</value>
     public string? Description { get; set; }
 
+    /// <summary>
+    /// The active date for the team.
+    /// </summary>
+    public LocalDate ActiveDate { get; set; }
+
     public CreateTeamOfTeamsCommand ToCreateTeamOfTeamsCommand()
     {
         TeamCode code = (TeamCode)Code;
 
-        return new CreateTeamOfTeamsCommand(Name, code, Description);
+        return new CreateTeamOfTeamsCommand(Name, code, Description, ActiveDate);
     }
 }
 
@@ -44,5 +49,8 @@ public sealed class CreateTeamOfTeamsRequestValidator : CustomValidator<CreateTe
 
         RuleFor(t => t.Description)
             .MaximumLength(1024);
+
+        RuleFor(t => t.ActiveDate)
+            .NotEmpty();
     }
 }

@@ -1,25 +1,8 @@
-﻿namespace Moda.Organization.Application.Teams.Commands;
-public sealed record CreateTeamCommand : ICommand<int>
-{
-    public CreateTeamCommand(string name, TeamCode code, string? description)
-    {
-        Name = name;
-        Code = code;
-        Description = description;
-    }
+﻿using Moda.Organization.Application.Teams.Models;
+using NodaTime;
 
-    /// <summary>Gets the team name.</summary>
-    /// <value>The team name.</value>
-    public string Name { get; }
-
-    /// <summary>Gets the code.</summary>
-    /// <value>The code.</value>
-    public TeamCode Code { get; }
-
-    /// <summary>Gets the team description.</summary>
-    /// <value>The team description.</value>
-    public string? Description { get; }
-}
+namespace Moda.Organization.Application.Teams.Commands;
+public sealed record CreateTeamCommand(string Name, TeamCode Code, string? Description, LocalDate ActiveDate) : ICommand<int>;
 
 public sealed class CreateTeamCommandValidator : CustomValidator<CreateTeamCommand>
 {
@@ -42,6 +25,9 @@ public sealed class CreateTeamCommandValidator : CustomValidator<CreateTeamComma
 
         RuleFor(t => t.Description)
             .MaximumLength(1024);
+
+        RuleFor(t => t.ActiveDate)
+            .NotEmpty();
     }
 
     public async Task<bool> BeUniqueTeamName(string name, CancellationToken cancellationToken)
@@ -52,6 +38,8 @@ public sealed class CreateTeamCommandValidator : CustomValidator<CreateTeamComma
 
 internal sealed class CreateTeamCommandHandler : ICommandHandler<CreateTeamCommand, int>
 {
+    private const string RequestName = nameof(CreateTeamCommand);
+
     private readonly IOrganizationDbContext _organizationDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<CreateTeamCommandHandler> _logger;
@@ -67,20 +55,26 @@ internal sealed class CreateTeamCommandHandler : ICommandHandler<CreateTeamComma
     {
         try
         {
-            var team = Team.Create(request.Name, request.Code, request.Description, _dateTimeProvider.Now);
-            await _organizationDbContext.Teams.AddAsync((Team)team, cancellationToken);
+            var team = Team.Create(request.Name, request.Code, request.Description, request.ActiveDate, _dateTimeProvider.Now);
+            await _organizationDbContext.Teams.AddAsync(team, cancellationToken);
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);
+
+            _logger.LogDebug("{RequestName}: created Team with Id {TeamId}, Key {TeamKey}, and Code {TeamCode}", RequestName, team.Id, team.Key, team.Code);
+
+            // Sync the new team with the graph database
+            // TODO: move to more of an event based approach
+            await _organizationDbContext.UpsertTeamNode(TeamNode.From(team), cancellationToken);
+
+            _logger.LogDebug("{RequestName}: synced TeamNode for Team with Id {TeamId}, Key {TeamKey}, and Code {TeamCode}", RequestName, team.Id, team.Key, team.Code);
 
             return Result.Success(team.Key);
         }
         catch (Exception ex)
         {
-            var requestName = request.GetType().Name;
+            _logger.LogError(ex, "Exception for request {RequestName}: {@Request}", RequestName, request);
 
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-
-            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<int>($"Exception for request {RequestName} {request}");
         }
     }
 }

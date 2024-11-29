@@ -83,9 +83,15 @@ const teamSlice = createCrudSlice({
           ? await getTeamsClient()
           : await getTeamsOfTeamsClient()
 
-      const id = await teamClient.create(newTeam)
+      const request = {
+        ...newTeam,
+        activeDate: (newTeam.activeDate as any)?.format('YYYY-MM-DD'),
+      }
+
+      const id = await teamClient.create(request)
       return await teamClient.getById(id)
     } catch (error) {
+      console.log('API Error:', error)
       return rejectWithValue({ error })
     }
   },

@@ -9,19 +9,20 @@ namespace Moda.Organization.Domain.Models;
 /// A team of teams is a collection of teams and/or other team of teams that aims to help deliver products collaboratively in the same complex environment.
 /// </summary>
 /// <seealso cref="Moda.Organization.Domain.Models.BaseTeam" />
-/// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
-public sealed class TeamOfTeams : BaseTeam, IActivatable
+/// <seealso cref=""/>
+public sealed class TeamOfTeams : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs>
 {
-    private readonly List<TeamMembership> _childMemberships = new();
+    private readonly List<TeamMembership> _childMemberships = [];
 
     private TeamOfTeams() { }
 
-    private TeamOfTeams(string name, TeamCode code, string? description)
+    private TeamOfTeams(string name, TeamCode code, string? description, LocalDate activeDate)
     {
         Name = name;
         Code = code;
         Description = description;
         Type = TeamType.TeamOfTeams;
+        ActiveDate = activeDate;
     }
 
     public IReadOnlyCollection<TeamMembership> ChildMemberships => _childMemberships.AsReadOnly();
@@ -36,9 +37,9 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
         if (!IsActive)
         {
             IsActive = true;
+            InactiveDate = null;
             AddDomainEvent(EntityActivatedEvent.WithEntity(this, timestamp));
         }
-
 
         return Result.Success();
     }
@@ -46,20 +47,25 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
     /// <summary>
     /// The process for deactivating a team of teams.
     /// </summary>
-    /// <param name="timestamp"></param>
+    /// <param name="args"></param>
     /// <returns>Result that indicates success or a list of errors</returns>
-    public Result Deactivate(Instant timestamp)
+    public Result Deactivate(TeamDeactivatableArgs args)
     {
         if (IsActive)
         {
-            var parentMembershipStates = ParentMemberships.Select(x => x.StateOn(timestamp.InUtc().LocalDateTime.Date)).ToArray();
-            var childMembershipStates = ParentMemberships.Select(x => x.StateOn(timestamp.InUtc().LocalDateTime.Date)).ToArray();
+            var parentMembershipStates = ParentMemberships.Select(x => x.StateOn(args.AsOfDate)).ToArray();
+            var childMembershipStates = ParentMemberships.Select(x => x.StateOn(args.AsOfDate)).ToArray();
             if (parentMembershipStates.Union(childMembershipStates).Any(m => m == MembershipState.Active || m == MembershipState.Future))
                 return Result.Failure("Cannot deactivate a team of teams that has active team memberships.");
 
-            IsActive = false;
+            if (args.AsOfDate <= ActiveDate
+                || args.AsOfDate < _parentMemberships.Max(x => x.DateRange.End)
+                || args.AsOfDate < _childMemberships.Max(x => x.DateRange.End))
+                return Result.Failure("Cannot deactivate a team of teams before the active timestamp or before the end of the latest membership.");
 
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, timestamp));
+            InactiveDate = args.AsOfDate;
+            IsActive = false;
+            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, args.Timestamp)); // TODO: this doesn't include the asOfTimestamp
         }
 
         return Result.Success();
@@ -119,11 +125,12 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable
     /// <param name="name">The name.</param>
     /// <param name="code">The code.</param>
     /// <param name="description">The description.</param>
+    /// <param name="activeDate">The active date.</param>
     /// <param name="timestamp">The timestamp.</param>
     /// <returns></returns>
-    public static TeamOfTeams Create(string name, TeamCode code, string? description, Instant timestamp)
+    public static TeamOfTeams Create(string name, TeamCode code, string? description, LocalDate activeDate, Instant timestamp)
     {
-        var team = new TeamOfTeams(name, code, description);
+        var team = new TeamOfTeams(name, code, description, activeDate);
 
         team.AddDomainEvent(EntityCreatedEvent.WithEntity(team, timestamp));
         return team;

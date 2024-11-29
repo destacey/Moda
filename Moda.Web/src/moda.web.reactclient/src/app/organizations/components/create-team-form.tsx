@@ -1,6 +1,6 @@
 'use client'
 
-import { Form, Input, Radio } from 'antd'
+import { DatePicker, Form, Input, Radio } from 'antd'
 import { CreateTeamFormValues } from '../types'
 import {
   createTeam,
@@ -60,6 +60,9 @@ const CreateTeamForm = ({ form }: FormProps<CreateTeamFormValues>) => {
           maxLength={1024}
         />
       </Item>
+      <Item name="activeDate" label="Active Date" rules={[{ required: true }]}>
+        <DatePicker />
+      </Item>
     </Form>
   )
 }
@@ -68,6 +71,7 @@ export const ModalCreateTeamForm = withModalForm(CreateTeamForm, {
   title: 'Create Team',
   okText: 'Create',
   useFormState: () => useAppSelector(selectEditTeamContext),
+  // TODO: validation errors not showing up on the form
   onOk: (values: CreateTeamFormValues) => createTeam(values),
   onCancel: setEditMode(false),
 })

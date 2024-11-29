@@ -18,6 +18,8 @@ public sealed class RemoveTeamMembershipCommandValidator : CustomValidator<Remov
 
 internal sealed class RemoveTeamMembershipCommandHandler : ICommandHandler<RemoveTeamMembershipCommand>
 {
+    private const string RequestName = nameof(RemoveTeamMembershipCommand);
+
     private readonly IOrganizationDbContext _organizationDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<RemoveTeamMembershipCommandHandler> _logger;
@@ -37,26 +39,35 @@ internal sealed class RemoveTeamMembershipCommandHandler : ICommandHandler<Remov
                 .Include(t => t.ParentMemberships.Where(m => m.Id == request.TeamMembershipId))
                     .ThenInclude(m => m.Target)
                 .AsNoTracking() // needed until the EF Core bug below is fixed
-                .SingleAsync(t => t.Id == request.TeamId);
+                .SingleAsync(t => t.Id == request.TeamId, cancellationToken: cancellationToken);
 
             var result = team.RemoveTeamMembership(request.TeamMembershipId);
             if (result.IsFailure)
+            {
+                _logger.LogError("{RequestName}: failed to remove Team Membership {TeamMembershipId} for Team of Teams {TeamId}. Error: {Error}", RequestName, request.TeamMembershipId, request.TeamId, result.Error);
                 return result;
+            }
 
             /// Cleans up deleted team memberships.  This is needed because of a bug in EF Core 7.x.
             _organizationDbContext.Entry(result.Value).State = EntityState.Deleted;
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);
 
+            _logger.LogDebug("{RequestName}: removed Team Membership {TeamMembershipId} for Team of Teams {TeamId}", RequestName, request.TeamMembershipId, request.TeamId);
+
+            // Sync the deleted TeamMembership with the graph database
+            // TODO: move to more of an event based approach
+            await _organizationDbContext.DeleteTeamMembershipEdge(request.TeamMembershipId, cancellationToken);
+
+            _logger.LogDebug("{RequestName}: synced TeamMembershipEdge for Team Membership {TeamMembershipId}", RequestName, request.TeamMembershipId);
+
             return Result.Success();
         }
         catch (Exception ex)
         {
-            var requestName = request.GetType().Name;
+            _logger.LogError(ex, "Exception for request {RequestName}: {@Request}", RequestName, request);
 
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-
-            return Result.Failure($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<int>($"Exception for request {RequestName} {request}");
         }
     }
 }

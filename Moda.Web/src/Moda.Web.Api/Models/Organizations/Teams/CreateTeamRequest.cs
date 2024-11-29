@@ -18,9 +18,14 @@ public sealed record CreateTeamRequest
     /// <value>The team description.</value>
     public string? Description { get; set; }
 
+    /// <summary>
+    /// The active date for the team.
+    /// </summary>
+    public LocalDate ActiveDate { get; set; }
+
     public CreateTeamCommand ToCreateTeamCommand()
     {
-        return new CreateTeamCommand(Name, (TeamCode)Code, Description);
+        return new CreateTeamCommand(Name, (TeamCode)Code, Description, ActiveDate);
     }
 }
 
@@ -43,5 +48,8 @@ public sealed class CreateTeamRequestValidator : CustomValidator<CreateTeamReque
 
         RuleFor(t => t.Description)
             .MaximumLength(1024);
+
+        RuleFor(t => t.ActiveDate)
+            .NotEmpty();
     }
 }

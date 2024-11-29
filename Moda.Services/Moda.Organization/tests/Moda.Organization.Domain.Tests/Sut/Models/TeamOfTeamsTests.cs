@@ -14,14 +14,15 @@ public class TeamOfTeamsTests
     private TeamOfTeams GenerateTeamOfTeams(bool isActive)
     {
         int key = RandomNumberGenerator.GetInt32(1, 100000);
+        var created = _now.Minus(Duration.FromDays(10));
 
-        var team = TeamOfTeams.Create("Test Team of Teams", _genericTeamCode, null, _now);
+        var team = TeamOfTeams.Create("Test Team of Teams", _genericTeamCode, null, created.InUtc().LocalDateTime.Date, created);
         team.SetPrivate(t => t.Id, Guid.NewGuid());
         team.SetPrivate(t => t.Key, key);
 
         if (!isActive)
         {
-            team.Deactivate(_now);
+            team.Deactivate(TeamDeactivatableArgs.Create(_now.InUtc().LocalDateTime.Date, _now));
         }
 
         team.ClearDomainEvents();
@@ -37,9 +38,10 @@ public class TeamOfTeamsTests
         // Arrange
         var name = "Test Team ";
         var description = "Test Team Description";
+        var created = _now.Minus(Duration.FromDays(10));
 
         // Act
-        var sut = TeamOfTeams.Create(name, _genericTeamCode, description, _now);
+        var sut = TeamOfTeams.Create(name, _genericTeamCode, description, created.InUtc().LocalDateTime.Date, created);
 
         // Assert
         sut.Type.Should().Be(TeamType.TeamOfTeams);
@@ -59,9 +61,10 @@ public class TeamOfTeamsTests
     {
         // Arrange
         string? name = null;
+        var created = _now;
 
         // Act
-        Action action = () => TeamOfTeams.Create(name!, _genericTeamCode, null, _now);
+        Action action = () => TeamOfTeams.Create(name!, _genericTeamCode, null, created.InUtc().LocalDateTime.Date, created);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Value cannot be null. (Parameter 'Name')");
@@ -72,8 +75,11 @@ public class TeamOfTeamsTests
     [InlineData("  ")]
     public void Create_WithInvalidName_Throws(string name)
     {
+        // Arrange
+        var created = _now;
+
         // Act
-        Action action = () => TeamOfTeams.Create(name, _genericTeamCode, null, _now);
+        Action action = () => TeamOfTeams.Create(name, _genericTeamCode, null, created.InUtc().LocalDateTime.Date, created);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Required input Name was empty. (Parameter 'Name')");
@@ -84,9 +90,10 @@ public class TeamOfTeamsTests
     {
         // Arrange
         TeamCode code = null!;
+        var created = _now;
 
         // Act
-        Action action = () => TeamOfTeams.Create("Test", code, null, _now);
+        Action action = () => TeamOfTeams.Create("Test", code, null, created.InUtc().LocalDateTime.Date, created);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Value cannot be null. (Parameter 'Code')");
@@ -98,8 +105,11 @@ public class TeamOfTeamsTests
     [InlineData(null)]
     public void Create_WithInvalidDescription_IsNull(string? description)
     {
+        // Arrange
+        var created = _now;
+
         // Act
-        var sut = TeamOfTeams.Create("Team", _genericTeamCode, description, _now);
+        var sut = TeamOfTeams.Create("Team", _genericTeamCode, description, created.InUtc().LocalDateTime.Date, created);
 
         // Assert
         sut.Description.Should().BeNull();
@@ -218,7 +228,7 @@ public class TeamOfTeamsTests
         TeamOfTeams team = GenerateTeamOfTeams(true);
 
         // Act
-        team.Deactivate(_now);
+        team.Deactivate(TeamDeactivatableArgs.Create(_now.InUtc().LocalDateTime.Date, _now));
 
         // Assert
         team.IsActive.Should().BeFalse();

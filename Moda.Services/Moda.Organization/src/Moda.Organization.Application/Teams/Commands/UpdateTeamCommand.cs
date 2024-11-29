@@ -1,30 +1,7 @@
-﻿namespace Moda.Organization.Application.Teams.Commands;
-public sealed record UpdateTeamCommand : ICommand<int>
-{
-    public UpdateTeamCommand(Guid id, string name, TeamCode code, string? description)
-    {
-        Id = id;
-        Name = name;
-        Code = code;
-        Description = description;
-    }
+﻿using Moda.Organization.Application.Teams.Models;
 
-    /// <summary>Gets or sets the identifier.</summary>
-    /// <value>The identifier.</value>
-    public Guid Id { get; }
-
-    /// <summary>Gets the team name.</summary>
-    /// <value>The team name.</value>
-    public string Name { get; }
-
-    /// <summary>Gets the code.</summary>
-    /// <value>The code.</value>
-    public TeamCode Code { get; }
-
-    /// <summary>Gets the team description.</summary>
-    /// <value>The team description.</value>
-    public string? Description { get; }
-}
+namespace Moda.Organization.Application.Teams.Commands;
+public sealed record UpdateTeamCommand(Guid Id, string Name, TeamCode Code, string? Description) : ICommand<int>;
 
 public sealed class UpdateTeamCommandValidator : CustomValidator<UpdateTeamCommand>
 {
@@ -60,6 +37,8 @@ public sealed class UpdateTeamCommandValidator : CustomValidator<UpdateTeamComma
 
 internal sealed class UpdateTeamCommandHandler : ICommandHandler<UpdateTeamCommand, int>
 {
+    private const string RequestName = nameof(UpdateTeamCommand);
+
     private readonly IOrganizationDbContext _organizationDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<UpdateTeamCommandHandler> _logger;
@@ -93,22 +72,28 @@ internal sealed class UpdateTeamCommandHandler : ICommandHandler<UpdateTeamComma
                 await _organizationDbContext.Entry(team).ReloadAsync(cancellationToken);
                 team.ClearDomainEvents();
 
-                var requestName = request.GetType().Name;
-                _logger.LogError("Moda Request: Failure for Request {Name} {@Request}.  Error message: {Error}", requestName, request, updateResult.Error);
+                _logger.LogError("Failure for request {RequestName}: {@Request}.  Error message: {Error}", RequestName, request, updateResult.Error);
+
                 return Result.Failure<int>(updateResult.Error);
             }
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);
 
+            _logger.LogDebug("{RequestName}: updated Team with Id {TeamId}, Key {TeamKey}, and Code {TeamCode}", RequestName, team.Id, team.Key, team.Code);
+
+            // Sync the new team with the graph database
+            // TODO: move to more of an event based approach
+            await _organizationDbContext.UpsertTeamNode(TeamNode.From(team), cancellationToken);
+
+            _logger.LogDebug("{RequestName}: synced TeamNode for Team with Id {TeamId}, Key {TeamKey}, and Code {TeamCode}", RequestName, team.Id, team.Key, team.Code);
+
             return Result.Success(team.Key);
         }
         catch (Exception ex)
         {
-            var requestName = request.GetType().Name;
+            _logger.LogError(ex, "Exception for request {RequestName}: {@Request}", RequestName, request);
 
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-
-            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+            return Result.Failure<int>($"Exception for request {RequestName} {request}");
         }
     }
 }
