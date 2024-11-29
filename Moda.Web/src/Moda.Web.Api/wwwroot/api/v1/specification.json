@@ -6469,6 +6469,43 @@
         ]
       }
     },
+    "/api/organization/teams/functional-organization-chart": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "Get the functional organizaation chart for a given date.",
+        "parameters": [
+          {
+            "name": "asOfDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FunctionalOrganizationChartDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/organization/teams-of-teams": {
       "get": {
         "tags": [
@@ -12643,6 +12680,50 @@
           "comment": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "FunctionalOrganizationChartDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "organization": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationalUnitDto"
+            }
+          }
+        }
+      },
+      "OrganizationalUnitDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "children": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/OrganizationalUnitDto"
+            }
           }
         }
       },

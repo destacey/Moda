@@ -67,6 +67,56 @@ export class Client {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    get_the_functional_organizaation_chart_for_a_given_date_(asOfDate: Date | null | undefined, cancelToken?: CancelToken): Promise<FunctionalOrganizationChartDto> {
+        let url_ = this.baseUrl + "/api/organization/teams/functional-organization-chart?";
+        if (asOfDate !== undefined && asOfDate !== null)
+            url_ += "asOfDate=" + encodeURIComponent(asOfDate ? "" + asOfDate.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGet_the_functional_organizaation_chart_for_a_given_date_(_response);
+        });
+    }
+
+    protected processGet_the_functional_organizaation_chart_for_a_given_date_(response: AxiosResponse): Promise<FunctionalOrganizationChartDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<FunctionalOrganizationChartDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FunctionalOrganizationChartDto>(null as any);
+    }
 }
 
 export class PermissionsClient {
@@ -11410,6 +11460,19 @@ export interface DependencyDto {
     createdOn?: Date;
     createdBy?: EmployeeNavigationDto | undefined;
     comment?: string | undefined;
+}
+
+export interface FunctionalOrganizationChartDto {
+    organization?: OrganizationalUnitDto[];
+}
+
+export interface OrganizationalUnitDto {
+    id?: string;
+    key?: number;
+    name?: string;
+    code?: string;
+    type?: string;
+    children?: OrganizationalUnitDto[] | undefined;
 }
 
 export interface TeamOfTeamsListDto {
