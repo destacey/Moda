@@ -1,3 +1,4 @@
+import { FunctionalOrganizationChartDto } from './../../../services/moda-api'
 import { TeamListItem } from '@/src/app/organizations/types'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
@@ -90,6 +91,30 @@ export const teamApi = apiSlice.injectEndpoints({
         })),
       ],
     }),
+    getFunctionalOrganizationChart: builder.query<
+      FunctionalOrganizationChartDto,
+      Date | null | undefined
+    >({
+      queryFn: async (asOfDate?: Date) => {
+        try {
+          const data = await (
+            await getTeamsClient()
+          ).getFunctionalOrganizationChart(
+            (asOfDate as any)?.format('YYYY-MM-DD'),
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        {
+          type: QueryTags.FunctionalOrganizationChart,
+          id: arg ? arg.toISOString() : 'default',
+        },
+      ],
+    }),
   }),
 })
 
@@ -98,4 +123,5 @@ export const {
   useGetTeamOptionsQuery,
   useGetTeamBacklogQuery,
   useGetTeamDependenciesQuery,
+  useGetFunctionalOrganizationChartQuery,
 } = teamApi

@@ -6474,7 +6474,8 @@
         "tags": [
           "Teams"
         ],
-        "operationId": "Get the functional organizaation chart for a given date.",
+        "summary": "Get the functional organizaation chart for a given date.",
+        "operationId": "Teams_GetFunctionalOrganizationChart",
         "parameters": [
           {
             "name": "asOfDate",
