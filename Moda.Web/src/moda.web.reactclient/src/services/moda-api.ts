@@ -11467,7 +11467,10 @@ export interface DependencyDto {
 }
 
 export interface FunctionalOrganizationChartDto {
+    asOfDate?: Date;
     organization?: OrganizationalUnitDto[];
+    total?: number;
+    maxDepth?: number;
 }
 
 export interface OrganizationalUnitDto {
@@ -11475,7 +11478,9 @@ export interface OrganizationalUnitDto {
     key?: number;
     name?: string;
     code?: string;
-    type?: string;
+    type?: SimpleNavigationDto;
+    level?: number;
+    path?: string;
     children?: OrganizationalUnitDto[] | undefined;
 }
 

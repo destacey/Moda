@@ -12688,11 +12688,23 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "asOfDate": {
+            "type": "string",
+            "format": "date"
+          },
           "organization": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/OrganizationalUnitDto"
             }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxDepth": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -12717,6 +12729,13 @@
             "type": "string"
           },
           "type": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "path": {
             "type": "string"
           },
           "children": {
