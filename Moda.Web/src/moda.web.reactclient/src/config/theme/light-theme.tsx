@@ -1,7 +1,8 @@
 import { ThemeConfig, theme } from 'antd'
+const { defaultAlgorithm } = theme
 
 const lightTheme: ThemeConfig = {
-  algorithm: theme.defaultAlgorithm,
+  algorithm: defaultAlgorithm,
   token: {
     colorPrimary: '#2196f3',
     borderRadius: 4,
@@ -9,7 +10,6 @@ const lightTheme: ThemeConfig = {
   },
   components: {
     Layout: {
-      // controls the background color for all layout components
       headerBg: '#2196f3',
     },
   },

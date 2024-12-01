@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useMemo, useState } from 'react'
 import { useLocalStorageState } from '@/src/app/hooks'
 import { ConfigProvider, ThemeConfig, theme } from 'antd'
 import lightTheme from '@/src/config/theme/light-theme'
@@ -7,42 +7,68 @@ import { ThemeContextType, ThemeName } from './types'
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
-export const ThemeProvider = ({ children }) => {
-  const { token } = theme.useToken()
+export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentThemeName, setCurrentThemeName] =
     useLocalStorageState<ThemeName>('modaTheme', 'light')
-  const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(lightTheme)
+
   const [agGridTheme, setAgGridTheme] = useState('ag-theme-balham')
   const [badgeColor, setBadgeColor] = useState<string>(null)
   const [antDesignChartsTheme, setAntDesignChartsTheme] = useState('classic')
+  const [antvisG6ChartsTheme, setAntvisG6ChartsTheme] = useState('light')
+
+  // Create the theme configuration
+  const currentTheme = useMemo(() => {
+    const baseTheme = currentThemeName === 'light' ? lightTheme : darkTheme
+    return {
+      ...baseTheme,
+      token: {
+        ...theme.defaultConfig.token,
+        ...baseTheme.token,
+      },
+    }
+  }, [currentThemeName])
 
   useEffect(() => {
-    setCurrentTheme(currentThemeName === 'light' ? lightTheme : darkTheme)
     setAgGridTheme(
       currentThemeName === 'light' ? 'ag-theme-balham' : 'ag-theme-balham-dark',
-    )
-    setBadgeColor(
-      currentThemeName === 'light' ? token.colorPrimary : token.colorPrimary, // token.colorBorderBg, // TODO: something broke in and color is not working the same way (see: objective count badge)
     )
     setAntDesignChartsTheme(
       currentThemeName === 'light' ? 'classic' : 'classicDark',
     )
-  }, [currentThemeName, token.colorBorderBg, token.colorPrimary])
+    setAntvisG6ChartsTheme(currentThemeName === 'light' ? 'light' : 'dark')
+  }, [currentThemeName])
 
-  return (
-    <ThemeContext.Provider
-      value={{
+  // Use theme.useToken() inside ConfigProvider
+  const ThemeContent = ({ children }: { children: React.ReactNode }) => {
+    const { token } = theme.useToken()
+
+    useEffect(() => {
+      setBadgeColor(token.colorPrimary)
+    }, [token.colorPrimary])
+
+    const themeContextValue = useMemo(
+      () => ({
         currentThemeName,
         setCurrentThemeName,
         agGridTheme,
         token,
         badgeColor,
         antDesignChartsTheme,
-      }}
-    >
-      <ConfigProvider theme={currentTheme}>
+        antvisG6ChartsTheme,
+      }),
+      [token],
+    )
+
+    return (
+      <ThemeContext.Provider value={themeContextValue}>
         <div data-theme={currentThemeName}>{children}</div>
-      </ConfigProvider>
-    </ThemeContext.Provider>
+      </ThemeContext.Provider>
+    )
+  }
+
+  return (
+    <ConfigProvider theme={currentTheme}>
+      <ThemeContent>{children}</ThemeContent>
+    </ConfigProvider>
   )
 }
