@@ -9,7 +9,7 @@ export interface Item {
   key: string
   route?: string
   icon?: React.ReactNode
-  children?: Item[]
+  children?: (Item | MenuItem)[]
   authClaimValue?: string
   authClaimType?: string
 }
@@ -19,7 +19,7 @@ export const menuItem = (
   key: string,
   route?: string,
   icon?: React.ReactNode,
-  children?: Item[],
+  children?: (Item | MenuItem)[],
 ) => {
   return {
     display,
@@ -37,7 +37,7 @@ export const restrictedMenuItem = (
   key: string,
   route?: string,
   icon?: React.ReactNode,
-  children?: Item[],
+  children?: (Item | MenuItem)[],
 ) => {
   return {
     ...menuItem(display, key, route, icon, children),

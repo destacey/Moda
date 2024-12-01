@@ -23,9 +23,10 @@ pnpm dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Core Libraries
-- Next.js (13.x)
+- Next.js (14.x)
 - React (18.x)
 - Typescript (5.x)
 - Ant Design (5.x)
+- RTK (2.x)
 - MSAL - Microsoft Authentication Library
 - Axios

@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useDocumentTitle } from '../../hooks/use-document-title'
 import { useGetEmployees } from '@/src/services/queries/organization-queries'
 import { ControlItemSwitch } from '../../components/common/control-items-menu'
+import { authorizePage } from '../../components/hoc'
 
 const EmployeeLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/organizations/employees/${data.key}`}>{value}</Link>
@@ -88,4 +89,10 @@ const EmployeeListPage = () => {
   )
 }
 
-export default EmployeeListPage
+const EmployeeListPageWithAuthorization = authorizePage(
+  EmployeeListPage,
+  'Permission',
+  'Permissions.Employees.View',
+)
+
+export default EmployeeListPageWithAuthorization

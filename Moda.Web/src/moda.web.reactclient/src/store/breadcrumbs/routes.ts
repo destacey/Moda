@@ -5,6 +5,9 @@ const routes = {
     title: 'Organizations',
     href: null,
   },
+  'functional-org-chart': {
+    title: 'Functional Org Chart',
+  },
   'team-of-teams': {
     title: 'Teams',
     href: '/organizations/teams',

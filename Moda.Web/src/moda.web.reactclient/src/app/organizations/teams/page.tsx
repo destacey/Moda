@@ -23,6 +23,7 @@ import {
 import { TeamListItem } from '../types'
 import { ColDef } from 'ag-grid-community'
 import { ControlItemSwitch } from '../../components/common/control-items-menu'
+import { authorizePage } from '../../components/hoc'
 
 const TeamListPage = () => {
   useDocumentTitle('Teams')
@@ -105,4 +106,10 @@ const TeamListPage = () => {
   )
 }
 
-export default TeamListPage
+const TeamListPageWithAuthorization = authorizePage(
+  TeamListPage,
+  'Permission',
+  'Permissions.Teams.View',
+)
+
+export default TeamListPageWithAuthorization
