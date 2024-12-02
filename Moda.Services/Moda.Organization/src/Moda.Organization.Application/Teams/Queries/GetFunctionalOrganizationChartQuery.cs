@@ -21,7 +21,8 @@ internal sealed class GetFunctionalOrganizationChartQueryHandler(IOrganizationDb
 
         var nodes = await GetTeamHierarchyNodes(asOfDate, cancellationToken);
 
-        _logger.LogDebug("{RequestName}: Retrieved {NodeCount} team hierarchy nodes with a max depth of {MaxDepth}", RequestName, nodes.Count, nodes.Max(n => n.Level));
+        var maxDepth = nodes.Count > 0 ? nodes.Max(n => n.Level) : 0;
+        _logger.LogDebug("{RequestName}: Retrieved {NodeCount} team hierarchy nodes with a max depth of {MaxDepth}", RequestName, nodes.Count, maxDepth);
 
         if (nodes.Count == 0)
         {
@@ -44,7 +45,7 @@ internal sealed class GetFunctionalOrganizationChartQueryHandler(IOrganizationDb
             AsOfDate = asOfDate,
             Organization = rootUnits,
             Total = nodes.Count,
-            MaxDepth = nodes.Max(n => n.Level)
+            MaxDepth = maxDepth
         };
     }
 

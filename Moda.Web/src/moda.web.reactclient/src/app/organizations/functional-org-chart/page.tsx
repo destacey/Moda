@@ -11,7 +11,7 @@ import {
   OrganizationalUnitDto,
   FunctionalOrganizationChartDto,
 } from '@/src/services/moda-api'
-import { Spin } from 'antd'
+import { DatePicker, Spin } from 'antd'
 import {
   ModaOrganizationChart,
   OrganizationChartEdgeData,
@@ -19,6 +19,7 @@ import {
   OrganizationChartNodeData,
 } from '../../components/common/organization-chart'
 import { OrganizationalChartTeamNode } from '../components'
+import dayjs from 'dayjs'
 
 export type OrganizationalUnitWithoutId = Omit<
   OrganizationalUnitDto,
@@ -83,6 +84,7 @@ function transformOrganizationToGraph(
 
 const FunctionalOrgChartPage: React.FC = () => {
   const [data, setData] = useState<TeamOrganizationGraphData>()
+  const [asOfDate, setAsOfDate] = useState<dayjs.Dayjs | null>(dayjs())
 
   useDocumentTitle('Functional Org Chart')
 
@@ -93,7 +95,7 @@ const FunctionalOrgChartPage: React.FC = () => {
     data: orgChartData,
     isLoading,
     isError,
-  } = useGetFunctionalOrganizationChartQuery(null)
+  } = useGetFunctionalOrganizationChartQuery(asOfDate?.toDate())
 
   useEffect(() => {
     dispatch(disableBreadcrumb(pathname))
@@ -116,10 +118,23 @@ const FunctionalOrgChartPage: React.FC = () => {
     )
   }
 
+  const actions = () => {
+    return (
+      <>
+        <DatePicker
+          value={asOfDate}
+          placeholder="As of date"
+          onChange={setAsOfDate}
+          title="The as of date for the functional org chart."
+        />
+      </>
+    )
+  }
+
   return (
     <>
       <br />
-      <PageTitle title="Functional Org Chart" />
+      <PageTitle title="Functional Org Chart" actions={actions()} />
       <Spin
         spinning={isLoading}
         tip="Loading functional org chart..."

@@ -95,13 +95,11 @@ export const teamApi = apiSlice.injectEndpoints({
       FunctionalOrganizationChartDto,
       Date | null | undefined
     >({
-      queryFn: async (asOfDate?: Date) => {
+      queryFn: async (asOfDate?: Date | null) => {
         try {
           const data = await (
             await getTeamsClient()
-          ).getFunctionalOrganizationChart(
-            (asOfDate as any)?.format('YYYY-MM-DD'),
-          )
+          ).getFunctionalOrganizationChart(asOfDate)
           return { data }
         } catch (error) {
           console.error('API Error:', error)

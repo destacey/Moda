@@ -59,8 +59,8 @@ const ModaOrganizationChart: React.FC<ModaOrganizationChartProps> = ({
       },
       layout: {
         type: 'antv-dagre',
-        nodesep: 50,
-        ranksep: 50,
+        nodesep: 24,
+        ranksep: 0,
         rankdir: 'TB',
         controlPoints: true,
       },
@@ -87,7 +87,7 @@ const ModaOrganizationChart: React.FC<ModaOrganizationChartProps> = ({
     [NodeComponent, data, nodeSize, token],
   )
 
-  if (!data) {
+  if (!data || !data.nodes || data.nodes.length === 0) {
     return <ModaEmpty message="No org chart data to display" />
   }
 
