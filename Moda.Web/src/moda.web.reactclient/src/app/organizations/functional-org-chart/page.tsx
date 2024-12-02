@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { authorizePage } from '../../components/hoc'
 import { useAppDispatch, useDocumentTitle } from '../../hooks'
 import { disableBreadcrumb } from '@/src/store/breadcrumbs'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { PageTitle } from '../../components/common'
 import { useGetFunctionalOrganizationChartQuery } from '@/src/store/features/organizations/team-api'
 import {
@@ -83,7 +83,6 @@ function transformOrganizationToGraph(
 }
 
 const FunctionalOrgChartPage: React.FC = () => {
-  const [data, setData] = useState<TeamOrganizationGraphData>()
   const [asOfDate, setAsOfDate] = useState<dayjs.Dayjs | null>(dayjs())
 
   useDocumentTitle('Functional Org Chart')
@@ -97,16 +96,13 @@ const FunctionalOrgChartPage: React.FC = () => {
     isError,
   } = useGetFunctionalOrganizationChartQuery(asOfDate?.toDate())
 
+  const data = useMemo<TeamOrganizationGraphData>(() => {
+    return orgChartData ? transformOrganizationToGraph(orgChartData) : undefined
+  }, [orgChartData])
+
   useEffect(() => {
     dispatch(disableBreadcrumb(pathname))
   }, [dispatch, pathname])
-
-  useEffect(() => {
-    if (orgChartData) {
-      const graphData = transformOrganizationToGraph(orgChartData)
-      setData(graphData)
-    }
-  }, [orgChartData])
 
   if (isError) {
     return (
