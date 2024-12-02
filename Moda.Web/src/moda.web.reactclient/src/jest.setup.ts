@@ -39,3 +39,23 @@ Object.defineProperty(window, 'localStorage', {
     clear: jest.fn(),
   },
 })
+
+// Mock next/navigation
+jest.mock('next/navigation', () => ({
+  useRouter() {
+    return {
+      push: jest.fn(),
+      replace: jest.fn(),
+      prefetch: jest.fn(),
+    }
+  },
+}))
+
+// Suppress console errors during tests
+beforeAll(() => {
+  console.error = jest.fn()
+})
+
+afterEach(() => {
+  jest.clearAllMocks()
+})

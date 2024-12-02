@@ -6534,6 +6534,44 @@
         ]
       }
     },
+    "/api/organization/teams/functional-organization-chart": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Get the functional organizaation chart for a given date.",
+        "operationId": "Teams_GetFunctionalOrganizationChart",
+        "parameters": [
+          {
+            "name": "asOfDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FunctionalOrganizationChartDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/organization/teams-of-teams": {
       "get": {
         "tags": [
@@ -12796,6 +12834,69 @@
           "comment": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "FunctionalOrganizationChartDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "asOfDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "organization": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationalUnitDto"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxDepth": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "OrganizationalUnitDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "path": {
+            "type": "string"
+          },
+          "children": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/OrganizationalUnitDto"
+            }
           }
         }
       },

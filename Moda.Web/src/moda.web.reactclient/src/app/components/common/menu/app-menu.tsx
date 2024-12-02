@@ -26,6 +26,12 @@ const menu: (Item | MenuItem)[] = [
   menuItem('Organizations', 'org', null, <TeamOutlined />, [
     menuItem('Teams', 'org.teams', '/organizations/teams'),
     menuItem('Employees', 'org.employees', '/organizations/employees'),
+    { key: 'org-settings-divider-1', type: 'divider' },
+    menuItem(
+      'Functional Org Chart',
+      'org.functional-org-chart',
+      '/organizations/functional-org-chart',
+    ),
   ]),
   menuItem('Planning', 'plan', null, <ScheduleOutlined />, [
     restrictedPermissionMenuItem(

@@ -1,7 +1,8 @@
 import { ThemeConfig, theme } from 'antd'
+const { darkAlgorithm } = theme
 
 const darkTheme: ThemeConfig = {
-  algorithm: theme.darkAlgorithm,
+  algorithm: darkAlgorithm,
   token: {
     colorPrimary: '#1f83d2',
     borderRadius: 4,
@@ -9,7 +10,6 @@ const darkTheme: ThemeConfig = {
   },
   components: {
     Layout: {
-      // controls the background color for all layout components
       headerBg: '#313131',
       triggerBg: '#313131',
     },

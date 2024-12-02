@@ -21,6 +21,7 @@ export enum QueryTags {
   Team = 'Organizations.Team',
   TeamBacklog = 'Organizations.TeamBacklog',
   TeamDependencies = 'Organizations.TeamDependencies',
+  FunctionalOrganizationChart = 'Organizations.FunctionalOrganizationChart',
 
   // PLANNING
   PlanningInterval = 'Planning.PlanningInterval',

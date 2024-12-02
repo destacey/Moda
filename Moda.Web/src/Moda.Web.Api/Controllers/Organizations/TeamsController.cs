@@ -252,7 +252,6 @@ public class TeamsController : ControllerBase
 
     #endregion Backlog
 
-
     #region Risks
 
     [HttpGet("{id}/risks")]
@@ -351,4 +350,20 @@ public class TeamsController : ControllerBase
     }
 
     #endregion Risks
+
+    [HttpGet("functional-organization-chart")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get the functional organizaation chart for a given date.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<FunctionalOrganizationChartDto>> GetFunctionalOrganizationChart([FromQuery] DateTime? asOfDate, CancellationToken cancellationToken)
+    {
+        // TODO: using LocalDate or DateOnly from axios wasn't working correctly
+
+        LocalDate? dateOnlyAsOfDate = asOfDate.HasValue
+            ? LocalDate.FromDateTime(asOfDate.Value)
+            : null;
+        var orgChart = await _sender.Send(new GetFunctionalOrganizationChartQuery(dateOnlyAsOfDate), cancellationToken);
+
+        return Ok(orgChart);
+    }
 }

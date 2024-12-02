@@ -9,4 +9,5 @@ export interface ThemeContextType {
   token: GlobalToken
   badgeColor: string
   antDesignChartsTheme: string
+  antvisG6ChartsTheme: string
 }
