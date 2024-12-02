@@ -1,4 +1,8 @@
-import { FunctionalOrganizationChartDto } from './../../../services/moda-api'
+import {
+  DeactivateTeamOfTeamsRequest,
+  DeactivateTeamRequest,
+  FunctionalOrganizationChartDto
+} from './../../../services/moda-api'
 import { TeamListItem } from '@/src/app/organizations/types'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
@@ -30,6 +34,34 @@ export const teamApi = apiSlice.injectEndpoints({
         ...result.map(({ key }) => ({ type: QueryTags.Team, key })),
       ],
     }),
+    deactivateTeam: builder.mutation<void, DeactivateTeamRequest>({
+      queryFn: async (request) => {
+        try {
+          const data = await (
+            await getTeamsClient()
+          ).deactivate(request.id, request)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+    }),
+    deactivateTeamOfTeams: builder.mutation<void, DeactivateTeamOfTeamsRequest>(
+      {
+        queryFn: async (request) => {
+          try {
+            const data = await (
+              await getTeamsOfTeamsClient()
+            ).deactivate(request.id, request)
+            return { data }
+          } catch (error) {
+            console.error('API Error:', error)
+            return { error }
+          }
+        },
+      },
+    ),
     getTeamOptions: builder.query<BaseOptionType[], boolean>({
       queryFn: async (includeInactive) => {
         try {
@@ -118,6 +150,8 @@ export const teamApi = apiSlice.injectEndpoints({
 
 export const {
   useGetTeamsQuery,
+  useDeactivateTeamMutation,
+  useDeactivateTeamOfTeamsMutation,
   useGetTeamOptionsQuery,
   useGetTeamBacklogQuery,
   useGetTeamDependenciesQuery,

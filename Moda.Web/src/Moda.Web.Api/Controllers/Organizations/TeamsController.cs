@@ -87,6 +87,24 @@ public class TeamsController : ControllerBase
             : BadRequest(result.Error);
     }
 
+    [HttpPut("{id}/deactivate")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Deactivate a team.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> Deactivate(Guid id, [FromBody] DeactivateTeamRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToDeactivateTeamCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "TeamsController.Deactivate"));
+    }
+
     //[HttpDelete("{id}")]
     //[MustHavePermission(ApplicationAction.Delete, ApplicationResource.Teams)]
     //[OpenApiOperation("Delete an team.", "")]

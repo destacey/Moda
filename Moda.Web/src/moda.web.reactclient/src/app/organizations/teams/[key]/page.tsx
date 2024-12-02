@@ -1,8 +1,8 @@
 'use client'
 
 import PageTitle from '@/src/app/components/common/page-title'
-import { Button, Card } from 'antd'
-import { createElement, useCallback, useEffect, useState } from 'react'
+import { Card, MenuProps, message } from 'antd'
+import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
 import TeamDetails from './team-details'
 import RisksGrid, {
   RisksGridProps,
@@ -31,6 +31,9 @@ import { WorkItemsBacklogGrid } from '@/src/app/components/common/work'
 import { useGetTeamBacklogQuery } from '@/src/store/features/organizations/team-api'
 import { WorkItemsBacklogGridProps } from '@/src/app/components/common/work/work-items-backlog-grid'
 import TeamDependencyManagement from './team-dependency-management'
+import { ItemType } from 'antd/es/menu/interface'
+import { PageActions } from '@/src/app/components/common'
+import DeactivateTeamForm from '../../components/deactivate-team-form'
 
 enum TeamTabs {
   Details = 'details',
@@ -46,10 +49,14 @@ const TeamDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState(TeamTabs.Details)
   const [openCreateTeamMembershipForm, setOpenCreateTeamMembershipForm] =
     useState<boolean>(false)
+  const [openDeactivateTeamForm, setOpenDeactivateTeamForm] =
+    useState<boolean>(false)
   const [teamMembershipsQueryEnabled, setTeamMembershipsQueryEnabled] =
     useState<boolean>(false)
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
+
+  const [messageApi, contextHolder] = message.useMessage()
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
@@ -57,7 +64,6 @@ const TeamDetailsPage = ({ params }) => {
     'Permission',
     'Permissions.Teams.ManageTeamMemberships',
   )
-  const showActions = canUpdateTeam || canManageTeamMemberships
 
   const {
     item: team,
@@ -85,20 +91,33 @@ const TeamDetailsPage = ({ params }) => {
     setIncludeClosedRisks(includeClosed)
   }, [])
 
-  const actions = () => {
-    return (
-      <>
-        {canUpdateTeam && (
-          <Button onClick={() => dispatch(setEditMode(true))}>Edit Team</Button>
-        )}
-        {canManageTeamMemberships && (
-          <Button onClick={() => setOpenCreateTeamMembershipForm(true)}>
-            Add Team Membership
-          </Button>
-        )}
-      </>
-    )
-  }
+  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+    const items: ItemType[] = []
+
+    if (canUpdateTeam) {
+      items.push(
+        {
+          key: 'edit',
+          label: 'Edit',
+          onClick: () => dispatch(setEditMode(true)),
+        },
+        {
+          key: 'deactivate',
+          label: 'Deactivate',
+          onClick: () => setOpenDeactivateTeamForm(true),
+        },
+      )
+    }
+    if (canManageTeamMemberships) {
+      items.push({
+        key: 'add-team-membership',
+        label: 'Add Team Membership',
+        onClick: () => setOpenCreateTeamMembershipForm(true),
+      })
+    }
+
+    return items
+  }, [canManageTeamMemberships, canUpdateTeam, dispatch])
 
   const tabs = [
     {
@@ -180,16 +199,24 @@ const TeamDetailsPage = ({ params }) => {
     }
   }
 
+  const onDeactivateTeamFormClosed = (wasSaved: boolean) => {
+    setOpenDeactivateTeamForm(false)
+    if (wasSaved) {
+      dispatch(retrieveTeam({ key, type: 'Team' }))
+    }
+  }
+
   if (teamNotFound) {
     return notFound()
   }
 
   return (
     <>
+      {contextHolder}
       <PageTitle
         title={team?.name}
         subtitle="Team Details"
-        actions={showActions && actions()}
+        actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card
         style={{ width: '100%' }}
@@ -207,6 +234,15 @@ const TeamDetailsPage = ({ params }) => {
           teamType={'Team'}
           onFormCreate={() => onCreateTeamMembershipFormClosed(true)}
           onFormCancel={() => onCreateTeamMembershipFormClosed(false)}
+        />
+      )}
+      {openDeactivateTeamForm && (
+        <DeactivateTeamForm
+          team={team}
+          showForm={openDeactivateTeamForm}
+          onFormComplete={() => onDeactivateTeamFormClosed(true)}
+          onFormCancel={() => onDeactivateTeamFormClosed(false)}
+          messageApi={messageApi}
         />
       )}
     </>

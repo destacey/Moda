@@ -6,6 +6,7 @@ using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
 using Moda.Web.Api.Models.Organizations;
 using Moda.Web.Api.Models.Organizations.TeamOfTeams;
+using Moda.Web.Api.Models.Organizations.Teams;
 using Moda.Web.Api.Models.Organizations.TeamsOfTeams;
 using Moda.Web.Api.Models.Planning.Risks;
 
@@ -81,6 +82,24 @@ public class TeamsOfTeamsController : ControllerBase
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.Error);
+    }
+
+    [HttpPut("{id}/deactivate")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Deactivate a team of teams.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> Deactivate(Guid id, [FromBody] DeactivateTeamOfTeamsRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest();
+
+        var result = await _sender.Send(request.ToDeactivateTeamOfTeamsCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "TeamsOfTeamsController.Deactivate"));
     }
 
     //[HttpDelete("{id}")]

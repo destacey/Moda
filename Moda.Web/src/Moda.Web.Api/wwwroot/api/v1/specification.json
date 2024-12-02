@@ -5809,6 +5809,71 @@
         ]
       }
     },
+    "/api/organization/teams/{id}/deactivate": {
+      "put": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "Deactivate a team.",
+        "operationId": "Teams_Deactivate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeactivateTeamRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/organization/teams/{id}/team-memberships": {
       "get": {
         "tags": [
@@ -6707,6 +6772,71 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateTeamOfTeamsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/organization/teams-of-teams/{id}/deactivate": {
+      "put": {
+        "tags": [
+          "TeamsOfTeams"
+        ],
+        "summary": "Deactivate a team of teams.",
+        "operationId": "TeamsOfTeams_Deactivate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeactivateTeamOfTeamsRequest"
               }
             }
           },
@@ -12469,6 +12599,29 @@
           }
         }
       },
+      "DeactivateTeamRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "inactiveDate"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "inactiveDate": {
+            "type": "string",
+            "format": "date",
+            "minLength": 1,
+            "nullable": false
+          }
+        }
+      },
       "TeamMembershipDto": {
         "type": "object",
         "additionalProperties": false,
@@ -12894,6 +13047,29 @@
             "maxLength": 1024,
             "minLength": 0,
             "nullable": true
+          }
+        }
+      },
+      "DeactivateTeamOfTeamsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "inactiveDate"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "inactiveDate": {
+            "type": "string",
+            "format": "date",
+            "minLength": 1,
+            "nullable": false
           }
         }
       },
