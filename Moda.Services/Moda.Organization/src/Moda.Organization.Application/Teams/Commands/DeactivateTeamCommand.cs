@@ -1,4 +1,5 @@
-﻿using NodaTime;
+﻿using Moda.Organization.Application.Teams.Models;
+using NodaTime;
 
 namespace Moda.Organization.Application.Teams.Commands;
 
@@ -53,6 +54,12 @@ internal sealed class DeactivateTeamCommandHandler(IOrganizationDbContext organi
             await _organizationDbContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("{RequestName}: deactivated Team {TeamId}", RequestName, team.Id);
+
+            // Sync the new team with the graph database
+            // TODO: move to more of an event based approach
+            await _organizationDbContext.UpsertTeamNode(TeamNode.From(team), cancellationToken);
+
+            _logger.LogDebug("{RequestName}: synced TeamNode for Team with Id {TeamId}, Key {TeamKey}, and Code {TeamCode}", RequestName, team.Id, team.Key, team.Code);
 
             return Result.Success();
         }

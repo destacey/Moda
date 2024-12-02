@@ -99,7 +99,7 @@ public class TeamsOfTeamsController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(result.Error);
+            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "TeamsOfTeamsController.Deactivate"));
     }
 
     //[HttpDelete("{id}")]

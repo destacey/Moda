@@ -1,4 +1,5 @@
 'use client'
+
 import PlanningIntervalObjectivesGrid from '@/src/app/components/common/planning/planning-interval-objectives-grid'
 import { useDocumentTitle } from '@/src/app/hooks'
 import {
