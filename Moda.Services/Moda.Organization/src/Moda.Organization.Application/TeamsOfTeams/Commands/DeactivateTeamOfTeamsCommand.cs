@@ -1,42 +1,36 @@
-﻿using System.Linq.Expressions;
-using Moda.Common.Application.Models;
-using NodaTime;
+﻿using NodaTime;
 
 namespace Moda.Organization.Application.TeamsOfTeams.Commands;
 
-public sealed record DeactivateTeamOfTeamsCommand : ICommand
-{
-    public DeactivateTeamOfTeamsCommand(IdOrKey idOrKey, LocalDate inactiveDate)
-    {
-        IdOrKeyFilter = idOrKey.CreateFilter<TeamOfTeams>();
-        InactiveDate = inactiveDate;
-    }
+public sealed record DeactivateTeamOfTeamsCommand(Guid Id, LocalDate InactiveDate) : ICommand;
 
-    public Expression<Func<TeamOfTeams, bool>> IdOrKeyFilter { get; }
-    public LocalDate InactiveDate { get; set; }
+public sealed class DeactivateTeamOfTeamsCommandValidator : CustomValidator<DeactivateTeamOfTeamsCommand>
+{
+    public DeactivateTeamOfTeamsCommandValidator()
+    {
+        RuleFor(t => t.Id)
+            .NotEmpty();
+
+        RuleFor(t => t.InactiveDate)
+            .NotEmpty();
+    }
 }
 
-internal sealed class DeactivateTeamOfTeamsCommandHandler : ICommandHandler<DeactivateTeamOfTeamsCommand>
+internal sealed class DeactivateTeamOfTeamsCommandHandler(IOrganizationDbContext organizationDbContext, ILogger<DeactivateTeamOfTeamsCommand> logger, IDateTimeProvider dateTimeProvider) : ICommandHandler<DeactivateTeamOfTeamsCommand>
 {
     private const string RequestName = nameof(DeactivateTeamOfTeamsCommand);
 
-    private readonly IOrganizationDbContext _organizationDbContext;
-    private readonly ILogger<DeactivateTeamOfTeamsCommand> _logger;
-    private readonly IDateTimeProvider _dateTimeProvider;
-
-    public DeactivateTeamOfTeamsCommandHandler(IOrganizationDbContext organizationDbContext, ILogger<DeactivateTeamOfTeamsCommand> logger, IDateTimeProvider dateTimeProvider)
-    {
-        _organizationDbContext = organizationDbContext;
-        _logger = logger;
-        _dateTimeProvider = dateTimeProvider;
-    }
+    private readonly IOrganizationDbContext _organizationDbContext = organizationDbContext;
+    private readonly ILogger<DeactivateTeamOfTeamsCommand> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<Result> Handle(DeactivateTeamOfTeamsCommand request, CancellationToken cancellationToken)
     {
         try
         {
             var team = await _organizationDbContext.TeamOfTeams
-                .FirstOrDefaultAsync(request.IdOrKeyFilter, cancellationToken);
+                .Include(t => t.ParentMemberships)
+                .FirstOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
 
             if (team is null)
             {
