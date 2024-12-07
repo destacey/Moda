@@ -24,32 +24,36 @@ public sealed class EmployeeService : IEmployeeService
         try
         {
             var getEmployeesResult = await _externalEmployeeDirectoryService.GetEmployees(cancellationToken);
-
-            if (getEmployeesResult.IsSuccess)
-            {
-                if (!getEmployeesResult.Value.NotNullAndAny())
-                {
-                    string message = "No employees where returned by the ExternalEmployeeDirectoryService.";
-                    _logger.LogError(message);
-                    return Result.Failure(message);
-                }
-
-                var upsertResult = await _sender.Send(new BulkUpsertEmployeesCommand(getEmployeesResult.Value), cancellationToken);
-                if (upsertResult.IsFailure)
-                    return upsertResult;
-
-                var userUpdateResult = await _userService.UpdateMissingEmployeeIds(cancellationToken);
-                if (userUpdateResult.IsFailure)
-                    return upsertResult;
-
-                return Result.Success();
-            }
-            else
+            if (getEmployeesResult.IsFailure)
             {
                 string message = "Unable to retrieve external employees.";
                 _logger.LogError(message);
                 return Result.Failure(message);
             }
+
+            var employees = getEmployeesResult.Value.ToList();
+            _logger.LogDebug("Retrieved {Count} employees from the ExternalEmployeeDirectoryService.", employees.Count);
+
+            if (employees.Count == 0)
+            {
+                string message = "No employees where returned by the ExternalEmployeeDirectoryService.";
+                _logger.LogWarning(message);
+                return Result.Failure(message);
+            }
+
+            var upsertResult = await _sender.Send(new BulkUpsertEmployeesCommand(employees), cancellationToken);
+            if (upsertResult.IsFailure)
+                return upsertResult;
+
+            var userLinkResult = await _userService.UpdateMissingEmployeeIds(cancellationToken);
+            if (userLinkResult.IsFailure)
+                return upsertResult;
+
+            var userUpdateResult = await _userService.SyncUsersFromEmployeeRecords(employees, cancellationToken);
+            if (userUpdateResult.IsFailure)
+                return upsertResult;
+
+            return Result.Success();
         }
         catch (Exception ex)
         {

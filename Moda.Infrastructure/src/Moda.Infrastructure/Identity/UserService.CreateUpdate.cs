@@ -155,7 +155,7 @@ internal partial class UserService
     {
         var users = await _userManager.Users.Where(u => !u.EmployeeId.HasValue).ToListAsync(cancellationToken);
 
-        if (users.Any())
+        if (users.Count != 0)
         {
             var employees = await _sender.Send(new GetEmployeeNumberMapQuery(), cancellationToken);
             foreach (var user in users)
@@ -176,6 +176,43 @@ internal partial class UserService
                 }
             }
         }
+
+        return Result.Success();
+    }
+
+    public async Task<Result> SyncUsersFromEmployeeRecords(List<IExternalEmployee> externalEmployees, CancellationToken cancellationToken)
+    {
+        var users = await _userManager.Users.Where(u => u.ObjectId != null).ToListAsync(cancellationToken);
+
+        _logger.LogDebug("{UserCount} users found with EmployeeId.", users.Count);
+        if (users.Count == 0)
+            return Result.Success();
+
+        foreach (var user in users)
+        {
+            var employee = externalEmployees.FirstOrDefault(e => e.EmployeeNumber == user.ObjectId);
+            if (employee is null)
+            {
+                _logger.LogWarning("Employee with Id {EmployeeId} not found.", user.EmployeeId);
+                continue;
+            }
+
+            user.FirstName = employee.Name.FirstName;
+            user.LastName = employee.Name.LastName;
+            user.Email = employee.Email;
+            user.IsActive = employee.IsActive;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User {UserId} updated.", user.Id);
+                await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
+            }
+            else
+            {
+                _logger.LogError("Error updating user {UserId}: {Errors}", user.Id, result.Errors.Select(e => e.Description));
+            }
+        }       
 
         return Result.Success();
     }
