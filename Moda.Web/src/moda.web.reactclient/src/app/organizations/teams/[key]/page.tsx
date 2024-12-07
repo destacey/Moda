@@ -95,20 +95,22 @@ const TeamDetailsPage = ({ params }) => {
     const items: ItemType[] = []
 
     if (canUpdateTeam) {
-      items.push(
-        {
-          key: 'edit',
-          label: 'Edit',
-          onClick: () => dispatch(setEditMode(true)),
-        },
-        {
+      items.push({
+        key: 'edit',
+        label: 'Edit',
+        onClick: () => dispatch(setEditMode(true)),
+      })
+
+      if (team?.isActive === true) {
+        items.push({
           key: 'deactivate',
           label: 'Deactivate',
           onClick: () => setOpenDeactivateTeamForm(true),
-        },
-      )
+        })
+      }
     }
-    if (canManageTeamMemberships) {
+
+    if (canManageTeamMemberships && team?.isActive === true) {
       items.push({
         key: 'add-team-membership',
         label: 'Add Team Membership',
@@ -117,7 +119,7 @@ const TeamDetailsPage = ({ params }) => {
     }
 
     return items
-  }, [canManageTeamMemberships, canUpdateTeam, dispatch])
+  }, [canManageTeamMemberships, canUpdateTeam, dispatch, team?.isActive])
 
   const tabs = [
     {
