@@ -1,33 +1,23 @@
-﻿using System.Security.Cryptography;
-using Moda.Common.Domain.Enums.Organization;
+﻿using Moda.Common.Domain.Enums.Organization;
 using Moda.Common.Domain.Events;
 using Moda.Organization.Domain.Models;
+using Moda.Organization.Domain.Tests.Data;
+using Moda.Tests.Shared;
 using Moda.Tests.Shared.Extensions;
 using NodaTime;
+using NodaTime.Extensions;
+using NodaTime.Testing;
 
 namespace Moda.Organization.Domain.Tests.Sut.Models;
 public class TeamOfTeamsTests
 {
-    private readonly Instant _now = Instant.FromUtc(2020, 1, 1, 8, 0);
-    private readonly TeamCode _genericTeamCode = new("TOT1");
+    private readonly TestingDateTimeProvider _dateTimeProvider;
+    private readonly TeamOfTeamsFaker _teamOfTeamsFaker;
 
-    private TeamOfTeams GenerateTeamOfTeams(bool isActive)
+    public TeamOfTeamsTests()
     {
-        int key = RandomNumberGenerator.GetInt32(1, 100000);
-        var created = _now.Minus(Duration.FromDays(10));
-
-        var team = TeamOfTeams.Create("Test Team of Teams", _genericTeamCode, null, created.InUtc().LocalDateTime.Date, created);
-        team.SetPrivate(t => t.Id, Guid.NewGuid());
-        team.SetPrivate(t => t.Key, key);
-
-        if (!isActive)
-        {
-            team.Deactivate(TeamDeactivatableArgs.Create(_now.InUtc().LocalDateTime.Date, _now));
-        }
-
-        team.ClearDomainEvents();
-
-        return team;
+        _dateTimeProvider = new(new FakeClock(DateTime.UtcNow.ToInstant()));
+        _teamOfTeamsFaker = new();
     }
 
     #region Create
@@ -36,18 +26,16 @@ public class TeamOfTeamsTests
     public void Create_WhenValid_Success()
     {
         // Arrange
-        var name = "Test Team ";
-        var description = "Test Team Description";
-        var created = _now.Minus(Duration.FromDays(10));
+        var fakeTeamOfTeams = _teamOfTeamsFaker.Generate();
 
         // Act
-        var sut = TeamOfTeams.Create(name, _genericTeamCode, description, created.InUtc().LocalDateTime.Date, created);
+        var sut = TeamOfTeams.Create(fakeTeamOfTeams.Name, fakeTeamOfTeams.Code, fakeTeamOfTeams.Description, fakeTeamOfTeams.ActiveDate, _dateTimeProvider.Now);
 
         // Assert
         sut.Type.Should().Be(TeamType.TeamOfTeams);
-        sut.Code.Should().Be(_genericTeamCode);
-        sut.Name.Should().Be(name.Trim());
-        sut.Description.Should().Be(description);
+        sut.Code.Should().Be(fakeTeamOfTeams.Code);
+        sut.Name.Should().Be(fakeTeamOfTeams.Name);
+        sut.Description.Should().Be(fakeTeamOfTeams.Description);
         sut.IsActive.Should().BeTrue();
         sut.ParentMemberships.Should().BeEmpty();
         sut.ChildMemberships.Should().BeEmpty();
@@ -60,11 +48,11 @@ public class TeamOfTeamsTests
     public void Create_WithNullName_Throws()
     {
         // Arrange
+        var fakeTeamOfTeams = _teamOfTeamsFaker.Generate();
         string? name = null;
-        var created = _now;
 
         // Act
-        Action action = () => TeamOfTeams.Create(name!, _genericTeamCode, null, created.InUtc().LocalDateTime.Date, created);
+        Action action = () => TeamOfTeams.Create(name!, fakeTeamOfTeams.Code, fakeTeamOfTeams.Description, fakeTeamOfTeams.ActiveDate, _dateTimeProvider.Now);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Value cannot be null. (Parameter 'Name')");
@@ -76,10 +64,10 @@ public class TeamOfTeamsTests
     public void Create_WithInvalidName_Throws(string name)
     {
         // Arrange
-        var created = _now;
+        var fakeTeamOfTeams = _teamOfTeamsFaker.Generate();
 
         // Act
-        Action action = () => TeamOfTeams.Create(name, _genericTeamCode, null, created.InUtc().LocalDateTime.Date, created);
+        Action action = () => TeamOfTeams.Create(name, fakeTeamOfTeams.Code, fakeTeamOfTeams.Description, fakeTeamOfTeams.ActiveDate, _dateTimeProvider.Now);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Required input Name was empty. (Parameter 'Name')");
@@ -89,11 +77,11 @@ public class TeamOfTeamsTests
     public void Create_WithNullCode_Throws()
     {
         // Arrange
+        var fakeTeamOfTeams = _teamOfTeamsFaker.Generate();
         TeamCode code = null!;
-        var created = _now;
 
         // Act
-        Action action = () => TeamOfTeams.Create("Test", code, null, created.InUtc().LocalDateTime.Date, created);
+        Action action = () => TeamOfTeams.Create(fakeTeamOfTeams.Name, code, fakeTeamOfTeams.Description, fakeTeamOfTeams.ActiveDate, _dateTimeProvider.Now);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Value cannot be null. (Parameter 'Code')");
@@ -106,10 +94,10 @@ public class TeamOfTeamsTests
     public void Create_WithInvalidDescription_IsNull(string? description)
     {
         // Arrange
-        var created = _now;
+        var fakeTeamOfTeams = _teamOfTeamsFaker.Generate();
 
         // Act
-        var sut = TeamOfTeams.Create("Team", _genericTeamCode, description, created.InUtc().LocalDateTime.Date, created);
+        var sut = TeamOfTeams.Create(fakeTeamOfTeams.Name, fakeTeamOfTeams.Code, description, fakeTeamOfTeams.ActiveDate, _dateTimeProvider.Now);
 
         // Assert
         sut.Description.Should().BeNull();
@@ -124,14 +112,14 @@ public class TeamOfTeamsTests
     public void Update_WhenValid_Success()
     {
         // Arrange
-        TeamOfTeams team = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
 
         var name = "New Team Name ";
         var code = new TeamCode("NEWTEST");
         var description = "New Description ";
 
         // Act
-        team.Update(name, code, description, _now);
+        team.Update(name, code, description, _dateTimeProvider.Now);
 
         // Assert
         team.Type.Should().Be(TeamType.TeamOfTeams);
@@ -148,11 +136,11 @@ public class TeamOfTeamsTests
     public void Update_WithNullName_ReturnsFailedResult()
     {
         // Arrange
-        TeamOfTeams team = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
         string name = null!;
 
         // Act
-        var result = team.Update(name, team.Code, team.Description, _now);
+        var result = team.Update(name, team.Code, team.Description, _dateTimeProvider.Now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -167,10 +155,10 @@ public class TeamOfTeamsTests
     public void Update_WithInvalidName_ReturnsFailedResult(string name)
     {
         // Arrange
-        TeamOfTeams team = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
 
         // Act
-        var result = team.Update(name, team.Code, team.Description, _now);
+        var result = team.Update(name, team.Code, team.Description, _dateTimeProvider.Now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -183,11 +171,11 @@ public class TeamOfTeamsTests
     public void Update_WithNullCode_ReturnsFailedResult()
     {
         // Arrange
-        TeamOfTeams team = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
         TeamCode code = null!;
 
         // Act
-        var result = team.Update(team.Name, code, team.Description, _now);
+        var result = team.Update(team.Name, code, team.Description, _dateTimeProvider.Now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -203,10 +191,10 @@ public class TeamOfTeamsTests
     public void Update_WithInvalidDescription_IsNull(string? description)
     {
         // Arrange
-        TeamOfTeams team = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
 
         // Act
-        var result = team.Update(team.Name, team.Code, description, _now);
+        var result = team.Update(team.Name, team.Code, description, _dateTimeProvider.Now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -222,29 +210,14 @@ public class TeamOfTeamsTests
     #region IActivatable
 
     [Fact]
-    public void Deactivate_WhenActive_SetsIsActiveToFalse()
-    {
-        // Arrange
-        TeamOfTeams team = GenerateTeamOfTeams(true);
-
-        // Act
-        team.Deactivate(TeamDeactivatableArgs.Create(_now.InUtc().LocalDateTime.Date, _now));
-
-        // Assert
-        team.IsActive.Should().BeFalse();
-
-        team.DomainEvents.Should().NotBeEmpty();
-        team.DomainEvents.Should().ContainSingle(e => e is EntityDeactivatedEvent<TeamOfTeams>);
-    }
-
-    [Fact]
     public void Activate_WhenActive_SetsIsActiveToFalse()
     {
         // Arrange
-        TeamOfTeams team = GenerateTeamOfTeams(false);
+        var inactiveDate = _dateTimeProvider.Now.Minus(Duration.FromDays(10)).InUtc().LocalDateTime.Date;
+        var team = _teamOfTeamsFaker.WithData(isActive: false, inactiveDate: inactiveDate).Generate();
 
         // Act
-        team.Activate(_now);
+        team.Activate(_dateTimeProvider.Now);
 
         // Assert
         team.IsActive.Should().BeTrue();
@@ -253,7 +226,261 @@ public class TeamOfTeamsTests
         team.DomainEvents.Should().ContainSingle(e => e is EntityActivatedEvent<TeamOfTeams>);
     }
 
+    [Fact]
+    public void Deactivate_WhenActiveAndNoActiveMemberships_Success()
+    {
+        // Arrange
+        var team = _teamOfTeamsFaker.Generate();
+        var inactiveDate = _dateTimeProvider.Now.InUtc().LocalDateTime.Date;
+        var args = TeamDeactivatableArgs.Create(inactiveDate, _dateTimeProvider.Now);
+
+        // Act
+        var result = team.Deactivate(args);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        team.IsActive.Should().BeFalse();
+        team.InactiveDate.Should().Be(inactiveDate);
+        team.DomainEvents.Should().ContainSingle(e => e is EntityDeactivatedEvent<TeamOfTeams>);
+    }
+
+    [Fact]
+    public void Deactivate_WhenAlreadyInactive_Failure()
+    {
+        // Arrange
+        var inactiveDate = _dateTimeProvider.Now.Minus(Duration.FromDays(10)).InUtc().LocalDateTime.Date;
+        var team = _teamOfTeamsFaker.WithData(isActive: false, inactiveDate: inactiveDate).Generate();
+        var args = TeamDeactivatableArgs.Create(inactiveDate, _dateTimeProvider.Now);
+
+        // Act
+        var result = team.Deactivate(args);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The team of teams is already inactive.");
+        team.IsActive.Should().BeFalse();
+        team.InactiveDate.Should().NotBeNull();
+        team.DomainEvents.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Deactivate_WhenActiveAndAsOfDateBeforeActiveDate_Failure()
+    {
+        // Arrange
+        var team = _teamOfTeamsFaker.Generate();
+        var inactiveDate = team.ActiveDate.PlusDays(-5);
+        var args = TeamDeactivatableArgs.Create(inactiveDate, _dateTimeProvider.Now);
+
+        // Act
+        var result = team.Deactivate(args);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The inactive date cannot be on or before the active date.");
+        team.IsActive.Should().BeTrue();
+        team.InactiveDate.Should().BeNull();
+    }
+
+    [Fact]
+    public void Deactivate_WhenActiveAndHasActiveParentMemberships_Failure()
+    {
+        // Arrange
+        var team = _teamOfTeamsFaker.Generate();
+        var teamOfTeams = _teamOfTeamsFaker.Generate();
+        LocalDate start = team.ActiveDate.PlusDays(5);
+        LocalDate? end = start.PlusDays(90);
+        MembershipDateRange dateRange = new(start, end);
+        team.AddTeamMembership(teamOfTeams, dateRange, _dateTimeProvider.Now);
+
+        var inactiveDate = start.PlusDays(10);
+        var args = TeamDeactivatableArgs.Create(inactiveDate, _dateTimeProvider.Now);
+
+        // Act
+        var result = team.Deactivate(args);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The inactive date must be on or after the end date of the last team membership.");
+        team.IsActive.Should().BeTrue();
+        team.InactiveDate.Should().BeNull();
+    }
+
+    [Fact]
+    public void Deactivate_WhenActiveAndHasActiveChildMemberships_Failure()
+    {
+        // Arrange
+        var team = _teamOfTeamsFaker.Generate();
+        var childTeam = _teamOfTeamsFaker.Generate();
+        LocalDate start = team.ActiveDate.PlusDays(5);
+        LocalDate? end = start.PlusDays(90);
+        MembershipDateRange dateRange = new(start, end);
+        childTeam.AddTeamMembership(team, dateRange, _dateTimeProvider.Now);
+        var membership = childTeam.ParentMemberships.First();
+
+        team.AddToPrivateList("_childMemberships", membership);
+
+        var inactiveDate = start.PlusDays(10);
+        var args = TeamDeactivatableArgs.Create(inactiveDate, _dateTimeProvider.Now);
+
+        // Act
+        var result = team.Deactivate(args);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The inactive date must be on or after the end date of the last child team membership.");
+        team.IsActive.Should().BeTrue();
+        team.InactiveDate.Should().BeNull();
+    }
+
+    [Fact]
+    public void Deactivate_WhenActiveAndAsOfDateBeforeLatestParentMembershipEnd_Failure()
+    {
+        // Arrange
+        var team = _teamOfTeamsFaker.Generate();
+        var teamOfTeams = _teamOfTeamsFaker.Generate();
+        LocalDate start = team.ActiveDate.PlusDays(5);
+        LocalDate? end = start.PlusDays(90);
+        MembershipDateRange dateRange = new(start, end);
+        team.AddTeamMembership(teamOfTeams, dateRange, _dateTimeProvider.Now);
+
+        var inactiveDate = start.PlusDays(10);
+        var args = TeamDeactivatableArgs.Create(inactiveDate, _dateTimeProvider.Now);
+
+        // Act
+        var result = team.Deactivate(args);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The inactive date must be on or after the end date of the last team membership.");
+        team.IsActive.Should().BeTrue();
+        team.InactiveDate.Should().BeNull();
+    }
+
+    [Fact]
+    public void Deactivate_WhenActiveAndAsOfDateBeforeLatestChildMembershipEnd_Failure()
+    {
+        // Arrange
+        var team = _teamOfTeamsFaker.Generate();
+        var childTeam = _teamOfTeamsFaker.Generate();
+        LocalDate start = team.ActiveDate.PlusDays(5);
+        LocalDate? end = start.PlusDays(90);
+        MembershipDateRange dateRange = new(start, end);
+        childTeam.AddTeamMembership(team, dateRange, _dateTimeProvider.Now);
+        var membership = childTeam.ParentMemberships.First();
+
+        team.AddToPrivateList("_childMemberships", membership);
+
+        var inactiveDate = start.PlusDays(10);
+        var args = TeamDeactivatableArgs.Create(inactiveDate, _dateTimeProvider.Now);
+
+        // Act
+        var result = team.Deactivate(args);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The inactive date must be on or after the end date of the last child team membership.");
+        team.IsActive.Should().BeTrue();
+        team.InactiveDate.Should().BeNull();
+    }
+
+    [Fact]
+    public void Deactivate_WhenActiveAndAsOfDateOnLatestParentMembershipEnd_Success()
+    {
+        // Arrange
+        var team = _teamOfTeamsFaker.Generate();
+        var teamOfTeams = _teamOfTeamsFaker.Generate();
+        LocalDate start = team.ActiveDate.PlusDays(5);
+        LocalDate? end = start.PlusDays(90);
+        MembershipDateRange dateRange = new(start, end);
+        team.AddTeamMembership(teamOfTeams, dateRange, _dateTimeProvider.Now);
+
+        var args = TeamDeactivatableArgs.Create(end.Value, _dateTimeProvider.Now);
+
+        // Act
+        var result = team.Deactivate(args);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        team.IsActive.Should().BeFalse();
+        team.InactiveDate.Should().Be(end);
+    }
+
+    [Fact]
+    public void Deactivate_WhenActiveAndAsOfDateOnLatestChildMembershipEnd_Success()
+    {
+        // Arrange
+        var team = _teamOfTeamsFaker.Generate();
+        var childTeam = _teamOfTeamsFaker.Generate();
+        LocalDate start = team.ActiveDate.PlusDays(5);
+        LocalDate? end = start.PlusDays(90);
+        MembershipDateRange dateRange = new(start, end);
+        childTeam.AddTeamMembership(team, dateRange, _dateTimeProvider.Now);
+        var membership = childTeam.ParentMemberships.First();
+
+        team.AddToPrivateList("_childMemberships", membership);
+
+        var args = TeamDeactivatableArgs.Create(end.Value, _dateTimeProvider.Now);
+
+        // Act
+        var result = team.Deactivate(args);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        team.IsActive.Should().BeFalse();
+        team.InactiveDate.Should().Be(end);
+    }
+
+    [Fact]
+    public void Deactivate_WhenActiveAndAsOfDateAfterLatestParentMembershipEnd_Success()
+    {
+        // Arrange
+        var team = _teamOfTeamsFaker.Generate();
+        var teamOfTeams = _teamOfTeamsFaker.Generate();
+        LocalDate start = team.ActiveDate.PlusDays(5);
+        LocalDate? end = start.PlusDays(90);
+        MembershipDateRange dateRange = new(start, end);
+        team.AddTeamMembership(teamOfTeams, dateRange, _dateTimeProvider.Now);
+
+        var inactiveDate = start.PlusDays(100);
+        var args = TeamDeactivatableArgs.Create(inactiveDate, _dateTimeProvider.Now);
+
+        // Act
+        var result = team.Deactivate(args);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        team.IsActive.Should().BeFalse();
+        team.InactiveDate.Should().Be(inactiveDate);
+    }
+
+    [Fact]
+    public void Deactivate_WhenActiveAndAsOfDateAfterLatestChildMembershipEnd_Success()
+    {
+        // Arrange
+        var team = _teamOfTeamsFaker.Generate();
+        var childTeam = _teamOfTeamsFaker.Generate();
+        LocalDate start = team.ActiveDate.PlusDays(5);
+        LocalDate? end = start.PlusDays(90);
+        MembershipDateRange dateRange = new(start, end);
+        childTeam.AddTeamMembership(team, dateRange, _dateTimeProvider.Now);
+        var membership = childTeam.ParentMemberships.First();
+
+        team.AddToPrivateList("_childMemberships", membership);
+
+        var inactiveDate = start.PlusDays(100);
+        var args = TeamDeactivatableArgs.Create(inactiveDate, _dateTimeProvider.Now);
+
+        // Act
+        var result = team.Deactivate(args);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        team.IsActive.Should().BeFalse();
+        team.InactiveDate.Should().Be(inactiveDate);
+    }
+
     #endregion IActivatable
+
 
     #region Memberships
 
@@ -261,258 +488,260 @@ public class TeamOfTeamsTests
     public void AddTeamToTeamMembership_WhenNoExistingMemberships_Success()
     {
         // Arrange
-        var source = GenerateTeamOfTeams(true);
-        var target = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
+        var parentTeam = _teamOfTeamsFaker.Generate();
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = new(2023, 5, 1); ;
         MembershipDateRange dateRange = new(start, end);
 
         // Act
-        var result = source.AddTeamMembership(target, dateRange, _now);
+        var result = team.AddTeamMembership(parentTeam, dateRange, _dateTimeProvider.Now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        source.ParentMemberships.Count.Should().Be(1);
-        source.ParentMemberships.First().SourceId.Should().Be(source.Id);
-        source.ParentMemberships.First().TargetId.Should().Be(target.Id);
-        source.ParentMemberships.First().DateRange.Start.Should().Be(start);
-        source.ParentMemberships.First().DateRange.End.Should().Be(end);
+        team.ParentMemberships.Count.Should().Be(1);
+        team.ParentMemberships.First().SourceId.Should().Be(team.Id);
+        team.ParentMemberships.First().TargetId.Should().Be(parentTeam.Id);
+        team.ParentMemberships.First().DateRange.Start.Should().Be(start);
+        team.ParentMemberships.First().DateRange.End.Should().Be(end);
     }
 
     [Fact]
     public void AddTeamToTeamMembership_WhenNoExistingMembershipsAndWithNullEnd_Success()
     {
         // Arrange
-        var source = GenerateTeamOfTeams(true);
-        var target = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
+        var parentTeam = _teamOfTeamsFaker.Generate();
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = null;
         MembershipDateRange dateRange = new(start, end);
 
         // Act
-        var result = source.AddTeamMembership(target, dateRange, _now);
+        var result = team.AddTeamMembership(parentTeam, dateRange, _dateTimeProvider.Now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        source.ParentMemberships.Count.Should().Be(1);
-        source.ParentMemberships.First().SourceId.Should().Be(source.Id);
-        source.ParentMemberships.First().TargetId.Should().Be(target.Id);
-        source.ParentMemberships.First().DateRange.Start.Should().Be(start);
-        source.ParentMemberships.First().DateRange.End.Should().BeNull();
+        team.ParentMemberships.Count.Should().Be(1);
+        team.ParentMemberships.First().SourceId.Should().Be(team.Id);
+        team.ParentMemberships.First().TargetId.Should().Be(parentTeam.Id);
+        team.ParentMemberships.First().DateRange.Start.Should().Be(start);
+        team.ParentMemberships.First().DateRange.End.Should().BeNull();
     }
 
     [Fact]
     public void AddTeamToTeamMembership_WhenSourceInactive_Failure()
     {
         // Arrange
-        var source = GenerateTeamOfTeams(false);
-        var target = GenerateTeamOfTeams(true);
+        var inactiveDate = _dateTimeProvider.Now.Minus(Duration.FromDays(10)).InUtc().LocalDateTime.Date;
+        var team = _teamOfTeamsFaker.WithData(isActive: false, inactiveDate: inactiveDate).Generate();
+        var parentTeam = _teamOfTeamsFaker.Generate();
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = null;
         MembershipDateRange dateRange = new(start, end);
 
-        var expectedErrorMessage = $"Memberships can not be added to inactive teams. {source.Name} is inactive.";
+        var expectedErrorMessage = $"Memberships can not be added to inactive teams. {team.Name} is inactive.";
 
         // Act
-        var result = source.AddTeamMembership(target, dateRange, _now);
+        var result = team.AddTeamMembership(parentTeam, dateRange, _dateTimeProvider.Now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(expectedErrorMessage);
-        source.ParentMemberships.Count.Should().Be(0);
+        team.ParentMemberships.Count.Should().Be(0);
     }
 
     [Fact]
     public void AddTeamToTeamMembership_WhenTargetInactive_Failure()
     {
         // Arrange
-        var source = GenerateTeamOfTeams(true);
-        var target = GenerateTeamOfTeams(false);
+        var team = _teamOfTeamsFaker.Generate();
+        var inactiveDate = _dateTimeProvider.Now.Minus(Duration.FromDays(10)).InUtc().LocalDateTime.Date;
+        var parentTeam = _teamOfTeamsFaker.WithData(isActive: false, inactiveDate: inactiveDate).Generate();
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = null;
         MembershipDateRange dateRange = new(start, end);
 
-        var expectedErrorMessage = $"Memberships can not be added to inactive teams. {target.Name} is inactive.";
+        var expectedErrorMessage = $"Memberships can not be added to inactive teams. {parentTeam.Name} is inactive.";
 
         // Act
-        var result = source.AddTeamMembership(target, dateRange, _now);
+        var result = team.AddTeamMembership(parentTeam, dateRange, _dateTimeProvider.Now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(expectedErrorMessage);
-        source.ParentMemberships.Count.Should().Be(0);
+        team.ParentMemberships.Count.Should().Be(0);
     }
 
     [Fact]
     public void UpdateTeamToTeamMembership_WithValidDates_Success()
     {
         // Arrange
-        var source = GenerateTeamOfTeams(true);
-        var target = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
+        var parentTeam = _teamOfTeamsFaker.Generate();
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = new(2023, 5, 1);
         MembershipDateRange dateRange = new(start, end);
-        var createresult = source.AddTeamMembership(target, dateRange, _now);
+        var createresult = team.AddTeamMembership(parentTeam, dateRange, _dateTimeProvider.Now);
 
-        var membership = source.ParentMemberships.First();
+        var membership = team.ParentMemberships.First();
         membership.SetPrivate(m => m.Id, Guid.NewGuid());
-        membership.SetPrivate(m => m.Source, source);
-        membership.SetPrivate(m => m.Target, target);
+        membership.SetPrivate(m => m.Source, team);
+        membership.SetPrivate(m => m.Target, parentTeam);
 
         LocalDate updatedStart = new(2023, 2, 1);
         LocalDate? updatedEnd = new(2023, 5, 10);
         MembershipDateRange updatedDateRange = new(updatedStart, updatedEnd);
 
         // Act
-        var result = source.UpdateTeamMembership(membership.Id, updatedDateRange, _now);
+        var result = team.UpdateTeamMembership(membership.Id, updatedDateRange, _dateTimeProvider.Now);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        source.ParentMemberships.Count.Should().Be(1);
-        source.ParentMemberships.First().SourceId.Should().Be(source.Id);
-        source.ParentMemberships.First().TargetId.Should().Be(target.Id);
-        source.ParentMemberships.First().DateRange.Start.Should().Be(updatedStart);
-        source.ParentMemberships.First().DateRange.End.Should().Be(updatedEnd);
+        team.ParentMemberships.Count.Should().Be(1);
+        team.ParentMemberships.First().SourceId.Should().Be(team.Id);
+        team.ParentMemberships.First().TargetId.Should().Be(parentTeam.Id);
+        team.ParentMemberships.First().DateRange.Start.Should().Be(updatedStart);
+        team.ParentMemberships.First().DateRange.End.Should().Be(updatedEnd);
     }
 
     [Fact]
     public void UpdateTeamToTeamMembership_WhenSourceIsInactive_Failure()
     {
         // Arrange
-        var source = GenerateTeamOfTeams(true);
-        var target = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
+        var parentTeam = _teamOfTeamsFaker.Generate();
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = new(2023, 5, 1);
         MembershipDateRange dateRange = new(start, end);
-        var createresult = source.AddTeamMembership(target, dateRange, _now);
+        var createresult = team.AddTeamMembership(parentTeam, dateRange, _dateTimeProvider.Now);
 
-        var membership = source.ParentMemberships.First();
+        var membership = team.ParentMemberships.First();
         membership.SetPrivate(m => m.Id, Guid.NewGuid());
-        membership.SetPrivate(m => m.Source, source);
-        membership.SetPrivate(m => m.Target, target);
+        membership.SetPrivate(m => m.Source, team);
+        membership.SetPrivate(m => m.Target, parentTeam);
 
         LocalDate updatedStart = new(2023, 2, 1);
         LocalDate? updatedEnd = new(2023, 5, 10);
         MembershipDateRange updatedDateRange = new(updatedStart, updatedEnd);
 
-        source.SetPrivate(m => m.IsActive, false);
+        team.SetPrivate(m => m.IsActive, false);
 
         // Act
-        var result = source.UpdateTeamMembership(membership.Id, updatedDateRange, _now);
+        var result = team.UpdateTeamMembership(membership.Id, updatedDateRange, _dateTimeProvider.Now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        source.ParentMemberships.Count.Should().Be(1);
-        source.ParentMemberships.First().DateRange.Start.Should().Be(start);
-        source.ParentMemberships.First().DateRange.End.Should().Be(end);
+        team.ParentMemberships.Count.Should().Be(1);
+        team.ParentMemberships.First().DateRange.Start.Should().Be(start);
+        team.ParentMemberships.First().DateRange.End.Should().Be(end);
     }
 
     [Fact]
     public void UpdateTeamToTeamMembership_WhenTargetIsInactive_Failure()
     {
         // Arrange
-        var source = GenerateTeamOfTeams(true);
-        var target = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
+        var parentTeam = _teamOfTeamsFaker.Generate();
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = new(2023, 5, 1);
         MembershipDateRange dateRange = new(start, end);
-        var createresult = source.AddTeamMembership(target, dateRange, _now);
+        var createresult = team.AddTeamMembership(parentTeam, dateRange, _dateTimeProvider.Now);
 
-        var membership = source.ParentMemberships.First();
+        var membership = team.ParentMemberships.First();
         membership.SetPrivate(m => m.Id, Guid.NewGuid());
-        membership.SetPrivate(m => m.Source, source);
-        membership.SetPrivate(m => m.Target, target);
+        membership.SetPrivate(m => m.Source, team);
+        membership.SetPrivate(m => m.Target, parentTeam);
 
         LocalDate updatedStart = new(2023, 2, 1);
         LocalDate? updatedEnd = new(2023, 5, 10);
         MembershipDateRange updatedDateRange = new(updatedStart, updatedEnd);
 
-        target.SetPrivate(m => m.IsActive, false);
+        parentTeam.SetPrivate(m => m.IsActive, false);
 
         // Act
-        var result = source.UpdateTeamMembership(membership.Id, updatedDateRange, _now);
+        var result = team.UpdateTeamMembership(membership.Id, updatedDateRange, _dateTimeProvider.Now);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        source.ParentMemberships.Count.Should().Be(1);
-        source.ParentMemberships.First().DateRange.Start.Should().Be(start);
-        source.ParentMemberships.First().DateRange.End.Should().Be(end);
+        team.ParentMemberships.Count.Should().Be(1);
+        team.ParentMemberships.First().DateRange.Start.Should().Be(start);
+        team.ParentMemberships.First().DateRange.End.Should().Be(end);
     }
 
     [Fact]
     public void RemoveTeamToTeamMembership_WhenValid_Success()
     {
         // Arrange
-        var source = GenerateTeamOfTeams(true);
-        var target = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
+        var parentTeam = _teamOfTeamsFaker.Generate();
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = new(2023, 5, 1);
         MembershipDateRange dateRange = new(start, end);
-        var createresult = source.AddTeamMembership(target, dateRange, _now);
+        var createresult = team.AddTeamMembership(parentTeam, dateRange, _dateTimeProvider.Now);
 
-        var membership = source.ParentMemberships.First();
+        var membership = team.ParentMemberships.First();
         membership.SetPrivate(m => m.Id, Guid.NewGuid());
-        membership.SetPrivate(m => m.Source, source);
-        membership.SetPrivate(m => m.Target, target);
+        membership.SetPrivate(m => m.Source, team);
+        membership.SetPrivate(m => m.Target, parentTeam);
 
         // Act
-        var result = source.RemoveTeamMembership(membership.Id);
+        var result = team.RemoveTeamMembership(membership.Id);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        source.ParentMemberships.Count.Should().Be(0);
+        team.ParentMemberships.Count.Should().Be(0);
     }
 
     [Fact]
     public void RemoveTeamToTeamMembership_WhenSourceIsInactive_Failure()
     {
         // Arrange
-        var source = GenerateTeamOfTeams(true);
-        var target = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
+        var parentTeam = _teamOfTeamsFaker.Generate();
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = new(2023, 5, 1);
         MembershipDateRange dateRange = new(start, end);
-        var createresult = source.AddTeamMembership(target, dateRange, _now);
+        var createresult = team.AddTeamMembership(parentTeam, dateRange, _dateTimeProvider.Now);
 
-        var membership = source.ParentMemberships.First();
+        var membership = team.ParentMemberships.First();
         membership.SetPrivate(m => m.Id, Guid.NewGuid());
-        membership.SetPrivate(m => m.Source, source);
-        membership.SetPrivate(m => m.Target, target);
+        membership.SetPrivate(m => m.Source, team);
+        membership.SetPrivate(m => m.Target, parentTeam);
 
-        source.SetPrivate(m => m.IsActive, false);
+        team.SetPrivate(m => m.IsActive, false);
 
         // Act
-        var result = source.RemoveTeamMembership(membership.Id);
+        var result = team.RemoveTeamMembership(membership.Id);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        source.ParentMemberships.Count.Should().Be(1);
+        team.ParentMemberships.Count.Should().Be(1);
     }
 
     [Fact]
     public void RemoveTeamToTeamMembership_WhenTargetIsInactive_Failure()
     {
         // Arrange
-        var source = GenerateTeamOfTeams(true);
-        var target = GenerateTeamOfTeams(true);
+        var team = _teamOfTeamsFaker.Generate();
+        var parentTeam = _teamOfTeamsFaker.Generate();
         LocalDate start = new(2023, 1, 1);
         LocalDate? end = new(2023, 5, 1);
         MembershipDateRange dateRange = new(start, end);
-        var createresult = source.AddTeamMembership(target, dateRange, _now);
+        var createresult = team.AddTeamMembership(parentTeam, dateRange, _dateTimeProvider.Now);
 
-        var membership = source.ParentMemberships.First();
+        var membership = team.ParentMemberships.First();
         membership.SetPrivate(m => m.Id, Guid.NewGuid());
-        membership.SetPrivate(m => m.Source, source);
-        membership.SetPrivate(m => m.Target, target);
+        membership.SetPrivate(m => m.Source, team);
+        membership.SetPrivate(m => m.Target, parentTeam);
 
-        target.SetPrivate(m => m.IsActive, false);
+        parentTeam.SetPrivate(m => m.IsActive, false);
 
         // Act
-        var result = source.RemoveTeamMembership(membership.Id);
+        var result = team.RemoveTeamMembership(membership.Id);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        source.ParentMemberships.Count.Should().Be(1);
+        team.ParentMemberships.Count.Should().Be(1);
     }
 
 
