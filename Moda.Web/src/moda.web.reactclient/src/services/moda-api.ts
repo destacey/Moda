@@ -11525,6 +11525,8 @@ export interface TeamDetailsDto {
     code?: string;
     description?: string | undefined;
     type?: string;
+    activeDate?: Date;
+    inactiveDate?: Date | undefined;
     isActive?: boolean;
     teamOfTeams?: TeamNavigationDto | undefined;
 }
@@ -11642,6 +11644,8 @@ export interface TeamOfTeamsDetailsDto {
     code?: string;
     description?: string | undefined;
     type?: string;
+    activeDate?: Date;
+    inactiveDate?: Date | undefined;
     isActive?: boolean;
     teamOfTeams?: TeamNavigationDto | undefined;
 }

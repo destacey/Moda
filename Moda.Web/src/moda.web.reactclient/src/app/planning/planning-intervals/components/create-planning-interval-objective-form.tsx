@@ -15,7 +15,7 @@ import {
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
 
-const { Item } = Form
+const { Item: FormItem } = Form
 const { TextArea } = Input
 
 export interface CreatePlanningIntervalObjectiveFormProps {
@@ -243,13 +243,13 @@ const CreatePlanningIntervalObjectiveForm = ({
           name="create-objective-form"
           initialValues={{ isStretch: false }} // used to set default value for switch
         >
-          <Item name="planningIntervalId" hidden={true}>
+          <FormItem name="planningIntervalId" hidden={true}>
             <Input />
-          </Item>
-          <Item name="statusId" hidden={true}>
+          </FormItem>
+          <FormItem name="statusId" hidden={true}>
             <Input />
-          </Item>
-          <Item name="teamId" label="Team" rules={[{ required: true }]}>
+          </FormItem>
+          <FormItem name="teamId" label="Team" rules={[{ required: true }]}>
             <Select
               showSearch
               disabled={teamId !== undefined}
@@ -267,25 +267,33 @@ const CreatePlanningIntervalObjectiveForm = ({
               }
               options={teams}
             />
-          </Item>
-          <Item label="Name" name="name" rules={[{ required: true }]}>
+          </FormItem>
+          <FormItem label="Name" name="name" rules={[{ required: true }]}>
             <TextArea
               autoSize={{ minRows: 2, maxRows: 4 }}
               showCount
               maxLength={256}
             />
-          </Item>
-          <Item name="description" label="Description" extra="Markdown enabled">
+          </FormItem>
+          <FormItem
+            name="description"
+            label="Description"
+            extra="Markdown enabled"
+          >
             <TextArea
               autoSize={{ minRows: 6, maxRows: 10 }}
               showCount
               maxLength={1024}
             />
-          </Item>
-          <Item label="Is Stretch?" name="isStretch" valuePropName="checked">
+          </FormItem>
+          <FormItem
+            label="Is Stretch?"
+            name="isStretch"
+            valuePropName="checked"
+          >
             <Switch checkedChildren="Yes" unCheckedChildren="No" />
-          </Item>
-          <Item
+          </FormItem>
+          <FormItem
             label="Start"
             name="startDate"
             rules={[
@@ -300,10 +308,11 @@ const CreatePlanningIntervalObjectiveForm = ({
             ]}
           >
             <DatePicker disabledDate={disabledDate} />
-          </Item>
-          <Item
+          </FormItem>
+          <FormItem
             label="Target"
             name="targetDate"
+            dependencies={['startDate']}
             rules={[
               {
                 validator: (_, value: Date) =>
@@ -313,10 +322,21 @@ const CreatePlanningIntervalObjectiveForm = ({
                         'The target date must be within the Planning Interval dates.',
                       ),
               },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const start = getFieldValue('startDate')
+                  if (!value || !start || start < value) {
+                    return Promise.resolve()
+                  }
+                  return Promise.reject(
+                    new Error('End date must be after start date'),
+                  )
+                },
+              }),
             ]}
           >
             <DatePicker disabledDate={disabledDate} />
-          </Item>
+          </FormItem>
         </Form>
       </Modal>
     </>

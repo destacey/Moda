@@ -26,7 +26,6 @@ const EmployeeDetails = ({ employee }: EmployeeDetailsProps) => {
         <Item label="Hire Date">
           {employee.hireDate && dayjs(employee.hireDate).format('M/D/YYYY')}
         </Item>
-        <Item label="Is Active?">{employee.isActive?.toString()}</Item>
       </Descriptions>
     </>
   )

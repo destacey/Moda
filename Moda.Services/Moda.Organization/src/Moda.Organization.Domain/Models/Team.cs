@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Enums.Organization;
-using Moda.Organization.Domain.Enums;
 using NodaTime;
 
 namespace Moda.Organization.Domain.Models;
@@ -48,21 +47,28 @@ public sealed class Team : BaseTeam, IActivatable<Instant, TeamDeactivatableArgs
     /// <returns>Result that indicates success or a list of errors</returns>
     public Result Deactivate(TeamDeactivatableArgs args)
     {
-        if (IsActive)
+        if (!IsActive)
         {
-            var membershipStates = ParentMemberships.Select(x => x.StateOn(args.AsOfDate)).ToArray();
-            if (membershipStates.Any(m => m == MembershipState.Active || m == MembershipState.Future))
-                return Result.Failure("Cannot deactivate a team that has active team memberships.");
-
-
-            if (args.AsOfDate <= ActiveDate
-                || args.AsOfDate < ParentMemberships.Max(x => x.DateRange.End))
-                return Result.Failure("Cannot deactivate a team of teams before the active timestamp or before the end of the latest membership.");
-
-            InactiveDate = args.AsOfDate;
-            IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, args.Timestamp)); // TODO: this doesn't include the asOfTimestamp
+            return Result.Failure("The team is already inactive.");
         }
+
+        if (args.AsOfDate <= ActiveDate)
+        {
+            return Result.Failure("The inactive date cannot be on or before the active date.");
+        }
+
+        if (ParentMemberships.Count != 0)
+        {
+            var latestMembership = ParentMemberships.OrderByDescending(x => x.DateRange.Start).First();
+            if (latestMembership.DateRange.End == null || args.AsOfDate < latestMembership.DateRange.End.Value)
+            {
+                return Result.Failure("The inactive date must be on or after the end date of the last team membership.");
+            }
+        }
+
+        InactiveDate = args.AsOfDate;
+        IsActive = false;  // TODO: this will be invalid if the InactiveDate is in the future
+        AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, args.Timestamp)); // TODO: this doesn't include the asOfTimestamp
 
         return Result.Success();
     }

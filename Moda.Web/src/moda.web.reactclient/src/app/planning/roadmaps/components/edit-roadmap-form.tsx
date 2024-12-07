@@ -252,7 +252,25 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
           <Item name="start" label="Start" rules={[{ required: true }]}>
             <DatePicker />
           </Item>
-          <Item name="end" label="End" rules={[{ required: true }]}>
+          <Item
+            name="end"
+            label="End"
+            dependencies={['start']}
+            rules={[
+              { required: true },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const start = getFieldValue('start')
+                  if (!value || !start || start < value) {
+                    return Promise.resolve()
+                  }
+                  return Promise.reject(
+                    new Error('End date must be after start date'),
+                  )
+                },
+              }),
+            ]}
+          >
             <DatePicker />
           </Item>
           <Item

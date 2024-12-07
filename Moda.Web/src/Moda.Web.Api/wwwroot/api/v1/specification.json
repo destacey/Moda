@@ -12510,6 +12510,15 @@
           "type": {
             "type": "string"
           },
+          "activeDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "inactiveDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
           "isActive": {
             "type": "boolean"
           },
@@ -12962,6 +12971,15 @@
           },
           "type": {
             "type": "string"
+          },
+          "activeDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "inactiveDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
           },
           "isActive": {
             "type": "boolean"

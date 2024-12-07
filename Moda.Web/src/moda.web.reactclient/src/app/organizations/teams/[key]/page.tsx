@@ -32,7 +32,7 @@ import { useGetTeamBacklogQuery } from '@/src/store/features/organizations/team-
 import { WorkItemsBacklogGridProps } from '@/src/app/components/common/work/work-items-backlog-grid'
 import TeamDependencyManagement from './team-dependency-management'
 import { ItemType } from 'antd/es/menu/interface'
-import { PageActions } from '@/src/app/components/common'
+import { InactiveTag, PageActions } from '@/src/app/components/common'
 import DeactivateTeamForm from '../../components/deactivate-team-form'
 
 enum TeamTabs {
@@ -95,20 +95,22 @@ const TeamDetailsPage = ({ params }) => {
     const items: ItemType[] = []
 
     if (canUpdateTeam) {
-      items.push(
-        {
-          key: 'edit',
-          label: 'Edit',
-          onClick: () => dispatch(setEditMode(true)),
-        },
-        {
+      items.push({
+        key: 'edit',
+        label: 'Edit',
+        onClick: () => dispatch(setEditMode(true)),
+      })
+
+      if (team?.isActive === true) {
+        items.push({
           key: 'deactivate',
           label: 'Deactivate',
           onClick: () => setOpenDeactivateTeamForm(true),
-        },
-      )
+        })
+      }
     }
-    if (canManageTeamMemberships) {
+
+    if (canManageTeamMemberships && team?.isActive === true) {
       items.push({
         key: 'add-team-membership',
         label: 'Add Team Membership',
@@ -117,7 +119,7 @@ const TeamDetailsPage = ({ params }) => {
     }
 
     return items
-  }, [canManageTeamMemberships, canUpdateTeam, dispatch])
+  }, [canManageTeamMemberships, canUpdateTeam, dispatch, team?.isActive])
 
   const tabs = [
     {
@@ -216,6 +218,7 @@ const TeamDetailsPage = ({ params }) => {
       <PageTitle
         title={team?.name}
         subtitle="Team Details"
+        tags={<InactiveTag isActive={team?.isActive} />}
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card

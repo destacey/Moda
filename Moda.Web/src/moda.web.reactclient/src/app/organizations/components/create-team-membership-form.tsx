@@ -12,7 +12,7 @@ import {
 } from '@/src/services/queries/organization-queries'
 import { TeamTypeName } from '../types'
 
-const { Item } = Form
+const { Item: FormItem } = Form
 
 export interface CreateTeamMembershipFormProps {
   showForm: boolean
@@ -49,7 +49,7 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
   const [messageApi, contextHolder] = message.useMessage()
 
   // TODO: only get teams that are not in the hierarchy
-  const { data: teamOptions } = useGetTeamOfTeamsOptions(true)
+  const { data: teamOptions } = useGetTeamOfTeamsOptions(false)
 
   const createTeamMembership = useCreateTeamMembershipMutation()
 
@@ -152,7 +152,7 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
           layout="vertical"
           name="create-team-membership-form"
         >
-          <Item
+          <FormItem
             name="parentTeamId"
             label="Parent Team"
             rules={[{ required: true }]}
@@ -173,13 +173,30 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
               }
               options={teamOptions?.filter((t) => t.value !== props.teamId)}
             />
-          </Item>
-          <Item label="Start" name="start" rules={[{ required: true }]}>
+          </FormItem>
+          <FormItem label="Start" name="start" rules={[{ required: true }]}>
             <DatePicker />
-          </Item>
-          <Item label="End" name="end">
+          </FormItem>
+          <FormItem
+            label="End"
+            name="end"
+            dependencies={['start']}
+            rules={[
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const start = getFieldValue('start')
+                  if (!value || !start || start < value) {
+                    return Promise.resolve()
+                  }
+                  return Promise.reject(
+                    new Error('End date must be after start date'),
+                  )
+                },
+              }),
+            ]}
+          >
             <DatePicker />
-          </Item>
+          </FormItem>
         </Form>
       </Modal>
     </>

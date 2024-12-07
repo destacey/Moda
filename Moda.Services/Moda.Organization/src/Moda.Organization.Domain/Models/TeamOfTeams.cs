@@ -51,22 +51,39 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable<Instant, TeamDeactivata
     /// <returns>Result that indicates success or a list of errors</returns>
     public Result Deactivate(TeamDeactivatableArgs args)
     {
-        if (IsActive)
+        if (!IsActive)
         {
-            var parentMembershipStates = ParentMemberships.Select(x => x.StateOn(args.AsOfDate)).ToArray();
-            var childMembershipStates = ParentMemberships.Select(x => x.StateOn(args.AsOfDate)).ToArray();
-            if (parentMembershipStates.Union(childMembershipStates).Any(m => m == MembershipState.Active || m == MembershipState.Future))
-                return Result.Failure("Cannot deactivate a team of teams that has active team memberships.");
-
-            if (args.AsOfDate <= ActiveDate
-                || args.AsOfDate < _parentMemberships.Max(x => x.DateRange.End)
-                || args.AsOfDate < _childMemberships.Max(x => x.DateRange.End))
-                return Result.Failure("Cannot deactivate a team of teams before the active timestamp or before the end of the latest membership.");
-
-            InactiveDate = args.AsOfDate;
-            IsActive = false;
-            AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, args.Timestamp)); // TODO: this doesn't include the asOfTimestamp
+            return Result.Failure("The team of teams is already inactive.");
         }
+
+        if (args.AsOfDate <= ActiveDate)
+        {
+            return Result.Failure("The inactive date cannot be on or before the active date.");
+        }
+
+        if (ParentMemberships.Count != 0)
+        {
+            // get the latest membership
+            var latestMembership = ParentMemberships.OrderByDescending(x => x.DateRange.Start).First();
+            if (latestMembership.DateRange.End == null || args.AsOfDate < latestMembership.DateRange.End.Value)
+            {
+                return Result.Failure("The inactive date must be on or after the end date of the last team membership.");
+            }
+        }
+
+        if (ChildMemberships.Count != 0)
+        {
+            // get the latest membership
+            var latestMembership = ChildMemberships.OrderByDescending(x => x.DateRange.Start).First();
+            if (latestMembership.DateRange.End == null || args.AsOfDate < latestMembership.DateRange.End.Value)
+            {
+                return Result.Failure("The inactive date must be on or after the end date of the last child team membership.");
+            }
+        }
+
+        InactiveDate = args.AsOfDate;
+        IsActive = false;  // TODO: this will be invalid if the InactiveDate is in the future
+        AddDomainEvent(EntityDeactivatedEvent.WithEntity(this, args.Timestamp)); // TODO: this doesn't include the asOfTimestamp
 
         return Result.Success();
     }
@@ -107,7 +124,7 @@ public sealed class TeamOfTeams : BaseTeam, IActivatable<Instant, TeamDeactivata
             query = _childMemberships.Where(x => x.StateOn(date) == MembershipState.Future).AsQueryable();
         }
 
-        List<Guid> descendantTeamIds = new();
+        List<Guid> descendantTeamIds = [];
         foreach (var membership in _childMemberships)
         {
             if (membership.Source is TeamOfTeams teamOfTeams)
