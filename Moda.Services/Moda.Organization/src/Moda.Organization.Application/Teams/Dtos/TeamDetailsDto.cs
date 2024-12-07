@@ -1,15 +1,18 @@
 ﻿using Mapster;
 using Moda.Organization.Application.Models;
+using NodaTime;
 
 namespace Moda.Organization.Application.Teams.Dtos;
 public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
 {
-    /// <summary>Gets or sets the identifier.</summary>
-    /// <value>The identifier.</value>
+    /// <summary>
+    /// The identifier of the team.
+    /// </summary>
     public Guid Id { get; set; }
 
-    /// <summary>Gets the key.</summary>
-    /// <value>The key.</value>
+    /// <summary>
+    /// The key of the team.
+    /// </summary>
     public int Key { get; set; }
 
     /// <summary>
@@ -17,8 +20,9 @@ public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
     /// </summary>
     public required string Name { get; set; }
 
-    /// <summary>Gets the code.</summary>
-    /// <value>The code.</value>
+    /// <summary>
+    /// The code of the team.
+    /// </summary>
     public required string Code { get; set; }
 
     /// <summary>
@@ -26,15 +30,29 @@ public sealed record TeamDetailsDto : IMapFrom<BaseTeam>
     /// </summary>
     public string? Description { get; set; }
 
-    /// <summary>Gets the team type.</summary>
-    /// <value>The team type.</value>
+    /// <summary>
+    /// The type of team.
+    /// </summary>
     public required string Type { get; set; }
 
     /// <summary>
-    /// Indicates whether the organization is active or not.  
+    /// The date for when the team became active.
+    /// </summary>
+    public LocalDate ActiveDate { get; set; }
+
+    /// <summary>
+    /// The date for when the team became inactive.
+    /// </summary>
+    public LocalDate? InactiveDate { get; set; }
+
+    /// <summary>
+    /// Indicates whether the team is active or not.  
     /// </summary>
     public bool IsActive { get; set; }
 
+    /// <summary>
+    /// The parent team of the team.
+    /// </summary>
     public TeamNavigationDto? TeamOfTeams { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)

@@ -11,13 +11,14 @@ import { authorizePage } from '@/src/app/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import { useAppDispatch } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
+import { InactiveTag } from '@/src/app/components/common'
 
 const EmployeeDetailsPage = ({ params }) => {
   useDocumentTitle('Employee Details')
   const [activeTab, setActiveTab] = useState('details')
   const [employee, setEmployee] = useState<EmployeeDetailsDto | null>(null)
   const { key } = params
-  const [notEmployeeFound, setEmployeeNotFound] = useState<boolean>(false)
+  const [employeeNotFound, setEmployeeNotFound] = useState<boolean>(false)
   const pathname = usePathname()
   const dispatch = useAppDispatch()
 
@@ -45,13 +46,17 @@ const EmployeeDetailsPage = ({ params }) => {
     })
   }, [key, dispatch, pathname])
 
-  if (notEmployeeFound) {
+  if (employeeNotFound) {
     return notFound()
   }
 
   return (
     <>
-      <PageTitle title={employee?.displayName} subtitle="Employee Details" />
+      <PageTitle
+        title={employee?.displayName}
+        subtitle="Employee Details"
+        tags={<InactiveTag isActive={employee?.isActive} />}
+      />
       <Card
         style={{ width: '100%' }}
         tabList={tabs}

@@ -32,7 +32,7 @@ import { useGetTeamBacklogQuery } from '@/src/store/features/organizations/team-
 import { WorkItemsBacklogGridProps } from '@/src/app/components/common/work/work-items-backlog-grid'
 import TeamDependencyManagement from './team-dependency-management'
 import { ItemType } from 'antd/es/menu/interface'
-import { PageActions } from '@/src/app/components/common'
+import { InactiveTag, PageActions } from '@/src/app/components/common'
 import DeactivateTeamForm from '../../components/deactivate-team-form'
 
 enum TeamTabs {
@@ -216,6 +216,7 @@ const TeamDetailsPage = ({ params }) => {
       <PageTitle
         title={team?.name}
         subtitle="Team Details"
+        tags={<InactiveTag isActive={team?.isActive} />}
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card

@@ -24,7 +24,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import { CreateTeamMembershipForm } from '../../components'
-import { PageActions } from '@/src/app/components/common'
+import { InactiveTag, PageActions } from '@/src/app/components/common'
 import { ItemType } from 'antd/es/menu/interface'
 import DeactivateTeamOfTeamsForm from '../../components/deactivate-team-of-teams-form'
 
@@ -184,12 +184,19 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
     return notFound()
   }
 
+  const teamName = !team
+    ? null
+    : team.isActive
+      ? team?.name
+      : `${team?.name} (Inactive)`
+
   return (
     <>
       {contextHolder}
       <PageTitle
         title={team?.name}
         subtitle="Team of Teams Details"
+        tags={<InactiveTag isActive={team?.isActive} />}
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card
