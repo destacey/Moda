@@ -184,7 +184,24 @@ const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
           <FormItem label="Start" name="start" rules={[{ required: true }]}>
             <DatePicker />
           </FormItem>
-          <FormItem label="End" name="end">
+          <FormItem
+            label="End"
+            name="end"
+            dependencies={['start']}
+            rules={[
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const start = getFieldValue('start')
+                  if (!value || !start || start < value) {
+                    return Promise.resolve()
+                  }
+                  return Promise.reject(
+                    new Error('End date must be after start date'),
+                  )
+                },
+              }),
+            ]}
+          >
             <DatePicker />
           </FormItem>
         </Form>
