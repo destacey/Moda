@@ -228,7 +228,25 @@ const ManagePlanningIntervalDatesForm = ({
           <Item label="Start" name="start" rules={[{ required: true }]}>
             <DatePicker />
           </Item>
-          <Item label="End" name="end" rules={[{ required: true }]}>
+          <Item
+            label="End"
+            name="end"
+            dependencies={['start']}
+            rules={[
+              { required: true },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const start = getFieldValue('start')
+                  if (!value || !start || start < value) {
+                    return Promise.resolve()
+                  }
+                  return Promise.reject(
+                    new Error('End date must be after start date'),
+                  )
+                },
+              }),
+            ]}
+          >
             <DatePicker />
           </Item>
 

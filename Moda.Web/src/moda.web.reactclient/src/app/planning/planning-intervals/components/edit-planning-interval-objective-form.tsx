@@ -317,6 +317,7 @@ const EditPlanningIntervalObjectiveForm = ({
           <FormItem
             label="Target"
             name="targetDate"
+            dependencies={['startDate']}
             rules={[
               {
                 validator: (_, value: Date) =>
@@ -326,6 +327,17 @@ const EditPlanningIntervalObjectiveForm = ({
                         'The target date must be within the Planning Interval dates.',
                       ),
               },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const start = getFieldValue('startDate')
+                  if (!value || !start || start < value) {
+                    return Promise.resolve()
+                  }
+                  return Promise.reject(
+                    new Error('End date must be after start date'),
+                  )
+                },
+              }),
             ]}
           >
             <DatePicker disabledDate={disabledDate} />
