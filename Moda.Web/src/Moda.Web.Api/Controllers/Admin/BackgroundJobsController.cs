@@ -67,6 +67,9 @@ public class BackgroundJobsController : ControllerBase
             case BackgroundJobType.AzdoBoardsDiffSync:
                 _jobService.Enqueue(() => jobManager.RunSyncAzureDevOpsBoards(SyncType.Differential, cancellationToken));
                 break;
+            case BackgroundJobType.TeamGraphSync:
+                _jobService.Enqueue(() => jobManager.RunSyncTeamsWithGraphTables(cancellationToken));
+                break;
             default:
                 _logger.LogWarning("Unknown job type {jobType} requested", jobType);
                 return BadRequest();
@@ -92,6 +95,7 @@ public class BackgroundJobsController : ControllerBase
                 BackgroundJobType.EmployeeSync => () => jobManager.RunSyncExternalEmployees(cancellationToken),
                 BackgroundJobType.AzdoBoardsFullSync => () => jobManager.RunSyncAzureDevOpsBoards(SyncType.Full, cancellationToken),
                 BackgroundJobType.AzdoBoardsDiffSync => () => jobManager.RunSyncAzureDevOpsBoards(SyncType.Differential, cancellationToken),
+                BackgroundJobType.TeamGraphSync => () => jobManager.RunSyncTeamsWithGraphTables(cancellationToken),
                 _ => throw new ArgumentOutOfRangeException(nameof(jobType), jobType, "Unknown job type requested")
             };
         }
