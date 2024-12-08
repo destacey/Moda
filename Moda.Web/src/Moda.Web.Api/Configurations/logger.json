@@ -30,7 +30,8 @@
                 "Hangfire": "Warning",
                 "Microsoft": "Error",
                 "Microsoft.Hosting.Lifetime": "Information",
-                "System": "Information"
+                "System": "Information",
+                "ZymLabs.NSwag.FluentValidation": "Warning"
             }
         },
         "Properties": {

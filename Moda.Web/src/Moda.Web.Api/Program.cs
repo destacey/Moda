@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
 using Microsoft.ApplicationInsights.Extensibility.Implementation;
+using Microsoft.AspNetCore.Http.Features;
 using Moda.AppIntegration.Application;
 using Moda.Common.Application;
 using Moda.Common.Application.Interfaces;
@@ -33,6 +35,7 @@ try
         config.ReadFrom.Configuration(context.Configuration);
         config.Enrich.WithProperty("version", Environment.GetEnvironmentVariable("version") ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "none-supplied");
     });
+
     if (builder.Environment.IsDevelopment())
     {
         Serilog.Debugging.SelfLog.Enable(Console.Error);
@@ -48,15 +51,23 @@ try
 
     builder.Services.Configure<ApiBehaviorOptions>(options =>
     {
+        // TODO: this is duplicate config for validation errors and problem details creation
         options.InvalidModelStateResponseFactory = context =>
         {
+            Activity? activity = context.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
+
             var problemDetails = new ValidationProblemDetails(context.ModelState)
             {
-                Type = "https://developer.mozilla.org/en-US/docs/web/http/status/422",
+                Type = "https://tools.ietf.org/html/rfc4918#section-11.2",
                 Title = "One or more validation errors occurred.",
                 Status = StatusCodes.Status422UnprocessableEntity,
                 Detail = "See the errors property for details.",
-                Instance = context.HttpContext.Request.Path
+                Instance = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}",
+                Extensions =
+                {
+                    ["requestId"] = context.HttpContext.TraceIdentifier,
+                    ["traceId"] = activity?.Id
+                }
             };
 
             return new UnprocessableEntityObjectResult(problemDetails)
