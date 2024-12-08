@@ -11,4 +11,7 @@ public enum BackgroundJobType
 
     [Display(Name = "Azure DevOps Boards Differential Sync", Description = "Synchronize active connectors for Azure DevOps Boards and return work items that have changed since the last sync.", Order = 3)]
     AzdoBoardsDiffSync = 2,
+
+    [Display(Name = "Team Graph Sync", Description = "Synchronize the latest team data into the Graph tables.", Order = 4)]
+    TeamGraphSync = 3,
 }
