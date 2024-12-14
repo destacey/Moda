@@ -1,4 +1,5 @@
-﻿using Moda.Web.Api.Models.Work.WorkStatuses;
+﻿using Moda.Web.Api.Extensions;
+using Moda.Web.Api.Models.Work.WorkStatuses;
 using Moda.Work.Application.WorkStatuses.Dtos;
 using Moda.Work.Application.WorkStatuses.Queries;
 
@@ -66,7 +67,7 @@ public class WorkStatusesController : ControllerBase
     public async Task<ActionResult> Update(int id, UpdateWorkStatusRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateWorkStatusCommand(), cancellationToken);
 

@@ -2,6 +2,7 @@
 using Hangfire;
 using Moda.Common.Application.BackgroundJobs;
 using Moda.Common.Application.Enums;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Interfaces;
 using Moda.Web.Api.Models.Admin;
 
@@ -72,7 +73,7 @@ public class BackgroundJobsController : ControllerBase
                 break;
             default:
                 _logger.LogWarning("Unknown job type {jobType} requested", jobType);
-                return BadRequest();
+                return BadRequest(ProblemDetailsExtensions.ForBadRequest($"Unknown job type {jobType} requested.", HttpContext));
         }
         return Accepted();
     }

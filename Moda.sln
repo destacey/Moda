@@ -142,6 +142,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moda.Integrations.AzureDevO
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Work.Application.Tests", "Moda.Services\Moda.Work\tests\Moda.Work.Application.Tests\Moda.Work.Application.Tests.csproj", "{686F2DFB-CB52-4689-BD37-903D1BD6B0E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Web.Api.Tests", "Moda.Web\tests\Moda.Web.Api.Tests\Moda.Web.Api.Tests.csproj", "{172D6183-01DA-4012-B874-87D410D3B778}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -278,6 +280,10 @@ Global
 		{686F2DFB-CB52-4689-BD37-903D1BD6B0E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{686F2DFB-CB52-4689-BD37-903D1BD6B0E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{686F2DFB-CB52-4689-BD37-903D1BD6B0E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{172D6183-01DA-4012-B874-87D410D3B778}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{172D6183-01DA-4012-B874-87D410D3B778}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{172D6183-01DA-4012-B874-87D410D3B778}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{172D6183-01DA-4012-B874-87D410D3B778}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -344,6 +350,7 @@ Global
 		{47FB5F4F-3A96-4B8D-A6F9-6956DFFF07D4} = {76EDC9D4-594A-4061-ACB2-E34704E55D6C}
 		{767BA6EA-155E-4483-B428-E90CD0D8A73F} = {76EDC9D4-594A-4061-ACB2-E34704E55D6C}
 		{686F2DFB-CB52-4689-BD37-903D1BD6B0E7} = {B1E9B8B1-3BCA-460E-B60C-652E6BD98DF3}
+		{172D6183-01DA-4012-B874-87D410D3B778} = {154B05B9-B519-4BB5-8D17-344F7EDB38E3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A287E480-E0D5-4A33-9958-D4A8F7DC3F31}

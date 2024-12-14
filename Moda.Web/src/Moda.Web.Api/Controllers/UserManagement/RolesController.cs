@@ -1,4 +1,5 @@
 using Moda.Common.Application.Exceptions;
+using Moda.Web.Api.Extensions;
 
 namespace Moda.Web.Api.Controllers.UserManagement;
 
@@ -66,21 +67,13 @@ public class RolesController : ControllerBase
     public async Task<ActionResult> UpdatePermissions(string id, UpdateRolePermissionsRequest request, CancellationToken cancellationToken)
     {
         if (id != request.RoleId)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = "The role id on the route and within the request do not match.",
-                Source = "RolesController.UpdatePermissions"
-            };
-            return BadRequest(error);
-        }
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.RoleId), HttpContext));
 
         var result = await _roleService.UpdatePermissions(request.ToUpdateRolePermissionsCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RolesController.UpdatePermissions"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPost]
@@ -109,13 +102,7 @@ public class RolesController : ControllerBase
         catch (ConflictException ex)
         {
             _logger.LogError(ex, "Error deleting role with id {id}", id);
-            var error = new ErrorResult
-            {
-                StatusCode = 409,
-                SupportMessage = ex.Message,
-                Source = "RolesController.Delete"
-            };
-            return BadRequest(error);
+            return BadRequest(ProblemDetailsExtensions.ForBadRequest(ex.Message, HttpContext));
         }
 
         return NoContent();

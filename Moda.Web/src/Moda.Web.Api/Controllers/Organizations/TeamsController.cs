@@ -7,6 +7,7 @@ using Moda.Organization.Domain.Extensions;
 using Moda.Organization.Domain.Models;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Organizations;
 using Moda.Web.Api.Models.Organizations.Teams;
 using Moda.Web.Api.Models.Planning.Risks;
@@ -34,7 +35,6 @@ public class TeamsController : ControllerBase
     [OpenApiOperation("Get a list of teams.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<IReadOnlyList<TeamListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var teams = await _sender.Send(new GetTeamsQuery(includeInactive), cancellationToken);
@@ -46,7 +46,6 @@ public class TeamsController : ControllerBase
     [OpenApiOperation("Get team details using the key.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<TeamDetailsDto>> GetById(int id)
     {
         var team = await _sender.Send(new GetTeamQuery(id));
@@ -78,13 +77,13 @@ public class TeamsController : ControllerBase
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdateTeamRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateTeamCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(result.Error);
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}/deactivate")]
@@ -96,13 +95,13 @@ public class TeamsController : ControllerBase
     public async Task<ActionResult> Deactivate(Guid id, [FromBody] DeactivateTeamRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToDeactivateTeamCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "TeamsController.Deactivate"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     //[HttpDelete("{id}")]
@@ -134,22 +133,13 @@ public class TeamsController : ControllerBase
     public async Task<ActionResult> AddTeamMembership(Guid id, [FromBody] AddTeamMembershipRequest request, CancellationToken cancellationToken)
     {
         if (id != request.TeamId)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.TeamId), HttpContext));
 
         var result = await _sender.Send(request.ToTeamAddParentTeamMembershipCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "TeamsController.AddTeamMembership"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}/team-memberships/{teamMembershipId}")]
@@ -160,23 +150,16 @@ public class TeamsController : ControllerBase
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> UpdateTeamMembership(Guid id, Guid teamMembershipId, [FromBody] UpdateTeamMembershipRequest request, CancellationToken cancellationToken)
     {
-        if (id != request.TeamId || teamMembershipId != request.TeamMembershipId)
-            return BadRequest();
+        if (id != request.TeamId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.TeamId), HttpContext));
+        else if (teamMembershipId != request.TeamMembershipId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(teamMembershipId), nameof(request.TeamMembershipId), HttpContext));
 
         var result = await _sender.Send(request.ToTeamUpdateTeamMembershipCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "TeamsController.UpdateTeamMembership"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpDelete("{id}/team-memberships/{teamMembershipId}")]
@@ -188,18 +171,9 @@ public class TeamsController : ControllerBase
     {
         var result = await _sender.Send(new RemoveTeamMembershipCommand(id, teamMembershipId), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "TeamsController.RemoveTeamMembership"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     #endregion Team Memberships
@@ -225,14 +199,14 @@ public class TeamsController : ControllerBase
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("TeamsController.GetTeamBacklog"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var result = await _sender.Send(query, cancellationToken);
 
-        return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "TeamsController.GetTeamBacklog"))
-            : Ok(result.Value);
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpGet("{id}/dependencies")]
@@ -300,7 +274,7 @@ public class TeamsController : ControllerBase
     public async Task<ActionResult> CreateRisk(Guid id, [FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
     {
         if (id != request.TeamId)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.TeamId), HttpContext));
 
         var teamExists = await _sender.Send(new TeamExistsQuery(id), cancellationToken);
         if (!teamExists)
@@ -308,18 +282,9 @@ public class TeamsController : ControllerBase
 
         var result = await _sender.Send(request.ToCreateRiskCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "TeamsController.CreateRisk"
-            };
-            return BadRequest(error);
-        }
-
-        return CreatedAtAction(nameof(GetRiskById), new { id, riskId = result.Value }, result.Value);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetRiskById), new { id, riskId = result.Value }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}/risks/{riskId}")]
@@ -330,23 +295,16 @@ public class TeamsController : ControllerBase
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> UpdateRisk(Guid id, Guid riskId, [FromBody] UpdateRiskRequest request, CancellationToken cancellationToken)
     {
-        if (id != request.TeamId || riskId != request.RiskId)
-            return BadRequest();
+        if (id != request.TeamId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.TeamId), HttpContext));
+        else if (riskId != request.RiskId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(riskId), nameof(request.RiskId), HttpContext));
 
         var result = await _sender.Send(request.ToUpdateRiskCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "TeamsController.UpdateRisk"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     #endregion Risks

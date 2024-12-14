@@ -1,3 +1,6 @@
+using Moda.Planning.Domain.Models.Roadmaps;
+using Moda.Web.Api.Extensions;
+
 namespace Moda.Web.Api.Controllers.UserManagement;
 
 [Route("api/user-management/users")]
@@ -42,7 +45,7 @@ public class UsersController : ControllerBase
     [OpenApiOperation("Get a user's roles.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<List<UserRoleDto>> GetRoles(string id, CancellationToken cancellationToken, [FromQuery] bool includeUnassigned = false)
     {
         return await _userService.GetRolesAsync(id, includeUnassigned, cancellationToken);
@@ -54,9 +57,10 @@ public class UsersController : ControllerBase
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Register))]
     public async Task<ActionResult<string>> ManageRoles(string id, AssignUserRolesRequest request, CancellationToken cancellationToken)
     {
-        return id != request.UserId
-            ? BadRequest()
-            : await _userService.AssignRolesAsync(request.ToAssignUserRolesRequest(), cancellationToken);
+        if (id != request.UserId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.UserId), HttpContext));
+
+        return await _userService.AssignRolesAsync(request.ToAssignUserRolesRequest(), cancellationToken);
     }
 
     [HttpPost("{id}/toggle-status")]
@@ -66,7 +70,7 @@ public class UsersController : ControllerBase
     public async Task<ActionResult> ToggleStatus(string id, ToggleUserStatusRequest request, CancellationToken cancellationToken)
     {
         if (id != request.UserId)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.UserId), HttpContext));
 
         await _userService.ToggleStatusAsync(request.ToToggleUserStatusCommand(), cancellationToken);
         return NoContent();

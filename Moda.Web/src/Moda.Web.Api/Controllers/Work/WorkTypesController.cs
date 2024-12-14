@@ -1,4 +1,5 @@
-﻿using Moda.Web.Api.Models.Work.WorkTypes;
+﻿using Moda.Web.Api.Extensions;
+using Moda.Web.Api.Models.Work.WorkTypes;
 using Moda.Work.Application.WorkTypes.Dtos;
 using Moda.Work.Application.WorkTypes.Queries;
 
@@ -52,20 +53,10 @@ public class WorkTypesController : ControllerBase
     {
         var result = await _sender.Send(request.ToCreateWorkTypeCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "WorkTypesController.Create"
-            };
-            return BadRequest(error);
-        }
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
-
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkTypes)]
@@ -76,22 +67,13 @@ public class WorkTypesController : ControllerBase
     public async Task<ActionResult> Update(int id, UpdateWorkTypeRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateWorkTypeCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "WorkTypesController.Update"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     //[HttpDelete("{id}")]

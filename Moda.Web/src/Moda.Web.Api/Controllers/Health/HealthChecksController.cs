@@ -1,5 +1,6 @@
 ﻿using Moda.Health.Dtos;
 using Moda.Health.Queries;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Health;
 
 namespace Moda.Web.Api.Controllers.Health;
@@ -23,7 +24,6 @@ public class HealthChecksController : ControllerBase
     [OpenApiOperation("Get a health check by id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<HealthCheckDto>> GetById(Guid id, CancellationToken cancellationToken)
     {
         var healthCheck = await _sender.Send(new GetHealthCheckQuery(id), cancellationToken);
@@ -65,7 +65,7 @@ public class HealthChecksController : ControllerBase
     public async Task<ActionResult<HealthCheckDto>> Update(Guid id, [FromBody] UpdateHealthCheckRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateHealthCheckCommand(), cancellationToken);
 

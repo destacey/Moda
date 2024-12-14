@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Planning.Application.PlanningIntervals.Commands;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Planning.PlanningIntervals;
 using Moda.Web.Api.Models.Work.WorkTypeLevels;
 using Moda.Work.Application.WorkTypeLevels.Commands;
@@ -57,18 +58,9 @@ public class WorkTypeLevelsController : ControllerBase
     {
         var result = await _sender.Send(request.ToCreateWorkTypeLevelCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "WorkTypeLevelsController.Create"
-            };
-            return BadRequest(error);
-        }
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}")]
@@ -80,22 +72,13 @@ public class WorkTypeLevelsController : ControllerBase
     public async Task<ActionResult> Update(int id, UpdateWorkTypeLevelRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateWorkTypeLevelCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "WorkTypeLevelsController.Update"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
 
@@ -109,18 +92,9 @@ public class WorkTypeLevelsController : ControllerBase
     {
         var result = await _sender.Send(new UpdateWorkTypeLevelsOrderCommand(request.Levels), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "WorkTypeLevelsController.UpdateOrder"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     //[HttpDelete("{id}")]

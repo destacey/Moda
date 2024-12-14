@@ -1,6 +1,7 @@
 ﻿using Moda.Links.Commands;
 using Moda.Links.Models;
 using Moda.Links.Queries;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Links;
 
 namespace Moda.Web.Api.Controllers.Links;
@@ -35,7 +36,6 @@ public class LinksController : ControllerBase
     [OpenApiOperation("Get a link by id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<LinkDto>> GetById(Guid id, CancellationToken cancellationToken)
     {
         var link = await _sender.Send(new GetLinkQuery(id), cancellationToken);
@@ -66,7 +66,7 @@ public class LinksController : ControllerBase
     public async Task<ActionResult<LinkDto>> Update(Guid id, [FromBody] UpdateLinkRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateLinkCommand(), cancellationToken);
 
@@ -86,6 +86,6 @@ public class LinksController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(result.Error);
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 }

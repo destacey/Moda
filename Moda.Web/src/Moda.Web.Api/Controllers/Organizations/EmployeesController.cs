@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Employees.Commands;
 using Moda.Common.Application.Employees.Dtos;
 using Moda.Common.Application.Employees.Queries;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Organizations.Employees;
 
 namespace Moda.Web.Api.Controllers.Organizations;
@@ -54,7 +55,7 @@ public class EmployeesController : ControllerBase
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
-            : BadRequest(result.Error);
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}")]
@@ -65,13 +66,13 @@ public class EmployeesController : ControllerBase
     public async Task<ActionResult> Update(Guid id, UpdateEmployeeRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateEmployeeCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(result.Error);
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     //[HttpDelete("{id}")]
@@ -105,6 +106,6 @@ public class EmployeesController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(result.Error);
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 }

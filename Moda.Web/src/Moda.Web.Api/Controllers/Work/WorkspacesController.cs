@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Extensions;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Work.Workspaces;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
@@ -12,9 +13,8 @@ namespace Moda.Web.Api.Controllers.Work;
 [Route("api/work/workspaces")]
 [ApiVersionNeutral]
 [ApiController]
-public class WorkspacesController(ILogger<WorkspacesController> logger, ISender sender) : ControllerBase
+public class WorkspacesController(ISender sender) : ControllerBase
 {
-    private readonly ILogger<WorkspacesController> _logger = logger;
     private readonly ISender _sender = sender;
 
     [HttpGet]
@@ -47,13 +47,13 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkspacesController.GetCalendar"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var result = await _sender.Send(query, cancellationToken);
 
         return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.Get"))
+            ? BadRequest(result.ToBadRequestObject(HttpContext))
             : result.Value is not null
                 ? result.Value
                 : NotFound();
@@ -68,9 +68,9 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
     {
         var result = await _sender.Send(new SetExternalViewWorkItemUrlTemplateCommand(id, dto.ExternalViewWorkItemUrlTemplate), cancellationToken);
 
-        return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.SetExternalViewWorkItemUrlTemplate"))
-            : NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     #region Work Items
@@ -93,14 +93,14 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkspacesController.GetWorkItems"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var result = await _sender.Send(query, cancellationToken);
 
-        return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetWorkItems"))
-            : Ok(result.Value.OrderByKey(true));
+        return result.IsSuccess
+            ? Ok(result.Value.OrderByKey(true))
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpGet("{idOrKey}/work-items/{workItemKey}")]
@@ -124,13 +124,13 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkspacesController.GetWorkItem"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var result = await _sender.Send(query, cancellationToken);
 
         return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetWorkItem"))
+            ? BadRequest(result.ToBadRequestObject(HttpContext))
             : result.Value is not null
                 ? result.Value
                 : NotFound();
@@ -156,14 +156,14 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkspacesController.GetChildWorkItems"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var result = await _sender.Send(query, cancellationToken);
 
-        return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetChildWorkItems"))
-            : Ok(result.Value.OrderBy(w => w.StackRank));
+        return result.IsSuccess
+            ? Ok(result.Value.OrderBy(w => w.StackRank))
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpGet("{idOrKey}/work-items/{workItemKey}/dependencies")]
@@ -180,7 +180,7 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
 
         
         return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetWorkItemDependencies"))
+            ? BadRequest(result.ToBadRequestObject(HttpContext))
             : result.Value is not null
                 ? Ok(result.Value.OrderBy(w => w.CreatedOn))
                 : NotFound();
@@ -206,17 +206,15 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkspacesController.GetMetrics"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var result = await _sender.Send(query, cancellationToken);
 
-        return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetMetrics"))
-            : Ok(result.Value);
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
-
-
 
     [HttpGet("work-items/search")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
@@ -227,9 +225,9 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
     {
         var result = await _sender.Send(new SearchWorkItemsQuery(query, top), cancellationToken);
 
-        return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.SearchWorkItems"))
-            : Ok(result.Value.OrderByKey(true));
+        return result.IsSuccess
+            ? Ok(result.Value.OrderByKey(true))
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     #endregion Work Items

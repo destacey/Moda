@@ -3,6 +3,8 @@ using Moda.Common.Application.Requests;
 using Moda.Planning.Application.Roadmaps.Commands;
 using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Application.Roadmaps.Queries;
+using Moda.Planning.Domain.Models.Roadmaps;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Planning.Roadmaps;
 
 namespace Moda.Web.Api.Controllers.Planning;
@@ -53,10 +55,10 @@ public class RoadmapsController : ControllerBase
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateRoadmapRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateRoadmapCommand(), cancellationToken);
-        if (result.IsFailure)
-            return BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Create"));
-
-        return CreatedAtAction(nameof(GetRoadmap), new { idOrKey = result.Value.Id.ToString() }, result.Value);
+        
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetRoadmap), new { idOrKey = result.Value.Id.ToString() }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}")]
@@ -68,13 +70,13 @@ public class RoadmapsController : ControllerBase
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdateRoadmapRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateRoadmapCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Update"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpDelete("{id}")]
@@ -88,7 +90,7 @@ public class RoadmapsController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.Delete"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     #region Roadmap Items
@@ -133,7 +135,7 @@ public class RoadmapsController : ControllerBase
     public async Task<ActionResult<ObjectIdAndKey>> CreateItem(Guid roadmapId, [FromBody] CreateRoadmapItemRequest request, CancellationToken cancellationToken)
     {
         if (roadmapId != request.RoadmapId)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(roadmapId), nameof(request.RoadmapId), HttpContext));
 
         var command = request switch
         {
@@ -144,10 +146,10 @@ public class RoadmapsController : ControllerBase
         };
 
         var result = await _sender.Send(command, cancellationToken);
-        if (result.IsFailure)
-            return BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.CreateItem"));
 
-        return CreatedAtAction(nameof(GetItem), new { roadmapIdOrKey = roadmapId, itemId = result.Value.ToString() }, result.Value);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetItem), new { roadmapIdOrKey = roadmapId, itemId = result.Value.ToString() }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{roadmapId}/items/{itemId}")]
@@ -159,10 +161,9 @@ public class RoadmapsController : ControllerBase
     public async Task<ActionResult> UpdateItem(Guid roadmapId, Guid itemId, [FromBody] UpdateRoadmapItemRequest request, CancellationToken cancellationToken)
     {
         if (roadmapId != request.RoadmapId)
-            return BadRequest();
-
-        if (itemId != request.ItemId)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(roadmapId), nameof(request.RoadmapId), HttpContext));
+        else if (itemId != request.ItemId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(itemId), nameof(request.ItemId), HttpContext));
 
         var command = request switch
         {
@@ -176,7 +177,7 @@ public class RoadmapsController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateItem"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
 
@@ -229,7 +230,7 @@ public class RoadmapsController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.DeleteItem"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     #endregion Roadmap Items

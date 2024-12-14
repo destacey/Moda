@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Web.Api.Extensions;
 using Moda.Work.Application.WorkProcesses.Commands;
 using Moda.Work.Application.WorkProcesses.Dtos;
 using Moda.Work.Application.WorkProcesses.Queries;
@@ -43,13 +44,13 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkProcessesController.GetCalendar"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var result = await _sender.Send(query, cancellationToken);
 
         return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkProcessesController.Get"))
+            ? BadRequest(result.ToBadRequestObject(HttpContext))
             : result.Value is not null
                 ? Ok(result.Value)
                 : NotFound();
@@ -64,7 +65,9 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     {
         var result = await _sender.Send(new ActivateWorkProcessCommand(id), cancellationToken);
 
-        return result.IsSuccess ? NoContent() : BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkProcessesController.Activate"));
+        return result.IsSuccess 
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPost("{id}/deactivate")]
@@ -75,7 +78,10 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     public async Task<ActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new DeactivateWorkProcessCommand(id), cancellationToken);
-        return result.IsSuccess ? NoContent() : BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkProcessesController.Deactivate"));
+
+        return result.IsSuccess 
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     // get work process schemes

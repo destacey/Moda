@@ -3,6 +3,7 @@ using Moda.AppIntegration.Application.Interfaces;
 using Moda.AppIntegration.Domain.Models;
 using Moda.Common.Application.Interfaces;
 using Moda.Organization.Application.BaseTeams.Queries;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.AppIntegrations.Connections;
 
 namespace Moda.Web.Api.Controllers.AppIntegrations;
@@ -58,18 +59,9 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     {
         var result = await _sender.Send(request.ToCreateAzureDevOpsBoardsConnectionCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "AzureDevOpsBoardsConnectionsController.Update"
-            };
-            return BadRequest(error);
-        }
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}")]
@@ -81,22 +73,13 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     public async Task<ActionResult> Update(Guid id, UpdateAzureDevOpsBoardConnectionRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpadateAzureDevOpsBoardsConnectionCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "AzureDevOpsBoardsConnectionsController.Update"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPost("{id}/sync-state")]
@@ -109,18 +92,9 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     {
         var result = await _sender.Send(new UpdateAzureDevOpsBoardsConnectionSyncStateCommand(id, isSyncEnabled), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "AzureDevOpsBoardsConnectionsController.Update"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpDelete("{id}")]
@@ -132,18 +106,9 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     {
         var result = await _sender.Send(new DeleteAzureDevOpsBoardsConnectionCommand(id), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "AzureDevOpsBoardsConnectionsController.Delete"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpGet("{id}/teams")]
@@ -166,7 +131,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     public async Task<ActionResult> MapConnectionTeams(Guid id, [FromBody] AzdoConnectionTeamMappingsRequest request, CancellationToken cancellationToken)
     {
         if (id != request.ConnectionId)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.ConnectionId), HttpContext));
 
         var teamIds = await _sender.Send(new GetValidBaseTeamIdsQuery(), cancellationToken);
 
@@ -174,7 +139,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "AzureDevOpsBoardsConnectionsController.MapConnectionTeams"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPost("test")]
@@ -186,30 +151,16 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     {
         if (request is null || string.IsNullOrWhiteSpace(request.Organization) || string.IsNullOrWhiteSpace(request.PersonalAccessToken))
         {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = "The Organization and PersonalAccessToken values are required to test.",
-                Source = "AzureDevOpsBoardsConnectionsController.Test"
-            };
-            return BadRequest(error);
+            return BadRequest(ProblemDetailsExtensions.ForBadRequest("The Organization and PersonalAccessToken values are required to test.", HttpContext));
         }
 
         var config = new AzureDevOpsBoardsConnectionConfiguration(request.Organization, request.PersonalAccessToken);
 
         var result = await azureDevOpsService.TestConnection(config.OrganizationUrl, config.PersonalAccessToken);
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "AzureDevOpsBoardsConnectionsController.Test"
-            };
-            return BadRequest(error);
-        }
 
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPost("{id}/sync-organization-configuration")]
@@ -220,18 +171,10 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     public async Task<ActionResult> SyncOrganizationConfiguration(Guid id, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsInitManager, CancellationToken cancellationToken)
     {
         var result = await azureDevOpsBoardsInitManager.SyncOrganizationConfiguration(id, cancellationToken);
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "AzureDevOpsBoardsConnectionsController.SyncOrganizationConfiguration"
-            };
-            return BadRequest(error);
-        }
 
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPost("{id}/init-work-process-integration")]
@@ -243,21 +186,13 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     public async Task<ActionResult> InitWorkProcesssIntegration(Guid id, InitWorkProcessIntegrationRequest request, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await azureDevOpsBoardsImportService.InitWorkProcessIntegration(request.Id, request.ExternalId, cancellationToken);
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "AzureDevOpsBoardsConnectionsController.InitWorkProcesssIntegration"
-            };
-            return BadRequest(error);
-        }
 
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPost("{id}/init-workspace-integration")]
@@ -269,20 +204,12 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     public async Task<ActionResult> InitWorkspaceIntegration(Guid id, InitWorkspaceIntegrationRequest request, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await azureDevOpsBoardsImportService.InitWorkspaceIntegration(request.Id, request.ExternalId, request.WorkspaceKey, request.WorkspaceName, request.ExternalViewWorkItemUrlTemplate, cancellationToken);
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "AzureDevOpsBoardsConnectionsController.InitWorkspaceIntegration"
-            };
-            return BadRequest(error);
-        }
 
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 }

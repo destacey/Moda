@@ -11,7 +11,9 @@ using Moda.Planning.Application.PlanningIntervals.Dtos;
 using Moda.Planning.Application.PlanningIntervals.Queries;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
+using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Web.Api.Dtos.Planning;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Planning.PlanningIntervals;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
@@ -52,7 +54,6 @@ public class PlanningIntervalsController : ControllerBase
     [OpenApiOperation("Get planning interval details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     public async Task<ActionResult<PlanningIntervalDetailsDto>> GetPlanningInterval(string idOrKey, CancellationToken cancellationToken)
     {
         var planningInterval = await _sender.Send(new GetPlanningIntervalQuery(idOrKey), cancellationToken);
@@ -102,7 +103,7 @@ public class PlanningIntervalsController : ControllerBase
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetPlanningInterval), new { idOrKey = result.Value.ToString() }, result.Value)
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.Create"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}")]
@@ -114,13 +115,13 @@ public class PlanningIntervalsController : ControllerBase
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdatePlanningIntervalRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdatePlanningIntervalCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.Update"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpGet("{id}/teams")]
@@ -165,13 +166,13 @@ public class PlanningIntervalsController : ControllerBase
     public async Task<ActionResult> ManageDates(Guid id, [FromBody] ManagePlanningIntervalDatesRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToManagePlanningIntervalDatesCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.ManageDates"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPost("{id}/teams")]
@@ -182,13 +183,13 @@ public class PlanningIntervalsController : ControllerBase
     public async Task<ActionResult> ManageTeams(Guid id, [FromBody] ManagePlanningIntervalTeamsRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToManagePlanningIntervalTeamsCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.ManageTeams"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     #region Iterations
@@ -272,21 +273,13 @@ public class PlanningIntervalsController : ControllerBase
     public async Task<ActionResult> CreateObjective(Guid id, [FromBody] CreatePlanningIntervalObjectiveRequest request, CancellationToken cancellationToken)
     {
         if (id != request.PlanningIntervalId)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.PlanningIntervalId), HttpContext));
 
         var result = await _sender.Send(request.ToCreatePlanningIntervalObjectiveCommand(), cancellationToken);
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "PlanningIntervalsController.CreateObjective"
-            };
-            return BadRequest(error);
-        }
 
-        return CreatedAtAction(nameof(GetObjectiveByKey), new { id, objectiveId = result.Value }, result.Value);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetObjectiveByKey), new { id, objectiveId = result.Value }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}/objectives/{objectiveId}")]
@@ -298,23 +291,16 @@ public class PlanningIntervalsController : ControllerBase
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> UpdateObjective(Guid id, Guid objectiveId, [FromBody] UpdatePlanningIntervalObjectiveRequest request, CancellationToken cancellationToken)
     {
-        if (id != request.PlanningIntervalId || objectiveId != request.ObjectiveId)
-            return BadRequest();
+        if (id != request.PlanningIntervalId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.PlanningIntervalId), HttpContext));
+        else if (objectiveId != request.ObjectiveId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(objectiveId), nameof(request.ObjectiveId), HttpContext));
 
         var result = await _sender.Send(request.ToUpdatePlanningIntervalObjectiveCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "PlanningIntervalsController.UpdateObjective"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}/objectives/order")]
@@ -327,13 +313,13 @@ public class PlanningIntervalsController : ControllerBase
     public async Task<ActionResult> UpdateObjectivesOrder(Guid id, [FromBody] UpdatePlanningIntervalObjectivesOrderRequest request, CancellationToken cancellationToken)
     {
         if (id != request.PlanningIntervalId)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.PlanningIntervalId), HttpContext));
 
         var result = await _sender.Send(new UpdatePlanningIntervalObjectivesOrderCommand(request.PlanningIntervalId, request.Objectives), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.UpdateObjectivesOrder"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpGet("{idOrKey}/objectives/health-report")]
@@ -354,7 +340,7 @@ public class PlanningIntervalsController : ControllerBase
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("PlanningIntervalsController.GetObjectivesHealthReport"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var objectives = await _sender.Send(objectivesQuery, cancellationToken);
@@ -434,8 +420,10 @@ public class PlanningIntervalsController : ControllerBase
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> ManageObjectiveWorkItems(Guid id, Guid objectiveId, [FromBody] ManagePlanningIntervalObjectiveWorkItemsRequest request, CancellationToken cancellationToken)
     {
-        if (id != request.PlanningIntervalId || objectiveId != request.ObjectiveId)
-            return BadRequest();
+        if (id != request.PlanningIntervalId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.PlanningIntervalId), HttpContext));
+        else if (objectiveId != request.ObjectiveId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(objectiveId), nameof(request.ObjectiveId), HttpContext));
 
         var exists = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(id, objectiveId), cancellationToken);
         if (!exists)
@@ -445,7 +433,7 @@ public class PlanningIntervalsController : ControllerBase
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "PlanningIntervalsController.ManageObjectiveWorkItems"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPost("{id}/objectives/import")]
@@ -466,7 +454,7 @@ public class PlanningIntervalsController : ControllerBase
             {
                 // TODO: allow importing of objectives for multiple PIs at once
                 if (id != objective.PlanningIntervalId)
-                    return BadRequest();
+                    return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(objective.PlanningIntervalId), HttpContext));
 
                 var validationResults = await validator.ValidateAsync(objective, cancellationToken);
                 if (!validationResults.IsValid)
@@ -492,29 +480,14 @@ public class PlanningIntervalsController : ControllerBase
 
             var result = await _sender.Send(new ImportPlanningIntervalObjectivesCommand(objectives), cancellationToken);
 
-            if (result.IsFailure)
-            {
-                var error = new ErrorResult
-                {
-                    StatusCode = 400,
-                    SupportMessage = result.Error,
-                    Source = "PlanningIntervalsController.ImportObjectives"
-                };
-                return BadRequest(error);
-            }
-
-            return NoContent();
+            return result.IsSuccess
+                ? NoContent()
+                : BadRequest(result.ToBadRequestObject(HttpContext));
         }
         catch (CsvHelperException ex)
         {
             // TODO: Convert this to a validation problem details
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = ex.ToString(),
-                Source = "PlanningIntervalsController.ImportObjectives"
-            };
-            return BadRequest(error);
+            return BadRequest(ProblemDetailsExtensions.ForBadRequest(ex.ToString(), HttpContext));
         }
     }
 
@@ -527,18 +500,9 @@ public class PlanningIntervalsController : ControllerBase
     {
         var result = await _sender.Send(new DeletePlanningIntervalObjectiveCommand(id, objectiveId), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "PlanningIntervalsController.DeleteObjective"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpGet("objective-statuses")]

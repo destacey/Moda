@@ -578,14 +578,11 @@ export class RolesClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<string>(null as any);
     }
 
     /**
@@ -1120,14 +1117,11 @@ export class UsersClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<string>(null as any);
     }
 
     /**
@@ -1184,14 +1178,11 @@ export class UsersClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<void>(null as any);
     }
 }
 
@@ -1321,14 +1312,11 @@ export class PlanningIntervalsClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<string>(null as any);
     }
 
     /**
@@ -1385,14 +1373,11 @@ export class PlanningIntervalsClient {
             result404 = JSON.parse(resultData404);
             return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<PlanningIntervalDetailsDto>(null as any);
     }
 
     /**
@@ -3031,14 +3016,11 @@ export class RisksClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<RiskListDto[]>(null as any);
     }
 
     /**
@@ -3171,14 +3153,11 @@ export class RisksClient {
             result404 = JSON.parse(resultData404);
             return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<RiskDetailsDto>(null as any);
     }
 
     /**
@@ -3232,14 +3211,11 @@ export class RisksClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<RiskListDto[]>(null as any);
     }
 
     /**
@@ -3695,14 +3671,11 @@ export class RoadmapsClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<ObjectIdAndKey>(null as any);
     }
 
     /**
@@ -3759,14 +3732,11 @@ export class RoadmapsClient {
             result404 = JSON.parse(resultData404);
             return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<RoadmapDetailsDto>(null as any);
     }
 
     /**
@@ -4138,14 +4108,11 @@ export class RoadmapsClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<ObjectIdAndKey>(null as any);
     }
 
     /**
@@ -5545,14 +5512,11 @@ export class WorkStatusesClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<number>(null as any);
     }
 
     /**
@@ -5818,14 +5782,11 @@ export class WorkTypeLevelsClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<number>(null as any);
     }
 
     /**
@@ -6161,14 +6122,11 @@ export class WorkTypesClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<number>(null as any);
     }
 
     /**
@@ -6511,14 +6469,11 @@ export class EmployeesClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<number>(null as any);
     }
 
     /**
@@ -6831,14 +6786,11 @@ export class TeamsClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<TeamListDto[]>(null as any);
     }
 
     /**
@@ -6896,14 +6848,11 @@ export class TeamsClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<number>(null as any);
     }
 
     /**
@@ -6960,14 +6909,11 @@ export class TeamsClient {
             result404 = JSON.parse(resultData404);
             return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<TeamDetailsDto>(null as any);
     }
 
     /**
@@ -7913,14 +7859,11 @@ export class TeamsOfTeamsClient {
             result400 = JSON.parse(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<TeamOfTeamsListDto[]>(null as any);
     }
 
     /**
@@ -7978,14 +7921,11 @@ export class TeamsOfTeamsClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<number>(null as any);
     }
 
     /**
@@ -8042,14 +7982,11 @@ export class TeamsOfTeamsClient {
             result404 = JSON.parse(resultData404);
             return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<TeamOfTeamsDetailsDto>(null as any);
     }
 
     /**
@@ -8871,14 +8808,11 @@ export class LinksClient {
             result404 = JSON.parse(resultData404);
             return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<LinkDto>(null as any);
     }
 
     /**
@@ -9065,14 +8999,11 @@ export class LinksClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<string>(null as any);
     }
 }
 
@@ -9143,14 +9074,11 @@ export class HealthChecksClient {
             result404 = JSON.parse(resultData404);
             return throwException("A server side error occurred.", status, _responseText, _headers, result404);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<HealthCheckDto>(null as any);
     }
 
     /**
@@ -9341,14 +9269,11 @@ export class HealthChecksClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<string>(null as any);
     }
 
     /**
@@ -9541,14 +9466,11 @@ export class AzureDevOpsBoardsConnectionsClient {
             result422 = JSON.parse(resultData422);
             return throwException("A server side error occurred.", status, _responseText, _headers, result422);
 
-        } else {
+        } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
-            let resultdefault: any = null;
-            let resultDatadefault  = _responseText;
-            resultdefault = JSON.parse(resultDatadefault);
-            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
-
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<string>(null as any);
     }
 
     /**
@@ -10518,13 +10440,14 @@ export interface ApplicationPermission {
     name?: string;
 }
 
-export interface ErrorResult {
-    messages?: string[] | undefined;
-    source?: string | undefined;
-    exception?: string | undefined;
-    errorId?: string | undefined;
-    supportMessage?: string | undefined;
-    statusCode?: number;
+export interface ProblemDetails {
+    type?: string | undefined;
+    title?: string | undefined;
+    status?: number | undefined;
+    detail?: string | undefined;
+    instance?: string | undefined;
+
+    [key: string]: any;
 }
 
 export interface UserDetailsDto {
@@ -10545,16 +10468,6 @@ export interface NavigationDtoOfGuidAndInteger {
 }
 
 export interface NavigationDto extends NavigationDtoOfGuidAndInteger {
-}
-
-export interface ProblemDetails {
-    type?: string | undefined;
-    title?: string | undefined;
-    status?: number | undefined;
-    detail?: string | undefined;
-    instance?: string | undefined;
-
-    [key: string]: any;
 }
 
 export interface HttpValidationProblemDetails extends ProblemDetails {
