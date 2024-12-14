@@ -194,8 +194,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
           layout="vertical"
           name="create-roadmap-form"
         >
-          {/* <Item label="Name" name="name" rules={[{ required: true }]}> */}
-          <Item label="Name" name="name" rules={[]}>
+          <Item label="Name" name="name" rules={[{ required: true }]}>
             <TextArea
               autoSize={{ minRows: 1, maxRows: 2 }}
               showCount
