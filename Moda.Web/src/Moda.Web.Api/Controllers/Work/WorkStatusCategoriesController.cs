@@ -19,7 +19,7 @@ public class WorkStatusCategoriesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkStatusCategories)]
     [OpenApiOperation("Get a list of all work status categories.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<WorkStatusCategoryListDto>>> GetList(CancellationToken cancellationToken)
     {
         var categories = await _sender.Send(new GetWorkStatusCategoriesQuery(), cancellationToken);

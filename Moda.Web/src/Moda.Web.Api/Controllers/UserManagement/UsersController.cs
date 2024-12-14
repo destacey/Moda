@@ -16,7 +16,7 @@ public class UsersController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Users)]
     [OpenApiOperation("Get list of all users.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<List<UserDetailsDto>> GetList(CancellationToken cancellationToken)
     {
         return await _userService.GetListAsync(cancellationToken);
@@ -26,7 +26,7 @@ public class UsersController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Users)]
     [OpenApiOperation("Get a user's details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserDetailsDto>> GetById(string id, CancellationToken cancellationToken)
     {
@@ -41,7 +41,7 @@ public class UsersController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.UserRoles)]
     [OpenApiOperation("Get a user's roles.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<List<UserRoleDto>> GetRoles(string id, CancellationToken cancellationToken, [FromQuery] bool includeUnassigned = false)
     {

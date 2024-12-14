@@ -22,7 +22,7 @@ public class WorkStatusesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkStatuses)]
     [OpenApiOperation("Get a list of all work statuss.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<WorkStatusDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var workStatuses = await _sender.Send(new GetWorkStatusesQuery(includeInactive), cancellationToken);
@@ -33,7 +33,7 @@ public class WorkStatusesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkStatuses)]
     [OpenApiOperation("Get work status details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WorkStatusDto>> GetById(int id)
     {
@@ -61,7 +61,7 @@ public class WorkStatusesController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkStatuses)]
     [OpenApiOperation("Update a work status.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(int id, UpdateWorkStatusRequest request, CancellationToken cancellationToken)
     {

@@ -26,7 +26,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
     [OpenApiOperation("Get a list of all Azure DevOps Boards connections.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<ConnectionListDto>>> GetList(CancellationToken cancellationToken, bool includeDisabled = false)
     {
         var connections = await _sender.Send(new GetConnectionsQuery(includeDisabled, _connector), cancellationToken);
@@ -37,7 +37,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
     [OpenApiOperation("Get Azure DevOps Boards connection based on id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AzureDevOpsBoardsConnectionDetailsDto>> GetById(Guid id, CancellationToken cancellationToken)
     {
@@ -76,7 +76,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
     [OpenApiOperation("Update an Azure DevOps Boards connection.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(Guid id, UpdateAzureDevOpsBoardConnectionRequest request, CancellationToken cancellationToken)
     {
@@ -103,7 +103,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
     [OpenApiOperation("Update an Azure DevOps Boards connection sync state.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> UpdateSyncState(Guid id, bool isSyncEnabled, CancellationToken cancellationToken)
     {
@@ -127,7 +127,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.Delete, ApplicationResource.Connections)]
     [OpenApiOperation("Delete an Azure DevOps Boards connection.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new DeleteAzureDevOpsBoardsConnectionCommand(id), cancellationToken);
@@ -150,7 +150,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Connections)]
     [OpenApiOperation("Get Azure DevOps connection teams based on id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<List<AzureDevOpsBoardsWorkspaceTeamDto>>> GetConnectionTeams(Guid id, Guid? workspaceId, CancellationToken cancellationToken)
     {
         var teams = await _sender.Send(new GetAzureDevOpsBoardsConnectionTeamsQuery(id, workspaceId), cancellationToken);
@@ -162,7 +162,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
     [OpenApiOperation("Update Azure DevOps connection team mappings.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> MapConnectionTeams(Guid id, [FromBody] AzdoConnectionTeamMappingsRequest request, CancellationToken cancellationToken)
     {
         if (id != request.ConnectionId)
@@ -181,7 +181,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
     [OpenApiOperation("Test Azure DevOps Boards connection configuration.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> TestConfig(TestAzureDevOpsBoardConnectionRequest request, [FromServices] IAzureDevOpsService azureDevOpsService)
     {
         if (request is null || string.IsNullOrWhiteSpace(request.Organization) || string.IsNullOrWhiteSpace(request.PersonalAccessToken))
@@ -216,7 +216,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
     [OpenApiOperation("Sync Azure DevOps processes and projects.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> SyncOrganizationConfiguration(Guid id, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsInitManager, CancellationToken cancellationToken)
     {
         var result = await azureDevOpsBoardsInitManager.SyncOrganizationConfiguration(id, cancellationToken);
@@ -238,7 +238,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
     [OpenApiOperation("Initialize Azure DevOps project integration as a Moda workspace.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> InitWorkProcesssIntegration(Guid id, InitWorkProcessIntegrationRequest request, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {
@@ -264,7 +264,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Connections)]
     [OpenApiOperation("Initialize Azure DevOps project integration as a Moda workspace.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> InitWorkspaceIntegration(Guid id, InitWorkspaceIntegrationRequest request, [FromServices] IAzureDevOpsBoardsInitManager azureDevOpsBoardsImportService, CancellationToken cancellationToken)
     {

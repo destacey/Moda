@@ -26,7 +26,7 @@ public class WorkTypeLevelsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkTypeLevels)]
     [OpenApiOperation("Get a list of all work type levels.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<WorkTypeLevelDto>>> GetList(CancellationToken cancellationToken)
     {
         var levels = await _sender.Send(new GetWorkTypeLevelsQuery(), cancellationToken);
@@ -38,7 +38,7 @@ public class WorkTypeLevelsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkTypeLevels)]
     [OpenApiOperation("Get work type level details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WorkTypeLevelDto>> GetById(int id)
     {
@@ -75,7 +75,7 @@ public class WorkTypeLevelsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkTypeLevels)]
     [OpenApiOperation("Update a work type level.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(int id, UpdateWorkTypeLevelRequest request, CancellationToken cancellationToken)
     {
@@ -103,7 +103,7 @@ public class WorkTypeLevelsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkTypeLevels)]
     [OpenApiOperation("Update the order of portfolio tier work type levels.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> UpdateOrder([FromBody] UpdateWorkTypeLevelsOrderRequest request, CancellationToken cancellationToken)
     {

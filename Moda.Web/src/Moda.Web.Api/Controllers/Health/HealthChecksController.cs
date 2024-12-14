@@ -36,7 +36,7 @@ public class HealthChecksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.HealthChecks)]
     [OpenApiOperation("Get the health report for a specific objectId.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<HealthCheckDto>>> GetHealthReport(Guid objectId, CancellationToken cancellationToken)
     {
         var healthChecks = await _sender.Send(new GetHealthReportQuery(objectId), cancellationToken);
@@ -60,7 +60,7 @@ public class HealthChecksController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.HealthChecks)]
     [OpenApiOperation("Update a health report.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<HealthCheckDto>> Update(Guid id, [FromBody] UpdateHealthCheckRequest request, CancellationToken cancellationToken)
     {
@@ -79,7 +79,7 @@ public class HealthChecksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.HealthChecks)]
     [OpenApiOperation("Get a list of health check statuses.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<HealthStatusDto>>> GetStatuses(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetHealthStatusesQuery(), cancellationToken);

@@ -17,7 +17,7 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkProcesses)]
     [OpenApiOperation("Get a list of work processes.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<WorkProcessListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var workProcesses = await _sender.Send(new GetWorkProcessesQuery(includeInactive), cancellationToken);
@@ -29,7 +29,7 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     [OpenApiOperation("Get work process details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<WorkProcessDto>> Get(string idOrKey, CancellationToken cancellationToken)
     {
         GetWorkProcessQuery query;
@@ -59,7 +59,7 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkProcesses)]
     [OpenApiOperation("Activate a work process.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Activate(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new ActivateWorkProcessCommand(id), cancellationToken);
@@ -71,7 +71,7 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkProcesses)]
     [OpenApiOperation("Deactivate a work process.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new DeactivateWorkProcessCommand(id), cancellationToken);
@@ -84,7 +84,7 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     [OpenApiOperation("Get work process schemes.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<WorkProcessSchemeDto>>> GetSchemes(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetWorkProcessSchemesQuery(id), cancellationToken);

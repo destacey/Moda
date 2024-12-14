@@ -13,7 +13,7 @@ public class PermissionsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Permissions)]
     [OpenApiOperation("Get a list of all permissions.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public ActionResult<IEnumerable<ApplicationPermission>> GetList()
     {
         var permissions = ApplicationPermissions.All;

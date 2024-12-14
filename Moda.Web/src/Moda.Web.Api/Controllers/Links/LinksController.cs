@@ -23,7 +23,7 @@ public class LinksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Links)]
     [OpenApiOperation("Get a list of links for a specific objectId.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<LinkDto>>> GetList(Guid objectId, CancellationToken cancellationToken)
     {
         var links = await _sender.Send(new GetLinksQuery(objectId), cancellationToken);
@@ -61,7 +61,7 @@ public class LinksController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Links)]
     [OpenApiOperation("Update a link.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<LinkDto>> Update(Guid id, [FromBody] UpdateLinkRequest request, CancellationToken cancellationToken)
     {
@@ -79,7 +79,7 @@ public class LinksController : ControllerBase
     [MustHavePermission(ApplicationAction.Delete, ApplicationResource.Links)]
     [OpenApiOperation("Delete a link.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new DeleteLinkCommand(id), cancellationToken);
