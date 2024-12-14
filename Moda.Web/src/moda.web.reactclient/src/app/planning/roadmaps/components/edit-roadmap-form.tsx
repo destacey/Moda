@@ -129,7 +129,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
         props.messageApi.error('Correct the validation error(s) to continue.')
       } else {
         props.messageApi.error(
-          error.supportMessage ??
+          error.detail ??
             'An error occurred while updating the roadmap. Please try again.',
         )
       }
@@ -185,7 +185,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
   useEffect(() => {
     if (error) {
       props.messageApi.error(
-        error.supportMessage ??
+        error.detail ??
           'An error occurred while loading the roadmap. Please try again.',
       )
     }

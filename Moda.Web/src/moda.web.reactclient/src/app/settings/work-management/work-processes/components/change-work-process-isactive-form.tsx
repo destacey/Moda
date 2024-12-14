@@ -45,7 +45,7 @@ const ChangeWorkProcessIsActiveForm = (
       return true
     } catch (error) {
       messageApi.error(
-        `Failed to ${actionLowerCase} work process. Error: ${error.supportMessage}`,
+        `Failed to ${actionLowerCase} work process. Error: ${error.detail}`,
       )
       console.error(error)
       // }

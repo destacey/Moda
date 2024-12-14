@@ -139,9 +139,7 @@ const ConnectionDetailsPage = ({ params }) => {
       )
     } catch (error) {
       console.error(error)
-      messageApi.error(
-        `Failed to change sync setting. Error: ${error.supportMessage}`,
-      )
+      messageApi.error(`Failed to change sync setting. Error: ${error.detail}`)
     }
   }, [
     connectionData?.isSyncEnabled,
@@ -162,7 +160,7 @@ const ConnectionDetailsPage = ({ params }) => {
     } catch (error) {
       console.error(error)
       messageApi.error(
-        `Failed to initialize organization. Error: ${error.supportMessage}`,
+        `Failed to initialize organization. Error: ${error.detail}`,
       )
     }
     setIsSyncingOrganization(false)

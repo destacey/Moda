@@ -60,7 +60,6 @@ try
             {
                 Type = "https://tools.ietf.org/html/rfc4918#section-11.2",
                 Title = "One or more validation errors occurred.",
-                Status = StatusCodes.Status422UnprocessableEntity,
                 Detail = "See the errors property for details.",
                 Instance = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}",
                 Extensions =

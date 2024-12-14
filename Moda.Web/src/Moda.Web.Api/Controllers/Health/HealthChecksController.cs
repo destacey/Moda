@@ -23,10 +23,11 @@ public class HealthChecksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.HealthChecks)]
     [OpenApiOperation("Get a health check by id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<HealthCheckDto>> GetById(Guid id, CancellationToken cancellationToken)
     {
         var healthCheck = await _sender.Send(new GetHealthCheckQuery(id), cancellationToken);
+
         return healthCheck is not null
             ? Ok(healthCheck)
             : NotFound();
@@ -37,10 +38,13 @@ public class HealthChecksController : ControllerBase
     [OpenApiOperation("Get the health report for a specific objectId.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IReadOnlyList<HealthCheckDto>>> GetHealthReport(Guid objectId, CancellationToken cancellationToken)
     {
         var healthChecks = await _sender.Send(new GetHealthReportQuery(objectId), cancellationToken);
-        return Ok(healthChecks);
+        return healthChecks is not null
+            ? Ok(healthChecks)
+            : NotFound();
     }
 
     [HttpPost]

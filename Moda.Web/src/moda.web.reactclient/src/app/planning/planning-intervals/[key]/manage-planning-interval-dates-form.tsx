@@ -125,7 +125,7 @@ const ManagePlanningIntervalDatesForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          error.supportMessage ??
+          error.detail ??
             'An error occurred while updating the planning interval dates.',
         )
         console.error(error)

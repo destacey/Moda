@@ -157,7 +157,7 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
       return true
     } catch (error) {
       messageApi.error(
-        `Failed to update objective work items. Error: ${error.supportMessage}`,
+        `Failed to update objective work items. Error: ${error.detail}`,
       )
       console.error(error)
       return false

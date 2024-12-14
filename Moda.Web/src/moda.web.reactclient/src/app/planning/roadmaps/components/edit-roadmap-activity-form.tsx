@@ -135,7 +135,7 @@ const EditRoadmapActivityForm = (props: EditRoadmapActivityFormProps) => {
         props.messageApi.error('Correct the validation error(s) to continue.')
       } else {
         props.messageApi.error(
-          error.supportMessage ??
+          error.detail ??
             'An error occurred while updating the roadmap activity. Please try again.',
         )
       }

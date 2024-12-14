@@ -85,7 +85,7 @@ const CreateRoadmapTimeboxForm = (props: CreateRoadmapTimeboxFormProps) => {
         props.messageApi.error('Correct the validation error(s) to continue.')
       } else {
         props.messageApi.error(
-          error.supportMessage ??
+          error.detail ??
             'An error occurred while creating the roadmap timebox. Please try again.',
         )
       }
