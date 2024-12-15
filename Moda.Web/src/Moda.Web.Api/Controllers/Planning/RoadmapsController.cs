@@ -3,7 +3,6 @@ using Moda.Common.Application.Requests;
 using Moda.Planning.Application.Roadmaps.Commands;
 using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.Planning.Application.Roadmaps.Queries;
-using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Planning.Roadmaps;
 

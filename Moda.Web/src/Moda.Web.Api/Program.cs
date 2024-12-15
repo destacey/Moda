@@ -11,6 +11,7 @@ using Moda.Goals.Application;
 using Moda.Health;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
+using Moda.Infrastructure.Middleware;
 using Moda.Links;
 using Moda.Organization.Application;
 using Moda.Planning.Application;
@@ -18,6 +19,7 @@ using Moda.Web.Api.Configurations;
 using Moda.Web.Api.Interfaces;
 using Moda.Web.Api.Services;
 using Moda.Work.Application;
+using Namotion.Reflection;
 using NodaTime.Serialization.SystemTextJson;
 using Serilog;
 
@@ -51,23 +53,9 @@ try
 
     builder.Services.Configure<ApiBehaviorOptions>(options =>
     {
-        // TODO: this is duplicate config for validation errors and problem details creation
         options.InvalidModelStateResponseFactory = context =>
         {
-            Activity? activity = context.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
-
-            var problemDetails = new ValidationProblemDetails(context.ModelState)
-            {
-                Type = "https://tools.ietf.org/html/rfc4918#section-11.2",
-                Title = "One or more validation errors occurred.",
-                Detail = "See the errors property for details.",
-                Instance = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}",
-                Extensions =
-                {
-                    ["requestId"] = context.HttpContext.TraceIdentifier,
-                    ["traceId"] = activity?.Id
-                }
-            };
+            var problemDetails = ExceptionMiddleware.EnrichValidationProblemDetails(new ValidationProblemDetails(context.ModelState), context.HttpContext);
 
             return new UnprocessableEntityObjectResult(problemDetails)
             {
