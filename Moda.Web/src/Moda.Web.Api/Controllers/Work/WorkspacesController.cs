@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Extensions;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Work.Workspaces;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
@@ -12,16 +13,15 @@ namespace Moda.Web.Api.Controllers.Work;
 [Route("api/work/workspaces")]
 [ApiVersionNeutral]
 [ApiController]
-public class WorkspacesController(ILogger<WorkspacesController> logger, ISender sender) : ControllerBase
+public class WorkspacesController(ISender sender) : ControllerBase
 {
-    private readonly ILogger<WorkspacesController> _logger = logger;
     private readonly ISender _sender = sender;
 
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Workspaces)]
     [OpenApiOperation("Get a list of workspaces.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<WorkspaceListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var workspaces = await _sender.Send(new GetWorkspacesQuery(includeInactive), cancellationToken);
@@ -32,8 +32,8 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Workspaces)]
     [OpenApiOperation("Get workspace details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<WorkspaceDto>> Get(string idOrKey, CancellationToken cancellationToken)
     {
         GetWorkspaceQuery query;
@@ -47,13 +47,13 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkspacesController.GetCalendar"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var result = await _sender.Send(query, cancellationToken);
 
         return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.Get"))
+            ? BadRequest(result.ToBadRequestObject(HttpContext))
             : result.Value is not null
                 ? result.Value
                 : NotFound();
@@ -63,14 +63,14 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Workspaces)]
     [OpenApiOperation("Set the external view work item URL template for a workspace.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> SetExternalUrlTemplates(Guid id, [FromBody] SetExternalUrlTemplatesRequest dto, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new SetExternalViewWorkItemUrlTemplateCommand(id, dto.ExternalViewWorkItemUrlTemplate), cancellationToken);
 
-        return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.SetExternalViewWorkItemUrlTemplate"))
-            : NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     #region Work Items
@@ -79,7 +79,7 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
     [OpenApiOperation("Get work items for a workspace.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<WorkItemListDto>>> GetWorkItems(string idOrKey, CancellationToken cancellationToken)
     {
         GetWorkItemsQuery query;
@@ -93,22 +93,22 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkspacesController.GetWorkItems"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var result = await _sender.Send(query, cancellationToken);
 
-        return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetWorkItems"))
-            : Ok(result.Value.OrderByKey(true));
+        return result.IsSuccess
+            ? Ok(result.Value.OrderByKey(true))
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpGet("{idOrKey}/work-items/{workItemKey}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
     [OpenApiOperation("Get work item details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<WorkItemDetailsDto>> GetWorkItem(string idOrKey, string workItemKey, CancellationToken cancellationToken)
     {
         // TODO: allow work item key or id
@@ -124,13 +124,13 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkspacesController.GetWorkItem"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var result = await _sender.Send(query, cancellationToken);
 
         return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetWorkItem"))
+            ? BadRequest(result.ToBadRequestObject(HttpContext))
             : result.Value is not null
                 ? result.Value
                 : NotFound();
@@ -140,7 +140,7 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
     [OpenApiOperation("Get a work item's child work items.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<WorkItemListDto>>> GetChildWorkItems(string idOrKey, string workItemKey, CancellationToken cancellationToken)
     {
         // TODO: allow work item key or id
@@ -156,22 +156,22 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkspacesController.GetChildWorkItems"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var result = await _sender.Send(query, cancellationToken);
 
-        return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetChildWorkItems"))
-            : Ok(result.Value.OrderBy(w => w.StackRank));
+        return result.IsSuccess
+            ? Ok(result.Value.OrderBy(w => w.StackRank))
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpGet("{idOrKey}/work-items/{workItemKey}/dependencies")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
     [OpenApiOperation("Get a work item's dependencies.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<ScopedDependencyDto>>> GetWorkItemDependencies(string idOrKey, string workItemKey, CancellationToken cancellationToken)
     {
         var key = new WorkItemKey(workItemKey);
@@ -180,7 +180,7 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
 
         
         return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetWorkItemDependencies"))
+            ? BadRequest(result.ToBadRequestObject(HttpContext))
             : result.Value is not null
                 ? Ok(result.Value.OrderBy(w => w.CreatedOn))
                 : NotFound();
@@ -190,7 +190,7 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
     [OpenApiOperation("Get metrics for a work item.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<WorkItemProgressDailyRollupDto>>> GetMetrics(string idOrKey, string workItemKey, CancellationToken cancellationToken)
     {
         // TODO: allow work item key or id
@@ -206,30 +206,28 @@ public class WorkspacesController(ILogger<WorkspacesController> logger, ISender 
         }
         else
         {
-            return BadRequest(ErrorResult.CreateUnknownIdOrKeyTypeBadRequest("WorkspacesController.GetMetrics"));
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
         }
 
         var result = await _sender.Send(query, cancellationToken);
 
-        return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.GetMetrics"))
-            : Ok(result.Value);
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
-
-
 
     [HttpGet("work-items/search")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
     [OpenApiOperation("Search for a work item using its key or title.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<WorkItemListDto>>> SearchWorkItems(string query, CancellationToken cancellationToken, int top = 50)
     {
         var result = await _sender.Send(new SearchWorkItemsQuery(query, top), cancellationToken);
 
-        return result.IsFailure
-            ? BadRequest(ErrorResult.CreateBadRequest(result.Error, "WorkspacesController.SearchWorkItems"))
-            : Ok(result.Value.OrderByKey(true));
+        return result.IsSuccess
+            ? Ok(result.Value.OrderByKey(true))
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     #endregion Work Items

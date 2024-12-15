@@ -82,7 +82,7 @@ const InitWorkspaceIntegrationForm = (
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          `Failed to initialize workspace. Error: ${error.supportMessage}`,
+          `Failed to initialize workspace. Error: ${error.detail}`,
         )
         console.error(error)
       }

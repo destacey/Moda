@@ -96,7 +96,7 @@ const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          error.supportMessage ??
+          error.detail ??
             'An unexpected error occurred while updating the team membership.',
         )
         console.error(error)

@@ -1,4 +1,5 @@
-﻿using Moda.Web.Api.Models.Work.WorkStatuses;
+﻿using Moda.Web.Api.Extensions;
+using Moda.Web.Api.Models.Work.WorkStatuses;
 using Moda.Work.Application.WorkStatuses.Dtos;
 using Moda.Work.Application.WorkStatuses.Queries;
 
@@ -22,7 +23,7 @@ public class WorkStatusesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkStatuses)]
     [OpenApiOperation("Get a list of all work statuss.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<WorkStatusDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var workStatuses = await _sender.Send(new GetWorkStatusesQuery(includeInactive), cancellationToken);
@@ -33,8 +34,8 @@ public class WorkStatusesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkStatuses)]
     [OpenApiOperation("Get work status details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WorkStatusDto>> GetById(int id)
     {
         var workStatus = await _sender.Send(new GetWorkStatusQuery(id));
@@ -54,25 +55,25 @@ public class WorkStatusesController : ControllerBase
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
-            : BadRequest(result.Error);
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkStatuses)]
     [OpenApiOperation("Update a work status.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(int id, UpdateWorkStatusRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateWorkStatusCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(result.Error);
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     //[HttpDelete("{id}")]

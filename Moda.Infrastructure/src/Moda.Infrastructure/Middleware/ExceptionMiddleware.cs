@@ -1,23 +1,17 @@
-using System.Net;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Serilog.Context;
+using Serilog.Events;
 
 namespace Moda.Infrastructure.Middleware;
 
-internal class ExceptionMiddleware : IMiddleware
+public sealed class ExceptionMiddleware(IProblemDetailsService problemDetailsService, ICurrentUser currentUser) : IMiddleware
 {
-    private readonly ICurrentUser _currentUser;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ISerializerService _jsonSerializer;
-
-    public ExceptionMiddleware(ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, ISerializerService jsonSerializer)
-    {
-        _currentUser = currentUser;
-        _dateTimeProvider = dateTimeProvider;
-        _jsonSerializer = jsonSerializer;
-    }
+    private readonly IProblemDetailsService _problemDetailsService = problemDetailsService;
+    private readonly ICurrentUser _currentUser = currentUser;
 
     public async Task InvokeAsync(HttpContext httpContext, RequestDelegate next)
     {
@@ -25,62 +19,18 @@ internal class ExceptionMiddleware : IMiddleware
         {
             await next(httpContext);
         }
-        catch (ValidationException ex)
-        {
-            string errorId = Guid.NewGuid().ToString();
-
-            using (LogContext.PushProperty("CorrelationId", httpContext.TraceIdentifier))
-            using (LogContext.PushProperty("RequestTimestampUtc", _dateTimeProvider.Now))
-            using (LogContext.PushProperty("UserEmail", _currentUser.GetUserEmail() is string userEmail ? userEmail : "Anonymous"))
-            using (LogContext.PushProperty("UserId", _currentUser.GetUserId()))
-            using (LogContext.PushProperty("ErrorId", errorId))
-            using (LogContext.PushProperty("ExceptionMessage", ex.Message))
-            {
-                var problemDetails = new ValidationProblemDetails(ex.Errors)
-                {
-                    Type = "https://developer.mozilla.org/en-US/docs/web/http/status/422",
-                    Title = "One or more validation errors occurred.",
-                    Status = StatusCodes.Status422UnprocessableEntity,
-                    Detail = "See the errors property for details.",
-                    Instance = httpContext.Request.Path
-                };
-
-                var response = httpContext.Response;
-                response.ContentType = "application/problem+json";
-                response.StatusCode = StatusCodes.Status422UnprocessableEntity;
-
-                var problemDetailsJson = _jsonSerializer.Serialize(problemDetails);
-                using (LogContext.PushProperty("ProblemDetails", problemDetailsJson))
-                {
-                    Log.Information("Request failed with status code {StatusCode}", response.StatusCode);
-                    await response.WriteAsync(problemDetailsJson);
-                }
-            }
-        }
         catch (Exception ex)
-        {
-            string errorId = Guid.NewGuid().ToString();
-
+        {            
             using (LogContext.PushProperty("CorrelationId", httpContext.TraceIdentifier))
-            using (LogContext.PushProperty("RequestTimestampUtc", _dateTimeProvider.Now))
             using (LogContext.PushProperty("UserEmail", _currentUser.GetUserEmail() is string userEmail ? userEmail : "Anonymous"))
             using (LogContext.PushProperty("UserId", _currentUser.GetUserId()))
-            using (LogContext.PushProperty("ErrorId", errorId))
             using (LogContext.PushProperty("ExceptionMessage", ex.Message))
-            using (LogContext.PushProperty("StackTrace", ex.StackTrace))
+            using (LogContext.PushProperty("SourceContext", $"{typeof(ExceptionMiddleware).FullName}"))
             {
-                var errorResult = new ErrorResult
-                {
-                    Source = ex.TargetSite?.DeclaringType?.FullName,
-                    Exception = ex.Message.Trim(),
-                    ErrorId = errorId,
-                    SupportMessage = "exceptionmiddleware.supportmessage"
-                };
 
-                errorResult.Messages!.Add(ex.Message);
+                httpContext.Response.ContentType = "application/problem+json";
+                httpContext.Response.StatusCode = GetStatusCodeFromException(ex);
 
-                var response = httpContext.Response;
-                response.ContentType = "application/json";
                 if (ex is not CustomException && ex.InnerException is not null)
                 {
                     while (ex.InnerException != null)
@@ -89,28 +39,82 @@ internal class ExceptionMiddleware : IMiddleware
                     }
                 }
 
-                switch (ex)
+                var logLevel = GetLogLevelFromException(ex);
+                Log.Write(logLevel, ex, "An unhandled exception has occurred while executing the request.");
+
+                if (ex is ValidationException validationException)
                 {
-                    case CustomException e:
-                        response.StatusCode = errorResult.StatusCode = (int)e.StatusCode;
-                        if (e.ErrorMessages is not null)
-                        {
-                            errorResult.Messages = e.ErrorMessages;
-                        }
-                        break;
+                    var validationProblemDetails = CreateValidationProblemDetails(validationException, httpContext);
 
-                    case KeyNotFoundException:
-                        response.StatusCode = errorResult.StatusCode = (int)HttpStatusCode.NotFound;
-                        break;
+                    var json = System.Text.Json.JsonSerializer.Serialize(validationProblemDetails);
+                    await httpContext.Response.WriteAsync(json);
 
-                    default:
-                        response.StatusCode = errorResult.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        break;
+                    return;
                 }
 
-                Log.Error("Request failed with Status Code {StatusCode}", response.StatusCode);
-                await response.WriteAsync(_jsonSerializer.Serialize(errorResult));
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "An error occurred while processing your request.",
+                    Detail = ex.Message
+                };
+
+                await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+                {
+                    HttpContext = httpContext,
+                    Exception = ex,
+                    ProblemDetails = problemDetails
+                });
             }
         }
+    }
+
+    public static int GetStatusCodeFromException(Exception exception)
+    {
+        return exception switch
+        {
+            ApplicationException => StatusCodes.Status400BadRequest,
+            UnauthorizedException => StatusCodes.Status401Unauthorized,
+            ForbiddenException => StatusCodes.Status403Forbidden,
+            NotFoundException => StatusCodes.Status404NotFound,
+            ConflictException => StatusCodes.Status409Conflict,
+            ValidationException => StatusCodes.Status422UnprocessableEntity,
+            _ => StatusCodes.Status418ImATeapot
+        };
+    }
+    public static LogEventLevel GetLogLevelFromException(Exception exception)
+    {
+        return exception switch
+        {
+            ApplicationException => LogEventLevel.Error,
+            UnauthorizedException => LogEventLevel.Warning,
+            ForbiddenException => LogEventLevel.Warning,
+            NotFoundException => LogEventLevel.Information,
+            ConflictException => LogEventLevel.Warning,
+            ValidationException => LogEventLevel.Information,
+            _ => LogEventLevel.Error
+        };
+    }
+
+    private static ValidationProblemDetails CreateValidationProblemDetails(ValidationException exception, HttpContext httpContext)
+    {
+        return EnrichValidationProblemDetails(new ValidationProblemDetails(exception.Errors), httpContext);
+    }
+
+    public static ValidationProblemDetails EnrichValidationProblemDetails(ValidationProblemDetails validationProblemDetails, HttpContext httpContext)
+    {
+        Activity? activity = httpContext.Features.Get<IHttpActivityFeature>()?.Activity;
+
+        validationProblemDetails.Type = "https://tools.ietf.org/html/rfc4918#section-11.2";
+        validationProblemDetails.Title = "One or more validation errors occurred.";
+        validationProblemDetails.Status = StatusCodes.Status422UnprocessableEntity;
+        validationProblemDetails.Detail = "See the errors property for details.";
+        validationProblemDetails.Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}";
+        validationProblemDetails.Extensions = new Dictionary<string, object?>
+        {
+            ["requestId"] = httpContext.TraceIdentifier,
+            ["traceId"] = activity?.Id
+        };
+
+        return validationProblemDetails;
     }
 }

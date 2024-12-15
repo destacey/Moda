@@ -58,7 +58,7 @@ const CreateRecurringJobForm = (props: CreateRecurringJobFormProps) => {
       } else {
         console.error('Mutation error:', mutationError)
         messageApi.error(
-          error.supportMessage ??
+          error.detail ??
             'An unexpected error occurred while creating a recurring job.',
         )
         console.error(error)

@@ -10,7 +10,6 @@ public static class ModaApiConventions
 {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Search(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -21,7 +20,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Get()
     {
@@ -29,7 +27,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Get(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -40,7 +37,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Get(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -54,7 +50,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Post(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -65,7 +60,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Post(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -79,7 +73,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Register(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -90,7 +83,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Toggle(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -101,7 +93,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Create(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -112,7 +103,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void CreateReturn201Int(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -123,7 +113,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void CreateReturn201Guid(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -134,7 +123,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(typeof(ObjectIdAndKey), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void CreateReturn201IdAndKey(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -145,7 +133,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void CreateReturn201String(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -156,7 +143,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Update(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -167,7 +153,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Update(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -181,7 +166,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Update(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -198,7 +182,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Put(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -212,7 +195,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Put(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -229,7 +211,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Delete(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -240,7 +221,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Delete(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -254,7 +234,6 @@ public static class ModaApiConventions
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Generate(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]

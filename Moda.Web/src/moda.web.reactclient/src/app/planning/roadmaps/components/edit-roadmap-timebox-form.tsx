@@ -126,7 +126,7 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
         props.messageApi.error('Correct the validation error(s) to continue.')
       } else {
         props.messageApi.error(
-          error.supportMessage ??
+          error.detail ??
             'An error occurred while updating the roadmap timebox. Please try again.',
         )
       }

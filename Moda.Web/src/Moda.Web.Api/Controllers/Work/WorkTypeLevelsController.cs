@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Planning.Application.PlanningIntervals.Commands;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Planning.PlanningIntervals;
 using Moda.Web.Api.Models.Work.WorkTypeLevels;
 using Moda.Work.Application.WorkTypeLevels.Commands;
@@ -26,7 +27,7 @@ public class WorkTypeLevelsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkTypeLevels)]
     [OpenApiOperation("Get a list of all work type levels.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<WorkTypeLevelDto>>> GetList(CancellationToken cancellationToken)
     {
         var levels = await _sender.Send(new GetWorkTypeLevelsQuery(), cancellationToken);
@@ -38,8 +39,8 @@ public class WorkTypeLevelsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkTypeLevels)]
     [OpenApiOperation("Get work type level details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WorkTypeLevelDto>> GetById(int id)
     {
         var backlogLevel = await _sender.Send(new GetWorkTypeLevelQuery(id));
@@ -57,45 +58,27 @@ public class WorkTypeLevelsController : ControllerBase
     {
         var result = await _sender.Send(request.ToCreateWorkTypeLevelCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "WorkTypeLevelsController.Create"
-            };
-            return BadRequest(error);
-        }
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkTypeLevels)]
     [OpenApiOperation("Update a work type level.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(int id, UpdateWorkTypeLevelRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateWorkTypeLevelCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "WorkTypeLevelsController.Update"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
 
@@ -103,24 +86,15 @@ public class WorkTypeLevelsController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkTypeLevels)]
     [OpenApiOperation("Update the order of portfolio tier work type levels.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> UpdateOrder([FromBody] UpdateWorkTypeLevelsOrderRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new UpdateWorkTypeLevelsOrderCommand(request.Levels), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "WorkTypeLevelsController.UpdateOrder"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     //[HttpDelete("{id}")]

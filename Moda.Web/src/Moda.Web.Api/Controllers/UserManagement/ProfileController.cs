@@ -23,7 +23,7 @@ public class ProfileController : ControllerBase
     [HttpGet]
     [OpenApiOperation("Get profile details of currently logged in user.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<UserDetailsDto>> Get(CancellationToken cancellationToken)
     {
         return User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId)
@@ -34,7 +34,7 @@ public class ProfileController : ControllerBase
     [HttpPut]
     [OpenApiOperation("Update profile details of currently logged in user.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(UpdateProfileRequest request)
     {
@@ -48,7 +48,7 @@ public class ProfileController : ControllerBase
     [HttpGet("permissions")]
     [OpenApiOperation("Get permissions of currently logged in user.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<List<string>>> GetPermissions(CancellationToken cancellationToken)
     {
         return User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId)
@@ -59,7 +59,7 @@ public class ProfileController : ControllerBase
     [HttpGet("internal-employee-id")]
     [OpenApiOperation("Get internal employee id of currently logged in user.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public Task<ActionResult<string>> GetInternalEmployeeId()
     {
         // TODO: move this to a claim
@@ -69,7 +69,7 @@ public class ProfileController : ControllerBase
     [HttpGet("logs")]
     [OpenApiOperation("Get audit logs of currently logged in user.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public Task<List<AuditDto>> GetLogs(CancellationToken cancellationToken)
     {
         return _sender.Send(new GetMyAuditLogsQuery(), cancellationToken);

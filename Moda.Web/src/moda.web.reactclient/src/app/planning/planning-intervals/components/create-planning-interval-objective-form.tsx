@@ -122,7 +122,7 @@ const CreatePlanningIntervalObjectiveForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          error.supportMessage ??
+          error.detail ??
             'An unexpected error occurred while creating the planning interval.',
         )
         console.error(error)

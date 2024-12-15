@@ -1,4 +1,5 @@
-﻿using Moda.Web.Api.Models.Work.WorkTypes;
+﻿using Moda.Web.Api.Extensions;
+using Moda.Web.Api.Models.Work.WorkTypes;
 using Moda.Work.Application.WorkTypes.Dtos;
 using Moda.Work.Application.WorkTypes.Queries;
 
@@ -22,7 +23,7 @@ public class WorkTypesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkTypes)]
     [OpenApiOperation("Get a list of all work types.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<WorkTypeDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var workTypes = await _sender.Send(new GetWorkTypesQuery(includeInactive), cancellationToken);
@@ -33,8 +34,8 @@ public class WorkTypesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkTypes)]
     [OpenApiOperation("Get work type details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WorkTypeDto>> GetById(int id, CancellationToken cancellationToken)
     {
         var workType = await _sender.Send(new GetWorkTypeQuery(id), cancellationToken);
@@ -52,46 +53,27 @@ public class WorkTypesController : ControllerBase
     {
         var result = await _sender.Send(request.ToCreateWorkTypeCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "WorkTypesController.Create"
-            };
-            return BadRequest(error);
-        }
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
-
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.WorkTypes)]
     [OpenApiOperation("Update a work type.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(int id, UpdateWorkTypeRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateWorkTypeCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "WorkTypesController.Update"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     //[HttpDelete("{id}")]

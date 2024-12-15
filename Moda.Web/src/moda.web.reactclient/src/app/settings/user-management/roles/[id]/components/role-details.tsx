@@ -40,8 +40,8 @@ const RoleDetails = (props: RolesDetailProps) => {
         router.push('/settings/user-management/roles')
       }, 1500)
     } catch (error) {
-      if (error.statusCode === 409 && error.supportMessage) {
-        messageApi.error(error.supportMessage)
+      if (error.statusCode === 409 && error.detail) {
+        messageApi.error(error.detail)
       } else {
         messageApi.error(error?.messages?.join() ?? 'Failed to delete role')
       }

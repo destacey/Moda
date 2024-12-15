@@ -3,6 +3,8 @@ using Moda.Common.Application.Interfaces;
 using Moda.Planning.Application.Risks.Commands;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
+using Moda.Planning.Domain.Models.Roadmaps;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Planning.Risks;
 
 namespace Moda.Web.Api.Controllers.Planning;
@@ -26,8 +28,7 @@ public class RisksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get a list of risks.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetList(CancellationToken cancellationToken, bool includeClosed = false)
     {
         var risks = await _sender.Send(new GetRisksQuery(includeClosed), cancellationToken);
@@ -38,8 +39,7 @@ public class RisksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get risk details by Id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RiskDetailsDto>> GetRisk(string idOrKey, CancellationToken cancellationToken)
     {
         var risk = await _sender.Send(new GetRiskQuery(idOrKey), cancellationToken);
@@ -53,8 +53,7 @@ public class RisksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get a list of open risks assigned to me.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesDefaultResponseType(typeof(ErrorResult))]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<RiskListDto>>> GetMyRisks(CancellationToken cancellationToken)
     {
         var risks = await _sender.Send(new GetMyRisksQuery(), cancellationToken);
@@ -65,59 +64,41 @@ public class RisksController : ControllerBase
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Risks)]
     [OpenApiOperation("Create a risk.", "")]
     [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> CreateRisk([FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreateRiskCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "RisksController.Create"
-            };
-            return BadRequest(error);
-        }
-
-        return CreatedAtAction(nameof(GetRisk), new { idOrKey = result.Value.Id.ToString() }, result.Value);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetRisk), new { idOrKey = result.Value.Id.ToString() }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Risks)]
     [OpenApiOperation("Update a risk.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdateRiskRequest request, CancellationToken cancellationToken)
     {
         if (id != request.RiskId)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.RiskId), HttpContext));
 
         var result = await _sender.Send(request.ToUpdateRiskCommand(), cancellationToken);
 
-        if (result.IsFailure)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = result.Error,
-                Source = "RisksController.Update"
-            };
-            return BadRequest(error);
-        }
-
-        return NoContent();
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPost("import")]
     [MustHavePermission(ApplicationAction.Import, ApplicationResource.Risks)]
     [OpenApiOperation("Import risks from a csv file.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Import([FromForm] IFormFile file, CancellationToken cancellationToken)
     {
@@ -125,7 +106,7 @@ public class RisksController : ControllerBase
         {
             var importedRisks = _csvService.ReadCsv<ImportRiskRequest>(file.OpenReadStream());
 
-            List<ImportRiskDto> risks = new();
+            List<ImportRiskDto> risks = [];
             var validator = new ImportRiskRequestValidator(_dateTimeProvider);
             foreach (var risk in importedRisks)
             {
@@ -148,34 +129,19 @@ public class RisksController : ControllerBase
                 }
             }
 
-            if (!risks.Any())
-                return BadRequest("No risks imported.");
+            if (risks.Count == 0)
+                return BadRequest(ProblemDetailsExtensions.ForBadRequest("No risks imported.", HttpContext));
 
             var result = await _sender.Send(new ImportRisksCommand(risks), cancellationToken);
 
-            if (result.IsFailure)
-            {
-                var error = new ErrorResult
-                {
-                    StatusCode = 400,
-                    SupportMessage = result.Error,
-                    Source = "RisksController.Import"
-                };
-                return BadRequest(error);
-            }
-
-            return NoContent();
+            return result.IsSuccess
+                ? NoContent()
+                : BadRequest(result.ToBadRequestObject(HttpContext));
         }
         catch (CsvHelperException ex)
         {
             // TODO: Convert this to a validation problem details
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = ex.ToString(),
-                Source = "RisksController.Import"
-            };
-            return BadRequest(error);
+            return BadRequest(ProblemDetailsExtensions.ForBadRequest(ex.ToString(), HttpContext));
         }
     }
 
@@ -183,7 +149,7 @@ public class RisksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get a list of all risk statuses.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<RiskStatusDto>>> GetStatuses(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetRiskStatusesQuery(), cancellationToken);
@@ -194,7 +160,7 @@ public class RisksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get a list of all risk categories.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<RiskCategoryDto>>> GetCategories(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetRiskCategoriesQuery(), cancellationToken);
@@ -205,7 +171,7 @@ public class RisksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get a list of all risk grades.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<RiskGradeDto>>> GetGrades(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetRiskGradesQuery(), cancellationToken);

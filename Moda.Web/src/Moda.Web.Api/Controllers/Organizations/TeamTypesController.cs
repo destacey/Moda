@@ -19,7 +19,7 @@ public class TeamTypesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkTypeTiers)]
     [OpenApiOperation("Get a list of all team types.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<TeamTypeDto>>> GetList(CancellationToken cancellationToken)
     {
         var categories = await _sender.Send(new GetTeamTypesQuery(), cancellationToken);

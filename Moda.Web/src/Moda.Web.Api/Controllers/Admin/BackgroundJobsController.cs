@@ -2,6 +2,7 @@
 using Hangfire;
 using Moda.Common.Application.BackgroundJobs;
 using Moda.Common.Application.Enums;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Interfaces;
 using Moda.Web.Api.Models.Admin;
 
@@ -27,7 +28,7 @@ public class BackgroundJobsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BackgroundJobs)]
     [OpenApiOperation("Get a list of all job types.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<BackgroundJobTypeDto>>> GetJobTypes(CancellationToken cancellationToken)
     {
         // TODO how do we determine what is active rather than returning all types
@@ -39,7 +40,7 @@ public class BackgroundJobsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.BackgroundJobs)]
     [OpenApiOperation("Get a list of running jobs.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public ActionResult<IReadOnlyList<BackgroundJobDto>> GetRunningJobs()
     {
         var jobs = _jobService.GetRunningJobs();
@@ -50,7 +51,7 @@ public class BackgroundJobsController : ControllerBase
     [MustHavePermission(ApplicationAction.Run, ApplicationResource.BackgroundJobs)]
     [OpenApiOperation("Run a background job.", "")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public IActionResult Run(int jobTypeId, [FromServices] IJobManager jobManager, CancellationToken cancellationToken)
     {
         var jobType = (BackgroundJobType)jobTypeId;
@@ -72,7 +73,7 @@ public class BackgroundJobsController : ControllerBase
                 break;
             default:
                 _logger.LogWarning("Unknown job type {jobType} requested", jobType);
-                return BadRequest();
+                return BadRequest(ProblemDetailsExtensions.ForBadRequest($"Unknown job type {jobType} requested.", HttpContext));
         }
         return Accepted();
     }
@@ -81,7 +82,7 @@ public class BackgroundJobsController : ControllerBase
     [MustHavePermission(ApplicationAction.Run, ApplicationResource.BackgroundJobs)]
     [OpenApiOperation("Create a recurring background job.", "")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public IActionResult Create([FromBody] CreateRecurringJobRequest request, [FromServices] IJobManager jobManager, CancellationToken cancellationToken)
     {
         _jobService.AddOrUpdate(request.JobId, GetMethodCall((BackgroundJobType)request.JobTypeId), () => request.CronExpression);

@@ -47,7 +47,7 @@ const InitWorkProcessIntegrationForm = (
       return true
     } catch (error) {
       messageApi.error(
-        `Failed to initialize work process. Error: ${error.supportMessage}`,
+        `Failed to initialize work process. Error: ${error.detail}`,
       )
       console.error(error)
       // }

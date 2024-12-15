@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
 using Microsoft.ApplicationInsights.Extensibility.Implementation;
+using Microsoft.AspNetCore.Http.Features;
 using Moda.AppIntegration.Application;
 using Moda.Common.Application;
 using Moda.Common.Application.Interfaces;
@@ -9,6 +11,7 @@ using Moda.Goals.Application;
 using Moda.Health;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
+using Moda.Infrastructure.Middleware;
 using Moda.Links;
 using Moda.Organization.Application;
 using Moda.Planning.Application;
@@ -16,6 +19,7 @@ using Moda.Web.Api.Configurations;
 using Moda.Web.Api.Interfaces;
 using Moda.Web.Api.Services;
 using Moda.Work.Application;
+using Namotion.Reflection;
 using NodaTime.Serialization.SystemTextJson;
 using Serilog;
 
@@ -33,6 +37,7 @@ try
         config.ReadFrom.Configuration(context.Configuration);
         config.Enrich.WithProperty("version", Environment.GetEnvironmentVariable("version") ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "none-supplied");
     });
+
     if (builder.Environment.IsDevelopment())
     {
         Serilog.Debugging.SelfLog.Enable(Console.Error);
@@ -50,14 +55,7 @@ try
     {
         options.InvalidModelStateResponseFactory = context =>
         {
-            var problemDetails = new ValidationProblemDetails(context.ModelState)
-            {
-                Type = "https://developer.mozilla.org/en-US/docs/web/http/status/422",
-                Title = "One or more validation errors occurred.",
-                Status = StatusCodes.Status422UnprocessableEntity,
-                Detail = "See the errors property for details.",
-                Instance = context.HttpContext.Request.Path
-            };
+            var problemDetails = ExceptionMiddleware.EnrichValidationProblemDetails(new ValidationProblemDetails(context.ModelState), context.HttpContext);
 
             return new UnprocessableEntityObjectResult(problemDetails)
             {

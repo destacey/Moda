@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Employees.Commands;
 using Moda.Common.Application.Employees.Dtos;
 using Moda.Common.Application.Employees.Queries;
+using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Organizations.Employees;
 
 namespace Moda.Web.Api.Controllers.Organizations;
@@ -23,7 +24,7 @@ public class EmployeesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
     [OpenApiOperation("Get a list of all employees.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<EmployeeListDto>>> GetList(CancellationToken cancellationToken, bool includeInactive = false)
     {
         var employees = await _sender.Send(new GetEmployeesQuery(includeInactive), cancellationToken);
@@ -34,7 +35,7 @@ public class EmployeesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
     [OpenApiOperation("Get employee details using the key.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<EmployeeDetailsDto>> GetById(int id)
     {
         var employee = await _sender.Send(new GetEmployeeQuery(id));
@@ -54,24 +55,24 @@ public class EmployeesController : ControllerBase
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value)
-            : BadRequest(result.Error);
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Employees)]
     [OpenApiOperation("Update an employee.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Update(Guid id, UpdateEmployeeRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
-            return BadRequest();
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateEmployeeCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(result.Error);
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     //[HttpDelete("{id}")]
@@ -86,7 +87,7 @@ public class EmployeesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
     [OpenApiOperation("Get a list of direct reports for an employee.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<EmployeeListDto>>> GetDirectReports(Guid id, CancellationToken cancellationToken)
     {
         var directReports = await _sender.Send(new GetDirectReportsQuery(id), cancellationToken);
@@ -98,13 +99,13 @@ public class EmployeesController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Employees)]
     [OpenApiOperation("Remove invalid employee record from employee list.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> RemoveInvalid(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new RemoveInvalidEmployeeCommand(id), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(result.Error);
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 }

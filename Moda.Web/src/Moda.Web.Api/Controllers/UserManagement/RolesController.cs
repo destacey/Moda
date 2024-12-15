@@ -1,4 +1,5 @@
 using Moda.Common.Application.Exceptions;
+using Moda.Web.Api.Extensions;
 
 namespace Moda.Web.Api.Controllers.UserManagement;
 
@@ -20,7 +21,7 @@ public class RolesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Roles)]
     [OpenApiOperation("Get a list of all roles.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<RoleListDto>>> GetList(CancellationToken cancellationToken)
     {
         var roles = await _roleService.GetList(cancellationToken);
@@ -32,8 +33,8 @@ public class RolesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Roles)]
     [OpenApiOperation("Get role details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RoleDto>> GetById(string id, CancellationToken cancellationToken)
     {
         var role = await _roleService.GetById(id, cancellationToken);
@@ -47,8 +48,8 @@ public class RolesController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.RoleClaims)]
     [OpenApiOperation("Get role details with its permissions.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RoleDto>> GetByIdWithPermissions(string id, CancellationToken cancellationToken)
     {
         var role = await _roleService.GetByIdWithPermissions(id, cancellationToken);
@@ -62,25 +63,17 @@ public class RolesController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.RoleClaims)]
     [OpenApiOperation("Update a role's permissions.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> UpdatePermissions(string id, UpdateRolePermissionsRequest request, CancellationToken cancellationToken)
     {
         if (id != request.RoleId)
-        {
-            var error = new ErrorResult
-            {
-                StatusCode = 400,
-                SupportMessage = "The role id on the route and within the request do not match.",
-                Source = "RolesController.UpdatePermissions"
-            };
-            return BadRequest(error);
-        }
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.RoleId), HttpContext));
 
         var result = await _roleService.UpdatePermissions(request.ToUpdateRolePermissionsCommand(), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
-            : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RolesController.UpdatePermissions"));
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPost]
@@ -98,8 +91,8 @@ public class RolesController : ControllerBase
     [MustHavePermission(ApplicationAction.Delete, ApplicationResource.Roles)]
     [OpenApiOperation("Delete a role.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResult), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<ActionResult> Delete(string id)
     {
         try
@@ -109,13 +102,7 @@ public class RolesController : ControllerBase
         catch (ConflictException ex)
         {
             _logger.LogError(ex, "Error deleting role with id {id}", id);
-            var error = new ErrorResult
-            {
-                StatusCode = 409,
-                SupportMessage = ex.Message,
-                Source = "RolesController.Delete"
-            };
-            return BadRequest(error);
+            return BadRequest(ProblemDetailsExtensions.ForBadRequest(ex.Message, HttpContext));
         }
 
         return NoContent();
