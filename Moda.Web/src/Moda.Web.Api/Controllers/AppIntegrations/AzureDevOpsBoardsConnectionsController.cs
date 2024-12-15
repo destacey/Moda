@@ -39,7 +39,7 @@ public class AzureDevOpsBoardsConnectionsController : ControllerBase
     [OpenApiOperation("Get Azure DevOps Boards connection based on id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AzureDevOpsBoardsConnectionDetailsDto>> GetById(Guid id, CancellationToken cancellationToken)
     {
         var connection = await _sender.Send(new GetAzureDevOpsBoardsConnectionQuery(id), cancellationToken);

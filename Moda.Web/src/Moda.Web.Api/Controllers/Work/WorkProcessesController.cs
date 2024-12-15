@@ -29,7 +29,7 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkProcesses)]
     [OpenApiOperation("Get work process details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<WorkProcessDto>> Get(string idOrKey, CancellationToken cancellationToken)
     {
@@ -89,7 +89,7 @@ public class WorkProcessesController(ILogger<WorkProcessesController> logger, IS
     [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkProcesses)]
     [OpenApiOperation("Get work process schemes.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyList<WorkProcessSchemeDto>>> GetSchemes(Guid id, CancellationToken cancellationToken)
     {

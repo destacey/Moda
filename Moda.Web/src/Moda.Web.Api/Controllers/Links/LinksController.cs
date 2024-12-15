@@ -35,7 +35,7 @@ public class LinksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Links)]
     [OpenApiOperation("Get a link by id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<LinkDto>> GetById(Guid id, CancellationToken cancellationToken)
     {
         var link = await _sender.Send(new GetLinkQuery(id), cancellationToken);

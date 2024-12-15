@@ -99,7 +99,7 @@ public class EmployeesController : ControllerBase
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Employees)]
     [OpenApiOperation("Remove invalid employee record from employee list.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> RemoveInvalid(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new RemoveInvalidEmployeeCommand(id), cancellationToken);

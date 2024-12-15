@@ -39,7 +39,7 @@ public class RisksController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
     [OpenApiOperation("Get risk details by Id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RiskDetailsDto>> GetRisk(string idOrKey, CancellationToken cancellationToken)
     {
         var risk = await _sender.Send(new GetRiskQuery(idOrKey), cancellationToken);
@@ -65,7 +65,7 @@ public class RisksController : ControllerBase
     [OpenApiOperation("Create a risk.", "")]
     [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> CreateRisk([FromBody] CreateRiskRequest request, CancellationToken cancellationToken)
     {

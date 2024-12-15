@@ -35,7 +35,7 @@ public class WorkTypesController : ControllerBase
     [OpenApiOperation("Get work type details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WorkTypeDto>> GetById(int id, CancellationToken cancellationToken)
     {
         var workType = await _sender.Send(new GetWorkTypeQuery(id), cancellationToken);

@@ -34,7 +34,7 @@ public class RolesController : ControllerBase
     [OpenApiOperation("Get role details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RoleDto>> GetById(string id, CancellationToken cancellationToken)
     {
         var role = await _roleService.GetById(id, cancellationToken);
@@ -49,7 +49,7 @@ public class RolesController : ControllerBase
     [OpenApiOperation("Get role details with its permissions.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RoleDto>> GetByIdWithPermissions(string id, CancellationToken cancellationToken)
     {
         var role = await _roleService.GetByIdWithPermissions(id, cancellationToken);

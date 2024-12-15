@@ -30,7 +30,7 @@ public class UsersController : ControllerBase
     [OpenApiOperation("Get a user's details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserDetailsDto>> GetById(string id, CancellationToken cancellationToken)
     {
         var user = await _userService.GetAsync(id, cancellationToken);

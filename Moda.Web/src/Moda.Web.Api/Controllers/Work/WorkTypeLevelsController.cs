@@ -40,7 +40,7 @@ public class WorkTypeLevelsController : ControllerBase
     [OpenApiOperation("Get work type level details using the id.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WorkTypeLevelDto>> GetById(int id)
     {
         var backlogLevel = await _sender.Send(new GetWorkTypeLevelQuery(id));

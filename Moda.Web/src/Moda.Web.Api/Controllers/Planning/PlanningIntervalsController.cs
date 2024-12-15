@@ -53,7 +53,7 @@ public class PlanningIntervalsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Get planning interval details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PlanningIntervalDetailsDto>> GetPlanningInterval(string idOrKey, CancellationToken cancellationToken)
     {
         var planningInterval = await _sender.Send(new GetPlanningIntervalQuery(idOrKey), cancellationToken);
@@ -67,7 +67,7 @@ public class PlanningIntervalsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Get the PI calendar.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PlanningIntervalCalendarDto>> GetCalendar(string idOrKey, CancellationToken cancellationToken)
     {
@@ -82,7 +82,7 @@ public class PlanningIntervalsController : ControllerBase
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Get the PI predictability for all teams.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PlanningIntervalPredictabilityDto>> GetPredictability(Guid id, CancellationToken cancellationToken)
     {
@@ -238,7 +238,7 @@ public class PlanningIntervalsController : ControllerBase
     [OpenApiOperation("Get a planning interval objective.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PlanningIntervalObjectiveDetailsDto>> GetObjectiveById(Guid id, Guid objectiveId, CancellationToken cancellationToken)
     {
         var objective = await _sender.Send(new GetPlanningIntervalObjectiveQuery(id, objectiveId), cancellationToken);
@@ -253,7 +253,7 @@ public class PlanningIntervalsController : ControllerBase
     [OpenApiOperation("Get a planning interval objective using the PI and Objective keys.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PlanningIntervalObjectiveDetailsDto>> GetObjectiveByKey(int id, int objectiveId, CancellationToken cancellationToken)
     {
         var objective = await _sender.Send(new GetPlanningIntervalObjectiveQuery(id, objectiveId), cancellationToken);
@@ -268,7 +268,7 @@ public class PlanningIntervalsController : ControllerBase
     [OpenApiOperation("Create a planning interval objective.", "")]
     [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> CreateObjective(Guid id, [FromBody] CreatePlanningIntervalObjectiveRequest request, CancellationToken cancellationToken)
     {
@@ -287,7 +287,7 @@ public class PlanningIntervalsController : ControllerBase
     [OpenApiOperation("Update a planning interval objective.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> UpdateObjective(Guid id, Guid objectiveId, [FromBody] UpdatePlanningIntervalObjectiveRequest request, CancellationToken cancellationToken)
     {
@@ -308,7 +308,7 @@ public class PlanningIntervalsController : ControllerBase
     [OpenApiOperation("Update the order of planning interval objectives.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> UpdateObjectivesOrder(Guid id, [FromBody] UpdatePlanningIntervalObjectivesOrderRequest request, CancellationToken cancellationToken)
     {
@@ -366,7 +366,7 @@ public class PlanningIntervalsController : ControllerBase
     [OpenApiOperation("Get work items for an objective.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WorkItemsSummaryDto>> GetObjectiveWorkItems(Guid id, Guid objectiveId, CancellationToken cancellationToken)
     {
         var exists = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(id, objectiveId), cancellationToken);
@@ -389,7 +389,7 @@ public class PlanningIntervalsController : ControllerBase
     [OpenApiOperation("Get metrics for the work items linked to an objective.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<List<WorkItemProgressDailyRollupDto>>> GetObjectiveWorkItemMetrics(Guid id, Guid objectiveId, CancellationToken cancellationToken)
     {
         var exists = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(id, objectiveId), cancellationToken);
@@ -416,7 +416,7 @@ public class PlanningIntervalsController : ControllerBase
     [OpenApiOperation("Manage objective work items.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> ManageObjectiveWorkItems(Guid id, Guid objectiveId, [FromBody] ManagePlanningIntervalObjectiveWorkItemsRequest request, CancellationToken cancellationToken)
     {
