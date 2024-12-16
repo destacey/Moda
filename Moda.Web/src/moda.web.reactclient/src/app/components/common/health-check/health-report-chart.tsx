@@ -2,7 +2,7 @@
 
 import useTheme from '@/src/app/components/contexts/theme'
 import { Spin } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 import dayjs from 'dayjs'
@@ -46,10 +46,9 @@ const HealthReportChart = (props: HealthReportChartProps) => {
     refetch,
   } = useGetHealthReportQuery(props.objectId, { skip: !props.objectId })
 
-  useEffect(() => {
-    if (!healthReportData) return
-
-    const chartData = healthReportData
+  const chartData = useMemo(() => {
+    if (!healthReportData) return []
+    return healthReportData
       .slice()
       .sort((a, b) =>
         dayjs(a.reportedOn).isAfter(dayjs(b.reportedOn)) ? 1 : -1,
@@ -58,89 +57,97 @@ const HealthReportChart = (props: HealthReportChartProps) => {
         x: dayjs(report.reportedOn),
         y: convertStatusToNumber(report.status?.name),
       }))
-    setSeriesData([{ name: 'Health Report', data: chartData }])
   }, [healthReportData])
+
+  useEffect(() => {
+    setSeriesData([{ name: 'Health Report', data: chartData }])
+  }, [chartData])
+
+  const options: ApexOptions = useMemo(
+    () => ({
+      chart: {
+        fontFamily: 'inherit',
+        parentHeightOffset: 0,
+      },
+      title: {
+        text: 'Health Report',
+        style: {
+          fontSize: '14px',
+          fontWeight: 'normal',
+          color: fontColor,
+        },
+      },
+      xaxis: {
+        type: 'datetime',
+        labels: {
+          style: {
+            colors: fontColor,
+          },
+          datetimeUTC: false,
+          datetimeFormatter: {
+            year: 'yyyy',
+            month: "MMM 'yy",
+            day: 'dd MMM',
+            hour: 'HH:mm',
+          },
+        },
+      },
+      yaxis: {
+        min: 0,
+        max: 2,
+        tickAmount: 2,
+        labels: {
+          style: {
+            colors: fontColor,
+          },
+          formatter: (value) => {
+            switch (value) {
+              case 0:
+                return 'Unhealthy'
+              case 1:
+                return 'At Risk'
+              case 2:
+                return 'Healthy'
+              default:
+                return ''
+            }
+          },
+        },
+      },
+      tooltip: {
+        enabled: true,
+        theme: currentThemeName,
+        x: {
+          format: 'MMM dd, yyyy h:mm TT',
+        },
+        y: {
+          title: {
+            formatter: () => 'Health Status:',
+          },
+        },
+      },
+      markers: {
+        size: 5,
+      },
+      stroke: {
+        width: 3,
+      },
+      noData: {
+        text: 'No Health Report Data',
+      },
+    }),
+    [currentThemeName, fontColor],
+  )
 
   if (isLoading || isFetching) {
     return <Spin size="small" />
   }
 
-  const options: ApexOptions = {
-    chart: {
-      fontFamily: 'inherit',
-      parentHeightOffset: 0,
-    },
-    title: {
-      text: 'Health Report',
-      style: {
-        fontSize: '14px',
-        fontWeight: 'normal',
-        color: fontColor,
-      },
-    },
-    xaxis: {
-      type: 'datetime', // removing this changes how the x-axis is displayed
-      labels: {
-        style: {
-          colors: fontColor,
-        },
-        datetimeUTC: false,
-        datetimeFormatter: {
-          year: 'yyyy',
-          month: "MMM 'yy",
-          day: 'dd MMM',
-          hour: 'HH:mm',
-        },
-      },
-    },
-    yaxis: {
-      min: 0,
-      max: 2,
-      tickAmount: 2,
-      labels: {
-        style: {
-          colors: fontColor,
-        },
-        formatter: (value) => {
-          switch (value) {
-            case 0:
-              return 'Unhealthy'
-            case 1:
-              return 'At Risk'
-            case 2:
-              return 'Healthy'
-            default:
-              return ''
-          }
-        },
-      },
-    },
-    tooltip: {
-      enabled: true,
-      theme: currentThemeName,
-      x: {
-        format: 'MMM dd, yyyy h:mm TT',
-      },
-      y: {
-        title: {
-          formatter: () => 'Health Status:',
-        },
-      },
-    },
-    markers: {
-      size: 5,
-    },
-    stroke: {
-      width: 3,
-    },
-    noData: {
-      text: 'No Health Report Data',
-    },
-  }
+  const isClient = typeof window !== 'undefined'
 
   return (
     <div id="object-health-report-chart">
-      {typeof window !== 'undefined' && (
+      {isClient && (
         <Chart
           options={options}
           series={seriesData}
