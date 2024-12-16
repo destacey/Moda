@@ -6,7 +6,7 @@ import {
   CarryOutOutlined,
 } from '@ant-design/icons'
 import { Layout, Menu } from 'antd'
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import useAuth from '../../contexts/auth'
 import {
   Item,
@@ -18,12 +18,21 @@ import {
 import useMenuToggle from '../../contexts/menu-toggle'
 import useTheme from '../../contexts/theme'
 import { ItemType, MenuItemType } from 'antd/es/menu/interface'
+import React from 'react'
 
 const { Sider } = Layout
 
+const menuIcons = {
+  home: <HomeOutlined />,
+  org: <TeamOutlined />,
+  planning: <ScheduleOutlined />,
+  work: <CarryOutOutlined />,
+  settings: <SettingOutlined />,
+}
+
 const menu: (Item | MenuItem)[] = [
-  menuItem('Home', 'home', '/', <HomeOutlined />),
-  menuItem('Organizations', 'org', null, <TeamOutlined />, [
+  menuItem('Home', 'home', '/', menuIcons.home),
+  menuItem('Organizations', 'org', null, menuIcons.org, [
     menuItem('Teams', 'org.teams', '/organizations/teams'),
     menuItem('Employees', 'org.employees', '/organizations/employees'),
     { key: 'org-settings-divider-1', type: 'divider' },
@@ -33,7 +42,7 @@ const menu: (Item | MenuItem)[] = [
       '/organizations/functional-org-chart',
     ),
   ]),
-  menuItem('Planning', 'plan', null, <ScheduleOutlined />, [
+  menuItem('Planning', 'plan', null, menuIcons.planning, [
     restrictedPermissionMenuItem(
       'Permissions.PlanningIntervals.View',
       'Planning Intervals',
@@ -49,7 +58,7 @@ const menu: (Item | MenuItem)[] = [
     // menuItem('Increments', 'plan.increments'),
     // menuItem('Sprints', 'plan.sprints'),
   ]),
-  menuItem('Work Management', 'work', null, <CarryOutOutlined />, [
+  menuItem('Work Management', 'work', null, menuIcons.work, [
     restrictedPermissionMenuItem(
       'Permissions.Workspaces.View',
       'Workspaces',
@@ -73,33 +82,38 @@ const menu: (Item | MenuItem)[] = [
   //     menuItem('Projects', 'ppm.projects'),
   // ]),
   { key: 'settings-divider', type: 'divider' },
-  menuItem('Settings', 'settings', '/settings', <SettingOutlined />),
+  menuItem('Settings', 'settings', '/settings', menuIcons.settings),
 ]
 
-export default function AppMenu() {
+const AppMenu = React.memo(() => {
   const { menuCollapsed } = useMenuToggle()
-  const [menuItems, setMenuItems] = useState<ItemType<MenuItemType>[]>([])
   const { currentThemeName } = useTheme()
   const { hasClaim } = useAuth()
 
-  useEffect(() => {
-    // Reduce the menu items based on the user's claims and transformed into antd menu items using the getItem function
-    setMenuItems(
+  const filteredMenuItems = useMemo(
+    () =>
       menu.reduce(
         (acc, item) => filterAndTransformMenuItem(acc, item, hasClaim),
         [] as ItemType<MenuItemType>[],
       ),
-    )
-  }, [hasClaim])
+    [hasClaim],
+  )
+
+  const menuStyle = useMemo(() => ({ minHeight: '100%' }), [])
+  const siderTheme = useMemo(() => currentThemeName, [currentThemeName])
 
   return (
     <Sider
-      theme={currentThemeName} // without this the menu displays weird faint lines on the left side below the menu items
+      theme={siderTheme}
       width={235}
       collapsedWidth={50}
       collapsed={menuCollapsed}
     >
-      <Menu mode="inline" style={{ minHeight: '100%' }} items={menuItems} />
+      <Menu mode="inline" style={menuStyle} items={filteredMenuItems} />
     </Sider>
   )
-}
+})
+
+AppMenu.displayName = 'AppMenu'
+
+export default AppMenu

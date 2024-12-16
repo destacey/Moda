@@ -3,8 +3,7 @@
 import { WorkItemProgressRollupDto } from '@/src/services/moda-api'
 import { Progress, Tooltip } from 'antd'
 import { round } from 'lodash'
-import React, { useEffect } from 'react'
-import { useState } from 'react'
+import React, { useMemo } from 'react'
 
 export interface WorkProgressProps {
   progress: WorkItemProgressRollupDto
@@ -45,43 +44,42 @@ const calculateProgressPercentages = (
   }
 }
 
-const WorkProgress = (props: WorkProgressProps) => {
-  const [progressSummary, setProgressSummary] =
-    useState<ProgressSummary | null>(null)
+const WorkProgress = React.memo(({ progress }: WorkProgressProps) => {
+  const progressSummary = useMemo(
+    () => (progress ? calculateProgressPercentages(progress) : null),
+    [progress],
+  )
 
-  useEffect(() => {
-    setProgressSummary(
-      props.progress ? calculateProgressPercentages(props.progress) : null,
+  const titleText = useMemo(() => {
+    if (!progressSummary) return null
+    return (
+      <ul style={{ paddingLeft: 20 }}>
+        <li>
+          Proposed: {progressSummary.proposed} (
+          {progressSummary.proposedPercentage}%)
+        </li>
+        <li>
+          Active: {progressSummary.active} ({progressSummary.activePercentage}%)
+        </li>
+        <li>
+          Done: {progressSummary.done} ({progressSummary.donePercentage}%)
+        </li>
+        <li>Total: {progressSummary.total}</li>
+      </ul>
     )
-  }, [props.progress])
+  }, [progressSummary])
 
   if (!progressSummary) return null
 
-  const titleText = (
-    <ul style={{ paddingLeft: 20 }}>
-      <li>
-        Proposed: {progressSummary.proposed} (
-        {progressSummary.proposedPercentage}%)
-      </li>
-      <li>
-        Active: {progressSummary.active} ({progressSummary.activePercentage}%)
-      </li>
-      <li>
-        Done: {progressSummary.done} ({progressSummary.donePercentage}%)
-      </li>
-      <li>Total: {progressSummary.total}</li>
-    </ul>
-  )
-
   return (
     <>
-      {progressSummary && progressSummary.total > 0 && (
+      {progressSummary.total > 0 && (
         <Tooltip title={titleText}>
           <Progress
             percent={
               progressSummary.activePercentage + progressSummary.donePercentage
             }
-            format={() => progressSummary.donePercentage + '% done'}
+            format={() => `${progressSummary.donePercentage}% done`}
             percentPosition={{ align: 'center', type: 'outer' }}
             success={{ percent: progressSummary.donePercentage }}
           />
@@ -89,6 +87,9 @@ const WorkProgress = (props: WorkProgressProps) => {
       )}
     </>
   )
-}
+})
+
+// Set display name for the memoized component
+WorkProgress.displayName = 'WorkProgress'
 
 export default WorkProgress

@@ -6,16 +6,17 @@ import {
 } from '@azure/msal-react'
 import { Avatar, Button, Dropdown, Space, Typography } from 'antd'
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
-import { createElement } from 'react'
 import { useRouter } from 'next/navigation'
 import useAuth from './contexts/auth'
-import ThemeToggle from './common/theme/theme-toggle'
+import useThemeToggleMenuItem from './common/theme/use-theme-toggle-menu-item'
+import { useMemo } from 'react'
 
 const { Text } = Typography
 
-export default function Profile() {
+const Profile = () => {
   const { login, logout, user, isLoading } = useAuth()
   const router = useRouter()
+  const themeToggleMenuItem = useThemeToggleMenuItem()
 
   const handleLogout = () => {
     logout().catch((e) => {
@@ -31,60 +32,47 @@ export default function Profile() {
     }
   }
 
-  function WelcomeUser() {
-    if (isLoading) {
-      return <Text>Loading user info...</Text>
-    }
-    return user.name && user.name.trim() ? (
-      <Text>Welcome, {user.name}</Text>
-    ) : null
+  const menuItems = useMemo(
+    () => [
+      { key: 'profile', label: 'Account', icon: <UserOutlined /> },
+      themeToggleMenuItem,
+      { key: 'logout', label: 'Logout', icon: <LogoutOutlined /> },
+    ],
+    [themeToggleMenuItem],
+  )
+
+  const menuActions: Record<string, () => void> = {
+    profile: () => router.push('/account/profile'),
+    logout: handleLogout,
   }
 
-  const menuItems = [
-    { key: 'profile', label: 'Account', icon: createElement(UserOutlined) },
-    //{ key: 'theme', label: 'Theme', icon: themeIcon },
-    ThemeToggle({}),
-    { key: 'logout', label: 'Logout', icon: createElement(LogoutOutlined) },
-  ]
-
-  const handleMenuItemClicked = (info: any) => {
-    switch (info.key) {
-      case 'profile':
-        router.push('/account/profile')
-        break
-      case 'logout':
-        handleLogout()
-    }
+  const handleMenuItemClicked = (info: { key: string }) => {
+    const action = menuActions[info.key]
+    if (action) action()
   }
 
-  const authTemplate = () => {
-    return (
+  return (
+    <>
       <AuthenticatedTemplate>
         <Space>
-          <WelcomeUser />
+          {isLoading ? (
+            <Text>Loading user info...</Text>
+          ) : (
+            user.name?.trim() && <Text>Welcome, {user.name}</Text>
+          )}
           <Dropdown menu={{ items: menuItems, onClick: handleMenuItemClicked }}>
             <Avatar icon={<UserOutlined />} />
           </Dropdown>
         </Space>
       </AuthenticatedTemplate>
-    )
-  }
-
-  const noAuthTemplate = () => {
-    return (
       <UnauthenticatedTemplate>
         <Space>
           <div>Unauthenticated</div>
           <Button onClick={handleLogin}>Login</Button>
         </Space>
       </UnauthenticatedTemplate>
-    )
-  }
-
-  return (
-    <>
-      {authTemplate()}
-      {noAuthTemplate()}
     </>
   )
 }
+
+export default Profile

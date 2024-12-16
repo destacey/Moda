@@ -13,8 +13,6 @@ export interface WorkItemsDashboardModalProps {
 }
 
 const WorkItemsDashboardModal = (props: WorkItemsDashboardModalProps) => {
-  const [open, setOpen] = useState(props.showDashboard)
-
   const {
     data: workItemsData,
     isLoading,
@@ -30,18 +28,13 @@ const WorkItemsDashboardModal = (props: WorkItemsDashboardModalProps) => {
     }
   }, [isError])
 
-  const handleClose = () => {
-    setOpen(false)
-    props.onModalClose()
-  }
-
   return (
     <>
       <Modal
         title="Work Items Dashboard"
         width={'80vw'}
-        open={open}
-        onCancel={handleClose}
+        open={props.showDashboard}
+        onCancel={props.onModalClose}
         footer={null}
         okText="Close"
         confirmLoading={isLoading}

@@ -5,18 +5,39 @@ export const useLocalStorageState = <T = any>(
   defaultValue: T,
 ): [T, (value: T) => void] => {
   const [value, setValue] = useState<T>(() => {
-    // If window is undefined, we are on the server and localStorage is not available
-    if (typeof window !== 'undefined') {
+    // Safe access to localStorage
+    if (typeof window === 'undefined') {
+      return defaultValue // Return default value during SSR
+    }
+
+    try {
       const storedValue = window.localStorage.getItem(key)
-      return storedValue && storedValue !== 'undefined'
-        ? JSON.parse(storedValue)
-        : defaultValue
+      return storedValue ? JSON.parse(storedValue) : defaultValue
+    } catch (error) {
+      console.error(`Error reading localStorage key "${key}":`, error)
+      return defaultValue
     }
   })
 
   useEffect(() => {
-    window.localStorage.setItem(key, JSON.stringify(value))
+    // Update localStorage only if value changes
+    try {
+      window.localStorage.setItem(key, JSON.stringify(value))
+    } catch (error) {
+      console.error(`Error writing localStorage key "${key}":`, error)
+    }
   }, [key, value])
 
-  return [value, setValue]
+  return [
+    value,
+    (newValue: T) => {
+      setValue((prevValue) => {
+        // Prevent redundant updates to localStorage
+        if (JSON.stringify(prevValue) !== JSON.stringify(newValue)) {
+          return newValue
+        }
+        return prevValue
+      })
+    },
+  ]
 }
