@@ -36,7 +36,7 @@ const PlanningIntervalDetails = ({
   const {
     data: objectivesData,
     isLoading: isLoadingObjectives,
-    refetch: refectObjectives,
+    refetch: refectchObjectives,
   } = useGetPlanningIntervalObjectivesQuery(
     {
       planningIntervalId: planningInterval?.id,

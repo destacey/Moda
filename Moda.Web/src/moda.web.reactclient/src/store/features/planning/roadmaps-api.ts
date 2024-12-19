@@ -80,7 +80,10 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.Roadmap, id: 'LIST' }]
+        return [
+          { type: QueryTags.Roadmap, id: 'LIST' },
+          { type: QueryTags.Roadmap, id: arg.cacheKey },
+        ]
       },
     }),
     deleteRoadmap: builder.mutation<void, string>({
