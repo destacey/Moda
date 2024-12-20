@@ -3,10 +3,10 @@
 import { useGetPlanningIntervalObjectiveQuery } from '@/src/store/features/planning/planning-interval-api'
 import { Descriptions, Drawer, Space } from 'antd'
 import Link from 'next/link'
-import ModaMarkdownDescription from '../../../components/common/moda-markdown-description'
 import dayjs from 'dayjs'
 import PlanningIntervalObjectiveWorkItemsCard from '../[key]/objectives/[objectiveKey]/planning-interval-objective-work-items-card'
 import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
+import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
 
 const { Item: DescriptionsItem } = Descriptions
 
@@ -66,7 +66,7 @@ const PlanningIntervalObjectiveDetailsDrawer = (
         </Descriptions>
         <Descriptions column={1} layout="vertical" style={{ paddingTop: 8 }}>
           <DescriptionsItem label="Description">
-            <ModaMarkdownDescription content={objectiveData?.description} />
+            <MarkdownRenderer markdown={objectiveData?.description} />
           </DescriptionsItem>
         </Descriptions>
         <Descriptions column={1}>

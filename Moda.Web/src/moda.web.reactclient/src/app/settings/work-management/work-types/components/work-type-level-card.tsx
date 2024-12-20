@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { EditOutlined, HolderOutlined } from '@ant-design/icons'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
+import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
 
 const { Item } = List
 const { Meta } = Item
@@ -72,7 +72,7 @@ const WorkTypeLevelCard = (props: WorkTypeLevelCardProps) => {
           <Meta
             title={props.level.name}
             description={
-              <ModaMarkdownDescription content={props.level.description} />
+              <MarkdownRenderer markdown={props.level.description} />
             }
           />
         </Item>

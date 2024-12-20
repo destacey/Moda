@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm'
 const { Title, Paragraph, Text } = Typography
 
 interface MarkdownRendererProps {
-  markdown: string
+  markdown?: string
 }
 
 const components = {
@@ -20,10 +20,15 @@ const components = {
   em: ({ node, ...props }) => <Text italic {...props} />,
 }
 
-const MarkdownRenderer = ({ markdown }: MarkdownRendererProps) => (
-  <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
-    {markdown}
-  </ReactMarkdown>
-)
+const MarkdownRenderer = ({ markdown }: MarkdownRendererProps) => {
+  if (!markdown) return null
+  return (
+    <div>
+      <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
+        {markdown}
+      </ReactMarkdown>
+    </div>
+  )
+}
 
 export default MarkdownRenderer

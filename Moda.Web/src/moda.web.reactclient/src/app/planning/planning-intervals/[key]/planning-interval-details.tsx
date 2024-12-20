@@ -10,7 +10,6 @@ import { useGetPlanningIntervalPredictability } from '@/src/services/queries/pla
 import { useMemo } from 'react'
 
 import type { DescriptionsProps } from 'antd'
-import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
 import PlanningIntervalIterationsList from './planning-interval-iterations-list'
 import ObjectiveStatusChart, {
   ObjectiveStatusChartDataItem,
@@ -19,6 +18,7 @@ import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/plan
 import ObjectiveHealthChart, {
   ObjectiveHealthChartDataItem,
 } from './objective-health-chart'
+import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
 
 const { Item } = Descriptions
 
@@ -182,9 +182,7 @@ const PlanningIntervalDetails = ({
           {planningInterval.description && (
             <Descriptions layout="vertical" size="small">
               <Item label="Description">
-                <ModaMarkdownDescription
-                  content={planningInterval.description}
-                />
+                <MarkdownRenderer markdown={planningInterval.description} />
               </Item>
             </Descriptions>
           )}

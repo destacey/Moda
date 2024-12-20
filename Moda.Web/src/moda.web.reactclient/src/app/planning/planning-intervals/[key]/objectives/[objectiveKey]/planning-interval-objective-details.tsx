@@ -1,3 +1,5 @@
+'use client'
+
 import HealthReportChart from '@/src/app/components/common/health-check/health-report-chart'
 import LinksCard from '@/src/app/components/common/links/links-card'
 import { PlanningIntervalObjectiveDetailsDto } from '@/src/services/moda-api'
@@ -5,7 +7,7 @@ import { Card, Col, Descriptions, Progress, Row, Space, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import PlanningIntervalObjectiveWorkItemsCard from './planning-interval-objective-work-items-card'
-import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
+import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
 
 const { Item } = Descriptions
 
@@ -72,7 +74,7 @@ const PlanningIntervalObjectiveDetails = ({
         <Col xs={24} md={12}>
           <Descriptions layout="vertical">
             <Item label="Description">
-              <ModaMarkdownDescription content={objective?.description} />
+              <MarkdownRenderer markdown={objective?.description} />
             </Item>
           </Descriptions>
         </Col>

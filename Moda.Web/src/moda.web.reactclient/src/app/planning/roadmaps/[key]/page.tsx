@@ -20,11 +20,11 @@ import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
 import { Descriptions, MenuProps, message } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import EditRoadmapForm from '../components/edit-roadmap-form'
-import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
 import RoadmapViewManager from './roadmap-view-manager'
 import { DeleteRoadmapForm, RoadmapItemDrawer } from '../components'
 import CreateRoadmapActivityForm from '../components/create-roadmap-activity-form'
 import CreateRoadmapTimeboxForm from '../components/create-roadmap-timebox-form'
+import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
 
 const { Item } = Descriptions
 
@@ -242,7 +242,7 @@ const RoadmapDetailsPage = ({ params }) => {
           <Descriptions>
             {roadmapData.description && (
               <Item>
-                <ModaMarkdownDescription content={roadmapData.description} />
+                <MarkdownRenderer markdown={roadmapData.description} />
               </Item>
             )}
           </Descriptions>
