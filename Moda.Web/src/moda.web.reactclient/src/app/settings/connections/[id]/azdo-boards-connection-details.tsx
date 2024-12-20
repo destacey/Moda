@@ -1,7 +1,7 @@
 import { AzureDevOpsBoardsConnectionDetailsDto } from '@/src/services/moda-api'
-import { Col, Descriptions, Row, Space, Typography } from 'antd'
-import ReactMarkdown from 'react-markdown'
+import { Col, Descriptions, Row, Typography } from 'antd'
 import AzdoBoardsConnectionConfiguration from './azdo-boards-connection-configuration'
+import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
 
 const { Item } = Descriptions
 const { Title } = Typography
@@ -32,9 +32,7 @@ const AzdoBoardsConnectionDetails = ({
         <Col xs={24} md={12}>
           <Descriptions layout="vertical">
             <Item label="Description">
-              <Space direction="vertical">
-                <ReactMarkdown>{connection.description}</ReactMarkdown>
-              </Space>
+              <MarkdownRenderer markdown={connection.description} />
             </Item>
           </Descriptions>
         </Col>

@@ -1,9 +1,9 @@
 import LinksCard from '@/src/app/components/common/links/links-card'
+import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
 import { RiskDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Row, Space } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import ReactMarkdown from 'react-markdown'
 
 const { Item } = Descriptions
 
@@ -24,16 +24,12 @@ const RiskDetails = ({ risk }: RiskDetailsProps) => {
         <Col xs={24} md={10}>
           <Descriptions layout="vertical">
             <Item label="Description">
-              <Space direction="vertical">
-                <ReactMarkdown>{risk.description}</ReactMarkdown>
-              </Space>
+              <MarkdownRenderer markdown={risk?.description} />
             </Item>
           </Descriptions>
           <Descriptions layout="vertical">
             <Item label="Response">
-              <Space direction="vertical">
-                <ReactMarkdown>{risk.response}</ReactMarkdown>
-              </Space>
+              <MarkdownRenderer markdown={risk?.response} />
             </Item>
           </Descriptions>
         </Col>

@@ -1,7 +1,6 @@
 import { MoreOutlined } from '@ant-design/icons'
 import { Button, Dropdown } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import ReactMarkdown from 'react-markdown'
 import './moda-grid-cell-renderers.css'
 import HealthCheckTag from './health-check/health-check-tag'
 import {
@@ -10,6 +9,7 @@ import {
   SimpleNavigationDto,
 } from '@/src/services/moda-api'
 import Link from 'next/link'
+import MarkdownRenderer from './markdown-renderer'
 
 export interface HealthCheckStatusColumn {
   id?: string
@@ -42,7 +42,7 @@ export const MarkdownCellRenderer = ({ value }) => {
   if (!value) return null
   return (
     <div className="grid-react-markdown">
-      <ReactMarkdown>{value}</ReactMarkdown>
+      <MarkdownRenderer markdown={value} />
     </div>
   )
 }
