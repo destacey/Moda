@@ -1,5 +1,5 @@
 import LinksCard from '@/src/app/components/common/links/links-card'
-import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
+import { MarkdownRenderer } from '@/src/app/components/common/markdown'
 import { TeamDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Row, Space } from 'antd'
 import dayjs from 'dayjs'

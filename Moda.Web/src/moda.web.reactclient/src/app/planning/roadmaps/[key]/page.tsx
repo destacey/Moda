@@ -24,7 +24,7 @@ import RoadmapViewManager from './roadmap-view-manager'
 import { DeleteRoadmapForm, RoadmapItemDrawer } from '../components'
 import CreateRoadmapActivityForm from '../components/create-roadmap-activity-form'
 import CreateRoadmapTimeboxForm from '../components/create-roadmap-timebox-form'
-import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
+import { MarkdownRenderer } from '@/src/app/components/common/markdown'
 
 const { Item } = Descriptions
 

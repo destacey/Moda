@@ -9,7 +9,7 @@ import {
   SimpleNavigationDto,
 } from '@/src/services/moda-api'
 import Link from 'next/link'
-import MarkdownRenderer from './markdown-renderer'
+import { MarkdownRenderer } from './markdown'
 
 export interface HealthCheckStatusColumn {
   id?: string

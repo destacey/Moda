@@ -9,7 +9,7 @@ import {
   selectHealthCheckContext,
 } from '@/src/store/features/health-check-slice'
 import { healthCheckTagColor } from './health-check-utils'
-import MarkdownRenderer from '../markdown-renderer'
+import { MarkdownRenderer } from '../markdown'
 
 const { Item } = Descriptions
 

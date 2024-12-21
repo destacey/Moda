@@ -1,4 +1,4 @@
-import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
+import { MarkdownRenderer } from '@/src/app/components/common/markdown'
 import { RoadmapActivityDetailsDto } from '@/src/services/moda-api'
 import { ColorPicker, Descriptions, Space } from 'antd'
 import dayjs from 'dayjs'

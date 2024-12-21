@@ -6,7 +6,7 @@ import Link from 'next/link'
 import dayjs from 'dayjs'
 import PlanningIntervalObjectiveWorkItemsCard from '../[key]/objectives/[objectiveKey]/planning-interval-objective-work-items-card'
 import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
-import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
+import { MarkdownRenderer } from '@/src/app/components/common/markdown'
 
 const { Item: DescriptionsItem } = Descriptions
 

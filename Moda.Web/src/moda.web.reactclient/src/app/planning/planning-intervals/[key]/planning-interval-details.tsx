@@ -18,7 +18,7 @@ import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/plan
 import ObjectiveHealthChart, {
   ObjectiveHealthChartDataItem,
 } from './objective-health-chart'
-import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
+import { MarkdownRenderer } from '@/src/app/components/common/markdown'
 
 const { Item } = Descriptions
 

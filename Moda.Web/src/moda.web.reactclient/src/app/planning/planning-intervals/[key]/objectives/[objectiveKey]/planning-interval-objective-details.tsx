@@ -7,7 +7,7 @@ import { Card, Col, Descriptions, Progress, Row, Space, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import PlanningIntervalObjectiveWorkItemsCard from './planning-interval-objective-work-items-card'
-import MarkdownRenderer from '@/src/app/components/common/markdown-renderer'
+import { MarkdownRenderer } from '@/src/app/components/common/markdown'
 
 const { Item } = Descriptions
 
