@@ -2,6 +2,11 @@ import { renderHook, act } from '@testing-library/react'
 import { useLocalStorageState } from '.'
 
 describe('useLocalStorageState', () => {
+  // Suppress console errors during tests
+  beforeAll(() => {
+    console.error = jest.fn()
+  })
+
   beforeEach(() => {
     // Mock localStorage
     const localStorageMock = (() => {
