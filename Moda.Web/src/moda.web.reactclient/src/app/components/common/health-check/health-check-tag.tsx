@@ -3,13 +3,13 @@
 import { PlanningHealthCheckDto } from '@/src/services/moda-api'
 import { Descriptions, Popover, Space, Spin, Tag } from 'antd'
 import dayjs from 'dayjs'
-import ReactMarkdown from 'react-markdown'
 import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
 import {
   getHealthCheck,
   selectHealthCheckContext,
 } from '@/src/store/features/health-check-slice'
 import { healthCheckTagColor } from './health-check-utils'
+import { MarkdownRenderer } from '../markdown'
 
 const { Item } = Descriptions
 
@@ -49,9 +49,7 @@ const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
           {dayjs(healthCheckData.expiration).format('M/D/YYYY hh:mm A')}
         </Item>
         <Item>
-          <Space direction="vertical">
-            <ReactMarkdown>{healthCheckData.note}</ReactMarkdown>
-          </Space>
+          <MarkdownRenderer markdown={healthCheckData.note} />
         </Item>
       </Descriptions>
     )

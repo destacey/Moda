@@ -1,9 +1,10 @@
+import { MarkdownEditor } from '@/src/app/components/common/markdown'
 import useAuth from '@/src/app/components/contexts/auth'
 import { CreateWorkTypeLevelRequest } from '@/src/services/moda-api'
 import { useCreateWorkTypeLevelMutation } from '@/src/store/features/work-management/work-type-level-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, message } from 'antd'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -90,11 +91,11 @@ const CreateWorkTypeLevelForm = ({
     }
   }
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setIsOpen(false)
-    onFormCancel()
     form.resetFields()
-  }
+    onFormCancel()
+  }, [form, onFormCancel])
 
   useEffect(() => {
     if (canCreateWorkTypeLevel) {
@@ -140,10 +141,17 @@ const CreateWorkTypeLevelForm = ({
               maxLength={128}
             />
           </Item>
-          <Item name="description" label="Description" extra="Markdown enabled">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+          <Item
+            name="description"
+            label="Description"
+            initialValue=""
+            rules={[{ max: 1024 }]}
+          >
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
               maxLength={1024}
             />
           </Item>

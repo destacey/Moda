@@ -11,9 +11,9 @@ import {
   selectEditTeamContext,
 } from '../../../store/features/organizations/team-slice'
 import { useAppSelector } from '../../hooks'
+import { MarkdownEditor } from '../../components/common/markdown'
 
 const { Item } = Form
-const { TextArea } = Input
 
 interface EditTeamFormProps extends FormProps<EditTeamFormValues> {
   team: TeamDetailsDto | TeamOfTeamsDetailsDto
@@ -26,7 +26,7 @@ const EditTeamForm = ({ form, team }: EditTeamFormProps) => {
         id: team.id,
         name: team.name,
         code: team.code,
-        description: team.description,
+        description: team.description || '',
         type: team.type,
       })
     },
@@ -76,10 +76,10 @@ const EditTeamForm = ({ form, team }: EditTeamFormProps) => {
             }
           />
         </Item>
-        <Item name="description" label="Description" extra="Markdown enabled">
-          <TextArea
-            autoSize={{ minRows: 6, maxRows: 10 }}
-            showCount
+        <Item name="description" label="Description" rules={[{ max: 1024 }]}>
+          <MarkdownEditor
+            value={form.getFieldValue('description')}
+            onChange={(value) => form.setFieldValue('description', value || '')}
             maxLength={1024}
           />
         </Item>

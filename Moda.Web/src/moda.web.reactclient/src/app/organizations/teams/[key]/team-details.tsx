@@ -1,9 +1,9 @@
 import LinksCard from '@/src/app/components/common/links/links-card'
+import { MarkdownRenderer } from '@/src/app/components/common/markdown'
 import { TeamDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Row, Space } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import ReactMarkdown from 'react-markdown'
 
 const { Item } = Descriptions
 
@@ -41,9 +41,7 @@ const TeamDetails = ({ team }: TeamDetailsProps) => {
           <Col xs={24} md={12}>
             <Descriptions layout="vertical">
               <Item label="Description">
-                <Space direction="vertical">
-                  <ReactMarkdown>{team.description}</ReactMarkdown>
-                </Space>
+                <MarkdownRenderer markdown={team?.description} />
               </Item>
             </Descriptions>
           </Col>

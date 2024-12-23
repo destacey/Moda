@@ -15,6 +15,7 @@ import { DatePicker, Form, Input, Modal, TreeSelect } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
+import { MarkdownEditor } from '@/src/app/components/common/markdown'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -95,7 +96,7 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
       form.setFieldsValue({
         parentActivityId: activity.parent?.id,
         name: activity.name,
-        description: activity.description,
+        description: activity.description || '',
         start: dayjs(activity.start),
         end: dayjs(activity.end),
         color: activity.color,
@@ -250,10 +251,12 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
               maxLength={128}
             />
           </Item>
-          <Item name="description" label="Description" extra="Markdown enabled">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+          <Item name="description" label="Description" rules={[{ max: 2048 }]}>
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
               maxLength={2048}
             />
           </Item>

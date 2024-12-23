@@ -1,3 +1,4 @@
+import { MarkdownEditor } from '@/src/app/components/common/markdown'
 import useAuth from '@/src/app/components/contexts/auth'
 import { CreateRoadmapRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
@@ -76,6 +77,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
     (roadmapManagerIds: string[]) => {
       form.setFieldsValue({
         roadmapManagerIds: roadmapManagerIds,
+        description: '',
       })
     },
     [form],
@@ -179,6 +181,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
       <Modal
         title="Create Roadmap"
         open={isOpen}
+        width={'60vw'}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
         okText="Create"
@@ -201,10 +204,12 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
               maxLength={128}
             />
           </Item>
-          <Item name="description" label="Description" extra="Markdown enabled">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+          <Item name="description" label="Description" rules={[{ max: 2048 }]}>
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
               maxLength={2048}
             />
           </Item>

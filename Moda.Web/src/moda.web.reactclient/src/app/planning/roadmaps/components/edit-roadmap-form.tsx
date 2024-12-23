@@ -17,6 +17,7 @@ import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
+import { MarkdownEditor } from '@/src/app/components/common/markdown'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -96,7 +97,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
       }
       form.setFieldsValue({
         name: roadmap.name,
-        description: roadmap.description,
+        description: roadmap.description || '', // Ensure an empty string if description is undefined
         start: dayjs(roadmap.start),
         end: dayjs(roadmap.end),
         visibilityId: roadmap.visibility.id,
@@ -220,6 +221,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
       <Modal
         title="Edit Roadmap"
         open={isOpen}
+        width={'60vw'}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
         okText="Save"
@@ -242,10 +244,12 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
               maxLength={128}
             />
           </Item>
-          <Item name="description" label="Description" extra="Markdown enabled">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+          <Item name="description" label="Description" rules={[{ max: 2048 }]}>
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
               maxLength={2048}
             />
           </Item>

@@ -1,7 +1,13 @@
-// src/jest.setup.ts
+import React from 'react'
 import '@testing-library/jest-dom'
 
 import crypto from 'crypto'
+
+Object.assign(navigator, {
+  clipboard: {
+    writeText: jest.fn(),
+  },
+})
 
 Object.defineProperty(window, 'crypto', {
   value: {
@@ -51,10 +57,24 @@ jest.mock('next/navigation', () => ({
   },
 }))
 
+jest.mock('react-markdown', () => ({
+  __esModule: true,
+  default: jest.fn(() =>
+    React.createElement('div', null, 'Mocked ReactMarkdown'),
+  ),
+}))
+
+jest.mock('remark-gfm', () => ({}))
+
+jest.mock('rehype-raw', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}))
+
 // Suppress console errors during tests
-beforeAll(() => {
-  console.error = jest.fn()
-})
+// beforeAll(() => {
+//   console.error = jest.fn()
+// })
 
 afterEach(() => {
   jest.clearAllMocks()

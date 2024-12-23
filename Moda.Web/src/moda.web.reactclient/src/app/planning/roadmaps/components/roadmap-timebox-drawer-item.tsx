@@ -1,4 +1,4 @@
-import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
+import { MarkdownRenderer } from '@/src/app/components/common/markdown'
 import { RoadmapTimeboxDetailsDto } from '@/src/services/moda-api'
 import { Descriptions, Space } from 'antd'
 import dayjs from 'dayjs'
@@ -36,7 +36,7 @@ const RoadmapTimeboxDrawerItem: React.FC<RoadmapTimeboxDrawerItemProps> = (
       </Descriptions>
       <Descriptions column={1} layout="vertical" style={{ paddingTop: 8 }}>
         <DescriptionsItem label="Description">
-          <ModaMarkdownDescription content={timebox?.description} />
+          <MarkdownRenderer markdown={timebox?.description} />
         </DescriptionsItem>
       </Descriptions>
     </Space>

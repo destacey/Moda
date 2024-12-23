@@ -14,6 +14,7 @@ import {
   useGetPlanningIntervalObjectiveStatuses,
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
+import { MarkdownEditor } from '@/src/app/components/common/markdown'
 
 const { Item: FormItem } = Form
 const { TextArea } = Input
@@ -278,11 +279,14 @@ const CreatePlanningIntervalObjectiveForm = ({
           <FormItem
             name="description"
             label="Description"
-            extra="Markdown enabled"
+            initialValue=""
+            rules={[{ max: 1024 }]}
           >
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
               maxLength={1024}
             />
           </FormItem>

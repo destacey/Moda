@@ -11,15 +11,22 @@ const config: Config = {
   coverageProvider: 'v8',
   testEnvironment: 'jsdom',
   collectCoverage: true,
-  moduleNameMapper: {
-    'react-markdown': './node_modules/react-markdown/lib/index.js',
-  },
   // Add more setup options before each test is run
   setupFilesAfterEnv: ['./src/jest.setup.ts'],
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.(ts|tsx|js|jsx)$': 'ts-jest',
   },
+  // Add other ESM packages here if needed
+  transformIgnorePatterns: [
+    'node_modules/(?!(rehype-raw|react-markdown|remark-gfm|remark-parse|unified|mdast-util-to-string)/)',
+  ],
   testPathIgnorePatterns: ['./.next/', './node_modules/'],
+  globals: {
+    'ts-jest': {
+      useESM: true,
+      jsx: 'react-jsx', // nextjs needs the main setting to be "preserve". This is a workaround.
+    },
+  },
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

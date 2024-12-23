@@ -1,4 +1,4 @@
-import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
+import { MarkdownRenderer } from '@/src/app/components/common/markdown'
 import { RoadmapActivityDetailsDto } from '@/src/services/moda-api'
 import { ColorPicker, Descriptions, Space } from 'antd'
 import dayjs from 'dayjs'
@@ -46,7 +46,7 @@ const RoadmapActivityDrawerItem: React.FC<RoadmapActivityDrawerItemProps> = (
       </Descriptions>
       <Descriptions column={1} layout="vertical" style={{ paddingTop: 8 }}>
         <DescriptionsItem label="Description">
-          <ModaMarkdownDescription content={activity?.description} />
+          <MarkdownRenderer markdown={activity?.description} />
         </DescriptionsItem>
       </Descriptions>
     </Space>

@@ -1,4 +1,4 @@
-import ModaMarkdownDescription from '@/src/app/components/common/moda-markdown-description'
+import { MarkdownRenderer } from '@/src/app/components/common/markdown'
 import { RoadmapMilestoneDetailsDto } from '@/src/services/moda-api'
 import { Descriptions, Space } from 'antd'
 import dayjs from 'dayjs'
@@ -35,7 +35,7 @@ const RoadmapMilestoneDrawerItem: React.FC<RoadmapMilestoneDrawerItemProps> = (
       </Descriptions>
       <Descriptions column={1} layout="vertical" style={{ paddingTop: 8 }}>
         <DescriptionsItem label="Description">
-          <ModaMarkdownDescription content={milestone?.description} />
+          <MarkdownRenderer markdown={milestone?.description} />
         </DescriptionsItem>
       </Descriptions>
     </Space>

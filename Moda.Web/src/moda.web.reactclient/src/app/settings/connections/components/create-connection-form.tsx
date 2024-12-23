@@ -1,3 +1,4 @@
+import { MarkdownEditor } from '@/src/app/components/common/markdown'
 import useAuth from '@/src/app/components/contexts/auth'
 import {
   CreateAzureDevOpsBoardConnectionRequest,
@@ -166,10 +167,17 @@ const CreateConnectionForm = ({
               maxLength={128}
             />
           </Item>
-          <Item name="description" label="Description" extra="Markdown enabled">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+          <Item
+            name="description"
+            label="Description"
+            initialValue=""
+            rules={[{ max: 1024 }]}
+          >
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
               maxLength={1024}
             />
           </Item>

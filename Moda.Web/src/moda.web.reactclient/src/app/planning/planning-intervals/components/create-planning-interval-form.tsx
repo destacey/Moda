@@ -14,6 +14,7 @@ import useAuth from '../../../components/contexts/auth'
 import { CreatePlanningIntervalRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { useCreatePlanningIntervalMutation } from '@/src/services/queries/planning-queries'
+import { MarkdownEditor } from '@/src/app/components/common/markdown'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -158,10 +159,17 @@ const CreatePlanningIntervalForm = ({
               maxLength={128}
             />
           </Item>
-          <Item name="description" label="Description" extra="Markdown enabled">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+          <Item
+            name="description"
+            label="Description"
+            initialValue=""
+            rules={[{ max: 2048 }]}
+          >
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
               maxLength={2048}
             />
           </Item>
