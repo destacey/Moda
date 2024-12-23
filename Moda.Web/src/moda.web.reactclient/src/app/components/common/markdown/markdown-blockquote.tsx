@@ -20,7 +20,7 @@ const MarkdownBlockquote = (props: MarkdownBlockquoteProps) => {
       paddingLeft: props.token.padding,
       paddingRight: props.token.padding,
       borderLeft: `${props.token.lineWidthBold}px solid ${props.token.colorPrimary}`,
-      background: props.token.colorBgContainer,
+      background: props.token.colorFillTertiary, // TODO: get this closer to the actual code block color <Text code {...props} />,
     }),
     [props.token],
   )

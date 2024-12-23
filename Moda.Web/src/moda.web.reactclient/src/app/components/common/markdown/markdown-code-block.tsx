@@ -51,7 +51,7 @@ const MarkdownCodeBlock: React.FC<MarkdownCodeBlockProps> = ({
       style={{
         display: 'block',
         padding: token.padding,
-        background: token.colorBgContainer,
+        background: token.colorFillTertiary, // TODO: get this closer to the actual code block color <Text code {...props} />,
         borderRadius: token.borderRadius,
         overflowX: 'auto',
         position: 'relative',
