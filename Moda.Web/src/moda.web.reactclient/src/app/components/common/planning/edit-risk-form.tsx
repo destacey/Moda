@@ -23,6 +23,7 @@ import {
   useUpdateRiskMutation,
 } from '@/src/services/queries/planning-queries'
 import { useGetEmployeeOptions } from '@/src/services/queries/organization-queries'
+import { MarkdownEditor } from '../markdown'
 
 const { Item } = Descriptions
 const { Item: FormItem } = Form
@@ -97,14 +98,14 @@ const EditRiskForm = ({
         riskId: risk.id,
         teamId: risk.team.id,
         summary: risk.summary,
-        description: risk.description,
+        description: risk.description || '',
         statusId: risk.status.id,
         categoryId: risk.category.id,
         impactId: risk.impact.id,
         likelihoodId: risk.likelihood.id,
         assigneeId: risk.assignee?.id,
         followUpDate: risk.followUpDate ? dayjs(risk.followUpDate) : undefined,
-        response: risk.response,
+        response: risk.response || '',
       })
     },
     [form],
@@ -235,11 +236,13 @@ const EditRiskForm = ({
           <FormItem
             name="description"
             label="Description"
-            extra="Markdown enabled"
+            rules={[{ max: 1024 }]}
           >
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
               maxLength={1024}
             />
           </FormItem>
@@ -301,10 +304,10 @@ const EditRiskForm = ({
           <FormItem label="Follow Up" name="followUpDate">
             <DatePicker />
           </FormItem>
-          <FormItem name="response" label="Response" extra="Markdown enabled">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+          <FormItem name="response" label="Response" rules={[{ max: 1024 }]}>
+            <MarkdownEditor
+              value={form.getFieldValue('response')}
+              onChange={(value) => form.setFieldValue('response', value || '')}
               maxLength={1024}
             />
           </FormItem>

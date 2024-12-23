@@ -15,6 +15,7 @@ import {
   useGetRiskGradeOptions,
 } from '@/src/services/queries/planning-queries'
 import { useGetEmployeeOptions } from '@/src/services/queries/organization-queries'
+import { MarkdownEditor } from '../markdown'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -82,6 +83,8 @@ const CreateRiskForm = ({
     (teamId: string | undefined) => {
       form.setFieldsValue({
         teamId: teamId,
+        description: '',
+        response: '',
       })
     },
     [form],
@@ -236,10 +239,12 @@ const CreateRiskForm = ({
               maxLength={256}
             />
           </Item>
-          <Item name="description" label="Description" extra="Markdown enabled">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+          <Item name="description" label="Description" rules={[{ max: 1024 }]}>
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
               maxLength={1024}
             />
           </Item>
@@ -290,10 +295,10 @@ const CreateRiskForm = ({
           <Item label="Follow Up" name="followUpDate">
             <DatePicker />
           </Item>
-          <Item name="response" label="Response" extra="Markdown enabled">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+          <Item name="response" label="Response" rules={[{ max: 1024 }]}>
+            <MarkdownEditor
+              value={form.getFieldValue('response')}
+              onChange={(value) => form.setFieldValue('response', value || '')}
               maxLength={1024}
             />
           </Item>

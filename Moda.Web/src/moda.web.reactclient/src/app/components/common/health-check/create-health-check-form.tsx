@@ -1,7 +1,7 @@
 'use client'
 
 import { CreateHealthCheckRequest } from '@/src/services/moda-api'
-import { DatePicker, Form, FormProps, Input, Radio } from 'antd'
+import { DatePicker, Form, FormProps, Radio } from 'antd'
 import useAuth from '../../contexts/auth'
 import dayjs from 'dayjs'
 import { SystemContext } from '@/src/app/components/constants'
@@ -14,9 +14,9 @@ import {
   getHealthCheckStatusOptions,
 } from '@/src/store/features/health-check-slice'
 import { useEffect } from 'react'
+import { MarkdownEditor } from '../markdown'
 
 const { Item } = Form
-const { TextArea } = Input
 const { Group: RadioGroup } = Radio
 
 export interface CreateHealthCheckFormProps {
@@ -86,10 +86,10 @@ const CreateHealthCheckForm = ({
             buttonStyle="solid"
           />
         </Item>
-        <Item label="Note" name="note" extra="Markdown enabled">
-          <TextArea
-            autoSize={{ minRows: 6, maxRows: 10 }}
-            showCount
+        <Item name="note" label="Note" initialValue="" rules={[{ max: 1024 }]}>
+          <MarkdownEditor
+            value={form.getFieldValue('note')}
+            onChange={(value) => form.setFieldValue('note', value || '')}
             maxLength={1024}
           />
         </Item>

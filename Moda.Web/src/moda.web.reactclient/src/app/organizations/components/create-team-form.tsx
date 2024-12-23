@@ -9,9 +9,9 @@ import {
 } from '../../../store/features/organizations/team-slice'
 import withModalForm, { FormProps } from '../../components/hoc/withModalForm'
 import { useAppSelector } from '../../hooks'
+import { MarkdownEditor } from '../../components/common/markdown'
 
 const { Item } = Form
-const { TextArea } = Input
 const { Group: RadioGroup } = Radio
 
 const CreateTeamForm = ({ form }: FormProps<CreateTeamFormValues>) => {
@@ -53,10 +53,15 @@ const CreateTeamForm = ({ form }: FormProps<CreateTeamFormValues>) => {
           }
         />
       </Item>
-      <Item name="description" label="Description" extra="Markdown enabled">
-        <TextArea
-          autoSize={{ minRows: 6, maxRows: 10 }}
-          showCount
+      <Item
+        name="description"
+        label="Description"
+        initialValue=""
+        rules={[{ max: 1024 }]}
+      >
+        <MarkdownEditor
+          value={form.getFieldValue('description')}
+          onChange={(value) => form.setFieldValue('description', value || '')}
           maxLength={1024}
         />
       </Item>

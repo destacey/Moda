@@ -1,5 +1,6 @@
 'use client'
 
+import { MarkdownEditor } from '@/src/app/components/common/markdown'
 import useAuth from '@/src/app/components/contexts/auth'
 import {
   AzureDevOpsBoardsConnectionDetailsDto,
@@ -92,7 +93,7 @@ const EditConnectionForm = ({
       form.setFieldsValue({
         id: connection.id,
         name: connection.name,
-        description: connection.description,
+        description: connection.description || '',
         organization: connection.configuration?.organization,
         personalAccessToken: connection.configuration?.personalAccessToken,
       })
@@ -200,10 +201,12 @@ const EditConnectionForm = ({
               maxLength={128}
             />
           </Item>
-          <Item name="description" label="Description" extra="Markdown enabled">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+          <Item name="description" label="Description" rules={[{ max: 1024 }]}>
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
               maxLength={1024}
             />
           </Item>

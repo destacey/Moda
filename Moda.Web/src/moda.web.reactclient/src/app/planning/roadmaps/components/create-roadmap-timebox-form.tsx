@@ -1,4 +1,5 @@
 import { ModaColorPicker } from '@/src/app/components/common'
+import { MarkdownEditor } from '@/src/app/components/common/markdown'
 import useAuth from '@/src/app/components/contexts/auth'
 import { CreateRoadmapTimeboxRequest } from '@/src/services/moda-api'
 import {
@@ -191,10 +192,17 @@ const CreateRoadmapTimeboxForm = (props: CreateRoadmapTimeboxFormProps) => {
               maxLength={128}
             />
           </Item>
-          <Item name="description" label="Description" extra="Markdown enabled">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+          <Item
+            name="description"
+            label="Description"
+            initialValue=""
+            rules={[{ max: 2048 }]}
+          >
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
               maxLength={2048}
             />
           </Item>

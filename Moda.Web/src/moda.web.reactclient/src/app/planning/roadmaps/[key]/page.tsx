@@ -17,7 +17,7 @@ import RoadmapDetailsLoading from './loading'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
-import { Descriptions, MenuProps, message } from 'antd'
+import { Descriptions, Divider, MenuProps, message } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import EditRoadmapForm from '../components/edit-roadmap-form'
 import RoadmapViewManager from './roadmap-view-manager'
@@ -248,6 +248,7 @@ const RoadmapDetailsPage = ({ params }) => {
           </Descriptions>
         </>
       )}
+      <Divider />
       <RoadmapViewManager
         roadmap={roadmapData}
         roadmapItems={children}

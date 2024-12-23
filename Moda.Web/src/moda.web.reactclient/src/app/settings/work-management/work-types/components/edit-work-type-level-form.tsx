@@ -1,3 +1,4 @@
+import { MarkdownEditor } from '@/src/app/components/common/markdown'
 import useAuth from '@/src/app/components/contexts/auth'
 import {
   UpdateWorkTypeLevelRequest,
@@ -58,7 +59,7 @@ const EditWorkTypeLevelForm = (props: EditWorkTypeLevelFormProps) => {
     (level: WorkTypeLevelDto) => {
       form.setFieldsValue({
         name: level.name,
-        description: level.description,
+        description: level.description || '',
       })
     },
     [form],
@@ -106,11 +107,11 @@ const EditWorkTypeLevelForm = (props: EditWorkTypeLevelFormProps) => {
     }
   }
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setIsOpen(false)
-    props.onFormCancel()
     form.resetFields()
-  }
+    props.onFormCancel()
+  }, [form, props])
 
   useEffect(() => {
     if (!workTypeLevelData) return
@@ -176,10 +177,12 @@ const EditWorkTypeLevelForm = (props: EditWorkTypeLevelFormProps) => {
               maxLength={128}
             />
           </Item>
-          <Item name="description" label="Description" extra="Markdown enabled">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
+          <Item name="description" label="Description" rules={[{ max: 1024 }]}>
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
               maxLength={1024}
             />
           </Item>

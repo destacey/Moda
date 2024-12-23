@@ -91,7 +91,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = React.memo(
           />
         </div>
         <MarkdownEditorFooter
-          currentLength={value.length}
+          currentLength={value?.length || 0}
           maxLength={maxLength}
         />
       </>
