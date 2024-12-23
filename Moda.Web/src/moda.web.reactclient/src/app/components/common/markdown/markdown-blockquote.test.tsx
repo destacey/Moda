@@ -8,7 +8,7 @@ describe('MarkdownBlockquote', () => {
     padding: '16px',
     lineWidthBold: 2,
     colorPrimary: '#1890ff',
-    colorBgContainer: '#ffffff',
+    colorFillTertiary: '#ffffff',
   } as any
 
   const defaultProps: MarkdownBlockquoteProps = {
@@ -28,7 +28,7 @@ describe('MarkdownBlockquote', () => {
       paddingLeft: mockThemeToken.padding,
       paddingRight: mockThemeToken.padding,
       borderLeft: `${mockThemeToken.lineWidthBold}px solid ${mockThemeToken.colorPrimary}`,
-      background: mockThemeToken.colorBgContainer,
+      background: mockThemeToken.colorFillTertiary,
     })
   })
 

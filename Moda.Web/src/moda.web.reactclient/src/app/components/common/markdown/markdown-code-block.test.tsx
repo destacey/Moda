@@ -6,7 +6,7 @@ import { MarkdownCodeBlock, MarkdownCodeBlockProps } from '.'
 describe('MarkdownCodeBlock', () => {
   const mockThemeToken = {
     padding: '16px',
-    colorBgContainer: '#ffffff',
+    colorFillTertiary: '#ffffff',
     borderRadius: '4px',
   } as any
 
