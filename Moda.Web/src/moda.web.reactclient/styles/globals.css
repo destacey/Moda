@@ -1,11 +1,92 @@
-html,
-body {
-  padding: 0;
+/* General Reset */
+html, body {
   margin: 0;
+  padding: 0;
   height: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
+  width: 100%;
+  overflow: hidden; /* Prevent scrolling on the body itself */
 }
+
+/* Root container */
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main-layout {
+  height: calc(100vh - 50px); /* Adjust height for the header */
+}
+
+.app-side-nav  {
+  height: calc(100vh - 50px); /* Adjust height to account for the fixed header */
+  overflow: hidden; /* Ensure the sidebar is fixed and does not scroll */
+}
+
+/* Content layout adjustments */
+.app-main-content {
+  flex: 1; /* Allows the content to grow and occupy remaining space */
+  overflow-y: auto; /* Enable vertical scrolling for breadcrumb and content */
+  padding: 0 24px 24px; /* 0 top, 24px left/right/bottom */
+}
+
+/* Utility Classes */
+
+/* Flex container with column layout */
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollable container */
+.scrollable {
+  overflow-y: auto;
+}
+
+/* Hide overflow for containers */
+.overflow-hidden {
+  overflow: hidden;
+}
+
+/* Scrollbar Styling */
+/* General Scrollbar Styling (Light Mode) */
+.ant-layout-content::-webkit-scrollbar {
+  width: 15px;
+}
+
+.ant-layout-content::-webkit-scrollbar-thumb {
+  background-color: #d0d0d0; /* Light thumb color */
+  border-radius: 8px;
+}
+
+.ant-layout-content::-webkit-scrollbar-track {
+  background-color: #f0f0f0; /* Light track color */
+}
+
+/* Scrollbar Styling for Dark Mode */
+[data-theme="dark"] .ant-layout-content::-webkit-scrollbar-thumb {
+  background-color: #555; /* Dark thumb color */
+  border-radius: 8px;
+}
+
+[data-theme="dark"] .ant-layout-content::-webkit-scrollbar-track {
+  background-color: #2a2a2a; /* Dark track color */
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .app-side-nav {
+    display: none;
+  }
+  .ant-layout-content {
+    padding: 0 16px 16px; /* Reduce padding for smaller screens */
+  }
+}
+
+
+
+/* Other Custom Styles */
 
 .trigger {
   padding: 0 24px;

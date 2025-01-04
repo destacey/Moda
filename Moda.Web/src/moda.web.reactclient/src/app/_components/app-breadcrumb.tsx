@@ -3,7 +3,7 @@
 import { Breadcrumb, Typography } from 'antd'
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb'
 import { useEffect, useState } from 'react'
-import { useAppSelector } from '../../hooks'
+import { useAppSelector } from '../hooks'
 import { selectBreadcrumb, BreadcrumbItem } from '@/src/store/breadcrumbs'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
@@ -63,7 +63,7 @@ const AppBreadcrumb = () => {
   return (
     <Breadcrumb
       separator=">"
-      style={{ margin: '16px 0' }}
+      style={{ margin: '16px 0px' }}
       itemRender={itemRender}
       items={pathItems}
     />
