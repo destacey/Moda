@@ -3,13 +3,13 @@
 import {
   WorkItemsDashboardModal,
   WorkItemsListCard,
-} from '@/src/app/components/common/work'
+} from '@/src/components/common/work'
 import { DashboardOutlined, FormOutlined } from '@ant-design/icons'
 import { Button, Card } from 'antd'
 import { useState } from 'react'
 import ManagePlanningIntervalObjectiveWorkItemsForm from './manage-planning-interval-objective-work-items-form'
 import { useGetObjectiveWorkItemsQuery } from '@/src/store/features/planning/planning-interval-api'
-import { WorkProgress } from '@/src/app/components/common'
+import { WorkProgress } from '@/src/components/common'
 
 export interface PlanningIntervalObjectiveWorkItemsCardProps {
   planningIntervalId: string

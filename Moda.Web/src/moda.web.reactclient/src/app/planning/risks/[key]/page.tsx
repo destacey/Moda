@@ -1,16 +1,16 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
+import PageTitle from '@/src/components/common/page-title'
 import { useEffect, useState } from 'react'
 import RiskDetails from './risk-details'
 import { Button, Card } from 'antd'
-import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import useAuth from '@/src/app/components/contexts/auth'
-import EditRiskForm from '@/src/app/components/common/planning/edit-risk-form'
-import { authorizePage } from '@/src/app/components/hoc'
+import { useDocumentTitle } from '@/src/hooks/use-document-title'
+import useAuth from '@/src/components/contexts/auth'
+import EditRiskForm from '@/src/components/common/planning/edit-risk-form'
+import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import { useGetRisk } from '@/src/services/queries/planning-queries'
-import { useAppDispatch } from '@/src/app/hooks'
+import { useAppDispatch } from '@/src/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 
 const RiskDetailsPage = ({ params }) => {

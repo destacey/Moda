@@ -1,13 +1,9 @@
 'use client'
 
-import { ModaGrid, PageTitle } from '@/src/app/components/common'
-import { ControlItemSwitch } from '@/src/app/components/common/control-items-menu'
-import { authorizePage } from '@/src/app/components/hoc'
-import {
-  useAppDispatch,
-  useAppSelector,
-  useDocumentTitle,
-} from '@/src/app/hooks'
+import { ModaGrid, PageTitle } from '@/src/components/common'
+import { ControlItemSwitch } from '@/src/components/common/control-items-menu'
+import { authorizePage } from '@/src/components/hoc'
+import { useAppDispatch, useAppSelector, useDocumentTitle } from '@/src/hooks'
 import { WorkProcessListDto } from '@/src/services/moda-api'
 import { useGetWorkProcessesQuery } from '@/src/store/features/work-management/work-process-api'
 import { setIncludeInactive } from '@/src/store/features/work-management/work-process-slice'

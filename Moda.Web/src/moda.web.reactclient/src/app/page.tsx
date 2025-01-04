@@ -1,9 +1,9 @@
 'use client'
 
 import { Col, Divider, Row } from 'antd'
-import ActivePlanningIntervals from './components/common/planning/active-planning-intervals'
-import MyAssignedRisks from './components/common/planning/my-assigned-risks'
-import { useDocumentTitle } from './hooks/use-document-title'
+import ActivePlanningIntervals from '../components/common/planning/active-planning-intervals'
+import MyAssignedRisks from '../components/common/planning/my-assigned-risks'
+import { useDocumentTitle } from '../hooks/use-document-title'
 
 const HomePage = () => {
   useDocumentTitle('Home')

@@ -1,4 +1,4 @@
-import useAuth from '@/src/app/components/contexts/auth'
+import useAuth from '@/src/components/contexts/auth'
 import { CreateOrUpdateRoleRequest, RoleDto } from '@/src/services/moda-api'
 import {
   useDeleteRoleMutation,

@@ -1,6 +1,6 @@
 'use client'
 
-import useAuth from '@/src/app/components/contexts/auth'
+import useAuth from '@/src/components/contexts/auth'
 import { AzureDevOpsBoardsConnectionDetailsDto } from '@/src/services/moda-api'
 import { useDeleteAzdoConnectionMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { Descriptions, Modal, message } from 'antd'

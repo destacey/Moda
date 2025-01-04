@@ -1,7 +1,7 @@
 'use client'
 
-import PlanningIntervalObjectivesGrid from '@/src/app/components/common/planning/planning-interval-objectives-grid'
-import { useDocumentTitle } from '@/src/app/hooks'
+import PlanningIntervalObjectivesGrid from '@/src/components/common/planning/planning-interval-objectives-grid'
+import { useDocumentTitle } from '@/src/hooks'
 import {
   useGetPlanningInterval,
   useGetPlanningIntervalCalendar,
@@ -13,12 +13,12 @@ import { useCallback, useMemo, useState } from 'react'
 import {
   CreatePlanningIntervalObjectiveForm,
   PlanningIntervalObjectivesTimeline,
-} from '../../components'
-import { PageTitle } from '@/src/app/components/common'
+} from '../../_components'
+import { PageTitle } from '@/src/components/common'
 import { notFound } from 'next/navigation'
 import { Button } from 'antd'
-import useAuth from '@/src/app/components/contexts/auth'
-import { authorizePage } from '@/src/app/components/hoc'
+import useAuth from '@/src/components/contexts/auth'
+import { authorizePage } from '@/src/components/hoc'
 import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
 
 const viewSelectorOptions: SegmentedLabeledOption[] = [

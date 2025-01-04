@@ -1,4 +1,4 @@
-import useAuth from '@/src/app/components/contexts/auth'
+import useAuth from '@/src/components/contexts/auth'
 import { useChangeWorkProcessIsActiveMutation } from '@/src/store/features/work-management/work-process-api'
 import { Modal, Typography, message } from 'antd'
 import { useEffect, useState } from 'react'

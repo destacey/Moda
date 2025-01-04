@@ -1,6 +1,6 @@
 'use client'
 
-import useTheme from '@/src/app/components/contexts/theme'
+import useTheme from '@/src/components/contexts/theme'
 import { Pie, PieConfig } from '@ant-design/charts'
 import { Card } from 'antd'
 import { useMemo } from 'react'

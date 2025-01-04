@@ -1,18 +1,18 @@
 'use client'
 
-import { useDocumentTitle } from '@/src/app/hooks'
+import { useDocumentTitle } from '@/src/hooks'
 import { PlanningIntervalTeamResponse } from '@/src/services/moda-api'
 import { useEffect, useMemo, useState } from 'react'
 import { Alert, Card, Tag } from 'antd'
 import TeamPlanReview from './team-plan-review'
 import { notFound, useRouter } from 'next/navigation'
-import { ModaEmpty, PageTitle } from '@/src/app/components/common'
+import { ModaEmpty, PageTitle } from '@/src/components/common'
 import {
   useGetPlanningInterval,
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
 import PlanningIntervalPlanReviewLoading from './loading'
-import { authorizePage } from '@/src/app/components/hoc'
+import { authorizePage } from '@/src/components/hoc'
 
 const PlanningIntervalPlanReviewPage = ({ params }) => {
   useDocumentTitle('PI Plan Review')

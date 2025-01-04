@@ -1,6 +1,6 @@
 'use client'
 
-import { useAppDispatch, useDocumentTitle } from '@/src/app/hooks'
+import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import {
   useGetChildWorkItemsQuery,
@@ -9,12 +9,12 @@ import {
 import { notFound, usePathname } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import WorkItemDetailsLoading from './loading'
-import { PageTitle } from '@/src/app/components/common'
+import { PageTitle } from '@/src/components/common'
 import { Card } from 'antd'
-import { authorizePage } from '@/src/app/components/hoc'
+import { authorizePage } from '@/src/components/hoc'
 import WorkItemDetails from './work-item-details'
-import ExternalIconLink from '@/src/app/components/common/external-icon-link'
-import { WorkItemsGrid } from '@/src/app/components/common/work'
+import ExternalIconLink from '@/src/components/common/external-icon-link'
+import { WorkItemsGrid } from '@/src/components/common/work'
 import WorkItemDashboard from './work-item-dashboard'
 import WorkItemDependencies from './work-item-dependencies'
 

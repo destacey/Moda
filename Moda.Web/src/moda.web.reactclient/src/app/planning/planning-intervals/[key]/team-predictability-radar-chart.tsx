@@ -1,6 +1,6 @@
 'use client'
 
-import useTheme from '@/src/app/components/contexts/theme'
+import useTheme from '@/src/components/contexts/theme'
 import { PlanningIntervalPredictabilityDto } from '@/src/services/moda-api'
 
 import dynamic from 'next/dynamic'

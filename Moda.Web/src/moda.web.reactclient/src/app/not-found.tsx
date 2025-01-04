@@ -3,7 +3,7 @@
 import { Result } from 'antd'
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { useAppDispatch } from './hooks'
+import { useAppDispatch } from '../hooks'
 import { disableBreadcrumb } from '../store/breadcrumbs'
 
 export default function NotFound() {

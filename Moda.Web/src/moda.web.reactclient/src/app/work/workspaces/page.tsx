@@ -1,8 +1,8 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
-import { authorizePage } from '../../components/hoc'
-import { useDocumentTitle } from '../../hooks'
+import PageTitle from '@/src/components/common/page-title'
+import { authorizePage } from '../../../components/hoc'
+import { useDocumentTitle } from '../../../hooks'
 import { useGetWorkspacesQuery } from '@/src/store/features/work-management/workspace-api'
 import { useEffect, useMemo, useState } from 'react'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'

@@ -1,15 +1,15 @@
 'use client'
 
-import { useDocumentTitle } from '@/src/app/hooks'
+import { useDocumentTitle } from '@/src/hooks'
 import {
   useGetPlanningInterval,
   useGetPlanningIntervalRisks,
 } from '@/src/services/queries/planning-queries'
 import { useCallback, useState } from 'react'
-import { PageTitle } from '@/src/app/components/common'
+import { PageTitle } from '@/src/components/common'
 import { notFound } from 'next/navigation'
-import RisksGrid from '@/src/app/components/common/planning/risks-grid'
-import { authorizePage } from '@/src/app/components/hoc'
+import RisksGrid from '@/src/components/common/planning/risks-grid'
+import { authorizePage } from '@/src/components/hoc'
 
 const PlanningIntervalRisksPage = ({ params }) => {
   useDocumentTitle('PI Risks')

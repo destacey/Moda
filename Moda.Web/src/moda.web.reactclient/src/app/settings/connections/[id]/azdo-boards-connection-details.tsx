@@ -1,7 +1,7 @@
 import { AzureDevOpsBoardsConnectionDetailsDto } from '@/src/services/moda-api'
 import { Col, Descriptions, Row, Typography } from 'antd'
 import AzdoBoardsConnectionConfiguration from './azdo-boards-connection-configuration'
-import { MarkdownRenderer } from '@/src/app/components/common/markdown'
+import { MarkdownRenderer } from '@/src/components/common/markdown'
 
 const { Item } = Descriptions
 const { Title } = Typography

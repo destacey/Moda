@@ -1,17 +1,17 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
-import { ModaGrid, PageActions, PageTitle } from '../../components/common'
-import { authorizePage } from '../../components/hoc'
-import { useDocumentTitle } from '../../hooks'
-import useAuth from '../../components/contexts/auth'
+import { ModaGrid, PageActions, PageTitle } from '../../../components/common'
+import { authorizePage } from '../../../components/hoc'
+import { useDocumentTitle } from '../../../hooks'
+import useAuth from '../../../components/contexts/auth'
 import CreateConnectionForm from './components/create-connection-form'
 import Link from 'next/link'
 import { ConnectionListDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import { ItemType } from 'antd/es/menu/interface'
 import { useGetAzdoConnectionsQuery } from '@/src/store/features/app-integration/azdo-integration-api'
-import { ControlItemSwitch } from '../../components/common/control-items-menu'
+import { ControlItemSwitch } from '../../../components/common/control-items-menu'
 
 const ConnectionLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/settings/connections/${data.id}`}>{value}</Link>

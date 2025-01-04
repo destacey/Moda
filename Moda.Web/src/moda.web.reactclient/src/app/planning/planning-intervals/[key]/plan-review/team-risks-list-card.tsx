@@ -4,11 +4,11 @@ import { RiskListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
 import { Badge, Button, Card, List, Space } from 'antd'
 import RiskListItem from './risk-list-item'
-import ModaEmpty from '@/src/app/components/common/moda-empty'
+import ModaEmpty from '@/src/components/common/moda-empty'
 import { useCallback, useMemo, useState } from 'react'
-import CreateRiskForm from '@/src/app/components/common/planning/create-risk-form'
+import CreateRiskForm from '@/src/components/common/planning/create-risk-form'
 import { UseQueryResult } from 'react-query'
-import useTheme from '@/src/app/components/contexts/theme'
+import useTheme from '@/src/components/contexts/theme'
 
 export interface TeamRisksListCardProps {
   riskQuery: UseQueryResult<RiskListDto[], unknown>

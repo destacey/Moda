@@ -1,14 +1,14 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
+import PageTitle from '@/src/components/common/page-title'
 import { Card } from 'antd'
 import { useState } from 'react'
 import RoleDetails from './components/role-details'
 import Permissions from './components/permissions'
-import useAuth from '@/src/app/components/contexts/auth'
-import { authorizePage } from '@/src/app/components/hoc'
+import useAuth from '@/src/components/contexts/auth'
+import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
-import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
+import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { useGetRoleQuery } from '@/src/store/features/user-management/roles-api'
 
 const RoleDetailsPage = ({ params }) => {

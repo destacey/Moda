@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import ModaGrid from '../../components/common/moda-grid'
-import useAuth, { Claim } from '../../components/contexts/auth'
+import ModaGrid from '../../../components/common/moda-grid'
+import useAuth, { Claim } from '../../../components/contexts/auth'
 import { ColDef } from 'ag-grid-community'
 
 const ClaimsGrid = () => {

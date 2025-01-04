@@ -1,11 +1,11 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
+import PageTitle from '@/src/components/common/page-title'
 import { useCallback, useEffect, useMemo } from 'react'
-import ModaGrid from '@/src/app/components/common/moda-grid'
-import { authorizePage } from '@/src/app/components/hoc'
+import ModaGrid from '@/src/components/common/moda-grid'
+import { authorizePage } from '@/src/components/hoc'
 import Link from 'next/link'
-import { useDocumentTitle } from '@/src/app/hooks'
+import { useDocumentTitle } from '@/src/hooks'
 import { useGetUsersQuery } from '@/src/store/features/user-management/users-api'
 import { message } from 'antd'
 

@@ -1,15 +1,15 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
+import PageTitle from '@/src/components/common/page-title'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import ModaGrid from '@/src/app/components/common/moda-grid'
-import { authorizePage } from '@/src/app/components/hoc'
+import ModaGrid from '@/src/components/common/moda-grid'
+import { authorizePage } from '@/src/components/hoc'
 import Link from 'next/link'
 import { Button } from 'antd'
-import useAuth from '@/src/app/components/contexts/auth'
+import useAuth from '@/src/components/contexts/auth'
 import CreateRoleForm from './create-role-form'
 import { useRouter } from 'next/navigation'
-import { useDocumentTitle } from '@/src/app/hooks'
+import { useDocumentTitle } from '@/src/hooks'
 import { useGetRolesQuery } from '@/src/store/features/user-management/roles-api'
 
 const LinkCellRenderer = ({ value, data }) => {

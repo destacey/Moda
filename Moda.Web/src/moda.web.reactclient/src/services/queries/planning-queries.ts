@@ -11,7 +11,7 @@ import {
   UpdateRiskRequest,
 } from '../moda-api'
 import _ from 'lodash'
-import { OptionModel } from '@/src/app/components/types'
+import { OptionModel } from '@/src/components/types'
 import dayjs from 'dayjs'
 
 // PLANNING INTERVALS

@@ -1,16 +1,16 @@
 'use client'
 
-import ModaGrid from '@/src/app/components/common/moda-grid'
-import PageTitle from '@/src/app/components/common/page-title'
+import ModaGrid from '@/src/components/common/moda-grid'
+import PageTitle from '@/src/components/common/page-title'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
-import { useDocumentTitle } from '../../hooks/use-document-title'
+import { useDocumentTitle } from '../../../hooks/use-document-title'
 import dayjs from 'dayjs'
-import { CreatePlanningIntervalForm } from './components'
-import useAuth from '../../components/contexts/auth'
+import { CreatePlanningIntervalForm } from './_components'
+import useAuth from '../../../components/contexts/auth'
 import { Button } from 'antd'
 import { useGetPlanningIntervals } from '@/src/services/queries/planning-queries'
-import { authorizePage } from '../../components/hoc'
+import { authorizePage } from '../../../components/hoc'
 
 const PlanningIntervalLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/planning/planning-intervals/${data.key}`}>{value}</Link>

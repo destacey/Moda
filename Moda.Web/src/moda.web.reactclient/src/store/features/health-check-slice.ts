@@ -5,10 +5,10 @@ import {
   UpdateHealthCheckRequest,
 } from '../../services/moda-api'
 import { getHealthChecksClient } from '../../services/clients'
-import { CreateHealthCheckFormValues } from '../../app/components/common/health-check/create-health-check-form'
-import { SystemContext } from '../../app/components/constants'
+import { CreateHealthCheckFormValues } from '../../components/common/health-check/create-health-check-form'
+import { SystemContext } from '../../components/constants'
 import { PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import { OptionModel } from '../../app/components/types'
+import { OptionModel } from '../../components/types'
 
 interface HealthCheckState extends CrudState<HealthCheckDto> {
   objectId?: string

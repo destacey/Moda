@@ -1,27 +1,27 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
+import PageTitle from '@/src/components/common/page-title'
 import { Card } from 'antd'
 import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
 import PlanningIntervalDetails from './planning-interval-details'
 import TeamsGrid, {
   TeamsGridProps,
-} from '@/src/app/components/common/organizations/teams-grid'
-import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import useAuth from '@/src/app/components/contexts/auth'
+} from '@/src/components/common/organizations/teams-grid'
+import { useDocumentTitle } from '@/src/hooks/use-document-title'
+import useAuth from '@/src/components/contexts/auth'
 import ManagePlanningIntervalTeamsForm from './manage-planning-interval-teams-form'
-import { EditPlanningIntervalForm } from '../components'
+import { EditPlanningIntervalForm } from '../_components'
 import {
   useGetPlanningInterval,
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
-import { authorizePage } from '@/src/app/components/hoc'
+import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
-import { useAppDispatch } from '@/src/app/hooks'
+import { useAppDispatch } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import PlanningIntervalDetailsLoading from './loading'
 import ManagePlanningIntervalDatesForm from './manage-planning-interval-dates-form'
-import { PageActions } from '@/src/app/components/common'
+import { PageActions } from '@/src/components/common'
 import { ItemType } from 'antd/es/menu/interface'
 
 enum PlanningIntervalTabs {

@@ -14,14 +14,14 @@ import { SegmentedLabeledOption } from 'antd/es/segmented'
 import {
   PlanningIntervalObjectiveDetailsDrawer,
   PlanningIntervalObjectivesTimeline,
-} from '../../components'
+} from '../../_components'
 import {
   useGetPlanningIntervalCalendar,
   useGetPlanningIntervalRisksByTeamId,
   useGetTeamPlanningIntervalPredictability,
 } from '@/src/services/queries/planning-queries'
 import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
-import useAuth from '@/src/app/components/contexts/auth'
+import useAuth from '@/src/components/contexts/auth'
 
 const { Title } = Typography
 

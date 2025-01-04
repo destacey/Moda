@@ -1,13 +1,13 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
+import PageTitle from '@/src/components/common/page-title'
 import { useCallback, useEffect, useState } from 'react'
-import { useDocumentTitle } from '../../hooks/use-document-title'
-import useAuth from '../../components/contexts/auth'
+import { useDocumentTitle } from '../../../hooks/use-document-title'
+import useAuth from '../../../components/contexts/auth'
 import { Button, message } from 'antd'
-import { authorizePage } from '../../components/hoc'
+import { authorizePage } from '../../../components/hoc'
 import { useGetRoadmapsQuery } from '@/src/store/features/planning/roadmaps-api'
-import { CreateRoadmapForm, RoadmapsGrid } from './components'
+import { CreateRoadmapForm, RoadmapsGrid } from './_components'
 
 const RoadmapsPage: React.FC = () => {
   useDocumentTitle('Roadmaps')

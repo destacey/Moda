@@ -6,7 +6,7 @@ import {
   getTeamsOfTeamsClient,
 } from '../clients'
 import _ from 'lodash'
-import { OptionModel } from '@/src/app/components/types'
+import { OptionModel } from '@/src/components/types'
 import {
   AddTeamMembershipRequest,
   UpdateTeamMembershipRequest,

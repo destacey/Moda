@@ -1,8 +1,8 @@
 'use client'
 
-import { PageTitle } from '@/src/app/components/common'
-import { authorizePage } from '@/src/app/components/hoc'
-import { useAppDispatch, useDocumentTitle } from '@/src/app/hooks'
+import { PageTitle } from '@/src/components/common'
+import { authorizePage } from '@/src/components/hoc'
+import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import {
   useGetWorkItemsQuery,
@@ -13,9 +13,9 @@ import { notFound, usePathname } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import WorkspaceDetailsLoading from './loading'
 import WorkspaceDetails from './workspace-details'
-import useAuth from '@/src/app/components/contexts/auth'
+import useAuth from '@/src/components/contexts/auth'
 import SetWorkspaceExternalUrlTemplatesForm from './set-workspace-external-url-templates-form'
-import { WorkItemsGrid } from '@/src/app/components/common/work'
+import { WorkItemsGrid } from '@/src/components/common/work'
 
 enum WorkspaceTabs {
   Details = 'details',

@@ -1,4 +1,4 @@
-import useTheme from '@/src/app/components/contexts/theme'
+import useTheme from '@/src/components/contexts/theme'
 import { useGetPermissionsQuery } from '@/src/store/features/user-management/permissions-api'
 import { useUpdatePermissionsMutation } from '@/src/store/features/user-management/roles-api'
 import {

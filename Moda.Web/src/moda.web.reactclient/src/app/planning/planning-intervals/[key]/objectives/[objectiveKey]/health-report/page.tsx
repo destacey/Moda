@@ -1,15 +1,15 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
+import PageTitle from '@/src/components/common/page-title'
 import { useEffect } from 'react'
-import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import { authorizePage } from '@/src/app/components/hoc'
+import { useDocumentTitle } from '@/src/hooks/use-document-title'
+import { authorizePage } from '@/src/components/hoc'
 import { useGetPlanningIntervalObjectiveByKey } from '@/src/services/queries/planning-queries'
 import { notFound, usePathname } from 'next/navigation'
-import { useAppDispatch } from '@/src/app/hooks'
+import { useAppDispatch } from '@/src/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
-import HealthCheckTag from '@/src/app/components/common/health-check/health-check-tag'
-import HealthReportGrid from '@/src/app/components/common/health-check/health-report-grid'
+import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
+import HealthReportGrid from '@/src/components/common/health-check/health-report-grid'
 
 const ObjectiveHealthReportPage = ({ params }) => {
   useDocumentTitle('PI Objective Health Report')
