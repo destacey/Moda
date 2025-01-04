@@ -63,7 +63,7 @@ const AppBreadcrumb = () => {
   return (
     <Breadcrumb
       separator=">"
-      style={{ margin: '16px 0' }}
+      style={{ margin: '16px 0px' }}
       itemRender={itemRender}
       items={pathItems}
     />

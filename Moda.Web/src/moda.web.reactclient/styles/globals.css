@@ -1,11 +1,77 @@
-html,
-body {
-  padding: 0;
+/* General Reset */
+html, body {
   margin: 0;
+  padding: 0;
   height: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
+  width: 100%;
+  overflow: hidden; /* Prevent scrolling on the body itself */
 }
+
+/* Root container */
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ant Design Layout Adjustments */
+.ant-layout {
+  height: 100%;
+}
+
+.ant-layout-header {
+  height: 50px; /* Match your header height */
+  padding: 0;
+  line-height: 50px;
+  display: flex;
+  align-items: center;
+}
+
+.ant-layout-sider {
+  height: calc(100vh - 50px); /* Adjust height to account for the fixed header */
+  overflow: hidden; /* Ensure the sidebar is fixed and does not scroll */
+}
+
+.ant-layout-has-sider {
+  height: calc(100vh - 50px); /* Adjust height for the header */
+}
+
+/* Content layout adjustments */
+.ant-layout-content {
+  flex: 1; /* Allows the content to grow and occupy remaining space */
+  overflow-y: auto; /* Enable vertical scrolling for breadcrumb and content */
+  padding: 0 24px 24px; /* 0 top, 24px left/right/bottom */
+}
+
+/* Utility Classes */
+
+/* Flex container with column layout */
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollable container */
+.scrollable {
+  overflow-y: auto;
+}
+
+/* Hide overflow for containers */
+.overflow-hidden {
+  overflow: hidden;
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .ant-layout-content {
+    padding: 0 16px 16px; /* Reduce padding for smaller screens */
+  }
+}
+
+
+
+/* Other Custom Styles */
 
 .trigger {
   padding: 0 24px;

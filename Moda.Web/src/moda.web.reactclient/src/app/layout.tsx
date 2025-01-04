@@ -42,22 +42,18 @@ const RootLayout = ({ children }: React.PropsWithChildren) => (
               <AuthenticatedTemplate>
                 <QueryClientProvider client={queryClient}>
                   <MenuToggleProvider>
+                    {/* Main Layout */}
                     <Layout>
+                      {/* Fixed Header */}
                       <AppHeader />
                       <LoadingAccount>
-                        <Layout hasSider style={{ minHeight: '100vh' }}>
+                        {/* Sidebar and Content */}
+                        <Layout hasSider className="ant-layout-has-sider">
                           <AppMenu />
-                          <Layout style={{ padding: '0 24px 24px' }}>
+                          <Content className="ant-layout-content">
                             <AppBreadcrumb />
-                            <Content
-                              style={{
-                                margin: 0,
-                                height: '100%',
-                              }}
-                            >
-                              {children}
-                            </Content>
-                          </Layout>
+                            {children}
+                          </Content>
                         </Layout>
                       </LoadingAccount>
                     </Layout>
