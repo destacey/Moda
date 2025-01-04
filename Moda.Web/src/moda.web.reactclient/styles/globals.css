@@ -14,30 +14,17 @@ html, body {
   flex-direction: column;
 }
 
-/* Ant Design Layout Adjustments */
-.ant-layout {
-  height: 100%;
+.app-main-layout {
+  height: calc(100vh - 50px); /* Adjust height for the header */
 }
 
-.ant-layout-header {
-  height: 50px; /* Match your header height */
-  padding: 0;
-  line-height: 50px;
-  display: flex;
-  align-items: center;
-}
-
-.ant-layout-sider {
+.app-side-nav  {
   height: calc(100vh - 50px); /* Adjust height to account for the fixed header */
   overflow: hidden; /* Ensure the sidebar is fixed and does not scroll */
 }
 
-.ant-layout-has-sider {
-  height: calc(100vh - 50px); /* Adjust height for the header */
-}
-
 /* Content layout adjustments */
-.ant-layout-content {
+.app-main-content {
   flex: 1; /* Allows the content to grow and occupy remaining space */
   overflow-y: auto; /* Enable vertical scrolling for breadcrumb and content */
   padding: 0 24px 24px; /* 0 top, 24px left/right/bottom */
@@ -89,6 +76,9 @@ html, body {
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
+  .app-side-nav {
+    display: none;
+  }
   .ant-layout-content {
     padding: 0 16px 16px; /* Reduce padding for smaller screens */
   }

@@ -1,3 +1,5 @@
+'use client'
+
 import {
   TeamOutlined,
   HomeOutlined,
@@ -5,22 +7,16 @@ import {
   ScheduleOutlined,
   CarryOutOutlined,
 } from '@ant-design/icons'
-import { Layout, Menu } from 'antd'
-import { useMemo } from 'react'
-import useAuth from '../../contexts/auth'
 import {
-  Item,
-  MenuItem,
   filterAndTransformMenuItem,
+  Item,
   menuItem,
+  MenuItem,
   restrictedPermissionMenuItem,
 } from './menu-helper'
-import useMenuToggle from '../../contexts/menu-toggle'
-import useTheme from '../../contexts/theme'
+import { useMemo } from 'react'
 import { ItemType, MenuItemType } from 'antd/es/menu/interface'
-import React from 'react'
-
-const { Sider } = Layout
+import useAuth from '../../components/contexts/auth'
 
 const menuIcons = {
   home: <HomeOutlined />,
@@ -30,7 +26,7 @@ const menuIcons = {
   settings: <SettingOutlined />,
 }
 
-const menu: (Item | MenuItem)[] = [
+const menuItems: (Item | MenuItem)[] = [
   menuItem('Home', 'home', '/', menuIcons.home),
   menuItem('Organizations', 'org', null, menuIcons.org, [
     menuItem('Teams', 'org.teams', '/organizations/teams'),
@@ -85,35 +81,19 @@ const menu: (Item | MenuItem)[] = [
   menuItem('Settings', 'settings', '/settings', menuIcons.settings),
 ]
 
-const AppMenu = React.memo(() => {
-  const { menuCollapsed } = useMenuToggle()
-  const { currentThemeName } = useTheme()
+const useAppMenuItems = () => {
   const { hasClaim } = useAuth()
 
   const filteredMenuItems = useMemo(
     () =>
-      menu.reduce(
+      menuItems.reduce(
         (acc, item) => filterAndTransformMenuItem(acc, item, hasClaim),
         [] as ItemType<MenuItemType>[],
       ),
     [hasClaim],
   )
 
-  const menuStyle = useMemo(() => ({ minHeight: '100%' }), [])
-  const siderTheme = useMemo(() => currentThemeName, [currentThemeName])
+  return filteredMenuItems
+}
 
-  return (
-    <Sider
-      theme={siderTheme}
-      width={235}
-      collapsedWidth={50}
-      collapsed={menuCollapsed}
-    >
-      <Menu mode="inline" style={menuStyle} items={filteredMenuItems} />
-    </Sider>
-  )
-})
-
-AppMenu.displayName = 'AppMenu'
-
-export default AppMenu
+export default useAppMenuItems
