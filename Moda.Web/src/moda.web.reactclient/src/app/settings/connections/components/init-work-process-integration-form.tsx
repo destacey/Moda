@@ -1,4 +1,4 @@
-import useAuth from '@/src/app/components/contexts/auth'
+import useAuth from '@/src/components/contexts/auth'
 import { InitWorkProcessIntegrationRequest } from '@/src/services/moda-api'
 import { useInitAzdoConnectionWorkProcessMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { Modal, Typography, message } from 'antd'

@@ -19,7 +19,7 @@ import {
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getRoadmapsClient } from '@/src/services/clients'
-import { OptionModel } from '@/src/app/components/types'
+import { OptionModel } from '@/src/components/types'
 
 export const roadmapApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

@@ -1,6 +1,6 @@
 'use client'
 
-import useAuth from '@/src/app/components/contexts/auth'
+import useAuth from '@/src/components/contexts/auth'
 import { UpdateWorkTypeRequest, WorkTypeDto } from '@/src/services/moda-api'
 import {
   useGetWorkTypeQuery,

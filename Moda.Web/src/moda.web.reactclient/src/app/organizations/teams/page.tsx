@@ -1,13 +1,13 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
+import PageTitle from '@/src/components/common/page-title'
 import { useEffect, useMemo } from 'react'
-import ModaGrid from '../../components/common/moda-grid'
+import ModaGrid from '../../../components/common/moda-grid'
 import { ItemType } from 'antd/es/menu/interface'
 import { Button } from 'antd'
-import { useDocumentTitle } from '../../hooks/use-document-title'
-import useAuth from '../../components/contexts/auth'
-import { useAppSelector, useAppDispatch } from '../../hooks'
+import { useDocumentTitle } from '../../../hooks/use-document-title'
+import useAuth from '../../../components/contexts/auth'
+import { useAppSelector, useAppDispatch } from '../../../hooks'
 import {
   retrieveTeams,
   setIncludeInactive,
@@ -15,15 +15,15 @@ import {
   selectTeamsContext,
   selectTeamIsInEditMode,
 } from '../../../store/features/organizations/team-slice'
-import { ModalCreateTeamForm } from '../components/create-team-form'
+import { ModalCreateTeamForm } from '../_components/create-team-form'
 import {
   NestedTeamOfTeamsNameLinkCellRenderer,
   TeamNameLinkCellRenderer,
-} from '../../components/common/moda-grid-cell-renderers'
+} from '../../../components/common/moda-grid-cell-renderers'
 import { TeamListItem } from '../types'
 import { ColDef } from 'ag-grid-community'
-import { ControlItemSwitch } from '../../components/common/control-items-menu'
-import { authorizePage } from '../../components/hoc'
+import { ControlItemSwitch } from '../../../components/common/control-items-menu'
+import { authorizePage } from '../../../components/hoc'
 
 const TeamListPage = () => {
   useDocumentTitle('Teams')

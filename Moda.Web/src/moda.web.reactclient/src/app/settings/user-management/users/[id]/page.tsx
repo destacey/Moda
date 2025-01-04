@@ -1,13 +1,13 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
-import { authorizePage } from '@/src/app/components/hoc'
+import PageTitle from '@/src/components/common/page-title'
+import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
 import UserDetailsLoading from './loading'
 import { useEffect, useState } from 'react'
 import UserDetails from './user-details'
 import { Card, message } from 'antd'
-import BasicBreadcrumb from '@/src/app/components/common/basic-breadcrumb'
+import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
 
 const UserDetailsPage = ({ params }) => {

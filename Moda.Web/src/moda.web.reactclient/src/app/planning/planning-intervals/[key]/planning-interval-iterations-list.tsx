@@ -1,6 +1,6 @@
 'use client'
 
-import ModaDateRange from '@/src/app/components/common/moda-date-range'
+import ModaDateRange from '@/src/components/common/moda-date-range'
 import { useGetPlanningIntervalIterations } from '@/src/services/queries/planning-queries'
 import { Card, List } from 'antd'
 

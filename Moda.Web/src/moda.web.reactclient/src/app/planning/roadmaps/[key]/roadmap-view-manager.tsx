@@ -5,8 +5,8 @@ import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useEffect, useMemo, useState } from 'react'
 import { MessageInstance } from 'antd/es/message/interface'
-import { RoadmapsTimeline } from '../components'
-import RoadmapItemsGrid from '../components/roadmap-items-grid'
+import { RoadmapsTimeline } from '../_components'
+import RoadmapItemsGrid from '../_components/roadmap-items-grid'
 
 interface RoadmapViewManagerProps {
   roadmap: RoadmapDetailsDto

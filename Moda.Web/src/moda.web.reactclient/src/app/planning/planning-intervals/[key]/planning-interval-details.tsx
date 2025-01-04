@@ -1,6 +1,6 @@
 'use client'
 
-import LinksCard from '@/src/app/components/common/links/links-card'
+import LinksCard from '@/src/components/common/links/links-card'
 import { PlanningIntervalDetailsDto } from '@/src/services/moda-api'
 import { Card, Col, Descriptions, Divider, Row, Space, Statistic } from 'antd'
 import dayjs from 'dayjs'
@@ -18,7 +18,7 @@ import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/plan
 import ObjectiveHealthChart, {
   ObjectiveHealthChartDataItem,
 } from './objective-health-chart'
-import { MarkdownRenderer } from '@/src/app/components/common/markdown'
+import { MarkdownRenderer } from '@/src/components/common/markdown'
 
 const { Item } = Descriptions
 

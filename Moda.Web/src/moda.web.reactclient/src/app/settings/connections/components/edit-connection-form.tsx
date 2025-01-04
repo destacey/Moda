@@ -1,7 +1,7 @@
 'use client'
 
-import { MarkdownEditor } from '@/src/app/components/common/markdown'
-import useAuth from '@/src/app/components/contexts/auth'
+import { MarkdownEditor } from '@/src/components/common/markdown'
+import useAuth from '@/src/components/contexts/auth'
 import {
   AzureDevOpsBoardsConnectionDetailsDto,
   TestAzureDevOpsBoardConnectionRequest,

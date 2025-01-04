@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
-import useAuth from '@/src/app/components/contexts/auth'
+import useAuth from '@/src/components/contexts/auth'
 import {
   AzdoConnectionTeamMappingsRequest,
   AzdoWorkspaceTeamMappingRequest,

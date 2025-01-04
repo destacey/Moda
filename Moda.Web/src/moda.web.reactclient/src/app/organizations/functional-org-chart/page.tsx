@@ -1,11 +1,11 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { authorizePage } from '../../components/hoc'
-import { useAppDispatch, useDocumentTitle } from '../../hooks'
+import { authorizePage } from '../../../components/hoc'
+import { useAppDispatch, useDocumentTitle } from '../../../hooks'
 import { disableBreadcrumb } from '@/src/store/breadcrumbs'
 import { useEffect, useMemo, useState } from 'react'
-import { PageTitle } from '../../components/common'
+import { PageTitle } from '../../../components/common'
 import { useGetFunctionalOrganizationChartQuery } from '@/src/store/features/organizations/team-api'
 import {
   OrganizationalUnitDto,
@@ -17,8 +17,8 @@ import {
   OrganizationChartEdgeData,
   OrganizationChartGraphData,
   OrganizationChartNodeData,
-} from '../../components/common/organization-chart'
-import { OrganizationalChartTeamNode } from '../components'
+} from '../../../components/common/organization-chart'
+import { OrganizationalChartTeamNode } from '../_components'
 import dayjs from 'dayjs'
 
 export type OrganizationalUnitWithoutId = Omit<

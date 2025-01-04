@@ -1,39 +1,39 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
+import PageTitle from '@/src/components/common/page-title'
 import { Card, MenuProps, message } from 'antd'
 import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
 import TeamDetails from './team-details'
 import RisksGrid, {
   RisksGridProps,
-} from '@/src/app/components/common/planning/risks-grid'
-import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
+} from '@/src/components/common/planning/risks-grid'
+import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import {
   CreateTeamMembershipForm,
   EditTeamForm,
   TeamMembershipsGrid,
-} from '../../components'
-import useAuth from '@/src/app/components/contexts/auth'
+} from '../../_components'
+import useAuth from '@/src/components/contexts/auth'
 import {
   useGetTeamMemberships,
   useGetTeamRisks,
 } from '@/src/services/queries/organization-queries'
-import { authorizePage } from '@/src/app/components/hoc'
+import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import {
   retrieveTeam,
   setEditMode,
   selectEditTeamContext,
 } from '../../../../store/features/organizations/team-slice'
-import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
+import { useAppDispatch, useAppSelector } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
-import { WorkItemsBacklogGrid } from '@/src/app/components/common/work'
+import { WorkItemsBacklogGrid } from '@/src/components/common/work'
 import { useGetTeamBacklogQuery } from '@/src/store/features/organizations/team-api'
-import { WorkItemsBacklogGridProps } from '@/src/app/components/common/work/work-items-backlog-grid'
+import { WorkItemsBacklogGridProps } from '@/src/components/common/work/work-items-backlog-grid'
 import TeamDependencyManagement from './team-dependency-management'
 import { ItemType } from 'antd/es/menu/interface'
-import { InactiveTag, PageActions } from '@/src/app/components/common'
-import DeactivateTeamForm from '../../components/deactivate-team-form'
+import { InactiveTag, PageActions } from '@/src/components/common'
+import DeactivateTeamForm from '../../_components/deactivate-team-form'
 
 enum TeamTabs {
   Details = 'details',

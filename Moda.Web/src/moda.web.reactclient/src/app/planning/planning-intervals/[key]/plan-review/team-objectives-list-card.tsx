@@ -4,10 +4,10 @@ import { PlanningIntervalObjectiveListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
 import { Badge, Button, Card, List, Space, message } from 'antd'
 import ObjectiveListItem from './objective-list-item'
-import ModaEmpty from '@/src/app/components/common/moda-empty'
+import ModaEmpty from '@/src/components/common/moda-empty'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import CreatePlanningIntervalObjectiveForm from '../../components/create-planning-interval-objective-form'
-import useTheme from '@/src/app/components/contexts/theme'
+import CreatePlanningIntervalObjectiveForm from '../../_components/create-planning-interval-objective-form'
+import useTheme from '@/src/components/contexts/theme'
 import {
   DndContext,
   DragEndEvent,

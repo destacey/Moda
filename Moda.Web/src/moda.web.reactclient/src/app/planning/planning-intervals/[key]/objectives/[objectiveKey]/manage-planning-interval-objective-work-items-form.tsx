@@ -1,6 +1,6 @@
 'use client'
 
-import { useDebounce } from '@/src/app/hooks'
+import { useDebounce } from '@/src/hooks'
 import {
   ManagePlanningIntervalObjectiveWorkItemsRequest,
   WorkItemListDto,
@@ -19,7 +19,7 @@ import {
   AgGridTransfer,
   asDeletableColDefs,
   asDraggableColDefs,
-} from '@/src/app/components/common/grid/ag-grid-transfer'
+} from '@/src/components/common/grid/ag-grid-transfer'
 
 const { Text } = Typography
 

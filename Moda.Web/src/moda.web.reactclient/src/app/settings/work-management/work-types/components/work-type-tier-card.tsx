@@ -1,4 +1,4 @@
-import { ModaEmpty } from '@/src/app/components/common'
+import { ModaEmpty } from '@/src/components/common'
 import { WorkTypeLevelDto, WorkTypeTierDto } from '@/src/services/moda-api'
 import { Button, Card, List, Typography } from 'antd'
 import { useEffect, useState } from 'react'

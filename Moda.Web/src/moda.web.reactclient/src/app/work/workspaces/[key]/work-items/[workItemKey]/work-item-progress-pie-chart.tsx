@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { WorkItemProgressDailyRollupDto } from '@/src/services/moda-api'
-import useTheme from '@/src/app/components/contexts/theme'
+import useTheme from '@/src/components/contexts/theme'
 import { Card } from 'antd'
 
 const Pie = dynamic(

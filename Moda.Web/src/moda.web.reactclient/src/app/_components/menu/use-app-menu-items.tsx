@@ -16,7 +16,7 @@ import {
 } from './menu-helper'
 import { useMemo } from 'react'
 import { ItemType, MenuItemType } from 'antd/es/menu/interface'
-import useAuth from '../../components/contexts/auth'
+import useAuth from '../../../components/contexts/auth'
 
 const menuIcons = {
   home: <HomeOutlined />,

@@ -1,13 +1,9 @@
 'use client'
 
-import {
-  ModaDateRange,
-  PageActions,
-  PageTitle,
-} from '@/src/app/components/common'
-import useAuth from '@/src/app/components/contexts/auth'
-import { authorizePage } from '@/src/app/components/hoc'
-import { useAppDispatch, useDocumentTitle } from '@/src/app/hooks'
+import { ModaDateRange, PageActions, PageTitle } from '@/src/components/common'
+import useAuth from '@/src/components/contexts/auth'
+import { authorizePage } from '@/src/components/hoc'
+import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
 import {
   useGetRoadmapItemsQuery,
   useGetRoadmapQuery,
@@ -19,12 +15,12 @@ import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
 import { Descriptions, Divider, MenuProps, message } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import EditRoadmapForm from '../components/edit-roadmap-form'
+import EditRoadmapForm from '../_components/edit-roadmap-form'
 import RoadmapViewManager from './roadmap-view-manager'
-import { DeleteRoadmapForm, RoadmapItemDrawer } from '../components'
-import CreateRoadmapActivityForm from '../components/create-roadmap-activity-form'
-import CreateRoadmapTimeboxForm from '../components/create-roadmap-timebox-form'
-import { MarkdownRenderer } from '@/src/app/components/common/markdown'
+import { DeleteRoadmapForm, RoadmapItemDrawer } from '../_components'
+import CreateRoadmapActivityForm from '../_components/create-roadmap-activity-form'
+import CreateRoadmapTimeboxForm from '../_components/create-roadmap-timebox-form'
+import { MarkdownRenderer } from '@/src/components/common/markdown'
 
 const { Item } = Descriptions
 

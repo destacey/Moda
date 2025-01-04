@@ -1,5 +1,5 @@
-import { MarkdownEditor } from '@/src/app/components/common/markdown'
-import useAuth from '@/src/app/components/contexts/auth'
+import { MarkdownEditor } from '@/src/components/common/markdown'
+import useAuth from '@/src/components/contexts/auth'
 import { CreateWorkTypeLevelRequest } from '@/src/services/moda-api'
 import { useCreateWorkTypeLevelMutation } from '@/src/store/features/work-management/work-type-level-api'
 import { toFormErrors } from '@/src/utils'

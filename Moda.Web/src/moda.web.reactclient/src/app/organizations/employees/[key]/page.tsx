@@ -1,17 +1,17 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
+import PageTitle from '@/src/components/common/page-title'
 import { EmployeeDetailsDto } from '@/src/services/moda-api'
 import { useEffect, useState } from 'react'
 import EmployeeDetails from './employee-details'
 import { getEmployeesClient } from '@/src/services/clients'
 import { Card } from 'antd'
-import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import { authorizePage } from '@/src/app/components/hoc'
+import { useDocumentTitle } from '@/src/hooks/use-document-title'
+import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
-import { useAppDispatch } from '@/src/app/hooks'
+import { useAppDispatch } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
-import { InactiveTag } from '@/src/app/components/common'
+import { InactiveTag } from '@/src/components/common'
 
 const EmployeeDetailsPage = ({ params }) => {
   useDocumentTitle('Employee Details')

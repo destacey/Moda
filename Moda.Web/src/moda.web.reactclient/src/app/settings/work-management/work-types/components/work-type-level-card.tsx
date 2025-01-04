@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { EditOutlined, HolderOutlined } from '@ant-design/icons'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { MarkdownRenderer } from '@/src/app/components/common/markdown'
+import { MarkdownRenderer } from '@/src/components/common/markdown'
 
 const { Item } = List
 const { Meta } = Item

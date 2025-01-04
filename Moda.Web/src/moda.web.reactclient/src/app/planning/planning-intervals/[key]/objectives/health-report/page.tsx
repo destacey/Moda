@@ -1,9 +1,9 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
+import PageTitle from '@/src/components/common/page-title'
 import { useCallback, useMemo } from 'react'
-import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import { authorizePage } from '@/src/app/components/hoc'
+import { useDocumentTitle } from '@/src/hooks/use-document-title'
+import { authorizePage } from '@/src/components/hoc'
 import {
   useGetPlanningInterval,
   useGetPlanningIntervalObjectivesHealthReport,
@@ -15,9 +15,9 @@ import {
   HealthCheckStatusCellRenderer,
   HealthCheckStatusColumn,
   NestedTeamNameLinkCellRenderer,
-} from '@/src/app/components/common/moda-grid-cell-renderers'
+} from '@/src/components/common/moda-grid-cell-renderers'
 import dayjs from 'dayjs'
-import { ModaGrid } from '@/src/app/components/common'
+import { ModaGrid } from '@/src/components/common'
 import { Progress } from 'antd'
 
 const LocalHealthCheckCellRenderer = ({ data }) => {

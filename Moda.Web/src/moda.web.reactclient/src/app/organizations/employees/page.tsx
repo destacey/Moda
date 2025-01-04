@@ -1,14 +1,14 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
-import ModaGrid from '../../components/common/moda-grid'
+import PageTitle from '@/src/components/common/page-title'
+import ModaGrid from '../../../components/common/moda-grid'
 import { useCallback, useMemo, useState } from 'react'
 import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
-import { useDocumentTitle } from '../../hooks/use-document-title'
+import { useDocumentTitle } from '../../../hooks/use-document-title'
 import { useGetEmployees } from '@/src/services/queries/organization-queries'
-import { ControlItemSwitch } from '../../components/common/control-items-menu'
-import { authorizePage } from '../../components/hoc'
+import { ControlItemSwitch } from '../../../components/common/control-items-menu'
+import { authorizePage } from '../../../components/hoc'
 
 const EmployeeLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/organizations/employees/${data.key}`}>{value}</Link>

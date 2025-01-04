@@ -3,14 +3,14 @@
 import React, { useEffect, useState } from 'react'
 import { Card } from 'antd'
 import { usePathname } from 'next/navigation'
-import PageTitle from '../../components/common/page-title'
+import PageTitle from '../../../components/common/page-title'
 import ProfileForm from './profile-form'
 import ClaimsGrid from './claims-grid'
-import useAuth from '../../components/contexts/auth'
-import { useDocumentTitle } from '../../hooks/use-document-title'
+import useAuth from '../../../components/contexts/auth'
+import { useDocumentTitle } from '../../../hooks/use-document-title'
 import { getProfileClient } from '@/src/services/clients'
 import { UserDetailsDto } from '@/src/services/moda-api'
-import { useAppDispatch } from '@/src/app/hooks'
+import { useAppDispatch } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 
 const AccountProfilePage = () => {
@@ -46,7 +46,7 @@ const AccountProfilePage = () => {
 
   useEffect(() => {
     if (!isLoading && user) {
-      dispatch(setBreadcrumbTitle({title: user.name, pathname}))
+      dispatch(setBreadcrumbTitle({ title: user.name, pathname }))
     }
   }, [user, isLoading, pathname, dispatch])
 

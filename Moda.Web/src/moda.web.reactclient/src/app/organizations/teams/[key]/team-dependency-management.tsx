@@ -1,6 +1,6 @@
 'use client'
 
-import TeamDependenciesGrid from '@/src/app/components/common/organizations/team-dependencies-grid'
+import TeamDependenciesGrid from '@/src/components/common/organizations/team-dependencies-grid'
 import { TeamDetailsDto } from '@/src/services/moda-api'
 import { useGetTeamDependenciesQuery } from '@/src/store/features/organizations/team-api'
 import { useEffect } from 'react'

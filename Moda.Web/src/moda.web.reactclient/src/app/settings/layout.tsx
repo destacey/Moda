@@ -1,8 +1,8 @@
 'use client'
 
 import { Card, Divider, Layout } from 'antd'
-import { PageTitle } from '../components/common'
-import SettingsMenu from './components/settings-menu'
+import { PageTitle } from '../../components/common'
+import SettingsMenu from './_components/settings-menu'
 
 const { Content, Sider } = Layout
 

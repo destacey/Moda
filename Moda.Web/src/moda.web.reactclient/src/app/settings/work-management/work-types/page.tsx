@@ -1,24 +1,20 @@
 'use client'
 
-import { ModaGrid, PageTitle } from '@/src/app/components/common'
-import {
-  useAppDispatch,
-  useAppSelector,
-  useDocumentTitle,
-} from '@/src/app/hooks'
+import { ModaGrid, PageTitle } from '@/src/components/common'
+import { useAppDispatch, useAppSelector, useDocumentTitle } from '@/src/hooks'
 import { WorkTypeDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import { Button } from 'antd'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { setIncludeInactive } from '../../../../store/features/work-management/work-type-slice'
-import { authorizePage } from '@/src/app/components/hoc'
+import { authorizePage } from '@/src/components/hoc'
 import { useGetWorkTypesQuery } from '@/src/store/features/work-management/work-type-api'
-import useAuth from '@/src/app/components/contexts/auth'
+import useAuth from '@/src/components/contexts/auth'
 import { EditOutlined } from '@ant-design/icons'
 import EditWorkTypeForm from './components/edit-work-type-form'
 import Link from 'next/link'
 import { ItemType } from 'antd/es/menu/interface'
-import { ControlItemSwitch } from '@/src/app/components/common/control-items-menu'
+import { ControlItemSwitch } from '@/src/components/common/control-items-menu'
 
 const WorkTypesPage = () => {
   useDocumentTitle('Work Management - Work Types')

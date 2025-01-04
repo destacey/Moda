@@ -1,32 +1,32 @@
 'use client'
 
-import PageTitle from '@/src/app/components/common/page-title'
+import PageTitle from '@/src/components/common/page-title'
 import { Card, MenuProps, message } from 'antd'
 import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
 import TeamOfTeamsDetails from './team-of-teams-details'
 import RisksGrid, {
   RisksGridProps,
-} from '@/src/app/components/common/planning/risks-grid'
-import { useDocumentTitle } from '@/src/app/hooks/use-document-title'
-import { EditTeamForm, TeamMembershipsGrid } from '../../components'
-import useAuth from '@/src/app/components/contexts/auth'
+} from '@/src/components/common/planning/risks-grid'
+import { useDocumentTitle } from '@/src/hooks/use-document-title'
+import { EditTeamForm, TeamMembershipsGrid } from '../../_components'
+import useAuth from '@/src/components/contexts/auth'
 import {
   useGetTeamOfTeamsMemberships,
   useGetTeamOfTeamsRisks,
 } from '@/src/services/queries/organization-queries'
-import { authorizePage } from '@/src/app/components/hoc'
+import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import {
   retrieveTeam,
   setEditMode,
   selectTeamContext,
 } from '../../../../store/features/organizations/team-slice'
-import { useAppDispatch, useAppSelector } from '@/src/app/hooks'
+import { useAppDispatch, useAppSelector } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
-import { CreateTeamMembershipForm } from '../../components'
-import { InactiveTag, PageActions } from '@/src/app/components/common'
+import { CreateTeamMembershipForm } from '../../_components'
+import { InactiveTag, PageActions } from '@/src/components/common'
 import { ItemType } from 'antd/es/menu/interface'
-import DeactivateTeamOfTeamsForm from '../../components/deactivate-team-of-teams-form'
+import DeactivateTeamOfTeamsForm from '../../_components/deactivate-team-of-teams-form'
 
 enum TeamOfTeamsTabs {
   Details = 'details',

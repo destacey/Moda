@@ -1,4 +1,4 @@
-import useAuth from '@/src/app/components/contexts/auth'
+import useAuth from '@/src/components/contexts/auth'
 import { InitWorkspaceIntegrationRequest } from '@/src/services/moda-api'
 import { useInitAzdoConnectionWorkspaceMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { toFormErrors } from '@/src/utils'

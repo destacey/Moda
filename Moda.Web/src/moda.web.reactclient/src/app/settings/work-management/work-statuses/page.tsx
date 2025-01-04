@@ -1,18 +1,14 @@
 'use client'
 
-import { ModaGrid, PageTitle } from '@/src/app/components/common'
-import {
-  useAppDispatch,
-  useAppSelector,
-  useDocumentTitle,
-} from '@/src/app/hooks'
+import { ModaGrid, PageTitle } from '@/src/components/common'
+import { useAppDispatch, useAppSelector, useDocumentTitle } from '@/src/hooks'
 import { WorkStatusDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import { useCallback, useEffect, useMemo } from 'react'
 import { setIncludeInactive } from '../../../../store/features/work-management/work-status-slice'
-import { authorizePage } from '@/src/app/components/hoc'
+import { authorizePage } from '@/src/components/hoc'
 import { useGetWorkStatusesQuery } from '@/src/store/features/work-management/work-status-api'
-import { ControlItemSwitch } from '@/src/app/components/common/control-items-menu'
+import { ControlItemSwitch } from '@/src/components/common/control-items-menu'
 import { ItemType } from 'antd/es/menu/interface'
 
 const WorkStatusesPage = () => {
