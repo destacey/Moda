@@ -395,6 +395,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
           isLoading={isLoading}
           options={timelineOptions}
           rangeItemTemplate={RoadmapRangeItemTemplate}
+          allowFullScreen={true}
         />
       </Card>
     </>

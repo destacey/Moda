@@ -8,7 +8,7 @@ import {
   TimelineOptions,
   TimelineOptionsTemplateFunction,
 } from 'vis-timeline/standalone'
-import { Spin } from 'antd'
+import { Button, Spin } from 'antd'
 import useTheme from '../../contexts/theme'
 import { ModaEmpty } from '..'
 import './moda-timeline.css'
@@ -22,16 +22,21 @@ import {
   ModaTimelineProps,
   TimelineTemplate,
 } from '.'
+import { FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons'
 
 const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   props: ModaTimelineProps<TItem, TGroup>,
 ) => {
   const [isTimelineLoading, setIsTimelineLoading] = useState(false)
+  const [isFullScreen, setIsFullScreen] = useState(false)
 
   const elementMapRef = useRef<Record<string | number, HTMLElement>>({})
   const timelineRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  const { currentThemeName } = useTheme()
+  const { currentThemeName, token } = useTheme()
+
+  const enableFullScreenToggle = props.allowFullScreen ?? false
 
   const colors = useMemo(
     () => DefaultTimeLineColors[currentThemeName],
@@ -227,16 +232,58 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     props.isLoading,
   ])
 
+  const toggleFullScreen = () => {
+    if (!enableFullScreenToggle) return
+    setIsFullScreen(!isFullScreen)
+  }
+
   const isLoading = props.isLoading || isTimelineLoading
 
   return (
     <Spin spinning={isLoading} tip="Loading timeline..." size="large">
-      <div ref={timelineRef} />
-      {!isLoading &&
-        (!props.data || props.data.length === 0) &&
-        (!props.groups || props.groups.length === 0) && (
-          <ModaEmpty message={props.emptyMessage ?? 'No timeline data'} />
+      <div
+        ref={containerRef}
+        style={{
+          position: isFullScreen ? 'fixed' : 'relative',
+          top: 0,
+          left: 0,
+          width: isFullScreen ? '100vw' : 'auto',
+          height: isFullScreen ? '100vh' : 'auto',
+          zIndex: isFullScreen ? 1000 : 'auto',
+          transition: 'all 0.3s ease',
+          background: isFullScreen ? token.colorBgContainer : 'transparent',
+          padding: isFullScreen ? 20 : 0,
+          overflow: isFullScreen ? 'auto' : 'unset',
+        }}
+      >
+        {enableFullScreenToggle && !isLoading && (
+          <Button
+            type="text"
+            shape="circle"
+            title={isFullScreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+            aria-label={
+              isFullScreen ? 'Exit Fullscreen Mode' : 'Enter Fullscreen Mode'
+            }
+            icon={
+              isFullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />
+            }
+            onClick={toggleFullScreen}
+            size="small"
+            style={{
+              position: 'absolute',
+              top: isFullScreen ? 25 : 5,
+              right: isFullScreen ? 25 : 5,
+              zIndex: 1100,
+            }}
+          />
         )}
+        <div ref={timelineRef} />
+        {!isLoading &&
+          (!props.data || props.data.length === 0) &&
+          (!props.groups || props.groups.length === 0) && (
+            <ModaEmpty message={props.emptyMessage ?? 'No timeline data'} />
+          )}
+      </div>
     </Spin>
   )
 }
