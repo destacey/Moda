@@ -39,6 +39,7 @@ export type ModaTimelineProps<
   groupTemplate?: TimelineTemplate<TGroup>
   emptyMessage?: string
   allowFullScreen?: boolean
+  allowSaveAsImage?: boolean
 }
 
 export type GroupTemplateProps<T extends ModaDataGroup> = {

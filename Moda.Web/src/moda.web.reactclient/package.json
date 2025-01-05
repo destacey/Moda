@@ -51,6 +51,7 @@
     "apexcharts": "4.3.0",
     "axios": "1.7.9",
     "dayjs": "1.11.13",
+    "html2canvas": "^1.4.1",
     "jwt-decode": "4.0.0",
     "lodash.difference": "4.5.0",
     "lodash.sortby": "4.7.0",

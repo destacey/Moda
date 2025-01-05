@@ -22,7 +22,13 @@ import {
   ModaTimelineProps,
   TimelineTemplate,
 } from '.'
-import { FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons'
+import {
+  FileImageOutlined,
+  FullscreenExitOutlined,
+  FullscreenOutlined,
+} from '@ant-design/icons'
+import { saveElementAsImage } from '@/src/utils'
+import { Options } from 'html2canvas'
 
 const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   props: ModaTimelineProps<TItem, TGroup>,
@@ -37,6 +43,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   const { currentThemeName, token } = useTheme()
 
   const enableFullScreenToggle = props.allowFullScreen ?? false
+  const enableSaveAsImage = props.allowSaveAsImage ?? false
 
   const colors = useMemo(
     () => DefaultTimeLineColors[currentThemeName],
@@ -237,6 +244,16 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     setIsFullScreen(!isFullScreen)
   }
 
+  const saveTimelineAsImage = () => {
+    if (timelineRef.current) {
+      const canvasOptions: Partial<Options> = {
+        backgroundColor: token.colorBgContainer,
+      }
+
+      saveElementAsImage(timelineRef.current, 'timeline.png', canvasOptions)
+    }
+  }
+
   const isLoading = props.isLoading || isTimelineLoading
 
   return (
@@ -273,6 +290,23 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
               position: 'absolute',
               top: isFullScreen ? 25 : 5,
               right: isFullScreen ? 25 : 5,
+              zIndex: 1100,
+            }}
+          />
+        )}
+        {enableSaveAsImage && !isLoading && (
+          <Button
+            type="text"
+            shape="circle"
+            title="Save Timeline as Image"
+            aria-label="Save Timeline as Image"
+            icon={<FileImageOutlined />}
+            onClick={saveTimelineAsImage}
+            size="small"
+            style={{
+              position: 'absolute',
+              top: isFullScreen ? 25 : 5,
+              right: isFullScreen ? 65 : 45, // Adjust position for multiple buttons
               zIndex: 1100,
             }}
           />
