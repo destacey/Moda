@@ -38,6 +38,7 @@ export type ModaTimelineProps<
   rangeItemTemplate?: TimelineTemplate<TItem>
   groupTemplate?: TimelineTemplate<TGroup>
   emptyMessage?: string
+  allowFullScreen?: boolean
 }
 
 export type GroupTemplateProps<T extends ModaDataGroup> = {
