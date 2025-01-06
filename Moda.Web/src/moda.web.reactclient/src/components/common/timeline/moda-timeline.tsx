@@ -35,6 +35,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
 ) => {
   const [isTimelineLoading, setIsTimelineLoading] = useState(false)
   const [isFullScreen, setIsFullScreen] = useState(false)
+  const [dynamicOptions, setDynamicOptions] = useState<TimelineOptions>({})
 
   const elementMapRef = useRef<Record<string | number, HTMLElement>>({})
   const timelineRef = useRef<HTMLDivElement>(null)
@@ -133,7 +134,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     [colors.item.font, colors.item.foreground, props],
   )
 
-  const options = useMemo((): TimelineOptions => {
+  const baseOptions = useMemo((): TimelineOptions => {
     return {
       editable: false,
       selectable: true,
@@ -166,6 +167,15 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     props.options.start,
     props.options.template,
   ])
+
+  useEffect(() => {
+    // Update options when fullscreen changes
+    const updatedOptions = {
+      ...baseOptions,
+      maxHeight: isFullScreen ? undefined : baseOptions.maxHeight,
+    }
+    setDynamicOptions(updatedOptions)
+  }, [isFullScreen, baseOptions])
 
   useEffect(() => {
     if (
@@ -211,10 +221,14 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
           timelineRef.current,
           datasetItems,
           new DataSet(props.groups),
-          options,
+          dynamicOptions,
         )
       } else {
-        timeline = new Timeline(timelineRef.current, datasetItems, options)
+        timeline = new Timeline(
+          timelineRef.current,
+          datasetItems,
+          dynamicOptions,
+        )
       }
     }
 
@@ -233,7 +247,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
   }, [
     colors.background.background,
     colors.item.background,
-    options,
+    dynamicOptions,
     props.data,
     props.groups,
     props.isLoading,
