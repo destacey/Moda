@@ -49,28 +49,48 @@ html, body {
 }
 
 /* Scrollbar Styling */
-/* General Scrollbar Styling (Light Mode) */
-.ant-layout-content::-webkit-scrollbar {
-  width: 15px;
+/* Firefox scrollbar styling */
+@supports (scrollbar-color: auto) {
+  @supports not (selector(::-webkit-scrollbar)) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #d0d0d0 #f0f0f0; /* Thumb color and track color for light mode */
+    }
+
+    [data-theme="dark"] * {
+      scrollbar-width: thin;
+      scrollbar-color: #656565 #2a2a2a; /* Thumb color and track color for dark mode */
+    }
+  }
 }
 
-.ant-layout-content::-webkit-scrollbar-thumb {
-  background-color: #d0d0d0; /* Light thumb color */
-  border-radius: 8px;
-}
+/* Webkit scrollbar styling */
+@supports selector(::-webkit-scrollbar) {
+  ::-webkit-scrollbar {
+    width: 15px;
+  }
 
-.ant-layout-content::-webkit-scrollbar-track {
-  background-color: #f0f0f0; /* Light track color */
-}
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar-thumb {
+    background-color: #d0d0d0; /* Light thumb color */
+    border: 3px solid #f0f0f0; /* Matches the track background color */
+    border-radius: 8px;
+    min-height: 20px;
+  }
 
-/* Scrollbar Styling for Dark Mode */
-[data-theme="dark"] .ant-layout-content::-webkit-scrollbar-thumb {
-  background-color: #555; /* Dark thumb color */
-  border-radius: 8px;
-}
+  ::-webkit-scrollbar-track {
+    background-color: #f0f0f0; /* Light track color */
+  }
 
-[data-theme="dark"] .ant-layout-content::-webkit-scrollbar-track {
-  background-color: #2a2a2a; /* Dark track color */
+  /* Scrollbar Styling for Dark Mode */
+  [data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background-color: #656565; /* Dark thumb color */
+    border: 3px solid #2a2a2a; /* Matches the track background color */
+  }
+
+  [data-theme="dark"] ::-webkit-scrollbar-track {
+    background-color: #2a2a2a; /* Dark track color */
+  }
 }
 
 
