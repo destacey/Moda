@@ -1,17 +1,21 @@
 import { createContext, useEffect, useMemo, useState } from 'react'
+import { themeBalham, colorSchemeDark, type Theme as AgGridTheme } from 'ag-grid-community'
 import { useLocalStorageState } from '@/src/hooks'
-import { ConfigProvider, ThemeConfig, theme } from 'antd'
+import { ConfigProvider, theme } from 'antd'
 import lightTheme from '@/src/config/theme/light-theme'
 import darkTheme from '@/src/config/theme/dark-theme'
 import { ThemeContextType, ThemeName } from './types'
 
 export const ThemeContext = createContext<ThemeContextType | null>(null)
 
+const agGridLightTheme = themeBalham;
+const agGridDarkTheme = themeBalham.withPart(colorSchemeDark);
+
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentThemeName, setCurrentThemeName] =
     useLocalStorageState<ThemeName>('modaTheme', 'light')
 
-  const [agGridTheme, setAgGridTheme] = useState('ag-theme-balham')
+  const [agGridTheme, setAgGridTheme] = useState<AgGridTheme>(agGridLightTheme)
   const [badgeColor, setBadgeColor] = useState<string>(null)
   const [antDesignChartsTheme, setAntDesignChartsTheme] = useState('classic')
   const [antvisG6ChartsTheme, setAntvisG6ChartsTheme] = useState('light')
@@ -30,7 +34,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     setAgGridTheme(
-      currentThemeName === 'light' ? 'ag-theme-balham' : 'ag-theme-balham-dark',
+      currentThemeName === 'light' ? agGridLightTheme : agGridDarkTheme,
     )
     setAntDesignChartsTheme(
       currentThemeName === 'light' ? 'classic' : 'classicDark',
