@@ -1,7 +1,5 @@
 'use client'
 
-import 'ag-grid-community/styles/ag-grid.css'
-import 'ag-grid-community/styles/ag-theme-balham.css'
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
 import { useCallback, useRef, useState } from 'react'
 import {
@@ -143,12 +141,13 @@ const ModaGrid = ({
           </Col>
         </Row>
 
-        <div className={agGridTheme} style={{ height: height ?? 700 }}>
+        <div style={{ height: height ?? 700 }}>
           <AgGridReact
             ref={gridRef}
+            theme={agGridTheme}
             defaultColDef={defaultColDef ?? modaDefaultColDef}
             onGridReady={onGridReady}
-            animateRows={false} // annimation has to be off for cell text selection to work correctly
+            animateRows={false} // animation has to be off for cell text selection to work correctly
             rowData={rowData}
             onModelUpdated={onModelUpdated}
             multiSortKey="ctrl"

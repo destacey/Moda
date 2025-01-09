@@ -1,4 +1,5 @@
-import useTheme from '../../components/contexts/theme'
+import { themeBalham } from 'ag-grid-community'
+import useTheme, { ThemeContextType } from '../../components/contexts/theme'
 import useThemeToggleMenuItem from './use-theme-toggle-menu-item'
 import { Mock } from 'jest-mock'
 
@@ -23,10 +24,10 @@ const mockToken = {
   colorTextSecondary: '#666666',
 }
 
-const mockThemeContext = {
+const mockThemeContext: ThemeContextType = {
   currentThemeName: 'light',
   setCurrentThemeName: jest.fn(),
-  agGridTheme: 'ag-theme-balham',
+  agGridTheme: themeBalham,
   token: mockToken as any,
   badgeColor: '#1890ff',
   antDesignChartsTheme: 'classic',

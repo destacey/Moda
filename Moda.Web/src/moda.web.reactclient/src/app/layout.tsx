@@ -1,9 +1,8 @@
 'use client'
 
 import '@/styles/globals.css'
-import 'ag-grid-community/styles/ag-grid.css'
-import 'ag-grid-community/styles/ag-theme-balham.css'
 import React, { useEffect, useState } from 'react'
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'
 import { Provider } from 'react-redux'
 import { Inter } from 'next/font/google'
 import { Layout } from 'antd'
@@ -31,6 +30,9 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+// Register all community features for ag-grid
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const RootLayout = ({ children }: React.PropsWithChildren) => {
   const [isMobile, setIsMobile] = useState(false)

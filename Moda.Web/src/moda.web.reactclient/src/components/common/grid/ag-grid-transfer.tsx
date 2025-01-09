@@ -8,7 +8,7 @@ import {
 } from 'ag-grid-community'
 import { DeleteOutlined } from '@ant-design/icons'
 import useTheme from '@/src/components/contexts/theme'
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { Flex } from 'antd'
 import { AgGridReactProps } from 'ag-grid-react/dist/types/src/shared/interfaces'
@@ -119,7 +119,7 @@ export const AgGridTransfer = <TData extends object>(
 
   const getGrid = useCallback(
     (isLeft: boolean) => (
-      <div className={agGridTheme} style={{ minHeight: 400, width: '100%' }}>
+      <div style={{ minHeight: 400, width: '100%' }}>
         <AgGridReact
           ref={isLeft ? leftGridRef : rightGridRef}
           getRowId={props.getRowId}
@@ -127,6 +127,7 @@ export const AgGridTransfer = <TData extends object>(
           rowSelection={
             isLeft ? props.leftGridRowSelection : props.rightGridRowSelection
           }
+          theme={agGridTheme}
           rowDragMultiRow={isLeft}
           suppressMoveWhenRowDragging={isLeft}
           rowData={isLeft ? props.leftGridData : props.rightGridData}
