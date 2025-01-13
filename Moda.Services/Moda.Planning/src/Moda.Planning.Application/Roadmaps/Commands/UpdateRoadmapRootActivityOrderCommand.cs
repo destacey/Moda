@@ -43,7 +43,7 @@ internal sealed class UpdateRoadmapRootActivityOrderCommandHandler(IPlanningDbCo
             if (roadmap is null)
                 return Result.Failure($"Roadmap with id {request.RoadmapId} not found");
 
-            var updateResult = roadmap.SetChildrenOrder(request.RoadmapActivityId, request.Order, _currentUserEmployeeId);
+            var updateResult = roadmap.SetActivityOrder(request.RoadmapActivityId, request.Order, _currentUserEmployeeId);
             if (updateResult.IsFailure)
             {
                 // Reset the entity

@@ -32,9 +32,22 @@ internal sealed class GetRoadmapItemsQueryHandler(IPlanningDbContext planningDbC
             //.ProjectToType<RoadmapItemDto>() // not working, it's always returning only the BaseRoadmapItem properties
             .ToListAsync(cancellationToken);
 
-        return items
-            .Where(r => r.ParentId == null)
-            .OrderBy(r => r is RoadmapActivity activity ? activity.Order : int.MaxValue)
-            .Adapt<List<RoadmapItemListDto>>();
+        var dtos = items.Adapt<List<RoadmapItemListDto>>();
+
+        return OrderItems(dtos.Where(r => r.Parent == null).ToList());
+    }
+
+    private static List<RoadmapItemListDto> OrderItems(List<RoadmapItemListDto> items)
+    {
+        var orderedItems = items
+            .OrderBy(r => r is RoadmapActivityListDto activity ? activity.Order : int.MaxValue)
+            .ToList();
+
+        foreach (var item in orderedItems.OfType<RoadmapActivityListDto>())
+        {
+            item.Children = OrderItems([.. item.Children]);
+        }
+
+        return orderedItems;
     }
 }

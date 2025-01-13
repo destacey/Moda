@@ -21,6 +21,7 @@ import { DeleteRoadmapForm, RoadmapItemDrawer } from '../_components'
 import CreateRoadmapActivityForm from '../_components/create-roadmap-activity-form'
 import CreateRoadmapTimeboxForm from '../_components/create-roadmap-timebox-form'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
+import ReorganizeRoadmapActivitiesModal from '../_components/reorganize-roadmap-activities-modal'
 
 const { Item } = Descriptions
 
@@ -38,6 +39,8 @@ const RoadmapDetailsPage = ({ params }) => {
     useState<boolean>(false)
   const [openEditRoadmapForm, setOpenEditRoadmapForm] = useState<boolean>(false)
   const [openDeleteRoadmapForm, setOpenDeleteRoadmapForm] =
+    useState<boolean>(false)
+  const [openReorganizeActivitiesModal, setOpenReorganizeActivitiesModal] =
     useState<boolean>(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
@@ -123,7 +126,16 @@ const RoadmapDetailsPage = ({ params }) => {
     if (canUpdateRoadmap) {
       items.push(
         {
-          key: 'divider',
+          key: 'manage-divider',
+          type: 'divider',
+        },
+        {
+          key: 'reorganize-activities',
+          label: 'Reorganize Activities',
+          onClick: () => setOpenReorganizeActivitiesModal(true),
+        },
+        {
+          key: 'create-divider',
           type: 'divider',
         },
         {
@@ -209,6 +221,11 @@ const RoadmapDetailsPage = ({ params }) => {
     [showDrawer],
   )
 
+  const onReorganizeActivitiesModalClose = useCallback(() => {
+    setOpenReorganizeActivitiesModal(false)
+    refetchRoadmapItems()
+  }, [refetchRoadmapItems])
+
   if (isLoading) {
     return <RoadmapDetailsLoading />
   }
@@ -269,6 +286,15 @@ const RoadmapDetailsPage = ({ params }) => {
           showForm={openDeleteRoadmapForm}
           onFormComplete={() => onDeleteFormClosed(true)}
           onFormCancel={() => onDeleteFormClosed(false)}
+          messageApi={messageApi}
+        />
+      )}
+      {openReorganizeActivitiesModal && (
+        <ReorganizeRoadmapActivitiesModal
+          showModal={openReorganizeActivitiesModal}
+          roadmapId={roadmapData?.id}
+          roadmapItems={roadmapItems}
+          onClose={onReorganizeActivitiesModalClose}
           messageApi={messageApi}
         />
       )}

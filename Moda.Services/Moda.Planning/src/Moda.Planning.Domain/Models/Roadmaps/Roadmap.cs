@@ -266,13 +266,13 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
     }
 
     /// <summary>
-    /// Updates the order of the root Roadmap Activities based on a single Roadmap Activity changing its order.
+    /// Updates the order of the Roadmap Activities based on a single Roadmap Activity changing its order.
     /// </summary>
-    /// <param name="childRoadmapId"></param>
+    /// <param name="activityId"></param>
     /// <param name="order"></param>
     /// <param name="currentUserEmployeeId"></param>
     /// <returns></returns>
-    public Result SetChildrenOrder(Guid childRoadmapId, int order, Guid currentUserEmployeeId)
+    public Result SetActivityOrder(Guid activityId, int order, Guid currentUserEmployeeId)
     {
         if (order < 1)
         {
@@ -285,35 +285,50 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
             return isManagerResult;
         }
 
-        var rootActivity = RootActivities
-            .FirstOrDefault(x => x.Id == childRoadmapId);
-        if (rootActivity is null)
+        var updatedActivityResult = GetActivity(activityId);
+        if (updatedActivityResult.IsFailure)
         {
-            return Result.Failure("Root roadmap activity does not exist on this roadmap.");
+            return Result.Failure(updatedActivityResult.Error);
         }
-        else if (rootActivity.Order == order)
+
+        var updatedActivity = updatedActivityResult.Value;
+        if (updatedActivity.Order == order)
         {
             return Result.Success();
         }
 
-        if (rootActivity.Order < order)
+        if (updatedActivity.ParentId.HasValue)
         {
-            foreach (var child in RootActivities.Where(x => x.Order > rootActivity.Order && x.Order <= order))
+
+            var parentActivityResult = GetActivity(updatedActivity.ParentId.Value);
+            if (parentActivityResult.IsFailure)
             {
-                child.SetOrder(child.Order - 1);
+                return Result.Failure(parentActivityResult.Error);
             }
+
+            return parentActivityResult.Value.SetChildActivityOrder(updatedActivity, order);
         }
         else
         {
-            foreach (var child in RootActivities.Where(x => x.Order >= order && x.Order < rootActivity.Order))
+            if (updatedActivity.Order < order)
             {
-                child.SetOrder(child.Order + 1);
+                foreach (var child in RootActivities.Where(x => x.Order > updatedActivity.Order && x.Order <= order))
+                {
+                    child.SetOrder(child.Order - 1);
+                }
             }
+            else
+            {
+                foreach (var child in RootActivities.Where(x => x.Order >= order && x.Order < updatedActivity.Order))
+                {
+                    child.SetOrder(child.Order + 1);
+                }
+            }
+
+            updatedActivity.SetOrder(order);
+
+            ResetRootActivitiesOrder();
         }
-
-        rootActivity.SetOrder(order);
-
-        ResetRootActivitiesOrder();
 
         return Result.Success();
     }
@@ -374,7 +389,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
             T item;
             if (newItem.ParentId.HasValue)
             {
-                var parentActivityResult = GetParentRoadmapActivity(newItem.ParentId.Value);
+                var parentActivityResult = GetActivity(newItem.ParentId.Value);
                 if (parentActivityResult.IsFailure)
                 {
                     return Result.Failure<T>(parentActivityResult.Error);
@@ -458,7 +473,7 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
             RoadmapActivity? parentActivity = null;
             if (item.ParentId.HasValue)
             {
-                var parentActivityResult = GetParentRoadmapActivity(item.ParentId.Value);
+                var parentActivityResult = GetActivity(item.ParentId.Value);
                 if (parentActivityResult.IsFailure)
                 {
                     return Result.Failure(parentActivityResult.Error);
@@ -518,6 +533,95 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         );
     }
 
+    /// <summary>
+    /// Moves an Activity to a new parent Activity and sets the new order.
+    /// </summary>
+    /// <param name="activityId"></param>
+    /// <param name="newParentId"></param>
+    /// <param name="newOrder"></param>
+    /// <param name="currentUserEmployeeId"></param>
+    /// <returns></returns>
+    public Result MoveActivity(Guid activityId, Guid? newParentId, int newOrder, Guid currentUserEmployeeId)
+    {
+        var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
+        if (isManagerResult.IsFailure)
+        {
+            return isManagerResult;
+        }
+
+        var activityResult = GetActivity(activityId);
+        if (activityResult.IsFailure)
+        {
+            return Result.Failure(activityResult.Error);
+        }
+
+        var activity = activityResult.Value;
+        if (activity.ParentId == newParentId)
+        {
+            // TODO: this currently does not support changing the order of the same parent
+            return Result.Success();
+        }
+
+        var oldParentId = activity.ParentId;
+
+        // Handle moving to a new parent
+        if (newParentId.HasValue)
+        {
+            var newParentResult = GetActivity(newParentId.Value);
+            if (newParentResult.IsFailure)
+            {
+                return Result.Failure(newParentResult.Error);
+            }
+
+            var newParent = newParentResult.Value;
+            var changeParentResult = activity.ChangeParent(newParent);
+            if (changeParentResult.IsFailure)
+            {
+                return changeParentResult;
+            }
+
+            var setChildActivityOrderResult = newParent.SetChildActivityOrder(activity, newOrder);
+            if (setChildActivityOrderResult.IsFailure)
+            {
+                return setChildActivityOrderResult;
+            }
+        }
+        else
+        {
+            // Handle moving to root
+            var changeParentResult = activity.ChangeParent(null);
+            if (changeParentResult.IsFailure)
+            {
+                return changeParentResult;
+            }
+
+            activity.SetOrder(RootActivities.Count);
+
+            var setOrderResult = SetActivityOrder(activityId, newOrder, currentUserEmployeeId);
+            if (setOrderResult.IsFailure)
+            {
+                return setOrderResult;
+            }
+        }
+
+        // Handle removing from old parent
+        if (oldParentId.HasValue)
+        {
+            var oldParentResult = GetActivity(oldParentId.Value);
+            if (oldParentResult.IsFailure)
+            {
+                return Result.Failure(oldParentResult.Error);
+            }
+            oldParentResult.Value.ResetChildActivitiesOrder();
+        }
+        else
+        {
+            ResetRootActivitiesOrder();
+        }
+
+        return Result.Success();
+    }
+
     public Result DeleteItem(Guid itemId, Guid currentUserEmployeeId)
     {
         var isManagerResult = CanEmployeeManage(currentUserEmployeeId);
@@ -564,13 +668,13 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
         return Result.Success();
     }
 
-    private Result<RoadmapActivity> GetParentRoadmapActivity(Guid parentId)
+    private Result<RoadmapActivity> GetActivity(Guid activityId)
     {
-        var parentActivity = _items.OfType<RoadmapActivity>().FirstOrDefault(x => x.Id == parentId);
+        var activity = _items.OfType<RoadmapActivity>().FirstOrDefault(x => x.Id == activityId);
 
-        return parentActivity is not null
-            ? parentActivity
-            : Result.Failure<RoadmapActivity>("Parent Roadmap Activity does not exist on this roadmap.");
+        return activity is not null
+            ? activity
+            : Result.Failure<RoadmapActivity>("Roadmap Activity does not exist on this roadmap.");
     }
 
     #endregion Roadmap Items Create/Update/Delete

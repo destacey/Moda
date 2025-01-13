@@ -304,7 +304,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
               position: 'absolute',
               top: isFullScreen ? 25 : 5,
               right: isFullScreen ? 25 : 5,
-              zIndex: 1100,
+              zIndex: 1000,
             }}
           />
         )}
@@ -321,7 +321,7 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
               position: 'absolute',
               top: isFullScreen ? 25 : 5,
               right: isFullScreen ? 65 : 45, // Adjust position for multiple buttons
-              zIndex: 1100,
+              zIndex: 1000,
             }}
           />
         )}

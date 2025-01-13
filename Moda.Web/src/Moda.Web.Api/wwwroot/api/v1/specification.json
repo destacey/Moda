@@ -3503,6 +3503,73 @@
         ]
       }
     },
+    "/api/planning/roadmaps/{roadmapId}/items/{activityId}/reorganize": {
+      "post": {
+        "tags": [
+          "Roadmaps"
+        ],
+        "summary": "Reorganize a roadmap activity.",
+        "operationId": "Roadmaps_ReorganizeActivity",
+        "parameters": [
+          {
+            "name": "roadmapId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "activityId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorganizeRoadmapActivityRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/roadmaps/visibility-options": {
       "get": {
         "tags": [
@@ -11097,6 +11164,42 @@
             }
           }
         ]
+      },
+      "ReorganizeRoadmapActivityRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "roadmapId",
+          "activityId"
+        ],
+        "properties": {
+          "roadmapId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "parentActivityId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "activityId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0.0,
+            "exclusiveMinimum": true
+          }
+        }
       },
       "VisibilityDto": {
         "allOf": [

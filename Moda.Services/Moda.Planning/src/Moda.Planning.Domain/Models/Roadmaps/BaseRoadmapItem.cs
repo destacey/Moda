@@ -54,7 +54,7 @@ public abstract class BaseRoadmapItem : BaseEntity<Guid>, ISystemAuditable
     public string? Color { get => _color; protected set => _color = value.NullIfWhiteSpacePlusTrim(); }
 
     /// <summary>
-    /// Remove the parent Roadmap Activity from the Roadmap Item.
+    /// Change the parent Roadmap Activity from the Roadmap Item.
     /// </summary>
     internal Result ChangeParent(RoadmapActivity? newParentActivity)
     {
