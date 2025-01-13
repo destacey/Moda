@@ -1,8 +1,10 @@
+import { act } from '@testing-library/react'
 import {
   CreateRoadmapActivityRequest,
   CreateRoadmapMilestoneRequest,
   CreateRoadmapTimeboxRequest,
   ObjectIdAndKey,
+  ReorganizeRoadmapActivityRequest,
   RoadmapActivityListDto,
   RoadmapItemDetailsDto,
   RoadmapItemListDto,
@@ -20,6 +22,7 @@ import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getRoadmapsClient } from '@/src/services/clients'
 import { OptionModel } from '@/src/components/types'
+import ReorganizeRoadmapActivitiesModal from '@/src/app/planning/roadmaps/_components/reorganize-roadmap-activities-modal'
 
 export const roadmapApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -198,47 +201,34 @@ export const roadmapApi = apiSlice.injectEndpoints({
         ]
       },
     }),
-    // updateChildrenOrder: builder.mutation<
-    //   void,
-    //   UpdateRoadmapChildrenOrderRequest
-    // >({
-    //   queryFn: async (request) => {
-    //     try {
-    //       const data = await (
-    //         await getRoadmapsClient()
-    //       ).updateChildrenOrder(request.roadmapId, request)
-    //       return { data }
-    //     } catch (error) {
-    //       console.error('API Error:', error)
-    //       return { error }
-    //     }
-    //   },
-    //   invalidatesTags: (result, error, arg) => [
-    //     {
-    //       type: QueryTags.RoadmapItems,
-    //       id: arg.roadmapId,
-    //     },
-    //   ],
-    // }),
-    // updateChildOrder: builder.mutation<void, UpdateRoadmapChildOrderRequest>({
-    //   queryFn: async (request) => {
-    //     try {
-    //       const data = await (
-    //         await getRoadmapsClient()
-    //       ).updateChildOrder(request.roadmapId, request.childRoadmapId, request)
-    //       return { data }
-    //     } catch (error) {
-    //       console.error('API Error:', error)
-    //       return { error }
-    //     }
-    //   },
-    //   invalidatesTags: (result, error, arg) => [
-    //     {
-    //       type: QueryTags.RoadmapItems,
-    //       id: arg.roadmapId,
-    //     },
-    //   ],
-    // }),
+    reorganizeRoadmapActivity: builder.mutation<
+      void,
+      {
+        request: ReorganizeRoadmapActivityRequest
+      }
+    >({
+      queryFn: async (mutationRequest) => {
+        try {
+          const data = await (
+            await getRoadmapsClient()
+          ).reorganizeActivity(
+            mutationRequest.request.roadmapId,
+            mutationRequest.request.activityId,
+            mutationRequest.request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          { type: QueryTags.RoadmapItems, id: arg.request.roadmapId },
+          { type: QueryTags.RoadmapItems, id: arg.request.activityId },
+        ]
+      },
+    }),
     deleteRoadmapItem: builder.mutation<
       void,
       {
@@ -298,8 +288,7 @@ export const {
   useGetRoadmapActivitiesQuery,
   useCreateRoadmapItemMutation,
   useUpdateRoadmapItemMutation,
-  // useUpdateChildrenOrderMutation,
-  // useUpdateChildOrderMutation,
+  useReorganizeRoadmapActivityMutation,
   useDeleteRoadmapItemMutation,
   useGetVisibilityOptionsQuery,
 } = roadmapApi
