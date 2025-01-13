@@ -595,6 +595,8 @@ public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
                 return changeParentResult;
             }
 
+            activity.SetOrder(RootActivities.Count);
+
             var setOrderResult = SetActivityOrder(activityId, newOrder, currentUserEmployeeId);
             if (setOrderResult.IsFailure)
             {

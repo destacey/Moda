@@ -93,10 +93,12 @@ internal sealed class ReorganizeRoadmapActivityCommandHandler : ICommandHandler<
             if (activity.ParentId == request.ParentActivityId)
             {
                 reorganizeResult = roadmap.SetActivityOrder(activity.Id, request.Order, _currentUserEmployeeId);
+                _logger.LogInformation("Reorganized roadmap activity {RoadmapActivityId} to order {Order}.", request.ActivityId, request.Order);
             }
             else
             {
                 reorganizeResult = roadmap.MoveActivity(activity.Id, request.ParentActivityId, request.Order, _currentUserEmployeeId);
+                _logger.LogInformation("Moved roadmap activity {RoadmapActivityId} to parent {ParentActivityId} and order {Order}.", request.ActivityId, request.ParentActivityId, request.Order);
             }
 
             if (reorganizeResult.IsFailure)
