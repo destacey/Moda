@@ -82,6 +82,49 @@ public sealed class RoadmapActivity : BaseRoadmapItem
     }
 
     /// <summary>
+    /// Sets the order of a child Roadmap Activity and resets the order of the other child Roadmap Activities to match.
+    /// </summary>
+    /// <param name="activity"></param>
+    /// <param name="order"></param>
+    /// <returns></returns>
+    internal Result SetChildActivityOrder(RoadmapActivity activity, int order)
+    {
+        // TODO: merge this with the SetActivityOrder on Roadmap.
+
+        if (!_children.OfType<RoadmapActivity>().Any(x => x.Id == activity.Id))
+        {
+            return Result.Failure("Child activity not found.");
+        }
+        else if (activity.Order == order)
+        {
+            return Result.Success();
+        }
+
+        if (activity.Order < order)
+        {
+            foreach (var child in _children.OfType<RoadmapActivity>()
+                .Where(x => x.Order > activity.Order && x.Order <= order))
+            {
+                child.SetOrder(child.Order - 1);
+            }
+        }
+        else
+        {
+            foreach (var child in _children.OfType<RoadmapActivity>()
+                .Where(x => x.Order >= order && x.Order < activity.Order))
+            {
+                child.SetOrder(child.Order + 1);
+            }
+        }
+
+        activity.SetOrder(order);
+
+        ResetChildActivitiesOrder();
+
+        return Result.Success();
+    }
+
+    /// <summary>
     /// Resets the order of the child Roadmap Activities. This is used to remove any gaps in the order.
     /// </summary>
     internal void ResetChildActivitiesOrder()

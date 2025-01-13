@@ -179,44 +179,24 @@ public class RoadmapsController : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPost("{roadmapId}/items/{activityId}/reorganize")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
+    [OpenApiOperation("Reorganize a roadmap activity.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> ReorganizeActivity(Guid roadmapId, Guid activityId, [FromBody] ReorganizeRoadmapActivityRequest request, CancellationToken cancellationToken)
+    {
+        if (roadmapId != request.RoadmapId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(roadmapId), nameof(request.RoadmapId), HttpContext));
+        else if (activityId != request.ActivityId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(activityId), nameof(request.ActivityId), HttpContext));
 
-    //[HttpPost("{id}/children/order")]
-    //[MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
-    //[OpenApiOperation("Update the order of child roadmaps.", "")]
-    //[ProducesResponseType(StatusCodes.Status204NoContent)]
-    //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    //public async Task<ActionResult> UpdateChildrenOrder(Guid id, [FromBody] UpdateRoadmapChildrenOrderRequest request, CancellationToken cancellationToken)
-    //{
-    //    if (id != request.RoadmapId)
-    //        return BadRequest();
+        var result = await _sender.Send(request.ToReorganizeRoadmapActivityCommand(), cancellationToken);
 
-    //    var result = await _sender.Send(new UpdateRoadmapRootActivitiesOrderCommand(request.RoadmapId, request.ChildrenOrder), cancellationToken);
-
-    //    return result.IsSuccess
-    //        ? NoContent()
-    //        : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildrenOrder"));
-    //}
-
-    //[HttpPost("{id}/children/{childRoadmapId}/order")]
-    //[MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]
-    //[OpenApiOperation("Update the order of child roadmaps based on a single change.", "")]
-    //[ProducesResponseType(StatusCodes.Status204NoContent)]
-    //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    //public async Task<ActionResult> UpdateChildOrder(Guid id, Guid childRoadmapId, [FromBody] UpdateRoadmapChildOrderRequest request, CancellationToken cancellationToken)
-    //{
-    //    if (id != request.RoadmapId)
-    //        return BadRequest();
-
-    //    if (childRoadmapId != request.ChildRoadmapId)
-    //        return BadRequest();
-
-
-    //    var result = await _sender.Send(new UpdateRoadmapRootActivityOrderCommand(request.RoadmapId, request.ChildRoadmapId, request.Order), cancellationToken);
-
-    //    return result.IsSuccess
-    //        ? NoContent()
-    //        : BadRequest(ErrorResult.CreateBadRequest(result.Error, "RoadmapsController.UpdateChildOrder"));
-    //}
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
 
     [HttpDelete("{roadmapId}/items/{itemId}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Roadmaps)]

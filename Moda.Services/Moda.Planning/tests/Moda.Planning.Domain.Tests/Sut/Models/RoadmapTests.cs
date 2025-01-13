@@ -250,7 +250,7 @@ public class RoadmapTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("Parent Roadmap Activity does not exist on this roadmap.");
+        result.Error.Should().Be("Roadmap Activity does not exist on this roadmap.");
     }
 
     [Fact]
