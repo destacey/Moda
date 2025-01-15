@@ -43,6 +43,10 @@ public static class ApplicationResource
     public const string Risks = nameof(Risks);
     public const string Roadmaps = nameof(Roadmaps);
 
+    public const string StrategicThemes = nameof(StrategicThemes);
+    public const string Strategies = nameof(Strategies);
+    public const string Visions = nameof(Visions);
+
     public const string WorkTypeTiers = nameof(WorkTypeTiers);
     public const string WorkTypeLevels = nameof(WorkTypeLevels);
     public const string Workspaces = nameof(Workspaces);
@@ -154,6 +158,24 @@ public static class ApplicationPermissions
         new("Delete Roadmaps", ApplicationAction.Delete, ApplicationResource.Roadmaps, IsBasic: true),
     ];
 
+    private static readonly ApplicationPermission[] _strategicManagement =
+    [
+        new ("View Strategic Themes", ApplicationAction.View, ApplicationResource.StrategicThemes),
+        new ("Create Strategic Themes", ApplicationAction.Create, ApplicationResource.StrategicThemes),
+        new ("Update Strategic Themes", ApplicationAction.Update, ApplicationResource.StrategicThemes),
+        new ("Delete Strategic Themes", ApplicationAction.Delete, ApplicationResource.StrategicThemes),
+
+        new ("View Strategies", ApplicationAction.View, ApplicationResource.Strategies),
+        new ("Create Strategies", ApplicationAction.Create, ApplicationResource.Strategies),
+        new ("Update Strategies", ApplicationAction.Update, ApplicationResource.Strategies),
+        new ("Delete Strategies", ApplicationAction.Delete, ApplicationResource.Strategies),
+
+        new ("View Visions", ApplicationAction.View, ApplicationResource.Visions),
+        new ("Create Visions", ApplicationAction.Create, ApplicationResource.Visions),
+        new ("Update Visions", ApplicationAction.Update, ApplicationResource.Visions),
+        new ("Delete Visions", ApplicationAction.Delete, ApplicationResource.Visions),
+    ];
+
     private static readonly ApplicationPermission[] _work =
     [
         new("View work type tiers", ApplicationAction.View, ApplicationResource.WorkTypeTiers, IsBasic: true),
@@ -199,6 +221,7 @@ public static class ApplicationPermissions
         .Union(_links)
         .Union(_organization)
         .Union(_planning)
+        .Union(_strategicManagement)
         .Union(_work)
         .ToArray();
 
