@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.StrategicManagement.Domain.Enums;
+
+// max length of 32 characters
+
 public enum VisionState
 {
     [Display(Name = "Proposed", Description = "The vision is under consideration but not yet active.", Order = 1)]

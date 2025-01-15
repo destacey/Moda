@@ -2,6 +2,8 @@
 
 namespace Moda.StrategicManagement.Domain.Enums;
 
+// max length of 32 characters
+
 public enum StrategyStatus
 {
     [Display(Name = "Draft", Description = "The strategy is in the planning phase.", Order = 1)]

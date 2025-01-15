@@ -7,7 +7,7 @@ namespace Moda.StrategicManagement.Domain.Models;
 /// <summary>
 /// Represents a high-level focus area or priority that guides related initiatives.
 /// </summary>
-public sealed class StrategicTheme : BaseAuditableEntity<Guid>, HasIdAndKey
+public sealed class StrategicTheme : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 {
     private string _name = default!;
     private string _description = default!;

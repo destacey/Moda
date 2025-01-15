@@ -1,9 +1,7 @@
-using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
 using Microsoft.ApplicationInsights.Extensibility.Implementation;
-using Microsoft.AspNetCore.Http.Features;
 using Moda.AppIntegration.Application;
 using Moda.Common.Application;
 using Moda.Common.Application.Interfaces;
@@ -11,15 +9,14 @@ using Moda.Goals.Application;
 using Moda.Health;
 using Moda.Infrastructure;
 using Moda.Infrastructure.Common;
-using Moda.Infrastructure.Middleware;
 using Moda.Links;
 using Moda.Organization.Application;
 using Moda.Planning.Application;
+using Moda.StrategicManagement.Application;
 using Moda.Web.Api.Configurations;
 using Moda.Web.Api.Interfaces;
 using Moda.Web.Api.Services;
 using Moda.Work.Application;
-using Namotion.Reflection;
 using NodaTime.Serialization.SystemTextJson;
 using Serilog;
 
@@ -70,13 +67,15 @@ try
 
     builder.Services.AddCommonApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
-    builder.Services.AddOrganizationApplication();
-    builder.Services.AddPlanningApplication();
+
+    builder.Services.AddAppIntegrationApplication();
     builder.Services.AddGoalsApplication();
     builder.Services.AddHealthApplication();
     builder.Services.AddLinksApplication();
+    builder.Services.AddOrganizationApplication();
+    builder.Services.AddPlanningApplication();
+    builder.Services.AddStrategicManagementApplication();
     builder.Services.AddWorkApplication();
-    builder.Services.AddAppIntegrationApplication();
 
     builder.Services.AddScoped<ICsvService, CsvService>();
     builder.Services.AddScoped<IJobManager, JobManager>();

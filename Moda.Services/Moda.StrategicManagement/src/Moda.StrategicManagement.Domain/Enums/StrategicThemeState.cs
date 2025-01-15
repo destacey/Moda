@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Moda.StrategicManagement.Domain.Enums;
+
+// max length of 32 characters
+
 public enum StrategicThemeState
 {
     [Display(Name = "Proposed", Description = "The theme is being considered but not yet adopted.", Order = 1)]

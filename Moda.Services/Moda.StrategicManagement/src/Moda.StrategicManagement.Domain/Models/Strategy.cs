@@ -8,16 +8,17 @@ namespace Moda.StrategicManagement.Domain.Models;
 /// <summary>
 /// Represents a strategic plan or initiative to achieve organizational goals.
 /// </summary>
-public class Strategy : BaseAuditableEntity<Guid>, HasIdAndKey
+public class Strategy : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 {
     private string _name = default!;
-    private string _description = default!;
+    private string? _description = default!;
     private LocalDate? _end;
 
     private Strategy() { }
 
-    private Strategy(string description, StrategyStatus status, LocalDate? start, LocalDate? end)
+    private Strategy(string name, string? description, StrategyStatus status, LocalDate? start, LocalDate? end)
     {
+        Name = name;
         Description = description;
         Status = status;
         Start = start;
@@ -30,7 +31,7 @@ public class Strategy : BaseAuditableEntity<Guid>, HasIdAndKey
     public int Key { get; private init; }
 
     /// <summary>
-    /// The name of the strategy, describing its purpose or focus area.
+    /// The concise statement describing the strategy and its purpose or focus area.
     /// </summary>
     public string Name
     {
@@ -41,10 +42,10 @@ public class Strategy : BaseAuditableEntity<Guid>, HasIdAndKey
     /// <summary>
     /// A detailed description of the strategy and its objectives.
     /// </summary>
-    public string Description
+    public string? Description
     {
         get => _description;
-        private set => _description = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
+        private set => _description = value.NullIfWhiteSpacePlusTrim();
     }
 
     /// <summary>
@@ -103,9 +104,9 @@ public class Strategy : BaseAuditableEntity<Guid>, HasIdAndKey
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    public static Strategy Create(string name, string description, StrategyStatus status, LocalDate? start, LocalDate? end)
+    public static Strategy Create(string name, string? description, StrategyStatus status, LocalDate? start, LocalDate? end)
     {
-        return new Strategy(description, status, start, end);
+        return new Strategy(name, description, status, start, end);
     }
 }
 
