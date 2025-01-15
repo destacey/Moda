@@ -1,7 +1,5 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.Common.Domain.Data;
-using Moda.Common.Domain.Interfaces;
 using Moda.StrategicManagement.Domain.Enums;
 
 namespace Moda.StrategicManagement.Domain.Models;
