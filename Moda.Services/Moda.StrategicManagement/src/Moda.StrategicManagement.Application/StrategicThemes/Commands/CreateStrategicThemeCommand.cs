@@ -1,0 +1,56 @@
+﻿using Moda.Common.Application.Models;
+using Moda.StrategicManagement.Domain.Enums;
+using Moda.StrategicManagement.Domain.Models;
+
+namespace Moda.StrategicManagement.Application.StrategicThemes.Commands;
+
+public sealed record CreateStrategicThemeCommand(string Name, string Description, StrategicThemeState State) : ICommand<ObjectIdAndKey>;
+
+public sealed class CreateStrategicThemeCommandValidator : AbstractValidator<CreateStrategicThemeCommand>
+{
+    public CreateStrategicThemeCommandValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .MaximumLength(100);
+
+        RuleFor(x => x.Description)
+            .MaximumLength(1000);
+
+        RuleFor(x => x.State)
+            .IsInEnum();
+    }
+}
+
+internal sealed class CreateStrategicThemeCommandHandler(IStrategicManagementDbContext strategicManagementDbContext, ILogger<CreateStrategicThemeCommandHandler> logger) : ICommandHandler<CreateStrategicThemeCommand, ObjectIdAndKey>
+{
+    private const string AppRequestName = nameof(CreateStrategicThemeCommand);
+
+    private readonly IStrategicManagementDbContext _strategicManagementDbContext = strategicManagementDbContext;
+    private readonly ILogger<CreateStrategicThemeCommandHandler> _logger = logger;
+
+    public async Task<Result<ObjectIdAndKey>> Handle(CreateStrategicThemeCommand request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var strategicTheme = StrategicTheme.Create(
+                request.Name,
+                request.Description,
+                request.State
+                );
+
+            await _strategicManagementDbContext.StrategicThemes.AddAsync(strategicTheme, cancellationToken);
+            await _strategicManagementDbContext.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Stratic Theme {StrategicThemeId} created with Key {StrategicThemeKey}.", strategicTheme.Id, strategicTheme.Key);
+
+            return new ObjectIdAndKey(strategicTheme.Id, strategicTheme.Key);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
+            return Result.Failure<ObjectIdAndKey>($"Error handling {AppRequestName} command.");
+        }
+    }
+}
+

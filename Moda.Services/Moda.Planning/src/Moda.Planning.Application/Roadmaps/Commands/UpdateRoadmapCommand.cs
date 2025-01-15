@@ -60,7 +60,10 @@ internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbC
                 .FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
 
             if (roadmap is null)
+            {
+                _logger.LogInformation("Roadmap with id {RoadmapId} not found.", request.Id);
                 return Result.Failure($"Roadmap with id {request.Id} not found");
+            }
 
             var updateResult = roadmap.Update(
                 request.Name,
@@ -77,11 +80,13 @@ internal sealed class UpdateRoadmapCommandHandler(IPlanningDbContext planningDbC
                 await _planningDbContext.Entry(roadmap).ReloadAsync(cancellationToken);
                 roadmap.ClearDomainEvents();
 
-                _logger.LogError("Failure for Request {CommandName} {@Request}.  Error message: {Error}", AppRequestName, request, updateResult.Error);
+                _logger.LogError("Unable to update Roadmap {RoadmapId}.  Error message: {Error}", request.Id, updateResult.Error);
                 return Result.Failure(updateResult.Error);
             }
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Roadmap {RoadmapId} updated.", request.Id);
 
             return Result.Success();
         }
