@@ -25,7 +25,7 @@ public sealed class Vision : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     }
 
     /// <summary>
-    /// The unique key of the StrategicTheme.  This is an alternate key to the Id.
+    /// The unique key of the vision.  This is an alternate key to the Id.
     /// </summary>
     public int Key { get; private init; }
 

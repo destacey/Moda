@@ -26,7 +26,7 @@ public class Strategy : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     }
 
     /// <summary>
-    /// The unique key of the StrategicTheme.  This is an alternate key to the Id.
+    /// The unique key of the strategy.  This is an alternate key to the Id.
     /// </summary>
     public int Key { get; private init; }
 
@@ -40,7 +40,7 @@ public class Strategy : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     }
 
     /// <summary>
-    /// A detailed description of the strategy and its objectives.
+    /// A detailed description of the strategy.
     /// </summary>
     public string? Description
     {
