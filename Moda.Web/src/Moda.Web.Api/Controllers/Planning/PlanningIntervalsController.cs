@@ -11,7 +11,6 @@ using Moda.Planning.Application.PlanningIntervals.Dtos;
 using Moda.Planning.Application.PlanningIntervals.Queries;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
-using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Web.Api.Dtos.Planning;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Planning.PlanningIntervals;
