@@ -21,8 +21,8 @@ public partial class AddinitialStrategicManagementconfiguration : Migration
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 Key = table.Column<int>(type: "int", nullable: false)
                     .Annotation("SqlServer:Identity", "1, 1"),
-                Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
+                Description = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: false),
                 State = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
                 SystemCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                 SystemCreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -43,8 +43,8 @@ public partial class AddinitialStrategicManagementconfiguration : Migration
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 Key = table.Column<int>(type: "int", nullable: false)
                     .Annotation("SqlServer:Identity", "1, 1"),
-                Name = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                Description = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
+                Name = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: false),
+                Description = table.Column<string>(type: "nvarchar(3072)", maxLength: 3072, nullable: true),
                 Status = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
                 Start = table.Column<DateTime>(type: "date", nullable: true),
                 End = table.Column<DateTime>(type: "date", nullable: true),
@@ -67,7 +67,7 @@ public partial class AddinitialStrategicManagementconfiguration : Migration
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 Key = table.Column<int>(type: "int", nullable: false)
                     .Annotation("SqlServer:Identity", "1, 1"),
-                Description = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: false),
+                Description = table.Column<string>(type: "nvarchar(3072)", maxLength: 3072, nullable: false),
                 State = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
                 Start = table.Column<DateTime>(type: "date", nullable: true),
                 End = table.Column<DateTime>(type: "date", nullable: true),
