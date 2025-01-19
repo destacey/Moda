@@ -6,18 +6,16 @@ using NodaTime;
 namespace Moda.Common.Models;
 
 /// <summary>
-/// A date range that uses <see cref="LocalDate" />.
+/// A date range that uses <see cref="LocalDate" for the start date and <see cref="LocalDate?"/> for the end date.
 /// </summary>
-/// <seealso cref="CSharpFunctionalExtensions.ValueObject" />
-/// <seealso cref="Moda.Common.Interfaces.IDateRange&lt;NodaTime.LocalDate&gt;" />
-public class LocalDateRange : ValueObject, IDateRange<LocalDate>
+public class FlexibleDateRange : ValueObject, IDateRange<LocalDate, LocalDate?>
 {
-    public LocalDateRange(LocalDate start, LocalDate end)
+    public FlexibleDateRange(LocalDate start, LocalDate? end = null)
     {
         Start = Guard.Against.Null(start);
-        End = Guard.Against.Null(end);
+        End = end;
 
-        if (End < Start)
+        if (End.HasValue && End < Start)
         {
             throw new ArgumentException("The start date must be on or before the end date.", nameof(LocalDateRange));
         }
@@ -31,12 +29,17 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
     /// <summary>
     /// Gets the end date.
     /// </summary>
-    public LocalDate End { get; private set; }
+    public LocalDate? End { get; private set; }
+
+    /// <summary>
+    /// Gets the effective end date with a default value of <see cref="LocalDate.MaxIsoValue"/>.
+    /// </summary>
+    public LocalDate EffectiveEnd => End ?? LocalDate.MaxIsoValue;
 
     /// <summary>
     /// Gets the number of days in the range.
     /// </summary>
-    public int Days => Period.DaysBetween(Start, End) + 1;
+    public int Days => Period.DaysBetween(Start, EffectiveEnd) + 1;
 
     /// <summary>
     /// Determines whether the range includes the specified value.
@@ -45,7 +48,7 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
     /// <returns></returns>
     public bool Includes(LocalDate value)
     {
-        return (Start <= value) && (value <= End);
+        return Start <= value && value <= EffectiveEnd;
     }
 
     /// <summary>
@@ -55,18 +58,30 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
     /// <returns></returns>
     public bool Includes(LocalDateRange otherRange)
     {
-        return (Start <= otherRange.Start) && (otherRange.End <= End);
+        return (Start <= otherRange.Start) && (otherRange.End <= EffectiveEnd);
     }
 
-    /// <summary>Overlapses the specified range.</summary>
-    /// <param name="range">The range.</param>
+    /// <summary>
+    /// Determines whether the range includes the specified range.
+    /// </summary>
+    /// <param name="otherRange"></param>
+    /// <returns></returns>
+    public bool Includes(FlexibleDateRange otherRange)
+    {
+        return Includes(otherRange.ToLocalDateRange());
+    }
+
+    /// <summary>
+    /// Determines whether the range overlaps the specified range.
+    /// </summary>
+    /// <param name="range"></param>
     /// <returns></returns>
     public bool Overlaps(LocalDateRange range)
     {
         return Includes(range)
-            || range.Includes(this)
-            || (range.Start <= Start && Start <= range.End && range.End <= End)
-            || (Start <= range.Start && range.Start <= End && End <= range.End);
+            || range.Includes(this.ToLocalDateRange())
+            || (range.Start <= Start && Start <= range.End && range.End <= EffectiveEnd)
+            || (Start <= range.Start && range.Start <= EffectiveEnd && EffectiveEnd <= range.End);
     }
 
     /// <summary>
@@ -78,7 +93,7 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
     /// </returns>
     public bool IsPastOn(LocalDate date)
     {
-        return End < date;
+        return EffectiveEnd < date;
     }
 
     /// <summary>
@@ -112,6 +127,15 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
     protected override IEnumerable<IComparable> GetEqualityComponents()
     {
         yield return Start;
-        yield return End;
+        yield return EffectiveEnd;
+    }
+
+    /// <summary>
+    /// Converts the <see cref="FlexibleDateRange"/> to a <see cref="LocalDateRange"/>.
+    /// </summary>
+    /// <returns></returns>
+    public LocalDateRange ToLocalDateRange()
+    {
+        return new LocalDateRange(Start, EffectiveEnd);
     }
 }

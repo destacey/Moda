@@ -6,46 +6,49 @@ using NodaTime;
 namespace Moda.Common.Models;
 
 /// <summary>
-/// A date range that uses <see cref="LocalDate" />.
+/// A date range that uses <see cref="Instant" /> for the start and a nullable <see cref="Instant" /> for the end.
 /// </summary>
-/// <seealso cref="CSharpFunctionalExtensions.ValueObject" />
-/// <seealso cref="Moda.Common.Interfaces.IDateRange&lt;NodaTime.LocalDate&gt;" />
-public class LocalDateRange : ValueObject, IDateRange<LocalDate>
+public class FlexibleInstantRange : ValueObject, IDateRange<Instant, Instant?>
 {
-    public LocalDateRange(LocalDate start, LocalDate end)
+    public FlexibleInstantRange(Instant start, Instant? end = null)
     {
         Start = Guard.Against.Null(start);
-        End = Guard.Against.Null(end);
+        End = end;
 
-        if (End < Start)
+        if (End.HasValue && End < Start)
         {
-            throw new ArgumentException("The start date must be on or before the end date.", nameof(LocalDateRange));
+            throw new ArgumentException("The start date must be on or before the end date.", nameof(FlexibleInstantRange));
         }
     }
 
     /// <summary>
     /// Gets the start date.
     /// </summary>
-    public LocalDate Start { get; private set; }
+    public Instant Start { get; private set; }
 
     /// <summary>
     /// Gets the end date.
     /// </summary>
-    public LocalDate End { get; private set; }
+    public Instant? End { get; private set; }
+
+    /// <summary>
+    /// Gets the effective end date with a default value of <see cref="Instant.MaxValue"/>.
+    /// </summary>
+    public Instant EffectiveEnd => End ?? Instant.MaxValue;
 
     /// <summary>
     /// Gets the number of days in the range.
     /// </summary>
-    public int Days => Period.DaysBetween(Start, End) + 1;
+    public int Days => (EffectiveEnd - Start).Days + 1;
 
     /// <summary>
     /// Determines whether the range includes the specified value.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public bool Includes(LocalDate value)
+    public bool Includes(Instant value)
     {
-        return (Start <= value) && (value <= End);
+        return Start <= value && value <= EffectiveEnd;
     }
 
     /// <summary>
@@ -53,20 +56,22 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
     /// </summary>
     /// <param name="otherRange"></param>
     /// <returns></returns>
-    public bool Includes(LocalDateRange otherRange)
+    public bool Includes(FlexibleInstantRange otherRange)
     {
-        return (Start <= otherRange.Start) && (otherRange.End <= End);
+        return (Start <= otherRange.Start) && (otherRange.EffectiveEnd <= EffectiveEnd);
     }
 
-    /// <summary>Overlapses the specified range.</summary>
-    /// <param name="range">The range.</param>
+    /// <summary>
+    /// Determines whether the range overlaps the specified range.
+    /// </summary>
+    /// <param name="range"></param>
     /// <returns></returns>
-    public bool Overlaps(LocalDateRange range)
+    public bool Overlaps(FlexibleInstantRange range)
     {
         return Includes(range)
             || range.Includes(this)
-            || (range.Start <= Start && Start <= range.End && range.End <= End)
-            || (Start <= range.Start && range.Start <= End && End <= range.End);
+            || (range.Start <= Start && Start <= range.End && range.End <= EffectiveEnd)
+            || (Start <= range.Start && range.Start <= EffectiveEnd && EffectiveEnd <= range.End);
     }
 
     /// <summary>
@@ -76,9 +81,9 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
     /// <returns>
     ///   <c>true</c> if [is past on] [the specified date]; otherwise, <c>false</c>.
     /// </returns>
-    public bool IsPastOn(LocalDate date)
+    public bool IsPastOn(Instant date)
     {
-        return End < date;
+        return EffectiveEnd < date;
     }
 
     /// <summary>
@@ -88,7 +93,7 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
     /// <returns>
     ///   <c>true</c> if [is active on] [the specified date]; otherwise, <c>false</c>.
     /// </returns>
-    public bool IsActiveOn(LocalDate date)
+    public bool IsActiveOn(Instant date)
     {
         return Includes(date);
     }
@@ -100,7 +105,7 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
     /// <returns>
     ///   <c>true</c> if [is future on] [the specified date]; otherwise, <c>false</c>.
     /// </returns>
-    public bool IsFutureOn(LocalDate date)
+    public bool IsFutureOn(Instant date)
     {
         return date < Start;
     }
@@ -112,6 +117,6 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
     protected override IEnumerable<IComparable> GetEqualityComponents()
     {
         yield return Start;
-        yield return End;
+        yield return EffectiveEnd;
     }
 }
