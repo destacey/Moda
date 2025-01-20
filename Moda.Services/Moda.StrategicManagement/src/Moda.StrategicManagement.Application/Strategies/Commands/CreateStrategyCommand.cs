@@ -4,7 +4,7 @@ using Moda.StrategicManagement.Domain.Models;
 
 namespace Moda.StrategicManagement.Application.Strategies.Commands;
 
-public sealed record CreateStrategyCommand(string Name, string Description, StrategyStatus Status, LocalDate? Start, LocalDate? End) : ICommand<ObjectIdAndKey>;
+public sealed record CreateStrategyCommand(string Name, string Description, StrategyStatus Status, FlexibleDateRange? Dates) : ICommand<ObjectIdAndKey>;
 
 public sealed class CreateStrategyCommandValidator : AbstractValidator<CreateStrategyCommand>
 {
@@ -12,23 +12,13 @@ public sealed class CreateStrategyCommandValidator : AbstractValidator<CreateStr
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MaximumLength(1000);
+            .MaximumLength(1024);
 
         RuleFor(x => x.Description)
-            .MaximumLength(3000);
+            .MaximumLength(3072);
 
         RuleFor(x => x.Status)
             .IsInEnum();
-
-        RuleFor(x => x.Start)
-            .NotEmpty()
-            .When(x => x.End.HasValue)
-            .WithMessage("Start date must be set if End date is provided.");
-
-        RuleFor(x => x.End)
-            .GreaterThan(x => x.Start)
-            .When(x => x.Start.HasValue && x.End.HasValue)
-            .WithMessage("End date must be greater than Start date.");
     }
 }
 
@@ -47,8 +37,7 @@ internal sealed class CreateStrategyCommandHandler(IStrategicManagementDbContext
                 request.Name,
                 request.Description,
                 request.Status,
-                request.Start,
-                request.End
+                request.Dates
                 );
 
             await _strategicManagementDbContext.Strategies.AddAsync(strategy, cancellationToken);

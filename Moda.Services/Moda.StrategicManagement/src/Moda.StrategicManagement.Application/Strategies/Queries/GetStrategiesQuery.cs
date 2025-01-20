@@ -7,13 +7,13 @@ namespace Moda.StrategicManagement.Application.Strategies.Queries;
 /// Retrieves a list of Strategies based on the provided filter.  Returns all Strategies if no filter is provided.
 /// </summary>
 /// <param name="StatusFilter"></param>
-public sealed record GetStrategysQuery(StrategyStatus? StatusFilter) : IQuery<List<StrategyListDto>>;
+public sealed record GetStrategiesQuery(StrategyStatus? StatusFilter) : IQuery<List<StrategyListDto>>;
 
-internal sealed class GetStrategysQueryHandler(IStrategicManagementDbContext strategicManagementDbContext) : IQueryHandler<GetStrategysQuery, List<StrategyListDto>>
+internal sealed class GetStrategysQueryHandler(IStrategicManagementDbContext strategicManagementDbContext) : IQueryHandler<GetStrategiesQuery, List<StrategyListDto>>
 {
     private readonly IStrategicManagementDbContext _strategicManagementDbContext = strategicManagementDbContext;
 
-    public async Task<List<StrategyListDto>> Handle(GetStrategysQuery request, CancellationToken cancellationToken)
+    public async Task<List<StrategyListDto>> Handle(GetStrategiesQuery request, CancellationToken cancellationToken)
     {
         var query = _strategicManagementDbContext.Strategies.AsQueryable();
 

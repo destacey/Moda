@@ -1123,6 +1123,401 @@
         ]
       }
     },
+    "/api/strategic-management/visions": {
+      "get": {
+        "tags": [
+          "Visions"
+        ],
+        "summary": "Get a list of visions.",
+        "operationId": "Visions_GetVisions",
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoadmapListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Visions"
+        ],
+        "summary": "Create a vision.",
+        "operationId": "Visions_Create",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVisionRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectIdAndKey"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/strategic-management/visions/{idOrKey}": {
+      "get": {
+        "tags": [
+          "Visions"
+        ],
+        "summary": "Get vision details.",
+        "operationId": "Visions_GetVision",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoadmapDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/strategic-management/visions/{id}": {
+      "put": {
+        "tags": [
+          "Visions"
+        ],
+        "summary": "Update a vision.",
+        "operationId": "Visions_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVisionRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Visions"
+        ],
+        "summary": "Delete a vision.",
+        "operationId": "Visions_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/strategic-management/visions/{id}/activate": {
+      "post": {
+        "tags": [
+          "Visions"
+        ],
+        "summary": "Activate a vision.",
+        "operationId": "Visions_Activate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/strategic-management/visions/{id}/archive": {
+      "post": {
+        "tags": [
+          "Visions"
+        ],
+        "summary": "Archive a vision.",
+        "operationId": "Visions_Archive",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/strategic-management/visions/states": {
+      "get": {
+        "tags": [
+          "Visions"
+        ],
+        "summary": "Get a list of all vision states.",
+        "operationId": "Visions_GetStateOptions",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VisionStateDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/planning-intervals": {
       "get": {
         "tags": [
@@ -9457,14 +9852,14 @@
           "name": {
             "type": "string",
             "description": "The name of the strategic theme, highlighting its focus or priority.",
-            "maxLength": 100,
+            "maxLength": 64,
             "minLength": 1,
             "nullable": false
           },
           "description": {
             "type": "string",
             "description": "A detailed description of the strategic theme and its importance.",
-            "maxLength": 1000,
+            "maxLength": 1024,
             "minLength": 1,
             "nullable": false
           },
@@ -9479,6 +9874,7 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "id",
           "name",
           "description"
         ],
@@ -9487,20 +9883,21 @@
             "type": "string",
             "description": "The unique identifier of the strategic theme.",
             "format": "guid",
+            "minLength": 1,
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
             "type": "string",
             "description": "The name of the strategic theme, highlighting its focus or priority.",
-            "maxLength": 100,
+            "maxLength": 64,
             "minLength": 1,
             "nullable": false
           },
           "description": {
             "type": "string",
             "description": "A detailed description of the strategic theme and its importance.",
-            "maxLength": 1000,
+            "maxLength": 1024,
             "minLength": 1,
             "nullable": false
           },
@@ -9542,6 +9939,58 @@
             "format": "int32"
           }
         }
+      },
+      "CreateVisionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "description"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "A concise statement describing the vision of the organization.",
+            "maxLength": 3072,
+            "minLength": 1,
+            "nullable": false
+          }
+        }
+      },
+      "UpdateVisionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier of the vision.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "description": {
+            "type": "string",
+            "description": "A concise statement describing the vision of the organization.",
+            "maxLength": 3072,
+            "minLength": 1,
+            "nullable": false
+          }
+        }
+      },
+      "VisionStateDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CommonEnumDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
       },
       "PlanningIntervalListDto": {
         "type": "object",

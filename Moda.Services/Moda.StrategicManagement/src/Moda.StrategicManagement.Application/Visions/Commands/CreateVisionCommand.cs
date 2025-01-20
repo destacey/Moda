@@ -1,30 +1,17 @@
 ﻿using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Domain.Enums;
 using Moda.StrategicManagement.Domain.Models;
 
 namespace Moda.StrategicManagement.Application.Visions.Commands;
 
-public sealed record CreateVisionCommand(string Description, VisionState State, LocalDate? Start, LocalDate? End) : ICommand<ObjectIdAndKey>;
+public sealed record CreateVisionCommand(string Description) : ICommand<ObjectIdAndKey>;
 
 public sealed class CreateVisionCommandValidator : AbstractValidator<CreateVisionCommand>
 {
     public CreateVisionCommandValidator()
     {
-        RuleFor(x => x.Description)
-            .MaximumLength(3000);
-
-        RuleFor(x => x.State)
-            .IsInEnum();
-
-        RuleFor(x => x.Start)
+        RuleFor(v => v.Description)
             .NotEmpty()
-            .When(x => x.End.HasValue)
-            .WithMessage("Start date must be set if End date is provided.");
-
-        RuleFor(x => x.End)
-            .GreaterThan(x => x.Start)
-            .When(x => x.Start.HasValue && x.End.HasValue)
-            .WithMessage("End date must be greater than Start date.");
+            .MaximumLength(3072);
     }
 }
 
@@ -39,12 +26,7 @@ internal sealed class CreateVisionCommandHandler(IStrategicManagementDbContext s
     {
         try
         {
-            var vision = Vision.Create(
-                request.Description,
-                request.State,
-                request.Start,
-                request.End
-                );
+            var vision = Vision.Create(request.Description);
 
             await _strategicManagementDbContext.Visions.AddAsync(vision, cancellationToken);
             await _strategicManagementDbContext.SaveChangesAsync(cancellationToken);

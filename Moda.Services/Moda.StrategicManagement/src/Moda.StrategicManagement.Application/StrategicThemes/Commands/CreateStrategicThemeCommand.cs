@@ -12,10 +12,10 @@ public sealed class CreateStrategicThemeCommandValidator : AbstractValidator<Cre
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MaximumLength(100);
+            .MaximumLength(64);
 
         RuleFor(x => x.Description)
-            .MaximumLength(1000);
+            .MaximumLength(1024);
 
         RuleFor(x => x.State)
             .IsInEnum();

@@ -35,13 +35,16 @@ public sealed class UpdateStrategicThemeRequestValidator : CustomValidator<Updat
 {
     public UpdateStrategicThemeRequestValidator()
     {
+        RuleFor(x => x.Id)
+            .NotEmpty();
+
         RuleFor(t => t.Name)
             .NotEmpty()
-            .MaximumLength(100);
+            .MaximumLength(64);
 
         RuleFor(t => t.Description)
             .NotEmpty()
-            .MaximumLength(1000);
+            .MaximumLength(1024);
 
         RuleFor(t => (StrategicThemeState)t.StateId)
             .IsInEnum()

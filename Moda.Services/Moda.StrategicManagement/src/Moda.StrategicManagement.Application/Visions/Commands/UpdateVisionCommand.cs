@@ -1,32 +1,19 @@
 ﻿using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Domain.Enums;
 
 namespace Moda.StrategicManagement.Application.Visions.Commands;
 
-public sealed record UpdateVisionCommand(Guid Id, string Description, VisionState State, LocalDate? Start, LocalDate? End) : ICommand;
+public sealed record UpdateVisionCommand(Guid Id, string Description) : ICommand;
 
 public sealed class UpdateVisionCommandValidator : AbstractValidator<UpdateVisionCommand>
 {
     public UpdateVisionCommandValidator()
     {
-        RuleFor(x => x.Id)
+        RuleFor(v => v.Id)
             .NotEmpty();
 
-        RuleFor(x => x.Description)
-            .MaximumLength(3000);
-
-        RuleFor(x => x.State)
-            .IsInEnum();
-
-        RuleFor(x => x.Start)
+        RuleFor(v => v.Description)
             .NotEmpty()
-            .When(x => x.End.HasValue)
-            .WithMessage("Start date must be set if End date is provided.");
-
-        RuleFor(x => x.End)
-            .GreaterThan(x => x.Start)
-            .When(x => x.Start.HasValue && x.End.HasValue)
-            .WithMessage("End date must be greater than Start date.");
+            .MaximumLength(3072);
     }
 }
 
@@ -43,19 +30,12 @@ internal sealed class UpdateVisionCommandHandler(IStrategicManagementDbContext s
         {
             var vision = await _strategicManagementDbContext.Visions
                 .FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
-
             if (vision is null)
             {
                 _logger.LogInformation("Vision {VisionId} not found.", request.Id);
                 return Result.Failure($"Vision {request.Id} not found.");
             }
-
-            var updateResult = vision.Update(
-                request.Description,
-                request.State,
-                request.Start,
-                request.End
-                );
+            var updateResult = vision.Update(request.Description);
 
             if (updateResult.IsFailure)
             {

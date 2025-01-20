@@ -27,16 +27,18 @@ public sealed record VisionDto : IMapFrom<Vision>
     /// <summary>
     /// The date when the vision became active or started guiding the organization.
     /// </summary>
-    public LocalDate? Start { get; set; }
+    public Instant? Start { get; set; }
 
     /// <summary>
     /// The date when the vision was archived or replaced.
     /// </summary>
-    public LocalDate? End { get; set; }
+    public Instant? End { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Vision, VisionDto>()
-            .Map(dest => dest.State, src => SimpleNavigationDto.FromEnum(src.State));
+            .Map(dest => dest.State, src => SimpleNavigationDto.FromEnum(src.State))
+            .Map(dest => dest.Start, src => src.Dates == null ? null : (Instant?)src.Dates.Start)
+            .Map(dest => dest.End, src => src.Dates == null ? null : src.Dates.End);
     }
 }
