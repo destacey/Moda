@@ -1,7 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.StrategicManagement.Domain.Enums;
-using NodaTime;
 
 namespace Moda.StrategicManagement.Domain.Models;
 
@@ -12,17 +11,15 @@ public class Strategy : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 {
     private string _name = default!;
     private string? _description = default!;
-    private LocalDate? _end;
 
     private Strategy() { }
 
-    private Strategy(string name, string? description, StrategyStatus status, LocalDate? start, LocalDate? end)
+    private Strategy(string name, string? description, StrategyStatus status, FlexibleDateRange? dates)
     {
         Name = name;
         Description = description;
         Status = status;
-        Start = start;
-        End = end;
+        Dates = dates;
     }
 
     /// <summary>
@@ -53,27 +50,12 @@ public class Strategy : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// </summary>
     public StrategyStatus Status { get; private set; }
 
-    /// <summary>
-    /// The date when the strategy was initiated or became active.
-    /// </summary>
-    public LocalDate? Start { get; private set; }
+    // TODO: lock these dates down based on the status.  Active should have a start date, Completed should have an end date, etc.
 
     /// <summary>
-    /// The date when the strategy was completed, archived, or ended.
+    /// The start and end dates of when the strategy was active.
     /// </summary>
-    public LocalDate? End
-    {
-        get => _end;
-        private set
-        {
-            if (value.HasValue)
-            {
-                Guard.Against.Null(Start, nameof(Start), "Start date must be set before setting the end date.");
-                Guard.Against.OutOfRange(value.Value, nameof(End), Start.Value.PlusDays(1), LocalDate.MaxIsoValue, "End date must be greater than the start date.");
-            }
-            _end = value;
-        }
-    }
+    public FlexibleDateRange? Dates { get; private set; }
 
     /// <summary>
     /// Updates the Strategy.
@@ -81,16 +63,14 @@ public class Strategy : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// <param name="name"></param>
     /// <param name="description"></param>
     /// <param name="status"></param>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
+    /// <param name="dates"></param>
     /// <returns></returns>
-    public Result Update(string name, string description, StrategyStatus status, LocalDate? start, LocalDate? end)
+    public Result Update(string name, string description, StrategyStatus status, FlexibleDateRange? dates)
     {
         Name = name;
         Description = description;
         Status = status;
-        Start = start;
-        End = end;
+        Dates = dates;
 
         return Result.Success();
     }
@@ -101,12 +81,10 @@ public class Strategy : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// <param name="name"></param>
     /// <param name="description"></param>
     /// <param name="status"></param>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
+    /// <param name="dates"></param>
     /// <returns></returns>
-    public static Strategy Create(string name, string? description, StrategyStatus status, LocalDate? start, LocalDate? end)
+    public static Strategy Create(string name, string? description, StrategyStatus status, FlexibleDateRange? dates)
     {
-        return new Strategy(name, description, status, start, end);
+        return new Strategy(name, description, status, dates);
     }
 }
-

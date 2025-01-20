@@ -47,8 +47,12 @@ public class StrategyConfig : IEntityTypeConfiguration<Strategy>
             .HasMaxLength(32)
             .HasColumnType("varchar");
 
-        builder.Property(s => s.Start);
-        builder.Property(s => s.End);
+        // Value Objects
+        builder.OwnsOne(r => r.Dates, options =>
+        {
+            options.Property(d => d.Start).HasColumnName("Start");
+            options.Property(d => d.End).HasColumnName("End");
+        });
     }
 }
 
@@ -71,7 +75,11 @@ public class VisionConfig : IEntityTypeConfiguration<Vision>
             .HasMaxLength(32)
             .HasColumnType("varchar");
 
-        builder.Property(s => s.Start);
-        builder.Property(s => s.End);
+        // Value Objects
+        builder.OwnsOne(r => r.Dates, options =>
+        {
+            options.Property(d => d.Start).HasColumnName("Start");
+            options.Property(d => d.End).HasColumnName("End");
+        });
     }
 }

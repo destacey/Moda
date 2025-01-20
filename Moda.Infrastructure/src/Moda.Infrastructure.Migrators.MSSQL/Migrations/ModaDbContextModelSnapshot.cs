@@ -1602,9 +1602,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(3072)
                         .HasColumnType("nvarchar(3072)");
 
-                    b.Property<DateTime?>("End")
-                        .HasColumnType("date");
-
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
@@ -1615,9 +1612,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
-
-                    b.Property<DateTime?>("Start")
-                        .HasColumnType("date");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -1656,17 +1650,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasMaxLength(3072)
                         .HasColumnType("nvarchar(3072)");
 
-                    b.Property<DateTime?>("End")
-                        .HasColumnType("date");
-
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
-
-                    b.Property<DateTime?>("Start")
-                        .HasColumnType("date");
 
                     b.Property<string>("State")
                         .IsRequired()
@@ -2858,6 +2846,58 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasForeignKey("Moda.Planning.Domain.Models.SimpleHealthCheck", "ObjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Moda.StrategicManagement.Domain.Models.Strategy", b =>
+                {
+                    b.OwnsOne("Moda.Common.Models.FlexibleDateRange", "Dates", b1 =>
+                        {
+                            b1.Property<Guid>("StrategyId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTime?>("End")
+                                .HasColumnType("date")
+                                .HasColumnName("End");
+
+                            b1.Property<DateTime>("Start")
+                                .HasColumnType("date")
+                                .HasColumnName("Start");
+
+                            b1.HasKey("StrategyId");
+
+                            b1.ToTable("Strategies", "StrategicManagement");
+
+                            b1.WithOwner()
+                                .HasForeignKey("StrategyId");
+                        });
+
+                    b.Navigation("Dates");
+                });
+
+            modelBuilder.Entity("Moda.StrategicManagement.Domain.Models.Vision", b =>
+                {
+                    b.OwnsOne("Moda.Common.Models.FlexibleInstantRange", "Dates", b1 =>
+                        {
+                            b1.Property<Guid>("VisionId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTime?>("End")
+                                .HasColumnType("datetime2")
+                                .HasColumnName("End");
+
+                            b1.Property<DateTime>("Start")
+                                .HasColumnType("datetime2")
+                                .HasColumnName("Start");
+
+                            b1.HasKey("VisionId");
+
+                            b1.ToTable("Visions", "StrategicManagement");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VisionId");
+                        });
+
+                    b.Navigation("Dates");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkItem", b =>
