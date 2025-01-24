@@ -1,6 +1,6 @@
 ﻿using Moda.Common.Application.Models;
-using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.StrategicManagement.Application.StrategicThemes.Commands;
+using Moda.StrategicManagement.Application.StrategicThemes.Dtos;
 using Moda.StrategicManagement.Application.StrategicThemes.Queries;
 using Moda.StrategicManagement.Domain.Enums;
 using Moda.Web.Api.Extensions;
@@ -27,7 +27,7 @@ public class StrategicThemesController : ControllerBase
     [OpenApiOperation("Get a list of strategic themes.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<RoadmapListDto>>> GetStrategicThemes(CancellationToken cancellationToken, [FromQuery] int? state = null)
+    public async Task<ActionResult<IEnumerable<StrategicThemeListDto>>> GetStrategicThemes(CancellationToken cancellationToken, [FromQuery] int? state = null)
     {
         StrategicThemeState? filter = state.HasValue ? (StrategicThemeState)state.Value : null;
 
@@ -41,7 +41,7 @@ public class StrategicThemesController : ControllerBase
     [OpenApiOperation("Get strategic themes details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<RoadmapDetailsDto>> GetStrategicTheme(string idOrKey, CancellationToken cancellationToken)
+    public async Task<ActionResult<StrategicThemeDetailsDto>> GetStrategicTheme(string idOrKey, CancellationToken cancellationToken)
     {
         var theme = await _sender.Send(new GetStrategicThemeQuery(idOrKey), cancellationToken);
 
@@ -103,6 +103,6 @@ public class StrategicThemesController : ControllerBase
     public async Task<ActionResult<IEnumerable<StrategicThemeStateDto>>> GetStateOptions(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetStrategicThemeStatesQuery(), cancellationToken);
-        return Ok(items.OrderBy(c => c.Order));
+        return Ok(items.OrderBy(s => s.Order));
     }
 }

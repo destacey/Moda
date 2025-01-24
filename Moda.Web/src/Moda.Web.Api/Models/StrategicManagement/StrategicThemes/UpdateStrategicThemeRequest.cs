@@ -35,7 +35,7 @@ public sealed class UpdateStrategicThemeRequestValidator : CustomValidator<Updat
 {
     public UpdateStrategicThemeRequestValidator()
     {
-        RuleFor(x => x.Id)
+        RuleFor(t => t.Id)
             .NotEmpty();
 
         RuleFor(t => t.Name)

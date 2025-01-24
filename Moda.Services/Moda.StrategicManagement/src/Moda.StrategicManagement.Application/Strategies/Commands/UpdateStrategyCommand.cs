@@ -3,12 +3,15 @@ using Moda.StrategicManagement.Domain.Enums;
 
 namespace Moda.StrategicManagement.Application.Strategies.Commands;
 
-public sealed record UpdateStrategyCommand(Guid Id, string Name, string Description, StrategyStatus Status, FlexibleDateRange Dates) : ICommand;
+public sealed record UpdateStrategyCommand(Guid Id, string Name, string Description, StrategyStatus Status, FlexibleDateRange? Dates) : ICommand;
 
 public sealed class UpdateStrategyCommandValidator : AbstractValidator<UpdateStrategyCommand>
 {
     public UpdateStrategyCommandValidator()
     {
+        RuleFor(t => t.Id)
+            .NotEmpty();
+
         RuleFor(x => x.Name)
             .NotEmpty()
             .MaximumLength(1024);

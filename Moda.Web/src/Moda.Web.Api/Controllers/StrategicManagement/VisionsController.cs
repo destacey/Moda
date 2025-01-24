@@ -1,9 +1,10 @@
 ﻿using Moda.Common.Application.Models;
-using Moda.Planning.Application.Roadmaps.Dtos;
 using Moda.StrategicManagement.Application.Visions.Commands;
+using Moda.StrategicManagement.Application.Visions.Dtos;
 using Moda.StrategicManagement.Application.Visions.Queries;
 using Moda.StrategicManagement.Domain.Enums;
 using Moda.Web.Api.Extensions;
+using Moda.Web.Api.Models.StrategicManagement.Strategies;
 using Moda.Web.Api.Models.StrategicManagement.Visions;
 
 namespace Moda.Web.Api.Controllers.StrategicManagement;
@@ -27,7 +28,7 @@ public class VisionsController : ControllerBase
     [OpenApiOperation("Get a list of visions.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<RoadmapListDto>>> GetVisions(CancellationToken cancellationToken, [FromQuery] int? state = null)
+    public async Task<ActionResult<IEnumerable<VisionDto>>> GetVisions(CancellationToken cancellationToken, [FromQuery] int? state = null)
     {
         VisionState? filter = state.HasValue ? (VisionState)state.Value : null;
 
@@ -41,7 +42,7 @@ public class VisionsController : ControllerBase
     [OpenApiOperation("Get vision details.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<RoadmapDetailsDto>> GetVision(string idOrKey, CancellationToken cancellationToken)
+    public async Task<ActionResult<VisionDto>> GetVision(string idOrKey, CancellationToken cancellationToken)
     {
         var vision = await _sender.Send(new GetVisionQuery(idOrKey), cancellationToken);
 
@@ -133,6 +134,6 @@ public class VisionsController : ControllerBase
     public async Task<ActionResult<IEnumerable<VisionStateDto>>> GetStateOptions(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetVisionStatesQuery(), cancellationToken);
-        return Ok(items.OrderBy(c => c.Order));
+        return Ok(items.OrderBy(s => s.Order));
     }
 }

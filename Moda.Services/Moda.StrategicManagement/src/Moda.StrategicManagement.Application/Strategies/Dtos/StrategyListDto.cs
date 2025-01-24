@@ -37,6 +37,8 @@ public sealed record StrategyListDto : IMapFrom<Strategy>
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Strategy, StrategyListDto>()
-            .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status));
+            .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))
+            .Map(dest => dest.Start, src => src.Dates == null ? null : (LocalDate?)src.Dates.Start)
+            .Map(dest => dest.End, src => src.Dates == null ? null : src.Dates.End);
     }
 }
