@@ -12,11 +12,13 @@ using Moda.Organization.Application.Teams.Models;
 using Moda.Planning.Application.Persistence;
 using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Models.Roadmaps;
+using Moda.StrategicManagement.Application;
+using Moda.StrategicManagement.Domain.Models;
 using Moda.Work.Domain.Models;
 
 namespace Moda.Infrastructure.Persistence.Context;
 
-public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IWorkDbContext
+public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IStrategicManagementDbContext, IWorkDbContext
 {
     public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events, IRequestCorrelationIdProvider requestCorrelationIdProvider)
         : base(options, currentUser, dateTimeProvider, serializer, dbSettings, events, requestCorrelationIdProvider)
@@ -71,6 +73,14 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<Roadmap> Roadmaps => Set<Roadmap>();
 
     #endregion IPlanning
+
+    #region IStrategicManagement
+
+    public DbSet<Strategy> Strategies => Set<Strategy>();
+    public DbSet<StrategicTheme> StrategicThemes => Set<StrategicTheme>();
+    public DbSet<Vision> Visions => Set<Vision>();
+
+    #endregion IStrategicManagement
 
     #region IWork
 

@@ -11,5 +11,6 @@ internal static class SchemaNames
     public static string Links = "Links";
     public static string Organization = "Organization";
     public static string Planning = "Planning";
+    public static string StrategicManagement = "StrategicManagement";
     public static string Work = "Work";
 }

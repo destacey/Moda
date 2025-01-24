@@ -23,32 +23,39 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
         }
     }
 
-    /// <summary>Gets the start.</summary>
-    /// <value>The start.</value>
+    /// <summary>
+    /// Gets the start date.
+    /// </summary>
     public LocalDate Start { get; private set; }
 
-    /// <summary>Gets the end.</summary>
-    /// <value>The end.</value>
+    /// <summary>
+    /// Gets the end date.
+    /// </summary>
     public LocalDate End { get; private set; }
 
-    /// <summary>Gets the days.</summary>
-    /// <value>The days.</value>
+    /// <summary>
+    /// Gets the number of days in the range.
+    /// </summary>
     public int Days => Period.DaysBetween(Start, End) + 1;
 
-    /// <summary>Includeses the specified value.</summary>
-    /// <param name="value">The value.</param>
+    /// <summary>
+    /// Determines whether the range includes the specified value.
+    /// </summary>
+    /// <param name="value"></param>
     /// <returns></returns>
     public bool Includes(LocalDate value)
     {
         return (Start <= value) && (value <= End);
     }
 
-    /// <summary>Includes the specified range.</summary>
-    /// <param name="range">The range.</param>
+    /// <summary>
+    /// Determines whether the range includes the specified range.
+    /// </summary>
+    /// <param name="otherRange"></param>
     /// <returns></returns>
-    public bool Includes(LocalDateRange range)
+    public bool Includes(LocalDateRange otherRange)
     {
-        return (Start <= range.Start) && (range.End <= End);
+        return (Start <= otherRange.Start) && (otherRange.End <= End);
     }
 
     /// <summary>Overlapses the specified range.</summary>
@@ -98,7 +105,9 @@ public class LocalDateRange : ValueObject, IDateRange<LocalDate>
         return date < Start;
     }
 
-    /// <summary>Gets the equality components.</summary>
+    /// <summary>
+    /// Gets the equality components.
+    /// </summary>
     /// <returns></returns>
     protected override IEnumerable<IComparable> GetEqualityComponents()
     {

@@ -3,7 +3,6 @@ using Moda.Common.Application.Interfaces;
 using Moda.Planning.Application.Risks.Commands;
 using Moda.Planning.Application.Risks.Dtos;
 using Moda.Planning.Application.Risks.Queries;
-using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Planning.Risks;
 

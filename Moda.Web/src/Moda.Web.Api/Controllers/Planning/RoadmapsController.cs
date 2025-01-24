@@ -215,7 +215,7 @@ public class RoadmapsController : ControllerBase
     #endregion Roadmap Items
 
     [HttpGet("visibility-options")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.Risks)]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Roadmaps)]
     [OpenApiOperation("Get a list of all visibility.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
