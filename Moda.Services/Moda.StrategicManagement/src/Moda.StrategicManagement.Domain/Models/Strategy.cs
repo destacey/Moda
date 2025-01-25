@@ -10,7 +10,7 @@ namespace Moda.StrategicManagement.Domain.Models;
 public sealed class Strategy : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 {
     private string _name = default!;
-    private string? _description = default!;
+    private string? _description;
 
     private Strategy() { }
 

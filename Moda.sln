@@ -156,6 +156,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.StrategicManagement.Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.StrategicManagement.Domain.Tests", "Moda.Services\Moda.StrategicManagement\tests\Moda.StrategicManagement.Domain.Tests\Moda.StrategicManagement.Domain.Tests.csproj", "{4F33335D-E3F5-40E8-937C-AE1FBD784F8C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Moda.ProjectPortfolioManagement", "Moda.ProjectPortfolioManagement", "{AFFD5046-56C7-4560-971E-280CEF8540E0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E7DE7780-8BAD-4177-B872-751CB6896331}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3C17D935-F66D-49E5-8011-06B60D237AA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.ProjectPortfolioManagement.Domain", "Moda.Services\Moda.ProjectPortfolioManagement\src\Moda.ProjectPortfolioManagement.Domain\Moda.ProjectPortfolioManagement.Domain.csproj", "{6FDD8F88-A313-4226-AB23-8680514FE803}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.ProjectPortfolioManagement.Domain.Tests", "Moda.Services\Moda.ProjectPortfolioManagement\tests\Moda.ProjectPortfolioManagement.Domain.Tests\Moda.ProjectPortfolioManagement.Domain.Tests.csproj", "{8629E348-3A8D-4466-8B74-1210C5922F5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -308,6 +318,14 @@ Global
 		{4F33335D-E3F5-40E8-937C-AE1FBD784F8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F33335D-E3F5-40E8-937C-AE1FBD784F8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F33335D-E3F5-40E8-937C-AE1FBD784F8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FDD8F88-A313-4226-AB23-8680514FE803}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FDD8F88-A313-4226-AB23-8680514FE803}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FDD8F88-A313-4226-AB23-8680514FE803}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FDD8F88-A313-4226-AB23-8680514FE803}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8629E348-3A8D-4466-8B74-1210C5922F5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8629E348-3A8D-4466-8B74-1210C5922F5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8629E348-3A8D-4466-8B74-1210C5922F5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8629E348-3A8D-4466-8B74-1210C5922F5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -381,6 +399,11 @@ Global
 		{18CCB91A-F744-488F-93A9-A573592EC08E} = {5531C648-5846-484F-A4DA-B1642FA7AABB}
 		{411C8137-AE49-4306-A285-82953A485C2F} = {5531C648-5846-484F-A4DA-B1642FA7AABB}
 		{4F33335D-E3F5-40E8-937C-AE1FBD784F8C} = {D19A8222-E268-4FE8-8023-CBF191D94F38}
+		{AFFD5046-56C7-4560-971E-280CEF8540E0} = {A6D1C8F1-0406-4A6E-832E-EE23D40202F9}
+		{E7DE7780-8BAD-4177-B872-751CB6896331} = {AFFD5046-56C7-4560-971E-280CEF8540E0}
+		{3C17D935-F66D-49E5-8011-06B60D237AA3} = {AFFD5046-56C7-4560-971E-280CEF8540E0}
+		{6FDD8F88-A313-4226-AB23-8680514FE803} = {E7DE7780-8BAD-4177-B872-751CB6896331}
+		{8629E348-3A8D-4466-8B74-1210C5922F5E} = {3C17D935-F66D-49E5-8011-06B60D237AA3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A287E480-E0D5-4A33-9958-D4A8F7DC3F31}
