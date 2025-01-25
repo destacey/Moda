@@ -36,6 +36,8 @@ public class ProjectPortfolioTests
         portfolio.DateRange.Should().BeNull();
     }
 
+    #region Lifecycle
+
     [Fact]
     public void Activate_ShouldActivateProposedPortfolioSuccessfully()
     {
@@ -199,4 +201,72 @@ public class ProjectPortfolioTests
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("Only portfolios on hold can be resumed.");
     }
+
+    #endregion Lifecycle
+
+    #region Projects
+
+    [Fact]
+    public void CreateProject_ShouldCreateProjectSuccessfully_WhenPortfolioIsActive()
+    {
+        // Arrange
+        var portfolio = _faker.ActivePortfolio(_dateTimeProvider);
+
+        // Act
+        var result = portfolio.CreateProject("Test Project", "Test Description");
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Name.Should().Be("Test Project");
+        result.Value.Description.Should().Be("Test Description");
+        result.Value.PortfolioId.Should().Be(portfolio.Id);
+        portfolio.Projects.Should().Contain(result.Value);
+    }
+
+    [Fact]
+    public void CreateProject_ShouldFail_WhenPortfolioIsNotActive()
+    {
+        // Arrange
+        var portfolio = _faker.ProposedPortfolio();
+
+        // Act
+        var result = portfolio.CreateProject("Test Project", "Test Description");
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Projects can only be created when the portfolio is active.");
+        portfolio.Projects.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void CreateProject_ShouldFail_WhenProjectNameIsEmpty()
+    {
+        // Arrange
+        var portfolio = _faker.ActivePortfolio(_dateTimeProvider);
+
+        // Act
+        Action action = () => portfolio.CreateProject(string.Empty, "Test Description");
+
+        // Assert
+        action.Should().Throw<ArgumentException>()
+            .WithMessage("Required input name was empty. (Parameter 'Name')");
+        portfolio.Projects.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void CreateProject_ShouldFail_WhenProjectDescriptionIsEmpty()
+    {
+        // Arrange
+        var portfolio = _faker.ActivePortfolio(_dateTimeProvider);
+
+        // Act
+        Action action = () => portfolio.CreateProject("Test Project", string.Empty);
+
+        // Assert
+        action.Should().Throw<ArgumentException>()
+            .WithMessage("Required input description was empty. (Parameter 'Description')");
+        portfolio.Projects.Should().BeEmpty();
+    }
+
+    #endregion Projects
 }

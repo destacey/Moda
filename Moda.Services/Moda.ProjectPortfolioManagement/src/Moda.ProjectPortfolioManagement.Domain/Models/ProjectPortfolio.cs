@@ -4,10 +4,16 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 using NodaTime;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Models;
+
+/// <summary>
+/// Represents a collection of projects or programs that are managed together to achieve strategic results.
+/// </summary>
 public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 {
     private string _name = default!;
     private string _description = default!;
+
+    private readonly List<Project> _projects = [];
 
     private ProjectPortfolio() { }
 
@@ -61,6 +67,11 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// The date range defining the portfolio’s lifecycle.
     /// </summary>
     public FlexibleDateRange? DateRange { get; private set; }
+
+    /// <summary>
+    /// The projects associated with this portfolio.
+    /// </summary>
+    public IReadOnlyCollection<Project> Projects => _projects.AsReadOnly();
 
     /// <summary>
     /// Updates the portfolio details, including the date range.
@@ -148,7 +159,10 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
             return Result.Failure("The end date cannot be earlier than the start date.");
         }
 
-        // TODO: Ensure all projects are completed or canceled before completing the portfolio.
+        if (_projects.Any(p => p.Status != ProjectStatus.Completed && p.Status != ProjectStatus.Cancelled))
+        {
+            return Result.Failure("All projects must be completed or canceled before the portfolio can be completed.");
+        }
 
         Status = ProjectPortfolioStatus.Completed;
         DateRange = new FlexibleDateRange(DateRange.Start, endDate);
@@ -172,6 +186,26 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     }
 
     #endregion Lifecycle
+
+    /// <summary>
+    /// Creates and adds a new project to the portfolio.
+    /// </summary>
+    /// <param name="name">The name of the project.</param>
+    /// <param name="description">A description of the project.</param>
+    /// <returns>A result object containing the created project or an error message.</returns>
+    public Result<Project> CreateProject(string name, string description)
+    {
+        if (Status != ProjectPortfolioStatus.Active)
+        {
+            return Result.Failure<Project>("Projects can only be created when the portfolio is active.");
+        }
+
+        var project = Project.Create(name, description, Id);
+
+        _projects.Add(project);
+
+        return Result.Success(project);
+    }
 
     /// <summary>
     /// Checks if the portfolio is active on the specified date.

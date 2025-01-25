@@ -6,28 +6,30 @@ using Moda.Tests.Shared.Data;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 
-public sealed class ProjectPortfolioFaker : PrivateConstructorFaker<ProjectPortfolio>
+public sealed class ProjectFaker : PrivateConstructorFaker<Project>
 {
-    public ProjectPortfolioFaker()
+    public ProjectFaker()
     {
         RuleFor(x => x.Id, f => f.Random.Guid());
         RuleFor(x => x.Key, f => f.Random.Int(1000, 10000));
-        RuleFor(x => x.Name, f => f.Commerce.Department());
+        RuleFor(x => x.Name, f => f.Commerce.ProductName());
         RuleFor(x => x.Description, f => f.Lorem.Paragraph());
-        RuleFor(x => x.Status, f => ProjectPortfolioStatus.Proposed);
-        RuleFor(x => x.DateRange, f => null); // Default is null, as proposed portfolios may not have dates.
+        RuleFor(x => x.Status, f => ProjectStatus.Proposed);
+        RuleFor(x => x.PortfolioId, f => f.Random.Guid());
+        RuleFor(x => x.DateRange, f => null); // Default is null, as proposed projects may not have dates.
     }
 }
 
-public static class ProjectPortfolioFakerExtensions
+public static class ProjectFakerExtensions
 {
-    public static ProjectPortfolioFaker WithData(
-        this ProjectPortfolioFaker faker,
+    public static ProjectFaker WithData(
+        this ProjectFaker faker,
         Guid? id = null,
         int? key = null,
         string? name = null,
         string? description = null,
-        ProjectPortfolioStatus? status = null,
+        ProjectStatus? status = null,
+        Guid? portfolioId = null,
         FlexibleDateRange? dateRange = null)
     {
         if (id.HasValue) { faker.RuleFor(x => x.Id, id.Value); }
@@ -35,47 +37,52 @@ public static class ProjectPortfolioFakerExtensions
         if (!string.IsNullOrWhiteSpace(name)) { faker.RuleFor(x => x.Name, name); }
         if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
         if (status.HasValue) { faker.RuleFor(x => x.Status, status); }
+        if (portfolioId.HasValue) { faker.RuleFor(x => x.PortfolioId, portfolioId.Value); }
         if (dateRange is not null) { faker.RuleFor(x => x.DateRange, dateRange); }
 
         return faker;
     }
 
     /// <summary>
-    /// Generates an active portfolio with a start date 10 days ago.
+    /// Generates an active project with a start date 10 days ago.
     /// </summary>
-    public static ProjectPortfolio ActivePortfolio(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
+    public static Project ActiveProject(this ProjectFaker faker, TestingDateTimeProvider dateTimeProvider)
     {
         var now = dateTimeProvider.Today;
         var defaultStartDate = now.PlusDays(-10);
 
         return faker.WithData(
-            status: ProjectPortfolioStatus.Active,
+            status: ProjectStatus.Active,
             dateRange: new FlexibleDateRange(defaultStartDate)
         ).Generate();
     }
 
     /// <summary>
-    /// Generates a proposed portfolio without a date range.
+    /// Generates a completed project with a start date 20 days ago and end date 10 days ago.
     /// </summary>
-    public static ProjectPortfolio ProposedPortfolio(this ProjectPortfolioFaker faker)
-    {
-        return faker.WithData(
-            status: ProjectPortfolioStatus.Proposed,
-            dateRange: null
-        ).Generate();
-    }
-
-    /// <summary>
-    /// Generates a completed portfolio with a start date 20 days ago and an end date 10 days ago.
-    /// </summary>
-    public static ProjectPortfolio CompletedPortfolio(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
+    public static Project CompletedProject(this ProjectFaker faker, TestingDateTimeProvider dateTimeProvider)
     {
         var now = dateTimeProvider.Today;
         var defaultStartDate = now.PlusDays(-20);
         var defaultEndDate = now.PlusDays(-10);
 
         return faker.WithData(
-            status: ProjectPortfolioStatus.Completed,
+            status: ProjectStatus.Completed,
+            dateRange: new FlexibleDateRange(defaultStartDate, defaultEndDate)
+        ).Generate();
+    }
+
+    /// <summary>
+    /// Generates a cancelled project with a start date and end date.
+    /// </summary>
+    public static Project CancelledProject(this ProjectFaker faker, TestingDateTimeProvider dateTimeProvider)
+    {
+        var now = dateTimeProvider.Today;
+        var defaultStartDate = now.PlusDays(-30);
+        var defaultEndDate = now.PlusDays(-20);
+
+        return faker.WithData(
+            status: ProjectStatus.Cancelled,
             dateRange: new FlexibleDateRange(defaultStartDate, defaultEndDate)
         ).Generate();
     }
