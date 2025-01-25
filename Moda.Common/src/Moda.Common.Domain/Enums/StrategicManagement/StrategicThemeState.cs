@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Moda.StrategicManagement.Domain.Enums;
+namespace Moda.Common.Domain.Enums.StrategicManagement;
 
 // max length of 32 characters
 

@@ -1,8 +1,8 @@
 ﻿using Moda.Common.Application.Models;
+using Moda.Common.Domain.Enums.StrategicManagement;
 using Moda.StrategicManagement.Application.StrategicThemes.Commands;
 using Moda.StrategicManagement.Application.StrategicThemes.Dtos;
 using Moda.StrategicManagement.Application.StrategicThemes.Queries;
-using Moda.StrategicManagement.Domain.Enums;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.StrategicManagement.StrategicThemes;
 

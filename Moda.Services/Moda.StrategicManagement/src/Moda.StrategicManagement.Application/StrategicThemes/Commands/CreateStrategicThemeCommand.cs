@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Application.Models;
+using Moda.Common.Domain.Enums.StrategicManagement;
 using Moda.StrategicManagement.Domain.Enums;
 using Moda.StrategicManagement.Domain.Models;
 

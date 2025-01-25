@@ -1,13 +1,14 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
-using Moda.StrategicManagement.Domain.Enums;
+using Moda.Common.Domain.Enums.StrategicManagement;
+using Moda.Common.Domain.Interfaces.StrategicManagement;
 
 namespace Moda.StrategicManagement.Domain.Models;
 
 /// <summary>
 /// Represents a high-level focus area or priority that guides related initiatives.
 /// </summary>
-public sealed class StrategicTheme : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
+public sealed class StrategicTheme : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey, IStrategicTheme
 {
     private string _name = default!;
     private string _description = default!;

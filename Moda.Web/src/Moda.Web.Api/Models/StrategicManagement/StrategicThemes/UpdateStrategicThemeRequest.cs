@@ -1,5 +1,5 @@
-﻿using Moda.StrategicManagement.Application.StrategicThemes.Commands;
-using Moda.StrategicManagement.Domain.Enums;
+﻿using Moda.Common.Domain.Enums.StrategicManagement;
+using Moda.StrategicManagement.Application.StrategicThemes.Commands;
 
 namespace Moda.Web.Api.Models.StrategicManagement.StrategicThemes;
 

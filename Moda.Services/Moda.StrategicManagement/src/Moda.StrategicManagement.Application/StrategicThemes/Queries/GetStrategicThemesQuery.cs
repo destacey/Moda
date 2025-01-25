@@ -1,4 +1,5 @@
-﻿using Moda.StrategicManagement.Application.StrategicThemes.Dtos;
+﻿using Moda.Common.Domain.Enums.StrategicManagement;
+using Moda.StrategicManagement.Application.StrategicThemes.Dtos;
 using Moda.StrategicManagement.Domain.Enums;
 
 namespace Moda.StrategicManagement.Application.StrategicThemes.Queries;
