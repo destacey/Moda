@@ -41,6 +41,14 @@ public static class ProjectPortfolioFakerExtensions
     }
 
     /// <summary>
+    /// Generates a proposed portfolio.
+    /// </summary>
+    public static ProjectPortfolio ProposedPortfolio(this ProjectPortfolioFaker faker)
+    {
+        return faker.WithData(status: ProjectPortfolioStatus.Proposed).Generate();
+    }
+
+    /// <summary>
     /// Generates an active portfolio with a start date 10 days ago.
     /// </summary>
     public static ProjectPortfolio ActivePortfolio(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
@@ -55,18 +63,7 @@ public static class ProjectPortfolioFakerExtensions
     }
 
     /// <summary>
-    /// Generates a proposed portfolio without a date range.
-    /// </summary>
-    public static ProjectPortfolio ProposedPortfolio(this ProjectPortfolioFaker faker)
-    {
-        return faker.WithData(
-            status: ProjectPortfolioStatus.Proposed,
-            dateRange: null
-        ).Generate();
-    }
-
-    /// <summary>
-    /// Generates a completed portfolio with a start date 20 days ago and an end date 10 days ago.
+    /// Generates a completed portfolio with a start date 20 days ago and end date 10 days ago.
     /// </summary>
     public static ProjectPortfolio CompletedPortfolio(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
     {
@@ -79,5 +76,28 @@ public static class ProjectPortfolioFakerExtensions
             dateRange: new FlexibleDateRange(defaultStartDate, defaultEndDate)
         ).Generate();
     }
-}
 
+    /// <summary>
+    /// Generates a portfolio with programs and projects.
+    /// </summary>
+    public static ProjectPortfolio PortfolioWithProgramsAndProjects(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider, int programCount = 2, int projectCount = 5)
+    {
+        var portfolio = faker.ActivePortfolio(dateTimeProvider);
+
+        var programFaker = new ProgramFaker();
+        for (int i = 0; i < programCount; i++)
+        {
+            var program = programFaker.ActiveProgram(dateTimeProvider, portfolio.Id);
+            portfolio.CreateProgram(program.Name, program.Description);
+        }
+
+        var projectFaker = new ProjectFaker();
+        for (int i = 0; i < projectCount; i++)
+        {
+            var project = projectFaker.ActiveProject(dateTimeProvider, portfolio.Id);
+            portfolio.CreateProject(project.Name, project.Description);
+        }
+
+        return portfolio;
+    }
+}

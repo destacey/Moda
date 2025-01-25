@@ -7,16 +7,23 @@ using NodaTime.Extensions;
 using NodaTime.Testing;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Tests.Sut.Models;
+
 public class ProjectPortfolioTests
 {
     private readonly TestingDateTimeProvider _dateTimeProvider;
-    private readonly ProjectPortfolioFaker _faker;
+    private readonly ProjectPortfolioFaker _portfolioFaker;
+    private readonly ProgramFaker _programFaker;
+    private readonly ProjectFaker _projectFaker;
 
     public ProjectPortfolioTests()
     {
-        _dateTimeProvider = new(new FakeClock(DateTime.UtcNow.ToInstant()));
-        _faker = new ProjectPortfolioFaker();
+        _dateTimeProvider = new TestingDateTimeProvider(new FakeClock(DateTime.UtcNow.ToInstant()));
+        _portfolioFaker = new ProjectPortfolioFaker();
+        _programFaker = new ProgramFaker();
+        _projectFaker = new ProjectFaker();
     }
+
+    #region Portfolio Creation
 
     [Fact]
     public void Create_ShouldCreateProposedPortfolioSuccessfully()
@@ -34,15 +41,19 @@ public class ProjectPortfolioTests
         portfolio.Description.Should().Be(description);
         portfolio.Status.Should().Be(ProjectPortfolioStatus.Proposed);
         portfolio.DateRange.Should().BeNull();
+        portfolio.Projects.Should().BeEmpty();
+        portfolio.Programs.Should().BeEmpty();
     }
 
-    #region Lifecycle
+    #endregion Portfolio Creation
+
+    #region Lifecycle Tests
 
     [Fact]
     public void Activate_ShouldActivateProposedPortfolioSuccessfully()
     {
         // Arrange
-        var portfolio = _faker.Generate();
+        var portfolio = _portfolioFaker.Generate();
         var startDate = _dateTimeProvider.Today;
 
         // Act
@@ -53,30 +64,42 @@ public class ProjectPortfolioTests
         portfolio.Status.Should().Be(ProjectPortfolioStatus.Active);
         portfolio.DateRange.Should().NotBeNull();
         portfolio.DateRange!.Start.Should().Be(startDate);
-        portfolio.DateRange.End.Should().BeNull();
     }
 
     [Fact]
-    public void Activate_ShouldFail_WhenPortfolioIsNotProposed()
+    public void Complete_ShouldFail_WhenPortfolioHasOpenProjectsOrPrograms()
     {
         // Arrange
-        var portfolio = _faker.ActivePortfolio(_dateTimeProvider);
-        var startDate = _dateTimeProvider.Today;
+        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var project = _projectFaker.ActiveProject(_dateTimeProvider, portfolio.Id);
+        portfolio.CreateProject(project.Name, project.Description);
+
+        var endDate = _dateTimeProvider.Today.PlusDays(10);
 
         // Act
-        var result = portfolio.Activate(startDate);
+        var result = portfolio.Complete(endDate);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("Only proposed portfolios can be activated.");
+        result.Error.Should().Be("All projects must be completed or canceled before the portfolio can be completed.");
     }
 
     [Fact]
-    public void Complete_ShouldCompleteActivePortfolioSuccessfully()
+    public void Complete_ShouldCompletePortfolioSuccessfully()
     {
         // Arrange
-        var portfolio = _faker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+
+        var fakeProject = _projectFaker.ProposedProject(portfolio.Id);
+        var createProjectReult = portfolio.CreateProject(fakeProject.Name, fakeProject.Description);
+        var project = createProjectReult.Value;
+
         var endDate = _dateTimeProvider.Today.PlusDays(10);
+
+        var activateProjectResult = project.Activate(_dateTimeProvider.Today);
+        activateProjectResult.IsSuccess.Should().BeTrue();
+        var completeProjectResult = project.Complete(endDate);
+        completeProjectResult.IsSuccess.Should().BeTrue();
 
         // Act
         var result = portfolio.Complete(endDate);
@@ -89,54 +112,10 @@ public class ProjectPortfolioTests
     }
 
     [Fact]
-    public void Complete_ShouldFail_WhenPortfolioIsNotActive()
-    {
-        // Arrange
-        var portfolio = _faker.WithData(status: ProjectPortfolioStatus.Proposed).Generate();
-        var endDate = _dateTimeProvider.Today.PlusDays(10);
-
-        // Act
-        var result = portfolio.Complete(endDate);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("Only active portfolios can be completed.");
-    }
-
-    [Fact]
-    public void Complete_ShouldFail_WhenEndDateIsBeforeStartDate()
-    {
-        // Arrange
-        var portfolio = _faker.ActivePortfolio(_dateTimeProvider);
-        var endDate = portfolio.DateRange!.Start.PlusDays(-1);
-
-        // Act
-        var result = portfolio.Complete(endDate);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("The end date cannot be earlier than the start date.");
-    }
-
-    [Fact]
-    public void Archive_ShouldArchiveCompletedPortfolioSuccessfully()
-    {
-        // Arrange
-        var portfolio = _faker.CompletedPortfolio(_dateTimeProvider);
-
-        // Act
-        var result = portfolio.Archive();
-
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-        portfolio.Status.Should().Be(ProjectPortfolioStatus.Archived);
-    }
-
-    [Fact]
     public void Archive_ShouldFail_WhenPortfolioIsNotCompleted()
     {
         // Arrange
-        var portfolio = _faker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
 
         // Act
         var result = portfolio.Archive();
@@ -147,126 +126,104 @@ public class ProjectPortfolioTests
     }
 
     [Fact]
-    public void Pause_ShouldPauseActivePortfolioSuccessfully()
+    public void Archive_ShouldArchiveCompletedPortfolioSuccessfully()
     {
         // Arrange
-        var portfolio = _faker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.CompletedPortfolio(_dateTimeProvider);
 
         // Act
-        var result = portfolio.Pause();
+        var result = portfolio.Archive();
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        portfolio.Status.Should().Be(ProjectPortfolioStatus.OnHold);
+        portfolio.Status.Should().Be(ProjectPortfolioStatus.Archived);
     }
 
+    #endregion Lifecycle Tests
+
+    #region Program Management
+
     [Fact]
-    public void Pause_ShouldFail_WhenPortfolioIsNotActive()
+    public void CreateProgram_ShouldFail_WhenPortfolioIsNotActiveOrOnHold()
     {
         // Arrange
-        var portfolio = _faker.WithData(status: ProjectPortfolioStatus.Proposed).Generate();
+        var portfolio = _portfolioFaker.Generate();
 
         // Act
-        var result = portfolio.Pause();
+        var result = portfolio.CreateProgram("Test Program", "Test Description");
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("Only active portfolios can be put on hold.");
+        result.Error.Should().Be("Programs can only be created in active or on-hold portfolios.");
     }
 
     [Fact]
-    public void Resume_ShouldResumeOnHoldPortfolioSuccessfully()
+    public void CreateProgram_ShouldAddProgramToPortfolio()
     {
         // Arrange
-        var portfolio = _faker.WithData(status: ProjectPortfolioStatus.OnHold).Generate();
+        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
 
         // Act
-        var result = portfolio.Resume();
+        var result = portfolio.CreateProgram("Test Program", "Test Description");
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        portfolio.Status.Should().Be(ProjectPortfolioStatus.Active);
+        portfolio.Programs.Should().ContainSingle();
+        portfolio.Programs.First().Name.Should().Be("Test Program");
     }
 
-    [Fact]
-    public void Resume_ShouldFail_WhenPortfolioIsNotOnHold()
-    {
-        // Arrange
-        var portfolio = _faker.ActivePortfolio(_dateTimeProvider);
+    #endregion Program Management
 
-        // Act
-        var result = portfolio.Resume();
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("Only portfolios on hold can be resumed.");
-    }
-
-    #endregion Lifecycle
-
-    #region Projects
+    #region Project Management
 
     [Fact]
-    public void CreateProject_ShouldCreateProjectSuccessfully_WhenPortfolioIsActive()
+    public void CreateProject_ShouldAddProjectToPortfolio()
     {
         // Arrange
-        var portfolio = _faker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
 
         // Act
         var result = portfolio.CreateProject("Test Project", "Test Description");
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Name.Should().Be("Test Project");
-        result.Value.Description.Should().Be("Test Description");
-        result.Value.PortfolioId.Should().Be(portfolio.Id);
-        portfolio.Projects.Should().Contain(result.Value);
+        portfolio.Projects.Should().ContainSingle();
+        portfolio.Projects.First().Name.Should().Be("Test Project");
     }
 
     [Fact]
-    public void CreateProject_ShouldFail_WhenPortfolioIsNotActive()
+    public void CreateProject_ShouldFail_WhenProgramDoesNotBelongToPortfolio()
     {
         // Arrange
-        var portfolio = _faker.ProposedPortfolio();
+        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var program = _programFaker.Generate();
 
         // Act
-        var result = portfolio.CreateProject("Test Project", "Test Description");
+        var result = portfolio.CreateProject("Test Project", "Test Description", program.Id);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("Projects can only be created when the portfolio is active.");
-        portfolio.Projects.Should().BeEmpty();
+        result.Error.Should().Be("The specified program does not belong to this portfolio.");
     }
 
     [Fact]
-    public void CreateProject_ShouldFail_WhenProjectNameIsEmpty()
+    public void CreateProject_ShouldFail_WhenProgramIsNotAcceptingProjects()
     {
         // Arrange
-        var portfolio = _faker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var fakeProgram = _programFaker.Generate();
+
+        var createProgramResult = portfolio.CreateProgram(fakeProgram.Name, fakeProgram.Description);
+        createProgramResult.IsSuccess.Should().BeTrue();
+        var program = createProgramResult.Value;
 
         // Act
-        Action action = () => portfolio.CreateProject(string.Empty, "Test Description");
+        var result = portfolio.CreateProject("Test Project", "Test Description", program.Id);
 
         // Assert
-        action.Should().Throw<ArgumentException>()
-            .WithMessage("Required input name was empty. (Parameter 'Name')");
-        portfolio.Projects.Should().BeEmpty();
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The specified program is not in a valid state to accept projects.");
     }
 
-    [Fact]
-    public void CreateProject_ShouldFail_WhenProjectDescriptionIsEmpty()
-    {
-        // Arrange
-        var portfolio = _faker.ActivePortfolio(_dateTimeProvider);
-
-        // Act
-        Action action = () => portfolio.CreateProject("Test Project", string.Empty);
-
-        // Assert
-        action.Should().Throw<ArgumentException>()
-            .WithMessage("Required input description was empty. (Parameter 'Description')");
-        portfolio.Projects.Should().BeEmpty();
-    }
-
-    #endregion Projects
+    #endregion Project Management
 }

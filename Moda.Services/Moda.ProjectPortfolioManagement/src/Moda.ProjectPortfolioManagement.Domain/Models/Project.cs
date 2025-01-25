@@ -15,7 +15,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 
     private Project() { }
 
-    private Project(string name, string description, ProjectStatus status, Guid portfolioId, FlexibleDateRange? dateRange = null)
+    private Project(string name, string description, ProjectStatus status, Guid portfolioId, Guid? programId = null, FlexibleDateRange? dateRange = null)
     {
         if (status is ProjectStatus.Active && dateRange?.Start is null)
         {
@@ -31,6 +31,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
         Description = description;
         Status = status;
         PortfolioId = portfolioId;
+        ProgramId = programId;
         DateRange = dateRange;
     }
 
@@ -73,12 +74,45 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     public Guid PortfolioId { get; private set; }
 
     /// <summary>
+    /// The ID of the program to which this project belongs (optional).
+    /// </summary>
+    public Guid? ProgramId { get; private set; }
+
+    /// <summary>
+    /// Indicates if the project is in a closed state.
+    /// </summary>
+    public bool IsClosed => Status is ProjectStatus.Completed or ProjectStatus.Cancelled;
+
+    /// <summary>
     /// Updates the project details.
     /// </summary>
     public Result UpdateDetails(string name, string description)
     {
         Name = name;
         Description = description;
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Updates the project's program association.
+    /// </summary>
+    /// <param name="program"></param>
+    /// <returns></returns>
+    internal Result UpdateProgram(Program? program)
+    {
+        if (program is null)
+        {
+            ProgramId = null;
+            return Result.Success();
+        }
+
+        if (program.PortfolioId != PortfolioId)
+        {
+            return Result.Failure("The project must belong to the same portfolio as the program.");
+        }
+
+        ProgramId = program.Id;
 
         return Result.Success();
     }

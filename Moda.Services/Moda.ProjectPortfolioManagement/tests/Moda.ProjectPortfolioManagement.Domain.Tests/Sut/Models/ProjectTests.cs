@@ -7,16 +7,19 @@ using NodaTime.Extensions;
 using NodaTime.Testing;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Tests.Sut.Models;
-public sealed class ProjectTests
+
+public class ProjectTests
 {
     private readonly TestingDateTimeProvider _dateTimeProvider;
-    private readonly ProjectFaker _faker;
+    private readonly ProjectFaker _projectFaker;
 
     public ProjectTests()
     {
-        _dateTimeProvider = new(new FakeClock(DateTime.UtcNow.ToInstant()));
-        _faker = new ProjectFaker();
+        _dateTimeProvider = new TestingDateTimeProvider(new FakeClock(DateTime.UtcNow.ToInstant()));
+        _projectFaker = new ProjectFaker();
     }
+
+    #region Project Creation
 
     [Fact]
     public void Create_ShouldCreateProposedProjectSuccessfully()
@@ -34,14 +37,20 @@ public sealed class ProjectTests
         project.Name.Should().Be(name);
         project.Description.Should().Be(description);
         project.Status.Should().Be(ProjectStatus.Proposed);
+        project.PortfolioId.Should().Be(portfolioId);
+        project.ProgramId.Should().BeNull();
         project.DateRange.Should().BeNull();
     }
+
+    #endregion Project Creation
+
+    #region Lifecycle Tests
 
     [Fact]
     public void Activate_ShouldActivateProposedProjectSuccessfully()
     {
         // Arrange
-        var project = _faker.Generate();
+        var project = _projectFaker.Generate();
         var startDate = _dateTimeProvider.Today;
 
         // Act
@@ -59,11 +68,10 @@ public sealed class ProjectTests
     public void Activate_ShouldFail_WhenProjectIsNotProposed()
     {
         // Arrange
-        var project = _faker.ActiveProject(_dateTimeProvider);
-        var startDate = _dateTimeProvider.Today;
+        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
 
         // Act
-        var result = project.Activate(startDate);
+        var result = project.Activate(_dateTimeProvider.Today);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -74,7 +82,7 @@ public sealed class ProjectTests
     public void Complete_ShouldCompleteActiveProjectSuccessfully()
     {
         // Arrange
-        var project = _faker.ActiveProject(_dateTimeProvider);
+        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
         var endDate = _dateTimeProvider.Today.PlusDays(10);
 
         // Act
@@ -91,7 +99,7 @@ public sealed class ProjectTests
     public void Complete_ShouldFail_WhenProjectIsNotActive()
     {
         // Arrange
-        var project = _faker.WithData(status: ProjectStatus.Proposed).Generate();
+        var project = _projectFaker.Generate();
         var endDate = _dateTimeProvider.Today.PlusDays(10);
 
         // Act
@@ -106,7 +114,7 @@ public sealed class ProjectTests
     public void Complete_ShouldFail_WhenEndDateIsBeforeStartDate()
     {
         // Arrange
-        var project = _faker.ActiveProject(_dateTimeProvider);
+        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
         var endDate = project.DateRange!.Start.PlusDays(-1);
 
         // Act
@@ -118,11 +126,11 @@ public sealed class ProjectTests
     }
 
     [Fact]
-    public void Cancel_ShouldCancelProjectSuccessfully()
+    public void Cancel_ShouldCancelActiveProjectSuccessfully()
     {
         // Arrange
-        var project = _faker.ActiveProject(_dateTimeProvider);
-        var endDate = _dateTimeProvider.Today.PlusDays(5);
+        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
+        var endDate = _dateTimeProvider.Today.PlusDays(10);
 
         // Act
         var result = project.Cancel(endDate);
@@ -138,8 +146,8 @@ public sealed class ProjectTests
     public void Cancel_ShouldFail_WhenProjectIsAlreadyCompletedOrCancelled()
     {
         // Arrange
-        var project = _faker.CompletedProject(_dateTimeProvider);
-        var endDate = _dateTimeProvider.Today.PlusDays(5);
+        var project = _projectFaker.CancelledProject(_dateTimeProvider, Guid.NewGuid());
+        var endDate = _dateTimeProvider.Today.PlusDays(10);
 
         // Act
         var result = project.Cancel(endDate);
@@ -148,4 +156,70 @@ public sealed class ProjectTests
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("The project is already completed or cancelled.");
     }
+
+    [Fact]
+    public void Cancel_ShouldFail_WhenEndDateIsBeforeStartDate()
+    {
+        // Arrange
+        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
+        var endDate = project.DateRange!.Start.PlusDays(-1);
+
+        // Act
+        var result = project.Cancel(endDate);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The end date cannot be earlier than the start date.");
+    }
+
+    #endregion Lifecycle Tests
+
+    #region Program Association Tests
+
+    [Fact]
+    public void UpdateProgram_ShouldAssociateProjectWithProgramSuccessfully()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var program = Program.Create("Test Program", "Description", project.PortfolioId);
+
+        // Act
+        var result = project.UpdateProgram(program);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.ProgramId.Should().Be(program.Id);
+    }
+
+    [Fact]
+    public void UpdateProgram_ShouldFail_WhenProgramIsInDifferentPortfolio()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var portfolioId = Guid.NewGuid();
+        var program = Program.Create("Test Program", "Description", portfolioId);
+
+        // Act
+        var result = project.UpdateProgram(program);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The project must belong to the same portfolio as the program.");
+    }
+
+    [Fact]
+    public void UpdateProgram_ShouldRemoveProgramAssociation_WhenNullProgramPassed()
+    {
+        // Arrange
+        var project = _projectFaker.WithData(programId: Guid.NewGuid()).Generate();
+
+        // Act
+        var result = project.UpdateProgram(null);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.ProgramId.Should().BeNull();
+    }
+
+    #endregion Program Association Tests
 }

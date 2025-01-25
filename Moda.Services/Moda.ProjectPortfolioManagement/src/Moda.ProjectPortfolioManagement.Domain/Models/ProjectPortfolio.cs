@@ -13,6 +13,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     private string _name = default!;
     private string _description = default!;
 
+    private readonly List<Program> _programs = [];
     private readonly List<Project> _projects = [];
 
     private ProjectPortfolio() { }
@@ -67,6 +68,11 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// The date range defining the portfolio’s lifecycle.
     /// </summary>
     public FlexibleDateRange? DateRange { get; private set; }
+
+    /// <summary>
+    /// The programs associated with this portfolio.
+    /// </summary>
+    public IReadOnlyCollection<Program> Programs => _programs.AsReadOnly();
 
     /// <summary>
     /// The projects associated with this portfolio.
@@ -159,7 +165,12 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
             return Result.Failure("The end date cannot be earlier than the start date.");
         }
 
-        if (_projects.Any(p => p.Status != ProjectStatus.Completed && p.Status != ProjectStatus.Cancelled))
+        if (_programs.Any(p => !p.IsClosed))
+        {
+            return Result.Failure("All programs must be completed or canceled before the portfolio can be completed.");
+        }
+
+        if (_projects.Any(p => !p.IsClosed))
         {
             return Result.Failure("All projects must be completed or canceled before the portfolio can be completed.");
         }
@@ -188,21 +199,70 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     #endregion Lifecycle
 
     /// <summary>
-    /// Creates and adds a new project to the portfolio.
+    /// Creates and adds a new program to the portfolio.
     /// </summary>
-    /// <param name="name">The name of the project.</param>
-    /// <param name="description">A description of the project.</param>
-    /// <returns>A result object containing the created project or an error message.</returns>
-    public Result<Project> CreateProject(string name, string description)
+    /// <param name="name">The name of the program.</param>
+    /// <param name="description">The description of the program.</param>
+    /// <returns>A result containing the created program or an error.</returns>
+    public Result<Program> CreateProgram(string name, string description)
     {
-        if (Status != ProjectPortfolioStatus.Active)
+        if (Status != ProjectPortfolioStatus.Active && Status != ProjectPortfolioStatus.OnHold)
         {
-            return Result.Failure<Project>("Projects can only be created when the portfolio is active.");
+            return Result.Failure<Program>("Programs can only be created in active or on-hold portfolios.");
         }
 
+        var program = Program.Create(name, description, Id);
+        _programs.Add(program);
+
+        return Result.Success(program);
+    }
+
+
+    /// <summary>
+    /// Creates and adds a new project to the portfolio, optionally associating it with a valid and accepting program.
+    /// </summary>
+    /// <param name="name">The name of the project.</param>
+    /// <param name="description">The description of the project.</param>
+    /// <param name="programId">The ID of the program the project should be associated with (optional).</param>
+    /// <returns>A result containing the created project or an error.</returns>
+    public Result<Project> CreateProject(string name, string description, Guid? programId = null)
+    {
+        if (Status != ProjectPortfolioStatus.Active && Status != ProjectPortfolioStatus.OnHold)
+        {
+            return Result.Failure<Project>("Projects can only be created in active or on-hold portfolios.");
+        }
+
+        // Validate the program ID if provided
+        Program? program = null;
+        if (programId.HasValue)
+        {
+            program = _programs.SingleOrDefault(p => p.Id == programId.Value);
+            if (program is null)
+            {
+                return Result.Failure<Project>("The specified program does not belong to this portfolio.");
+            }
+
+            if (program.AcceptingProjects is false)
+            {
+                return Result.Failure<Project>("The specified program is not in a valid state to accept projects.");
+            }
+        }
+
+        // Create the project
         var project = Project.Create(name, description, Id);
 
+        // Add the project to the portfolio's project list
         _projects.Add(project);
+
+        // Associate the project with the program if provided
+        if (program is not null)
+        {
+            var addToProgramResult = program.AddProject(project);
+            if (addToProgramResult.IsFailure)
+            {
+                return Result.Failure<Project>(addToProgramResult.Error);
+            }
+        }
 
         return Result.Success(project);
     }
