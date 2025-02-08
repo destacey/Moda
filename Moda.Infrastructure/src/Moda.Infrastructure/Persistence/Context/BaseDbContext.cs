@@ -85,7 +85,9 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
 
         await HandleAuditingAfterSaveChangesAsync(auditEntries, cancellationToken);
 
-        await SendDomainEventsAsync();
+        ExecutePostPersistenceActions();
+
+        await SendDomainEvents();
 
         return result;
     }
@@ -234,7 +236,20 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
         return SaveChangesAsync(cancellationToken);
     }
 
-    private async Task SendDomainEventsAsync()
+    private void ExecutePostPersistenceActions()
+    {
+        var entitiesWithActions = ChangeTracker.Entries<IEntity>()
+            .Select(e => e.Entity)
+            .Where(e => e.PostPersistenceActions.Count > 0)
+            .ToArray();
+
+        foreach (var entity in entitiesWithActions)
+        {
+            entity.ExecutePostPersistenceActions();
+        }
+    }
+
+    private async Task SendDomainEvents()
     {
         var entitiesWithEvents = ChangeTracker.Entries<IEntity>()
             .Select(e => e.Entity)
