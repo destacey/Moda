@@ -19,7 +19,7 @@ public class ProjectTests
         _projectFaker = new ProjectFaker();
     }
 
-    #region Project Creation
+    #region Project Create and Update
 
     [Fact]
     public void Create_ShouldCreateProposedProjectSuccessfully()
@@ -42,7 +42,33 @@ public class ProjectTests
         project.DateRange.Should().BeNull();
     }
 
-    #endregion Project Creation
+    [Fact]
+    public void UpdateDetails_ShouldFail_WhenNameIsEmpty()
+    {
+        // Arrange
+        var program = _projectFaker.Generate();
+
+        // Act
+        Action action = () => program.UpdateDetails("", "Valid Description");
+
+        // Assert
+        action.Should().Throw<ArgumentException>().WithMessage("Required input Name was empty. (Parameter 'Name')");
+    }
+
+    [Fact]
+    public void UpdateDetails_ShouldFail_WhenDescriptionIsEmpty()
+    {
+        // Arrange
+        var program = _projectFaker.Generate();
+
+        // Act
+        Action action = () => program.UpdateDetails("Valid Name", "");
+
+        // Assert
+        action.Should().Throw<ArgumentException>().WithMessage("Required input Description was empty. (Parameter 'Description')");
+    }
+
+    #endregion Project Create and Update
 
     #region Lifecycle Tests
 

@@ -172,6 +172,27 @@ public class ProjectPortfolioTests
         portfolio.Programs.First().Name.Should().Be("Test Program");
     }
 
+    [Fact]
+    public void Complete_ShouldFail_WhenPortfolioHasProgramsWithOpenProjects()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var program = portfolio.CreateProgram("Test Program", "Description").Value;
+        var project = _projectFaker.ActiveProject(_dateTimeProvider, portfolio.Id);
+
+        program.AddProject(project);
+
+        var endDate = _dateTimeProvider.Today.PlusDays(10);
+
+        // Act
+        var result = portfolio.Complete(endDate);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("All programs must be completed or canceled before the portfolio can be completed.");
+    }
+
+
     #endregion Program Management
 
     #region Project Management
@@ -224,6 +245,101 @@ public class ProjectPortfolioTests
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("The specified program is not in a valid state to accept projects.");
     }
+
+    [Fact]
+    public void ChangeProjectProgram_ShouldMoveProjectToNewProgram()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.PortfolioWithProgramsAndProjects(_dateTimeProvider, 2, 0);
+
+        var program1 = portfolio.Programs.First();
+        var program2 = portfolio.Programs.Last();
+
+        var project = portfolio.CreateProject("Test Project", "Description", program1.Id);
+        project.IsSuccess.Should().BeTrue();
+
+        // Act
+        var result = portfolio.ChangeProjectProgram(project.Value.Id, program2.Id);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Value.ProgramId.Should().Be(program2.Id);
+        program1.Projects.Should().NotContain(project.Value);
+        program2.Projects.Should().Contain(project.Value);
+    }
+
+    //[Fact]
+    //public void ChangeProjectProgram_ShouldRemoveProjectFromProgram()
+    //{
+    //    // Arrange
+    //    var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+    //    var program = portfolio.CreateProgram("Test Program", "Description").Value;
+    //    var project = portfolio.CreateProject("Test Project", "Description", program.Id).Value;
+
+    //    // Act
+    //    var result = portfolio.ChangeProjectProgram(project.Id, null);
+
+    //    // Assert
+    //    result.IsSuccess.Should().BeTrue();
+    //    project.ProgramId.Should().BeNull();
+    //    program.Projects.Should().NotContain(project);
+    //}
+
+    [Fact]
+    public void ChangeProjectProgram_ShouldFail_WhenProjectAlreadyInProgram()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.PortfolioWithProgramsAndProjects(_dateTimeProvider, 1, 0);
+
+        var program = portfolio.Programs.First();
+
+        var project = portfolio.CreateProject("Test Project", "Description", program.Id);
+        project.IsSuccess.Should().BeTrue();
+
+        // Act
+        var result = portfolio.ChangeProjectProgram(project.Value.Id, program.Id);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The project is already associated with the specified program.");
+    }
+
+    [Fact]
+    public void ChangeProjectProgram_ShouldFail_WhenProgramNotInPortfolio()
+    {
+        // Arrange
+        var portfolio1 = _portfolioFaker.PortfolioWithProgramsAndProjects(_dateTimeProvider,1,0);
+
+        var program1 = portfolio1.Programs.First();
+
+        var program2 = _programFaker.ActiveProgram(_dateTimeProvider, Guid.NewGuid());
+
+        var projectResult = portfolio1.CreateProject("Test Project", "Description", program1.Id);
+        projectResult.IsSuccess.Should().BeTrue();
+
+        // Act
+        var result = portfolio1.ChangeProjectProgram(projectResult.Value.Id, program2.Id);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The specified program does not belong to this portfolio.");
+    }
+
+    [Fact]
+    public void ChangeProjectProgram_ShouldFail_WhenProjectHasNoProgramAndIsRemovedAgain()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var project = portfolio.CreateProject("Test Project", "Description").Value;
+
+        // Act
+        var result = portfolio.ChangeProjectProgram(project.Id, null);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The project is not currently assigned to a program.");
+    }
+
 
     #endregion Project Management
 }

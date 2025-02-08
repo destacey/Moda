@@ -222,22 +222,28 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
         return Result.Success();
     }
 
-    ///// <summary>
-    ///// Removes an existing project from the program.
-    ///// </summary>
-    //internal Result RemoveProject(Project project)
-    //{
-    //    Guard.Against.Null(project, nameof(project));
+    /// <summary>
+    /// Removes an existing project from the program.
+    /// </summary>
+    internal Result RemoveProject(Project project)
+    {
+        Guard.Against.Null(project, nameof(project));
 
-    //    if (!_projects.Contains(project))
-    //    {
-    //        return Result.Failure("The project is not part of this program.");
-    //    }
+        if (!_projects.Contains(project))
+        {
+            return Result.Failure("The project is not part of this program.");
+        }
 
-    //    _projects.Remove(project);
+        var result = project.UpdateProgram(null);
+        if (result.IsFailure)
+        {
+            return result;
+        }
 
-    //    return Result.Success();
-    //}
+        _projects.Remove(project);
+
+        return Result.Success();
+    }
 
     /// <summary>
     /// Checks if the program is active on the specified date.

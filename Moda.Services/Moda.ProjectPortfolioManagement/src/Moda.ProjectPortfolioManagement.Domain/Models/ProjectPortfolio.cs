@@ -267,6 +267,62 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
         return Result.Success(project);
     }
 
+    public Result ChangeProjectProgram(Guid projectId, Guid? programId)
+    {
+        var project = _projects.SingleOrDefault(p => p.Id == projectId);
+        if (project is null)
+        {
+            return Result.Failure("The specified project does not belong to this portfolio.");
+        }
+
+        if (project.ProgramId == programId)
+        {
+            return Result.Failure(programId is null
+                ? "The project is not currently assigned to a program."
+                : "The project is already associated with the specified program.");
+        }
+
+        var program = programId.HasValue ? _programs.SingleOrDefault(p => p.Id == programId.Value) : null;
+        if (program is null && programId.HasValue)
+        {
+            return Result.Failure("The specified program does not belong to this portfolio.");
+        }
+
+        if (project.ProgramId.HasValue)
+        {
+            // remove the project from the current program
+            var currentProgram = _programs.SingleOrDefault(p => p.Id == project.ProgramId.Value);
+            if (currentProgram is null)
+            {
+                return Result.Failure("The project is associated with an invalid program.");
+            }
+            var removeProjectResult = currentProgram.RemoveProject(project);
+            if (removeProjectResult.IsFailure)
+            {
+                return Result.Failure(removeProjectResult.Error);
+            }
+        }
+
+        if (program is not null)
+        {
+            var addToProgramResult = program.AddProject(project);
+            if (addToProgramResult.IsFailure)
+            {
+                return Result.Failure(addToProgramResult.Error);
+            }
+        }
+        else
+        {
+            var removeFromProgramResult = project.UpdateProgram(null);
+            if (removeFromProgramResult.IsFailure)
+            {
+                return Result.Failure(removeFromProgramResult.Error);
+            }
+        }
+
+        return Result.Success();
+    }
+
     /// <summary>
     /// Checks if the portfolio is active on the specified date.
     /// </summary>

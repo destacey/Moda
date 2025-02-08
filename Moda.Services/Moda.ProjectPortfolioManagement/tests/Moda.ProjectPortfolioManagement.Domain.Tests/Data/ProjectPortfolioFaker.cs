@@ -3,6 +3,7 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.Tests.Shared;
 using Moda.Tests.Shared.Data;
+using Moda.Tests.Shared.Extensions;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 
@@ -84,18 +85,30 @@ public static class ProjectPortfolioFakerExtensions
     {
         var portfolio = faker.ActivePortfolio(dateTimeProvider);
 
-        var programFaker = new ProgramFaker();
-        for (int i = 0; i < programCount; i++)
+        if (programCount > 0)
         {
-            var program = programFaker.ActiveProgram(dateTimeProvider, portfolio.Id);
-            portfolio.CreateProgram(program.Name, program.Description);
+            var programFaker = new ProgramFaker();
+
+            var programsList = GenericExtensions.GetPrivateList<Program>(portfolio, "_programs");
+
+            for (int i = 0; i < programCount; i++)
+            {
+                var program = programFaker.ActiveProgram(dateTimeProvider, portfolio.Id);
+                programsList.Add(program);
+            }
         }
 
-        var projectFaker = new ProjectFaker();
-        for (int i = 0; i < projectCount; i++)
+        if (projectCount > 0)
         {
-            var project = projectFaker.ActiveProject(dateTimeProvider, portfolio.Id);
-            portfolio.CreateProject(project.Name, project.Description);
+            var projectFaker = new ProjectFaker();
+
+            var projectsList = GenericExtensions.GetPrivateList<Project>(portfolio, "_projects");
+
+            for (int i = 0; i < projectCount; i++)
+            {
+                var project = projectFaker.ActiveProject(dateTimeProvider, portfolio.Id);
+                projectsList.Add(project);
+            }
         }
 
         return portfolio;

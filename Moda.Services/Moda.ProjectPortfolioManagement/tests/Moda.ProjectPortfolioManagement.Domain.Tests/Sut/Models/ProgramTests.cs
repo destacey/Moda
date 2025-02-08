@@ -21,7 +21,7 @@ public class ProgramTests
         _projectFaker = new ProjectFaker();
     }
 
-    #region Program Creation
+    #region Program Create and Update
 
     [Fact]
     public void Create_ShouldCreateProposedProgramSuccessfully()
@@ -44,7 +44,34 @@ public class ProgramTests
         program.Projects.Should().BeEmpty();
     }
 
-    #endregion Program Creation
+    [Fact]
+    public void UpdateDetails_ShouldFail_WhenNameIsEmpty()
+    {
+        // Arrange
+        var program = _programFaker.Generate();
+
+        // Act
+        Action action = () => program.UpdateDetails("", "Valid Description");
+
+        // Assert
+        action.Should().Throw<ArgumentException>().WithMessage("Required input Name was empty. (Parameter 'Name')");
+    }
+
+    [Fact]
+    public void UpdateDetails_ShouldFail_WhenDescriptionIsEmpty()
+    {
+        // Arrange
+        var program = _programFaker.Generate();
+
+        // Act
+        Action action = () => program.UpdateDetails("Valid Name", "");
+
+        // Assert
+        action.Should().Throw<ArgumentException>().WithMessage("Required input Description was empty. (Parameter 'Description')");
+    }
+
+
+    #endregion Program Create and Update
 
     #region Lifecycle Tests
 
@@ -66,6 +93,20 @@ public class ProgramTests
     }
 
     [Fact]
+    public void Activate_ShouldFail_WhenProgramIsAlreadyActive()
+    {
+        // Arrange
+        var program = _programFaker.ActiveProgram(_dateTimeProvider);
+
+        // Act
+        var result = program.Activate(_dateTimeProvider.Today);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Only proposed programs can be activated.");
+    }
+
+    [Fact]
     public void Complete_ShouldCompleteActiveProgramSuccessfully()
     {
         // Arrange
@@ -80,6 +121,20 @@ public class ProgramTests
         program.Status.Should().Be(ProgramStatus.Completed);
         program.DateRange.Should().NotBeNull();
         program.DateRange!.End.Should().Be(endDate);
+    }
+
+    [Fact]
+    public void Complete_ShouldFail_WhenProgramIsAlreadyCompleted()
+    {
+        // Arrange
+        var program = _programFaker.CompletedProgram(_dateTimeProvider);
+
+        // Act
+        var result = program.Complete(_dateTimeProvider.Today.PlusDays(5));
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Only active programs can be completed.");
     }
 
     [Fact]
@@ -131,6 +186,21 @@ public class ProgramTests
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("The end date cannot be earlier than the start date.");
     }
+
+    [Fact]
+    public void Cancel_ShouldFail_WhenProgramIsAlreadyCancelled()
+    {
+        // Arrange
+        var program = _programFaker.CancelledProgram(_dateTimeProvider);
+
+        // Act
+        var result = program.Cancel(_dateTimeProvider.Today.PlusDays(5));
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The program is already completed or cancelled.");
+    }
+
 
     #endregion Lifecycle Tests
 
@@ -203,6 +273,22 @@ public class ProgramTests
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("The project is already part of this program.");
     }
+
+    [Fact]
+    public void RemoveProject_ShouldFail_WhenProjectIsNotInProgram()
+    {
+        // Arrange
+        var program = _programFaker.ActiveProgram(_dateTimeProvider);
+        var project = _projectFaker.Generate();
+
+        // Act
+        var result = program.RemoveProject(project);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The project is not part of this program.");
+    }
+
 
     #endregion Project Management
 }
