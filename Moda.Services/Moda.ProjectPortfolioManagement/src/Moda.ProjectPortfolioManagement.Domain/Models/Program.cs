@@ -13,7 +13,8 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     private string _name = default!;
     private string _description = default!;
 
-    private readonly List<Project> _projects = [];
+    private readonly HashSet<Project> _projects = [];
+    private readonly HashSet<StrategicTheme> _strategicThemes = [];
 
     private Program() { }
 
@@ -77,7 +78,7 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// <summary>
     /// The projects associated with this program.
     /// </summary>
-    public IReadOnlyCollection<Project> Projects => _projects.AsReadOnly();
+    public IReadOnlyCollection<Project> Projects => _projects;
 
     /// <summary>
     /// Indicates if the program is currently accepting new projects.
@@ -90,12 +91,76 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     public bool IsClosed => Status is ProgramStatus.Completed or ProgramStatus.Cancelled;
 
     /// <summary>
+    /// The strategic themes associated with this program.
+    /// </summary>
+    public IReadOnlyCollection<StrategicTheme> StrategicThemes => _strategicThemes;
+
+    /// <summary>
     /// Updates the program details.
     /// </summary>
     public Result UpdateDetails(string name, string description)
     {
         Name = name;
         Description = description;
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Associates a strategic theme with this program.
+    /// </summary>
+    public Result AddStrategicTheme(StrategicTheme strategicTheme)
+    {
+        Guard.Against.Null(strategicTheme, nameof(strategicTheme));
+
+        if (_strategicThemes.Contains(strategicTheme))
+        {
+            return Result.Failure("This strategic theme is already associated with the program.");
+        }
+
+        _strategicThemes.Add(strategicTheme);
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Removes a strategic theme from this program.
+    /// </summary>
+    public Result RemoveStrategicTheme(StrategicTheme strategicTheme)
+    {
+        Guard.Against.Null(strategicTheme, nameof(strategicTheme));
+
+        if (!_strategicThemes.Contains(strategicTheme))
+        {
+            return Result.Failure("This strategic theme is not associated with the program.");
+        }
+
+        _strategicThemes.Remove(strategicTheme);
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Updates the strategic themes associated with this program.
+    /// </summary>
+    /// <param name="themes"></param>
+    /// <returns></returns>
+    public Result UpdateStrategicThemes(IEnumerable<StrategicTheme> themes)
+    {
+        Guard.Against.Null(themes, nameof(themes));
+
+        var distinctThemes = themes.DistinctBy(t => t.Id).ToList();
+
+        // No changes needed if the themes are the same
+        if (_strategicThemes.Count == distinctThemes.Count && _strategicThemes.All(distinctThemes.Contains))
+        {
+            return Result.Failure("No changes detected in strategic themes.");
+        }
+
+        _strategicThemes.Clear();
+
+        foreach (var theme in distinctThemes)
+        {
+            _strategicThemes.Add(theme);
+        }
 
         return Result.Success();
     }

@@ -13,12 +13,14 @@ public class ProgramTests
     private readonly TestingDateTimeProvider _dateTimeProvider;
     private readonly ProgramFaker _programFaker;
     private readonly ProjectFaker _projectFaker;
+    private readonly StrategicThemeFaker _themeFaker;
 
     public ProgramTests()
     {
         _dateTimeProvider = new TestingDateTimeProvider(new FakeClock(DateTime.UtcNow.ToInstant()));
         _programFaker = new ProgramFaker();
         _projectFaker = new ProjectFaker();
+        _themeFaker = new StrategicThemeFaker();
     }
 
     #region Program Create and Update
@@ -289,6 +291,76 @@ public class ProgramTests
         result.Error.Should().Be("The project is not part of this program.");
     }
 
-
     #endregion Project Management
+
+    #region Strategic Theme Management
+
+    [Fact]
+    public void UpdateStrategicThemes_ShouldUpdateThemesSuccessfully()
+    {
+        // Arrange
+        var program = _programFaker.Generate();
+        var themes = _themeFaker.Generate(3); // Generate 3 unique themes
+
+        // Act
+        var result = program.UpdateStrategicThemes(themes);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        program.StrategicThemes.Should().HaveCount(3);
+        program.StrategicThemes.Should().BeEquivalentTo(themes);
+    }
+
+    [Fact]
+    public void UpdateStrategicThemes_ShouldRemoveExistingThemes_WhenNewThemesAreAdded()
+    {
+        // Arrange
+        var program = _programFaker.Generate();
+        var initialThemes = _themeFaker.Generate(2);
+        program.UpdateStrategicThemes(initialThemes);
+
+        var newThemes = _themeFaker.Generate(3); // Replace with different themes
+
+        // Act
+        var result = program.UpdateStrategicThemes(newThemes);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        program.StrategicThemes.Should().HaveCount(3);
+        program.StrategicThemes.Should().BeEquivalentTo(newThemes);
+    }
+
+    [Fact]
+    public void UpdateStrategicThemes_ShouldFail_WhenNoChangesAreMade()
+    {
+        // Arrange
+        var program = _programFaker.Generate();
+        var themes = _themeFaker.Generate(2);
+        program.UpdateStrategicThemes(themes);
+
+        // Act
+        var result = program.UpdateStrategicThemes(themes); // Same themes
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("No changes detected in strategic themes.");
+    }
+
+    [Fact]
+    public void UpdateStrategicThemes_ShouldHandleEmptyListCorrectly()
+    {
+        // Arrange
+        var program = _programFaker.Generate();
+        var initialThemes = _themeFaker.Generate(2);
+        program.UpdateStrategicThemes(initialThemes);
+
+        // Act
+        var result = program.UpdateStrategicThemes([]);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        program.StrategicThemes.Should().BeEmpty();
+    }
+
+    #endregion Strategic Theme Management
 }

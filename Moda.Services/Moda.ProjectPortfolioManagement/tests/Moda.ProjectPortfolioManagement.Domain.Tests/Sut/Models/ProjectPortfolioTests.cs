@@ -268,22 +268,25 @@ public class ProjectPortfolioTests
         program2.Projects.Should().Contain(project.Value);
     }
 
-    //[Fact]
-    //public void ChangeProjectProgram_ShouldRemoveProjectFromProgram()
-    //{
-    //    // Arrange
-    //    var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
-    //    var program = portfolio.CreateProgram("Test Program", "Description").Value;
-    //    var project = portfolio.CreateProject("Test Project", "Description", program.Id).Value;
+    [Fact]
+    public void ChangeProjectProgram_ShouldRemoveProjectFromProgram()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.PortfolioWithProgramsAndProjects(_dateTimeProvider, 1, 0);
 
-    //    // Act
-    //    var result = portfolio.ChangeProjectProgram(project.Id, null);
+        var program = portfolio.Programs.First();
 
-    //    // Assert
-    //    result.IsSuccess.Should().BeTrue();
-    //    project.ProgramId.Should().BeNull();
-    //    program.Projects.Should().NotContain(project);
-    //}
+        var project = portfolio.CreateProject("Test Project", "Description", program.Id);
+        project.IsSuccess.Should().BeTrue();
+
+        // Act
+        var result = portfolio.ChangeProjectProgram(project.Value.Id, null);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Value.ProgramId.Should().BeNull();
+        program.Projects.Should().NotContain(project.Value);
+    }
 
     [Fact]
     public void ChangeProjectProgram_ShouldFail_WhenProjectAlreadyInProgram()

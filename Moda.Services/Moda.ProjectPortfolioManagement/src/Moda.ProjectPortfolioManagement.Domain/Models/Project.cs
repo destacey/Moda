@@ -13,6 +13,8 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     private string _name = default!;
     private string _description = default!;
 
+    private readonly HashSet<StrategicTheme> _strategicThemes = [];
+
     private Project() { }
 
     private Project(string name, string description, ProjectStatus status, Guid portfolioId, Guid? programId = null, FlexibleDateRange? dateRange = null)
@@ -84,6 +86,11 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     public bool IsClosed => Status is ProjectStatus.Completed or ProjectStatus.Cancelled;
 
     /// <summary>
+    /// The strategic themes associated with this project.
+    /// </summary>
+    public IReadOnlyList<StrategicTheme> StrategicThemes => _strategicThemes.ToList().AsReadOnly();
+
+    /// <summary>
     /// Updates the project details.
     /// </summary>
     public Result UpdateDetails(string name, string description)
@@ -116,6 +123,66 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 
         return Result.Success();
     }
+
+    /// <summary>
+    /// Associates a strategic theme with this project.
+    /// </summary>
+    public Result AddStrategicTheme(StrategicTheme strategicTheme)
+    {
+        Guard.Against.Null(strategicTheme, nameof(strategicTheme));
+
+        if (_strategicThemes.Contains(strategicTheme))
+        {
+            return Result.Failure("This strategic theme is already associated with the project.");
+        }
+
+        _strategicThemes.Add(strategicTheme);
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Removes a strategic theme from this project.
+    /// </summary>
+    public Result RemoveStrategicTheme(StrategicTheme strategicTheme)
+    {
+        Guard.Against.Null(strategicTheme, nameof(strategicTheme));
+
+        if (!_strategicThemes.Contains(strategicTheme))
+        {
+            return Result.Failure("This strategic theme is not associated with the project.");
+        }
+
+        _strategicThemes.Remove(strategicTheme);
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Updates the strategic themes associated with this project.
+    /// </summary>
+    /// <param name="themes"></param>
+    /// <returns></returns>
+    public Result UpdateStrategicThemes(IEnumerable<StrategicTheme> themes)
+    {
+        Guard.Against.Null(themes, nameof(themes));
+
+        var distinctThemes = themes.DistinctBy(t => t.Id).ToList();
+
+        // No changes needed if the themes are the same
+        if (_strategicThemes.Count == distinctThemes.Count && _strategicThemes.All(distinctThemes.Contains))
+        {
+            return Result.Failure("No changes detected in strategic themes.");
+        }
+
+        _strategicThemes.Clear();
+
+        foreach (var theme in distinctThemes)
+        {
+            _strategicThemes.Add(theme);
+        }
+
+        return Result.Success();
+    }
+
 
     #region Lifecycle
 

@@ -89,7 +89,7 @@ public static class ProjectPortfolioFakerExtensions
         {
             var programFaker = new ProgramFaker();
 
-            var programsList = GenericExtensions.GetPrivateList<Program>(portfolio, "_programs");
+            var programsList = GenericExtensions.GetPrivateHashSet<Program>(portfolio, "_programs");
 
             for (int i = 0; i < programCount; i++)
             {
@@ -102,7 +102,7 @@ public static class ProjectPortfolioFakerExtensions
         {
             var projectFaker = new ProjectFaker();
 
-            var projectsList = GenericExtensions.GetPrivateList<Project>(portfolio, "_projects");
+            var projectsList = GenericExtensions.GetPrivateHashSet<Project>(portfolio, "_projects");
 
             for (int i = 0; i < projectCount; i++)
             {

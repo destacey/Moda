@@ -13,8 +13,8 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     private string _name = default!;
     private string _description = default!;
 
-    private readonly List<Program> _programs = [];
-    private readonly List<Project> _projects = [];
+    private readonly HashSet<Program> _programs = [];
+    private readonly HashSet<Project> _projects = [];
 
     private ProjectPortfolio() { }
 
@@ -72,12 +72,12 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// <summary>
     /// The programs associated with this portfolio.
     /// </summary>
-    public IReadOnlyCollection<Program> Programs => _programs.AsReadOnly();
+    public IReadOnlyCollection<Program> Programs => _programs;
 
     /// <summary>
     /// The projects associated with this portfolio.
     /// </summary>
-    public IReadOnlyCollection<Project> Projects => _projects.AsReadOnly();
+    public IReadOnlyCollection<Project> Projects => _projects;
 
     /// <summary>
     /// Updates the portfolio details, including the date range.
