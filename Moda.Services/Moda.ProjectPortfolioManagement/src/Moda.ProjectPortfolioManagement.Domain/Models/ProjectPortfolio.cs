@@ -203,15 +203,16 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// </summary>
     /// <param name="name">The name of the program.</param>
     /// <param name="description">The description of the program.</param>
+    /// <param name="dateRange">The date range of the program (optional).</param>
     /// <returns>A result containing the created program or an error.</returns>
-    public Result<Program> CreateProgram(string name, string description)
+    public Result<Program> CreateProgram(string name, string description, LocalDateRange? dateRange)
     {
         if (Status != ProjectPortfolioStatus.Active && Status != ProjectPortfolioStatus.OnHold)
         {
             return Result.Failure<Program>("Programs can only be created in active or on-hold portfolios.");
         }
 
-        var program = Program.Create(name, description, Id);
+        var program = Program.Create(name, description, dateRange, Id);
         _programs.Add(program);
 
         return Result.Success(program);
@@ -225,7 +226,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// <param name="description">The description of the project.</param>
     /// <param name="programId">The ID of the program the project should be associated with (optional).</param>
     /// <returns>A result containing the created project or an error.</returns>
-    public Result<Project> CreateProject(string name, string description, Guid? programId = null)
+    public Result<Project> CreateProject(string name, string description, int expenditureCategoryId, LocalDateRange? dateRange, Guid? programId = null)
     {
         if (Status != ProjectPortfolioStatus.Active && Status != ProjectPortfolioStatus.OnHold)
         {
@@ -249,7 +250,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
         }
 
         // Create the project
-        var project = Project.Create(name, description, Id);
+        var project = Project.Create(name, description, expenditureCategoryId, dateRange, Id);
 
         // Add the project to the portfolio's project list
         _projects.Add(project);

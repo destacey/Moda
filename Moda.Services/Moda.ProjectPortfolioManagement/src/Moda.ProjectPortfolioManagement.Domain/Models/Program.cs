@@ -18,16 +18,11 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 
     private Program() { }
 
-    private Program(string name, string description, ProgramStatus status, Guid portfolioId, FlexibleDateRange? dateRange = null)
+    private Program(string name, string description, ProgramStatus status, LocalDateRange? dateRange, Guid portfolioId)
     {
-        if (status is ProgramStatus.Active && dateRange?.Start is null)
+        if (Status is ProgramStatus.Active or ProgramStatus.Completed && dateRange is null)
         {
-            throw new InvalidOperationException("An active program must have a start date.");
-        }
-
-        if (status is ProgramStatus.Completed or ProgramStatus.Cancelled && (dateRange?.Start is null || dateRange?.End is null))
-        {
-            throw new InvalidOperationException("A completed or cancelled program must have a start and end date.");
+            throw new InvalidOperationException("An active and completed program must have a start and end date.");
         }
 
         Name = name;
@@ -68,12 +63,17 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// <summary>
     /// The date range defining the program's lifecycle.
     /// </summary>
-    public FlexibleDateRange? DateRange { get; private set; }
+    public LocalDateRange? DateRange { get; private set; }
 
     /// <summary>
     /// The ID of the portfolio to which this program belongs.
     /// </summary>
     public Guid PortfolioId { get; private set; }
+
+    /// <summary>
+    /// The portfolio to which this program belongs.
+    /// </summary>
+    public ProjectPortfolio? Portfolio { get; private set; }
 
     /// <summary>
     /// The projects associated with this program.
@@ -102,6 +102,18 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     {
         Name = name;
         Description = description;
+
+        return Result.Success();
+    }
+
+    public Result UpdateTimeline(LocalDateRange? dateRange)
+    {
+        if (Status is ProgramStatus.Active or ProgramStatus.Completed && dateRange is null)
+        {
+            return Result.Failure("An active and completed program must have a start and end date.");
+        }
+
+        DateRange = dateRange;
 
         return Result.Success();
     }
@@ -168,30 +180,30 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     #region Lifecycle
 
     /// <summary>
-    /// Activates the program on the specified start date.
+    /// Activates the program.
     /// </summary>
-    public Result Activate(LocalDate startDate)
+    public Result Activate()
     {
-        Guard.Against.Null(startDate, nameof(startDate));
-
         if (Status != ProgramStatus.Proposed)
         {
             return Result.Failure("Only proposed programs can be activated.");
         }
 
+        if (DateRange is null)
+        {
+            return Result.Failure("The program must have a start and end date before it can be activated.");
+        }
+
         Status = ProgramStatus.Active;
-        DateRange = new FlexibleDateRange(startDate);
 
         return Result.Success();
     }
 
     /// <summary>
-    /// Marks the program as completed on the specified end date.
+    /// Marks the program as completed.
     /// </summary>
-    public Result Complete(LocalDate endDate)
+    public Result Complete()
     {
-        Guard.Against.Null(endDate, nameof(endDate));
-
         if (Status != ProgramStatus.Active)
         {
             return Result.Failure("Only active programs can be completed.");
@@ -199,12 +211,7 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 
         if (DateRange is null)
         {
-            return Result.Failure("The program must have a start date before it can be completed.");
-        }
-
-        if (endDate < DateRange.Start)
-        {
-            return Result.Failure("The end date cannot be earlier than the start date.");
+            return Result.Failure("The program must have a start and end date before it can be activated.");
         }
 
         if (_projects.Any(p => !p.IsClosed))
@@ -213,18 +220,15 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
         }
 
         Status = ProgramStatus.Completed;
-        DateRange = new FlexibleDateRange(DateRange.Start, endDate);
 
         return Result.Success();
     }
 
     /// <summary>
-    /// Cancels the program and sets an end date if it was active.
+    /// Cancels the program.
     /// </summary>
-    public Result Cancel(LocalDate endDate)
+    public Result Cancel()
     {
-        Guard.Against.Null(endDate, nameof(endDate));
-
         if (Status is ProgramStatus.Completed or ProgramStatus.Cancelled)
         {
             return Result.Failure("The program is already completed or cancelled.");
@@ -236,13 +240,6 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
             {
                 return Result.Failure("All projects must be completed or canceled before the program can be cancelled.");
             }
-
-            if (DateRange is null || endDate < DateRange.Start)
-            {
-                return Result.Failure("The end date cannot be earlier than the start date.");
-            }
-
-            DateRange = new FlexibleDateRange(DateRange.Start, endDate);
         }
 
         // Directly allow Proposed → Cancelled without setting DateRange
@@ -321,10 +318,15 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     }
 
     /// <summary>
-    /// Creates a new program in the proposed status.
+    /// Creates a new program with the specified details.
     /// </summary>
-    internal static Program Create(string name, string description, Guid portfolioId)
+    /// <param name="name"></param>
+    /// <param name="description"></param>
+    /// <param name="dateRange"></param>
+    /// <param name="portfolioId"></param>
+    /// <returns></returns>
+    internal static Program Create(string name, string description, LocalDateRange? dateRange, Guid portfolioId)
     {
-        return new Program(name, description, ProgramStatus.Proposed, portfolioId);
+        return new Program(name, description, ProgramStatus.Proposed, dateRange, portfolioId);
     }
 }

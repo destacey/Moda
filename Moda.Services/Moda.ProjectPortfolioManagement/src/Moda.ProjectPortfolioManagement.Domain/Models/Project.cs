@@ -17,24 +17,21 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 
     private Project() { }
 
-    private Project(string name, string description, ProjectStatus status, Guid portfolioId, Guid? programId = null, FlexibleDateRange? dateRange = null)
+    private Project(string name, string description, ProjectStatus status, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId = null)
     {
-        if (status is ProjectStatus.Active && dateRange?.Start is null)
+        if (Status is ProjectStatus.Active or ProjectStatus.Completed && dateRange is null)
         {
-            throw new InvalidOperationException("An active project must have a start date.");
-        }
-
-        if (status is ProjectStatus.Completed or ProjectStatus.Cancelled && (dateRange?.Start is null || dateRange?.End is null))
-        {
-            throw new InvalidOperationException("A completed or cancelled project must have a start and end date.");
+            throw new InvalidOperationException("An active and completed project must have a start and end date.");
         }
 
         Name = name;
         Description = description;
         Status = status;
+        ExpenditureCategoryId = expenditureCategoryId;
+        DateRange = dateRange;
+
         PortfolioId = portfolioId;
         ProgramId = programId;
-        DateRange = dateRange;
     }
 
     /// <summary>
@@ -66,9 +63,19 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     public ProjectStatus Status { get; private set; }
 
     /// <summary>
-    /// The date range defining the project's lifecycle.
+    /// The date range defining the project's planned timeline.
     /// </summary>
-    public FlexibleDateRange? DateRange { get; private set; }
+    public LocalDateRange? DateRange { get; private set; }
+
+    /// <summary>
+    /// The expenditure category ID.
+    /// </summary>
+    public int ExpenditureCategoryId { get; private set; }
+
+    /// <summary>
+    /// The expenditure category associated with the project.
+    /// </summary>
+    public ExpenditureCategory? ExpenditureCategory { get; private set; }
 
     /// <summary>
     /// The ID of the portfolio to which this project belongs.
@@ -76,9 +83,19 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     public Guid PortfolioId { get; private set; }
 
     /// <summary>
+    /// The portfolio associated with this project.
+    /// </summary>
+    public ProjectPortfolio? Portfolio { get; private set; }
+
+    /// <summary>
     /// The ID of the program to which this project belongs (optional).
     /// </summary>
     public Guid? ProgramId { get; private set; }
+
+    /// <summary>
+    /// The program associated with this project (if any).
+    /// </summary>
+    public Program? Program { get; private set; }
 
     /// <summary>
     /// Indicates if the project is in a closed state.
@@ -93,10 +110,23 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// <summary>
     /// Updates the project details.
     /// </summary>
-    public Result UpdateDetails(string name, string description)
+    public Result UpdateDetails(string name, string description, int expenditureCategoryId)
     {
         Name = name;
         Description = description;
+        ExpenditureCategoryId = expenditureCategoryId;
+
+        return Result.Success();
+    }
+
+    public Result UpdateTimeline(LocalDateRange? dateRange)
+    {
+        if (Status is ProjectStatus.Active or ProjectStatus.Completed && dateRange is null)
+        {
+            return Result.Failure("An active and completed project must have a start and end date.");
+        }
+
+        DateRange = dateRange;
 
         return Result.Success();
     }
@@ -187,30 +217,30 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     #region Lifecycle
 
     /// <summary>
-    /// Activates the project on the specified start date.
+    /// Activates the project.
     /// </summary>
-    public Result Activate(LocalDate startDate)
+    public Result Activate()
     {
-        Guard.Against.Null(startDate, nameof(startDate));
-
         if (Status != ProjectStatus.Proposed)
         {
             return Result.Failure("Only proposed projects can be activated.");
         }
 
+        if (DateRange is null)
+        {
+            return Result.Failure("The project must have a start and end date before it can be activated.");
+        }
+
         Status = ProjectStatus.Active;
-        DateRange = new FlexibleDateRange(startDate);
 
         return Result.Success();
     }
 
     /// <summary>
-    /// Marks the project as completed on the specified end date.
+    /// Marks the project as completed.
     /// </summary>
-    public Result Complete(LocalDate endDate)
+    public Result Complete()
     {
-        Guard.Against.Null(endDate, nameof(endDate));
-
         if (Status != ProjectStatus.Active)
         {
             return Result.Failure("Only active projects can be completed.");
@@ -218,44 +248,25 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 
         if (DateRange == null)
         {
-            return Result.Failure("The project must have a start date before it can be completed.");
-        }
-
-        if (endDate < DateRange.Start)
-        {
-            return Result.Failure("The end date cannot be earlier than the start date.");
+            return Result.Failure("The project must have a start and end date before it can be completed.");
         }
 
         Status = ProjectStatus.Completed;
-        DateRange = new FlexibleDateRange(DateRange.Start, endDate);
 
         return Result.Success();
     }
 
     /// <summary>
-    /// Cancels the project and sets an end date.
+    /// Cancels the project.
     /// </summary>
-    public Result Cancel(LocalDate endDate)
+    public Result Cancel()
     {
-        Guard.Against.Null(endDate, nameof(endDate));
-
         if (Status is ProjectStatus.Completed or ProjectStatus.Cancelled)
         {
             return Result.Failure("The project is already completed or cancelled.");
         }
 
-        if (DateRange == null)
-        {
-            return Result.Failure("The project must have a start date before it can be cancelled.");
-        }
-
-        if (endDate < DateRange.Start)
-        {
-            return Result.Failure("The end date cannot be earlier than the start date.");
-        }
-
         Status = ProjectStatus.Cancelled;
-        DateRange = new FlexibleDateRange(DateRange.Start, endDate);
 
         return Result.Success();
     }
@@ -273,10 +284,16 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     }
 
     /// <summary>
-    /// Creates a new project in the proposed status.
+    /// Creates a new project.
     /// </summary>
-    internal static Project Create(string name, string description, Guid portfolioId)
+    /// <param name="name"></param>
+    /// <param name="description"></param>
+    /// <param name="expenditureCategoryId"></param>
+    /// <param name="dateRange"></param>
+    /// <param name="portfolioId"></param>
+    /// <returns></returns>
+    internal static Project Create(string name, string description, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId)
     {
-        return new Project(name, description, ProjectStatus.Proposed, portfolioId);
+        return new Project(name, description, ProjectStatus.Proposed, expenditureCategoryId, dateRange, portfolioId);
     }
 }

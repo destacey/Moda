@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Moda.Common.Models;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
@@ -30,15 +31,17 @@ public class ProjectTests
         var name = "Test Project";
         var description = "Test Description";
         var portfolioId = Guid.NewGuid();
+        var expenditureCategoryId = 1;
 
         // Act
-        var project = Project.Create(name, description, portfolioId);
+        var project = Project.Create(name, description, expenditureCategoryId, null, portfolioId);
 
         // Assert
         project.Should().NotBeNull();
         project.Name.Should().Be(name);
         project.Description.Should().Be(description);
         project.Status.Should().Be(ProjectStatus.Proposed);
+        project.ExpenditureCategoryId.Should().Be(expenditureCategoryId);
         project.PortfolioId.Should().Be(portfolioId);
         project.ProgramId.Should().BeNull();
         project.DateRange.Should().BeNull();
@@ -48,10 +51,10 @@ public class ProjectTests
     public void UpdateDetails_ShouldFail_WhenNameIsEmpty()
     {
         // Arrange
-        var program = _projectFaker.Generate();
+        var project = _projectFaker.Generate();
 
         // Act
-        Action action = () => program.UpdateDetails("", "Valid Description");
+        Action action = () => project.UpdateDetails("", "Valid Description", project.ExpenditureCategoryId);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Required input Name was empty. (Parameter 'Name')");
@@ -61,10 +64,10 @@ public class ProjectTests
     public void UpdateDetails_ShouldFail_WhenDescriptionIsEmpty()
     {
         // Arrange
-        var program = _projectFaker.Generate();
+        var project = _projectFaker.Generate();
 
         // Act
-        Action action = () => program.UpdateDetails("Valid Name", "");
+        Action action = () => project.UpdateDetails("Valid Name", "", project.ExpenditureCategoryId);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Required input Description was empty. (Parameter 'Description')");
@@ -72,24 +75,93 @@ public class ProjectTests
 
     #endregion Project Create and Update
 
+    #region UpdateTimeline Tests
+
+    [Fact]
+    public void UpdateTimeline_ShouldUpdatePlannedDatesSuccessfully_WhenProjectIsProposed()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var startDate = _dateTimeProvider.Today;
+        var endDate = _dateTimeProvider.Today.PlusDays(30);
+        var dateRange = new LocalDateRange(startDate, endDate);
+
+        // Act
+        var result = project.UpdateTimeline(dateRange);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.DateRange.Should().NotBeNull();
+        project.DateRange!.Start.Should().Be(startDate);
+        project.DateRange.End.Should().Be(endDate);
+    }
+
+    [Fact]
+    public void UpdateTimeline_ShouldFail_WhenProjectIsActive_AndDatesAreNull()
+    {
+        // Arrange
+        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
+
+        // Act
+        var result = project.UpdateTimeline(null);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("An active and completed project must have a start and end date.");
+    }
+
+    [Fact]
+    public void UpdateTimeline_ShouldFail_WhenProjectIsCompleted_AndDatesAreNull()
+    {
+        // Arrange
+        var project = _projectFaker.CompletedProject(_dateTimeProvider, Guid.NewGuid());
+
+        // Act
+        var result = project.UpdateTimeline(null);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("An active and completed project must have a start and end date.");
+    }
+
+    [Fact]
+    public void UpdateTimeline_ShouldUpdateSuccessfully_WhenProjectIsActive_AndDatesAreValid()
+    {
+        // Arrange
+        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
+        var startDate = _dateTimeProvider.Today;
+        var endDate = _dateTimeProvider.Today.PlusDays(60);
+        var dateRange = new LocalDateRange(startDate, endDate);
+
+        // Act
+        var result = project.UpdateTimeline(dateRange);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.DateRange.Should().NotBeNull();
+        project.DateRange!.Start.Should().Be(startDate);
+        project.DateRange.End.Should().Be(endDate);
+    }
+
+    #endregion UpdateTimeline Tests
+
     #region Lifecycle Tests
 
     [Fact]
     public void Activate_ShouldActivateProposedProjectSuccessfully()
     {
         // Arrange
-        var project = _projectFaker.Generate();
-        var startDate = _dateTimeProvider.Today;
+        var dateRange = new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusMonths(3));
+        var project = _projectFaker.WithData(dateRange: dateRange).Generate();
 
         // Act
-        var result = project.Activate(startDate);
+        var result = project.Activate();
 
         // Assert
         result.IsSuccess.Should().BeTrue();
         project.Status.Should().Be(ProjectStatus.Active);
         project.DateRange.Should().NotBeNull();
-        project.DateRange!.Start.Should().Be(startDate);
-        project.DateRange.End.Should().BeNull();
+        project.DateRange.Should().Be(dateRange);
     }
 
     [Fact]
@@ -99,7 +171,7 @@ public class ProjectTests
         var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
 
         // Act
-        var result = project.Activate(_dateTimeProvider.Today);
+        var result = project.Activate();
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -111,16 +183,13 @@ public class ProjectTests
     {
         // Arrange
         var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
-        var endDate = _dateTimeProvider.Today.PlusDays(10);
 
         // Act
-        var result = project.Complete(endDate);
+        var result = project.Complete();
 
         // Assert
         result.IsSuccess.Should().BeTrue();
         project.Status.Should().Be(ProjectStatus.Completed);
-        project.DateRange.Should().NotBeNull();
-        project.DateRange!.End.Should().Be(endDate);
     }
 
     [Fact]
@@ -131,7 +200,7 @@ public class ProjectTests
         var endDate = _dateTimeProvider.Today.PlusDays(10);
 
         // Act
-        var result = project.Complete(endDate);
+        var result = project.Complete();
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -139,35 +208,17 @@ public class ProjectTests
     }
 
     [Fact]
-    public void Complete_ShouldFail_WhenEndDateIsBeforeStartDate()
-    {
-        // Arrange
-        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
-        var endDate = project.DateRange!.Start.PlusDays(-1);
-
-        // Act
-        var result = project.Complete(endDate);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("The end date cannot be earlier than the start date.");
-    }
-
-    [Fact]
     public void Cancel_ShouldCancelActiveProjectSuccessfully()
     {
         // Arrange
         var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
-        var endDate = _dateTimeProvider.Today.PlusDays(10);
 
         // Act
-        var result = project.Cancel(endDate);
+        var result = project.Cancel();
 
         // Assert
         result.IsSuccess.Should().BeTrue();
         project.Status.Should().Be(ProjectStatus.Cancelled);
-        project.DateRange.Should().NotBeNull();
-        project.DateRange!.End.Should().Be(endDate);
     }
 
     [Fact]
@@ -178,26 +229,11 @@ public class ProjectTests
         var endDate = _dateTimeProvider.Today.PlusDays(10);
 
         // Act
-        var result = project.Cancel(endDate);
+        var result = project.Cancel();
 
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("The project is already completed or cancelled.");
-    }
-
-    [Fact]
-    public void Cancel_ShouldFail_WhenEndDateIsBeforeStartDate()
-    {
-        // Arrange
-        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
-        var endDate = project.DateRange!.Start.PlusDays(-1);
-
-        // Act
-        var result = project.Cancel(endDate);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("The end date cannot be earlier than the start date.");
     }
 
     #endregion Lifecycle Tests
@@ -209,7 +245,7 @@ public class ProjectTests
     {
         // Arrange
         var project = _projectFaker.Generate();
-        var program = Program.Create("Test Program", "Description", project.PortfolioId);
+        var program = Program.Create("Test Program", "Description", null, project.PortfolioId);
 
         // Act
         var result = project.UpdateProgram(program);
@@ -225,7 +261,7 @@ public class ProjectTests
         // Arrange
         var project = _projectFaker.Generate();
         var portfolioId = Guid.NewGuid();
-        var program = Program.Create("Test Program", "Description", portfolioId);
+        var program = Program.Create("Test Program", "Description", null, portfolioId);
 
         // Act
         var result = project.UpdateProgram(program);

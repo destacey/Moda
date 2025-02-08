@@ -27,7 +27,7 @@ public static class ProgramFakerExtensions
         string? name = null,
         string? description = null,
         ProgramStatus? status = null,
-        FlexibleDateRange? dateRange = null,
+        LocalDateRange? dateRange = null,
         Guid? portfolioId = null)
     {
         if (id.HasValue) { faker.RuleFor(x => x.Id, id.Value); }
@@ -47,10 +47,11 @@ public static class ProgramFakerExtensions
     {
         var now = dateTimeProvider.Today;
         var startDate = now.PlusDays(-10);
+        var endDate = startDate.PlusDays(10);
 
         return faker.WithData(
             status: ProgramStatus.Active,
-            dateRange: new FlexibleDateRange(startDate),
+            dateRange: new LocalDateRange(startDate, endDate),
             portfolioId: portfolioId
         ).Generate();
     }
@@ -62,11 +63,11 @@ public static class ProgramFakerExtensions
     {
         var now = dateTimeProvider.Today;
         var startDate = now.PlusDays(-20);
-        var endDate = now.PlusDays(-10);
+        var endDate = startDate.PlusDays(5);
 
         return faker.WithData(
             status: ProgramStatus.Completed,
-            dateRange: new FlexibleDateRange(startDate, endDate),
+            dateRange: new LocalDateRange(startDate, endDate),
             portfolioId: portfolioId
         ).Generate();
     }
@@ -89,11 +90,11 @@ public static class ProgramFakerExtensions
     {
         var now = dateTimeProvider.Today;
         var startDate = now.PlusDays(-15);
-        var endDate = now.PlusDays(-5);
+        var endDate = startDate.PlusDays(5);
 
         return faker.WithData(
             status: ProgramStatus.Cancelled,
-            dateRange: new FlexibleDateRange(startDate, endDate),
+            dateRange: new LocalDateRange(startDate, endDate),
             portfolioId: portfolioId
         ).Generate();
     }

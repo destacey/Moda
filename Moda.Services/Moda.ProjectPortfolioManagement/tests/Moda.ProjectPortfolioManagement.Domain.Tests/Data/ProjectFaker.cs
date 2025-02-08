@@ -73,7 +73,7 @@ public static class ProjectFakerExtensions
     {
         var now = dateTimeProvider.Today;
         var startDate = now.PlusDays(-20);
-        var endDate = now.PlusDays(-10);
+        var endDate = startDate.PlusDays(10);
 
         return faker.WithData(
             status: ProjectStatus.Completed,
@@ -102,7 +102,7 @@ public static class ProjectFakerExtensions
     {
         var now = dateTimeProvider.Today;
         var startDate = now.PlusDays(-15);
-        var endDate = now.PlusDays(-5);
+        var endDate = startDate.PlusDays(5);
 
         return faker.WithData(
             status: ProjectStatus.Cancelled,

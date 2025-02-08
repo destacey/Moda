@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Moda.Common.Models;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
@@ -72,7 +73,7 @@ public class ProjectPortfolioTests
         // Arrange
         var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
         var project = _projectFaker.ActiveProject(_dateTimeProvider, portfolio.Id);
-        portfolio.CreateProject(project.Name, project.Description);
+        portfolio.CreateProject(project.Name, project.Description, 1, null);
 
         var endDate = _dateTimeProvider.Today.PlusDays(10);
 
@@ -91,14 +92,15 @@ public class ProjectPortfolioTests
         var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
 
         var fakeProject = _projectFaker.ProposedProject(portfolio.Id);
-        var createProjectReult = portfolio.CreateProject(fakeProject.Name, fakeProject.Description);
+        var projectDateRange = new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusMonths(3));
+        var createProjectReult = portfolio.CreateProject(fakeProject.Name, fakeProject.Description, 1, projectDateRange);
         var project = createProjectReult.Value;
 
         var endDate = _dateTimeProvider.Today.PlusDays(10);
 
-        var activateProjectResult = project.Activate(_dateTimeProvider.Today);
+        var activateProjectResult = project.Activate();
         activateProjectResult.IsSuccess.Should().BeTrue();
-        var completeProjectResult = project.Complete(endDate);
+        var completeProjectResult = project.Complete();
         completeProjectResult.IsSuccess.Should().BeTrue();
 
         // Act
@@ -150,7 +152,7 @@ public class ProjectPortfolioTests
         var portfolio = _portfolioFaker.Generate();
 
         // Act
-        var result = portfolio.CreateProgram("Test Program", "Test Description");
+        var result = portfolio.CreateProgram("Test Program", "Test Description", null);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -164,7 +166,7 @@ public class ProjectPortfolioTests
         var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
 
         // Act
-        var result = portfolio.CreateProgram("Test Program", "Test Description");
+        var result = portfolio.CreateProgram("Test Program", "Test Description", null);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -177,7 +179,7 @@ public class ProjectPortfolioTests
     {
         // Arrange
         var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
-        var program = portfolio.CreateProgram("Test Program", "Description").Value;
+        var program = portfolio.CreateProgram("Test Program", "Description", null).Value;
         var project = _projectFaker.ActiveProject(_dateTimeProvider, portfolio.Id);
 
         program.AddProject(project);
@@ -204,7 +206,7 @@ public class ProjectPortfolioTests
         var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
 
         // Act
-        var result = portfolio.CreateProject("Test Project", "Test Description");
+        var result = portfolio.CreateProject("Test Project", "Test Description", 1, null);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -220,7 +222,7 @@ public class ProjectPortfolioTests
         var program = _programFaker.Generate();
 
         // Act
-        var result = portfolio.CreateProject("Test Project", "Test Description", program.Id);
+        var result = portfolio.CreateProject("Test Project", "Test Description", 1, null, program.Id);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -234,12 +236,12 @@ public class ProjectPortfolioTests
         var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
         var fakeProgram = _programFaker.Generate();
 
-        var createProgramResult = portfolio.CreateProgram(fakeProgram.Name, fakeProgram.Description);
+        var createProgramResult = portfolio.CreateProgram(fakeProgram.Name, fakeProgram.Description, null);
         createProgramResult.IsSuccess.Should().BeTrue();
         var program = createProgramResult.Value;
 
         // Act
-        var result = portfolio.CreateProject("Test Project", "Test Description", program.Id);
+        var result = portfolio.CreateProject("Test Project", "Test Description", 1, null, program.Id);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -255,7 +257,7 @@ public class ProjectPortfolioTests
         var program1 = portfolio.Programs.First();
         var program2 = portfolio.Programs.Last();
 
-        var project = portfolio.CreateProject("Test Project", "Description", program1.Id);
+        var project = portfolio.CreateProject("Test Project", "Description", 1, null, program1.Id);
         project.IsSuccess.Should().BeTrue();
 
         // Act
@@ -276,7 +278,7 @@ public class ProjectPortfolioTests
 
         var program = portfolio.Programs.First();
 
-        var project = portfolio.CreateProject("Test Project", "Description", program.Id);
+        var project = portfolio.CreateProject("Test Project", "Description", 1, null, program.Id);
         project.IsSuccess.Should().BeTrue();
 
         // Act
@@ -296,7 +298,7 @@ public class ProjectPortfolioTests
 
         var program = portfolio.Programs.First();
 
-        var project = portfolio.CreateProject("Test Project", "Description", program.Id);
+        var project = portfolio.CreateProject("Test Project", "Description", 1, null, program.Id);
         project.IsSuccess.Should().BeTrue();
 
         // Act
@@ -317,7 +319,7 @@ public class ProjectPortfolioTests
 
         var program2 = _programFaker.ActiveProgram(_dateTimeProvider, Guid.NewGuid());
 
-        var projectResult = portfolio1.CreateProject("Test Project", "Description", program1.Id);
+        var projectResult = portfolio1.CreateProject("Test Project", "Description", 1, null, program1.Id);
         projectResult.IsSuccess.Should().BeTrue();
 
         // Act
@@ -333,7 +335,7 @@ public class ProjectPortfolioTests
     {
         // Arrange
         var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
-        var project = portfolio.CreateProject("Test Project", "Description").Value;
+        var project = portfolio.CreateProject("Test Project", "Description", 1, null).Value;
 
         // Act
         var result = portfolio.ChangeProjectProgram(project.Id, null);
