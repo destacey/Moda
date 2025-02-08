@@ -1,7 +1,7 @@
 ﻿using Moda.Common.Domain.Enums.StrategicManagement;
 
 namespace Moda.Common.Domain.Interfaces.StrategicManagement;
-public interface IStrategicTheme
+public interface IStrategicThemeData
 {
     Guid Id { get; }
     int Key { get; }

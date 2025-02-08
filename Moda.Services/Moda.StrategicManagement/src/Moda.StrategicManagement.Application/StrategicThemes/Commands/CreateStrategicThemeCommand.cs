@@ -23,12 +23,16 @@ public sealed class CreateStrategicThemeCommandValidator : AbstractValidator<Cre
     }
 }
 
-internal sealed class CreateStrategicThemeCommandHandler(IStrategicManagementDbContext strategicManagementDbContext, ILogger<CreateStrategicThemeCommandHandler> logger) : ICommandHandler<CreateStrategicThemeCommand, ObjectIdAndKey>
+internal sealed class CreateStrategicThemeCommandHandler(
+    IStrategicManagementDbContext strategicManagementDbContext, 
+    ILogger<CreateStrategicThemeCommandHandler> logger,
+    IDateTimeProvider dateTimeProvider) : ICommandHandler<CreateStrategicThemeCommand, ObjectIdAndKey>
 {
     private const string AppRequestName = nameof(CreateStrategicThemeCommand);
 
     private readonly IStrategicManagementDbContext _strategicManagementDbContext = strategicManagementDbContext;
     private readonly ILogger<CreateStrategicThemeCommandHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<Result<ObjectIdAndKey>> Handle(CreateStrategicThemeCommand request, CancellationToken cancellationToken)
     {
@@ -37,7 +41,8 @@ internal sealed class CreateStrategicThemeCommandHandler(IStrategicManagementDbC
             var strategicTheme = StrategicTheme.Create(
                 request.Name,
                 request.Description,
-                request.State
+                request.State,
+                _dateTimeProvider.Now
                 );
 
             await _strategicManagementDbContext.StrategicThemes.AddAsync(strategicTheme, cancellationToken);

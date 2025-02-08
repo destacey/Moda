@@ -25,12 +25,17 @@ public sealed class UpdateStrategicThemeCommandValidator : AbstractValidator<Upd
     }
 }
 
-internal sealed class UpdateStrategicThemeCommandHandler(IStrategicManagementDbContext strategicManagementDbContext, ILogger<UpdateStrategicThemeCommandHandler> logger) : ICommandHandler<UpdateStrategicThemeCommand>
+internal sealed class UpdateStrategicThemeCommandHandler(
+    IStrategicManagementDbContext strategicManagementDbContext, 
+    ILogger<UpdateStrategicThemeCommandHandler> logger,
+    IDateTimeProvider dateTimeProvider)
+    : ICommandHandler<UpdateStrategicThemeCommand>
 {
     private const string AppRequestName = nameof(UpdateStrategicThemeCommand);
 
     private readonly IStrategicManagementDbContext _strategicManagementDbContext = strategicManagementDbContext;
     private readonly ILogger<UpdateStrategicThemeCommandHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<Result> Handle(UpdateStrategicThemeCommand request, CancellationToken cancellationToken)
     {
@@ -48,7 +53,8 @@ internal sealed class UpdateStrategicThemeCommandHandler(IStrategicManagementDbC
             var updateResult = strategicTheme.Update(
                 request.Name,
                 request.Description,
-                request.State
+                request.State,
+                _dateTimeProvider.Now
                 );
 
             if (updateResult.IsFailure)

@@ -1,14 +1,16 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Enums.StrategicManagement;
+using Moda.Common.Domain.Events.StrategicManagement;
 using Moda.Common.Domain.Interfaces.StrategicManagement;
+using NodaTime;
 
 namespace Moda.StrategicManagement.Domain.Models;
 
 /// <summary>
 /// Represents a high-level focus area or priority that guides related initiatives.
 /// </summary>
-public sealed class StrategicTheme : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey, IStrategicTheme
+public sealed class StrategicTheme : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey, IStrategicThemeData
 {
     private string _name = default!;
     private string _description = default!;
@@ -56,12 +58,15 @@ public sealed class StrategicTheme : BaseEntity<Guid>, ISystemAuditable, HasIdAn
     /// <param name="name"></param>
     /// <param name="description"></param>
     /// <param name="state"></param>
+    /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result Update(string name, string description, StrategicThemeState state)
+    public Result Update(string name, string description, StrategicThemeState state, Instant timestamp)
     {
         Name = name;
         Description = description;
         State = state;
+
+        AddDomainEvent(new StrategicThemeCreatedEvent(this, timestamp));
 
         return Result.Success();
     }
@@ -72,9 +77,14 @@ public sealed class StrategicTheme : BaseEntity<Guid>, ISystemAuditable, HasIdAn
     /// <param name="name"></param>
     /// <param name="description"></param>
     /// <param name="state"></param>
+    /// <param name="timestamp"></param>
     /// <returns></returns>
-    public static StrategicTheme Create(string name, string description, StrategicThemeState state)
+    public static StrategicTheme Create(string name, string description, StrategicThemeState state, Instant timestamp)
     {
-        return new StrategicTheme(name, description, state);
+        var theme = new StrategicTheme(name, description, state);
+
+        theme.AddPostPersistenceAction(() => theme.AddDomainEvent(new StrategicThemeCreatedEvent(theme, timestamp)));
+
+        return theme;
     }
 }
