@@ -16,6 +16,7 @@ public sealed class ProjectFaker : PrivateConstructorFaker<Project>
         RuleFor(x => x.Description, f => f.Lorem.Paragraph());
         RuleFor(x => x.Status, f => ProjectStatus.Proposed);
         RuleFor(x => x.DateRange, f => null); // Default is null for proposed projects.
+        RuleFor(p => p.ExpenditureCategoryId, f => f.Random.Int(1, 10));
         RuleFor(x => x.PortfolioId, f => f.Random.Guid()); // Set by portfolio in real scenarios.
         RuleFor(x => x.ProgramId, f => null); // Optional, can be null by default.
     }
@@ -30,7 +31,8 @@ public static class ProjectFakerExtensions
         string? name = null,
         string? description = null,
         ProjectStatus? status = null,
-        FlexibleDateRange? dateRange = null,
+        LocalDateRange? dateRange = null,
+        int? expenditureCategoryId = null,
         Guid? portfolioId = null,
         Guid? programId = null)
     {
@@ -40,6 +42,7 @@ public static class ProjectFakerExtensions
         if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
         if (status.HasValue) { faker.RuleFor(x => x.Status, status); }
         if (dateRange is not null) { faker.RuleFor(x => x.DateRange, dateRange); }
+        if (expenditureCategoryId.HasValue) faker.RuleFor(p => p.ExpenditureCategoryId, expenditureCategoryId.Value);
         if (portfolioId.HasValue) { faker.RuleFor(x => x.PortfolioId, portfolioId.Value); }
         if (programId.HasValue) { faker.RuleFor(x => x.ProgramId, programId.Value); }
 
@@ -53,10 +56,11 @@ public static class ProjectFakerExtensions
     {
         var now = dateTimeProvider.Today;
         var startDate = now.PlusDays(-10);
+        var endDate = startDate.PlusMonths(5);
 
         return faker.WithData(
             status: ProjectStatus.Active,
-            dateRange: new FlexibleDateRange(startDate),
+            dateRange: new LocalDateRange(startDate, endDate),
             portfolioId: portfolioId,
             programId: programId
         ).Generate();
@@ -73,7 +77,7 @@ public static class ProjectFakerExtensions
 
         return faker.WithData(
             status: ProjectStatus.Completed,
-            dateRange: new FlexibleDateRange(startDate, endDate),
+            dateRange: new LocalDateRange(startDate, endDate),
             portfolioId: portfolioId,
             programId: programId
         ).Generate();
@@ -102,7 +106,7 @@ public static class ProjectFakerExtensions
 
         return faker.WithData(
             status: ProjectStatus.Cancelled,
-            dateRange: new FlexibleDateRange(startDate, endDate),
+            dateRange: new LocalDateRange(startDate, endDate),
             portfolioId: portfolioId,
             programId: programId
         ).Generate();
