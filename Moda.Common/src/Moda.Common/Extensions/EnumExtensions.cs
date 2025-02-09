@@ -16,10 +16,17 @@ public static class EnumExtensions
         DisplayAttribute? displayAttribute = GetDisplayAttribute<T>(enumValue);
         return displayAttribute?.GetDescription();
     }
+
     public static int GetDisplayOrder<T>(this T enumValue) where T : IComparable, IFormattable, IConvertible
     {
         DisplayAttribute? displayAttribute = GetDisplayAttribute<T>(enumValue);
         return displayAttribute?.GetOrder() ?? 999;
+    }
+
+    public static string? GetDisplayGroupName<T>(this T enumValue) where T : IComparable, IFormattable, IConvertible
+    {
+        DisplayAttribute? displayAttribute = GetDisplayAttribute<T>(enumValue);
+        return displayAttribute?.GetGroupName();
     }
 
     private static DisplayAttribute? GetDisplayAttribute<T>(T enumValue)

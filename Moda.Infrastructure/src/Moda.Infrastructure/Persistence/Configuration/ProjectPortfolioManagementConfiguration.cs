@@ -39,7 +39,9 @@ public class PpmStrategicThemeConfig : IEntityTypeConfiguration<StrategicTheme>
 
         builder.HasIndex(s => s.State);
 
-        builder.Property(s => s.Key).ValueGeneratedOnAdd();
+        builder.Property(t => t.Id).ValueGeneratedNever();
+        builder.Property(t => t.Key).ValueGeneratedNever();
+
         builder.Property(s => s.Name).HasMaxLength(64).IsRequired();
         builder.Property(s => s.Description).HasMaxLength(1024).IsRequired();
 

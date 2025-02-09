@@ -1,4 +1,5 @@
-﻿using Moda.Common.Domain.Enums.StrategicManagement;
+﻿using Ardalis.GuardClauses;
+using Moda.Common.Domain.Enums.StrategicManagement;
 using Moda.Common.Domain.Interfaces.StrategicManagement;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Models;
@@ -12,6 +13,10 @@ public class StrategicTheme : IStrategicThemeData, HasIdAndKey
 
     public StrategicTheme(IStrategicThemeData strategicTheme)
     {
+        Guard.Against.Null(strategicTheme, nameof(strategicTheme));
+        Guard.Against.NullOrWhiteSpace(strategicTheme.Name, nameof(strategicTheme.Name));
+        Guard.Against.NullOrWhiteSpace(strategicTheme.Description, nameof(strategicTheme.Description));
+
         Id = strategicTheme.Id;
         Key = strategicTheme.Key;
         Name = strategicTheme.Name;
@@ -30,13 +35,18 @@ public class StrategicTheme : IStrategicThemeData, HasIdAndKey
     public StrategicThemeState State { get; private set; }
 
     /// <summary>
-    /// Update the strategic theme with the provided data
+    /// Update the strategic theme with the provided values.
     /// </summary>
-    /// <param name="strategicTheme"></param>
-    public void Update(IStrategicThemeData strategicTheme)
+    /// <param name="name"></param>
+    /// <param name="description"></param>
+    /// <param name="state"></param>
+    public void Update(string name, string description, StrategicThemeState state)
     {
-        Name = strategicTheme.Name;
-        Description = strategicTheme.Description;
-        State = strategicTheme.State;
+        Guard.Against.NullOrWhiteSpace(name, nameof(name));
+        Guard.Against.NullOrWhiteSpace(description, nameof(description));
+
+        Name = name;
+        Description = description;
+        State = state;
     }
 }

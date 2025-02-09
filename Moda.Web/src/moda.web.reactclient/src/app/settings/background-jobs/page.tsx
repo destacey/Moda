@@ -60,6 +60,7 @@ const BackgroundJobsListPage = () => {
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const hangfireUrl = process.env.NEXT_PUBLIC_API_BASE_URL + '/jobs'
     const items: ItemType[] = []
+
     if (canViewHangfire) {
       items.push({
         label: (
@@ -84,13 +85,50 @@ const BackgroundJobsListPage = () => {
       items.push({
         type: 'divider',
       })
-      jobTypeData.map((jobType) => {
-        items.push({
+
+      // Sort jobTypeData by groupName and then by order
+      const sortedJobTypeData = [...jobTypeData].sort((a, b) => {
+        if (a.groupName === b.groupName) {
+          return a.order - b.order
+        }
+        return a.groupName.localeCompare(b.groupName)
+      })
+
+      let currentGroupName = ''
+      let currentGroupItems: ItemType[] = []
+
+      sortedJobTypeData.forEach((jobType) => {
+        if (jobType.groupName !== currentGroupName) {
+          if (currentGroupName !== '') {
+            items.push({
+              key: currentGroupName,
+              type: 'group',
+              label: currentGroupName,
+              children: currentGroupItems,
+            })
+            items.push({
+              type: 'divider',
+            })
+          }
+          currentGroupName = jobType.groupName
+          currentGroupItems = []
+        }
+        currentGroupItems.push({
           label: jobType.name,
           key: jobType.name,
           onClick: () => runJob(jobType.id),
         })
       })
+
+      // Add the last group
+      if (currentGroupName !== '') {
+        items.push({
+          key: currentGroupName,
+          type: 'group',
+          label: currentGroupName,
+          children: currentGroupItems,
+        })
+      }
     }
     return items
   }, [canViewHangfire, canRunBackgroundJobs, jobTypeData, runJob])

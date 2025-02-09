@@ -13243,6 +13243,7 @@ export interface BackgroundJobTypeDto {
     name?: string;
     description?: string | undefined;
     order?: number;
+    groupName?: string;
 }
 
 export interface BackgroundJobDto {

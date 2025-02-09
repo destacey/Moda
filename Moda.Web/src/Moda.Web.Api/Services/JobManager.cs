@@ -4,7 +4,10 @@ using Moda.Common.Application.Enums;
 using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Interfaces;
 using Moda.Organization.Application.Teams.Commands;
+using Moda.StrategicManagement.Application.StrategicThemes.Queries;
 using Moda.Web.Api.Interfaces;
+
+using PpmSyncStrategicThemesCommand = Moda.ProjectPortfolioManagement.Application.StrategicThemes.Commands.SyncStrategicThemesCommand;
 
 namespace Moda.Web.Api.Services;
 
@@ -65,5 +68,23 @@ public class JobManager(ILogger<JobManager> logger, IEmployeeService employeeSer
         }
 
         _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncTeamsWithGraphTables));
+    }
+
+
+    [DisableConcurrentExecution(60 * 3)]
+    public async Task RunSyncStrategicThemes(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Running {BackgroundJob} job", nameof(RunSyncStrategicThemes));
+
+        var strategicThemes = await _sender.Send(new GetStrategicThemesDataQuery(), cancellationToken);
+
+        var result = await _sender.Send(new PpmSyncStrategicThemesCommand(strategicThemes), cancellationToken);
+        if (result.IsFailure)
+        {
+            _logger.LogError("Failed to sync strategic themes: {Error}", result.Error);
+            throw new InternalServerException($"Failed to sync strategic themes. Error: {result.Error}");
+        }
+
+        _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncStrategicThemes));
     }
 }

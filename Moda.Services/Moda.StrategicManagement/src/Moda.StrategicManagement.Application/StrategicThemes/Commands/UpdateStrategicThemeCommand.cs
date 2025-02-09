@@ -69,7 +69,7 @@ internal sealed class UpdateStrategicThemeCommandHandler(
 
             await _strategicManagementDbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Stratic Theme {StrategicThemeId} updated.", request.Id);
+            _logger.LogInformation("Strategic Theme {StrategicThemeId} updated.", request.Id);
 
             return Result.Success();
         }

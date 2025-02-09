@@ -1761,7 +1761,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
@@ -1770,10 +1769,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnType("nvarchar(1024)");
 
                     b.Property<int>("Key")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
 
                     b.Property<string>("Name")
                         .IsRequired()

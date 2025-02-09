@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20250208215537_Add-initial-PPM-configuration")]
+    [Migration("20250209155209_Add-initial-PPM-configuration")]
     partial class AddinitialPPMconfiguration
     {
         /// <inheritdoc />
@@ -1764,7 +1764,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
@@ -1773,10 +1772,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .HasColumnType("nvarchar(1024)");
 
                     b.Property<int>("Key")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
 
                     b.Property<string>("Name")
                         .IsRequired()

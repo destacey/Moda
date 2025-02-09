@@ -48,7 +48,7 @@ internal sealed class CreateStrategicThemeCommandHandler(
             await _strategicManagementDbContext.StrategicThemes.AddAsync(strategicTheme, cancellationToken);
             await _strategicManagementDbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Stratic Theme {StrategicThemeId} created with Key {StrategicThemeKey}.", strategicTheme.Id, strategicTheme.Key);
+            _logger.LogInformation("Strategic Theme {StrategicThemeId} created with Key {StrategicThemeKey}.", strategicTheme.Id, strategicTheme.Key);
 
             return new ObjectIdAndKey(strategicTheme.Id, strategicTheme.Key);
         }

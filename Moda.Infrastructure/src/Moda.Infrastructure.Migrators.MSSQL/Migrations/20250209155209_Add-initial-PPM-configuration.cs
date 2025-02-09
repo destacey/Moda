@@ -66,8 +66,7 @@ public partial class AddinitialPPMconfiguration : Migration
             columns: table => new
             {
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Key = table.Column<int>(type: "int", nullable: false)
-                    .Annotation("SqlServer:Identity", "1, 1"),
+                Key = table.Column<int>(type: "int", nullable: false),
                 Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                 Description = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: false),
                 State = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false)
@@ -282,7 +281,6 @@ public partial class AddinitialPPMconfiguration : Migration
             table: "ExpenditureCategories",
             columns: new[] { "Id", "Name", "Description", "State", "IsCapitalizable", "RequiresDepreciation", "AccountingCode", "SystemCreated", "SystemCreatedBy", "SystemLastModified", "SystemLastModifiedBy" },
             values: new object[] { 2, "CapEx", "Capital Expenditure", "Active", true, true, null, DateTime.UtcNow, "00000000-0000-0000-0000-000000000000", DateTime.UtcNow, "00000000-0000-0000-0000-000000000000" });
-
     }
 
     /// <inheritdoc />

@@ -14960,6 +14960,9 @@
           "order": {
             "type": "integer",
             "format": "int32"
+          },
+          "groupName": {
+            "type": "string"
           }
         }
       },

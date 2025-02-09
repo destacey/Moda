@@ -66,7 +66,7 @@ public sealed class StrategicTheme : BaseEntity<Guid>, ISystemAuditable, HasIdAn
         Description = description;
         State = state;
 
-        AddDomainEvent(new StrategicThemeCreatedEvent(this, timestamp));
+        AddDomainEvent(new StrategicThemeUpdatedEvent(this, timestamp));
 
         return Result.Success();
     }
