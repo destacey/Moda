@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Moda.Common.Application.Models;
 using Moda.StrategicManagement.Application.StrategicThemes.Dtos;
-using Moda.StrategicManagement.Application.Strategies.Dtos;
 using Moda.StrategicManagement.Domain.Models;
 
 namespace Moda.StrategicManagement.Application.StrategicThemes.Queries;

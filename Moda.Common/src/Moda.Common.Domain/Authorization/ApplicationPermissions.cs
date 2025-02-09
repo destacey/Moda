@@ -43,6 +43,11 @@ public static class ApplicationResource
     public const string Risks = nameof(Risks);
     public const string Roadmaps = nameof(Roadmaps);
 
+    public const string ProjectPortfolios = nameof(ProjectPortfolios);
+    public const string Projects = nameof(Projects);
+    public const string Programs = nameof(Programs);
+    public const string PpmStrategicThemes = nameof(PpmStrategicThemes);
+
     public const string StrategicThemes = nameof(StrategicThemes);
     public const string Strategies = nameof(Strategies);
     public const string Visions = nameof(Visions);
@@ -158,6 +163,16 @@ public static class ApplicationPermissions
         new("Delete Roadmaps", ApplicationAction.Delete, ApplicationResource.Roadmaps, IsBasic: true),
     ];
 
+    private static readonly ApplicationPermission[] _projectPortfolioManagement =
+    [
+        new ("View PPM Strategic Themes", ApplicationAction.View, ApplicationResource.PpmStrategicThemes),
+
+        new ("View Portfolios", ApplicationAction.View, ApplicationResource.ProjectPortfolios),
+        new ("Create Portfolios", ApplicationAction.Create, ApplicationResource.ProjectPortfolios),
+        new ("Update Portfolios", ApplicationAction.Update, ApplicationResource.ProjectPortfolios),
+        new ("Delete Portfolios", ApplicationAction.Delete, ApplicationResource.ProjectPortfolios),
+    ];
+
     private static readonly ApplicationPermission[] _strategicManagement =
     [
         new ("View Strategic Themes", ApplicationAction.View, ApplicationResource.StrategicThemes),
@@ -221,6 +236,7 @@ public static class ApplicationPermissions
         .Union(_links)
         .Union(_organization)
         .Union(_planning)
+        .Union(_projectPortfolioManagement)
         .Union(_strategicManagement)
         .Union(_work)
         .ToArray();

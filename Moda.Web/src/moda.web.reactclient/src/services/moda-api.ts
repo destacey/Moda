@@ -2457,6 +2457,278 @@ export class VisionsClient {
     }
 }
 
+export class PortfoliosClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get a list of project portfolios.
+     * @param status (optional) 
+     */
+    getProjectPortfolios(status: number | null | undefined, cancelToken?: CancelToken): Promise<ProjectPortfolioListDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/portfolios?";
+        if (status !== undefined && status !== null)
+            url_ += "status=" + encodeURIComponent("" + status) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProjectPortfolios(_response);
+        });
+    }
+
+    protected processGetProjectPortfolios(response: AxiosResponse): Promise<ProjectPortfolioListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectPortfolioListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectPortfolioListDto[]>(null as any);
+    }
+
+    /**
+     * Get project portfolio details.
+     */
+    getProjectPortfolio(idOrKey: string, cancelToken?: CancelToken): Promise<ProjectPortfolioDetailsDto> {
+        let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProjectPortfolio(_response);
+        });
+    }
+
+    protected processGetProjectPortfolio(response: AxiosResponse): Promise<ProjectPortfolioDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectPortfolioDetailsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectPortfolioDetailsDto>(null as any);
+    }
+}
+
+export class PpmStrategicThemesClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get a list of strategic themes.
+     * @param state (optional) 
+     */
+    getStrategicThemes(state: number | null | undefined, cancelToken?: CancelToken): Promise<PpmStrategicThemeListDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/strategicthemes?";
+        if (state !== undefined && state !== null)
+            url_ += "state=" + encodeURIComponent("" + state) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetStrategicThemes(_response);
+        });
+    }
+
+    protected processGetStrategicThemes(response: AxiosResponse): Promise<PpmStrategicThemeListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PpmStrategicThemeListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PpmStrategicThemeListDto[]>(null as any);
+    }
+
+    /**
+     * Get strategic themes details.
+     */
+    getStrategicTheme(idOrKey: string, cancelToken?: CancelToken): Promise<PpmStrategicThemeDetailsDto> {
+        let url_ = this.baseUrl + "/api/ppm/strategicthemes/{idOrKey}";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetStrategicTheme(_response);
+        });
+    }
+
+    protected processGetStrategicTheme(response: AxiosResponse): Promise<PpmStrategicThemeDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<PpmStrategicThemeDetailsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PpmStrategicThemeDetailsDto>(null as any);
+    }
+}
+
 export class PlanningIntervalsClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -12006,6 +12278,47 @@ export interface UpdateVisionRequest {
 }
 
 export interface VisionStateDto extends CommonEnumDto {
+}
+
+export interface ProjectPortfolioListDto {
+    id?: string;
+    key?: number;
+    name?: string;
+    status?: SimpleNavigationDto;
+}
+
+export interface ProjectPortfolioDetailsDto {
+    id?: string;
+    key?: number;
+    name?: string;
+    description?: string;
+    status?: SimpleNavigationDto;
+    dateRange?: FlexibleDateRange | undefined;
+}
+
+export interface ValueObject {
+}
+
+export interface FlexibleDateRange extends ValueObject {
+    start?: Date;
+    end?: Date | undefined;
+    effectiveEnd?: Date;
+    days?: number;
+}
+
+export interface PpmStrategicThemeListDto {
+    id?: string;
+    key?: number;
+    name?: string;
+    state?: SimpleNavigationDto;
+}
+
+export interface PpmStrategicThemeDetailsDto {
+    id?: string;
+    key?: number;
+    name?: string;
+    description?: string;
+    state?: SimpleNavigationDto;
 }
 
 export interface PlanningIntervalListDto {
