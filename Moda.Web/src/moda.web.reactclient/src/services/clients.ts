@@ -20,6 +20,8 @@ import {
   WorkTypeLevelsClient,
   WorkTypeTiersClient,
   RoadmapsClient,
+  StrategicThemesClient,
+  PortfoliosClient,
 } from './moda-api'
 import auth from './auth'
 
@@ -54,6 +56,8 @@ export const getLinksClient = async (accessToken?: string) =>
   new LinksClient('', await createDefaultAxiosInstance(accessToken))
 export const getPermissionsClient = async (accessToken?: string) =>
   new PermissionsClient('', await createDefaultAxiosInstance(accessToken))
+export const getPortfoliosClient = async (accessToken?: string) =>
+  new PortfoliosClient('', await createDefaultAxiosInstance(accessToken))
 export const getProfileClient = async (accessToken?: string) =>
   new ProfileClient('', await createDefaultAxiosInstance(accessToken))
 export const getPlanningIntervalsClient = async (accessToken?: string) =>
@@ -64,6 +68,8 @@ export const getRoadmapsClient = async (accessToken?: string) =>
   new RoadmapsClient('', await createDefaultAxiosInstance(accessToken))
 export const getRolesClient = async (accessToken?: string) =>
   new RolesClient('', await createDefaultAxiosInstance(accessToken))
+export const getStrategicThemesClient = async (accessToken?: string) =>
+  new StrategicThemesClient('', await createDefaultAxiosInstance(accessToken))
 export const getTeamsClient = async (accessToken?: string) =>
   new TeamsClient('', await createDefaultAxiosInstance(accessToken))
 export const getTeamsOfTeamsClient = async (accessToken?: string) =>

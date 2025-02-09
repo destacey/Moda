@@ -33,6 +33,13 @@ export enum QueryTags {
   RoadmapActivities = 'Planning.RoadmapActivities',
   RoadmapVisibility = 'Planning.RoadmapVisibility',
 
+  // PPM
+  Portfolio = 'Ppm.Portfolio',
+
+  // STRATEGIC MANAGEMENT
+  StrategicTheme = 'StrategicManagement.StrategicTheme',
+  StrategicThemState = 'StrategicManagement.StrategicThemeState',
+
   // USER MANAGEMENT
   Users = 'UserManagement.Users',
   UserRoles = 'UserManagement.UserRoles',

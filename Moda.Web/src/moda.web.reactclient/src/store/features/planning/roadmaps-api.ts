@@ -22,7 +22,6 @@ import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getRoadmapsClient } from '@/src/services/clients'
 import { OptionModel } from '@/src/components/types'
-import ReorganizeRoadmapActivitiesModal from '@/src/app/planning/roadmaps/_components/reorganize-roadmap-activities-modal'
 
 export const roadmapApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
