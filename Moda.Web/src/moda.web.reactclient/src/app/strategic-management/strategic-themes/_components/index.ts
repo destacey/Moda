@@ -1,1 +1,5 @@
+export { default as ChangeStrategicThemeStateForm } from './change-strategic-theme-state-form'
+export { default as CreateStrategicThemeForm } from './create-strategic-theme-form'
+export { default as DeleteStrategicThemeForm } from './delete-strategic-theme-form'
+export { default as EditStrategicThemeForm } from './edit-strategic-theme-form'
 export { default as StrategicThemesGrid } from './strategic-themes-grid'

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moda.StrategicManagement.Domain.Models;
+﻿using Moda.StrategicManagement.Domain.Models;
 
 namespace Moda.StrategicManagement.Application.Visions.Commands;
 
@@ -42,7 +37,7 @@ internal sealed class ActivateVisionCommandHandler(IStrategicManagementDbContext
             if (vision is null)
             {
                 _logger.LogInformation("Vision {VisionId} not found.", request.Id);
-                return Result.Failure($"Vision {request.Id} not found.");
+                return Result.Failure("Vision not found.");
             }
 
             var aggregate = new VisionAggregate(visions);

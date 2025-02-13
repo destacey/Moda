@@ -29,20 +29,20 @@ export const strategicThemesApi = apiSlice.injectEndpoints({
       },
       providesTags: () => [{ type: QueryTags.StrategicTheme, id: 'LIST' }],
     }),
-    getStrategicTheme: builder.query<StrategicThemeListDto, string>({
-      queryFn: async (idOrKey) => {
+    getStrategicTheme: builder.query<StrategicThemeListDto, number>({
+      queryFn: async (key) => {
         try {
           const data = await (
             await getStrategicThemesClient()
-          ).getStrategicTheme(idOrKey)
+          ).getStrategicTheme(key.toString())
           return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
-      providesTags: (result) => [
-        { type: QueryTags.StrategicTheme, id: result?.id },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.StrategicTheme, id: arg },
       ],
     }),
     createStrategicTheme: builder.mutation<
@@ -84,6 +84,46 @@ export const strategicThemesApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+    activateStrategicTheme: builder.mutation<
+      void,
+      { id: string; cacheKey: number }
+    >({
+      queryFn: async ({ id }) => {
+        try {
+          const data = await (await getStrategicThemesClient()).activate(id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, { cacheKey }) => {
+        return [
+          { type: QueryTags.StrategicTheme, id: 'LIST' },
+          { type: QueryTags.StrategicTheme, id: cacheKey },
+        ]
+      },
+    }),
+    archiveStrategicTheme: builder.mutation<
+      void,
+      { id: string; cacheKey: number }
+    >({
+      queryFn: async ({ id }) => {
+        try {
+          const data = await (await getStrategicThemesClient()).archive(id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, { cacheKey }) => {
+        return [
+          { type: QueryTags.StrategicTheme, id: 'LIST' },
+          { type: QueryTags.StrategicTheme, id: cacheKey },
+        ]
+      },
+    }),
     deleteStrategicTheme: builder.mutation<
       void,
       { strategicThemeId: string; cacheKey: number }
@@ -100,10 +140,7 @@ export const strategicThemesApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, { cacheKey }) => {
-        return [
-          { type: QueryTags.StrategicTheme, id: 'LIST' },
-          { type: QueryTags.StrategicTheme, id: cacheKey },
-        ]
+        return [{ type: QueryTags.StrategicTheme, id: 'LIST' }]
       },
     }),
     getStateOptions: builder.query<OptionModel<number>[], void>({
@@ -136,6 +173,8 @@ export const {
   useGetStrategicThemeQuery,
   useCreateStrategicThemeMutation,
   useUpdateStrategicThemeMutation,
+  useActivateStrategicThemeMutation,
+  useArchiveStrategicThemeMutation,
   useDeleteStrategicThemeMutation,
   useGetStateOptionsQuery,
 } = strategicThemesApi

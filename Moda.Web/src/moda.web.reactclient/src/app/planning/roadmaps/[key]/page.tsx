@@ -273,7 +273,7 @@ const RoadmapDetailsPage = ({ params }) => {
       />
       {openEditRoadmapForm && (
         <EditRoadmapForm
-          roadmapId={roadmapData?.id}
+          roadmapKey={roadmapData?.key}
           showForm={openEditRoadmapForm}
           onFormComplete={() => onEditRoadmapFormClosed(true)}
           onFormCancel={() => onEditRoadmapFormClosed(false)}

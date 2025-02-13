@@ -1509,6 +1509,134 @@ export class StrategicThemesClient {
     }
 
     /**
+     * Activate a strategic theme.
+     */
+    activate(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/strategic-management/strategic-themes/{id}/activate";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processActivate(_response);
+        });
+    }
+
+    protected processActivate(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Archive a strategic theme.
+     */
+    archive(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/strategic-management/strategic-themes/{id}/archive";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processArchive(_response);
+        });
+    }
+
+    protected processArchive(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Get a list of all strategic theme states.
      */
     getStateOptions( cancelToken?: CancelToken): Promise<StrategicThemeStateDto[]> {
@@ -2590,142 +2718,6 @@ export class PortfoliosClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<ProjectPortfolioDetailsDto>(null as any);
-    }
-}
-
-export class PpmStrategicThemesClient {
-    protected instance: AxiosInstance;
-    protected baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(baseUrl?: string, instance?: AxiosInstance) {
-
-        this.instance = instance || axios.create();
-
-        this.baseUrl = baseUrl ?? "";
-
-    }
-
-    /**
-     * Get a list of strategic themes.
-     * @param state (optional) 
-     */
-    getStrategicThemes(state: number | null | undefined, cancelToken?: CancelToken): Promise<PpmStrategicThemeListDto[]> {
-        let url_ = this.baseUrl + "/api/ppm/strategicthemes?";
-        if (state !== undefined && state !== null)
-            url_ += "state=" + encodeURIComponent("" + state) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetStrategicThemes(_response);
-        });
-    }
-
-    protected processGetStrategicThemes(response: AxiosResponse): Promise<PpmStrategicThemeListDto[]> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<PpmStrategicThemeListDto[]>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = JSON.parse(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<PpmStrategicThemeListDto[]>(null as any);
-    }
-
-    /**
-     * Get strategic themes details.
-     */
-    getStrategicTheme(idOrKey: string, cancelToken?: CancelToken): Promise<PpmStrategicThemeDetailsDto> {
-        let url_ = this.baseUrl + "/api/ppm/strategicthemes/{idOrKey}";
-        if (idOrKey === undefined || idOrKey === null)
-            throw new Error("The parameter 'idOrKey' must be defined.");
-        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetStrategicTheme(_response);
-        });
-    }
-
-    protected processGetStrategicTheme(response: AxiosResponse): Promise<PpmStrategicThemeDetailsDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = JSON.parse(resultData200);
-            return Promise.resolve<PpmStrategicThemeDetailsDto>(result200);
-
-        } else if (status === 404) {
-            const _responseText = response.data;
-            let result404: any = null;
-            let resultData404  = _responseText;
-            result404 = JSON.parse(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<PpmStrategicThemeDetailsDto>(null as any);
     }
 }
 
@@ -12181,8 +12173,6 @@ export interface CreateStrategicThemeRequest {
     name: string;
     /** A detailed description of the strategic theme and its importance. */
     description: string;
-    /** The current lifecycle state of the strategic theme (e.g., Active, Proposed, Archived). */
-    stateId?: number;
 }
 
 export interface UpdateStrategicThemeRequest {
@@ -12192,8 +12182,6 @@ export interface UpdateStrategicThemeRequest {
     name: string;
     /** A detailed description of the strategic theme and its importance. */
     description: string;
-    /** The current lifecycle state of the strategic theme (e.g., Active, Proposed, Archived). */
-    stateId?: number;
 }
 
 export interface CommonEnumDto {
@@ -12304,21 +12292,6 @@ export interface FlexibleDateRange extends ValueObject {
     end?: Date | undefined;
     effectiveEnd?: Date;
     days?: number;
-}
-
-export interface PpmStrategicThemeListDto {
-    id?: string;
-    key?: number;
-    name?: string;
-    state?: SimpleNavigationDto;
-}
-
-export interface PpmStrategicThemeDetailsDto {
-    id?: string;
-    key?: number;
-    name?: string;
-    description?: string;
-    state?: SimpleNavigationDto;
 }
 
 export interface PlanningIntervalListDto {

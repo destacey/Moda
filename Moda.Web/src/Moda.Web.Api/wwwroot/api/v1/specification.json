@@ -1084,6 +1084,112 @@
         ]
       }
     },
+    "/api/strategic-management/strategic-themes/{id}/activate": {
+      "post": {
+        "tags": [
+          "StrategicThemes"
+        ],
+        "summary": "Activate a strategic theme.",
+        "operationId": "StrategicThemes_Activate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/strategic-management/strategic-themes/{id}/archive": {
+      "post": {
+        "tags": [
+          "StrategicThemes"
+        ],
+        "summary": "Archive a strategic theme.",
+        "operationId": "StrategicThemes_Archive",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/strategic-management/strategic-themes/states": {
       "get": {
         "tags": [
@@ -1883,104 +1989,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProjectPortfolioDetailsDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      }
-    },
-    "/api/ppm/strategicthemes": {
-      "get": {
-        "tags": [
-          "StrategicThemes"
-        ],
-        "summary": "Get a list of strategic themes.",
-        "operationId": "PpmStrategicThemes_GetStrategicThemes",
-        "parameters": [
-          {
-            "name": "state",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PpmStrategicThemeListDto"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      }
-    },
-    "/api/ppm/strategicthemes/{idOrKey}": {
-      "get": {
-        "tags": [
-          "StrategicThemes"
-        ],
-        "summary": "Get strategic themes details.",
-        "operationId": "PpmStrategicThemes_GetStrategicTheme",
-        "parameters": [
-          {
-            "name": "idOrKey",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PpmStrategicThemeDetailsDto"
                 }
               }
             }
@@ -10303,11 +10311,6 @@
             "maxLength": 1024,
             "minLength": 1,
             "nullable": false
-          },
-          "stateId": {
-            "type": "integer",
-            "description": "The current lifecycle state of the strategic theme (e.g., Active, Proposed, Archived).",
-            "format": "int32"
           }
         }
       },
@@ -10341,11 +10344,6 @@
             "maxLength": 1024,
             "minLength": 1,
             "nullable": false
-          },
-          "stateId": {
-            "type": "integer",
-            "description": "The current lifecycle state of the strategic theme (e.g., Active, Proposed, Archived).",
-            "format": "int32"
           }
         }
       },
@@ -10719,53 +10717,6 @@
         "type": "object",
         "x-abstract": true,
         "additionalProperties": false
-      },
-      "PpmStrategicThemeListDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "key": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "state": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          }
-        }
-      },
-      "PpmStrategicThemeDetailsDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "key": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "state": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          }
-        }
       },
       "PlanningIntervalListDto": {
         "type": "object",

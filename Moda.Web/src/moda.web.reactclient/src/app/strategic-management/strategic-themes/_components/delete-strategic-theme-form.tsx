@@ -1,37 +1,50 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
-import { RoadmapDetailsDto } from '@/src/services/moda-api'
-import { useDeleteRoadmapMutation } from '@/src/store/features/planning/roadmaps-api'
+import { StrategicThemeDetailsDto } from '@/src/services/moda-api'
+import { useDeleteStrategicThemeMutation } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { Modal } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
-export interface DeleteRoadmapFormProps {
-  roadmap: RoadmapDetailsDto
+export interface DeleteStrategicThemeFormProps {
+  strategicTheme: StrategicThemeDetailsDto
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
   messageApi: MessageInstance
 }
 
-const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
+const DeleteStrategicThemeForm = (props: DeleteStrategicThemeFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
-  const [deleteRoadmapMutation, { error: mutationError }] =
-    useDeleteRoadmapMutation()
+  const [deleteStrategicThemeMutation, { error: mutationError }] =
+    useDeleteStrategicThemeMutation()
 
   const { hasPermissionClaim } = useAuth()
-  const canDeleteRoadmap = hasPermissionClaim('Permissions.Roadmaps.Delete')
+  const canDeleteStrategicTheme = hasPermissionClaim(
+    'Permissions.StrategicThemes.Delete',
+  )
 
-  const deleteRoadmap = async (roadmap: RoadmapDetailsDto) => {
+  const deleteStrategicTheme = async (
+    strategicTheme: StrategicThemeDetailsDto,
+  ) => {
     try {
-      await deleteRoadmapMutation(roadmap.id)
+      const response = await deleteStrategicThemeMutation({
+        strategicThemeId: strategicTheme.id,
+        cacheKey: strategicTheme.key,
+      })
+
+      if (response.error) {
+        throw response.error
+      }
+
       return true
     } catch (error) {
       props.messageApi.error(
-        'An unexpected error occurred while deleting the roadmap.',
+        error.detail ??
+          'An unexpected error occurred while deleting the strategic theme.',
       )
       console.log(error)
       return false
@@ -41,16 +54,16 @@ const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
   const handleOk = async () => {
     setIsSaving(true)
     try {
-      if (await deleteRoadmap(props.roadmap)) {
+      if (await deleteStrategicTheme(props.strategicTheme)) {
         // TODO: not working because the parent page is gone
-        props.messageApi.success('Successfully deleted Roadmap.')
+        props.messageApi.success('Successfully deleted Strategic Theme.')
         props.onFormComplete()
         setIsOpen(false)
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
       props.messageApi.error(
-        'An unexpected error occurred while deleting the roadmap.',
+        'An unexpected error occurred while deleting the strategic theme.',
       )
     } finally {
       setIsSaving(false)
@@ -63,19 +76,18 @@ const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
   }
 
   useEffect(() => {
-    if (!props.roadmap) return
-    if (canDeleteRoadmap) {
+    if (!props.strategicTheme) return
+    if (canDeleteStrategicTheme) {
       setIsOpen(props.showForm)
     } else {
       props.onFormCancel()
-      props.messageApi.error('You do not have permission to delete roadmaps.')
     }
-  }, [canDeleteRoadmap, props])
+  }, [canDeleteStrategicTheme, props])
 
   return (
     <>
       <Modal
-        title="Are you sure you want to delete this Roadmap?"
+        title="Are you sure you want to delete this Strategic Theme?"
         open={isOpen}
         onOk={handleOk}
         okText="Delete"
@@ -86,10 +98,10 @@ const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
         keyboard={false} // disable esc key to close modal
         destroyOnClose={true}
       >
-        {props.roadmap?.key} - {props.roadmap?.name}
+        {props.strategicTheme?.key} - {props.strategicTheme?.name}
       </Modal>
     </>
   )
 }
 
-export default DeleteRoadmapForm
+export default DeleteStrategicThemeForm

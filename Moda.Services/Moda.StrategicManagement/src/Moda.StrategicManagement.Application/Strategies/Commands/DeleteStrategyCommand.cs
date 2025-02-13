@@ -29,7 +29,7 @@ internal sealed class DeleteStrategyCommandHandler(IStrategicManagementDbContext
             if (strategy is null)
             {
                 _logger.LogInformation("Strategy {StrategyId} not found.", request.Id);
-                return Result.Failure($"Strategy {request.Id} not found.");
+                return Result.Failure("Strategy not found.");
             }
 
             _strategicManagementDbContext.Strategies.Remove(strategy);

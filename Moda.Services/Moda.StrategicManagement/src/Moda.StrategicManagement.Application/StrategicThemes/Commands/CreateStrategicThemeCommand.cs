@@ -1,11 +1,10 @@
 ﻿using Moda.Common.Application.Models;
 using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.StrategicManagement.Domain.Enums;
 using Moda.StrategicManagement.Domain.Models;
 
 namespace Moda.StrategicManagement.Application.StrategicThemes.Commands;
 
-public sealed record CreateStrategicThemeCommand(string Name, string Description, StrategicThemeState State) : ICommand<ObjectIdAndKey>;
+public sealed record CreateStrategicThemeCommand(string Name, string Description) : ICommand<ObjectIdAndKey>;
 
 public sealed class CreateStrategicThemeCommandValidator : AbstractValidator<CreateStrategicThemeCommand>
 {
@@ -17,9 +16,6 @@ public sealed class CreateStrategicThemeCommandValidator : AbstractValidator<Cre
 
         RuleFor(x => x.Description)
             .MaximumLength(1024);
-
-        RuleFor(x => x.State)
-            .IsInEnum();
     }
 }
 
@@ -41,7 +37,7 @@ internal sealed class CreateStrategicThemeCommandHandler(
             var strategicTheme = StrategicTheme.Create(
                 request.Name,
                 request.Description,
-                request.State,
+                StrategicThemeState.Proposed,
                 _dateTimeProvider.Now
                 );
 

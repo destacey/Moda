@@ -37,7 +37,7 @@ internal sealed class ArchiveVisionCommandHandler(IStrategicManagementDbContext 
             if (vision is null)
             {
                 _logger.LogInformation("Vision {VisionId} not found.", request.Id);
-                return Result.Failure($"Vision {request.Id} not found.");
+                return Result.Failure("Vision not found.");
             }
 
             var aggregate = new VisionAggregate(visions);

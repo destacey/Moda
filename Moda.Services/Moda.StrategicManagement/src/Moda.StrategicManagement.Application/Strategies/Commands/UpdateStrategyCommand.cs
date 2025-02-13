@@ -41,7 +41,7 @@ internal sealed class UpdateStrategyCommandHandler(IStrategicManagementDbContext
             if (strategy is null)
             {
                 _logger.LogInformation("Strategy {StrategyId} not found.", request.Id);
-                return Result.Failure($"Strategy {request.Id} not found.");
+                return Result.Failure("Strategy not found.");
             }
 
             var updateResult = strategy.Update(

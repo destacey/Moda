@@ -29,7 +29,7 @@ internal sealed class DeleteVisionCommandHandler(IStrategicManagementDbContext s
             if (strategicTheme is null)
             {
                 _logger.LogInformation("Vision {VisionId} not found.", request.Id);
-                return Result.Failure($"Vision {request.Id} not found.");
+                return Result.Failure("Vision not found.");
             }
 
             _strategicManagementDbContext.Visions.Remove(strategicTheme);

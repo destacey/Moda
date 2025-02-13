@@ -1,5 +1,4 @@
-﻿using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.StrategicManagement.Application.StrategicThemes.Commands;
+﻿using Moda.StrategicManagement.Application.StrategicThemes.Commands;
 
 namespace Moda.Web.Api.Models.StrategicManagement.StrategicThemes;
 
@@ -16,14 +15,9 @@ public sealed record CreateStrategicThemeRequest
     /// </summary>
     public required string Description { get; set; }
 
-    /// <summary>
-    /// The current lifecycle state of the strategic theme (e.g., Active, Proposed, Archived).
-    /// </summary>
-    public int StateId { get; set; }
-
     public CreateStrategicThemeCommand ToCreateStrategicThemeCommand()
     {
-        return new CreateStrategicThemeCommand(Name, Description, (StrategicThemeState)StateId);
+        return new CreateStrategicThemeCommand(Name, Description);
     }
 }
 
@@ -38,9 +32,5 @@ public sealed class CreateStrategicThemeRequestValidator : CustomValidator<Creat
         RuleFor(t => t.Description)
             .NotEmpty()
             .MaximumLength(1024);
-
-        RuleFor(t => (StrategicThemeState)t.StateId)
-            .IsInEnum()
-            .WithMessage("The state is not valid.");
     }
 }

@@ -1,3 +1,5 @@
+'use client'
+
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { CreateRoadmapRequest } from '@/src/services/moda-api'
@@ -92,7 +94,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
       }
 
       props.messageApi.success(
-        `Roadmap created successfully. Roadmap Key ${response.data.key}`,
+        `Roadmap created successfully. Roadmap key ${response.data.key}`,
       )
 
       return true

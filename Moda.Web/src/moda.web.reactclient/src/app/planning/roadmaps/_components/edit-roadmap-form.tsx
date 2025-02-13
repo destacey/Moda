@@ -24,7 +24,7 @@ const { TextArea } = Input
 const { Group: RadioGroup } = Radio
 
 export interface EditRoadmapFormProps {
-  roadmapId: string
+  roadmapKey: number
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
@@ -66,8 +66,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
     data: roadmapData,
     isLoading,
     error,
-    refetch,
-  } = useGetRoadmapQuery(props.roadmapId)
+  } = useGetRoadmapQuery(props.roadmapKey.toString())
 
   const {
     data: visibilityData,

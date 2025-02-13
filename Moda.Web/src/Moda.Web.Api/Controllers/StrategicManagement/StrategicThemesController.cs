@@ -3,6 +3,7 @@ using Moda.Common.Domain.Enums.StrategicManagement;
 using Moda.StrategicManagement.Application.StrategicThemes.Commands;
 using Moda.StrategicManagement.Application.StrategicThemes.Dtos;
 using Moda.StrategicManagement.Application.StrategicThemes.Queries;
+using Moda.StrategicManagement.Application.Visions.Commands;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.StrategicManagement.StrategicThemes;
 
@@ -75,6 +76,37 @@ public class StrategicThemesController : ControllerBase
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
 
         var result = await _sender.Send(request.ToUpdateStrategicThemeCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+
+    [HttpPost("{id}/activate")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicThemes)]
+    [OpenApiOperation("Activate a strategic theme.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> Activate(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new ActivateStrategicThemeCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPost("{id}/archive")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicThemes)]
+    [OpenApiOperation("Archive a strategic theme.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> Archive(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new ArchiveStrategicThemeCommand(id), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

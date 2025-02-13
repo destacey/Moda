@@ -1,10 +1,9 @@
 ﻿using Moda.Common.Application.Models;
 using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.StrategicManagement.Domain.Enums;
 
 namespace Moda.StrategicManagement.Application.StrategicThemes.Commands;
 
-public sealed record UpdateStrategicThemeCommand(Guid Id, string Name, string Description, StrategicThemeState State) : ICommand;
+public sealed record UpdateStrategicThemeCommand(Guid Id, string Name, string Description) : ICommand;
 
 public sealed class UpdateStrategicThemeCommandValidator : AbstractValidator<UpdateStrategicThemeCommand>
 {
@@ -19,9 +18,6 @@ public sealed class UpdateStrategicThemeCommandValidator : AbstractValidator<Upd
 
         RuleFor(x => x.Description)
             .MaximumLength(1024);
-
-        RuleFor(x => x.State)
-            .IsInEnum();
     }
 }
 
@@ -47,13 +43,12 @@ internal sealed class UpdateStrategicThemeCommandHandler(
             if (strategicTheme is null)
             {
                 _logger.LogInformation("Strategic Theme {StrategicThemeId} not found.", request.Id);
-                return Result.Failure($"Strategic Theme {request.Id} not found.");
+                return Result.Failure("Strategic Theme not found.");
             }
 
             var updateResult = strategicTheme.Update(
                 request.Name,
                 request.Description,
-                request.State,
                 _dateTimeProvider.Now
                 );
 

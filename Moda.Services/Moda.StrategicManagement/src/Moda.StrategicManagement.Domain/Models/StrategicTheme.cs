@@ -53,18 +53,16 @@ public sealed class StrategicTheme : BaseEntity<Guid>, ISystemAuditable, HasIdAn
     public StrategicThemeState State { get; private set; }
 
     /// <summary>
-    /// Updates the StrategicTheme.
+    /// Updates the Strategic Theme.
     /// </summary>
     /// <param name="name"></param>
     /// <param name="description"></param>
-    /// <param name="state"></param>
     /// <param name="timestamp"></param>
     /// <returns></returns>
-    public Result Update(string name, string description, StrategicThemeState state, Instant timestamp)
+    public Result Update(string name, string description, Instant timestamp)
     {
         Name = name;
         Description = description;
-        State = state;
 
         AddDomainEvent(new StrategicThemeUpdatedEvent(this, timestamp));
 
@@ -72,7 +70,49 @@ public sealed class StrategicTheme : BaseEntity<Guid>, ISystemAuditable, HasIdAn
     }
 
     /// <summary>
-    /// Creates a new StrategicTheme.
+    /// Activates the Strategic Theme.
+    /// </summary>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    public Result Activate(Instant timestamp)
+    {
+        if (State != StrategicThemeState.Proposed)
+        {
+            return Result.Failure("Only proposed strategic themes can be activated.");
+        }
+
+        State = StrategicThemeState.Active;
+        AddDomainEvent(new StrategicThemeUpdatedEvent(this, timestamp));
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Archives the Strategic Theme.
+    /// </summary>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    public Result Archive(Instant timestamp)
+    {
+        if (State != StrategicThemeState.Active)
+        {
+            return Result.Failure("Only active strategic themes can be archived.");
+        }
+
+        State = StrategicThemeState.Archived;
+        AddDomainEvent(new StrategicThemeUpdatedEvent(this, timestamp));
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Indicates whether the Strategic Theme can be deleted.
+    /// </summary>
+    /// <returns></returns>
+    public bool CanDelete() => State == StrategicThemeState.Proposed;
+
+    /// <summary>
+    /// Creates a new Strategic Theme.
     /// </summary>
     /// <param name="name"></param>
     /// <param name="description"></param>

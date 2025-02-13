@@ -7,7 +7,7 @@ import { useDocumentTitle } from '@/src/hooks'
 import { useGetStrategicThemesQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { Button, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
-import { StrategicThemesGrid } from './_components'
+import { CreateStrategicThemeForm, StrategicThemesGrid } from './_components'
 
 const StrategicThemesPage: React.FC = () => {
   useDocumentTitle('Strategic Themes')
@@ -53,14 +53,21 @@ const StrategicThemesPage: React.FC = () => {
   return (
     <>
       {contextHolder}
-      {/* <PageTitle title="Strategic Themes" actions={showActions && actions()} /> */}
-      <PageTitle title="Strategic Themes" />
+      <PageTitle title="Strategic Themes" actions={showActions && actions()} />
       <StrategicThemesGrid
         strategicThemesData={strategicThemesData || []}
         strategicThemesLoading={isLoading}
         refreshStrategicThemes={refresh}
         messageApi={messageApi}
       />
+      {openCreateStrategicThemeForm && (
+        <CreateStrategicThemeForm
+          showForm={openCreateStrategicThemeForm}
+          onFormComplete={() => setOpenCreateStrategicThemeForm(false)}
+          onFormCancel={() => setOpenCreateStrategicThemeForm(false)}
+          messageApi={messageApi}
+        />
+      )}
     </>
   )
 }
