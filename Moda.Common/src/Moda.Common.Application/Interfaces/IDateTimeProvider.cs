@@ -3,4 +3,6 @@
 public interface IDateTimeProvider : IScopedService
 {
     Instant Now { get; }
+
+    LocalDate Today { get; }
 }
