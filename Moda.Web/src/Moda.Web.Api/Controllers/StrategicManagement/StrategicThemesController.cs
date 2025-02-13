@@ -82,7 +82,6 @@ public class StrategicThemesController : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-
     [HttpPost("{id}/activate")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicThemes)]
     [OpenApiOperation("Activate a strategic theme.", "")]

@@ -32,7 +32,7 @@ internal sealed class DeleteStrategicThemeCommandHandler(IStrategicManagementDbC
                 return Result.Failure("Strategic Theme not found.");
             }
 
-            if (!strategicTheme.CanDelete())
+            if (!strategicTheme.CanBeDeleted())
             {
                 _logger.LogInformation("Strategic Theme {StrategicThemeId} cannot be deleted.", request.Id);
                 return Result.Failure("Strategic Theme cannot be deleted.");

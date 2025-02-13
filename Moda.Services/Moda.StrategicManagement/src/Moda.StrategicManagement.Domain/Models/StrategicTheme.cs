@@ -109,7 +109,7 @@ public sealed class StrategicTheme : BaseEntity<Guid>, ISystemAuditable, HasIdAn
     /// Indicates whether the Strategic Theme can be deleted.
     /// </summary>
     /// <returns></returns>
-    public bool CanDelete() => State == StrategicThemeState.Proposed;
+    public bool CanBeDeleted() => State == StrategicThemeState.Proposed;
 
     /// <summary>
     /// Creates a new Strategic Theme.

@@ -17,6 +17,11 @@ public sealed record ProjectPortfolioListDto : IMapFrom<ProjectPortfolio>
     public required string Name { get; set; }
 
     /// <summary>
+    /// The description of the portfolio.
+    /// </summary>
+    public required string Description { get; set; }
+
+    /// <summary>
     /// The status of the portfolio.
     /// </summary>
     public required SimpleNavigationDto Status { get; set; }

@@ -1,5 +1,4 @@
 ﻿using Moda.Common.Application.Models;
-using Moda.Common.Domain.Enums.StrategicManagement;
 
 namespace Moda.StrategicManagement.Application.StrategicThemes.Commands;
 

@@ -1919,7 +1919,7 @@
           "Portfolios"
         ],
         "summary": "Get a list of project portfolios.",
-        "operationId": "Portfolios_GetProjectPortfolios",
+        "operationId": "Portfolios_GetPortfolios",
         "parameters": [
           {
             "name": "status",
@@ -1962,6 +1962,52 @@
             "Bearer": []
           }
         ]
+      },
+      "post": {
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Create a portfolio.",
+        "operationId": "Portfolios_Create",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePortfolioRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectIdAndKey"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/ppm/portfolios/{idOrKey}": {
@@ -1970,7 +2016,7 @@
           "Portfolios"
         ],
         "summary": "Get project portfolio details.",
-        "operationId": "Portfolios_GetProjectPortfolio",
+        "operationId": "Portfolios_GetPortfolio",
         "parameters": [
           {
             "name": "idOrKey",
@@ -1999,6 +2045,271 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/portfolios/{id}": {
+      "put": {
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Update a portfolio.",
+        "operationId": "Portfolios_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePortfolioRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Delete a portfolio.",
+        "operationId": "Portfolios_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/portfolios/{id}/activate": {
+      "post": {
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Activate a project portfolio.",
+        "operationId": "Portfolios_Activate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/portfolios/{id}/complete": {
+      "post": {
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Complete a project portfolio.",
+        "operationId": "Portfolios_Complete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/portfolios/{id}/archive": {
+      "post": {
+        "tags": [
+          "Portfolios"
+        ],
+        "summary": "Archive a project portfolio.",
+        "operationId": "Portfolios_Archive",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -10645,6 +10956,9 @@
           "name": {
             "type": "string"
           },
+          "description": {
+            "type": "string"
+          },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
           }
@@ -10717,6 +11031,63 @@
         "type": "object",
         "x-abstract": true,
         "additionalProperties": false
+      },
+      "CreatePortfolioRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "description"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the portfolio.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "A detailed description of the portfolio’s purpose.",
+            "maxLength": 1024,
+            "minLength": 1,
+            "nullable": false
+          }
+        }
+      },
+      "UpdatePortfolioRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier of the strategic theme.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the portfolio.",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "A detailed description of the portfolio’s purpose.",
+            "maxLength": 1024,
+            "minLength": 1,
+            "nullable": false
+          }
+        }
       },
       "PlanningIntervalListDto": {
         "type": "object",

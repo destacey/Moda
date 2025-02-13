@@ -80,6 +80,12 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     public IReadOnlyCollection<Project> Projects => _projects;
 
     /// <summary>
+    /// Indicates whether the portfolio can be deleted.
+    /// </summary>
+    /// <returns></returns>
+    public bool CanBeDeleted() => Status is ProjectPortfolioStatus.Proposed;
+
+    /// <summary>
     /// Updates the portfolio details, including the date range.
     /// </summary>
     public Result UpdateDetails(string name, string description)
