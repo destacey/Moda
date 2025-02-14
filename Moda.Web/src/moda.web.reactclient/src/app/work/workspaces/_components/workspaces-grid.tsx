@@ -1,10 +1,10 @@
 'use client'
 
+import { ModaGrid } from '@/src/components/common'
+import { WorkspaceLinkCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
 import { WorkspaceListDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
 import { ReactElement, useCallback, useMemo } from 'react'
-import { ModaGrid } from '../../../components/common'
-import { WorkspaceLinkCellRenderer } from '../../../components/common/moda-grid-cell-renderers'
 
 export interface WorkspacesGridProps {
   workspaces: WorkspaceListDto[]

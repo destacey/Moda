@@ -2,62 +2,91 @@
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
-import { CreateStrategicThemeRequest } from '@/src/services/moda-api'
-import { useCreateStrategicThemeMutation } from '@/src/store/features/strategic-management/strategic-themes-api'
+import {
+  ProjectPortfolioDetailsDto,
+  UpdatePortfolioRequest,
+} from '@/src/services/moda-api'
+import {
+  useGetPortfolioQuery,
+  useUpdatePortfolioMutation,
+} from '@/src/store/features/ppm/portfolios-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
+import TextArea from 'antd/es/input/TextArea'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
 
-export interface CreateStrategicThemeFormProps {
+export interface EditPortfolioFormProps {
+  portfolioKey: number
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
   messageApi: MessageInstance
 }
 
-interface CreateStrategicThemeFormValues {
+interface UpdatePortfolioFormValues {
   name: string
   description: string
 }
 
 const mapToRequestValues = (
-  values: CreateStrategicThemeFormValues,
-): CreateStrategicThemeRequest => {
+  values: UpdatePortfolioFormValues,
+  strategicThemeId: string,
+): UpdatePortfolioRequest => {
   return {
+    id: strategicThemeId,
     name: values.name,
     description: values.description,
-  } as CreateStrategicThemeRequest
+  } as UpdatePortfolioRequest
 }
 
-const CreateStrategicThemeForm = (props: CreateStrategicThemeFormProps) => {
+const EditPortfolioForm = (props: EditPortfolioFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateStrategicThemeFormValues>()
+  const [form] = Form.useForm<UpdatePortfolioFormValues>()
   const formValues = Form.useWatch([], form)
 
-  const [createStrategicTheme, { error: mutationError }] =
-    useCreateStrategicThemeMutation()
+  const {
+    data: portfolioData,
+    isLoading,
+    error,
+  } = useGetPortfolioQuery(props.portfolioKey)
+
+  const [updatePortfolio, { error: mutationError }] =
+    useUpdatePortfolioMutation()
 
   const { hasPermissionClaim } = useAuth()
-  const canCreateStrategicTheme = hasPermissionClaim(
-    'Permissions.StrategicThemes.Create',
+  const canUpdatePortfolio = hasPermissionClaim(
+    'Permissions.ProjectPortfolios.Update',
   )
 
-  const create = async (values: CreateStrategicThemeFormValues) => {
+  const mapToFormValues = useCallback(
+    (strategicTheme: ProjectPortfolioDetailsDto) => {
+      if (!strategicTheme) {
+        throw new Error('Portfolio not found')
+      }
+      form.setFieldsValue({
+        name: strategicTheme.name,
+        description: strategicTheme.description,
+      })
+    },
+    [form],
+  )
+
+  const update = async (values: UpdatePortfolioFormValues) => {
     try {
-      const request = mapToRequestValues(values)
-      const response = await createStrategicTheme(request)
+      const request = mapToRequestValues(values, portfolioData.id)
+      const response = await updatePortfolio({
+        request,
+        cacheKey: portfolioData.key,
+      })
       if (response.error) {
         throw response.error
       }
-      props.messageApi.success(
-        'Strategic Theme created successfully. Strategic Theme key: ' +
-          response.data.key,
-      )
+      props.messageApi.success('Portfolio updated successfully.')
 
       return true
     } catch (error) {
@@ -68,9 +97,10 @@ const CreateStrategicThemeForm = (props: CreateStrategicThemeFormProps) => {
       } else {
         props.messageApi.error(
           error.detail ??
-            'An error occurred while creating the strategic theme. Please try again.',
+            'An error occurred while updating the Portfolio. Please try again.',
         )
       }
+
       return false
     }
   }
@@ -79,15 +109,15 @@ const CreateStrategicThemeForm = (props: CreateStrategicThemeFormProps) => {
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values)) {
+      if (await update(values)) {
         setIsOpen(false)
         form.resetFields()
         props.onFormComplete()
       }
     } catch (error) {
-      console.error('handleOk error', error)
+      console.error('update error', error)
       props.messageApi.error(
-        'An error occurred while creating the strategic theme. Please try again.',
+        'An error occurred while updating the Portfolio. Please try again.',
       )
     } finally {
       setIsSaving(false)
@@ -101,15 +131,18 @@ const CreateStrategicThemeForm = (props: CreateStrategicThemeFormProps) => {
   }, [form, props])
 
   useEffect(() => {
-    if (canCreateStrategicTheme) {
+    if (!portfolioData) return
+
+    if (canUpdatePortfolio) {
       setIsOpen(props.showForm)
+      if (props.showForm) {
+        mapToFormValues(portfolioData)
+      }
     } else {
       props.onFormCancel()
-      props.messageApi.error(
-        'You do not have permission to create strategic themes.',
-      )
+      props.messageApi.error('You do not have permission to update Portfolios.')
     }
-  }, [canCreateStrategicTheme, props])
+  }, [canUpdatePortfolio, mapToFormValues, props, portfolioData])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -118,15 +151,24 @@ const CreateStrategicThemeForm = (props: CreateStrategicThemeFormProps) => {
     )
   }, [form, formValues])
 
+  useEffect(() => {
+    if (error) {
+      props.messageApi.error(
+        error.detail ??
+          'An error occurred while loading the Portfolio. Please try again.',
+      )
+    }
+  }, [error, props.messageApi])
+
   return (
     <>
       <Modal
-        title="Create Strategic Theme"
+        title="Edit Portfolio"
         open={isOpen}
         width={'60vw'}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
-        okText="Create"
+        okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
@@ -137,14 +179,14 @@ const CreateStrategicThemeForm = (props: CreateStrategicThemeFormProps) => {
           form={form}
           size="small"
           layout="vertical"
-          name="create-strategic-theme-form"
+          name="update-portfolio-form"
         >
           <Item
             label="Name"
             name="name"
             rules={[{ required: true, message: 'Name is required' }]}
           >
-            <Input maxLength={64} showCount />
+            <Input maxLength={128} showCount />
           </Item>
           <Item name="description" label="Description" rules={[{ max: 1024 }]}>
             <MarkdownEditor
@@ -161,4 +203,4 @@ const CreateStrategicThemeForm = (props: CreateStrategicThemeFormProps) => {
   )
 }
 
-export default CreateStrategicThemeForm
+export default EditPortfolioForm

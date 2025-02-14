@@ -127,6 +127,16 @@ export const PlanningIntervalLinkCellRenderer = ({
   )
 }
 
+export interface PortfolioLinkCellRendererProps {
+  data: NavigationDto
+}
+export const PortfolioLinkCellRenderer = ({
+  data,
+}: PortfolioLinkCellRendererProps) => {
+  if (!data) return null
+  return <Link href={`/ppm/portfolios/${data.key}`}>{data.name}</Link>
+}
+
 export interface RowMenuCellRendererProps {
   menuItems: ItemType[]
 }

@@ -215,7 +215,7 @@ const StrategicThemeDetailsPage = ({ params }) => {
         </Descriptions>
         <Descriptions layout="vertical" size="small">
           <Item label="Description">
-            <MarkdownRenderer markdown={strategicThemeData.name} />
+            <MarkdownRenderer markdown={strategicThemeData.description} />
           </Item>
         </Descriptions>
       </Space>

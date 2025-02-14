@@ -1,8 +1,8 @@
-import { get } from 'lodash'
 import { apiSlice } from '../apiSlice'
 import {
   CreateStrategicThemeRequest,
   ObjectIdAndKey,
+  StrategicThemeDetailsDto,
   StrategicThemeListDto,
   UpdateStrategicThemeRequest,
 } from '@/src/services/moda-api'
@@ -29,7 +29,7 @@ export const strategicThemesApi = apiSlice.injectEndpoints({
       },
       providesTags: () => [{ type: QueryTags.StrategicTheme, id: 'LIST' }],
     }),
-    getStrategicTheme: builder.query<StrategicThemeListDto, number>({
+    getStrategicTheme: builder.query<StrategicThemeDetailsDto, number>({
       queryFn: async (key) => {
         try {
           const data = await (

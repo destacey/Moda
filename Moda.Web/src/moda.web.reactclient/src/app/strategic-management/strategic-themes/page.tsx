@@ -6,7 +6,7 @@ import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetStrategicThemesQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { Button, message } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CreateStrategicThemeForm, StrategicThemesGrid } from './_components'
 
 const StrategicThemesPage: React.FC = () => {
@@ -31,14 +31,17 @@ const StrategicThemesPage: React.FC = () => {
   } = useGetStrategicThemesQuery(undefined)
 
   useEffect(() => {
-    error && console.error(error)
-  }, [error])
+    if (error) {
+      console.error(error)
+      messageApi.error('Failed to load strategic themes.')
+    }
+  }, [error, messageApi])
 
   const refresh = useCallback(async () => {
     refetch()
   }, [refetch])
 
-  const actions = () => {
+  const actions = useMemo(() => {
     return (
       <>
         {canCreateStrategicTheme && (
@@ -48,12 +51,12 @@ const StrategicThemesPage: React.FC = () => {
         )}
       </>
     )
-  }
+  }, [canCreateStrategicTheme])
 
   return (
     <>
       {contextHolder}
-      <PageTitle title="Strategic Themes" actions={showActions && actions()} />
+      <PageTitle title="Strategic Themes" actions={showActions && actions} />
       <StrategicThemesGrid
         strategicThemesData={strategicThemesData || []}
         strategicThemesLoading={isLoading}

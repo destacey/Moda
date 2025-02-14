@@ -12661,17 +12661,6 @@ export interface ProjectPortfolioDetailsDto {
     name?: string;
     description?: string;
     status?: SimpleNavigationDto;
-    dateRange?: FlexibleDateRange | undefined;
-}
-
-export interface ValueObject {
-}
-
-export interface FlexibleDateRange extends ValueObject {
-    start?: Date;
-    end?: Date | undefined;
-    effectiveEnd?: Date;
-    days?: number;
 }
 
 export interface CreatePortfolioRequest {

@@ -29,7 +29,7 @@ public sealed record ProjectPortfolioDetailsDto : IMapFrom<ProjectPortfolio>
     /// <summary>
     /// The date range defining the portfolio’s lifecycle.
     /// </summary>
-    public FlexibleDateRange? DateRange { get; set; }
+    //public FlexibleDateRange? DateRange { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
