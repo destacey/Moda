@@ -12,28 +12,35 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
 {
     private string _name = default!;
     private string _description = default!;
+    private readonly HashSet<RoleAssignment<ProjectPortfolioRole>> _roles = [];
 
     private readonly HashSet<Program> _programs = [];
     private readonly HashSet<Project> _projects = [];
 
     private ProjectPortfolio() { }
 
-    private ProjectPortfolio(string name, string description, ProjectPortfolioStatus status, FlexibleDateRange? dateRange = null)
+    private ProjectPortfolio(string name, string description, ProjectPortfolioStatus status, Dictionary<ProjectPortfolioRole, HashSet<Guid>>? roles = null, FlexibleDateRange? dateRange = null)
     {
         if (status is ProjectPortfolioStatus.Active or ProjectPortfolioStatus.OnHold && dateRange?.Start is null)
         {
             throw new InvalidOperationException("An active or on hold portfolio must have a start date.");
         }
 
-        if (status is ProjectPortfolioStatus.Completed or ProjectPortfolioStatus.Archived && (dateRange?.Start is null || dateRange?.End is null))
+        if (status is ProjectPortfolioStatus.Closed or ProjectPortfolioStatus.Archived && (dateRange?.Start is null || dateRange?.End is null))
         {
-            throw new InvalidOperationException("A completed or archived portfolio must have a start and end date.");
+            throw new InvalidOperationException("A closed or archived portfolio must have a start and end date.");
         }
 
         Name = name;
         Description = description;
         Status = status;
         DateRange = dateRange;
+
+        _roles = roles?
+            .SelectMany(r => r.Value
+                .Select(e => new RoleAssignment<ProjectPortfolioRole>(Id, r.Key, e)))
+            .ToHashSet()
+            ?? [];
     }
 
     /// <summary>
@@ -65,6 +72,11 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     public ProjectPortfolioStatus Status { get; private set; }
 
     /// <summary>
+    /// The roles associated with the portfolio.
+    /// </summary>
+    public IReadOnlyCollection<RoleAssignment<ProjectPortfolioRole>> Roles => _roles;
+
+    /// <summary>
     /// The date range defining the portfolio’s lifecycle.
     /// </summary>
     public FlexibleDateRange? DateRange { get; private set; }
@@ -94,6 +106,32 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
         Description = description;
 
         return Result.Success();
+    }
+
+    /// <summary>
+    /// Assigns an employee to a specific role within the portfolio, allowing multiple employees per role.
+    /// </summary>
+    public Result AssignRole(ProjectPortfolioRole role, Guid employeeId)
+    {
+        return RoleManager.AssignRole(_roles, Id, role, employeeId);
+    }
+
+    /// <summary>
+    /// Removes an employee from a specific role.
+    /// </summary>
+    public Result RemoveRole(ProjectPortfolioRole role, Guid employeeId)
+    {
+        return RoleManager.RemoveAssignment(_roles, role, employeeId);
+    }
+
+    /// <summary>
+    /// Updates the roles for the portfolio.
+    /// </summary>
+    /// <param name="updatedRoles"></param>
+    /// <returns></returns>
+    public Result UpdateRoles(Dictionary<ProjectPortfolioRole, HashSet<Guid>> updatedRoles)
+    {
+        return RoleManager.UpdateRoles(_roles, Id, updatedRoles);
     }
 
     #region Lifecycle
@@ -149,21 +187,21 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     }
 
     /// <summary>
-    /// Marks the portfolio as completed.
+    /// Marks the portfolio as closed.
     /// Ensures all projects or programs are resolved before transitioning to this status.
     /// </summary>
-    public Result Complete(LocalDate endDate)
+    public Result Close(LocalDate endDate)
     {
         Guard.Against.Null(endDate, nameof(endDate));
 
         if (Status != ProjectPortfolioStatus.Active)
         {
-            return Result.Failure("Only active portfolios can be completed.");
+            return Result.Failure("Only active portfolios can be closed.");
         }
 
         if (DateRange == null)
         {
-            return Result.Failure("The portfolio must have a start date before it can be completed.");
+            return Result.Failure("The portfolio must have a start date before it can be closed.");
         }
 
         if (endDate < DateRange.Start)
@@ -173,28 +211,28 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
 
         if (_programs.Any(p => !p.IsClosed))
         {
-            return Result.Failure("All programs must be completed or canceled before the portfolio can be completed.");
+            return Result.Failure("All programs must be completed or canceled before the portfolio can be closed.");
         }
 
         if (_projects.Any(p => !p.IsClosed))
         {
-            return Result.Failure("All projects must be completed or canceled before the portfolio can be completed.");
+            return Result.Failure("All projects must be completed or canceled before the portfolio can be closed.");
         }
 
-        Status = ProjectPortfolioStatus.Completed;
+        Status = ProjectPortfolioStatus.Closed;
         DateRange = new FlexibleDateRange(DateRange.Start, endDate);
 
         return Result.Success();
     }
 
     /// <summary>
-    /// Archives a completed portfolio.
+    /// Archives a closed portfolio.
     /// </summary>
     public Result Archive()
     {
-        if (Status != ProjectPortfolioStatus.Completed)
+        if (Status != ProjectPortfolioStatus.Closed)
         {
-            return Result.Failure("Only completed portfolios can be archived.");
+            return Result.Failure("Only closed portfolios can be archived.");
         }
 
         Status = ProjectPortfolioStatus.Archived;
@@ -256,7 +294,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
         }
 
         // Create the project
-        var project = Project.Create(name, description, expenditureCategoryId, dateRange, Id);
+        var project = Project.Create(name, description, expenditureCategoryId, dateRange, Id, null);
 
         // Add the project to the portfolio's project list
         _projects.Add(project);
@@ -343,8 +381,8 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// <summary>
     /// Creates a new portfolio in the proposed status.
     /// </summary>
-    public static ProjectPortfolio Create(string name, string description)
+    public static ProjectPortfolio Create(string name, string description, Dictionary<ProjectPortfolioRole, HashSet<Guid>>? roles = null)
     {
-        return new ProjectPortfolio(name, description, ProjectPortfolioStatus.Proposed);
+        return new ProjectPortfolio(name, description, ProjectPortfolioStatus.Proposed, roles);
     }
 }

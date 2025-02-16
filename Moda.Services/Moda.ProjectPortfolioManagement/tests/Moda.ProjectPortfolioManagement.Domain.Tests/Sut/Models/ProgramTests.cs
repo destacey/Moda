@@ -145,6 +145,187 @@ public class ProgramTests
 
     #endregion UpdateTimeline Tests
 
+    #region Roles
+
+    [Fact]
+    public void AssignRole_ShouldAssignEmployeeToRoleSuccessfully()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var program = _programFaker.Generate();
+
+        // Act
+        var result = program.AssignRole(ProgramRole.Owner, employeeId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        program.Roles.Should().ContainSingle();
+        program.Roles.First().Role.Should().Be(ProgramRole.Owner);
+        program.Roles.First().EmployeeId.Should().Be(employeeId);
+    }
+
+    [Fact]
+    public void AssignRole_ShouldFail_WhenEmployeeAlreadyAssignedToRole()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var program = _programFaker.WithData(roles: new Dictionary<ProgramRole, HashSet<Guid>>
+        {
+            { ProgramRole.Owner, new HashSet<Guid> { employeeId } }
+        }).Generate();
+
+        // Act
+        var result = program.AssignRole(ProgramRole.Owner, employeeId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Employee is already assigned to this role.");
+    }
+
+    [Fact]
+    public void RemoveRole_WithOneRoleAssignment_ShouldRemoveEmployeeFromRoleSuccessfully()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var program = _programFaker.WithData(roles: new Dictionary<ProgramRole, HashSet<Guid>>
+        {
+            { ProgramRole.Owner, new HashSet<Guid> { employeeId } }
+        }).Generate();
+
+        // Act
+        var result = program.RemoveRole(ProgramRole.Owner, employeeId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        program.Roles.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void RemoveRole_WithMultipleRoleAssignments_ShouldRemoveEmployeeFromRoleSuccessfully()
+    {
+        // Arrange
+        var employeeId1 = Guid.NewGuid();
+        var employeeId2 = Guid.NewGuid();
+        var program = _programFaker.WithData(roles: new Dictionary<ProgramRole, HashSet<Guid>>
+        {
+            { ProgramRole.Owner, new HashSet<Guid> { employeeId1, employeeId2 } }
+        }).Generate();
+
+        // Act
+        var result = program.RemoveRole(ProgramRole.Owner, employeeId1);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        program.Roles.Count.Should().Be(1);
+        program.Roles.First().Role.Should().Be(ProgramRole.Owner);
+        program.Roles.First().EmployeeId.Should().Be(employeeId2);
+    }
+
+    [Fact]
+    public void RemoveRole_ShouldFail_WhenEmployeeNotAssignedToRole()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var program = _programFaker.Generate();
+
+        // Act
+        var result = program.RemoveRole(ProgramRole.Owner, employeeId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Employee is not assigned to this role.");
+    }
+
+    [Fact]
+    public void UpdateRoles_ShouldAssignNewRolesSuccessfully()
+    {
+        // Arrange
+        var program = _programFaker.Generate();
+        var employee1 = Guid.NewGuid();
+        var employee2 = Guid.NewGuid();
+        var updatedRoles = new Dictionary<ProgramRole, HashSet<Guid>>
+        {
+            { ProgramRole.Manager, new HashSet<Guid> { employee1, employee2 } }
+        };
+
+        // Act
+        var result = program.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        program.Roles.Should().Contain(role => role.Role == ProgramRole.Manager && role.EmployeeId == employee1);
+        program.Roles.Should().Contain(role => role.Role == ProgramRole.Manager && role.EmployeeId == employee2);
+    }
+
+    [Fact]
+    public void UpdateRoles_ShouldRemoveUnspecifiedRoles()
+    {
+        // Arrange
+        var program = _programFaker.WithData(roles: new Dictionary<ProgramRole, HashSet<Guid>>
+        {
+            { ProgramRole.Manager, new HashSet<Guid> { Guid.NewGuid(), Guid.NewGuid() } },
+            { ProgramRole.Owner, new HashSet<Guid> { Guid.NewGuid() } }
+        }).Generate();
+
+        var updatedRoles = new Dictionary<ProgramRole, HashSet<Guid>>
+        {
+            { ProgramRole.Manager, new HashSet<Guid> { Guid.NewGuid() } }  // Remove Owner role
+        };
+
+        // Act
+        var result = program.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        program.Roles.Should().Contain(role => role.Role == ProgramRole.Manager);
+        program.Roles.Should().NotContain(role => role.Role == ProgramRole.Owner); // Removed role
+    }
+
+    [Fact]
+    public void UpdateRoles_ShouldNotChange_WhenRolesAreUnchanged()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var program = _programFaker.WithData(roles: new Dictionary<ProgramRole, HashSet<Guid>>
+        {
+            { ProgramRole.Sponsor, new HashSet<Guid> { employeeId } }
+        }).Generate();
+
+        var updatedRoles = new Dictionary<ProgramRole, HashSet<Guid>>
+        {
+            { ProgramRole.Sponsor, new HashSet<Guid> { employeeId } }
+        };
+
+        // Act
+        var result = program.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        program.Roles.Count.Should().Be(1);
+        program.Roles.Should().Contain(role => role.Role == ProgramRole.Sponsor && role.EmployeeId == employeeId);
+    }
+
+    [Fact]
+    public void UpdateRoles_ShouldFail_WhenInvalidRoleProvided()
+    {
+        // Arrange
+        var program = _programFaker.Generate();
+        var invalidRole = (ProgramRole)999;
+        var updatedRoles = new Dictionary<ProgramRole, HashSet<Guid>>
+        {
+            { invalidRole, new HashSet<Guid> { Guid.NewGuid() } }
+        };
+
+        // Act
+        var result = program.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be($"Role is not a valid {nameof(ProgramRole)} value.");
+    }
+
+    #endregion Roles
+
     #region Lifecycle Tests
 
     [Fact]

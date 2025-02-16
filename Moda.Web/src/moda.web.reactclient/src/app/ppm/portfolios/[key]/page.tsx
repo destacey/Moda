@@ -25,7 +25,7 @@ enum MenuActions {
   Edit = 'Edit',
   Delete = 'Delete',
   Activate = 'Activate',
-  Complete = 'Complete',
+  Close = 'Close',
   Archive = 'Archive',
 }
 
@@ -35,7 +35,7 @@ const PortfolioDetailsPage = ({ params }) => {
     useState<boolean>(false)
   const [openActivatePortfolioForm, setOpenActivatePortfolioForm] =
     useState<boolean>(false)
-  const [openCompletePortfolioForm, setOpenCompletePortfolioForm] =
+  const [openClosePortfolioForm, setOpenClosePortfolioForm] =
     useState<boolean>(false)
   const [openArchivePortfolioForm, setOpenArchivePortfolioForm] =
     useState<boolean>(false)
@@ -94,15 +94,15 @@ const PortfolioDetailsPage = ({ params }) => {
       currentStatus === 'Proposed'
         ? [MenuActions.Delete, MenuActions.Activate]
         : currentStatus === 'Active'
-          ? [MenuActions.Complete]
-          : currentStatus === 'Completed'
+          ? [MenuActions.Close]
+          : currentStatus === 'Closed'
             ? [MenuActions.Archive]
             : []
 
     // TODO: Implement On Hold status
 
     const items: ItemType[] = []
-    if (canUpdatePortfolio) {
+    if (canUpdatePortfolio && currentStatus !== 'Archived') {
       items.push({
         key: 'edit',
         label: MenuActions.Edit,
@@ -135,11 +135,11 @@ const PortfolioDetailsPage = ({ params }) => {
       })
     }
 
-    if (canUpdatePortfolio && availableActions.includes(MenuActions.Complete)) {
+    if (canUpdatePortfolio && availableActions.includes(MenuActions.Close)) {
       items.push({
-        key: 'complete',
-        label: MenuActions.Complete,
-        onClick: () => setOpenCompletePortfolioForm(true),
+        key: 'close',
+        label: MenuActions.Close,
+        onClick: () => setOpenClosePortfolioForm(true),
       })
     }
 
@@ -174,9 +174,9 @@ const PortfolioDetailsPage = ({ params }) => {
     [refetchPortfolio],
   )
 
-  const onCompletePortfolioFormClosed = useCallback(
+  const onClosePortfolioFormClosed = useCallback(
     (wasSaved: boolean) => {
-      setOpenCompletePortfolioForm(false)
+      setOpenClosePortfolioForm(false)
       if (wasSaved) {
         refetchPortfolio()
       }
@@ -212,6 +212,19 @@ const PortfolioDetailsPage = ({ params }) => {
     notFound()
   }
 
+  const sponsorNames =
+    portfolioData?.portfolioSponsors.length > 0
+      ? portfolioData?.portfolioSponsors.map((s) => s.name).join(', ')
+      : 'No sponsors assigned'
+  const ownerNames =
+    portfolioData?.portfolioOwners.length > 0
+      ? portfolioData?.portfolioOwners.map((s) => s.name).join(', ')
+      : 'No owners assigned'
+  const managerNames =
+    portfolioData?.portfolioManagers.length > 0
+      ? portfolioData?.portfolioManagers.map((s) => s.name).join(', ')
+      : 'No managers assigned'
+
   return (
     <>
       {contextHolder}
@@ -221,8 +234,11 @@ const PortfolioDetailsPage = ({ params }) => {
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Space direction="vertical" size="small">
-        <Descriptions>
+        <Descriptions column={1} size="small">
           <Item label="State">{portfolioData.status.name}</Item>
+          <Item label="Sponsors">{sponsorNames}</Item>
+          <Item label="Owners">{ownerNames}</Item>
+          <Item label="Managers">{managerNames}</Item>
         </Descriptions>
         <Descriptions layout="vertical" size="small">
           <Item label="Description">
@@ -250,13 +266,13 @@ const PortfolioDetailsPage = ({ params }) => {
           messageApi={messageApi}
         />
       )}
-      {openCompletePortfolioForm && (
+      {openClosePortfolioForm && (
         <ChangePortfolioStateForm
           portfolio={portfolioData}
-          stateAction={PortfolioStateAction.Complete}
-          showForm={openCompletePortfolioForm}
-          onFormComplete={() => onCompletePortfolioFormClosed(true)}
-          onFormCancel={() => onCompletePortfolioFormClosed(false)}
+          stateAction={PortfolioStateAction.Close}
+          showForm={openClosePortfolioForm}
+          onFormComplete={() => onClosePortfolioFormClosed(true)}
+          onFormCancel={() => onClosePortfolioFormClosed(false)}
           messageApi={messageApi}
         />
       )}

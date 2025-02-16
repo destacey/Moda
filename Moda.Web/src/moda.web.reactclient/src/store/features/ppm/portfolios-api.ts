@@ -97,25 +97,23 @@ export const portfoliosApi = apiSlice.injectEndpoints({
         },
       },
     ),
-    completePortfolio: builder.mutation<void, { id: string; cacheKey: number }>(
-      {
-        queryFn: async ({ id }) => {
-          try {
-            const data = await (await getPortfoliosClient()).complete(id)
-            return { data }
-          } catch (error) {
-            console.error('API Error:', error)
-            return { error }
-          }
-        },
-        invalidatesTags: (result, error, { cacheKey }) => {
-          return [
-            { type: QueryTags.Portfolio, id: 'LIST' },
-            { type: QueryTags.Portfolio, id: cacheKey },
-          ]
-        },
+    closePortfolio: builder.mutation<void, { id: string; cacheKey: number }>({
+      queryFn: async ({ id }) => {
+        try {
+          const data = await (await getPortfoliosClient()).close(id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
       },
-    ),
+      invalidatesTags: (result, error, { cacheKey }) => {
+        return [
+          { type: QueryTags.Portfolio, id: 'LIST' },
+          { type: QueryTags.Portfolio, id: cacheKey },
+        ]
+      },
+    }),
     archivePortfolio: builder.mutation<void, { id: string; cacheKey: number }>({
       queryFn: async ({ id }) => {
         try {
@@ -161,7 +159,7 @@ export const {
   useCreatePortfolioMutation,
   useUpdatePortfolioMutation,
   useActivatePortfolioMutation,
-  useCompletePortfolioMutation,
+  useClosePortfolioMutation,
   useArchivePortfolioMutation,
   useDeletePortfolioMutation,
 } = portfoliosApi

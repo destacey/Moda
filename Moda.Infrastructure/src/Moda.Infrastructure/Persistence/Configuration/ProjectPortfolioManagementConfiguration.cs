@@ -88,6 +88,11 @@ public class ProjectPortfolioConfiguration : IEntityTypeConfiguration<ProjectPor
             .WithOne(prg => prg.Portfolio)
             .HasForeignKey(p => p.PortfolioId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.Roles)
+            .WithOne()
+            .HasForeignKey(r => r.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
@@ -122,6 +127,11 @@ public class ProgramConfiguration : IEntityTypeConfiguration<Program>
             .WithOne(prj => prj.Program)
             .HasForeignKey(p => p.ProgramId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasMany(p => p.Roles)
+            .WithOne()
+            .HasForeignKey(r => r.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(p => p.StrategicThemes)
             .WithMany()
@@ -175,6 +185,11 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasForeignKey(p => p.ExpenditureCategoryId)
             .OnDelete(DeleteBehavior.NoAction);
 
+        builder.HasMany(p => p.Roles)
+            .WithOne()
+            .HasForeignKey(r => r.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasMany(p => p.StrategicThemes)
             .WithMany()
             .UsingEntity<Dictionary<string, object>>(
@@ -194,3 +209,80 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             );
     }
 }
+
+#region Role Assignments
+
+public class ProjectPortfolioRoleAssignmentConfiguration : IEntityTypeConfiguration<RoleAssignment<ProjectPortfolioRole>>
+{
+    public void Configure(EntityTypeBuilder<RoleAssignment<ProjectPortfolioRole>> builder)
+    {
+        builder.ToTable("PortfolioRoleAssignments", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(r => new { r.ObjectId, r.EmployeeId, r.Role });
+
+        builder.HasIndex(r => r.ObjectId);
+        builder.HasIndex(r => r.EmployeeId);
+
+        builder.Property(p => p.Role).IsRequired()
+            .HasConversion<EnumConverter<ProjectPortfolioRole>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        // Relationships
+        builder.HasOne(rm => rm.Employee)
+            .WithMany()
+            .HasForeignKey(rm => rm.EmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+public class ProgramRoleAssignmentConfiguration : IEntityTypeConfiguration<RoleAssignment<ProgramRole>>
+{
+    public void Configure(EntityTypeBuilder<RoleAssignment<ProgramRole>> builder)
+    {
+        builder.ToTable("ProgramRoleAssignments", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(r => new { r.ObjectId, r.EmployeeId, r.Role });
+
+        builder.HasIndex(r => r.ObjectId);
+        builder.HasIndex(r => r.EmployeeId);
+
+        builder.Property(p => p.Role).IsRequired()
+            .HasConversion<EnumConverter<ProgramRole>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        // Relationships
+        builder.HasOne(rm => rm.Employee)
+            .WithMany()
+            .HasForeignKey(rm => rm.EmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+public class ProjectRoleAssignmentConfiguration : IEntityTypeConfiguration<RoleAssignment<ProjectRole>>
+{
+    public void Configure(EntityTypeBuilder<RoleAssignment<ProjectRole>> builder)
+    {
+        builder.ToTable("ProjectRoleAssignments", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(r => new { r.ObjectId, r.EmployeeId, r.Role });
+
+        builder.HasIndex(r => r.ObjectId);
+        builder.HasIndex(r => r.EmployeeId);
+
+        builder.Property(p => p.Role).IsRequired()
+            .HasConversion<EnumConverter<ProjectRole>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        // Relationships
+        builder.HasOne(rm => rm.Employee)
+            .WithMany()
+            .HasForeignKey(rm => rm.EmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+#endregion Role Assignments
+

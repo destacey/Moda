@@ -91,15 +91,15 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-    [HttpPost("{id}/complete")]
+    [HttpPost("{id}/close")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.ProjectPortfolios)]
-    [OpenApiOperation("Complete a project portfolio.", "")]
+    [OpenApiOperation("Close a project portfolio.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> Complete(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult> Close(Guid id, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(new CompleteProjectPortfolioCommand(id), cancellationToken);
+        var result = await _sender.Send(new CloseProjectPortfolioCommand(id), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

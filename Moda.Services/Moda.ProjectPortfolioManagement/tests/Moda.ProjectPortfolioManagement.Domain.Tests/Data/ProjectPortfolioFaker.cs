@@ -29,6 +29,7 @@ public static class ProjectPortfolioFakerExtensions
         string? name = null,
         string? description = null,
         ProjectPortfolioStatus? status = null,
+        Dictionary<ProjectPortfolioRole, HashSet<Guid>>? roles = null,
         FlexibleDateRange? dateRange = null)
     {
         if (id.HasValue) { faker.RuleFor(x => x.Id, id.Value); }
@@ -36,6 +37,27 @@ public static class ProjectPortfolioFakerExtensions
         if (!string.IsNullOrWhiteSpace(name)) { faker.RuleFor(x => x.Name, name); }
         if (!string.IsNullOrWhiteSpace(description)) { faker.RuleFor(x => x.Description, description); }
         if (status.HasValue) { faker.RuleFor(x => x.Status, status); }
+
+        if (roles is not null) 
+        {
+            var portfolioId = id ?? Guid.NewGuid();
+            if (!id.HasValue)
+            {
+                faker.RuleFor(x => x.Id, portfolioId);
+            }
+
+            HashSet<RoleAssignment<ProjectPortfolioRole>> updatedRoles = new();
+            foreach (var role in roles)
+            {
+                foreach (var employeeId in role.Value)
+                {
+                    updatedRoles.Add(new RoleAssignment<ProjectPortfolioRole>(portfolioId, role.Key, employeeId));
+                }
+            }
+
+            faker.RuleFor("_roles", x => updatedRoles); 
+        }
+
         if (dateRange is not null) { faker.RuleFor(x => x.DateRange, dateRange); }
 
         return faker;
@@ -73,7 +95,7 @@ public static class ProjectPortfolioFakerExtensions
         var defaultEndDate = now.PlusDays(-10);
 
         return faker.WithData(
-            status: ProjectPortfolioStatus.Completed,
+            status: ProjectPortfolioStatus.Closed,
             dateRange: new FlexibleDateRange(defaultStartDate, defaultEndDate)
         ).Generate();
     }

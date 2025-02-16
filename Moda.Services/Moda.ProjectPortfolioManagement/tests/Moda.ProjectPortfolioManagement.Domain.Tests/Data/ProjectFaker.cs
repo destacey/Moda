@@ -34,7 +34,8 @@ public static class ProjectFakerExtensions
         LocalDateRange? dateRange = null,
         int? expenditureCategoryId = null,
         Guid? portfolioId = null,
-        Guid? programId = null)
+        Guid? programId = null,
+        Dictionary<ProjectRole, HashSet<Guid>>? roles = null)
     {
         if (id.HasValue) { faker.RuleFor(x => x.Id, id.Value); }
         if (key.HasValue) { faker.RuleFor(x => x.Key, key.Value); }
@@ -45,6 +46,26 @@ public static class ProjectFakerExtensions
         if (expenditureCategoryId.HasValue) faker.RuleFor(p => p.ExpenditureCategoryId, expenditureCategoryId.Value);
         if (portfolioId.HasValue) { faker.RuleFor(x => x.PortfolioId, portfolioId.Value); }
         if (programId.HasValue) { faker.RuleFor(x => x.ProgramId, programId.Value); }
+
+        if (roles is not null)
+        {
+            var projectId = id ?? Guid.NewGuid();
+            if (!id.HasValue)
+            {
+                faker.RuleFor(x => x.Id, projectId);
+            }
+
+            HashSet<RoleAssignment<ProjectRole>> updatedRoles = new();
+            foreach (var role in roles)
+            {
+                foreach (var employeeId in role.Value)
+                {
+                    updatedRoles.Add(new RoleAssignment<ProjectRole>(projectId, role.Key, employeeId));
+                }
+            }
+
+            faker.RuleFor("_roles", x => updatedRoles);
+        }
 
         return faker;
     }

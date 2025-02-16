@@ -1,25 +1,25 @@
 ﻿namespace Moda.ProjectPortfolioManagement.Application.Portfolios.Command;
 
-public sealed record CompleteProjectPortfolioCommand(Guid Id) : ICommand;
+public sealed record CloseProjectPortfolioCommand(Guid Id) : ICommand;
 
-public sealed class CompleteProjectPortfolioCommandValidator : AbstractValidator<CompleteProjectPortfolioCommand>
+public sealed class CloseProjectPortfolioCommandValidator : AbstractValidator<CloseProjectPortfolioCommand>
 {
-    public CompleteProjectPortfolioCommandValidator()
+    public CloseProjectPortfolioCommandValidator()
     {
         RuleFor(v => v.Id)
             .NotEmpty();
     }
 }
 
-internal sealed class CompleteProjectPortfolioCommandHandler(IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext, ILogger<CompleteProjectPortfolioCommandHandler> logger, IDateTimeProvider dateTimeProvider) : ICommandHandler<CompleteProjectPortfolioCommand>
+internal sealed class CloseProjectPortfolioCommandHandler(IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext, ILogger<CloseProjectPortfolioCommandHandler> logger, IDateTimeProvider dateTimeProvider) : ICommandHandler<CloseProjectPortfolioCommand>
 {
-    private const string AppRequestName = nameof(CompleteProjectPortfolioCommand);
+    private const string AppRequestName = nameof(CloseProjectPortfolioCommand);
 
     private readonly IProjectPortfolioManagementDbContext _projectPortfolioManagementDbContext = projectPortfolioManagementDbContext;
-    private readonly ILogger<CompleteProjectPortfolioCommandHandler> _logger = logger;
+    private readonly ILogger<CloseProjectPortfolioCommandHandler> _logger = logger;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
-    public async Task<Result> Handle(CompleteProjectPortfolioCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CloseProjectPortfolioCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -31,19 +31,19 @@ internal sealed class CompleteProjectPortfolioCommandHandler(IProjectPortfolioMa
                 return Result.Failure("Project Portfolio not found.");
             }
 
-            var completeResult = portfolio.Complete(_dateTimeProvider.Today);
-            if (completeResult.IsFailure)
+            var closeResult = portfolio.Close(_dateTimeProvider.Today);
+            if (closeResult.IsFailure)
             {
                 // Reset the entity
                 await _projectPortfolioManagementDbContext.Entry(portfolio).ReloadAsync(cancellationToken);
                 portfolio.ClearDomainEvents();
 
-                _logger.LogError("Unable to complete Project Portfolio {ProjectPortfolioId}.  Error message: {Error}", request.Id, completeResult.Error);
-                return Result.Failure(completeResult.Error);
+                _logger.LogError("Unable to close Project Portfolio {ProjectPortfolioId}.  Error message: {Error}", request.Id, closeResult.Error);
+                return Result.Failure(closeResult.Error);
             }
             await _projectPortfolioManagementDbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Project Portfolio {ProjectPortfolioId} completed.", request.Id);
+            _logger.LogInformation("Project Portfolio {ProjectPortfolioId} closed.", request.Id);
 
             return Result.Success();
         }

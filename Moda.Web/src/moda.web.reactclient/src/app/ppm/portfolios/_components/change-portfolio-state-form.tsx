@@ -5,7 +5,7 @@ import { ProjectPortfolioDetailsDto } from '@/src/services/moda-api'
 import {
   useActivatePortfolioMutation,
   useArchivePortfolioMutation,
-  useCompletePortfolioMutation,
+  useClosePortfolioMutation,
 } from '@/src/store/features/ppm/portfolios-api'
 import { Modal, Space } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
 
 export enum PortfolioStateAction {
   Activate = 'Activate',
-  Complete = 'Complete',
+  Close = 'Close',
   Archive = 'Archive',
 }
 
@@ -21,8 +21,8 @@ const stateActionToPastTense = (stateAction: PortfolioStateAction) => {
   switch (stateAction) {
     case PortfolioStateAction.Activate:
       return 'activated'
-    case PortfolioStateAction.Complete:
-      return 'completed'
+    case PortfolioStateAction.Close:
+      return 'closed'
     case PortfolioStateAction.Archive:
       return 'archived'
     default:
@@ -34,8 +34,8 @@ const stateActionToPresentTense = (stateAction: PortfolioStateAction) => {
   switch (stateAction) {
     case PortfolioStateAction.Activate:
       return 'activating'
-    case PortfolioStateAction.Complete:
-      return 'completing'
+    case PortfolioStateAction.Close:
+      return 'closing'
     case PortfolioStateAction.Archive:
       return 'archiving'
     default:
@@ -58,8 +58,8 @@ const ChangePortfolioStateForm = (props: ChangePortfolioStateFormProps) => {
 
   const [activatePortfolioMutation, { error: activateError }] =
     useActivatePortfolioMutation()
-  const [completePortfolioMutation, { error: completeError }] =
-    useCompletePortfolioMutation()
+  const [closePortfolioMutation, { error: closeError }] =
+    useClosePortfolioMutation()
   const [archivePortfolioMutation, { error: archiveError }] =
     useArchivePortfolioMutation()
 
@@ -78,8 +78,8 @@ const ChangePortfolioStateForm = (props: ChangePortfolioStateFormProps) => {
       let response = null
       if (stateAction === PortfolioStateAction.Activate) {
         response = await activatePortfolioMutation(request)
-      } else if (stateAction === PortfolioStateAction.Complete) {
-        response = await completePortfolioMutation(request)
+      } else if (stateAction === PortfolioStateAction.Close) {
+        response = await closePortfolioMutation(request)
       } else if (stateAction === PortfolioStateAction.Archive) {
         response = await archivePortfolioMutation(request)
       }

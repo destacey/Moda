@@ -2972,10 +2972,10 @@ export class PortfoliosClient {
     }
 
     /**
-     * Complete a project portfolio.
+     * Close a project portfolio.
      */
-    complete(id: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/ppm/portfolios/{id}/complete";
+    close(id: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/portfolios/{id}/close";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
@@ -2996,11 +2996,11 @@ export class PortfoliosClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processComplete(_response);
+            return this.processClose(_response);
         });
     }
 
-    protected processComplete(response: AxiosResponse): Promise<void> {
+    protected processClose(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -12653,6 +12653,12 @@ export interface ProjectPortfolioListDto {
     name?: string;
     description?: string;
     status?: SimpleNavigationDto;
+    portfolioSponsors?: EmployeeNavigationDto[];
+    portfolioOwners?: EmployeeNavigationDto[];
+    portfolioManagers?: EmployeeNavigationDto[];
+}
+
+export interface EmployeeNavigationDto extends NavigationDto {
 }
 
 export interface ProjectPortfolioDetailsDto {
@@ -12661,6 +12667,9 @@ export interface ProjectPortfolioDetailsDto {
     name?: string;
     description?: string;
     status?: SimpleNavigationDto;
+    portfolioSponsors?: EmployeeNavigationDto[];
+    portfolioOwners?: EmployeeNavigationDto[];
+    portfolioManagers?: EmployeeNavigationDto[];
 }
 
 export interface CreatePortfolioRequest {
@@ -12668,6 +12677,9 @@ export interface CreatePortfolioRequest {
     name: string;
     /** A detailed description of the portfolio’s purpose. */
     description: string;
+    sponsorIds?: string[] | undefined;
+    ownerIds?: string[] | undefined;
+    managerIds?: string[] | undefined;
 }
 
 export interface UpdatePortfolioRequest {
@@ -12677,6 +12689,9 @@ export interface UpdatePortfolioRequest {
     name: string;
     /** A detailed description of the portfolio’s purpose. */
     description: string;
+    sponsorIds?: string[] | undefined;
+    ownerIds?: string[] | undefined;
+    managerIds?: string[] | undefined;
 }
 
 export interface PlanningIntervalListDto {
@@ -12961,9 +12976,6 @@ export interface WorkItemNavigationDto {
 
 export interface WorkTeamNavigationDto extends NavigationDto {
     type?: string;
-}
-
-export interface EmployeeNavigationDto extends NavigationDto {
 }
 
 export interface WorkItemProgressDailyRollupDto extends WorkItemProgressRollupDto {

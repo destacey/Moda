@@ -19,9 +19,15 @@ public sealed record UpdatePortfolioRequest
     /// </summary>
     public required string Description { get; set; }
 
+    public List<Guid>? SponsorIds { get; set; } = [];
+
+    public List<Guid>? OwnerIds { get; set; } = [];
+
+    public List<Guid>? ManagerIds { get; set; } = [];
+
     public UpdateProjectPortfolioCommand ToUpdateProjectPortfolioCommand()
     {
-        return new UpdateProjectPortfolioCommand(Id, Name, Description);
+        return new UpdateProjectPortfolioCommand(Id, Name, Description, SponsorIds, OwnerIds, ManagerIds);
     }
 }
 

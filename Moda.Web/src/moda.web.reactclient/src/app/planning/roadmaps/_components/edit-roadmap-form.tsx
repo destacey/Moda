@@ -18,6 +18,7 @@ import dayjs from 'dayjs'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
 import { MarkdownEditor } from '@/src/components/common/markdown'
+import { EmployeeSelect } from '@/src/components/common/organizations'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -298,17 +299,10 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
               },
             ]}
           >
-            <Select
-              mode="multiple"
-              allowClear
+            <EmployeeSelect
+              employees={employeeData ?? []}
+              allowMultiple={true}
               placeholder="Select one or more roadmap managers"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
-              options={employeeData}
             />
           </Item>
           <Item

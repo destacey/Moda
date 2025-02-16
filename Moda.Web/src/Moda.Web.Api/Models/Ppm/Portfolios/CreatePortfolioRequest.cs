@@ -14,9 +14,15 @@ public sealed record CreatePortfolioRequest
     /// </summary>
     public required string Description { get; set; }
 
+    public List<Guid>? SponsorIds { get; set; } = [];
+
+    public List<Guid>? OwnerIds { get; set; } = [];
+
+    public List<Guid>? ManagerIds { get; set; } = [];
+
     public CreateProjectPortfolioCommand ToCreateProjectPortfolioCommand()
     {
-        return new CreateProjectPortfolioCommand(Name, Description);
+        return new CreateProjectPortfolioCommand(Name, Description, SponsorIds, OwnerIds, ManagerIds);
     }
 }
 
@@ -31,5 +37,17 @@ public sealed class CreatePortfolioRequestValidator : CustomValidator<CreatePort
         RuleFor(p => p.Description)
             .NotEmpty()
             .MaximumLength(1024);
+
+        RuleFor(x => x.SponsorIds)
+            .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
+            .WithMessage("SponsorIds cannot contain empty GUIDs.");
+
+        RuleFor(x => x.OwnerIds)
+            .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
+            .WithMessage("OwnerIds cannot contain empty GUIDs.");
+
+        RuleFor(x => x.ManagerIds)
+            .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
+            .WithMessage("ManagerIds cannot contain empty GUIDs.");
     }
 }

@@ -1,11 +1,13 @@
 'use client'
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
+import { EmployeeSelect } from '@/src/components/common/organizations'
 import useAuth from '@/src/components/contexts/auth'
 import { CreatePortfolioRequest } from '@/src/services/moda-api'
+import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useCreatePortfolioMutation } from '@/src/store/features/ppm/portfolios-api'
 import { toFormErrors } from '@/src/utils'
-import { Form, Input, Modal } from 'antd'
+import { Form, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
@@ -22,6 +24,9 @@ export interface CreatePortfolioFormProps {
 interface CreatePortfolioFormValues {
   name: string
   description: string
+  sponsorIds: string[]
+  ownerIds: string[]
+  managerIds: string[]
 }
 
 const mapToRequestValues = (
@@ -30,6 +35,9 @@ const mapToRequestValues = (
   return {
     name: values.name,
     description: values.description,
+    sponsorIds: values.sponsorIds,
+    ownerIds: values.ownerIds,
+    managerIds: values.managerIds,
   } as CreatePortfolioRequest
 }
 
@@ -42,6 +50,12 @@ const CreatePortfolioForm = (props: CreatePortfolioFormProps) => {
 
   const [createPortfolio, { error: mutationError }] =
     useCreatePortfolioMutation()
+
+  const {
+    data: employeeData,
+    isLoading: employeeOptionsIsLoading,
+    error: employeeOptionsError,
+  } = useGetEmployeeOptionsQuery(false)
 
   const { hasPermissionClaim } = useAuth()
   const canCreatePortfolio = hasPermissionClaim(
@@ -155,6 +169,27 @@ const CreatePortfolioForm = (props: CreatePortfolioFormProps) => {
                 form.setFieldValue('description', value || '')
               }
               maxLength={1024}
+            />
+          </Item>
+          <Item name="sponsorIds" label="Sponsors">
+            <EmployeeSelect
+              employees={employeeData ?? []}
+              allowMultiple={true}
+              placeholder="Select Sponsors"
+            />
+          </Item>
+          <Item name="ownerIds" label="Owners">
+            <EmployeeSelect
+              employees={employeeData ?? []}
+              allowMultiple={true}
+              placeholder="Select Owners"
+            />
+          </Item>
+          <Item name="managerIds" label="Managers">
+            <EmployeeSelect
+              employees={employeeData ?? []}
+              allowMultiple={true}
+              placeholder="Select Managers"
             />
           </Item>
         </Form>

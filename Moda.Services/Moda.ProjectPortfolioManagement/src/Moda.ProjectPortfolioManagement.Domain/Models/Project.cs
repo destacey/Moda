@@ -12,12 +12,13 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 {
     private string _name = default!;
     private string _description = default!;
+    private readonly HashSet<RoleAssignment<ProjectRole>> _roles = [];
 
     private readonly HashSet<StrategicTheme> _strategicThemes = [];
 
     private Project() { }
 
-    private Project(string name, string description, ProjectStatus status, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId = null)
+    private Project(string name, string description, ProjectStatus status, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId = null, Dictionary<ProjectRole, HashSet<Guid>>? roles = null)
     {
         if (Status is ProjectStatus.Active or ProjectStatus.Completed && dateRange is null)
         {
@@ -32,6 +33,12 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 
         PortfolioId = portfolioId;
         ProgramId = programId;
+
+        _roles = roles?
+            .SelectMany(r => r.Value
+                .Select(e => new RoleAssignment<ProjectRole>(Id, r.Key, e)))
+            .ToHashSet()
+            ?? [];
     }
 
     /// <summary>
@@ -61,6 +68,11 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// The current status of the project.
     /// </summary>
     public ProjectStatus Status { get; private set; }
+
+    /// <summary>
+    /// The roles associated with the project.
+    /// </summary>
+    public IReadOnlyCollection<RoleAssignment<ProjectRole>> Roles => _roles;
 
     /// <summary>
     /// The date range defining the project's planned timeline.
@@ -117,6 +129,32 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
         ExpenditureCategoryId = expenditureCategoryId;
 
         return Result.Success();
+    }
+
+    /// <summary>
+    /// Assigns an employee to a specific role within the project, allowing multiple employees per role.
+    /// </summary>
+    public Result AssignRole(ProjectRole role, Guid employeeId)
+    {
+        return RoleManager.AssignRole(_roles, Id, role, employeeId);
+    }
+
+    /// <summary>
+    /// Removes an employee from a specific role.
+    /// </summary>
+    public Result RemoveRole(ProjectRole role, Guid employeeId)
+    {
+        return RoleManager.RemoveAssignment(_roles, role, employeeId);
+    }
+
+    /// <summary>
+    /// Updates the roles for the project.
+    /// </summary>
+    /// <param name="updatedRoles"></param>
+    /// <returns></returns>
+    public Result UpdateRoles(Dictionary<ProjectRole, HashSet<Guid>> updatedRoles)
+    {
+        return RoleManager.UpdateRoles(_roles, Id, updatedRoles);
     }
 
     public Result UpdateTimeline(LocalDateRange? dateRange)
@@ -291,9 +329,11 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// <param name="expenditureCategoryId"></param>
     /// <param name="dateRange"></param>
     /// <param name="portfolioId"></param>
+    /// <param name="programId"></param>
+    /// <param name="roles"></param>
     /// <returns></returns>
-    internal static Project Create(string name, string description, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId)
+    internal static Project Create(string name, string description, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId, Dictionary<ProjectRole, HashSet<Guid>>? roles = null)
     {
-        return new Project(name, description, ProjectStatus.Proposed, expenditureCategoryId, dateRange, portfolioId);
+        return new Project(name, description, ProjectStatus.Proposed, expenditureCategoryId, dateRange, portfolioId, programId, roles);
     }
 }

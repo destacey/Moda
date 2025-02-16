@@ -15,8 +15,8 @@ public enum ProjectPortfolioStatus
     [Display(Name = "On Hold", Description = "The portfolio is temporarily paused, and active work on associated projects/programs is halted.", Order = 3)]
     OnHold = 3,
 
-    [Display(Name = "Completed", Description = "The project portfolio has been successfully executed. All associated projects/programs must be completed or canceled.", Order = 4)]
-    Completed = 4,
+    [Display(Name = "Closed", Description = "The project portfolio has been successfully executed. All associated projects/programs must be completed or canceled.", Order = 4)]
+    Closed = 4,
 
     [Display(Name = "Archived", Description = "The project portfolio is no longer active but retained for historical purposes.", Order = 5)]
     Archived = 5

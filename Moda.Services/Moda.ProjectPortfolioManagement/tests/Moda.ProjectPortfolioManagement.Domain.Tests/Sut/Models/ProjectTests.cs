@@ -34,7 +34,7 @@ public class ProjectTests
         var expenditureCategoryId = 1;
 
         // Act
-        var project = Project.Create(name, description, expenditureCategoryId, null, portfolioId);
+        var project = Project.Create(name, description, expenditureCategoryId, null, portfolioId, null);
 
         // Assert
         project.Should().NotBeNull();
@@ -144,6 +144,188 @@ public class ProjectTests
     }
 
     #endregion UpdateTimeline Tests
+
+    #region Roles
+
+    [Fact]
+    public void AssignRole_ShouldAssignEmployeeToRoleSuccessfully()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var project = _projectFaker.Generate();
+
+        // Act
+        var result = project.AssignRole(ProjectRole.Owner, employeeId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Roles.Should().ContainSingle();
+        project.Roles.First().Role.Should().Be(ProjectRole.Owner);
+        project.Roles.First().EmployeeId.Should().Be(employeeId);
+    }
+
+    [Fact]
+    public void AssignRole_ShouldFail_WhenEmployeeAlreadyAssignedToRole()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var project = _projectFaker.WithData(roles: new Dictionary<ProjectRole, HashSet<Guid>>
+        {
+            { ProjectRole.Owner, new HashSet<Guid> { employeeId } }
+        }).Generate();
+
+        // Act
+        var result = project.AssignRole(ProjectRole.Owner, employeeId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Employee is already assigned to this role.");
+    }
+
+    [Fact]
+    public void RemoveRole_WithOneRoleAssignment_ShouldRemoveEmployeeFromRoleSuccessfully()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var project = _projectFaker.WithData(roles: new Dictionary<ProjectRole, HashSet<Guid>>
+        {
+            { ProjectRole.Owner, new HashSet<Guid> { employeeId } }
+        }).Generate();
+
+        // Act
+        var result = project.RemoveRole(ProjectRole.Owner, employeeId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Roles.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void RemoveRole_WithMultipleRoleAssignments_ShouldRemoveEmployeeFromRoleSuccessfully()
+    {
+        // Arrange
+        var employeeId1 = Guid.NewGuid();
+        var employeeId2 = Guid.NewGuid();
+        var project = _projectFaker.WithData(roles: new Dictionary<ProjectRole, HashSet<Guid>>
+        {
+            { ProjectRole.Owner, new HashSet<Guid> { employeeId1, employeeId2 } }
+        }).Generate();
+
+        // Act
+        var result = project.RemoveRole(ProjectRole.Owner, employeeId1);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Roles.Count.Should().Be(1);
+        project.Roles.First().Role.Should().Be(ProjectRole.Owner);
+        project.Roles.First().EmployeeId.Should().Be(employeeId2);
+    }
+
+    [Fact]
+    public void RemoveRole_ShouldFail_WhenEmployeeNotAssignedToRole()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var project = _projectFaker.Generate();
+
+        // Act
+        var result = project.RemoveRole(ProjectRole.Owner, employeeId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Employee is not assigned to this role.");
+    }
+
+
+    [Fact]
+    public void UpdateRoles_ShouldAssignNewRolesSuccessfully()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var employee1 = Guid.NewGuid();
+        var employee2 = Guid.NewGuid();
+        var updatedRoles = new Dictionary<ProjectRole, HashSet<Guid>>
+        {
+            { ProjectRole.Manager, new HashSet<Guid> { employee1, employee2 } }
+        };
+
+        // Act
+        var result = project.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Roles.Should().Contain(role => role.Role == ProjectRole.Manager && role.EmployeeId == employee1);
+        project.Roles.Should().Contain(role => role.Role == ProjectRole.Manager && role.EmployeeId == employee2);
+    }
+
+    [Fact]
+    public void UpdateRoles_ShouldRemoveUnspecifiedRoles()
+    {
+        // Arrange
+        var project = _projectFaker.WithData(roles: new Dictionary<ProjectRole, HashSet<Guid>>
+        {
+            { ProjectRole.Manager, new HashSet<Guid> { Guid.NewGuid(), Guid.NewGuid() } },
+            { ProjectRole.Owner, new HashSet<Guid> { Guid.NewGuid() } }
+        }).Generate();
+
+        var updatedRoles = new Dictionary<ProjectRole, HashSet<Guid>>
+        {
+            { ProjectRole.Manager, new HashSet<Guid> { Guid.NewGuid() } }  // Remove Owner role
+        };
+
+        // Act
+        var result = project.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Roles.Should().Contain(role => role.Role == ProjectRole.Manager);
+        project.Roles.Should().NotContain(role => role.Role == ProjectRole.Owner); // Removed role
+    }
+
+    [Fact]
+    public void UpdateRoles_ShouldNotChange_WhenRolesAreUnchanged()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var project = _projectFaker.WithData(roles: new Dictionary<ProjectRole, HashSet<Guid>>
+        {
+            { ProjectRole.Sponsor, new HashSet<Guid> { employeeId } }
+        }).Generate();
+
+        var updatedRoles = new Dictionary<ProjectRole, HashSet<Guid>>
+        {
+            { ProjectRole.Sponsor, new HashSet<Guid> { employeeId } }
+        };
+
+        // Act
+        var result = project.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Roles.Count.Should().Be(1);
+        project.Roles.Should().Contain(role => role.Role == ProjectRole.Sponsor && role.EmployeeId == employeeId);
+    }
+
+    [Fact]
+    public void UpdateRoles_ShouldFail_WhenInvalidRoleProvided()
+    {
+        // Arrange
+        var project = _projectFaker.Generate();
+        var invalidRole = (ProjectRole)999;
+        var updatedRoles = new Dictionary<ProjectRole, HashSet<Guid>>
+        {
+            { invalidRole, new HashSet<Guid> { Guid.NewGuid() } }
+        };
+
+        // Act
+        var result = project.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be($"Role is not a valid {nameof(ProjectRole)} value.");
+    }
+
+    #endregion Roles
 
     #region Lifecycle Tests
 

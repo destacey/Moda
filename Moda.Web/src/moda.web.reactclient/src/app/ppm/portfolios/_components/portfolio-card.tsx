@@ -1,37 +1,44 @@
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { ProjectPortfolioListDto } from '@/src/services/moda-api'
-import { Card, Descriptions, Tag, Typography } from 'antd'
+import { Card, Descriptions, Tag } from 'antd'
 import { useRouter } from 'next/navigation'
 
-const { Item: DiscriptionItem } = Descriptions
-const { Text } = Typography
+const { Item } = Descriptions
 
 export interface PortfolioCardProps {
   portfolio: ProjectPortfolioListDto
 }
 
-const PortfolioCard: React.FC<PortfolioCardProps> = (
-  props: PortfolioCardProps,
-) => {
+const PortfolioCard: React.FC<PortfolioCardProps> = ({
+  portfolio,
+}: PortfolioCardProps) => {
   const router = useRouter()
 
   return (
     <Card
-      title={props.portfolio.name}
+      title={portfolio.name}
       size="small"
       style={{ width: '100%' }}
       hoverable
-      onClick={() => router.push(`/ppm/portfolios/${props.portfolio.key}`)}
+      onClick={() => router.push(`/ppm/portfolios/${portfolio.key}`)}
     >
       <Descriptions column={1} size="small">
-        <DiscriptionItem label="Key">{props.portfolio.key}</DiscriptionItem>
-        <DiscriptionItem>
-          <MarkdownRenderer markdown={props.portfolio.description} />
-        </DiscriptionItem>
+        <Item label="Key">{portfolio.key}</Item>
+        {portfolio?.portfolioOwners.length > 0 && (
+          <Item label="Owners">
+            {portfolio.portfolioOwners.map((s) => s.name).join(', ')}
+          </Item>
+        )}
+        {portfolio?.portfolioManagers.length > 0 && (
+          <Item label="Managers">
+            {portfolio.portfolioManagers.map((s) => s.name).join(', ')}
+          </Item>
+        )}
+        <Item>
+          <MarkdownRenderer markdown={portfolio.description} />
+        </Item>
       </Descriptions>
-      {props.portfolio?.status.name && (
-        <Tag>{props.portfolio?.status.name}</Tag>
-      )}
+      {portfolio?.status.name && <Tag>{portfolio?.status.name}</Tag>}
     </Card>
   )
 }

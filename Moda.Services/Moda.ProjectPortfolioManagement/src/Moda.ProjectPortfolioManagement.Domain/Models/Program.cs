@@ -12,13 +12,14 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 {
     private string _name = default!;
     private string _description = default!;
+    private readonly HashSet<RoleAssignment<ProgramRole>> _roles = [];
 
     private readonly HashSet<Project> _projects = [];
     private readonly HashSet<StrategicTheme> _strategicThemes = [];
 
     private Program() { }
 
-    private Program(string name, string description, ProgramStatus status, LocalDateRange? dateRange, Guid portfolioId)
+    private Program(string name, string description, ProgramStatus status, LocalDateRange? dateRange, Guid portfolioId, Dictionary<ProgramRole, HashSet<Guid>>? roles = null)
     {
         if (Status is ProgramStatus.Active or ProgramStatus.Completed && dateRange is null)
         {
@@ -30,6 +31,12 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
         Status = status;
         PortfolioId = portfolioId;
         DateRange = dateRange;
+
+        _roles = roles?
+            .SelectMany(r => r.Value
+                .Select(e => new RoleAssignment<ProgramRole>(Id, r.Key, e)))
+            .ToHashSet()
+            ?? [];
     }
 
     /// <summary>
@@ -59,6 +66,11 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// The current status of the program.
     /// </summary>
     public ProgramStatus Status { get; private set; }
+
+    /// <summary>
+    /// The roles associated with this program.
+    /// </summary>
+    public IReadOnlyCollection<RoleAssignment<ProgramRole>> Roles => _roles;
 
     /// <summary>
     /// The date range defining the program's lifecycle.
@@ -116,6 +128,32 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
         DateRange = dateRange;
 
         return Result.Success();
+    }
+
+    /// <summary>
+    /// Assigns an employee to a specific role within the program, allowing multiple employees per role.
+    /// </summary>
+    public Result AssignRole(ProgramRole role, Guid employeeId)
+    {
+        return RoleManager.AssignRole(_roles, Id, role, employeeId);
+    }
+
+    /// <summary>
+    /// Removes an employee from a specific role.
+    /// </summary>
+    public Result RemoveRole(ProgramRole role, Guid employeeId)
+    {
+        return RoleManager.RemoveAssignment(_roles, role, employeeId);
+    }
+
+    /// <summary>
+    /// Updates the roles for the program.
+    /// </summary>
+    /// <param name="updatedRoles"></param>
+    /// <returns></returns>
+    public Result UpdateRoles(Dictionary<ProgramRole, HashSet<Guid>> updatedRoles)
+    {
+        return RoleManager.UpdateRoles(_roles, Id, updatedRoles);
     }
 
     /// <summary>
@@ -324,9 +362,10 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// <param name="description"></param>
     /// <param name="dateRange"></param>
     /// <param name="portfolioId"></param>
+    /// <param name="roles"></param>
     /// <returns></returns>
-    internal static Program Create(string name, string description, LocalDateRange? dateRange, Guid portfolioId)
+    internal static Program Create(string name, string description, LocalDateRange? dateRange, Guid portfolioId, Dictionary<ProgramRole, HashSet<Guid>>? roles = null)
     {
-        return new Program(name, description, ProgramStatus.Proposed, dateRange, portfolioId);
+        return new Program(name, description, ProgramStatus.Proposed, dateRange, portfolioId, roles);
     }
 }

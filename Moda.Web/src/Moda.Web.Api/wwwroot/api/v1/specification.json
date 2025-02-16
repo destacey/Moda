@@ -2216,13 +2216,13 @@
         ]
       }
     },
-    "/api/ppm/portfolios/{id}/complete": {
+    "/api/ppm/portfolios/{id}/close": {
       "post": {
         "tags": [
           "Portfolios"
         ],
-        "summary": "Complete a project portfolio.",
-        "operationId": "Portfolios_Complete",
+        "summary": "Close a project portfolio.",
+        "operationId": "Portfolios_Close",
         "parameters": [
           {
             "name": "id",
@@ -10961,8 +10961,37 @@
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "portfolioSponsors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
+          },
+          "portfolioOwners": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
+          },
+          "portfolioManagers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
           }
         }
+      },
+      "EmployeeNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
       },
       "ProjectPortfolioDetailsDto": {
         "type": "object",
@@ -10986,6 +11015,24 @@
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "portfolioSponsors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
+          },
+          "portfolioOwners": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
+          },
+          "portfolioManagers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeNavigationDto"
+            }
           }
         }
       },
@@ -11010,6 +11057,36 @@
             "maxLength": 1024,
             "minLength": 1,
             "nullable": false
+          },
+          "sponsorIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "ownerIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "managerIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
           }
         }
       },
@@ -11043,6 +11120,36 @@
             "maxLength": 1024,
             "minLength": 1,
             "nullable": false
+          },
+          "sponsorIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "ownerIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          },
+          "managerIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
           }
         }
       },
@@ -12042,17 +12149,6 @@
                 "type": "string"
               }
             }
-          }
-        ]
-      },
-      "EmployeeNavigationDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/NavigationDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false
           }
         ]
       },

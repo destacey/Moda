@@ -48,6 +48,188 @@ public class ProjectPortfolioTests
 
     #endregion Portfolio Creation
 
+
+    #region Roles
+
+    [Fact]
+    public void AssignRole_ShouldAssignEmployeeToPortfolioRoleSuccessfully()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var portfolio = _portfolioFaker.Generate();
+
+        // Act
+        var result = portfolio.AssignRole(ProjectPortfolioRole.Owner, employeeId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        portfolio.Roles.Should().ContainSingle();
+        portfolio.Roles.First().Role.Should().Be(ProjectPortfolioRole.Owner);
+        portfolio.Roles.First().EmployeeId.Should().Be(employeeId);
+    }
+
+    [Fact]
+    public void AssignRole_ShouldFail_WhenEmployeeAlreadyAssignedToRole()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var portfolio = _portfolioFaker.WithData(roles: new Dictionary<ProjectPortfolioRole, HashSet<Guid>>
+        {
+            { ProjectPortfolioRole.Owner, new HashSet<Guid> { employeeId } }
+        }).Generate();
+
+        // Act
+        var result = portfolio.AssignRole(ProjectPortfolioRole.Owner, employeeId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Employee is already assigned to this role.");
+    }
+
+    [Fact]
+    public void RemoveRole_WithOneRoleAssignment_ShouldRemoveEmployeeFromPortfolioRoleSuccessfully()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var portfolio = _portfolioFaker.WithData(roles: new Dictionary<ProjectPortfolioRole, HashSet<Guid>>
+        {
+            { ProjectPortfolioRole.Owner, new HashSet<Guid> { employeeId } }
+        }).Generate();
+
+        // Act
+        var result = portfolio.RemoveRole(ProjectPortfolioRole.Owner, employeeId);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        portfolio.Roles.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void RemoveRole_WithMultipleRoleAssignments_ShouldRemoveEmployeeFromPortfolioRoleSuccessfully()
+    {
+        // Arrange
+        var employeeId1 = Guid.NewGuid();
+        var employeeId2 = Guid.NewGuid();
+        var portfolio = _portfolioFaker.WithData(roles: new Dictionary<ProjectPortfolioRole, HashSet<Guid>>
+        {
+            { ProjectPortfolioRole.Owner, new HashSet<Guid> { employeeId1, employeeId2 } }
+        }).Generate();
+
+        // Act
+        var result = portfolio.RemoveRole(ProjectPortfolioRole.Owner, employeeId1);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        portfolio.Roles.Count.Should().Be(1);
+        portfolio.Roles.First().Role.Should().Be(ProjectPortfolioRole.Owner);
+        portfolio.Roles.First().EmployeeId.Should().Be(employeeId2);
+    }
+
+    [Fact]
+    public void RemoveRole_ShouldFail_WhenEmployeeNotAssignedToRole()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var portfolio = _portfolioFaker.Generate();
+
+        // Act
+        var result = portfolio.RemoveRole(ProjectPortfolioRole.Owner, employeeId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Employee is not assigned to this role.");
+    }
+
+    [Fact]
+    public void UpdateRoles_ShouldAssignNewRolesSuccessfully()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.Generate();
+        var employee1 = Guid.NewGuid();
+        var employee2 = Guid.NewGuid();
+        var updatedRoles = new Dictionary<ProjectPortfolioRole, HashSet<Guid>>
+        {
+            { ProjectPortfolioRole.Manager, new HashSet<Guid> { employee1, employee2 } }
+        };
+
+        // Act
+        var result = portfolio.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        portfolio.Roles.Should().Contain(role => role.Role == ProjectPortfolioRole.Manager && role.EmployeeId == employee1);
+        portfolio.Roles.Should().Contain(role => role.Role == ProjectPortfolioRole.Manager && role.EmployeeId == employee2);
+    }
+
+    [Fact]
+    public void UpdateRoles_ShouldRemoveUnspecifiedRoles()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.WithData(roles: new Dictionary<ProjectPortfolioRole, HashSet<Guid>>
+        {
+            { ProjectPortfolioRole.Manager, new HashSet<Guid> { Guid.NewGuid(), Guid.NewGuid() } },
+            { ProjectPortfolioRole.Owner, new HashSet<Guid> { Guid.NewGuid() } }
+        }).Generate();
+
+        var updatedRoles = new Dictionary<ProjectPortfolioRole, HashSet<Guid>>
+        {
+            { ProjectPortfolioRole.Manager, new HashSet<Guid> { Guid.NewGuid() } }  // Remove Owner role
+        };
+
+        // Act
+        var result = portfolio.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        portfolio.Roles.Should().Contain(role => role.Role == ProjectPortfolioRole.Manager);
+        portfolio.Roles.Should().NotContain(role => role.Role == ProjectPortfolioRole.Owner); // Removed role
+    }
+
+    [Fact]
+    public void UpdateRoles_ShouldNotChange_WhenRolesAreUnchanged()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var portfolio = _portfolioFaker.WithData(roles: new Dictionary<ProjectPortfolioRole, HashSet<Guid>>
+        {
+            { ProjectPortfolioRole.Sponsor, new HashSet<Guid> { employeeId } }
+        }).Generate();
+
+        var updatedRoles = new Dictionary<ProjectPortfolioRole, HashSet<Guid>>
+        {
+            { ProjectPortfolioRole.Sponsor, new HashSet<Guid> { employeeId } }
+        };
+
+        // Act
+        var result = portfolio.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        portfolio.Roles.Count.Should().Be(1);
+        portfolio.Roles.Should().Contain(role => role.Role == ProjectPortfolioRole.Sponsor && role.EmployeeId == employeeId);
+    }
+
+    [Fact]
+    public void UpdateRoles_ShouldFail_WhenInvalidRoleProvided()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.Generate();
+        var invalidRole = (ProjectPortfolioRole)999;
+        var updatedRoles = new Dictionary<ProjectPortfolioRole, HashSet<Guid>>
+        {
+            { invalidRole, new HashSet<Guid> { Guid.NewGuid() } }
+        };
+
+        // Act
+        var result = portfolio.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be($"Role is not a valid {nameof(ProjectPortfolioRole)} value.");
+    }
+
+    #endregion Roles
+
     #region Lifecycle Tests
 
     [Fact]
@@ -68,7 +250,7 @@ public class ProjectPortfolioTests
     }
 
     [Fact]
-    public void Complete_ShouldFail_WhenPortfolioHasOpenProjectsOrPrograms()
+    public void Close_ShouldFail_WhenPortfolioHasOpenProjectsOrPrograms()
     {
         // Arrange
         var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
@@ -78,15 +260,15 @@ public class ProjectPortfolioTests
         var endDate = _dateTimeProvider.Today.PlusDays(10);
 
         // Act
-        var result = portfolio.Complete(endDate);
+        var result = portfolio.Close(endDate);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("All projects must be completed or canceled before the portfolio can be completed.");
+        result.Error.Should().Be("All projects must be completed or canceled before the portfolio can be closed.");
     }
 
     [Fact]
-    public void Complete_ShouldCompletePortfolioSuccessfully()
+    public void Close_ShouldClosePortfolioSuccessfully()
     {
         // Arrange
         var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
@@ -104,17 +286,17 @@ public class ProjectPortfolioTests
         completeProjectResult.IsSuccess.Should().BeTrue();
 
         // Act
-        var result = portfolio.Complete(endDate);
+        var result = portfolio.Close(endDate);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        portfolio.Status.Should().Be(ProjectPortfolioStatus.Completed);
+        portfolio.Status.Should().Be(ProjectPortfolioStatus.Closed);
         portfolio.DateRange.Should().NotBeNull();
         portfolio.DateRange!.End.Should().Be(endDate);
     }
 
     [Fact]
-    public void Archive_ShouldFail_WhenPortfolioIsNotCompleted()
+    public void Archive_ShouldFail_WhenPortfolioIsNotClosed()
     {
         // Arrange
         var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
@@ -124,7 +306,7 @@ public class ProjectPortfolioTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("Only completed portfolios can be archived.");
+        result.Error.Should().Be("Only closed portfolios can be archived.");
     }
 
     [Fact]
@@ -175,7 +357,7 @@ public class ProjectPortfolioTests
     }
 
     [Fact]
-    public void Complete_ShouldFail_WhenPortfolioHasProgramsWithOpenProjects()
+    public void Close_ShouldFail_WhenPortfolioHasProgramsWithOpenProjects()
     {
         // Arrange
         var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
@@ -187,11 +369,11 @@ public class ProjectPortfolioTests
         var endDate = _dateTimeProvider.Today.PlusDays(10);
 
         // Act
-        var result = portfolio.Complete(endDate);
+        var result = portfolio.Close(endDate);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("All programs must be completed or canceled before the portfolio can be completed.");
+        result.Error.Should().Be("All programs must be completed or canceled before the portfolio can be closed.");
     }
 
 
@@ -313,7 +495,7 @@ public class ProjectPortfolioTests
     public void ChangeProjectProgram_ShouldFail_WhenProgramNotInPortfolio()
     {
         // Arrange
-        var portfolio1 = _portfolioFaker.PortfolioWithProgramsAndProjects(_dateTimeProvider,1,0);
+        var portfolio1 = _portfolioFaker.PortfolioWithProgramsAndProjects(_dateTimeProvider, 1, 0);
 
         var program1 = portfolio1.Programs.First();
 

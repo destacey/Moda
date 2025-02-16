@@ -26,6 +26,36 @@ const PortfoliosGrid: React.FC<PortfoliosGridProps> = (
       { field: 'name', cellRenderer: PortfolioLinkCellRenderer },
       // { field: 'description', width: 300 },
       { field: 'status.name', headerName: 'Status' },
+      {
+        field: 'portfolioSponsors',
+        headerName: 'Sponsors',
+        valueGetter: (params) =>
+          params.data.portfolioSponsors
+            .slice()
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((m) => m.name)
+            .join(', '),
+      },
+      {
+        field: 'portfolioOwners',
+        headerName: 'Owners',
+        valueGetter: (params) =>
+          params.data.portfolioOwners
+            .slice()
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((m) => m.name)
+            .join(', '),
+      },
+      {
+        field: 'portfolioManagers',
+        headerName: 'Managers',
+        valueGetter: (params) =>
+          params.data.portfolioManagers
+            .slice()
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((m) => m.name)
+            .join(', '),
+      },
     ],
     [],
   )

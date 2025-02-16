@@ -1,8 +1,10 @@
 ﻿using Moda.Common.Application.Models;
+using Moda.ProjectPortfolioManagement.Domain.Enums;
+using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.Portfolios.Command;
 
-public sealed record UpdateProjectPortfolioCommand(Guid Id, string Name, string Description) : ICommand;
+public sealed record UpdateProjectPortfolioCommand(Guid Id, string Name, string Description, List<Guid>? SponsorIds, List<Guid>? OwnerIds, List<Guid>? ManagerIds) : ICommand;
 
 public sealed class UpdateProjectPortfolioCommandValidator : AbstractValidator<UpdateProjectPortfolioCommand>
 {
@@ -17,6 +19,18 @@ public sealed class UpdateProjectPortfolioCommandValidator : AbstractValidator<U
 
         RuleFor(x => x.Description)
             .MaximumLength(1024);
+
+        RuleFor(x => x.SponsorIds)
+            .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
+            .WithMessage("SponsorIds cannot contain empty GUIDs.");
+
+        RuleFor(x => x.OwnerIds)
+            .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
+            .WithMessage("OwnerIds cannot contain empty GUIDs.");
+
+        RuleFor(x => x.ManagerIds)
+            .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
+            .WithMessage("ManagerIds cannot contain empty GUIDs.");
     }
 }
 
@@ -37,27 +51,33 @@ internal sealed class UpdateProjectPortfolioCommandHandler(
         try
         {
             var portfolio = await _projectPortfolioManagementDbContext.Portfolios
+                .Include(p => p.Roles)
                 .FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
-
             if (portfolio is null)
             {
                 _logger.LogInformation("Project Portfolio {ProjectPortfolioId} not found.", request.Id);
                 return Result.Failure("Project Portfolio not found.");
             }
 
+            if (portfolio.Status == ProjectPortfolioStatus.Archived)
+            {
+                _logger.LogInformation("Project Portfolio {ProjectPortfolioId} is archived and cannot be updated.", request.Id);
+                return Result.Failure("Project Portfolio is archived and cannot be updated.");
+            }
+
             var updateResult = portfolio.UpdateDetails(
                 request.Name,
                 request.Description
                 );
-
             if (updateResult.IsFailure)
             {
-                // Reset the entity
-                await _projectPortfolioManagementDbContext.Entry(portfolio).ReloadAsync(cancellationToken);
-                portfolio.ClearDomainEvents();
+                return await HandleDomainFailure(portfolio, updateResult, cancellationToken);
+            }
 
-                _logger.LogError("Unable to update Project Portfolio {ProjectPortfolioId}.  Error message: {Error}", request.Id, updateResult.Error);
-                return Result.Failure(updateResult.Error);
+            var roles = GetRoles(request);
+            var updateRolesResult = portfolio.UpdateRoles(roles);
+            if (updateRolesResult.IsFailure) {
+                return await HandleDomainFailure(portfolio, updateRolesResult, cancellationToken);
             }
 
             await _projectPortfolioManagementDbContext.SaveChangesAsync(cancellationToken);
@@ -71,5 +91,35 @@ internal sealed class UpdateProjectPortfolioCommandHandler(
             _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
             return Result.Failure<ObjectIdAndKey>($"Error handling {AppRequestName} command.");
         }
+    }
+
+    private static Dictionary<ProjectPortfolioRole, HashSet<Guid>> GetRoles(UpdateProjectPortfolioCommand request)
+    {
+        Dictionary<ProjectPortfolioRole, HashSet<Guid>>? roles = [];
+
+        if (request.SponsorIds != null && request.SponsorIds.Count != 0)
+        {
+            roles.Add(ProjectPortfolioRole.Sponsor, [.. request.SponsorIds]);
+        }
+        if (request.OwnerIds != null && request.OwnerIds.Count != 0)
+        {
+            roles.Add(ProjectPortfolioRole.Owner, [.. request.OwnerIds]);
+        }
+        if (request.ManagerIds != null && request.ManagerIds.Count != 0)
+        {
+            roles.Add(ProjectPortfolioRole.Manager, [.. request.ManagerIds]);
+        }
+
+        return roles;
+    }
+
+    private async Task<Result<ObjectIdAndKey>> HandleDomainFailure(ProjectPortfolio portfolio, Result errorResult, CancellationToken cancellationToken)
+    {
+        // Reset the entity
+        await _projectPortfolioManagementDbContext.Entry(portfolio).ReloadAsync(cancellationToken);
+        portfolio.ClearDomainEvents();
+
+        _logger.LogError("Unable to update Project Portfolio {ProjectPortfolioId}.  Error message: {Error}", portfolio.Id, errorResult.Error);
+        return Result.Failure<ObjectIdAndKey>(errorResult.Error);
     }
 }

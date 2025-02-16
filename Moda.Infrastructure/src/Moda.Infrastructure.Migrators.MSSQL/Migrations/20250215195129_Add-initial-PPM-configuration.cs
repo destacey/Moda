@@ -78,6 +78,38 @@ public partial class AddinitialPPMconfiguration : Migration
             });
 
         migrationBuilder.CreateTable(
+            name: "PortfolioRoleAssignments",
+            schema: "Ppm",
+            columns: table => new
+            {
+                ObjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Role = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
+                EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                SystemCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                SystemCreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                SystemLastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                SystemLastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_PortfolioRoleAssignments", x => new { x.ObjectId, x.EmployeeId, x.Role });
+                table.ForeignKey(
+                    name: "FK_PortfolioRoleAssignments_Employees_EmployeeId",
+                    column: x => x.EmployeeId,
+                    principalSchema: "Organization",
+                    principalTable: "Employees",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Restrict);
+                table.ForeignKey(
+                    name: "FK_PortfolioRoleAssignments_Portfolios_ObjectId",
+                    column: x => x.ObjectId,
+                    principalSchema: "Ppm",
+                    principalTable: "Portfolios",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
+            });
+
+        migrationBuilder.CreateTable(
             name: "Programs",
             schema: "Ppm",
             columns: table => new
@@ -105,6 +137,38 @@ public partial class AddinitialPPMconfiguration : Migration
                     column: x => x.PortfolioId,
                     principalSchema: "Ppm",
                     principalTable: "Portfolios",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
+            });
+
+        migrationBuilder.CreateTable(
+            name: "ProgramRoleAssignments",
+            schema: "Ppm",
+            columns: table => new
+            {
+                ObjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Role = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
+                EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                SystemCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                SystemCreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                SystemLastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                SystemLastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_ProgramRoleAssignments", x => new { x.ObjectId, x.EmployeeId, x.Role });
+                table.ForeignKey(
+                    name: "FK_ProgramRoleAssignments_Employees_EmployeeId",
+                    column: x => x.EmployeeId,
+                    principalSchema: "Organization",
+                    principalTable: "Employees",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Restrict);
+                table.ForeignKey(
+                    name: "FK_ProgramRoleAssignments_Programs_ObjectId",
+                    column: x => x.ObjectId,
+                    principalSchema: "Ppm",
+                    principalTable: "Programs",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
             });
@@ -183,6 +247,38 @@ public partial class AddinitialPPMconfiguration : Migration
             });
 
         migrationBuilder.CreateTable(
+            name: "ProjectRoleAssignments",
+            schema: "Ppm",
+            columns: table => new
+            {
+                ObjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Role = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false),
+                EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                SystemCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                SystemCreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                SystemLastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                SystemLastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_ProjectRoleAssignments", x => new { x.ObjectId, x.EmployeeId, x.Role });
+                table.ForeignKey(
+                    name: "FK_ProjectRoleAssignments_Employees_EmployeeId",
+                    column: x => x.EmployeeId,
+                    principalSchema: "Organization",
+                    principalTable: "Employees",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Restrict);
+                table.ForeignKey(
+                    name: "FK_ProjectRoleAssignments_Projects_ObjectId",
+                    column: x => x.ObjectId,
+                    principalSchema: "Ppm",
+                    principalTable: "Projects",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
+            });
+
+        migrationBuilder.CreateTable(
             name: "ProjectStrategicThemes",
             schema: "Ppm",
             columns: table => new
@@ -210,10 +306,34 @@ public partial class AddinitialPPMconfiguration : Migration
             });
 
         migrationBuilder.CreateIndex(
+            name: "IX_PortfolioRoleAssignments_EmployeeId",
+            schema: "Ppm",
+            table: "PortfolioRoleAssignments",
+            column: "EmployeeId");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_PortfolioRoleAssignments_ObjectId",
+            schema: "Ppm",
+            table: "PortfolioRoleAssignments",
+            column: "ObjectId");
+
+        migrationBuilder.CreateIndex(
             name: "IX_Portfolios_Status",
             schema: "Ppm",
             table: "Portfolios",
             column: "Status");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_ProgramRoleAssignments_EmployeeId",
+            schema: "Ppm",
+            table: "ProgramRoleAssignments",
+            column: "EmployeeId");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_ProgramRoleAssignments_ObjectId",
+            schema: "Ppm",
+            table: "ProgramRoleAssignments",
+            column: "ObjectId");
 
         migrationBuilder.CreateIndex(
             name: "IX_Programs_PortfolioId",
@@ -232,6 +352,18 @@ public partial class AddinitialPPMconfiguration : Migration
             schema: "Ppm",
             table: "ProgramStrategicThemes",
             column: "StrategicThemeId");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_ProjectRoleAssignments_EmployeeId",
+            schema: "Ppm",
+            table: "ProjectRoleAssignments",
+            column: "EmployeeId");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_ProjectRoleAssignments_ObjectId",
+            schema: "Ppm",
+            table: "ProjectRoleAssignments",
+            column: "ObjectId");
 
         migrationBuilder.CreateIndex(
             name: "IX_Projects_ExpenditureCategoryId",
@@ -268,7 +400,7 @@ public partial class AddinitialPPMconfiguration : Migration
             schema: "Ppm",
             table: "StrategicThemes",
             column: "State");
-
+        
         // Seed data in the ExpenditureCategories table
         migrationBuilder.InsertData(
             schema: "Ppm",
@@ -287,7 +419,19 @@ public partial class AddinitialPPMconfiguration : Migration
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropTable(
+            name: "PortfolioRoleAssignments",
+            schema: "Ppm");
+
+        migrationBuilder.DropTable(
+            name: "ProgramRoleAssignments",
+            schema: "Ppm");
+
+        migrationBuilder.DropTable(
             name: "ProgramStrategicThemes",
+            schema: "Ppm");
+
+        migrationBuilder.DropTable(
+            name: "ProjectRoleAssignments",
             schema: "Ppm");
 
         migrationBuilder.DropTable(

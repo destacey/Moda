@@ -28,7 +28,8 @@ public static class ProgramFakerExtensions
         string? description = null,
         ProgramStatus? status = null,
         LocalDateRange? dateRange = null,
-        Guid? portfolioId = null)
+        Guid? portfolioId = null,
+        Dictionary<ProgramRole, HashSet<Guid>>? roles = null)
     {
         if (id.HasValue) { faker.RuleFor(x => x.Id, id.Value); }
         if (!string.IsNullOrWhiteSpace(name)) { faker.RuleFor(x => x.Name, name); }
@@ -36,6 +37,26 @@ public static class ProgramFakerExtensions
         if (status.HasValue) { faker.RuleFor(x => x.Status, status); }
         if (dateRange is not null) { faker.RuleFor(x => x.DateRange, dateRange); }
         if (portfolioId.HasValue) { faker.RuleFor(x => x.PortfolioId, portfolioId.Value); }
+
+        if (roles is not null)
+        {
+            var programId = id ?? Guid.NewGuid();
+            if (!id.HasValue)
+            {
+                faker.RuleFor(x => x.Id, programId);
+            }
+
+            HashSet<RoleAssignment<ProgramRole>> updatedRoles = new();
+            foreach (var role in roles)
+            {
+                foreach (var employeeId in role.Value)
+                {
+                    updatedRoles.Add(new RoleAssignment<ProgramRole>(programId, role.Key, employeeId));
+                }
+            }
+
+            faker.RuleFor("_roles", x => updatedRoles);
+        }
 
         return faker;
     }
