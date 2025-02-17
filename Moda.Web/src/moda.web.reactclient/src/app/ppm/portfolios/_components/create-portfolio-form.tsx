@@ -154,7 +154,10 @@ const CreatePortfolioForm = (props: CreatePortfolioFormProps) => {
           <Item
             label="Name"
             name="name"
-            rules={[{ required: true, message: 'Name is required' }]}
+            rules={[
+              { required: true, message: 'Name is required' },
+              { max: 128 },
+            ]}
           >
             <TextArea
               autoSize={{ minRows: 1, maxRows: 2 }}
@@ -162,7 +165,14 @@ const CreatePortfolioForm = (props: CreatePortfolioFormProps) => {
               maxLength={128}
             />
           </Item>
-          <Item name="description" label="Description" rules={[{ max: 1024 }]}>
+          <Item
+            name="description"
+            label="Description"
+            rules={[
+              { required: true, message: 'Description is required' },
+              { max: 1024 },
+            ]}
+          >
             <MarkdownEditor
               value={form.getFieldValue('description')}
               onChange={(value) =>

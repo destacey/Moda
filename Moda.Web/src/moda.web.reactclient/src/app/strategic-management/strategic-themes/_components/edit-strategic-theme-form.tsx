@@ -185,11 +185,21 @@ const EditStrategicThemeForm = (props: EditStrategicThemeFormProps) => {
           <Item
             label="Name"
             name="name"
-            rules={[{ required: true, message: 'Name is required' }]}
+            rules={[
+              { required: true, message: 'Name is required' },
+              { max: 64 },
+            ]}
           >
             <Input maxLength={64} showCount />
           </Item>
-          <Item name="description" label="Description" rules={[{ max: 1024 }]}>
+          <Item
+            name="description"
+            label="Description"
+            rules={[
+              { required: true, message: 'Description is required' },
+              { max: 1024 },
+            ]}
+          >
             <MarkdownEditor
               value={form.getFieldValue('description')}
               onChange={(value) =>
