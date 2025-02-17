@@ -80,6 +80,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
 
     #region IProjectPortfolioManagementDbContext
 
+    public DbSet<ExpenditureCategory> ExpenditureCategories => Set<ExpenditureCategory>();
     public DbSet<ProjectPortfolio> Portfolios => Set<ProjectPortfolio>();
     public DbSet<Program> Programs => Set<Program>();
     public DbSet<Project> Projects => Set<Project>();

@@ -133,13 +133,11 @@ export const portfoliosApi = apiSlice.injectEndpoints({
     }),
     deletePortfolio: builder.mutation<
       void,
-      { strategicThemeId: string; cacheKey: number }
+      { portfolioId: string; cacheKey: number }
     >({
-      queryFn: async ({ strategicThemeId }) => {
+      queryFn: async ({ portfolioId }) => {
         try {
-          const data = await (
-            await getPortfoliosClient()
-          ).delete(strategicThemeId)
+          const data = await (await getPortfoliosClient()).delete(portfolioId)
           return { data }
         } catch (error) {
           console.error('API Error:', error)

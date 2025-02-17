@@ -86,9 +86,9 @@ public static class ProjectPortfolioFakerExtensions
     }
 
     /// <summary>
-    /// Generates a completed portfolio with a start date 20 days ago and end date 10 days ago.
+    /// Generates a closed portfolio with a start date 20 days ago and end date 10 days ago.
     /// </summary>
-    public static ProjectPortfolio CompletedPortfolio(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
+    public static ProjectPortfolio ClosedPortfolio(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
     {
         var now = dateTimeProvider.Today;
         var defaultStartDate = now.PlusDays(-20);
@@ -96,6 +96,21 @@ public static class ProjectPortfolioFakerExtensions
 
         return faker.WithData(
             status: ProjectPortfolioStatus.Closed,
+            dateRange: new FlexibleDateRange(defaultStartDate, defaultEndDate)
+        ).Generate();
+    }
+
+    /// <summary>
+    /// Generates an archived portfolio with a start date 20 days ago and end date 10 days ago.
+    /// </summary>
+    public static ProjectPortfolio ArchivedPortfolio(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
+    {
+        var now = dateTimeProvider.Today;
+        var defaultStartDate = now.PlusDays(-20);
+        var defaultEndDate = now.PlusDays(-10);
+
+        return faker.WithData(
+            status: ProjectPortfolioStatus.Archived,
             dateRange: new FlexibleDateRange(defaultStartDate, defaultEndDate)
         ).Generate();
     }

@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Moda.Common.Domain.Employees;
 using Moda.Common.Models;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
@@ -24,7 +25,7 @@ public class ProjectPortfolioTests
         _projectFaker = new ProjectFaker();
     }
 
-    #region Portfolio Creation
+    #region Portfolio Create and Update
 
     [Fact]
     public void Create_ShouldCreateProposedPortfolioSuccessfully()
@@ -46,8 +47,40 @@ public class ProjectPortfolioTests
         portfolio.Programs.Should().BeEmpty();
     }
 
-    #endregion Portfolio Creation
+    [Fact]
+    public void Update_ShouldUpdatePortfolioSuccessfully()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.Generate();
+        var updatedName = "Updated Portfolio";
+        var updatedDescription = "Updated Description";
 
+        // Act
+        var result = portfolio.UpdateDetails(updatedName, updatedDescription);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        portfolio.Name.Should().Be(updatedName);
+        portfolio.Description.Should().Be(updatedDescription);
+    }
+
+    [Fact]
+    public void Update_ShouldFail_WhenPortfolioIsReadonly()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.ArchivedPortfolio(_dateTimeProvider);
+        var updatedName = "Updated Portfolio";
+        var updatedDescription = "Updated Description";
+
+        // Act
+        var result = portfolio.UpdateDetails(updatedName, updatedDescription);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Project Portfolio is readonly and cannot be updated.");
+    }
+
+    #endregion Portfolio Create and Update
 
     #region Roles
 
@@ -84,6 +117,20 @@ public class ProjectPortfolioTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("Employee is already assigned to this role.");
+    }
+
+    [Fact]
+    public void AssignRole_ShouldFail_WhenPortfolioIsReadonly()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.ArchivedPortfolio(_dateTimeProvider);
+
+        // Act
+        var result = portfolio.AssignRole(ProjectPortfolioRole.Owner, Guid.NewGuid());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Project Portfolio is readonly and cannot be updated.");
     }
 
     [Fact]
@@ -138,6 +185,20 @@ public class ProjectPortfolioTests
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("Employee is not assigned to this role.");
+    }
+
+    [Fact]
+    public void RemoveRole_ShouldFail_WhenPortfolioIsReadonly()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.ArchivedPortfolio(_dateTimeProvider);
+
+        // Act
+        var result = portfolio.RemoveRole(ProjectPortfolioRole.Owner, Guid.NewGuid());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Project Portfolio is readonly and cannot be updated.");
     }
 
     [Fact]
@@ -228,6 +289,25 @@ public class ProjectPortfolioTests
         result.Error.Should().Be($"Role is not a valid {nameof(ProjectPortfolioRole)} value.");
     }
 
+    [Fact]
+    public void UpdateRoles_ShouldFail_WhenPortfolioIsReadonly()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.ArchivedPortfolio(_dateTimeProvider);
+
+        var updatedRoles = new Dictionary<ProjectPortfolioRole, HashSet<Guid>>
+        {
+            { ProjectPortfolioRole.Sponsor, new HashSet<Guid> { Guid.NewGuid() } }
+        };
+
+        // Act
+        var result = portfolio.UpdateRoles(updatedRoles);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Project Portfolio is readonly and cannot be updated.");
+    }
+
     #endregion Roles
 
     #region Lifecycle Tests
@@ -313,7 +393,7 @@ public class ProjectPortfolioTests
     public void Archive_ShouldArchiveCompletedPortfolioSuccessfully()
     {
         // Arrange
-        var portfolio = _portfolioFaker.CompletedPortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.ClosedPortfolio(_dateTimeProvider);
 
         // Act
         var result = portfolio.Archive();

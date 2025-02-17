@@ -36,15 +36,13 @@ public sealed class UpdateProjectPortfolioCommandValidator : AbstractValidator<U
 
 internal sealed class UpdateProjectPortfolioCommandHandler(
     IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext,
-    ILogger<UpdateProjectPortfolioCommandHandler> logger,
-    IDateTimeProvider dateTimeProvider)
+    ILogger<UpdateProjectPortfolioCommandHandler> logger)
     : ICommandHandler<UpdateProjectPortfolioCommand>
 {
     private const string AppRequestName = nameof(UpdateProjectPortfolioCommand);
 
     private readonly IProjectPortfolioManagementDbContext _projectPortfolioManagementDbContext = projectPortfolioManagementDbContext;
     private readonly ILogger<UpdateProjectPortfolioCommandHandler> _logger = logger;
-    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<Result> Handle(UpdateProjectPortfolioCommand request, CancellationToken cancellationToken)
     {
@@ -57,12 +55,6 @@ internal sealed class UpdateProjectPortfolioCommandHandler(
             {
                 _logger.LogInformation("Project Portfolio {ProjectPortfolioId} not found.", request.Id);
                 return Result.Failure("Project Portfolio not found.");
-            }
-
-            if (portfolio.Status == ProjectPortfolioStatus.Archived)
-            {
-                _logger.LogInformation("Project Portfolio {ProjectPortfolioId} is archived and cannot be updated.", request.Id);
-                return Result.Failure("Project Portfolio is archived and cannot be updated.");
             }
 
             var updateResult = portfolio.UpdateDetails(

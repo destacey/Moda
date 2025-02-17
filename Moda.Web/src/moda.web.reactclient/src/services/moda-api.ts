@@ -2585,6 +2585,454 @@ export class VisionsClient {
     }
 }
 
+export class ExpenditureCategoriesClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get a list of expenditure categories.
+     */
+    getExpenditureCategories( cancelToken?: CancelToken): Promise<ExpenditureCategoryListDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/expenditure-categories";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetExpenditureCategories(_response);
+        });
+    }
+
+    protected processGetExpenditureCategories(response: AxiosResponse): Promise<ExpenditureCategoryListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ExpenditureCategoryListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ExpenditureCategoryListDto[]>(null as any);
+    }
+
+    /**
+     * Create an expenditure category.
+     */
+    create(request: CreateExpenditureCategoryRequest, cancelToken?: CancelToken): Promise<number> {
+        let url_ = this.baseUrl + "/api/ppm/expenditure-categories";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreate(_response);
+        });
+    }
+
+    protected processCreate(response: AxiosResponse): Promise<number> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 201) {
+            const _responseText = response.data;
+            let result201: any = null;
+            let resultData201  = _responseText;
+            result201 = JSON.parse(resultData201);
+            return Promise.resolve<number>(result201);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<number>(null as any);
+    }
+
+    /**
+     * Get expenditure category details.
+     */
+    getExpenditureCategory(id: number, cancelToken?: CancelToken): Promise<ExpenditureCategoryDetailsDto> {
+        let url_ = this.baseUrl + "/api/ppm/expenditure-categories/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetExpenditureCategory(_response);
+        });
+    }
+
+    protected processGetExpenditureCategory(response: AxiosResponse): Promise<ExpenditureCategoryDetailsDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ExpenditureCategoryDetailsDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ExpenditureCategoryDetailsDto>(null as any);
+    }
+
+    /**
+     * Update an expenditure category.
+     */
+    update(id: number, request: UpdateExpenditureCategoryRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/expenditure-categories/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdate(_response);
+        });
+    }
+
+    protected processUpdate(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Delete an expenditure category.
+     */
+    delete(id: number, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/expenditure-categories/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Activate an expenditure category.
+     */
+    activate(id: number, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/expenditure-categories/{id}/activate";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processActivate(_response);
+        });
+    }
+
+    protected processActivate(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Archive an expenditure category.
+     */
+    archive(id: number, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/expenditure-categories/{id}/archive";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processArchive(_response);
+        });
+    }
+
+    protected processArchive(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+}
+
 export class PortfoliosClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -12645,6 +13093,52 @@ export interface UpdateVisionRequest {
 }
 
 export interface VisionStateDto extends CommonEnumDto {
+}
+
+export interface ExpenditureCategoryListDto {
+    id?: number;
+    name?: string;
+    state?: SimpleNavigationDto;
+    isCapitalizable?: boolean;
+    requiresDepreciation?: boolean;
+    accountingCode?: string | undefined;
+}
+
+export interface ExpenditureCategoryDetailsDto {
+    id?: number;
+    name?: string;
+    description?: string;
+    state?: SimpleNavigationDto;
+    isCapitalizable?: boolean;
+    requiresDepreciation?: boolean;
+    accountingCode?: string | undefined;
+}
+
+export interface CreateExpenditureCategoryRequest {
+    /** The name of the expenditure category (e.g., "Opex", "Capex", "Hybrid", etc.). */
+    name: string;
+    /** Detailed description of what qualifies under this expenditure category. */
+    description: string;
+    /** Defines whether the expenditure is treated as capitalizable. */
+    isCapitalizable?: boolean;
+    /** Defines whether the expenditure requires asset depreciation tracking. */
+    requiresDepreciation?: boolean;
+    /** Reporting codes or financial classifications for the expenditure category. */
+    accountingCode?: string | undefined;
+}
+
+export interface UpdateExpenditureCategoryRequest {
+    id?: number;
+    /** The name of the expenditure category (e.g., "Opex", "Capex", "Hybrid", etc.). */
+    name: string;
+    /** Detailed description of what qualifies under this expenditure category. */
+    description: string;
+    /** Defines whether the expenditure is treated as capitalizable. */
+    isCapitalizable?: boolean;
+    /** Defines whether the expenditure requires asset depreciation tracking. */
+    requiresDepreciation?: boolean;
+    /** Reporting codes or financial classifications for the expenditure category. */
+    accountingCode?: string | undefined;
 }
 
 export interface ProjectPortfolioListDto {

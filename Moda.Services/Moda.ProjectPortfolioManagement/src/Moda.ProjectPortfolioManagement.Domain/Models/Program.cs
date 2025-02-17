@@ -108,6 +108,12 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     public IReadOnlyCollection<StrategicTheme> StrategicThemes => _strategicThemes;
 
     /// <summary>
+    /// Indicates whether the program can be deleted.
+    /// </summary>
+    /// <returns></returns>
+    public bool CanBeDeleted() => Status is ProgramStatus.Proposed;
+
+    /// <summary>
     /// Updates the program details.
     /// </summary>
     public Result UpdateDetails(string name, string description)

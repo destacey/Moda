@@ -400,19 +400,6 @@ public partial class AddinitialPPMconfiguration : Migration
             schema: "Ppm",
             table: "StrategicThemes",
             column: "State");
-        
-        // Seed data in the ExpenditureCategories table
-        migrationBuilder.InsertData(
-            schema: "Ppm",
-            table: "ExpenditureCategories",
-            columns: new[] { "Id", "Name", "Description", "State", "IsCapitalizable", "RequiresDepreciation", "AccountingCode", "SystemCreated", "SystemCreatedBy", "SystemLastModified", "SystemLastModifiedBy" },
-            values: new object[] { 1, "OpEx", "Operational Expenditure", "Active", false, false, null, DateTime.UtcNow, "00000000-0000-0000-0000-000000000000", DateTime.UtcNow, "00000000-0000-0000-0000-000000000000" });
-
-        migrationBuilder.InsertData(
-            schema: "Ppm",
-            table: "ExpenditureCategories",
-            columns: new[] { "Id", "Name", "Description", "State", "IsCapitalizable", "RequiresDepreciation", "AccountingCode", "SystemCreated", "SystemCreatedBy", "SystemLastModified", "SystemLastModifiedBy" },
-            values: new object[] { 2, "CapEx", "Capital Expenditure", "Active", true, true, null, DateTime.UtcNow, "00000000-0000-0000-0000-000000000000", DateTime.UtcNow, "00000000-0000-0000-0000-000000000000" });
     }
 
     /// <inheritdoc />

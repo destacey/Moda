@@ -1913,6 +1913,342 @@
         ]
       }
     },
+    "/api/ppm/expenditure-categories": {
+      "get": {
+        "tags": [
+          "ExpenditureCategories"
+        ],
+        "summary": "Get a list of expenditure categories.",
+        "operationId": "ExpenditureCategories_GetExpenditureCategories",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExpenditureCategoryListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "ExpenditureCategories"
+        ],
+        "summary": "Create an expenditure category.",
+        "operationId": "ExpenditureCategories_Create",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExpenditureCategoryRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/expenditure-categories/{id}": {
+      "get": {
+        "tags": [
+          "ExpenditureCategories"
+        ],
+        "summary": "Get expenditure category details.",
+        "operationId": "ExpenditureCategories_GetExpenditureCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenditureCategoryDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "ExpenditureCategories"
+        ],
+        "summary": "Update an expenditure category.",
+        "operationId": "ExpenditureCategories_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExpenditureCategoryRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "ExpenditureCategories"
+        ],
+        "summary": "Delete an expenditure category.",
+        "operationId": "ExpenditureCategories_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/expenditure-categories/{id}/activate": {
+      "post": {
+        "tags": [
+          "ExpenditureCategories"
+        ],
+        "summary": "Activate an expenditure category.",
+        "operationId": "ExpenditureCategories_Activate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/expenditure-categories/{id}/archive": {
+      "post": {
+        "tags": [
+          "ExpenditureCategories"
+        ],
+        "summary": "Archive an expenditure category.",
+        "operationId": "ExpenditureCategories_Archive",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/ppm/portfolios": {
       "get": {
         "tags": [
@@ -10938,6 +11274,143 @@
             "additionalProperties": false
           }
         ]
+      },
+      "ExpenditureCategoryListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "isCapitalizable": {
+            "type": "boolean"
+          },
+          "requiresDepreciation": {
+            "type": "boolean"
+          },
+          "accountingCode": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ExpenditureCategoryDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "isCapitalizable": {
+            "type": "boolean"
+          },
+          "requiresDepreciation": {
+            "type": "boolean"
+          },
+          "accountingCode": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CreateExpenditureCategoryRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "description"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the expenditure category (e.g., \"Opex\", \"Capex\", \"Hybrid\", etc.).",
+            "maxLength": 64,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of what qualifies under this expenditure category.",
+            "maxLength": 1024,
+            "minLength": 1,
+            "nullable": false
+          },
+          "isCapitalizable": {
+            "type": "boolean",
+            "description": "Defines whether the expenditure is treated as capitalizable."
+          },
+          "requiresDepreciation": {
+            "type": "boolean",
+            "description": "Defines whether the expenditure requires asset depreciation tracking."
+          },
+          "accountingCode": {
+            "type": "string",
+            "description": "Reporting codes or financial classifications for the expenditure category.",
+            "maxLength": 64,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
+      "UpdateExpenditureCategoryRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the expenditure category (e.g., \"Opex\", \"Capex\", \"Hybrid\", etc.).",
+            "maxLength": 64,
+            "minLength": 1,
+            "nullable": false
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of what qualifies under this expenditure category.",
+            "maxLength": 1024,
+            "minLength": 1,
+            "nullable": false
+          },
+          "isCapitalizable": {
+            "type": "boolean",
+            "description": "Defines whether the expenditure is treated as capitalizable."
+          },
+          "requiresDepreciation": {
+            "type": "boolean",
+            "description": "Defines whether the expenditure requires asset depreciation tracking."
+          },
+          "accountingCode": {
+            "type": "string",
+            "description": "Reporting codes or financial classifications for the expenditure category.",
+            "maxLength": 64,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
       },
       "ProjectPortfolioListDto": {
         "type": "object",

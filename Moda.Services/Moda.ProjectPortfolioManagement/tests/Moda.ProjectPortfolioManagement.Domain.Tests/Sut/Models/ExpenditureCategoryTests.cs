@@ -44,7 +44,7 @@ public class ExpenditureCategoryTests
     #region Update Tests
 
     [Fact]
-    public void UpdateDetails_ShouldUpdateAllFields_WhenProposed()
+    public void Update_ShouldUpdateAllFields_WhenProposed()
     {
         // Arrange
         var category = _faker.GenerateProposed();
@@ -55,7 +55,7 @@ public class ExpenditureCategoryTests
         var newAccountingCode = "Updated-AC-1001";
 
         // Act
-        var result = category.UpdateDetails(newName, newDescription, newIsCapitalizable, newRequiresDepreciation, newAccountingCode);
+        var result = category.Update(newName, newDescription, newIsCapitalizable, newRequiresDepreciation, newAccountingCode);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -67,7 +67,7 @@ public class ExpenditureCategoryTests
     }
 
     [Fact]
-    public void UpdateDetails_ShouldFail_WhenActive_IfCapitalizationChanges()
+    public void Update_ShouldFail_WhenActive_IfCapitalizationChanges()
     {
         // Arrange
         var category = _faker.GenerateActive();
@@ -78,7 +78,7 @@ public class ExpenditureCategoryTests
         var newAccountingCode = "Updated-AC-1001";
 
         // Act
-        var result = category.UpdateDetails(newName, newDescription, newIsCapitalizable, newRequiresDepreciation, newAccountingCode);
+        var result = category.Update(newName, newDescription, newIsCapitalizable, newRequiresDepreciation, newAccountingCode);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -86,7 +86,7 @@ public class ExpenditureCategoryTests
     }
 
     [Fact]
-    public void UpdateDetails_ShouldFail_WhenArchived()
+    public void Update_ShouldFail_WhenArchived()
     {
         // Arrange
         var category = _faker.GenerateArchived();
@@ -94,7 +94,7 @@ public class ExpenditureCategoryTests
         var newDescription = "Updated Description";
 
         // Act
-        var result = category.UpdateDetails(newName, newDescription, category.IsCapitalizable, category.RequiresDepreciation, category.AccountingCode);
+        var result = category.Update(newName, newDescription, category.IsCapitalizable, category.RequiresDepreciation, category.AccountingCode);
 
         // Assert
         result.IsFailure.Should().BeTrue();

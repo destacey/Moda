@@ -10,6 +10,8 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// </summary>
 public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 {
+    private const string ReadOnlyErrorMessage = "Project Portfolio is readonly and cannot be updated.";
+
     private string _name = default!;
     private string _description = default!;
     private readonly HashSet<RoleAssignment<ProjectPortfolioRole>> _roles = [];
@@ -92,6 +94,11 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     public IReadOnlyCollection<Project> Projects => _projects;
 
     /// <summary>
+    /// Indicates whether the portfolio is readonly.
+    /// </summary>
+    public bool IsReadOnly => Status is ProjectPortfolioStatus.Archived;
+
+    /// <summary>
     /// Indicates whether the portfolio can be deleted.
     /// </summary>
     /// <returns></returns>
@@ -102,6 +109,11 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// </summary>
     public Result UpdateDetails(string name, string description)
     {
+        if (IsReadOnly)
+        {
+            return Result.Failure(ReadOnlyErrorMessage);
+        }
+
         Name = name;
         Description = description;
 
@@ -113,6 +125,11 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// </summary>
     public Result AssignRole(ProjectPortfolioRole role, Guid employeeId)
     {
+        if (IsReadOnly)
+        {
+            return Result.Failure(ReadOnlyErrorMessage);
+        }
+
         return RoleManager.AssignRole(_roles, Id, role, employeeId);
     }
 
@@ -121,6 +138,11 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// </summary>
     public Result RemoveRole(ProjectPortfolioRole role, Guid employeeId)
     {
+        if (IsReadOnly)
+        {
+            return Result.Failure(ReadOnlyErrorMessage);
+        }
+
         return RoleManager.RemoveAssignment(_roles, role, employeeId);
     }
 
@@ -131,6 +153,11 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// <returns></returns>
     public Result UpdateRoles(Dictionary<ProjectPortfolioRole, HashSet<Guid>> updatedRoles)
     {
+        if (IsReadOnly)
+        {
+            return Result.Failure(ReadOnlyErrorMessage);
+        }
+
         return RoleManager.UpdateRoles(_roles, Id, updatedRoles);
     }
 
@@ -194,9 +221,9 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     {
         Guard.Against.Null(endDate, nameof(endDate));
 
-        if (Status != ProjectPortfolioStatus.Active)
+        if (Status is not ProjectPortfolioStatus.Active or ProjectPortfolioStatus.OnHold)
         {
-            return Result.Failure("Only active portfolios can be closed.");
+            return Result.Failure("Only active or on hold portfolios can be closed.");
         }
 
         if (DateRange == null)

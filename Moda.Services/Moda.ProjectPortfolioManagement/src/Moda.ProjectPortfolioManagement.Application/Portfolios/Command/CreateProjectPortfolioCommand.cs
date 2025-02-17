@@ -33,14 +33,13 @@ public sealed class CreateProjectPortfolioCommandValidator : AbstractValidator<C
 
 internal sealed class CreateProjectPortfolioCommandHandler(
     IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext,
-    ILogger<CreateProjectPortfolioCommandHandler> logger,
-    IDateTimeProvider dateTimeProvider) : ICommandHandler<CreateProjectPortfolioCommand, ObjectIdAndKey>
+    ILogger<CreateProjectPortfolioCommandHandler> logger)
+    : ICommandHandler<CreateProjectPortfolioCommand, ObjectIdAndKey>
 {
     private const string AppRequestName = nameof(CreateProjectPortfolioCommand);
 
     private readonly IProjectPortfolioManagementDbContext _projectPortfolioManagementDbContext = projectPortfolioManagementDbContext;
     private readonly ILogger<CreateProjectPortfolioCommandHandler> _logger = logger;
-    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<Result<ObjectIdAndKey>> Handle(CreateProjectPortfolioCommand request, CancellationToken cancellationToken)
     {

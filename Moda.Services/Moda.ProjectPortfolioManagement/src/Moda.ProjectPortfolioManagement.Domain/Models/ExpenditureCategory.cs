@@ -60,9 +60,15 @@ public sealed class ExpenditureCategory : BaseEntity<int>, ISystemAuditable
     public string? AccountingCode { get; private set; }
 
     /// <summary>
+    /// Indicates whether the expenditure category can be deleted.
+    /// </summary>
+    /// <returns></returns>
+    public bool CanBeDeleted() => State is ExpenditureCategoryState.Proposed;
+
+    /// <summary>
     /// Updates the expenditure category details. Once active, capitalizable and depreciation settings cannot be changed.
     /// </summary>
-    public Result UpdateDetails(string name, string description, bool isCapitalizable, bool requiresDepreciation, string? accountingCode)
+    public Result Update(string name, string description, bool isCapitalizable, bool requiresDepreciation, string? accountingCode)
     {
         if (State == ExpenditureCategoryState.Archived)
         {
@@ -129,4 +135,3 @@ public sealed class ExpenditureCategory : BaseEntity<int>, ISystemAuditable
         return new ExpenditureCategory(name, description, ExpenditureCategoryState.Proposed, isCapitalizable, requiresDepreciation, accountingCode);
     }
 }
-

@@ -120,6 +120,12 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     public IReadOnlyList<StrategicTheme> StrategicThemes => _strategicThemes.ToList().AsReadOnly();
 
     /// <summary>
+    /// Indicates whether the project can be deleted.
+    /// </summary>
+    /// <returns></returns>
+    public bool CanBeDeleted() => Status is ProjectStatus.Proposed;
+
+    /// <summary>
     /// Updates the project details.
     /// </summary>
     public Result UpdateDetails(string name, string description, int expenditureCategoryId)

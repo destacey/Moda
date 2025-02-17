@@ -34,6 +34,7 @@ export enum QueryTags {
   RoadmapVisibility = 'Planning.RoadmapVisibility',
 
   // PPM
+  ExpenditureCategory = 'Ppm.ExpenditureCategory',
   Portfolio = 'Ppm.Portfolio',
 
   // STRATEGIC MANAGEMENT

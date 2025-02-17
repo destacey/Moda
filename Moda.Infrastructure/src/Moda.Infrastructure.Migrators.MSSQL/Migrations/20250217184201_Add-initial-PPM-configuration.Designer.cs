@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20250215195129_Add-initial-PPM-configuration")]
+    [Migration("20250217184201_Add-initial-PPM-configuration")]
     partial class AddinitialPPMconfiguration
     {
         /// <inheritdoc />
