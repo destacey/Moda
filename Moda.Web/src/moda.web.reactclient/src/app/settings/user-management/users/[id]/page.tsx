@@ -5,10 +5,10 @@ import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
 import UserDetailsLoading from './loading'
 import { useEffect, useState } from 'react'
-import UserDetails from './user-details'
 import { Card, message } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
+import { UserDetails } from '../_components'
 
 const UserDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')

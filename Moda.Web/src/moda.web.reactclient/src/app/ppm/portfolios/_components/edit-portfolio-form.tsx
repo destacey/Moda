@@ -38,10 +38,10 @@ interface UpdatePortfolioFormValues {
 
 const mapToRequestValues = (
   values: UpdatePortfolioFormValues,
-  strategicThemeId: string,
+  portfolioId: string,
 ): UpdatePortfolioRequest => {
   return {
-    id: strategicThemeId,
+    id: portfolioId,
     name: values.name,
     description: values.description,
     sponsorIds: values.sponsorIds,

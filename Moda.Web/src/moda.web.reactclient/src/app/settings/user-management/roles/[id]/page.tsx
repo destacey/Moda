@@ -3,13 +3,12 @@
 import PageTitle from '@/src/components/common/page-title'
 import { Card } from 'antd'
 import { useState } from 'react'
-import RoleDetails from './components/role-details'
-import Permissions from './components/permissions'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { useGetRoleQuery } from '@/src/store/features/user-management/roles-api'
+import { Permissions, RoleDetails } from '../_components'
 
 const RoleDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')

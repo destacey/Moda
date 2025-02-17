@@ -70,6 +70,7 @@ const PortfoliosPage: React.FC = () => {
   )
 
   const actions = useMemo(() => {
+    if (!showActions) return null
     return (
       <>
         {canCreatePortfolio && (
@@ -79,12 +80,19 @@ const PortfoliosPage: React.FC = () => {
         )}
       </>
     )
-  }, [canCreatePortfolio])
+  }, [canCreatePortfolio, showActions])
+
+  const onCreatePortfolioFormClosed = (wasCreated: boolean) => {
+    setOpenCreatePortfolioForm(false)
+    if (wasCreated) {
+      refetch()
+    }
+  }
 
   return (
     <>
       {contextHolder}
-      <PageTitle title="Portfolios" actions={showActions && actions} />
+      <PageTitle title="Portfolios" actions={actions} />
       {currentView === Views.Cards ? (
         <PortfoliosCardGrid
           portfolios={portfolioData}
@@ -104,8 +112,8 @@ const PortfoliosPage: React.FC = () => {
       {openCreatePortfolioForm && (
         <CreatePortfolioForm
           showForm={openCreatePortfolioForm}
-          onFormComplete={() => setOpenCreatePortfolioForm(false)}
-          onFormCancel={() => setOpenCreatePortfolioForm(false)}
+          onFormComplete={() => onCreatePortfolioFormClosed(true)}
+          onFormCancel={() => onCreatePortfolioFormClosed(false)}
           messageApi={messageApi}
         />
       )}

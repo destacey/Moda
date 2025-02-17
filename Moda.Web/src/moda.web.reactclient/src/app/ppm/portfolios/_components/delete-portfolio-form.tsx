@@ -27,13 +27,11 @@ const DeletePortfolioForm = (props: DeletePortfolioFormProps) => {
     'Permissions.ProjectPortfolios.Delete',
   )
 
-  const deletePortfolio = async (
-    strategicTheme: ProjectPortfolioDetailsDto,
-  ) => {
+  const deletePortfolio = async (portfolio: ProjectPortfolioDetailsDto) => {
     try {
       const response = await deletePortfolioMutation({
-        strategicThemeId: strategicTheme.id,
-        cacheKey: strategicTheme.key,
+        portfolioId: portfolio.id,
+        cacheKey: portfolio.key,
       })
 
       if (response.error) {

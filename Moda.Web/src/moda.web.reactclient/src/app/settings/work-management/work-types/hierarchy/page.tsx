@@ -8,7 +8,7 @@ import { useDocumentTitle } from '@/src/hooks'
 import { useGetWorkTypeLevelsQuery } from '@/src/store/features/work-management/work-type-level-api'
 import { useGetWorkTypeTiersQuery } from '@/src/store/features/work-management/work-type-tier-api'
 import { Space, Spin } from 'antd'
-import { WorkTypeTierCard } from '../components'
+import { WorkTypeTierCard } from '../_components'
 
 const HierarchyPage = () => {
   useDocumentTitle('Work Management - Work Type Hierarchy')
