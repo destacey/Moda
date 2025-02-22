@@ -14,8 +14,8 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
 
     private string _name = default!;
     private string _description = default!;
-    private readonly HashSet<RoleAssignment<ProjectPortfolioRole>> _roles = [];
 
+    private readonly HashSet<RoleAssignment<ProjectPortfolioRole>> _roles = [];
     private readonly HashSet<Program> _programs = [];
     private readonly HashSet<Project> _projects = [];
 
@@ -275,15 +275,17 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// <param name="name">The name of the program.</param>
     /// <param name="description">The description of the program.</param>
     /// <param name="dateRange">The date range of the program (optional).</param>
+    /// <param name="roles">The roles associated with the program (optional).</param>
+    /// <param name="strategicThemes">The strategic themes associated with the program (optional).</param>
     /// <returns>A result containing the created program or an error.</returns>
-    public Result<Program> CreateProgram(string name, string description, LocalDateRange? dateRange)
+    public Result<Program> CreateProgram(string name, string description, LocalDateRange? dateRange, Dictionary<ProgramRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
     {
         if (Status != ProjectPortfolioStatus.Active && Status != ProjectPortfolioStatus.OnHold)
         {
             return Result.Failure<Program>("Programs can only be created in active or on-hold portfolios.");
         }
 
-        var program = Program.Create(name, description, dateRange, Id);
+        var program = Program.Create(name, description, dateRange, Id, roles, strategicThemes);
         _programs.Add(program);
 
         return Result.Success(program);
@@ -295,9 +297,13 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// </summary>
     /// <param name="name">The name of the project.</param>
     /// <param name="description">The description of the project.</param>
+    /// <param name="expenditureCategoryId">The ID of the expenditure category associated with the project.</param>
+    /// <param name="dateRange">The date range of the project (optional).</param>
     /// <param name="programId">The ID of the program the project should be associated with (optional).</param>
+    /// <param name="roles">The roles associated with the project (optional).</param>
+    /// <param name="strategicThemes">The strategic themes associated with the project (optional).</param>
     /// <returns>A result containing the created project or an error.</returns>
-    public Result<Project> CreateProject(string name, string description, int expenditureCategoryId, LocalDateRange? dateRange, Guid? programId = null)
+    public Result<Project> CreateProject(string name, string description, int expenditureCategoryId, LocalDateRange? dateRange, Guid? programId = null, Dictionary<ProjectRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
     {
         if (Status != ProjectPortfolioStatus.Active && Status != ProjectPortfolioStatus.OnHold)
         {
@@ -321,7 +327,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
         }
 
         // Create the project
-        var project = Project.Create(name, description, expenditureCategoryId, dateRange, Id, null);
+        var project = Project.Create(name, description, expenditureCategoryId, dateRange, Id, programId, roles, strategicThemes);
 
         // Add the project to the portfolio's project list
         _projects.Add(project);
@@ -391,6 +397,49 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
                 return Result.Failure(removeFromProgramResult.Error);
             }
         }
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Deletes the specified project from the portfolio.
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <returns></returns>
+    public Result DeleteProject(Guid projectId)
+    {
+        var project = _projects.SingleOrDefault(p => p.Id == projectId);
+        if (project is null)
+        {
+            return Result.Failure("The specified project does not belong to this portfolio.");
+        }
+
+        if (IsReadOnly)
+        {
+            return Result.Failure(ReadOnlyErrorMessage);
+        }
+
+        if (!project.CanBeDeleted())
+        {
+            return Result.Failure("The project cannot be deleted.");
+        }
+
+        if (project.ProgramId.HasValue)
+        {
+            var program = _programs.SingleOrDefault(p => p.Id == project.ProgramId.Value);
+            if (program is null)
+            {
+                return Result.Failure("The project is associated with an invalid program.");
+            }
+
+            var removeProjectResult = program.RemoveProject(project);
+            if (removeProjectResult.IsFailure)
+            {
+                return Result.Failure(removeProjectResult.Error);
+            }
+        }
+
+        _projects.Remove(project);
 
         return Result.Success();
     }

@@ -1,6 +1,4 @@
-﻿using Moda.Common.Application.Models;
-
-namespace Moda.ProjectPortfolioManagement.Application.Portfolios.Command;
+﻿namespace Moda.ProjectPortfolioManagement.Application.Portfolios.Command;
 
 public sealed record DeleteProjectPortfolioCommand(Guid Id) : ICommand;
 
@@ -49,7 +47,7 @@ internal sealed class DeleteProjectPortfolioCommandHandler(IProjectPortfolioMana
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
-            return Result.Failure<ObjectIdAndKey>($"Error handling {AppRequestName} command.");
+            return Result.Failure($"Error handling {AppRequestName} command.");
         }
     }
 }

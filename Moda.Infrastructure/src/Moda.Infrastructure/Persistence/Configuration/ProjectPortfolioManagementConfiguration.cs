@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums.StrategicManagement;
+using Moda.ProjectPortfolioManagement.Domain;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 
@@ -12,7 +13,7 @@ public class ExpenditureCategoryConfig : IEntityTypeConfiguration<ExpenditureCat
     {
         builder.ToTable("ExpenditureCategories", SchemaNames.ProjectPortfolioManagement);
         builder.HasKey(e => e.Id);
-        
+
 
         builder.Property(e => e.Name).HasMaxLength(64).IsRequired();
         builder.Property(e => e.Description).HasMaxLength(1024).IsRequired();
@@ -133,23 +134,10 @@ public class ProgramConfiguration : IEntityTypeConfiguration<Program>
             .HasForeignKey(r => r.ObjectId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(p => p.StrategicThemes)
-            .WithMany()
-            .UsingEntity<Dictionary<string, object>>(
-                "ProgramStrategicThemes",  // Table name
-                j => j.HasOne<StrategicTheme>()
-                      .WithMany()
-                      .HasForeignKey("StrategicThemeId")
-                      .OnDelete(DeleteBehavior.Cascade),
-                j => j.HasOne<Program>()
-                      .WithMany()
-                      .HasForeignKey("ProgramId")
-                      .OnDelete(DeleteBehavior.Cascade),
-                j =>
-                {
-                    j.HasKey("ProgramId", "StrategicThemeId"); // Composite Primary Key
-                }
-            );
+        builder.HasMany(p => p.StrategicThemeTags)
+            .WithOne(t => t.Object)
+            .HasForeignKey(r => r.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
@@ -190,23 +178,10 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .HasForeignKey(r => r.ObjectId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(p => p.StrategicThemes)
-            .WithMany()
-            .UsingEntity<Dictionary<string, object>>(
-                "ProjectStrategicThemes",  // Table name
-                j => j.HasOne<StrategicTheme>()
-                      .WithMany()
-                      .HasForeignKey("StrategicThemeId")
-                      .OnDelete(DeleteBehavior.Cascade),
-                j => j.HasOne<Project>()
-                      .WithMany()
-                      .HasForeignKey("ProjectId")
-                      .OnDelete(DeleteBehavior.Cascade),
-                j =>
-                {
-                    j.HasKey("ProjectId", "StrategicThemeId"); // Composite Primary Key
-                }
-            );
+        builder.HasMany(p => p.StrategicThemeTags)
+            .WithOne(t => t.Object)
+            .HasForeignKey(r => r.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
@@ -232,7 +207,7 @@ public class ProjectPortfolioRoleAssignmentConfiguration : IEntityTypeConfigurat
         builder.HasOne(rm => rm.Employee)
             .WithMany()
             .HasForeignKey(rm => rm.EmployeeId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
 
@@ -256,7 +231,7 @@ public class ProgramRoleAssignmentConfiguration : IEntityTypeConfiguration<RoleA
         builder.HasOne(rm => rm.Employee)
             .WithMany()
             .HasForeignKey(rm => rm.EmployeeId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
 
@@ -280,9 +255,50 @@ public class ProjectRoleAssignmentConfiguration : IEntityTypeConfiguration<RoleA
         builder.HasOne(rm => rm.Employee)
             .WithMany()
             .HasForeignKey(rm => rm.EmployeeId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
 
 #endregion Role Assignments
 
+#region Strategic Theme Tags
+
+public class ProjectStrategicThemesConfiguration : IEntityTypeConfiguration<StrategicThemeTag<Project>>
+{
+    public void Configure(EntityTypeBuilder<StrategicThemeTag<Project>> builder)
+    {
+        builder.ToTable("ProjectStrategicThemes", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(t => new { t.ObjectId, t.StrategicThemeId });
+
+        builder.HasIndex(t => t.ObjectId);
+        builder.HasIndex(t => t.StrategicThemeId);
+
+        // Relationships
+        builder.HasOne(t => t.StrategicTheme)
+            .WithMany()
+            .HasForeignKey(t => t.StrategicThemeId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}
+
+public class ProgramStrategicThemesConfiguration : IEntityTypeConfiguration<StrategicThemeTag<Program>>
+{
+    public void Configure(EntityTypeBuilder<StrategicThemeTag<Program>> builder)
+    {
+        builder.ToTable("ProgramStrategicThemes", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(t => new { t.ObjectId, t.StrategicThemeId });
+
+        builder.HasIndex(t => t.ObjectId);
+        builder.HasIndex(t => t.StrategicThemeId);
+
+        // Relationships
+        builder.HasOne(t => t.StrategicTheme)
+            .WithMany()
+            .HasForeignKey(t => t.StrategicThemeId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}
+
+#endregion Strategic Theme Tags

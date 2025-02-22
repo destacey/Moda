@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20250217184201_Add-initial-PPM-configuration")]
+    [Migration("20250221001059_Add-initial-PPM-configuration")]
     partial class AddinitialPPMconfiguration
     {
         /// <inheritdoc />
@@ -1892,6 +1892,64 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("StrategicThemes", "Ppm");
                 });
 
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Moda.ProjectPortfolioManagement.Domain.Models.Program>", b =>
+                {
+                    b.Property<Guid>("ObjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StrategicThemeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ObjectId", "StrategicThemeId");
+
+                    b.HasIndex("ObjectId");
+
+                    b.HasIndex("StrategicThemeId");
+
+                    b.ToTable("ProgramStrategicThemes", "Ppm");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Moda.ProjectPortfolioManagement.Domain.Models.Project>", b =>
+                {
+                    b.Property<Guid>("ObjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StrategicThemeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ObjectId", "StrategicThemeId");
+
+                    b.HasIndex("ObjectId");
+
+                    b.HasIndex("StrategicThemeId");
+
+                    b.ToTable("ProjectStrategicThemes", "Ppm");
+                });
+
             modelBuilder.Entity("Moda.StrategicManagement.Domain.Models.StrategicTheme", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2886,36 +2944,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("Workspaces", "Work");
                 });
 
-            modelBuilder.Entity("ProgramStrategicThemes", b =>
-                {
-                    b.Property<Guid>("ProgramId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("StrategicThemeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ProgramId", "StrategicThemeId");
-
-                    b.HasIndex("StrategicThemeId");
-
-                    b.ToTable("ProgramStrategicThemes", "Ppm");
-                });
-
-            modelBuilder.Entity("ProjectStrategicThemes", b =>
-                {
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("StrategicThemeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ProjectId", "StrategicThemeId");
-
-                    b.HasIndex("StrategicThemeId");
-
-                    b.ToTable("ProjectStrategicThemes", "Ppm");
-                });
-
             modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
                 {
                     b.HasBaseType("Moda.AppIntegration.Domain.Models.Connection");
@@ -3340,7 +3368,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasOne("Moda.Common.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Program", null)
@@ -3357,7 +3385,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasOne("Moda.Common.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", null)
@@ -3374,7 +3402,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasOne("Moda.Common.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Project", null)
@@ -3384,6 +3412,44 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
 
                     b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Moda.ProjectPortfolioManagement.Domain.Models.Program>", b =>
+                {
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Program", "Object")
+                        .WithMany("StrategicThemeTags")
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme", "StrategicTheme")
+                        .WithMany()
+                        .HasForeignKey("StrategicThemeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Object");
+
+                    b.Navigation("StrategicTheme");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Moda.ProjectPortfolioManagement.Domain.Models.Project>", b =>
+                {
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Project", "Object")
+                        .WithMany("StrategicThemeTags")
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme", "StrategicTheme")
+                        .WithMany()
+                        .HasForeignKey("StrategicThemeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Object");
+
+                    b.Navigation("StrategicTheme");
                 });
 
             modelBuilder.Entity("Moda.StrategicManagement.Domain.Models.Strategy", b =>
@@ -3621,36 +3687,6 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
 
                     b.Navigation("WorkProcess");
-                });
-
-            modelBuilder.Entity("ProgramStrategicThemes", b =>
-                {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Program", null)
-                        .WithMany()
-                        .HasForeignKey("ProgramId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme", null)
-                        .WithMany()
-                        .HasForeignKey("StrategicThemeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ProjectStrategicThemes", b =>
-                {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Project", null)
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme", null)
-                        .WithMany()
-                        .HasForeignKey("StrategicThemeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Moda.AppIntegration.Domain.Models.AzureDevOpsBoardsConnection", b =>
@@ -3892,11 +3928,15 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Projects");
 
                     b.Navigation("Roles");
+
+                    b.Navigation("StrategicThemeTags");
                 });
 
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.Project", b =>
                 {
                     b.Navigation("Roles");
+
+                    b.Navigation("StrategicThemeTags");
                 });
 
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", b =>

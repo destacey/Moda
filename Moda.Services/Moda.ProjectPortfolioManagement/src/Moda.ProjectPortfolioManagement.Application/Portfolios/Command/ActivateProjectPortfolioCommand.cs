@@ -41,6 +41,7 @@ internal sealed class ActivateProjectPortfolioCommandHandler(IProjectPortfolioMa
                 _logger.LogError("Unable to activate Project Portfolio {ProjectPortfolioId}.  Error message: {Error}", request.Id, activateResult.Error);
                 return Result.Failure(activateResult.Error);
             }
+
             await _projectPortfolioManagementDbContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("Project Portfolio {ProjectPortfolioId} activated.", request.Id);

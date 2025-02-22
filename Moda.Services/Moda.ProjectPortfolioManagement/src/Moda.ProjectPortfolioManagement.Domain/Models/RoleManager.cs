@@ -61,9 +61,8 @@ public static class RoleManager
                 currentEmployees = [];
             }
 
-            var employeesToAdd = role.Value.Except(currentEmployees).ToList();
-            var employeesToRemove = currentEmployees.Except(role.Value).ToList();
 
+            var employeesToAdd = role.Value.Except(currentEmployees).ToList();
             foreach (var employeeId in employeesToAdd)
             {
                 var result = AssignRole(roles, objectId, role.Key, employeeId);
@@ -73,6 +72,7 @@ public static class RoleManager
                 }
             }
 
+            var employeesToRemove = currentEmployees.Except(role.Value).ToList();
             foreach (var employeeId in employeesToRemove)
             {
                 var result = RemoveAssignment(roles, role.Key, employeeId);

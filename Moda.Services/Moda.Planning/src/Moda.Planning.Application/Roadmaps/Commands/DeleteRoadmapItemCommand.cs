@@ -30,7 +30,7 @@ internal sealed class DeleteRoadmapItemCommandHandler(IPlanningDbContext plannin
                 .FirstOrDefaultAsync(r => r.Id == request.RoadmapId, cancellationToken);
 
             if (roadmap is null)
-                return Result.Failure($"Roadmap with id {request.RoadmapId} not found");
+                return Result.Failure("Roadmap not found");
 
             var deleteResult = roadmap.DeleteItem(request.ActivityId, _currentUserEmployeeId);
             if (deleteResult.IsFailure)

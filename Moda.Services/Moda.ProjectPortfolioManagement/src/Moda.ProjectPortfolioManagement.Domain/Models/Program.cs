@@ -12,14 +12,14 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
 {
     private string _name = default!;
     private string _description = default!;
-    private readonly HashSet<RoleAssignment<ProgramRole>> _roles = [];
 
+    private readonly HashSet<RoleAssignment<ProgramRole>> _roles = [];
     private readonly HashSet<Project> _projects = [];
-    private readonly HashSet<StrategicTheme> _strategicThemes = [];
+    private readonly HashSet<StrategicThemeTag<Program>> _strategicThemeTags = [];
 
     private Program() { }
 
-    private Program(string name, string description, ProgramStatus status, LocalDateRange? dateRange, Guid portfolioId, Dictionary<ProgramRole, HashSet<Guid>>? roles = null)
+    private Program(string name, string description, ProgramStatus status, LocalDateRange? dateRange, Guid portfolioId, Dictionary<ProgramRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
     {
         if (Status is ProgramStatus.Active or ProgramStatus.Completed && dateRange is null)
         {
@@ -36,6 +36,9 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
             .SelectMany(r => r.Value
                 .Select(e => new RoleAssignment<ProgramRole>(Id, r.Key, e)))
             .ToHashSet()
+            ?? [];
+
+        _strategicThemeTags = strategicThemes?.Select(t => new StrategicThemeTag<Program>(Id, t)).ToHashSet()
             ?? [];
     }
 
@@ -105,7 +108,7 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// <summary>
     /// The strategic themes associated with this program.
     /// </summary>
-    public IReadOnlyCollection<StrategicTheme> StrategicThemes => _strategicThemes;
+    public IReadOnlyCollection<StrategicThemeTag<Program>> StrategicThemeTags => _strategicThemeTags;
 
     /// <summary>
     /// Indicates whether the program can be deleted.
@@ -165,60 +168,33 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// <summary>
     /// Associates a strategic theme with this program.
     /// </summary>
-    public Result AddStrategicTheme(StrategicTheme strategicTheme)
+    public Result AddStrategicTheme(Guid strategicThemeId)
     {
-        Guard.Against.Null(strategicTheme, nameof(strategicTheme));
+        Guard.Against.NullOrEmpty(strategicThemeId, nameof(strategicThemeId));
 
-        if (_strategicThemes.Contains(strategicTheme))
-        {
-            return Result.Failure("This strategic theme is already associated with the program.");
-        }
-
-        _strategicThemes.Add(strategicTheme);
-        return Result.Success();
+        return StrategicThemeTagManager<Program>.AddStrategicThemeTag(_strategicThemeTags, Id, strategicThemeId, "program");
     }
 
     /// <summary>
     /// Removes a strategic theme from this program.
     /// </summary>
-    public Result RemoveStrategicTheme(StrategicTheme strategicTheme)
+    public Result RemoveStrategicTheme(Guid strategicThemeId)
     {
-        Guard.Against.Null(strategicTheme, nameof(strategicTheme));
+        Guard.Against.NullOrEmpty(strategicThemeId, nameof(strategicThemeId));
 
-        if (!_strategicThemes.Contains(strategicTheme))
-        {
-            return Result.Failure("This strategic theme is not associated with the program.");
-        }
-
-        _strategicThemes.Remove(strategicTheme);
-        return Result.Success();
+        return StrategicThemeTagManager<Program>.RemoveStrategicThemeTag(_strategicThemeTags, strategicThemeId, "program");
     }
 
     /// <summary>
     /// Updates the strategic themes associated with this program.
     /// </summary>
-    /// <param name="themes"></param>
+    /// <param name="strategicThemeIds"></param>
     /// <returns></returns>
-    public Result UpdateStrategicThemes(IEnumerable<StrategicTheme> themes)
+    public Result UpdateStrategicThemes(HashSet<Guid> strategicThemeIds)
     {
-        Guard.Against.Null(themes, nameof(themes));
+        Guard.Against.Null(strategicThemeIds, nameof(strategicThemeIds));;
 
-        var distinctThemes = themes.DistinctBy(t => t.Id).ToList();
-
-        // No changes needed if the themes are the same
-        if (_strategicThemes.Count == distinctThemes.Count && _strategicThemes.All(distinctThemes.Contains))
-        {
-            return Result.Failure("No changes detected in strategic themes.");
-        }
-
-        _strategicThemes.Clear();
-
-        foreach (var theme in distinctThemes)
-        {
-            _strategicThemes.Add(theme);
-        }
-
-        return Result.Success();
+        return StrategicThemeTagManager<Program>.UpdateTags(_strategicThemeTags, Id, strategicThemeIds, "program");
     }
 
     #region Lifecycle
@@ -340,6 +316,11 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
             return Result.Failure("The project is not part of this program.");
         }
 
+        if (IsClosed)
+        {
+            return Result.Failure("Projects cannot be removed from a closed program.");
+        }
+
         var result = project.UpdateProgram(null);
         if (result.IsFailure)
         {
@@ -369,9 +350,10 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     /// <param name="dateRange"></param>
     /// <param name="portfolioId"></param>
     /// <param name="roles"></param>
+    /// <param name="strategicThemes"></param>
     /// <returns></returns>
-    internal static Program Create(string name, string description, LocalDateRange? dateRange, Guid portfolioId, Dictionary<ProgramRole, HashSet<Guid>>? roles = null)
+    internal static Program Create(string name, string description, LocalDateRange? dateRange, Guid portfolioId, Dictionary<ProgramRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
     {
-        return new Program(name, description, ProgramStatus.Proposed, dateRange, portfolioId, roles);
+        return new Program(name, description, ProgramStatus.Proposed, dateRange, portfolioId, roles, strategicThemes);
     }
 }

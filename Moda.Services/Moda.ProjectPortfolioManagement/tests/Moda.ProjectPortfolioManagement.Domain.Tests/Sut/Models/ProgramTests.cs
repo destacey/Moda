@@ -528,12 +528,12 @@ public class ProgramTests
         var themes = _themeFaker.Generate(3); // Generate 3 unique themes
 
         // Act
-        var result = program.UpdateStrategicThemes(themes);
+        var result = program.UpdateStrategicThemes(themes.Select(t => t.Id).ToHashSet());
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        program.StrategicThemes.Should().HaveCount(3);
-        program.StrategicThemes.Should().BeEquivalentTo(themes);
+        program.StrategicThemeTags.Should().HaveCount(3);
+        program.StrategicThemeTags.Select(t => t.StrategicThemeId).Should().BeEquivalentTo(themes.Select(t => t.Id));
     }
 
     [Fact]
@@ -542,33 +542,33 @@ public class ProgramTests
         // Arrange
         var program = _programFaker.Generate();
         var initialThemes = _themeFaker.Generate(2);
-        program.UpdateStrategicThemes(initialThemes);
+        program.UpdateStrategicThemes(initialThemes.Select(t => t.Id).ToHashSet());
 
         var newThemes = _themeFaker.Generate(3); // Replace with different themes
 
         // Act
-        var result = program.UpdateStrategicThemes(newThemes);
+        var result = program.UpdateStrategicThemes(newThemes.Select(t => t.Id).ToHashSet());
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        program.StrategicThemes.Should().HaveCount(3);
-        program.StrategicThemes.Should().BeEquivalentTo(newThemes);
+        program.StrategicThemeTags.Should().HaveCount(3);
+        program.StrategicThemeTags.Select(t => t.StrategicThemeId).Should().BeEquivalentTo(newThemes.Select(t => t.Id));
     }
 
     [Fact]
-    public void UpdateStrategicThemes_ShouldFail_WhenNoChangesAreMade()
+    public void UpdateStrategicThemes_ShouldSucceed_WhenNoChangesAreMade()
     {
         // Arrange
         var program = _programFaker.Generate();
         var themes = _themeFaker.Generate(2);
-        program.UpdateStrategicThemes(themes);
+        program.UpdateStrategicThemes(themes.Select(t => t.Id).ToHashSet());
 
         // Act
-        var result = program.UpdateStrategicThemes(themes); // Same themes
+        var result = program.UpdateStrategicThemes(themes.Select(t => t.Id).ToHashSet()); // Same themes
 
         // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be("No changes detected in strategic themes.");
+        result.IsSuccess.Should().BeTrue();
+        program.StrategicThemeTags.Should().HaveCount(2);
     }
 
     [Fact]
@@ -577,14 +577,14 @@ public class ProgramTests
         // Arrange
         var program = _programFaker.Generate();
         var initialThemes = _themeFaker.Generate(2);
-        program.UpdateStrategicThemes(initialThemes);
+        program.UpdateStrategicThemes(initialThemes.Select(t => t.Id).ToHashSet());
 
         // Act
         var result = program.UpdateStrategicThemes([]);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        program.StrategicThemes.Should().BeEmpty();
+        program.StrategicThemeTags.Should().BeEmpty();
     }
 
     #endregion Strategic Theme Management

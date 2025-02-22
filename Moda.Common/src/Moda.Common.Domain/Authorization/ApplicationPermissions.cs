@@ -177,6 +177,11 @@ public static class ApplicationPermissions
         new ("Create Portfolios", ApplicationAction.Create, ApplicationResource.ProjectPortfolios),
         new ("Update Portfolios", ApplicationAction.Update, ApplicationResource.ProjectPortfolios),
         new ("Delete Portfolios", ApplicationAction.Delete, ApplicationResource.ProjectPortfolios),
+
+        new ("View Projects", ApplicationAction.View, ApplicationResource.Projects),
+        new ("Create Projects", ApplicationAction.Create, ApplicationResource.Projects),
+        new ("Update Projects", ApplicationAction.Update, ApplicationResource.Projects),
+        new ("Delete Projects", ApplicationAction.Delete, ApplicationResource.Projects),
     ];
 
     private static readonly ApplicationPermission[] _strategicManagement =

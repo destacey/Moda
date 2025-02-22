@@ -69,7 +69,7 @@ internal sealed class CreateProjectPortfolioCommandHandler(
 
     private static Dictionary<ProjectPortfolioRole, HashSet<Guid>> GetRoles(CreateProjectPortfolioCommand request)
     {
-        Dictionary<ProjectPortfolioRole, HashSet<Guid>>? roles = [];
+        Dictionary<ProjectPortfolioRole, HashSet<Guid>> roles = [];
 
         if (request.SponsorIds != null && request.SponsorIds.Count != 0)
         {

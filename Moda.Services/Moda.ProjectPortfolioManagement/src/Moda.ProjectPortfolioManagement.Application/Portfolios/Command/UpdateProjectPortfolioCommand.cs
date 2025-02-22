@@ -81,13 +81,13 @@ internal sealed class UpdateProjectPortfolioCommandHandler(
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
-            return Result.Failure<ObjectIdAndKey>($"Error handling {AppRequestName} command.");
+            return Result.Failure($"Error handling {AppRequestName} command.");
         }
     }
 
     private static Dictionary<ProjectPortfolioRole, HashSet<Guid>> GetRoles(UpdateProjectPortfolioCommand request)
     {
-        Dictionary<ProjectPortfolioRole, HashSet<Guid>>? roles = [];
+        Dictionary<ProjectPortfolioRole, HashSet<Guid>> roles = [];
 
         if (request.SponsorIds != null && request.SponsorIds.Count != 0)
         {
@@ -105,13 +105,13 @@ internal sealed class UpdateProjectPortfolioCommandHandler(
         return roles;
     }
 
-    private async Task<Result<ObjectIdAndKey>> HandleDomainFailure(ProjectPortfolio portfolio, Result errorResult, CancellationToken cancellationToken)
+    private async Task<Result> HandleDomainFailure(ProjectPortfolio portfolio, Result errorResult, CancellationToken cancellationToken)
     {
         // Reset the entity
         await _projectPortfolioManagementDbContext.Entry(portfolio).ReloadAsync(cancellationToken);
         portfolio.ClearDomainEvents();
 
         _logger.LogError("Unable to update Project Portfolio {ProjectPortfolioId}.  Error message: {Error}", portfolio.Id, errorResult.Error);
-        return Result.Failure<ObjectIdAndKey>(errorResult.Error);
+        return Result.Failure(errorResult.Error);
     }
 }

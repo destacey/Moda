@@ -98,8 +98,7 @@ public partial class AddinitialPPMconfiguration : Migration
                     column: x => x.EmployeeId,
                     principalSchema: "Organization",
                     principalTable: "Employees",
-                    principalColumn: "Id",
-                    onDelete: ReferentialAction.Restrict);
+                    principalColumn: "Id");
                 table.ForeignKey(
                     name: "FK_PortfolioRoleAssignments_Portfolios_ObjectId",
                     column: x => x.ObjectId,
@@ -162,8 +161,7 @@ public partial class AddinitialPPMconfiguration : Migration
                     column: x => x.EmployeeId,
                     principalSchema: "Organization",
                     principalTable: "Employees",
-                    principalColumn: "Id",
-                    onDelete: ReferentialAction.Restrict);
+                    principalColumn: "Id");
                 table.ForeignKey(
                     name: "FK_ProgramRoleAssignments_Programs_ObjectId",
                     column: x => x.ObjectId,
@@ -178,15 +176,19 @@ public partial class AddinitialPPMconfiguration : Migration
             schema: "Ppm",
             columns: table => new
             {
-                ProgramId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                StrategicThemeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                ObjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                StrategicThemeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                SystemCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                SystemCreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                SystemLastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                SystemLastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_ProgramStrategicThemes", x => new { x.ProgramId, x.StrategicThemeId });
+                table.PrimaryKey("PK_ProgramStrategicThemes", x => new { x.ObjectId, x.StrategicThemeId });
                 table.ForeignKey(
-                    name: "FK_ProgramStrategicThemes_Programs_ProgramId",
-                    column: x => x.ProgramId,
+                    name: "FK_ProgramStrategicThemes_Programs_ObjectId",
+                    column: x => x.ObjectId,
                     principalSchema: "Ppm",
                     principalTable: "Programs",
                     principalColumn: "Id",
@@ -196,8 +198,7 @@ public partial class AddinitialPPMconfiguration : Migration
                     column: x => x.StrategicThemeId,
                     principalSchema: "Ppm",
                     principalTable: "StrategicThemes",
-                    principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
+                    principalColumn: "Id");
             });
 
         migrationBuilder.CreateTable(
@@ -267,8 +268,7 @@ public partial class AddinitialPPMconfiguration : Migration
                     column: x => x.EmployeeId,
                     principalSchema: "Organization",
                     principalTable: "Employees",
-                    principalColumn: "Id",
-                    onDelete: ReferentialAction.Restrict);
+                    principalColumn: "Id");
                 table.ForeignKey(
                     name: "FK_ProjectRoleAssignments_Projects_ObjectId",
                     column: x => x.ObjectId,
@@ -283,15 +283,19 @@ public partial class AddinitialPPMconfiguration : Migration
             schema: "Ppm",
             columns: table => new
             {
-                ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                StrategicThemeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                ObjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                StrategicThemeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                SystemCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                SystemCreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                SystemLastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                SystemLastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_ProjectStrategicThemes", x => new { x.ProjectId, x.StrategicThemeId });
+                table.PrimaryKey("PK_ProjectStrategicThemes", x => new { x.ObjectId, x.StrategicThemeId });
                 table.ForeignKey(
-                    name: "FK_ProjectStrategicThemes_Projects_ProjectId",
-                    column: x => x.ProjectId,
+                    name: "FK_ProjectStrategicThemes_Projects_ObjectId",
+                    column: x => x.ObjectId,
                     principalSchema: "Ppm",
                     principalTable: "Projects",
                     principalColumn: "Id",
@@ -301,8 +305,7 @@ public partial class AddinitialPPMconfiguration : Migration
                     column: x => x.StrategicThemeId,
                     principalSchema: "Ppm",
                     principalTable: "StrategicThemes",
-                    principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
+                    principalColumn: "Id");
             });
 
         migrationBuilder.CreateIndex(
@@ -348,6 +351,12 @@ public partial class AddinitialPPMconfiguration : Migration
             column: "Status");
 
         migrationBuilder.CreateIndex(
+            name: "IX_ProgramStrategicThemes_ObjectId",
+            schema: "Ppm",
+            table: "ProgramStrategicThemes",
+            column: "ObjectId");
+
+        migrationBuilder.CreateIndex(
             name: "IX_ProgramStrategicThemes_StrategicThemeId",
             schema: "Ppm",
             table: "ProgramStrategicThemes",
@@ -388,6 +397,12 @@ public partial class AddinitialPPMconfiguration : Migration
             schema: "Ppm",
             table: "Projects",
             column: "Status");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_ProjectStrategicThemes_ObjectId",
+            schema: "Ppm",
+            table: "ProjectStrategicThemes",
+            column: "ObjectId");
 
         migrationBuilder.CreateIndex(
             name: "IX_ProjectStrategicThemes_StrategicThemeId",

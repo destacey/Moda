@@ -14,10 +14,19 @@ public sealed record CreatePortfolioRequest
     /// </summary>
     public required string Description { get; set; }
 
+    /// <summary>
+    /// The sponsors of the portfolio.
+    /// </summary>
     public List<Guid>? SponsorIds { get; set; } = [];
 
+    /// <summary>
+    /// The owners of the portfolio.
+    /// </summary>
     public List<Guid>? OwnerIds { get; set; } = [];
 
+    /// <summary>
+    /// The managers of the portfolio.
+    /// </summary>
     public List<Guid>? ManagerIds { get; set; } = [];
 
     public CreateProjectPortfolioCommand ToCreateProjectPortfolioCommand()
