@@ -23,6 +23,7 @@ import ChangePortfolioStatusForm, {
   PortfolioStatusAction,
 } from '../_components/change-portfolio-status-form'
 import ProjectsGrid from '../../_components/projects-grid'
+import ProjectViewManager from '../../_components/project-view-manager'
 
 const { Item } = Descriptions
 
@@ -117,12 +118,11 @@ const PortfolioDetailsPage = ({ params }) => {
         key: PortfolioTabs.Projects,
         label: 'Projects',
         content: (
-          <ProjectsGrid
+          <ProjectViewManager
             projects={projectData}
             isLoading={isLoadingProjects}
             refetch={refetchProjects}
             messageApi={messageApi}
-            hidePortfolio={true}
           />
         ),
       },

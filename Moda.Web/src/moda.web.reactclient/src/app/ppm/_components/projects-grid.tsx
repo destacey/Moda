@@ -18,6 +18,8 @@ export interface ProjectsGridProps {
   refetch: () => void
   messageApi: MessageInstance
   hidePortfolio?: boolean
+  gridHeight?: number | undefined
+  viewSelector?: React.ReactNode | undefined
 }
 
 const ProjectsGrid: React.FC<ProjectsGridProps> = (
@@ -71,13 +73,14 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         valueGetter: (params) => getSortedNames(params.data.strategicThemes),
       },
     ],
-    [],
+    [props.hidePortfolio],
   )
 
   const refresh = useCallback(async () => {
     refetch()
   }, [refetch])
 
+  // TODO: pass the viewSelector to the grid once the timeline is ready.
   return (
     <>
       <ModaGrid
@@ -85,6 +88,7 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         rowData={props.projects}
         loadData={refresh}
         loading={props.isLoading}
+        toolbarActions={undefined}
         emptyMessage="No projects found."
       />
     </>
