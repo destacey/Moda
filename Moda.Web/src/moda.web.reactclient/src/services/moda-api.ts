@@ -14917,25 +14917,25 @@ export interface UpdateEmployeeRequest {
 }
 
 export interface TeamListDto {
-    id?: string;
-    key?: number;
-    name?: string;
-    code?: string;
-    type?: string;
-    isActive?: boolean;
+    id: string;
+    key: number;
+    name: string;
+    code: string;
+    type: string;
+    isActive: boolean;
     teamOfTeams?: TeamNavigationDto | undefined;
 }
 
 export interface TeamDetailsDto {
-    id?: string;
-    key?: number;
-    name?: string;
-    code?: string;
+    id: string;
+    key: number;
+    name: string;
+    code: string;
     description?: string | undefined;
-    type?: string;
+    type: string;
     activeDate?: Date;
     inactiveDate?: Date | undefined;
-    isActive?: boolean;
+    isActive: boolean;
     teamOfTeams?: TeamNavigationDto | undefined;
 }
 
@@ -15036,25 +15036,25 @@ export interface OrganizationalUnitDto {
 }
 
 export interface TeamOfTeamsListDto {
-    id?: string;
-    key?: number;
-    name?: string;
-    code?: string;
-    type?: string;
-    isActive?: boolean;
+    id: string;
+    key: number;
+    name: string;
+    code: string;
+    type: string;
+    isActive: boolean;
     teamOfTeams?: TeamNavigationDto | undefined;
 }
 
 export interface TeamOfTeamsDetailsDto {
-    id?: string;
-    key?: number;
-    name?: string;
-    code?: string;
+    id: string;
+    key: number;
+    name: string;
+    code: string;
     description?: string | undefined;
-    type?: string;
+    type: string;
     activeDate?: Date;
     inactiveDate?: Date | undefined;
-    isActive?: boolean;
+    isActive: boolean;
     teamOfTeams?: TeamNavigationDto | undefined;
 }
 
