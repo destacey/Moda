@@ -9,6 +9,7 @@ import {
 import { getStrategicThemesClient } from '@/src/services/clients'
 import { QueryTags } from '../query-tags'
 import { OptionModel } from '@/src/components/types'
+import { BaseOptionType } from 'antd/es/select'
 
 export const strategicThemesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -165,6 +166,30 @@ export const strategicThemesApi = apiSlice.injectEndpoints({
       },
       providesTags: () => [QueryTags.StrategicThemState],
     }),
+    getStrategicThemeOptions: builder.query<
+      BaseOptionType[],
+      boolean | undefined
+    >({
+      queryFn: async (includeArchived = false) => {
+        try {
+          const themes = await (
+            await getStrategicThemesClient()
+          ).getStrategicThemeOptions(includeArchived)
+
+          const data: BaseOptionType[] = themes
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((category) => ({
+              label: category.name,
+              value: category.id,
+            }))
+
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+    }),
   }),
 })
 
@@ -177,4 +202,5 @@ export const {
   useArchiveStrategicThemeMutation,
   useDeleteStrategicThemeMutation,
   useGetStateOptionsQuery,
+  useGetStrategicThemeOptionsQuery,
 } = strategicThemesApi

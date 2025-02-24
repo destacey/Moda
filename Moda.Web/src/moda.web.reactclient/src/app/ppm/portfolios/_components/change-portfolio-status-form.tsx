@@ -11,48 +11,48 @@ import { Modal, Space } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
-export enum PortfolioStateAction {
+export enum PortfolioStatusAction {
   Activate = 'Activate',
   Close = 'Close',
   Archive = 'Archive',
 }
 
-const stateActionToPastTense = (stateAction: PortfolioStateAction) => {
-  switch (stateAction) {
-    case PortfolioStateAction.Activate:
+const statusActionToPastTense = (statusAction: PortfolioStatusAction) => {
+  switch (statusAction) {
+    case PortfolioStatusAction.Activate:
       return 'activated'
-    case PortfolioStateAction.Close:
+    case PortfolioStatusAction.Close:
       return 'closed'
-    case PortfolioStateAction.Archive:
+    case PortfolioStatusAction.Archive:
       return 'archived'
     default:
-      return stateAction
+      return statusAction
   }
 }
 
-const stateActionToPresentTense = (stateAction: PortfolioStateAction) => {
-  switch (stateAction) {
-    case PortfolioStateAction.Activate:
+const statusActionToPresentTense = (statusAction: PortfolioStatusAction) => {
+  switch (statusAction) {
+    case PortfolioStatusAction.Activate:
       return 'activating'
-    case PortfolioStateAction.Close:
+    case PortfolioStatusAction.Close:
       return 'closing'
-    case PortfolioStateAction.Archive:
+    case PortfolioStatusAction.Archive:
       return 'archiving'
     default:
-      return stateAction
+      return statusAction
   }
 }
 
-export interface ChangePortfolioStateFormProps {
+export interface ChangePortfolioStatusFormProps {
   portfolio: ProjectPortfolioDetailsDto
-  stateAction: PortfolioStateAction
+  statusAction: PortfolioStatusAction
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
   messageApi: MessageInstance
 }
 
-const ChangePortfolioStateForm = (props: ChangePortfolioStateFormProps) => {
+const ChangePortfolioStatusForm = (props: ChangePortfolioStatusFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
@@ -68,19 +68,19 @@ const ChangePortfolioStateForm = (props: ChangePortfolioStateFormProps) => {
     'Permissions.ProjectPortfolios.Update',
   )
 
-  const changeState = async (
+  const changeStatus = async (
     id: string,
     cacheKey: number,
-    stateAction: PortfolioStateAction,
+    statusAction: PortfolioStatusAction,
   ) => {
     try {
       const request = { id: id, cacheKey: cacheKey }
       let response = null
-      if (stateAction === PortfolioStateAction.Activate) {
+      if (statusAction === PortfolioStatusAction.Activate) {
         response = await activatePortfolioMutation(request)
-      } else if (stateAction === PortfolioStateAction.Close) {
+      } else if (statusAction === PortfolioStatusAction.Close) {
         response = await closePortfolioMutation(request)
-      } else if (stateAction === PortfolioStateAction.Archive) {
+      } else if (statusAction === PortfolioStatusAction.Archive) {
         response = await archivePortfolioMutation(request)
       }
 
@@ -92,7 +92,7 @@ const ChangePortfolioStateForm = (props: ChangePortfolioStateFormProps) => {
     } catch (error) {
       props.messageApi.error(
         error.detail ??
-          `An unexpected error occurred while ${stateActionToPresentTense(stateAction)} the portfolio.`,
+          `An unexpected error occurred while ${statusActionToPresentTense(statusAction)} the portfolio.`,
       )
       console.log(error)
       return false
@@ -103,14 +103,14 @@ const ChangePortfolioStateForm = (props: ChangePortfolioStateFormProps) => {
     setIsSaving(true)
     try {
       if (
-        await changeState(
+        await changeStatus(
           props.portfolio.id,
           props.portfolio.key,
-          props.stateAction,
+          props.statusAction,
         )
       ) {
         props.messageApi.success(
-          `Successfully ${stateActionToPastTense(props.stateAction)} Portfolio.`,
+          `Successfully ${statusActionToPastTense(props.statusAction)} Portfolio.`,
         )
         props.onFormComplete()
         setIsOpen(false)
@@ -118,7 +118,7 @@ const ChangePortfolioStateForm = (props: ChangePortfolioStateFormProps) => {
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
       props.messageApi.error(
-        `An unexpected error occurred while ${stateActionToPresentTense(props.stateAction)} the portfolio.`,
+        `An unexpected error occurred while ${statusActionToPresentTense(props.statusAction)} the portfolio.`,
       )
     } finally {
       setIsSaving(false)
@@ -135,16 +135,17 @@ const ChangePortfolioStateForm = (props: ChangePortfolioStateFormProps) => {
       setIsOpen(props.showForm)
     } else {
       props.onFormCancel()
+      props.messageApi.error('You do not have permission to update portfolios.')
     }
   }, [canUpdatePortfolio, props])
 
   return (
     <>
       <Modal
-        title={`Are you sure you want to ${props.stateAction} this Portfolio?`}
+        title={`Are you sure you want to ${props.statusAction} this Portfolio?`}
         open={isOpen}
         onOk={handleOk}
-        okText={props.stateAction}
+        okText={props.statusAction}
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
@@ -162,4 +163,4 @@ const ChangePortfolioStateForm = (props: ChangePortfolioStateFormProps) => {
   )
 }
 
-export default ChangePortfolioStateForm
+export default ChangePortfolioStatusForm

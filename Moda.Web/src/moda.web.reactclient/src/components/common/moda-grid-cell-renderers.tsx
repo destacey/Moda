@@ -137,6 +137,16 @@ export const PortfolioLinkCellRenderer = ({
   return <Link href={`/ppm/portfolios/${data.key}`}>{data.name}</Link>
 }
 
+export interface ProjectLinkCellRendererProps {
+  data: NavigationDto
+}
+export const ProjectLinkCellRenderer = ({
+  data,
+}: ProjectLinkCellRendererProps) => {
+  if (!data) return null
+  return <Link href={`/ppm/projects/${data.key}`}>{data.name}</Link>
+}
+
 export interface RowMenuCellRendererProps {
   menuItems: ItemType[]
 }

@@ -25,9 +25,9 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     {
         ProjectStatus? filter = status.HasValue ? (ProjectStatus)status.Value : null;
 
-        var portfolios = await _sender.Send(new GetProjectsQuery(filter), cancellationToken);
+        var projects = await _sender.Send(new GetProjectsQuery(StatusFilter: filter), cancellationToken);
 
-        return Ok(portfolios);
+        return Ok(projects);
     }
 
     [HttpGet("{idOrKey}")]
@@ -37,16 +37,16 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProjectDetailsDto>> GetProject(string idOrKey, CancellationToken cancellationToken)
     {
-        var portfolio = await _sender.Send(new GetProjectQuery(idOrKey), cancellationToken);
+        var project = await _sender.Send(new GetProjectQuery(idOrKey), cancellationToken);
 
-        return portfolio is not null
-            ? Ok(portfolio)
+        return project is not null
+            ? Ok(project)
             : NotFound();
     }
 
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.Projects)]
-    [OpenApiOperation("Create a portfolio.", "")]
+    [OpenApiOperation("Create a project.", "")]
     [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult<ObjectIdAndKey>> Create([FromBody] CreateProjectRequest request, CancellationToken cancellationToken)
     {
@@ -59,7 +59,7 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
 
     [HttpPut("{id}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Projects)]
-    [OpenApiOperation("Update a portfolio.", "")]
+    [OpenApiOperation("Update a project.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
@@ -96,7 +96,7 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> Close(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult> Complete(Guid id, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new CompleteProjectCommand(id), cancellationToken);
 
@@ -122,7 +122,7 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
 
     [HttpDelete("{id}")]
     [MustHavePermission(ApplicationAction.Delete, ApplicationResource.Projects)]
-    [OpenApiOperation("Delete a portfolio.", "")]
+    [OpenApiOperation("Delete a project.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)

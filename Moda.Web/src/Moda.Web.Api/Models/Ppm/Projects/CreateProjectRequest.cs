@@ -21,9 +21,14 @@ public sealed record CreateProjectRequest
     public int ExpenditureCategoryId { get; set; }
 
     /// <summary>
-    /// The date range of the project.
+    /// The Project start date.
     /// </summary>
-    public LocalDateRange? DateRange { get; set; }
+    public LocalDate? Start { get; set; }
+
+    /// <summary>
+    /// The Project end date.
+    /// </summary>
+    public LocalDate? End { get; set; }
 
     /// <summary>
     /// The ID of the portfolio to which this project belongs.
@@ -57,7 +62,9 @@ public sealed record CreateProjectRequest
 
     public CreateProjectCommand ToCreateProjectCommand()
     {
-        return new CreateProjectCommand(Name, Description, ExpenditureCategoryId, DateRange, PortfolioId, ProgramId, SponsorIds, OwnerIds, ManagerIds, StrategicThemeIds);
+        var dateRange = Start is null || End is null ? null : new LocalDateRange((LocalDate)Start, (LocalDate)End);
+
+        return new CreateProjectCommand(Name, Description, ExpenditureCategoryId, dateRange, PortfolioId, ProgramId, SponsorIds, OwnerIds, ManagerIds, StrategicThemeIds);
     }
 }
 
@@ -71,7 +78,25 @@ public sealed class CreateProjectRequestValidator : CustomValidator<CreateProjec
 
         RuleFor(p => p.Description)
             .NotEmpty()
-            .MaximumLength(1024);
+            .MaximumLength(2048);
+
+        RuleFor(p => p.ExpenditureCategoryId)
+            .GreaterThan(0);
+
+        RuleFor(p => p)
+            .Must(p => (p.Start == null && p.End == null) || (p.Start != null && p.End != null))
+            .WithMessage("Start and End must either both be null or both have a value.");
+
+        RuleFor(p => p)
+            .Must(p => p.Start == null || p.End == null || p.Start <= p.End)
+            .WithMessage("End date must be greater than or equal to start date.");
+
+        RuleFor(p => p.PortfolioId)
+            .NotEmpty();
+
+        RuleFor(p => p.ProgramId)
+            .Must(id => id == null || id != Guid.Empty)
+            .WithMessage("ProgramId cannot be an empty GUID.");
 
         RuleFor(x => x.SponsorIds)
             .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
@@ -84,5 +109,9 @@ public sealed class CreateProjectRequestValidator : CustomValidator<CreateProjec
         RuleFor(x => x.ManagerIds)
             .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
             .WithMessage("ManagerIds cannot contain empty GUIDs.");
+
+        RuleFor(p => p.StrategicThemeIds)
+            .Must(ids => ids == null || ids.All(id => id != Guid.Empty))
+            .WithMessage("StrategicThemeIds cannot contain empty GUIDs.");
     }
 }

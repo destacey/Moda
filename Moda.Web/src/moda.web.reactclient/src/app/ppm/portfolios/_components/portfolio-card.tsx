@@ -1,5 +1,6 @@
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { ProjectPortfolioListDto } from '@/src/services/moda-api'
+import { getSortedNames } from '@/src/utils'
 import { Card, Descriptions, Tag } from 'antd'
 import { useRouter } from 'next/navigation'
 
@@ -26,12 +27,12 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
         <Item label="Key">{portfolio.key}</Item>
         {portfolio?.portfolioOwners.length > 0 && (
           <Item label="Owners">
-            {portfolio.portfolioOwners.map((s) => s.name).join(', ')}
+            {getSortedNames(portfolio.portfolioOwners)}
           </Item>
         )}
         {portfolio?.portfolioManagers.length > 0 && (
           <Item label="Managers">
-            {portfolio.portfolioManagers.map((s) => s.name).join(', ')}
+            {getSortedNames(portfolio.portfolioManagers)}
           </Item>
         )}
         <Item>

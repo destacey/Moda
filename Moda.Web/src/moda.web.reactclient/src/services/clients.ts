@@ -23,6 +23,7 @@ import {
   StrategicThemesClient,
   PortfoliosClient,
   ExpenditureCategoriesClient,
+  ProjectsClient,
 } from './moda-api'
 import auth from './auth'
 
@@ -81,6 +82,8 @@ export const getExpenditureCategoriesClient = async (accessToken?: string) =>
   )
 export const getPortfoliosClient = async (accessToken?: string) =>
   new PortfoliosClient('', await createDefaultAxiosInstance(accessToken))
+export const getProjectsClient = async (accessToken?: string) =>
+  new ProjectsClient('', await createDefaultAxiosInstance(accessToken))
 
 // STRATEGIC MANAGEMENT
 export const getStrategicThemesClient = async (accessToken?: string) =>

@@ -1,7 +1,11 @@
 ﻿using Moda.Common.Application.Models;
+using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Dtos;
+using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Queries;
 using Moda.ProjectPortfolioManagement.Application.Portfolios.Command;
 using Moda.ProjectPortfolioManagement.Application.Portfolios.Dtos;
 using Moda.ProjectPortfolioManagement.Application.Portfolios.Queries;
+using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
+using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Ppm.Portfolios;
@@ -133,5 +137,29 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("{idOrKey}/projects")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a list of projects for the portfolio.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects(string idOrKey, CancellationToken cancellationToken)
+    {
+        var projects = await _sender.Send(new GetProjectsQuery(PortfolioIdOrKey: idOrKey), cancellationToken);
+
+        return Ok(projects);
+    }
+
+    [HttpGet("options")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ProjectPortfolios)]
+    [OpenApiOperation("Get a list of project portfolio options.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProjectPortfolioOptionDto>>> GetPortfolioOptions(CancellationToken cancellationToken)
+    {
+        var options = await _sender.Send(new GetProjectPortfolioOptionsQuery(), cancellationToken);
+
+        return Ok(options);
     }
 }

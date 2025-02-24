@@ -1,4 +1,6 @@
-﻿namespace Moda.Common.Application.Dtos;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Moda.Common.Application.Dtos;
 
 public record NavigationDto<TId, TKey>
 {
@@ -11,8 +13,13 @@ public record NavigationDto<TId, TKey>
         Name = name;        
     }
 
+    [Required]
     public required TId Id { get; set; }
+
+    [Required]
     public required TKey Key { get; set; }
+
+    [Required]
     public required string Name { get; set; }
 }
 

@@ -34,6 +34,7 @@ interface ModaGridProps extends AgGridReactProps {
   gridControlMenuItems?: ItemType[]
   toolbarActions?: React.ReactNode | null
   loadData?: () => Promise<void> | void
+  emptyMessage?: string
 }
 
 const modaDefaultColDef = {
@@ -54,6 +55,7 @@ const ModaGrid = ({
   defaultColDef,
   rowData,
   loadData,
+  emptyMessage,
   ...props
 }: ModaGridProps) => {
   const { agGridTheme } = useTheme()
@@ -154,7 +156,7 @@ const ModaGrid = ({
             loading={props.loading}
             loadingOverlayComponent={() => <Spin size="large" />}
             noRowsOverlayComponent={() => (
-              <ModaEmpty message="No records found." />
+              <ModaEmpty message={emptyMessage ?? 'No records found.'} />
             )}
             enableCellTextSelection={true}
             ensureDomOrder={true}

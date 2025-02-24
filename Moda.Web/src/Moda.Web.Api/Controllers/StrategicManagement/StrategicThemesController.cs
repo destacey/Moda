@@ -3,7 +3,6 @@ using Moda.Common.Domain.Enums.StrategicManagement;
 using Moda.StrategicManagement.Application.StrategicThemes.Commands;
 using Moda.StrategicManagement.Application.StrategicThemes.Dtos;
 using Moda.StrategicManagement.Application.StrategicThemes.Queries;
-using Moda.StrategicManagement.Application.Visions.Commands;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.StrategicManagement.StrategicThemes;
 
@@ -124,6 +123,18 @@ public class StrategicThemesController : ControllerBase
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("options")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicThemes)]
+    [OpenApiOperation("Get a list of strategic theme options.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<StrategicThemeOptionDto>>> GetStrategicThemeOptions(CancellationToken cancellationToken, [FromQuery] bool? includeArchived)
+    {
+        var options = await _sender.Send(new GetStrategicThemeOptionsQuery(includeArchived), cancellationToken);
+
+        return Ok(options);
     }
 
     [HttpGet("states")]

@@ -1637,6 +1637,67 @@ export class StrategicThemesClient {
     }
 
     /**
+     * Get a list of strategic theme options.
+     * @param includeArchived (optional) 
+     */
+    getStrategicThemeOptions(includeArchived: boolean | null | undefined, cancelToken?: CancelToken): Promise<StrategicThemeOptionDto[]> {
+        let url_ = this.baseUrl + "/api/strategic-management/strategic-themes/options?";
+        if (includeArchived !== undefined && includeArchived !== null)
+            url_ += "includeArchived=" + encodeURIComponent("" + includeArchived) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetStrategicThemeOptions(_response);
+        });
+    }
+
+    protected processGetStrategicThemeOptions(response: AxiosResponse): Promise<StrategicThemeOptionDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<StrategicThemeOptionDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<StrategicThemeOptionDto[]>(null as any);
+    }
+
+    /**
      * Get a list of all strategic theme states.
      */
     getStateOptions( cancelToken?: CancelToken): Promise<StrategicThemeStateDto[]> {
@@ -3031,6 +3092,67 @@ export class ExpenditureCategoriesClient {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    /**
+     * Get a list of expenditure categories options.
+     * @param includeArchived (optional) 
+     */
+    getExpenditureCategoryOptions(includeArchived: boolean | null | undefined, cancelToken?: CancelToken): Promise<ExpenditureCategoryOptionDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/expenditure-categories/options?";
+        if (includeArchived !== undefined && includeArchived !== null)
+            url_ += "includeArchived=" + encodeURIComponent("" + includeArchived) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetExpenditureCategoryOptions(_response);
+        });
+    }
+
+    protected processGetExpenditureCategoryOptions(response: AxiosResponse): Promise<ExpenditureCategoryOptionDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ExpenditureCategoryOptionDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ExpenditureCategoryOptionDto[]>(null as any);
+    }
 }
 
 export class PortfoliosClient {
@@ -3546,6 +3668,125 @@ export class PortfoliosClient {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    /**
+     * Get a list of projects for the portfolio.
+     */
+    getProjects(idOrKey: string, cancelToken?: CancelToken): Promise<ProjectListDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/projects";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProjects(_response);
+        });
+    }
+
+    protected processGetProjects(response: AxiosResponse): Promise<ProjectListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectListDto[]>(null as any);
+    }
+
+    /**
+     * Get a list of project portfolio options.
+     */
+    getPortfolioOptions( cancelToken?: CancelToken): Promise<ProjectPortfolioOptionDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/portfolios/options";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetPortfolioOptions(_response);
+        });
+    }
+
+    protected processGetPortfolioOptions(response: AxiosResponse): Promise<ProjectPortfolioOptionDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<ProjectPortfolioOptionDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProjectPortfolioOptionDto[]>(null as any);
+    }
 }
 
 export class ProjectsClient {
@@ -3623,7 +3864,7 @@ export class ProjectsClient {
     }
 
     /**
-     * Create a portfolio.
+     * Create a project.
      */
     create(request: CreateProjectRequest, cancelToken?: CancelToken): Promise<ObjectIdAndKey> {
         let url_ = this.baseUrl + "/api/ppm/projects";
@@ -3746,7 +3987,7 @@ export class ProjectsClient {
     }
 
     /**
-     * Update a portfolio.
+     * Update a project.
      */
     update(id: string, request: UpdateProjectRequest, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/ppm/projects/{id}";
@@ -3814,7 +4055,7 @@ export class ProjectsClient {
     }
 
     /**
-     * Delete a portfolio.
+     * Delete a project.
      */
     delete(id: string, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/ppm/projects/{id}";
@@ -3937,7 +4178,7 @@ export class ProjectsClient {
     /**
      * Complete a project.
      */
-    close(id: string, cancelToken?: CancelToken): Promise<void> {
+    complete(id: string, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/ppm/projects/{id}/complete";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -3959,11 +4200,11 @@ export class ProjectsClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processClose(_response);
+            return this.processComplete(_response);
         });
     }
 
-    protected processClose(response: AxiosResponse): Promise<void> {
+    protected processComplete(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -13410,9 +13651,9 @@ export interface UserDetailsDto {
 }
 
 export interface NavigationDtoOfGuidAndInteger {
-    id?: string;
-    key?: number;
-    name?: string;
+    id: string;
+    key: number;
+    name: string;
 }
 
 export interface NavigationDto extends NavigationDtoOfGuidAndInteger {
@@ -13524,6 +13765,12 @@ export interface UpdateStrategicThemeRequest {
     name: string;
     /** A detailed description of the strategic theme and its importance. */
     description: string;
+}
+
+export interface StrategicThemeOptionDto {
+    id?: string;
+    name?: string;
+    state?: string;
 }
 
 export interface CommonEnumDto {
@@ -13656,6 +13903,12 @@ export interface UpdateExpenditureCategoryRequest {
     accountingCode?: string | undefined;
 }
 
+export interface ExpenditureCategoryOptionDto {
+    id?: number;
+    name?: string;
+    state?: string;
+}
+
 export interface ProjectPortfolioListDto {
     id?: string;
     key?: number;
@@ -13723,6 +13976,11 @@ export interface ProjectListDto {
     strategicThemes?: NavigationDto[];
 }
 
+export interface ProjectPortfolioOptionDto {
+    id?: string;
+    name?: string;
+}
+
 export interface ProjectDetailsDto {
     id?: string;
     key?: number;
@@ -13746,10 +14004,12 @@ export interface CreateProjectRequest {
     description: string;
     /** The ID of the expenditure category associated with the project. */
     expenditureCategoryId?: number;
-    /** The date range of the project. */
-    dateRange?: LocalDateRange | undefined;
+    /** The Project start date. */
+    start?: Date | undefined;
+    /** The Project end date. */
+    end?: Date | undefined;
     /** The ID of the portfolio to which this project belongs. */
-    portfolioId?: string;
+    portfolioId: string;
     /** The ID of the program to which this project belongs (optional). */
     programId?: string | undefined;
     /** The sponsors of the project. */
@@ -13762,15 +14022,6 @@ export interface CreateProjectRequest {
     strategicThemeIds?: string[] | undefined;
 }
 
-export interface ValueObject {
-}
-
-export interface LocalDateRange extends ValueObject {
-    start?: Date;
-    end?: Date;
-    days?: number;
-}
-
 export interface UpdateProjectRequest {
     /** The unique identifier of the project. */
     id: string;
@@ -13780,8 +14031,10 @@ export interface UpdateProjectRequest {
     description: string;
     /** The ID of the expenditure category associated with the project. */
     expenditureCategoryId?: number;
-    /** The date range of the project. */
-    dateRange?: LocalDateRange | undefined;
+    /** The Project start date. */
+    start?: Date | undefined;
+    /** The Project end date. */
+    end?: Date | undefined;
     /** The sponsors of the project. */
     sponsorIds?: string[] | undefined;
     /** The owners of the project. */
@@ -14056,9 +14309,9 @@ export interface WorkItemListDto {
 }
 
 export interface NavigationDtoOfGuidAndString {
-    id?: string;
-    key?: string | undefined;
-    name?: string;
+    id: string;
+    key: string;
+    name: string;
 }
 
 export interface WorkspaceNavigationDto extends NavigationDtoOfGuidAndString {

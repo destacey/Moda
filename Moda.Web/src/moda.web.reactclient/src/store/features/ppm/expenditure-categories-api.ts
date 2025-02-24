@@ -7,6 +7,7 @@ import {
   ExpenditureCategoryListDto,
   UpdateExpenditureCategoryRequest,
 } from '@/src/services/moda-api'
+import { BaseOptionType } from 'antd/es/select'
 
 export const expenditureCategoriesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -140,6 +141,30 @@ export const expenditureCategoriesApi = apiSlice.injectEndpoints({
         return [{ type: QueryTags.ExpenditureCategory, id: 'LIST' }]
       },
     }),
+    getExpenditureCategoryOptions: builder.query<
+      BaseOptionType[],
+      boolean | undefined
+    >({
+      queryFn: async (includeArchived = false) => {
+        try {
+          const categories = await (
+            await getExpenditureCategoriesClient()
+          ).getExpenditureCategoryOptions(includeArchived)
+
+          const data: BaseOptionType[] = categories
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((category) => ({
+              label: category.name,
+              value: category.id,
+            }))
+
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+    }),
   }),
 })
 
@@ -151,4 +176,5 @@ export const {
   useActivateExpenditureCategoryMutation,
   useArchiveExpenditureCategoryMutation,
   useDeleteExpenditureCategoryMutation,
+  useGetExpenditureCategoryOptionsQuery,
 } = expenditureCategoriesApi

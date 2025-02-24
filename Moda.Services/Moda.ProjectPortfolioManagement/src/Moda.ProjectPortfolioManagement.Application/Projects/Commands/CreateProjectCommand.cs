@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Application.Models;
+using Moda.Common.Domain.Enums.StrategicManagement;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
@@ -59,17 +60,46 @@ internal sealed class CreateProjectCommandHandler(
     {
         try
         {
+            // TODO: move the Active state checks into the domain models
+            var expenditureCategory = await _projectPortfolioManagementDbContext.ExpenditureCategories
+                .FirstOrDefaultAsync(e => e.Id == request.ExpenditureCategoryId, cancellationToken);
+            if (expenditureCategory == null)
+            {
+                _logger.LogInformation("Expenditure Category with Id {ExpenditureCategoryId} not found.", request.ExpenditureCategoryId);
+                return Result.Failure<ObjectIdAndKey>("Expenditure Category not found.");
+            }
+            else if (expenditureCategory.State != ExpenditureCategoryState.Active)
+            {
+                _logger.LogInformation("Expenditure Category with Id {ExpenditureCategoryId} is not active.", request.ExpenditureCategoryId);
+                return Result.Failure<ObjectIdAndKey>("Expenditure Category is not active.");
+            }
+
+            var strategicThemeIds = request.StrategicThemeIds?.Distinct().ToHashSet() ?? [];
+            var strategicThemes = request.StrategicThemeIds is not null && request.StrategicThemeIds.Count != 0
+                ? await _projectPortfolioManagementDbContext.PpmStrategicThemes
+                    .Where(st => strategicThemeIds.Contains(st.Id))
+                    .ToListAsync(cancellationToken)
+                : [];
+            if (request.StrategicThemeIds is not null && strategicThemes.Count != strategicThemeIds.Count)
+            {
+                _logger.LogInformation("One or more Strategic Themes not found.");
+                return Result.Failure<ObjectIdAndKey>("One or more Strategic Themes not found.");
+            }
+            else if (request.StrategicThemeIds is not null && strategicThemes.Any(st => st.State != StrategicThemeState.Active))
+            {
+                _logger.LogInformation("One or more Strategic Themes are not active.");
+                return Result.Failure<ObjectIdAndKey>("One or more Strategic Themes are not active.");
+            }
+
             var portfolio = await _projectPortfolioManagementDbContext.Portfolios
-                .Include(p => p.Programs)
-                .FirstOrDefaultAsync(p => p.Id == request.PortfolioId, cancellationToken);
+                    .Include(p => p.Programs)
+                    .FirstOrDefaultAsync(p => p.Id == request.PortfolioId, cancellationToken);
             if (portfolio == null) {
                 _logger.LogInformation("Portfolio with Id {PortfolioId} not found.", request.PortfolioId);
                 return Result.Failure<ObjectIdAndKey>("Portfolio not found.");
             }
 
             var roles = GetRoles(request);
-
-            var strategicThemes = request.StrategicThemeIds?.Distinct().ToHashSet();
 
             var createResult = portfolio.CreateProject(
                 request.Name,
@@ -78,7 +108,7 @@ internal sealed class CreateProjectCommandHandler(
                 request.DateRange,
                 request.ProgramId,
                 roles,
-                strategicThemes
+                [.. strategicThemes.Select(st => st.Id)]
                 );
             if (createResult.IsFailure)
             {

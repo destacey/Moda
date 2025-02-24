@@ -1,5 +1,4 @@
-﻿using Moda.Common.Application.Models;
-using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Commands;
+﻿using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Commands;
 using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Dtos;
 using Moda.ProjectPortfolioManagement.Application.ExpenditureCategories.Queries;
 using Moda.Web.Api.Extensions;
@@ -114,5 +113,17 @@ public class ExpenditureCategoriesController(ILogger<ExpenditureCategoriesContro
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("options")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.ExpenditureCategories)]
+    [OpenApiOperation("Get a list of expenditure categories options.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ExpenditureCategoryOptionDto>>> GetExpenditureCategoryOptions(CancellationToken cancellationToken, [FromQuery] bool? includeArchived)
+    {
+        var options = await _sender.Send(new GetExpenditureCategoryOptionsQuery(includeArchived), cancellationToken);
+
+        return Ok(options);
     }
 }

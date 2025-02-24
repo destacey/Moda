@@ -253,11 +253,9 @@ const RoadmapDetailsPage = ({ params }) => {
             </Item>
           </Descriptions>
           <Descriptions>
-            {roadmapData.description && (
-              <Item>
-                <MarkdownRenderer markdown={roadmapData.description} />
-              </Item>
-            )}
+            <Item>
+              <MarkdownRenderer markdown={roadmapData.description} />
+            </Item>
           </Descriptions>
         </>
       )}

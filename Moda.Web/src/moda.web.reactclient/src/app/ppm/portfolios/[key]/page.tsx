@@ -1,25 +1,35 @@
 'use client'
 
 import { PageActions, PageTitle } from '@/src/components/common'
-import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
-import { Descriptions, MenuProps, message, Space } from 'antd'
+import { Card, Descriptions, MenuProps, message, Space } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import PortfolioDetailsLoading from './loading'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import {
-  ChangePortfolioStateForm,
   DeletePortfolioForm,
   EditPortfolioForm,
+  PortfolioDetails,
 } from '../_components'
-import { useGetPortfolioQuery } from '@/src/store/features/ppm/portfolios-api'
-import { PortfolioStateAction } from '../_components/change-portfolio-state-form'
+import {
+  useGetPortfolioProjectsQuery,
+  useGetPortfolioQuery,
+} from '@/src/store/features/ppm/portfolios-api'
+import ChangePortfolioStatusForm, {
+  PortfolioStatusAction,
+} from '../_components/change-portfolio-status-form'
+import ProjectsGrid from '../../_components/projects-grid'
 
 const { Item } = Descriptions
+
+enum PortfolioTabs {
+  Details = 'details',
+  Projects = 'projects',
+}
 
 enum MenuActions {
   Edit = 'Edit',
@@ -31,6 +41,7 @@ enum MenuActions {
 
 const PortfolioDetailsPage = ({ params }) => {
   useDocumentTitle('Portfolio Details')
+  const [activeTab, setActiveTab] = useState(PortfolioTabs.Details)
   const [openEditPortfolioForm, setOpenEditPortfolioForm] =
     useState<boolean>(false)
   const [openActivatePortfolioForm, setOpenActivatePortfolioForm] =
@@ -64,6 +75,13 @@ const PortfolioDetailsPage = ({ params }) => {
     refetch: refetchPortfolio,
   } = useGetPortfolioQuery(params.key)
 
+  const {
+    data: projectData,
+    isLoading: isLoadingProjects,
+    error: errorProjects,
+    refetch: refetchProjects,
+  } = useGetPortfolioProjectsQuery(params.key)
+
   useEffect(() => {
     if (!portfolioData) return
 
@@ -87,6 +105,36 @@ const PortfolioDetailsPage = ({ params }) => {
   useEffect(() => {
     error && console.error(error)
   }, [error])
+
+  const tabs = useMemo(() => {
+    const pageTabs = [
+      {
+        key: PortfolioTabs.Details,
+        label: 'Details',
+        content: <PortfolioDetails portfolio={portfolioData} />,
+      },
+      {
+        key: PortfolioTabs.Projects,
+        label: 'Projects',
+        content: (
+          <ProjectsGrid
+            projects={projectData}
+            isLoading={isLoadingProjects}
+            refetch={refetchProjects}
+            messageApi={messageApi}
+            hidePortfolio={true}
+          />
+        ),
+      },
+    ]
+    return pageTabs
+  }, [
+    isLoadingProjects,
+    messageApi,
+    portfolioData,
+    projectData,
+    refetchProjects,
+  ])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const currentStatus = portfolioData?.status.name
@@ -154,6 +202,11 @@ const PortfolioDetailsPage = ({ params }) => {
     return items
   }, [canDeletePortfolio, canUpdatePortfolio, portfolioData?.status.name])
 
+  // doesn't trigger on first render
+  const onTabChange = useCallback((tabKey) => {
+    setActiveTab(tabKey)
+  }, [])
+
   const onEditPortfolioFormClosed = useCallback(
     (wasSaved: boolean) => {
       setOpenEditPortfolioForm(false)
@@ -212,19 +265,6 @@ const PortfolioDetailsPage = ({ params }) => {
     notFound()
   }
 
-  const sponsorNames =
-    portfolioData?.portfolioSponsors.length > 0
-      ? portfolioData?.portfolioSponsors.map((s) => s.name).join(', ')
-      : 'No sponsors assigned'
-  const ownerNames =
-    portfolioData?.portfolioOwners.length > 0
-      ? portfolioData?.portfolioOwners.map((s) => s.name).join(', ')
-      : 'No owners assigned'
-  const managerNames =
-    portfolioData?.portfolioManagers.length > 0
-      ? portfolioData?.portfolioManagers.map((s) => s.name).join(', ')
-      : 'No managers assigned'
-
   return (
     <>
       {contextHolder}
@@ -233,19 +273,14 @@ const PortfolioDetailsPage = ({ params }) => {
         subtitle="Portfolio Details"
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
-      <Space direction="vertical" size="small">
-        <Descriptions column={1} size="small">
-          <Item label="State">{portfolioData.status.name}</Item>
-          <Item label="Sponsors">{sponsorNames}</Item>
-          <Item label="Owners">{ownerNames}</Item>
-          <Item label="Managers">{managerNames}</Item>
-        </Descriptions>
-        <Descriptions layout="vertical" size="small">
-          <Item label="Description">
-            <MarkdownRenderer markdown={portfolioData.description} />
-          </Item>
-        </Descriptions>
-      </Space>
+      <Card
+        style={{ width: '100%' }}
+        tabList={tabs}
+        activeTabKey={activeTab}
+        onTabChange={onTabChange}
+      >
+        {tabs.find((t) => t.key === activeTab)?.content}
+      </Card>
 
       {openEditPortfolioForm && (
         <EditPortfolioForm
@@ -257,9 +292,9 @@ const PortfolioDetailsPage = ({ params }) => {
         />
       )}
       {openActivatePortfolioForm && (
-        <ChangePortfolioStateForm
+        <ChangePortfolioStatusForm
           portfolio={portfolioData}
-          stateAction={PortfolioStateAction.Activate}
+          statusAction={PortfolioStatusAction.Activate}
           showForm={openActivatePortfolioForm}
           onFormComplete={() => onActivatePortfolioFormClosed(true)}
           onFormCancel={() => onActivatePortfolioFormClosed(false)}
@@ -267,9 +302,9 @@ const PortfolioDetailsPage = ({ params }) => {
         />
       )}
       {openClosePortfolioForm && (
-        <ChangePortfolioStateForm
+        <ChangePortfolioStatusForm
           portfolio={portfolioData}
-          stateAction={PortfolioStateAction.Close}
+          statusAction={PortfolioStatusAction.Close}
           showForm={openClosePortfolioForm}
           onFormComplete={() => onClosePortfolioFormClosed(true)}
           onFormCancel={() => onClosePortfolioFormClosed(false)}
@@ -277,9 +312,9 @@ const PortfolioDetailsPage = ({ params }) => {
         />
       )}
       {openArchivePortfolioForm && (
-        <ChangePortfolioStateForm
+        <ChangePortfolioStatusForm
           portfolio={portfolioData}
-          stateAction={PortfolioStateAction.Archive}
+          statusAction={PortfolioStatusAction.Archive}
           showForm={openArchivePortfolioForm}
           onFormComplete={() => onArchivePortfolioFormClosed(true)}
           onFormCancel={() => onArchivePortfolioFormClosed(false)}

@@ -3,6 +3,7 @@
 import { ModaGrid } from '@/src/components/common'
 import { PortfolioLinkCellRenderer } from '@/src/components/common/moda-grid-cell-renderers'
 import { ProjectPortfolioListDto } from '@/src/services/moda-api'
+import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
 import { MessageInstance } from 'antd/es/message/interface'
 import { ReactElement, useCallback, useMemo } from 'react'
@@ -24,37 +25,21 @@ const PortfoliosGrid: React.FC<PortfoliosGridProps> = (
     () => [
       { field: 'key', width: 90 },
       { field: 'name', cellRenderer: PortfolioLinkCellRenderer },
-      // { field: 'description', width: 300 },
       { field: 'status.name', headerName: 'Status' },
       {
         field: 'portfolioSponsors',
         headerName: 'Sponsors',
-        valueGetter: (params) =>
-          params.data.portfolioSponsors
-            .slice()
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((m) => m.name)
-            .join(', '),
+        valueGetter: (params) => getSortedNames(params.data.portfolioSponsors),
       },
       {
         field: 'portfolioOwners',
         headerName: 'Owners',
-        valueGetter: (params) =>
-          params.data.portfolioOwners
-            .slice()
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((m) => m.name)
-            .join(', '),
+        valueGetter: (params) => getSortedNames(params.data.portfolioOwners),
       },
       {
         field: 'portfolioManagers',
         headerName: 'Managers',
-        valueGetter: (params) =>
-          params.data.portfolioManagers
-            .slice()
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((m) => m.name)
-            .join(', '),
+        valueGetter: (params) => getSortedNames(params.data.portfolioManagers),
       },
     ],
     [],
@@ -72,6 +57,7 @@ const PortfoliosGrid: React.FC<PortfoliosGridProps> = (
         loadData={refresh}
         loading={props.isLoading}
         toolbarActions={props.viewSelector}
+        emptyMessage="No portolios found."
       />
     </>
   )

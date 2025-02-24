@@ -297,13 +297,13 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// </summary>
     /// <param name="name">The name of the project.</param>
     /// <param name="description">The description of the project.</param>
-    /// <param name="expenditureCategoryId">The ID of the expenditure category associated with the project.</param>
+    /// <param name="expenditureCategory">The ID of the expenditure category associated with the project.</param>
     /// <param name="dateRange">The date range of the project (optional).</param>
     /// <param name="programId">The ID of the program the project should be associated with (optional).</param>
     /// <param name="roles">The roles associated with the project (optional).</param>
     /// <param name="strategicThemes">The strategic themes associated with the project (optional).</param>
     /// <returns>A result containing the created project or an error.</returns>
-    public Result<Project> CreateProject(string name, string description, int expenditureCategoryId, LocalDateRange? dateRange, Guid? programId = null, Dictionary<ProjectRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
+    public Result<Project> CreateProject(string name, string description, int expenditureCategory, LocalDateRange? dateRange, Guid? programId = null, Dictionary<ProjectRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
     {
         if (Status != ProjectPortfolioStatus.Active && Status != ProjectPortfolioStatus.OnHold)
         {
@@ -327,7 +327,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
         }
 
         // Create the project
-        var project = Project.Create(name, description, expenditureCategoryId, dateRange, Id, programId, roles, strategicThemes);
+        var project = Project.Create(name, description, expenditureCategory, dateRange, Id, programId, roles, strategicThemes);
 
         // Add the project to the portfolio's project list
         _projects.Add(project);
