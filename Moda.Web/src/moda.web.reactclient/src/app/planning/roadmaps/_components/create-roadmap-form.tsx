@@ -1,4 +1,7 @@
+'use client'
+
 import { MarkdownEditor } from '@/src/components/common/markdown'
+import { EmployeeSelect } from '@/src/components/common/organizations'
 import useAuth from '@/src/components/contexts/auth'
 import { CreateRoadmapRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
@@ -63,7 +66,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
     data: employeeData,
     isLoading: employeeOptionsIsLoading,
     error: employeeOptionsError,
-  } = useGetEmployeeOptionsQuery(true)
+  } = useGetEmployeeOptionsQuery(false)
 
   const {
     data: currentUserInternalEmployeeId,
@@ -92,7 +95,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
       }
 
       props.messageApi.success(
-        `Roadmap created successfully. Roadmap Key ${response.data.key}`,
+        `Roadmap created successfully. Roadmap key ${response.data.key}`,
       )
 
       return true
@@ -259,17 +262,10 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
               },
             ]}
           >
-            <Select
-              mode="multiple"
-              allowClear
+            <EmployeeSelect
+              employees={employeeData ?? []}
+              allowMultiple={true}
               placeholder="Select one or more roadmap managers"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
-              options={employeeData}
             />
           </Item>
           <Item

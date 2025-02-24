@@ -29,7 +29,13 @@ internal sealed class DeleteStrategicThemeCommandHandler(IStrategicManagementDbC
             if (strategicTheme is null)
             {
                 _logger.LogInformation("Strategic Theme {StrategicThemeId} not found.", request.Id);
-                return Result.Failure($"Strategic Theme {request.Id} not found.");
+                return Result.Failure("Strategic Theme not found.");
+            }
+
+            if (!strategicTheme.CanBeDeleted())
+            {
+                _logger.LogInformation("Strategic Theme {StrategicThemeId} cannot be deleted.", request.Id);
+                return Result.Failure("Strategic Theme cannot be deleted.");
             }
 
             _strategicManagementDbContext.StrategicThemes.Remove(strategicTheme);

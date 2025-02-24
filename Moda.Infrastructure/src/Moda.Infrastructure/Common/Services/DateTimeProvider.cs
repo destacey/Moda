@@ -1,14 +1,11 @@
 ﻿using NodaTime;
 
 namespace Moda.Infrastructure.Common.Services;
-public class DateTimeProvider : IDateTimeProvider
+public class DateTimeProvider(IClock clock) : IDateTimeProvider
 {
-    private readonly IClock _clock;
-
-    public DateTimeProvider(IClock clock)
-    {
-        _clock = clock;
-    }
+    private readonly IClock _clock = clock;
 
     public Instant Now => _clock.GetCurrentInstant();
+
+    public LocalDate Today => _clock.GetCurrentInstant().InUtc().Date;
 }

@@ -1,8 +1,8 @@
 ﻿using Moda.Common.Application.Models;
+using Moda.Common.Domain.Enums.StrategicManagement;
 using Moda.StrategicManagement.Application.StrategicThemes.Commands;
 using Moda.StrategicManagement.Application.StrategicThemes.Dtos;
 using Moda.StrategicManagement.Application.StrategicThemes.Queries;
-using Moda.StrategicManagement.Domain.Enums;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.StrategicManagement.StrategicThemes;
 
@@ -81,6 +81,36 @@ public class StrategicThemesController : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPost("{id}/activate")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicThemes)]
+    [OpenApiOperation("Activate a strategic theme.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> Activate(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new ActivateStrategicThemeCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPost("{id}/archive")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicThemes)]
+    [OpenApiOperation("Archive a strategic theme.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> Archive(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new ArchiveStrategicThemeCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpDelete("{id}")]
     [MustHavePermission(ApplicationAction.Delete, ApplicationResource.StrategicThemes)]
     [OpenApiOperation("Delete a strategic theme.", "")]
@@ -93,6 +123,18 @@ public class StrategicThemesController : ControllerBase
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("options")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicThemes)]
+    [OpenApiOperation("Get a list of strategic theme options.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<StrategicThemeOptionDto>>> GetStrategicThemeOptions(CancellationToken cancellationToken, [FromQuery] bool? includeArchived)
+    {
+        var options = await _sender.Send(new GetStrategicThemeOptionsQuery(includeArchived), cancellationToken);
+
+        return Ok(options);
     }
 
     [HttpGet("states")]

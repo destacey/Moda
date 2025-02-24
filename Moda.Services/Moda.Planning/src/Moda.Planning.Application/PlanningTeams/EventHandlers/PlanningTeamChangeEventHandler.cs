@@ -85,27 +85,18 @@ internal sealed class PlanningTeamChangeEventHandler :
 
         try
         {
-            Guid teamId = default!;
-            string teamName = default!;
-
             if (existingTeam is null)
             {
                 var planningTeam = new PlanningTeam(simpleTeam);
-                await _planningDbContext.PlanningTeams.AddAsync(planningTeam);
-
-                teamId = planningTeam.Id;
-                teamName = planningTeam.Name;
+                await _planningDbContext.PlanningTeams.AddAsync(planningTeam, cancellationToken);
             }
             else
             {
                 existingTeam.Update(simpleTeam);
-
-                teamId = existingTeam.Id;
-                teamName = existingTeam.Name;
             }
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("[{SystemActionType}] Planning Team {Action}. {PlanningTeamId} - {PlanningTeamName}", SystemActionType.ServiceDataReplication, action, teamId, teamName);
+            _logger.LogInformation("[{SystemActionType}] Planning Team {Action}. {PlanningTeamId} - {PlanningTeamName}", SystemActionType.ServiceDataReplication, action, simpleTeam.Id, simpleTeam.Name);
         }
         catch (Exception ex)
         {

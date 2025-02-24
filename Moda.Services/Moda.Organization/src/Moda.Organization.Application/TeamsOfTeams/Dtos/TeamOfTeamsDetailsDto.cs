@@ -1,4 +1,5 @@
-﻿using Mapster;
+﻿using System.ComponentModel.DataAnnotations;
+using Mapster;
 using Moda.Organization.Application.Models;
 using NodaTime;
 
@@ -8,21 +9,25 @@ public class TeamOfTeamsDetailsDto : IMapFrom<BaseTeam>
     /// <summary>
     /// The identifier of the team.
     /// </summary>
+    [Required]
     public Guid Id { get; set; }
 
     /// <summary>
     /// The key of the team.
     /// </summary>
+    [Required]
     public int Key { get; set; }
 
     /// <summary>
     /// The name of the team.
     /// </summary>
+    [Required]
     public required string Name { get; set; }
 
     /// <summary>
     /// The code of the team.
     /// </summary>
+    [Required]
     public required string Code { get; set; }
 
     /// <summary>
@@ -33,6 +38,7 @@ public class TeamOfTeamsDetailsDto : IMapFrom<BaseTeam>
     /// <summary>
     /// The type of team.
     /// </summary>
+    [Required]
     public required string Type { get; set; }
 
     /// <summary>
@@ -48,6 +54,7 @@ public class TeamOfTeamsDetailsDto : IMapFrom<BaseTeam>
     /// <summary>
     /// Indicates whether the team is active or not.  
     /// </summary>
+    [Required]
     public bool IsActive { get; set; }
 
     /// <summary>

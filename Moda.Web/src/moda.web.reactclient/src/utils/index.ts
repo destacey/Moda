@@ -1,4 +1,5 @@
 export { daysRemaining } from './dates'
+export { getSortedNames } from './get-sorted-names'
 export {
   getWorkStatusCategoryColor,
   getObjectiveStatusColor,

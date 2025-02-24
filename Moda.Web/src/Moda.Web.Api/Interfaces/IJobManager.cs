@@ -7,4 +7,5 @@ public interface IJobManager
     Task RunSyncExternalEmployees(CancellationToken cancellationToken);
     Task RunSyncAzureDevOpsBoards(SyncType syncType, CancellationToken cancellationToken);
     Task RunSyncTeamsWithGraphTables(CancellationToken cancellationToken);
+    Task RunSyncStrategicThemes(CancellationToken cancellationToken);
 }

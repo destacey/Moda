@@ -16,6 +16,9 @@ enum SettingsTab {
   Users = 'users',
   Roles = 'roles',
 
+  // project portfolio management
+  ExpenditureCategories = 'expenditure-categories',
+
   // work-management
   WorkTypes = 'work-types',
   WorkStatuses = 'work-statuses',
@@ -136,6 +139,15 @@ const settingsMenuItems: ItemType[] = [
       'Work Processes',
       SettingsTab.WorkProcesses,
       '/settings/work-management/work-processes',
+    ),
+  ]),
+
+  getSectionMenuItem('PPM', 'ppm', [
+    getRestrictedMenuItem(
+      'Permissions.ExpenditureCategories.View',
+      'Expenditure Categories',
+      SettingsTab.ExpenditureCategories,
+      '/settings/ppm/expenditure-categories',
     ),
   ]),
 

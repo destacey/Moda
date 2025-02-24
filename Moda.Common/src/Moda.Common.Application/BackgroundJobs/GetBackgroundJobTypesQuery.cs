@@ -11,7 +11,8 @@ internal sealed class GetBackgroundJobTypesQueryHandler : IQueryHandler<GetBackg
             Id = (int)c,
             Name = c.GetDisplayName(),
             Description = c.GetDisplayDescription(),
-            Order = c.GetDisplayOrder()
+            Order = c.GetDisplayOrder(),
+            GroupName = c.GetDisplayGroupName() ?? "Other"
         }).ToList();
 
         return Task.FromResult(values);

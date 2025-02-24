@@ -7,10 +7,10 @@ import { authorizePage } from '@/src/components/hoc'
 import Link from 'next/link'
 import { Button } from 'antd'
 import useAuth from '@/src/components/contexts/auth'
-import CreateRoleForm from './create-role-form'
 import { useRouter } from 'next/navigation'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetRolesQuery } from '@/src/store/features/user-management/roles-api'
+import { CreateRoleForm } from './_components'
 
 const LinkCellRenderer = ({ value, data }) => {
   return <Link href={`roles/${data.id}`}>{value}</Link>

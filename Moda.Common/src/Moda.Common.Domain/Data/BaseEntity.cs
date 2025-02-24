@@ -10,9 +10,13 @@ public abstract class BaseEntity<TId> : IEntity<TId>
     public TId Id { get; protected set; } = default!;
 
     private readonly List<DomainEvent> _domainEvents = [];
+    private readonly List<Action> _postPersistenceActions = [];
 
     [NotMapped]
     public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+    [NotMapped]
+    public IReadOnlyCollection<Action> PostPersistenceActions => _postPersistenceActions.AsReadOnly();
 
     public void AddDomainEvent(DomainEvent domainEvent)
     {
@@ -27,5 +31,24 @@ public abstract class BaseEntity<TId> : IEntity<TId>
     public void ClearDomainEvents()
     {
         _domainEvents.Clear();
+    }
+
+    public void AddPostPersistenceAction(Action action)
+    {
+        _postPersistenceActions.Add(action);
+    }
+
+    public void RemovePostPersistenceAction(Action action)
+    {
+        _postPersistenceActions.Remove(action);
+    }
+
+    public void ExecutePostPersistenceActions()
+    {
+        foreach (var action in _postPersistenceActions)
+        {
+            action();
+        }
+        _postPersistenceActions.Clear();
     }
 }

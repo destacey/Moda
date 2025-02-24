@@ -10,10 +10,51 @@ public class IdOrKey : OneOfBase<Guid, int>
 
     public IdOrKey(string value) : base(Guid.TryParse(value, out var guid) ? guid : int.Parse(value)) { }
 
-    public static implicit operator IdOrKey(Guid value) => new(value);
-    public static implicit operator IdOrKey(int value) => new(value);
-    public static implicit operator IdOrKey(string value) => new(value);
+    /// <summary>
+    /// Gets the value as a Guid if it is a Guid; otherwise, null.
+    /// </summary>
+    public Guid? AsId => Value switch
+    {
+        Guid id => id,
+        _ => null
+    };
 
+    /// <summary>
+    /// Gets a value indicating whether the value is a Guid.
+    /// </summary>
+    public bool IsId => Value is Guid;
+
+    /// <summary>
+    /// Gets the value as an int if it is an int; otherwise, null.
+    /// </summary>
+    public int? AsKey => Value switch
+    {
+        int key => key,
+        _ => null
+    };
+
+    /// <summary>
+    /// Gets a value indicating whether the value is an int.
+    /// </summary>
+    public bool IsKey => Value is int;
+
+    /// <summary>
+    /// Implicitly converts a Guid to an <see cref="IdOrKey"/>.
+    /// </summary>
+    /// <param name="value">The Guid value to convert.</param>
+    public static implicit operator IdOrKey(Guid value) => new(value);
+
+    /// <summary>
+    /// Implicitly converts an int to an <see cref="IdOrKey"/>.
+    /// </summary>
+    /// <param name="value">The int value to convert.</param>
+    public static implicit operator IdOrKey(int value) => new(value);
+
+    /// <summary>
+    /// Implicitly converts a string to an <see cref="IdOrKey"/>.
+    /// </summary>
+    /// <param name="value">The string value to convert.</param>
+    public static implicit operator IdOrKey(string value) => new(value);
 }
 
 public static class IdOrKeyExtensions

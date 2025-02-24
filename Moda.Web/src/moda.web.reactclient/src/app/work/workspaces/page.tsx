@@ -7,8 +7,7 @@ import { useGetWorkspacesQuery } from '@/src/store/features/work-management/work
 import { useEffect, useMemo, useState } from 'react'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { AppstoreOutlined, MenuOutlined } from '@ant-design/icons'
-import WorkspacesCardGrid from './workspaces-card-grid'
-import WorkspacesGrid from './workspaces-grid'
+import { WorkspacesCardGrid, WorkspacesGrid } from './_components'
 
 enum Views {
   Cards,

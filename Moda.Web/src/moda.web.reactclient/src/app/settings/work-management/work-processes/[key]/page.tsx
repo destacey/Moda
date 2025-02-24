@@ -7,12 +7,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { Card } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import WorkProcessDetailsLoading from './loading'
-import WorkProcessDetails from './work-process-details'
 import { PageActions } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
-import ChangeWorkProcessIsActiveForm from '../components/change-work-process-isactive-form'
+import ChangeWorkProcessIsActiveForm from '../_components/change-work-process-isactive-form'
 import { useGetWorkProcessQuery } from '@/src/store/features/work-management/work-process-api'
 import { ItemType } from 'antd/es/menu/interface'
+import { WorkProcessDetails } from '../_components'
 
 const WorkProcessDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')
@@ -21,9 +21,8 @@ const WorkProcessDetailsPage = ({ params }) => {
     setOpenChangeWorkProcessIsActiveForm,
   ] = useState<boolean>(false)
 
-  const { hasClaim } = useAuth()
-  const canUpdateWorkProcess = hasClaim(
-    'Permission',
+  const { hasPermissionClaim } = useAuth()
+  const canUpdateWorkProcess = hasPermissionClaim(
     'Permissions.WorkProcesses.Update',
   )
 

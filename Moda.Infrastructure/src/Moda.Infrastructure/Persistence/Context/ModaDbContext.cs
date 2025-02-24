@@ -12,13 +12,17 @@ using Moda.Organization.Application.Teams.Models;
 using Moda.Planning.Application.Persistence;
 using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Models.Roadmaps;
+using Moda.ProjectPortfolioManagement.Application;
+using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.StrategicManagement.Application;
 using Moda.StrategicManagement.Domain.Models;
 using Moda.Work.Domain.Models;
+using PpmStrategicTheme = Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme;
+using StrategicTheme = Moda.StrategicManagement.Domain.Models.StrategicTheme;
 
 namespace Moda.Infrastructure.Persistence.Context;
 
-public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IStrategicManagementDbContext, IWorkDbContext
+public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IProjectPortfolioManagementDbContext, IStrategicManagementDbContext, IWorkDbContext
 {
     public ModaDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, ISerializerService serializer, IOptions<DatabaseSettings> dbSettings, IEventPublisher events, IRequestCorrelationIdProvider requestCorrelationIdProvider)
         : base(options, currentUser, dateTimeProvider, serializer, dbSettings, events, requestCorrelationIdProvider)
@@ -73,6 +77,16 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<Roadmap> Roadmaps => Set<Roadmap>();
 
     #endregion IPlanning
+
+    #region IProjectPortfolioManagementDbContext
+
+    public DbSet<ExpenditureCategory> ExpenditureCategories => Set<ExpenditureCategory>();
+    public DbSet<ProjectPortfolio> Portfolios => Set<ProjectPortfolio>();
+    public DbSet<Program> Programs => Set<Program>();
+    public DbSet<Project> Projects => Set<Project>();
+    public DbSet<PpmStrategicTheme> PpmStrategicThemes => Set<PpmStrategicTheme>();
+
+    #endregion IProjectPortfolioManagementDbContext
 
     #region IStrategicManagement
 

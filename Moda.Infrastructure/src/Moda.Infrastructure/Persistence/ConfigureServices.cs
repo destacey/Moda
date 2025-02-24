@@ -5,6 +5,7 @@ using Moda.Goals.Application.Persistence;
 using Moda.Health;
 using Moda.Links;
 using Moda.Planning.Application.Persistence;
+using Moda.ProjectPortfolioManagement.Application;
 using Moda.StrategicManagement.Application;
 using Serilog;
 
@@ -80,6 +81,7 @@ internal static class ConfigureServices
         services.AddScoped<ILinksDbContext, ModaDbContext>();
         services.AddScoped<IOrganizationDbContext, ModaDbContext>();
         services.AddScoped<IPlanningDbContext, ModaDbContext>();
+        services.AddScoped<IProjectPortfolioManagementDbContext, ModaDbContext>();
         services.AddScoped<IStrategicManagementDbContext, ModaDbContext>();
         services.AddScoped<IWorkDbContext, ModaDbContext>();
 

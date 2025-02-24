@@ -59,7 +59,7 @@ public sealed class CreateRoadmapRequestValidator : CustomValidator<CreateRoadma
 
         RuleFor(t => t.End)
             .NotNull()
-            .Must((membership, end) => membership.Start <= end)
+            .Must((roadmap, end) => roadmap.Start <= end)
                 .WithMessage("End date must be greater than or equal to start date");
 
         RuleFor(t => t.RoadmapManagerIds)

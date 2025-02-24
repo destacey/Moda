@@ -71,6 +71,9 @@ public class BackgroundJobsController : ControllerBase
             case BackgroundJobType.TeamGraphSync:
                 _jobService.Enqueue(() => jobManager.RunSyncTeamsWithGraphTables(cancellationToken));
                 break;
+            case BackgroundJobType.StrategicThemesSync:
+                _jobService.Enqueue(() => jobManager.RunSyncStrategicThemes(cancellationToken));
+                break;
             default:
                 _logger.LogWarning("Unknown job type {jobType} requested", jobType);
                 return BadRequest(ProblemDetailsExtensions.ForBadRequest($"Unknown job type {jobType} requested.", HttpContext));

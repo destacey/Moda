@@ -13,7 +13,7 @@ const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false })
 
 interface MarkdownEditorProps {
   value?: string
-  onChange: (value: string) => void
+  onChange?: (value: string) => void
   maxLength: number
 }
 
@@ -41,6 +41,8 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = React.memo(
         document.body.style.overflow = ''
       }
     }, [])
+
+    const contentLength = value?.length || 0
 
     return (
       <>
@@ -91,7 +93,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = React.memo(
           />
         </div>
         <MarkdownEditorFooter
-          currentLength={value?.length || 0}
+          currentLength={contentLength}
           maxLength={maxLength}
         />
       </>

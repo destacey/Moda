@@ -6,6 +6,8 @@ import {
   SettingOutlined,
   ScheduleOutlined,
   CarryOutOutlined,
+  ProjectOutlined,
+  FundOutlined,
 } from '@ant-design/icons'
 import {
   filterAndTransformMenuItem,
@@ -22,6 +24,8 @@ const menuIcons = {
   home: <HomeOutlined />,
   org: <TeamOutlined />,
   planning: <ScheduleOutlined />,
+  ppm: <ProjectOutlined />,
+  strategy: <FundOutlined />,
   work: <CarryOutOutlined />,
   settings: <SettingOutlined />,
 }
@@ -72,11 +76,29 @@ const menuItems: (Item | MenuItem)[] = [
   //     { type: 'divider' },
   //     menuItem('Requirements Management', 'pdc.requirements-management'),
   // ]),
-  // menuItem('Projects', 'ppm', null, <ProjectOutlined />, [
-  //     menuItem('Portfolios', 'ppm.portfolios'),
-  //     menuItem('Programs', 'ppm.programs'),
-  //     menuItem('Projects', 'ppm.projects'),
-  // ]),
+  menuItem('Strategic Management', 'strategy', null, menuIcons.strategy, [
+    restrictedPermissionMenuItem(
+      'Permissions.StrategicThemes.View',
+      'Strategic Themes',
+      'strategy.strategic-themes',
+      '/strategic-management/strategic-themes',
+    ),
+  ]),
+  menuItem('PPM', 'ppm', null, menuIcons.ppm, [
+    restrictedPermissionMenuItem(
+      'Permissions.ProjectPortfolios.View',
+      'Portfolios',
+      'ppm.portfolios',
+      '/ppm/portfolios',
+    ),
+    // restrictedPermissionMenuItem('Permissions.Programs.View', 'Programs', 'ppm.programs', '/ppm/programs'),
+    restrictedPermissionMenuItem(
+      'Permissions.Projects.View',
+      'Projects',
+      'ppm.projects',
+      '/ppm/projects',
+    ),
+  ]),
   { key: 'settings-divider', type: 'divider' },
   menuItem('Settings', 'settings', '/settings', menuIcons.settings),
 ]

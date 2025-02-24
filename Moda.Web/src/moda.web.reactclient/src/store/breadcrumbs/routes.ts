@@ -34,6 +34,28 @@ const routes = {
     title: 'Roadmaps',
   },
 
+  ppm: {
+    title: 'PPM',
+    href: null,
+  },
+  portfolios: {
+    title: 'Portfolios',
+    href: '/ppm/portfolios',
+  },
+  projects: {
+    title: 'Projects',
+    href: '/ppm/projects',
+  },
+
+  'strategic-management': {
+    title: 'Strategic Management',
+    href: null,
+  },
+  'strategic-themes': {
+    title: 'Strategic Themes',
+    href: '/strategic-management/strategic-themes',
+  },
+
   work: {
     title: 'Work',
     href: null,

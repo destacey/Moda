@@ -12,6 +12,7 @@ using Moda.Infrastructure.Common;
 using Moda.Links;
 using Moda.Organization.Application;
 using Moda.Planning.Application;
+using Moda.ProjectPortfolioManagement.Application;
 using Moda.StrategicManagement.Application;
 using Moda.Web.Api.Configurations;
 using Moda.Web.Api.Interfaces;
@@ -74,6 +75,7 @@ try
     builder.Services.AddLinksApplication();
     builder.Services.AddOrganizationApplication();
     builder.Services.AddPlanningApplication();
+    builder.Services.AddProjectPortfolioManagementApplication();
     builder.Services.AddStrategicManagementApplication();
     builder.Services.AddWorkApplication();
 

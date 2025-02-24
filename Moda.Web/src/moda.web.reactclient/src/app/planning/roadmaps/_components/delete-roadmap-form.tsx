@@ -1,3 +1,5 @@
+'use client'
+
 import useAuth from '@/src/components/contexts/auth'
 import { RoadmapDetailsDto } from '@/src/services/moda-api'
 import { useDeleteRoadmapMutation } from '@/src/store/features/planning/roadmaps-api'

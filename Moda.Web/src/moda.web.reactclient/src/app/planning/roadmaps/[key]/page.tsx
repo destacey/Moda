@@ -15,13 +15,16 @@ import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
 import { Descriptions, Divider, MenuProps, message } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import EditRoadmapForm from '../_components/edit-roadmap-form'
-import RoadmapViewManager from './roadmap-view-manager'
-import { DeleteRoadmapForm, RoadmapItemDrawer } from '../_components'
-import CreateRoadmapActivityForm from '../_components/create-roadmap-activity-form'
-import CreateRoadmapTimeboxForm from '../_components/create-roadmap-timebox-form'
+import {
+  DeleteRoadmapForm,
+  EditRoadmapForm,
+  RoadmapItemDrawer,
+  RoadmapViewManager,
+} from '../_components'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import ReorganizeRoadmapActivitiesModal from '../_components/reorganize-roadmap-activities-modal'
+import CreateRoadmapActivityForm from '../_components/create-roadmap-activity-form'
+import CreateRoadmapTimeboxForm from '../_components/create-roadmap-timebox-form'
 
 const { Item } = Descriptions
 
@@ -253,11 +256,9 @@ const RoadmapDetailsPage = ({ params }) => {
             </Item>
           </Descriptions>
           <Descriptions>
-            {roadmapData.description && (
-              <Item>
-                <MarkdownRenderer markdown={roadmapData.description} />
-              </Item>
-            )}
+            <Item>
+              <MarkdownRenderer markdown={roadmapData.description} />
+            </Item>
           </Descriptions>
         </>
       )}
@@ -273,7 +274,7 @@ const RoadmapDetailsPage = ({ params }) => {
       />
       {openEditRoadmapForm && (
         <EditRoadmapForm
-          roadmapId={roadmapData?.id}
+          roadmapKey={roadmapData?.key}
           showForm={openEditRoadmapForm}
           onFormComplete={() => onEditRoadmapFormClosed(true)}
           onFormCancel={() => onEditRoadmapFormClosed(false)}

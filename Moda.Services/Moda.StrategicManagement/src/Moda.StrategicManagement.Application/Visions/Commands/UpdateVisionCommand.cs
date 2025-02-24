@@ -33,7 +33,7 @@ internal sealed class UpdateVisionCommandHandler(IStrategicManagementDbContext s
             if (vision is null)
             {
                 _logger.LogInformation("Vision {VisionId} not found.", request.Id);
-                return Result.Failure($"Vision {request.Id} not found.");
+                return Result.Failure("Vision not found.");
             }
             var updateResult = vision.Update(request.Description);
 

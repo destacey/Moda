@@ -1,5 +1,5 @@
 ﻿using Moda.Common.Application.Models;
-using Moda.StrategicManagement.Domain.Enums;
+using Moda.Common.Domain.Enums.StrategicManagement;
 
 namespace Moda.StrategicManagement.Application.StrategicThemes.Queries;
 public sealed record GetStrategicThemeStatesQuery : IQuery<List<StrategicThemeStateDto>> { }
