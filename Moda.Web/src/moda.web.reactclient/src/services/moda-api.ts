@@ -13734,8 +13734,8 @@ export interface StrategicThemeListDto {
 }
 
 export interface SimpleNavigationDto {
-    id?: number;
-    name?: string;
+    id: number;
+    name: string;
 }
 
 export interface StrategicThemeDetailsDto {
