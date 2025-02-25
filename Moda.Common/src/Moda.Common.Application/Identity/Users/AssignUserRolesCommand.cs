@@ -2,12 +2,12 @@ namespace Moda.Common.Application.Identity.Users;
 
 public sealed record AssignUserRolesCommand
 {
-    public AssignUserRolesCommand(string userId, List<UserRoleDto> userRoles)
+    public AssignUserRolesCommand(string userId, List<string> roleNames)
     {
         UserId = userId;
-        UserRoles = userRoles ?? new List<UserRoleDto>();
+        RoleNames = roleNames ?? [];
     }
 
     public string UserId { get; }
-    public List<UserRoleDto> UserRoles { get; }
+    public List<string> RoleNames { get; }
 }

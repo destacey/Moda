@@ -1,10 +1,10 @@
-﻿namespace Moda.Web.Api.Models.Identity.Users;
+﻿namespace Moda.Web.Api.Models.UserManagement.Users;
 
 public sealed record AssignUserRolesRequest
 {
     public required string UserId { get; set; }
-    public List<UserRoleDto> UserRoles { get; set; } = new();
+    public List<string> RoleNames { get; set; } = [];
 
     public AssignUserRolesCommand ToAssignUserRolesRequest()
-        => new(UserId, UserRoles);
+        => new(UserId, RoleNames);
 }

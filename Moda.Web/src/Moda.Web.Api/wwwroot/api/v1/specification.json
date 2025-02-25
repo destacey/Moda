@@ -755,14 +755,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": ""
           },
           "422": {
             "description": "",
@@ -11446,10 +11439,10 @@
           "userId": {
             "type": "string"
           },
-          "userRoles": {
+          "roleNames": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/UserRoleDto"
+              "type": "string"
             }
           }
         }

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CSharpFunctionalExtensions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Moda.Infrastructure.Identity;
 
@@ -10,7 +12,7 @@ internal partial class UserService
 
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
-            return new List<UserRoleDto>();
+            return [];
 
         var roles = await _roleManager.Roles.AsNoTracking().ToListAsync(cancellationToken);
         foreach (var role in roles)
@@ -24,10 +26,10 @@ internal partial class UserService
             });
         }
 
-        return includeUnassigned ? userRoles : userRoles.Where(r => r.Enabled).ToList();
+        return includeUnassigned ? userRoles : [.. userRoles.Where(r => r.Enabled)];
     }
 
-    public async Task<string> AssignRolesAsync(AssignUserRolesCommand command, CancellationToken cancellationToken)
+    public async Task<Result> AssignRolesAsync(AssignUserRolesCommand command, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(command, nameof(command));
 
@@ -35,39 +37,40 @@ internal partial class UserService
 
         _ = user ?? throw new NotFoundException("User Not Found.");
 
-        // Check if the user is an admin for which the admin role is getting disabled
-        if (await _userManager.IsInRoleAsync(user, ApplicationRoles.Admin)
-            && command.UserRoles.Any(a => !a.Enabled && a.RoleName == ApplicationRoles.Admin))
+        var userCurrentRoles = await _userManager.GetRolesAsync(user);
+
+        // REMOVE ROLES
+        var rolesToRemove = userCurrentRoles.Except(command.RoleNames);
+
+        if (rolesToRemove.Contains(ApplicationRoles.Admin))
         {
-            // Get count of users in Admin Role
-            int adminCount = (await _userManager.GetUsersInRoleAsync(ApplicationRoles.Admin)).Count;
-            if (adminCount <= 2)
+            var adminCount = (await _userManager.GetUsersInRoleAsync(ApplicationRoles.Admin)).Count;
+            if (adminCount <= 1)
             {
-                throw new ConflictException("Moda should have at least 2 Admins.");
+                _logger.LogWarning("Moda should have at least 1 Admin.");
+                throw new ConflictException("Moda should have at least 1 Admin.");
             }
         }
 
-        foreach (var userRole in command.UserRoles)
+        var result = await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
+        if (!result.Succeeded)
         {
-            // Check if Role Exists
-            if (userRole.RoleName is not null && await _roleManager.FindByNameAsync(userRole.RoleName) is not null)
-            {
-                if (userRole.Enabled)
-                {
-                    if (!await _userManager.IsInRoleAsync(user, userRole.RoleName))
-                    {
-                        await _userManager.AddToRoleAsync(user, userRole.RoleName);
-                    }
-                }
-                else
-                {
-                    await _userManager.RemoveFromRoleAsync(user, userRole.RoleName);
-                }
-            }
+            _logger.LogError("Failed to remove roles from user.");
+            throw new InternalServerException("Failed to remove roles from user.");
+        }
+
+        // ADD ROLES
+        var rolesToAdd = command.RoleNames.Except(userCurrentRoles);
+
+        result = await _userManager.AddToRolesAsync(user, rolesToAdd);
+        if (!result.Succeeded)
+        {
+            _logger.LogError("Failed to add roles to user.");
+            throw new InternalServerException("Failed to add roles to user.");
         }
 
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now, true));
 
-        return "User Roles Updated Successfully.";
+        return Result.Success();
     }
 }
