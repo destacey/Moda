@@ -21,7 +21,7 @@ public sealed record StrategicThemeOptionDto : IMapFrom<StrategicTheme>
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
-        config.NewConfig<StrategicTheme, StrategicThemeListDto>()
+        config.NewConfig<StrategicTheme, StrategicThemeOptionDto>()
             .Map(dest => dest.State, src => src.State.GetDisplayName());
     }
 }

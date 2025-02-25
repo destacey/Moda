@@ -1,7 +1,12 @@
-﻿namespace Moda.Common.Application.Dtos;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Moda.Common.Application.Dtos;
 public record SimpleNavigationDto
 {
+    [Required]
     public int Id { get; set; }
+
+    [Required]
     public required string Name { get; set; }
 
     public static SimpleNavigationDto Create(int id, string name)
