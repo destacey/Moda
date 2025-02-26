@@ -214,13 +214,15 @@ const ManagePlanningIntervalTeamsForm = ({
     try {
       if (await savePITeams()) {
         setIsOpen(false)
-        setIsSaving(false)
         onFormSave()
         messageApi.success(`Successfully updated PI teams.`)
-      } else {
-        setIsSaving(false)
       }
-    } catch (errorInfo) {
+    } catch (error) {
+      console.error('handleOk error', error)
+      messageApi.error(
+        'An error occurred while updating PI teams. Please try again.',
+      )
+    } finally {
       setIsSaving(false)
     }
   }

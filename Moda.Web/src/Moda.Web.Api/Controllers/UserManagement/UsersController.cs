@@ -54,7 +54,9 @@ public class UsersController : ControllerBase
     [HttpPost("{id}/roles")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.UserRoles)]
     [OpenApiOperation("Update a user's assigned roles.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Register))]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> ManageRoles(string id, AssignUserRolesRequest request, CancellationToken cancellationToken)
     {
         if (id != request.UserId)

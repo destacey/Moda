@@ -754,8 +754,18 @@
           "x-position": 2
         },
         "responses": {
-          "200": {
+          "204": {
             "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "422": {
             "description": "",
