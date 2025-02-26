@@ -88,7 +88,8 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
         rowData={props.projects}
         loadData={refresh}
         loading={props.isLoading}
-        toolbarActions={undefined}
+        toolbarActions={props.viewSelector}
+        height={props.gridHeight}
         emptyMessage="No projects found."
       />
     </>

@@ -2,10 +2,11 @@
 
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
-import { memo, useEffect, useMemo, useState } from 'react'
+import { memo, useMemo, useState } from 'react'
 import { MessageInstance } from 'antd/es/message/interface'
 import { ProjectListDto } from '@/src/services/moda-api'
 import ProjectsGrid from './projects-grid'
+import { ProjectsTimeline } from '.'
 
 interface ProjectViewManagerProps {
   projects: ProjectListDto[]
@@ -27,11 +28,6 @@ const viewSelectorOptions: SegmentedLabeledOption[] = [
 
 const ProjectViewManager = (props: ProjectViewManagerProps) => {
   const [currentView, setCurrentView] = useState<string | number>('List')
-  const [projects, setProjectItems] = useState<ProjectListDto[]>([])
-
-  useEffect(() => {
-    setProjectItems(props.projects)
-  }, [props.projects])
 
   const viewSelector = useMemo(
     () => (
@@ -48,7 +44,7 @@ const ProjectViewManager = (props: ProjectViewManagerProps) => {
     <>
       {currentView === 'List' && (
         <ProjectsGrid
-          projects={projects}
+          projects={props.projects}
           isLoading={props.isLoading}
           refetch={props.refetch}
           messageApi={props.messageApi}
@@ -57,14 +53,15 @@ const ProjectViewManager = (props: ProjectViewManagerProps) => {
           viewSelector={viewSelector}
         />
       )}
-      {/* {currentView === 'Timeline' && (
+      {currentView === 'Timeline' && (
         <ProjectsTimeline
-          projects={projects}
-          isProjectItemsLoading={props.isLoading}
-          refreshProjectItems={props.refetch}
+          projects={props.projects}
+          isLoading={props.isLoading}
+          refetch={props.refetch}
+          messageApi={props.messageApi}
           viewSelector={viewSelector}
         />
-      )} */}
+      )}
     </>
   )
 }

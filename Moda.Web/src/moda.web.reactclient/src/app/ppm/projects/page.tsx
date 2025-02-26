@@ -7,8 +7,8 @@ import { useDocumentTitle } from '@/src/hooks'
 import { useGetProjectsQuery } from '@/src/store/features/ppm/projects-api'
 import { Button, message } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
-import ProjectsGrid from '../_components/projects-grid'
 import { CreateProjectForm } from './_components'
+import { ProjectsGrid } from '../_components'
 
 const ProjectsPage: React.FC = () => {
   useDocumentTitle('Projects')
