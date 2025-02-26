@@ -1,4 +1,4 @@
-﻿namespace Moda.Web.Api.Models.Identity.Users;
+﻿namespace Moda.Web.Api.Models.UserManagement.Users;
 
 public sealed record ToggleUserStatusRequest
 {

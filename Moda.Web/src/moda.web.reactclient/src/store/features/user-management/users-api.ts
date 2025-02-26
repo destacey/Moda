@@ -6,7 +6,6 @@ import {
 } from '@/src/services/moda-api'
 import { getUsersClient } from '@/src/services/clients'
 import { QueryTags } from '../query-tags'
-import { update } from 'lodash'
 
 export const usersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -55,10 +54,13 @@ export const usersApi = apiSlice.injectEndpoints({
         { type: QueryTags.UserRoles, id: arg.id },
       ],
     }),
-    updateUserRoles: builder.mutation<void, AssignUserRolesRequest>({
+    manageUserRoles: builder.mutation<void, AssignUserRolesRequest>({
       queryFn: async (request) => {
         try {
-          await (await getUsersClient()).manageRoles(request.userId, request)
+          const data = await (
+            await getUsersClient()
+          ).manageRoles(request.userId, request)
+          return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -75,5 +77,5 @@ export const {
   useGetUsersQuery,
   useGetUserQuery,
   useGetUserRolesQuery,
-  useUpdateUserRolesMutation,
+  useManageUserRolesMutation,
 } = usersApi

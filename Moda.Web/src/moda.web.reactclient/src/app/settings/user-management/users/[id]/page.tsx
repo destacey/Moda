@@ -4,7 +4,7 @@ import PageTitle from '@/src/components/common/page-title'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
 import UserDetailsLoading from './loading'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Card, message } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
@@ -21,14 +21,6 @@ const UserDetailsPage = ({ params }) => {
     refetch,
   } = useGetUserQuery(params.id)
 
-  const tabs = [
-    {
-      key: 'details',
-      tab: 'Details',
-      content: <UserDetails user={userData} canEdit={true} />,
-    },
-  ]
-
   useEffect(() => {
     error && console.error(error)
   }, [error])
@@ -40,6 +32,14 @@ const UserDetailsPage = ({ params }) => {
   if (!userData) {
     notFound()
   }
+
+  const tabs = [
+    {
+      key: 'details',
+      tab: 'Details',
+      content: <UserDetails user={userData} messageApi={messageApi} />,
+    },
+  ]
 
   const fullName = `${userData?.firstName} ${userData?.lastName}`
 

@@ -1,5 +1,5 @@
-using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.Web.Api.Extensions;
+using Moda.Web.Api.Models.UserManagement.Users;
 
 namespace Moda.Web.Api.Controllers.UserManagement;
 
@@ -54,13 +54,19 @@ public class UsersController : ControllerBase
     [HttpPost("{id}/roles")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.UserRoles)]
     [OpenApiOperation("Update a user's assigned roles.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.Register))]
-    public async Task<ActionResult<string>> ManageRoles(string id, AssignUserRolesRequest request, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ManageRoles(string id, AssignUserRolesRequest request, CancellationToken cancellationToken)
     {
         if (id != request.UserId)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(id), nameof(request.UserId), HttpContext));
+        
+        var result = await _userService.AssignRolesAsync(request.ToAssignUserRolesRequest(), cancellationToken);
 
-        return await _userService.AssignRolesAsync(request.ToAssignUserRolesRequest(), cancellationToken);
+        return result.IsSuccess
+            ? Ok()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpPost("{id}/toggle-status")]

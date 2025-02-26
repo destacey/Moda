@@ -19,7 +19,7 @@ public interface IUserService : ITransientService
     Task<string?> GetEmailAsync(string userId);
 
     Task<List<UserRoleDto>> GetRolesAsync(string userId, bool includeUnassigned, CancellationToken cancellationToken);
-    Task<string> AssignRolesAsync(AssignUserRolesCommand command, CancellationToken cancellationToken);
+    Task<Result> AssignRolesAsync(AssignUserRolesCommand command, CancellationToken cancellationToken);
 
     Task<List<string>> GetPermissionsAsync(string userId, CancellationToken cancellationToken);
     Task<bool> HasPermissionAsync(string userId, string permission, CancellationToken cancellationToken = default);
