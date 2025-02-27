@@ -5,13 +5,15 @@ import {
   ModaDataItem,
   ModaTimeline,
   ModaTimelineOptions,
+  TimelineTemplate,
 } from '@/src/components/common/timeline'
 import { ProjectListDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
-import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { ProjectDrawer } from '.'
 
 const { Text } = Typography
 
@@ -25,17 +27,54 @@ export interface ProjectsTimelineProps {
 
 interface ProjectTimelineItem extends ModaDataItem<ProjectListDto, string> {
   id: string
+  openProjectDrawer: (projectKey: number) => void
+}
+
+export const ProjectRangeItemTemplate: TimelineTemplate<
+  ProjectTimelineItem
+> = ({ item, fontColor, foregroundColor }) => {
+  return (
+    <Text style={{ padding: '5px' }}>
+      <a
+        onClick={() => item.openProjectDrawer(item.objectData.key)}
+        style={{ textDecoration: 'none' }}
+        onMouseOver={(e) =>
+          (e.currentTarget.style.textDecoration = 'underline')
+        }
+        onMouseOut={(e) => (e.currentTarget.style.textDecoration = 'none')}
+      >
+        {item.content}
+      </a>
+    </Text>
+  )
 }
 
 const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
   const [isLoading, setIsLoading] = useState(true)
   const [projects, setProjects] = useState<ProjectTimelineItem[]>([])
-  const [timelineStart, setTimelineStart] = useState<Date | undefined>(
-    undefined,
-  )
-  const [timelineEnd, setTimelineEnd] = useState<Date | undefined>(undefined)
+  const [timelineStart, setTimelineStart] = useState<Date>(dayjs().toDate())
+  const [timelineEnd, setTimelineEnd] = useState<Date>(dayjs().toDate())
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [selectedItemKey, setSelectedItemKey] = useState<number | null>(null)
 
   const [showCurrentTime, setShowCurrentTime] = useState<boolean>(true)
+
+  const showDrawer = useCallback(() => {
+    setDrawerOpen(true)
+  }, [])
+
+  const onDrawerClose = useCallback(() => {
+    setDrawerOpen(false)
+    setSelectedItemKey(null)
+  }, [])
+
+  const openProjectDrawer = useCallback(
+    (projectKey: number) => {
+      setSelectedItemKey(projectKey)
+      showDrawer()
+    },
+    [showDrawer],
+  )
 
   useEffect(() => {
     if (props.isLoading) return
@@ -51,6 +90,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
         type: 'range',
         start: new Date(project.start),
         end: new Date(project.end),
+        openProjectDrawer: openProjectDrawer,
       }))
 
     setProjects(filteredProjects)
@@ -67,7 +107,6 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
       }
     })
 
-    // Adjust minDate and maxDate at the end of processing the list
     minDate = minDate.subtract(14, 'days')
     maxDate = maxDate.add(1, 'month')
 
@@ -75,27 +114,25 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
     setTimelineEnd(maxDate.toDate())
 
     setIsLoading(props.isLoading)
-  }, [props.isLoading, props.projects])
+  }, [openProjectDrawer, props.isLoading, props.projects])
 
   const timelineOptions = useMemo(
-    (): ModaTimelineOptions<ProjectTimelineItem> =>
-      // TODO: start,end,min,max types don't allow undefined, but initial state is undefined
-      ({
-        showCurrentTime: showCurrentTime,
-        maxHeight: 650,
-        start: timelineStart,
-        end: timelineEnd,
-        min: timelineStart,
-        max: timelineEnd,
-      }),
+    (): ModaTimelineOptions<ProjectTimelineItem> => ({
+      showCurrentTime: showCurrentTime,
+      maxHeight: 650,
+      start: timelineStart,
+      end: timelineEnd,
+      min: timelineStart,
+      max: timelineEnd,
+    }),
     [showCurrentTime, timelineEnd, timelineStart],
   )
 
-  const onShowCurrentTimeChange = (checked: boolean) => {
+  const onShowCurrentTimeChange = useCallback((checked: boolean) => {
     setShowCurrentTime(checked)
-  }
+  }, [])
 
-  const controlItems = (): ItemType[] => {
+  const controlItems = useCallback((): ItemType[] => {
     const items: ItemType[] = []
 
     items.push({
@@ -114,7 +151,7 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
     })
 
     return items
-  }
+  }, [showCurrentTime, onShowCurrentTimeChange])
 
   return (
     <>
@@ -123,15 +160,24 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
         <Divider type="vertical" style={{ height: '30px' }} />
         {props.viewSelector}
       </Flex>
-      <Card size="small" bordered={false}>
+      <Card size="small" variant="borderless">
         <ModaTimeline
           data={projects}
           isLoading={isLoading}
           options={timelineOptions}
+          rangeItemTemplate={ProjectRangeItemTemplate}
           allowFullScreen={true}
           allowSaveAsImage={true}
         />
       </Card>
+      {selectedItemKey && (
+        <ProjectDrawer
+          projectKey={selectedItemKey}
+          drawerOpen={drawerOpen}
+          onDrawerClose={onDrawerClose}
+          messageApi={props.messageApi}
+        />
+      )}
     </>
   )
 }
