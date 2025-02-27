@@ -18,7 +18,7 @@ internal sealed class WorkItemClient : BaseClient
         var request = new RestRequest("/_apis/wit/wiql", Method.Post);
         SetupRequest(request);
 
-        int maxResults = 20_000;
+        int maxResults = 10_000; // this was erroring out with 20_000, even though the API supports up to 20_000
         request.AddQueryParameter("$top", maxResults);
         request.AddQueryParameter("timePrecision", "true");
 
@@ -53,7 +53,7 @@ internal sealed class WorkItemClient : BaseClient
             request.RemoveParameter(bodyParameter);
         }
 
-        return workItemIds.Distinct().ToArray();
+        return [.. workItemIds.Distinct()];
     }
 
     internal async Task<List<WorkItemResponse>> GetWorkItems(string projectName, int[] workItemIds, string[] fields, CancellationToken cancellationToken)
