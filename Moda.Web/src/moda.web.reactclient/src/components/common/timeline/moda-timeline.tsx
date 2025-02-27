@@ -335,6 +335,5 @@ const ModaTimeline = <TItem extends ModaDataItem, TGroup extends ModaDataGroup>(
     </Spin>
   )
 }
-ModaTimeline.displayName = 'ModaTimeline'
 
-export default ModaTimeline
+export default React.memo(ModaTimeline)

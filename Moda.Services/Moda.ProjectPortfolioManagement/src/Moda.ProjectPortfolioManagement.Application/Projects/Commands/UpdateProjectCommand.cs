@@ -58,6 +58,7 @@ internal sealed class UpdateProjectCommandHandler(
         {
             var project = await _projectPortfolioManagementDbContext.Projects
                 .Include(p => p.Roles)
+                .Include(p => p.StrategicThemeTags)
                 .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
             if (project is null)
             {

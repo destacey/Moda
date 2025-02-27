@@ -388,7 +388,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
           {props.viewSelector}
         </Flex>
       </Flex>
-      <Card size="small" bordered={false}>
+      <Card size="small" variant="borderless">
         <ModaTimeline
           data={filteredItems}
           groups={processedGroups}
