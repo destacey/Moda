@@ -1,13 +1,13 @@
 'use client'
 
-import HealthReportChart from '@/src/components/common/health-check/health-report-chart'
 import LinksCard from '@/src/components/common/links/links-card'
 import { PlanningIntervalObjectiveDetailsDto } from '@/src/services/moda-api'
-import { Card, Col, Descriptions, Progress, Row, Space, Tooltip } from 'antd'
+import { Col, Descriptions, Progress, Row, Space, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import PlanningIntervalObjectiveWorkItemsCard from './planning-interval-objective-work-items-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
+import HealthReportChart from '@/src/components/common/health-check/health-report-chart'
 
 const { Item } = Descriptions
 
@@ -80,9 +80,7 @@ const PlanningIntervalObjectiveDetails = ({
         </Col>
       </Row>
       <Space align="start" wrap>
-        <Card size="small">
-          <HealthReportChart objectId={objective.id} />
-        </Card>
+        <HealthReportChart objectId={objective.id} />
         <PlanningIntervalObjectiveWorkItemsCard
           planningIntervalId={objective.planningInterval?.id}
           objectiveId={objective.id}

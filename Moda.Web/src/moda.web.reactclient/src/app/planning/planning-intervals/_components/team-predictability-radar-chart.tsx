@@ -45,13 +45,17 @@ const TeamPredictabilityRadarChart: React.FC<
       width: 400,
       data: teamPredictabilities?.map((x) => ({
         team: x.team.name,
-        Predictability: x.predictability ?? 0,
+        predictability: x.predictability ?? 0,
       })),
       xField: 'team',
-      yField: 'Predictability',
+      yField: 'predictability',
       tooltip: {
         items: [
-          { channel: 'y', valueFormatter: (value) => `${value.toFixed(0)}%` },
+          {
+            channel: 'y',
+            valueFormatter: (value) => `${value.toFixed(0)}%`,
+            name: 'Predictability',
+          },
         ],
       },
       area: {
