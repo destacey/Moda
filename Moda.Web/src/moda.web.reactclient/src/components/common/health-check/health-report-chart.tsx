@@ -1,15 +1,16 @@
 'use client'
 
-import useTheme from '@/src/components/contexts/theme'
-import { Spin } from 'antd'
-import { useEffect, useMemo, useState } from 'react'
-
 import dynamic from 'next/dynamic'
-import dayjs from 'dayjs'
-import { ApexOptions } from 'apexcharts'
+import React, { useEffect, useMemo, useState } from 'react'
+import useTheme from '../../contexts/theme'
 import { useGetHealthReportQuery } from '@/src/store/features/common/health-checks-api'
+import { Card } from 'antd'
+import dayjs from 'dayjs'
 
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
+const Line = dynamic(
+  () => import('@ant-design/charts').then((mod) => mod.Line) as any,
+  { ssr: false },
+)
 
 interface HealthReportChartProps {
   objectId: string
@@ -28,15 +29,20 @@ const convertStatusToNumber = (status: string) => {
   }
 }
 
-// TODO: add a way to refresh the chart when a new health report is added from a parent component
-const HealthReportChart = (props: HealthReportChartProps) => {
-  const [seriesData, setSeriesData] = useState([])
+const statusMap = {
+  0: 'Unhealthy',
+  1: 'At Risk',
+  2: 'Healthy',
+}
 
-  const { currentThemeName } = useTheme()
-  const fontColor =
-    currentThemeName === 'light'
-      ? 'rgba(0, 0, 0, 0.45)'
-      : 'rgba(255, 255, 255, 0.45)'
+// TODO: copying the image in light mode works, but in dark mode it doesn't
+// TODO: add empty state
+
+const HealthReportChart: React.FC<HealthReportChartProps> = (
+  props: HealthReportChartProps,
+) => {
+  const [seriesData, setSeriesData] = useState([])
+  const { currentThemeName, antDesignChartsTheme } = useTheme()
 
   const {
     data: healthReportData,
@@ -46,117 +52,91 @@ const HealthReportChart = (props: HealthReportChartProps) => {
     refetch,
   } = useGetHealthReportQuery(props.objectId, { skip: !props.objectId })
 
-  const chartData = useMemo(() => {
-    if (!healthReportData) return []
-    return healthReportData
+  useEffect(() => {
+    if (!healthReportData) return
+
+    const chartData = healthReportData
       .slice()
       .sort((a, b) =>
         dayjs(a.reportedOn).isAfter(dayjs(b.reportedOn)) ? 1 : -1,
       )
       .map((report) => ({
-        x: dayjs(report.reportedOn),
-        y: convertStatusToNumber(report.status?.name),
+        date: dayjs(report.reportedOn).toDate(),
+        status: convertStatusToNumber(report.status?.name),
       }))
+
+    setSeriesData(chartData)
   }, [healthReportData])
 
-  useEffect(() => {
-    setSeriesData([{ name: 'Health Report', data: chartData }])
-  }, [chartData])
+  // https://ant-design-charts.antgroup.com/en/options/plots/component/axis
+  const config = useMemo(() => {
+    const fontColor =
+      currentThemeName === 'light'
+        ? 'rgba(0, 0, 0, 0.45)'
+        : 'rgba(255, 255, 255, 0.45)'
 
-  const options: ApexOptions = useMemo(
-    () => ({
-      chart: {
-        fontFamily: 'inherit',
-        parentHeightOffset: 0,
-      },
+    return {
       title: {
-        text: 'Health Report',
+        title: 'Health Report',
         style: {
-          fontSize: '14px',
-          fontWeight: 'normal',
-          color: fontColor,
+          titleFontSize: 14,
+          titleFontWeight: 'normal',
+          titleFill: fontColor,
         },
       },
-      xaxis: {
-        type: 'datetime',
-        labels: {
-          style: {
-            colors: fontColor,
-          },
-          datetimeUTC: false,
-          datetimeFormatter: {
-            year: 'yyyy',
-            month: "MMM 'yy",
-            day: 'dd MMM',
-            hour: 'HH:mm',
-          },
-        },
-      },
-      yaxis: {
-        min: 0,
-        max: 2,
-        tickAmount: 2,
-        labels: {
-          style: {
-            colors: fontColor,
-          },
-          formatter: (value) => {
-            switch (value) {
-              case 0:
-                return 'Unhealthy'
-              case 1:
-                return 'At Risk'
-              case 2:
-                return 'Healthy'
-              default:
-                return ''
-            }
-          },
-        },
+      theme: antDesignChartsTheme,
+      height: 200,
+      width: 350,
+      data: seriesData,
+      xField: 'date',
+      yField: 'status',
+      point: {
+        size: 5,
+        shape: 'circle',
       },
       tooltip: {
-        enabled: true,
-        theme: currentThemeName,
+        title: (datum) => `${dayjs(datum.date).format('MMM D')}`, // Show full Date & Time
+        items: [
+          {
+            channel: 'y',
+            valueFormatter: (value) => statusMap[value],
+            name: 'Status',
+          },
+          {
+            channel: 'x',
+            valueFormatter: (value) => dayjs(value).format('h:mm A'),
+            name: 'Time',
+          },
+        ],
+      },
+      axis: {
         x: {
-          format: 'MMM dd, yyyy h:mm TT',
+          gridStrokeOpacity: 0.3,
+          labelFormatter: (value) => dayjs(value).format('MMM D'),
         },
         y: {
-          title: {
-            formatter: () => 'Health Status:',
-          },
+          labelFormatter: (value) => statusMap[value],
+          gridStrokeOpacity: 0.3,
         },
       },
-      markers: {
-        size: 5,
+      scale: {
+        y: {
+          type: 'linear',
+          domain: [0, 1, 2],
+          tickMethod: () => [0, 1, 2],
+        },
       },
-      stroke: {
-        width: 3,
-      },
-      noData: {
-        text: 'No Health Report Data',
-      },
-    }),
-    [currentThemeName, fontColor],
-  )
-
-  if (isLoading || isFetching) {
-    return <Spin size="small" />
-  }
-
-  const isClient = typeof window !== 'undefined'
+    } as any
+  }, [antDesignChartsTheme, currentThemeName, seriesData])
 
   return (
-    <div id="object-health-report-chart">
-      {isClient && (
-        <Chart
-          options={options}
-          series={seriesData}
-          type="line"
-          height={200}
-          width={350}
-        />
-      )}
-    </div>
+    <Card
+      size="small"
+      loading={isLoading}
+      style={{ minHeight: 200, minWidth: 350 }}
+    >
+      <Line {...config} />
+    </Card>
   )
 }
 
