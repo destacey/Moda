@@ -8,7 +8,7 @@ import { Avatar, Button, Dropdown, Space, Typography } from 'antd'
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/navigation'
 import useAuth from '../../components/contexts/auth'
-import { useMemo } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import useThemeToggleMenuItem from '../../hooks/theme/use-theme-toggle-menu-item'
 
 const { Text } = Typography
@@ -18,17 +18,28 @@ const Profile = () => {
   const router = useRouter()
   const themeToggleMenuItem = useThemeToggleMenuItem()
 
-  const handleLogout = () => {
-    logout().catch((e) => {
+  // Ensure UI updates when authentication state changes (multi-tab sync)
+  const [userState, setUserState] = useState(user)
+
+  useEffect(() => {
+    setUserState(user)
+  }, [user]) // Reactively update profile when authentication state changes
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+    } catch (e) {
       console.error(`logoutRedirect failed: ${e}`)
-    })
+    }
   }
 
   const handleLogin = async () => {
-    if (!user.isAuthenticated) {
-      await login().catch((e) => {
+    if (!user?.isAuthenticated) {
+      try {
+        await login()
+      } catch (e) {
         console.error(`loginRedirect failed: ${e}`)
-      })
+      }
     }
   }
 
@@ -48,7 +59,11 @@ const Profile = () => {
 
   const handleMenuItemClicked = (info: { key: string }) => {
     const action = menuActions[info.key]
-    if (action) action()
+    if (action) {
+      action()
+    } else {
+      console.warn(`No action found for menu key: ${info.key}`)
+    }
   }
 
   return (
@@ -58,16 +73,19 @@ const Profile = () => {
           {isLoading ? (
             <Text>Loading user info...</Text>
           ) : (
-            user.name?.trim() && <Text>Welcome, {user.name}</Text>
+            userState?.name && <Text>Welcome, {userState.name}</Text>
           )}
-          <Dropdown menu={{ items: menuItems, onClick: handleMenuItemClicked }}>
+          <Dropdown
+            menu={{ items: menuItems, onClick: handleMenuItemClicked }}
+            trigger={['click']}
+          >
             <Avatar icon={<UserOutlined />} />
           </Dropdown>
         </Space>
       </AuthenticatedTemplate>
       <UnauthenticatedTemplate>
         <Space>
-          <div>Unauthenticated</div>
+          <Text>Unauthenticated</Text>
           <Button onClick={handleLogin}>Login</Button>
         </Space>
       </UnauthenticatedTemplate>

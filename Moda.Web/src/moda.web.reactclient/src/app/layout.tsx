@@ -6,7 +6,6 @@ import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'
 import { Provider } from 'react-redux'
 import { Inter } from 'next/font/google'
 import { Layout } from 'antd'
-import { AuthenticatedTemplate } from '@azure/msal-react'
 import { store } from '../store'
 import AppHeader from './_components/app-header'
 import AppSideNav from './_components/menu/app-side-nav'
@@ -17,6 +16,7 @@ import { MenuToggleProvider } from '../components/contexts/menu-toggle'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import LoadingAccount from '../components/common/loading-account'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
+import { AuthenticatedTemplate } from '@azure/msal-react'
 
 const { Content } = Layout
 
@@ -32,17 +32,18 @@ const queryClient = new QueryClient({
 })
 
 // Register all community features for ag-grid
-ModuleRegistry.registerModules([AllCommunityModule]);
+ModuleRegistry.registerModules([AllCommunityModule])
 
 const RootLayout = ({ children }: React.PropsWithChildren) => {
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
+
     const handleResize = () => setIsMobile(window.innerWidth < 768)
     handleResize()
 
     window.addEventListener('resize', handleResize)
-
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
@@ -50,17 +51,17 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
     <html lang="en">
       <body className={inter.className}>
         <AntdRegistry>
-          <Provider store={store}>
-            <AuthProvider>
-              <ThemeProvider>
-                <AuthenticatedTemplate>
-                  <QueryClientProvider client={queryClient}>
-                    <MenuToggleProvider>
-                      {/* Main Layout */}
-                      <Layout>
-                        {/* Fixed Header */}
-                        <AppHeader />
-                        <LoadingAccount>
+          <QueryClientProvider client={queryClient}>
+            <Provider store={store}>
+              <AuthProvider>
+                <ThemeProvider>
+                  <MenuToggleProvider>
+                    {/* Main Layout */}
+                    <Layout>
+                      {/* Fixed Header */}
+                      <AppHeader />
+                      <LoadingAccount>
+                        <AuthenticatedTemplate>
                           {/* Sidebar and Content */}
                           <Layout hasSider className="app-main-layout">
                             <AppSideNav isMobile={isMobile} />
@@ -69,14 +70,14 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
                               {children}
                             </Content>
                           </Layout>
-                        </LoadingAccount>
-                      </Layout>
-                    </MenuToggleProvider>
-                  </QueryClientProvider>
-                </AuthenticatedTemplate>
-              </ThemeProvider>
-            </AuthProvider>
-          </Provider>
+                        </AuthenticatedTemplate>
+                      </LoadingAccount>
+                    </Layout>
+                  </MenuToggleProvider>
+                </ThemeProvider>
+              </AuthProvider>
+            </Provider>
+          </QueryClientProvider>
         </AntdRegistry>
       </body>
     </html>
