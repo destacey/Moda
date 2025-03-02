@@ -2,22 +2,29 @@
 
 import LinksCard from '@/src/components/common/links/links-card'
 import { PlanningIntervalDetailsDto } from '@/src/services/moda-api'
-import { Card, Col, Descriptions, Divider, Row, Space, Statistic } from 'antd'
+import {
+  Card,
+  Col,
+  Descriptions,
+  DescriptionsProps,
+  Divider,
+  Row,
+  Space,
+  Statistic,
+} from 'antd'
 import dayjs from 'dayjs'
 import { daysRemaining } from '@/src/utils'
-import TeamPredictabilityRadarChart from './team-predictability-radar-chart'
 import { useGetPlanningIntervalPredictability } from '@/src/services/queries/planning-queries'
 import { useMemo } from 'react'
-
-import type { DescriptionsProps } from 'antd'
-import PlanningIntervalIterationsList from './planning-interval-iterations-list'
-import ObjectiveStatusChart, {
-  ObjectiveStatusChartDataItem,
-} from './objective-status-chart'
 import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
-import ObjectiveHealthChart, {
+import {
+  ObjectiveHealthChart,
   ObjectiveHealthChartDataItem,
-} from './objective-health-chart'
+  ObjectiveStatusChart,
+  ObjectiveStatusChartDataItem,
+  PlanningIntervalIterationsList,
+  TeamPredictabilityRadarChart,
+} from '.'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 
 const { Item } = Descriptions
@@ -29,9 +36,8 @@ interface PlanningIntervalDetailsProps {
 const PlanningIntervalDetails = ({
   planningInterval,
 }: PlanningIntervalDetailsProps) => {
-  const { data: piPredictabilityData } = useGetPlanningIntervalPredictability(
-    planningInterval?.id,
-  )
+  const { data: piPredictabilityData, isLoading: isLoadingPiPredictability } =
+    useGetPlanningIntervalPredictability(planningInterval?.id)
 
   const {
     data: objectivesData,
@@ -96,35 +102,6 @@ const PlanningIntervalDetails = ({
         return null
     }
   }, [planningInterval])
-
-  const planningIntervalPredictability = useMemo(() => {
-    if (!planningInterval || planningInterval.predictability == null)
-      return null
-    return (
-      <Card>
-        <Statistic
-          title="PI Predictability"
-          value={planningInterval.predictability}
-          suffix="%"
-        />
-      </Card>
-    )
-  }, [planningInterval])
-
-  const teamPredictabilityChart = useMemo(() => {
-    if (
-      !planningInterval ||
-      planningInterval.state === 'Future' ||
-      !piPredictabilityData ||
-      piPredictabilityData.predictability === null
-    )
-      return null
-    return (
-      <Card size="small">
-        <TeamPredictabilityRadarChart predictability={piPredictabilityData} />
-      </Card>
-    )
-  }, [planningInterval, piPredictabilityData])
 
   const { objectiveStatusData, objectiveHealthData } = useMemo(() => {
     if (!objectivesData)
@@ -194,10 +171,19 @@ const PlanningIntervalDetails = ({
       <Divider />
       <Space align="start" wrap>
         {daysCountdownMetric}
-        {planningIntervalPredictability}
-        {teamPredictabilityChart}
-        {planningInterval && planningInterval.state !== 'Future' && (
+        {objectivesData && objectivesData.length > 0 && (
           <>
+            <Card>
+              <Statistic
+                title="PI Predictability"
+                value={planningInterval.predictability ?? 0}
+                suffix="%"
+              />
+            </Card>
+            <TeamPredictabilityRadarChart
+              teamPredictabilities={piPredictabilityData?.teamPredictabilities}
+              isLoading={isLoadingPiPredictability}
+            />
             <ObjectiveStatusChart data={objectiveStatusData} />
             <ObjectiveHealthChart data={objectiveHealthData} />
           </>

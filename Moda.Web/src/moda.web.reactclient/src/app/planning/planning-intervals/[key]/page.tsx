@@ -3,14 +3,11 @@
 import PageTitle from '@/src/components/common/page-title'
 import { Card } from 'antd'
 import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
-import PlanningIntervalDetails from './planning-interval-details'
 import TeamsGrid, {
   TeamsGridProps,
 } from '@/src/components/common/organizations/teams-grid'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
-import ManagePlanningIntervalTeamsForm from './manage-planning-interval-teams-form'
-import { EditPlanningIntervalForm } from '../_components'
 import {
   useGetPlanningInterval,
   useGetPlanningIntervalTeams,
@@ -20,9 +17,14 @@ import { notFound, usePathname } from 'next/navigation'
 import { useAppDispatch } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import PlanningIntervalDetailsLoading from './loading'
-import ManagePlanningIntervalDatesForm from './manage-planning-interval-dates-form'
 import { PageActions } from '@/src/components/common'
 import { ItemType } from 'antd/es/menu/interface'
+import {
+  EditPlanningIntervalForm,
+  ManagePlanningIntervalDatesForm,
+  ManagePlanningIntervalTeamsForm,
+  PlanningIntervalDetails,
+} from '../_components'
 
 enum PlanningIntervalTabs {
   Details = 'details',
