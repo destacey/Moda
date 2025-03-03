@@ -16,7 +16,6 @@ import { MenuToggleProvider } from '../components/contexts/menu-toggle'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import LoadingAccount from '../components/common/loading-account'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
-import { AuthenticatedTemplate } from '@azure/msal-react'
 
 const { Content } = Layout
 
@@ -61,16 +60,14 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
                       {/* Fixed Header */}
                       <AppHeader />
                       <LoadingAccount>
-                        <AuthenticatedTemplate>
-                          {/* Sidebar and Content */}
-                          <Layout hasSider className="app-main-layout">
-                            <AppSideNav isMobile={isMobile} />
-                            <Content className="app-main-content">
-                              <AppBreadcrumb />
-                              {children}
-                            </Content>
-                          </Layout>
-                        </AuthenticatedTemplate>
+                        {/* Sidebar and Content */}
+                        <Layout hasSider className="app-main-layout">
+                          <AppSideNav isMobile={isMobile} />
+                          <Content className="app-main-content">
+                            <AppBreadcrumb />
+                            {children}
+                          </Content>
+                        </Layout>
                       </LoadingAccount>
                     </Layout>
                   </MenuToggleProvider>

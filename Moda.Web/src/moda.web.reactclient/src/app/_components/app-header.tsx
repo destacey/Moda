@@ -6,7 +6,7 @@ import {
   MenuUnfoldOutlined,
   MenuOutlined,
 } from '@ant-design/icons'
-import React, { FC, useState } from 'react'
+import React, { FC, useMemo, useState } from 'react'
 import { Layout, Button, Typography, Dropdown, Menu, Flex } from 'antd'
 import useMenuToggle from '../../components/contexts/menu-toggle'
 import { useMediaQuery } from 'react-responsive'
@@ -17,10 +17,12 @@ const { Title } = Typography
 
 const AppHeader: FC = React.memo(() => {
   const { menuCollapsed, setMenuCollapsed } = useMenuToggle()
-  const isMobile = useMediaQuery({ maxWidth: 768 }) // Define mobile breakpoint
+  const isMobile = useMediaQuery({ maxWidth: 768 })
   const [dropdownOpen, setDropdownOpen] = useState(false)
-
   const menuItems = useAppMenuItems()
+
+  // Avoid re-renders when authentication state changes
+  const profileComponent = useMemo(() => <Profile />, [])
 
   const handleDropdownOpen = (open: boolean) => {
     setDropdownOpen(open)
@@ -71,7 +73,7 @@ const AppHeader: FC = React.memo(() => {
           Moda
         </Title>
       </Flex>
-      <Profile />
+      {profileComponent}
     </Header>
   )
 })
