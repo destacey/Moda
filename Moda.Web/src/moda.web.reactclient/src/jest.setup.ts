@@ -3,6 +3,36 @@ import '@testing-library/jest-dom'
 
 import crypto from 'crypto'
 
+// Mock BroadcastChannel to prevent ReferenceError in Jest (Node.js environment)
+global.BroadcastChannel = class BroadcastChannel {
+  name: string
+  onmessage: ((this: BroadcastChannel, ev: MessageEvent) => any) | null = null
+  onmessageerror: ((this: BroadcastChannel, ev: MessageEvent) => any) | null =
+    null
+
+  constructor(name: string) {
+    this.name = name
+  }
+
+  postMessage(message: any) {}
+
+  close() {}
+
+  addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+  ) {}
+
+  removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+  ) {}
+
+  dispatchEvent(event: Event): boolean {
+    return false
+  }
+}
+
 Object.assign(navigator, {
   clipboard: {
     writeText: jest.fn(),
