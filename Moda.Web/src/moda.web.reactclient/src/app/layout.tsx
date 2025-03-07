@@ -16,7 +16,11 @@ import { MenuToggleProvider } from '../components/contexts/menu-toggle'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import LoadingAccount from '../components/common/loading-account'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
-import { AuthenticatedTemplate } from '@azure/msal-react'
+import {
+  AuthenticatedTemplate,
+  UnauthenticatedTemplate,
+} from '@azure/msal-react'
+import Login from './_components/Login'
 
 const { Content } = Layout
 
@@ -74,6 +78,9 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
                       </Layout>
                     </MenuToggleProvider>
                   </AuthenticatedTemplate>
+                  <UnauthenticatedTemplate>
+                    <Login />
+                  </UnauthenticatedTemplate>
                 </ThemeProvider>
               </AuthProvider>
             </Provider>
