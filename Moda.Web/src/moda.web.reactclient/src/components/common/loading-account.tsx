@@ -1,5 +1,4 @@
 import { Spin } from 'antd'
-import { AuthenticatedTemplate } from '@azure/msal-react'
 import useAuth from '../contexts/auth/use-auth'
 
 const LoadingAccount = ({ children }: { children: React.ReactNode }) => {
@@ -7,7 +6,7 @@ const LoadingAccount = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <Spin spinning={isLoading} tip="Loading account..." size="large">
-      <AuthenticatedTemplate>{children}</AuthenticatedTemplate>
+      {children}
     </Spin>
   )
 }
