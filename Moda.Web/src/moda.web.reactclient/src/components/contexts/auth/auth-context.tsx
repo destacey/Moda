@@ -6,6 +6,7 @@ import {
   ReactNode,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from 'react'
 import { jwtDecode } from 'jwt-decode'
@@ -80,28 +81,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, [acquireToken, setUser])
 
-  const hasClaim = useCallback(
-    (claimType: string, claimValue: string): boolean => {
-      return (
-        user?.claims.some(
-          (claim) => claim.type === claimType && claim.value === claimValue,
-        ) ?? false
-      )
-    },
-    [user],
-  )
-
-  const hasPermissionClaim = useCallback(
-    (claimValue: string): boolean => {
-      return (
-        user?.claims.some(
-          (claim) => claim.type === 'Permission' && claim.value === claimValue,
-        ) ?? false
-      )
-    },
-    [user],
-  )
-
   useEffect(() => {
     msalWrapper.getInstance().then((msalInstance) => {
       setMsalInstanceInitialized(msalWrapper.isInitialized)
@@ -123,29 +102,43 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const authContext: AuthContextType = {
-    user,
-    isLoading,
-    hasClaim,
-    hasPermissionClaim,
-    acquireToken,
-    refreshUser,
-    login: async () => (await msalWrapper.getInstance()).loginRedirect(),
-    logout: async () => (await msalWrapper.getInstance()).logoutRedirect(),
+  const authContext: AuthContextType = useMemo(
+    () => ({
+      user,
+      isLoading,
+      acquireToken,
+      refreshUser,
+      hasClaim: (type: string, value: string) =>
+        user.claims.some(
+          (claim) => claim.type === type && claim.value === value,
+        ),
+      hasPermissionClaim: (value: string) =>
+        user.claims.some(
+          (claim) => claim.type === 'Permission' && claim.value === value,
+        ),
+      login: async () => (await msalWrapper.getInstance()).loginRedirect(),
+      logout: async () => (await msalWrapper.getInstance()).logoutRedirect(),
+    }),
+    [acquireToken, isLoading, refreshUser, user],
+  )
+
+  if (isLoading) {
+    return (
+      <Spin tip="Loading user's Moda account..." size="large">
+        <div
+          style={{
+            minHeight: '100vh',
+            background: 'linear-gradient(to right, #fff, #2196f3)',
+          }}
+        />
+      </Spin>
+    )
   }
 
   return (
-    <>
-      {!msalInstanceInitialized ? (
-        <Spin />
-      ) : (
-        <AuthContext.Provider value={authContext}>
-          <MsalProvider instance={msalWrapper.instance}>
-            {children}
-          </MsalProvider>
-        </AuthContext.Provider>
-      )}
-    </>
+    <AuthContext.Provider value={authContext}>
+      <MsalProvider instance={msalWrapper.instance}>{children}</MsalProvider>
+    </AuthContext.Provider>
   )
 }
 
