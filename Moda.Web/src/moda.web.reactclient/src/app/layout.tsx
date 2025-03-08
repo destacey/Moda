@@ -74,7 +74,7 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
                 </ThemeProvider>
               </AuthenticatedTemplate>
               <UnauthenticatedTemplate>
-                <Spin tip="Loading user's Moda account..." size="large">
+                <Spin tip="Loading Moda user's account..." size="large">
                   <div
                     style={{
                       minHeight: '100vh',

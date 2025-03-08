@@ -4,7 +4,7 @@ import { Avatar, Dropdown, Space, Typography } from 'antd'
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/navigation'
 import useAuth from '../../components/contexts/auth'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import useThemeToggleMenuItem from '../../hooks/theme/use-theme-toggle-menu-item'
 
 const { Text } = Typography
@@ -14,13 +14,13 @@ const ProfileMenu = () => {
   const router = useRouter()
   const themeToggleMenuItem = useThemeToggleMenuItem()
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await logout()
     } catch (e) {
       console.error(`logoutRedirect failed: ${e}`)
     }
-  }
+  }, [logout])
 
   const menuItems = useMemo(
     () => [

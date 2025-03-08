@@ -99,8 +99,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         }
       })
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [refreshUser])
 
   const authContext: AuthContextType = useMemo(
     () => ({
@@ -122,9 +121,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     [acquireToken, isLoading, refreshUser, user],
   )
 
-  if (isLoading) {
+  console.log('authContext.user', authContext.user)
+  console.log('authContext.isLoading', authContext.isLoading)
+
+  if (!authContext.user) {
     return (
-      <Spin tip="Loading user's Moda account..." size="large">
+      <Spin tip="Loading Moda user's account..." size="large">
         <div
           style={{
             minHeight: '100vh',
