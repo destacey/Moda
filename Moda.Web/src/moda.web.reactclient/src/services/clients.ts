@@ -29,17 +29,22 @@ import auth from './auth'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL
 
-const createDefaultAxiosInstance = async (accessToken?: string) =>
-  axios.create({
+const createDefaultAxiosInstance = async (accessToken?: string) => {
+  const token = accessToken ?? (await auth.acquireToken())?.token
+
+  if (!token) {
+    throw new Error('Unable to acquire token. User might not be authenticated.')
+  }
+
+  return axios.create({
     baseURL: apiUrl,
     headers: {
-      Authorization: `Bearer ${
-        accessToken ?? (await auth.acquireToken())?.token
-      }`,
+      Authorization: `Bearer ${token}`,
     },
     //Removing the transformResponse will cause the response to be a string instead of an object
     transformResponse: (data) => data,
   })
+}
 
 export const getAzureDevOpsBoardsConnectionsClient = async (
   accessToken?: string,

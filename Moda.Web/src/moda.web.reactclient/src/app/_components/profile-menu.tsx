@@ -4,12 +4,12 @@ import { Avatar, Dropdown, Space, Typography } from 'antd'
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/navigation'
 import useAuth from '../../components/contexts/auth'
-import { useMemo, useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import useThemeToggleMenuItem from '../../hooks/theme/use-theme-toggle-menu-item'
 
 const { Text } = Typography
 
-const Profile = () => {
+const ProfileMenu = () => {
   const { logout, user } = useAuth()
   const router = useRouter()
   const themeToggleMenuItem = useThemeToggleMenuItem()
@@ -60,4 +60,4 @@ const Profile = () => {
   )
 }
 
-export default Profile
+export default ProfileMenu

@@ -1,20 +1,29 @@
 'use client'
 
 import { MsalProvider } from '@azure/msal-react'
-import { createContext, useCallback, useEffect, useState } from 'react'
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react'
 import { jwtDecode } from 'jwt-decode'
 import auth from '@/src/services/auth'
 import { getProfileClient } from '@/src/services/clients'
 import { useLocalStorageState } from '@/src/hooks'
 import { AuthContextType, Claim, User } from './types'
 import { Spin } from 'antd'
-import { EventType } from '@azure/msal-browser'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
+interface AuthProviderProps {
+  children: ReactNode
+}
+
 const { msalWrapper, acquireToken: authAcquire } = auth
 
-const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useLocalStorageState<User>('current-user', {
     name: '',
     username: '',
@@ -34,28 +43,29 @@ const AuthProvider = ({ children }) => {
     setIsLoading(true)
     try {
       const msalInstance = await msalWrapper.getInstance()
-      const activeAccount = msalInstance.getActiveAccount()
-
+      const activeAccount =
+        msalInstance.getActiveAccount() ?? msalInstance.getAllAccounts()[0]
       if (activeAccount) {
         const accessToken = await acquireToken()
         const profileClient = await getProfileClient(accessToken)
         const permissions = await profileClient.getPermissions()
-        const decodedClaims = jwtDecode(accessToken ?? '') as Record<
-          string,
-          string
-        >
-
+        const decodedClaims = jwtDecode(accessToken ?? '') as {
+          [key: string]: string
+        }
         const claims: Claim[] = [
-          ...Object.entries(decodedClaims).map(([key, value]) => ({
-            type: key,
-            value,
-          })),
-          ...permissions.map((permission) => ({
-            type: 'Permission',
-            value: permission,
-          })),
+          ...Object.keys(decodedClaims).map((key) => {
+            return {
+              type: key,
+              value: decodedClaims[key],
+            }
+          }),
+          ...permissions.map((permission) => {
+            return {
+              type: 'Permission',
+              value: permission,
+            }
+          }),
         ]
-
         setUser({
           name: activeAccount.name,
           username: activeAccount.username,
@@ -93,55 +103,25 @@ const AuthProvider = ({ children }) => {
   )
 
   useEffect(() => {
-    const initializeMsal = async () => {
-      const msalInstance = await msalWrapper.getInstance()
+    msalWrapper.getInstance().then((msalInstance) => {
       setMsalInstanceInitialized(msalWrapper.isInitialized)
-
-      try {
-        const response = await msalInstance.handleRedirectPromise()
-        const activeAccount = msalInstance.getActiveAccount()
-
-        if (response) {
-          msalInstance.setActiveAccount(response.account)
-          await refreshUser()
-        } else if (!activeAccount) {
+      msalInstance.handleRedirectPromise().then(async (response) => {
+        if (!response) {
           const accounts = msalInstance.getAllAccounts()
           if (
             accounts.length === 0 &&
             msalWrapper.interactionStatus() === 'none'
           ) {
-            await msalInstance.loginRedirect()
-          } else if (accounts.length > 0) {
-            msalInstance.setActiveAccount(accounts[0])
-            await refreshUser()
+            msalInstance.loginRedirect()
           }
+        } else {
+          msalInstance.setActiveAccount(response.account)
+          await refreshUser()
         }
-      } catch (error) {
-        console.error('MSAL initialization error:', error)
-      }
-    }
-
-    initializeMsal()
-
-    // Listen for account changes across tabs
-    const accountChangeListener = msalWrapper.instance.addEventCallback(
-      (event) => {
-        if (
-          event.eventType === EventType.ACCOUNT_ADDED ||
-          event.eventType === EventType.ACCOUNT_REMOVED
-        ) {
-          console.info(`[MSAL] Account change detected: ${event.eventType}`)
-          refreshUser()
-        }
-      },
-    )
-
-    return () => {
-      if (accountChangeListener) {
-        msalWrapper.instance.removeEventCallback(accountChangeListener)
-      }
-    }
-  }, [refreshUser])
+      })
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const authContext: AuthContextType = {
     user,

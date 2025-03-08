@@ -11,16 +11,10 @@ import AppHeader from './_components/app-header'
 import AppSideNav from './_components/menu/app-side-nav'
 import AppBreadcrumb from './_components/app-breadcrumb'
 import { ThemeProvider } from '../components/contexts/theme'
-import { AuthProvider } from '../components/contexts/auth'
 import { MenuToggleProvider } from '../components/contexts/menu-toggle'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import LoadingAccount from '../components/common/loading-account'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
-import {
-  AuthenticatedTemplate,
-  UnauthenticatedTemplate,
-} from '@azure/msal-react'
-import Login from './_components/Login'
+import { AuthProvider } from '../components/contexts/auth'
 
 const { Content } = Layout
 
@@ -55,36 +49,26 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
     <html lang="en">
       <body className={inter.className}>
         <AntdRegistry>
-          <QueryClientProvider client={queryClient}>
-            <Provider store={store}>
-              <AuthProvider>
-                <ThemeProvider>
-                  <AuthenticatedTemplate>
-                    <MenuToggleProvider>
-                      {/* Main Layout */}
-                      <Layout>
-                        {/* Fixed Header */}
-                        <AppHeader />
-                        <LoadingAccount>
-                          {/* Sidebar and Content */}
-                          <Layout hasSider className="app-main-layout">
-                            <AppSideNav isMobile={isMobile} />
-                            <Content className="app-main-content">
-                              <AppBreadcrumb />
-                              {children}
-                            </Content>
-                          </Layout>
-                        </LoadingAccount>
+          <Provider store={store}>
+            <AuthProvider>
+              <ThemeProvider>
+                <QueryClientProvider client={queryClient}>
+                  <MenuToggleProvider>
+                    <Layout>
+                      <AppHeader />
+                      <Layout hasSider className="app-main-layout">
+                        <AppSideNav isMobile={isMobile} />
+                        <Content className="app-main-content">
+                          <AppBreadcrumb />
+                          {children}
+                        </Content>
                       </Layout>
-                    </MenuToggleProvider>
-                  </AuthenticatedTemplate>
-                  <UnauthenticatedTemplate>
-                    <Login />
-                  </UnauthenticatedTemplate>
-                </ThemeProvider>
-              </AuthProvider>
-            </Provider>
-          </QueryClientProvider>
+                    </Layout>
+                  </MenuToggleProvider>
+                </QueryClientProvider>
+              </ThemeProvider>
+            </AuthProvider>
+          </Provider>
         </AntdRegistry>
       </body>
     </html>

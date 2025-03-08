@@ -18,22 +18,15 @@ export const msalConfig: Configuration = {
   system: {
     loggerOptions: {
       loggerCallback: (level, message, containsPii) => {
-        if (containsPii) return // Ensures sensitive data isn't logged
+        if (containsPii) return
 
         switch (level) {
           case LogLevel.Error:
             console.error(message)
-            return
+            break
           case LogLevel.Warning:
             console.warn(message)
-            return
-          // Uncomment if you want more logging
-          // case LogLevel.Info:
-          //   console.info(message);
-          //   return;
-          // case LogLevel.Verbose:
-          //   console.debug(message);
-          //   return;
+            break
         }
       },
     },
