@@ -14,7 +14,6 @@ import auth from '@/src/services/auth'
 import { getProfileClient } from '@/src/services/clients'
 import { useLocalStorageState } from '@/src/hooks'
 import { AuthContextType, Claim, User } from './types'
-import { Spin } from 'antd'
 import { LoadingAccount } from '../../common'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
@@ -98,6 +97,18 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     })
   }, [refreshUser])
 
+  const logout = useCallback(async () => {
+    setUser({
+      name: '',
+      username: '',
+      isAuthenticated: false,
+      claims: [],
+    })
+
+    const msalInstance = await msalWrapper.getInstance()
+    msalInstance.logoutRedirect()
+  }, [setUser])
+
   const authContext: AuthContextType = useMemo(
     () => ({
       user,
@@ -113,9 +124,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
           (claim) => claim.type === 'Permission' && claim.value === value,
         ),
       login: async () => (await msalWrapper.getInstance()).loginRedirect(),
-      logout: async () => (await msalWrapper.getInstance()).logoutRedirect(),
+      logout,
     }),
-    [acquireToken, isLoading, refreshUser, user],
+    [acquireToken, isLoading, logout, refreshUser, user],
   )
 
   if (!authContext.user) {
