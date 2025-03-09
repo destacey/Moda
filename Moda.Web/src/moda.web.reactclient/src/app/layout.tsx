@@ -19,6 +19,7 @@ import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
 } from '@azure/msal-react'
+import { LoadingAccount } from '../components/common'
 
 const { Content } = Layout
 
@@ -74,14 +75,8 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
                 </ThemeProvider>
               </AuthenticatedTemplate>
               <UnauthenticatedTemplate>
-                <Spin tip="Loading Moda user's account..." size="large">
-                  <div
-                    style={{
-                      minHeight: '100vh',
-                      background: 'linear-gradient(to right, #fff, #2196f3)',
-                    }}
-                  />
-                </Spin>
+                {/* TODO: change this to a login form after the login flow is manual rather than automatic */}
+                <LoadingAccount />
               </UnauthenticatedTemplate>
             </AuthProvider>
           </Provider>

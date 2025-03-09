@@ -1,17 +1,15 @@
-'use client'
-
 import { Spin } from 'antd'
-import useAuth from '../contexts/auth/use-auth'
 
-const LoadingAccount = ({ children }: { children: React.ReactNode }) => {
-  const { isLoading } = useAuth()
-
-  return isLoading ? (
-    <Spin spinning={true} tip="Loading account..." size="large">
-      <div style={{ minHeight: '100vh' }} /> {/* Prevents layout collapse */}
+const LoadingAccount = () => {
+  return (
+    <Spin tip="Loading Moda user's account..." size="large">
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(to right, #fff, #2196f3)',
+        }}
+      />
     </Spin>
-  ) : (
-    <>{children}</>
   )
 }
 

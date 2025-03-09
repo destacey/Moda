@@ -15,6 +15,7 @@ import { getProfileClient } from '@/src/services/clients'
 import { useLocalStorageState } from '@/src/hooks'
 import { AuthContextType, Claim, User } from './types'
 import { Spin } from 'antd'
+import { LoadingAccount } from '../../common'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
@@ -32,9 +33,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     claims: [],
   })
   const [isLoading, setIsLoading] = useState(false)
-  const [msalInstanceInitialized, setMsalInstanceInitialized] = useState(
-    msalWrapper.isInitialized,
-  )
 
   const acquireToken = useCallback(async () => {
     return (await authAcquire())?.token
@@ -83,7 +81,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     msalWrapper.getInstance().then((msalInstance) => {
-      setMsalInstanceInitialized(msalWrapper.isInitialized)
       msalInstance.handleRedirectPromise().then(async (response) => {
         if (!response) {
           const accounts = msalInstance.getAllAccounts()
@@ -121,20 +118,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     [acquireToken, isLoading, refreshUser, user],
   )
 
-  console.log('authContext.user', authContext.user)
-  console.log('authContext.isLoading', authContext.isLoading)
-
   if (!authContext.user) {
-    return (
-      <Spin tip="Loading Moda user's account..." size="large">
-        <div
-          style={{
-            minHeight: '100vh',
-            background: 'linear-gradient(to right, #fff, #2196f3)',
-          }}
-        />
-      </Spin>
-    )
+    return <LoadingAccount />
   }
 
   return (
