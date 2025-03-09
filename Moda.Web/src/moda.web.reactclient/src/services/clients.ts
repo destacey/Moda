@@ -25,7 +25,9 @@ import {
   ExpenditureCategoriesClient,
   ProjectsClient,
 } from './moda-api'
-import auth from './auth'
+import { tokenRequest } from '@/auth-config'
+import { InteractionRequiredAuthError } from '@azure/msal-browser'
+import { msalInstance } from '../components/contexts/auth'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL
 
@@ -35,9 +37,22 @@ const axiosClient = axios.create({
   transformResponse: (data) => data,
 })
 
+// Use the shared MSAL instance to acquire tokens for outgoing requests.
 axiosClient.interceptors.request.use(
   async (config) => {
-    const token = (await auth.acquireToken())?.token
+    let token: string | null = null
+    try {
+      const response = await msalInstance.acquireTokenSilent(tokenRequest)
+      token = response.accessToken
+    } catch (error: any) {
+      if (error instanceof InteractionRequiredAuthError) {
+        const response = await msalInstance.acquireTokenPopup(tokenRequest)
+        token = response.accessToken
+      } else {
+        throw error
+      }
+    }
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     } else {

@@ -14,9 +14,10 @@ import { ThemeProvider } from '../components/contexts/theme'
 import { MenuToggleProvider } from '../components/contexts/menu-toggle'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
-import { AuthProvider } from '../components/contexts/auth'
+import { AuthProvider, msalInstance } from '../components/contexts/auth'
 import {
   AuthenticatedTemplate,
+  MsalProvider,
   UnauthenticatedTemplate,
 } from '@azure/msal-react'
 import { LoadingAccount } from '../components/common'
@@ -55,30 +56,32 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
       <body className={inter.className}>
         <AntdRegistry>
           <Provider store={store}>
-            <AuthProvider>
-              <AuthenticatedTemplate>
-                <ThemeProvider>
-                  <QueryClientProvider client={queryClient}>
-                    <MenuToggleProvider>
-                      <Layout>
-                        <AppHeader />
-                        <Layout hasSider className="app-main-layout">
-                          <AppSideNav isMobile={isMobile} />
-                          <Content className="app-main-content">
-                            <AppBreadcrumb />
-                            {children}
-                          </Content>
+            <MsalProvider instance={msalInstance}>
+              <AuthProvider>
+                <AuthenticatedTemplate>
+                  <ThemeProvider>
+                    <QueryClientProvider client={queryClient}>
+                      <MenuToggleProvider>
+                        <Layout>
+                          <AppHeader />
+                          <Layout hasSider className="app-main-layout">
+                            <AppSideNav isMobile={isMobile} />
+                            <Content className="app-main-content">
+                              <AppBreadcrumb />
+                              {children}
+                            </Content>
+                          </Layout>
                         </Layout>
-                      </Layout>
-                    </MenuToggleProvider>
-                  </QueryClientProvider>
-                </ThemeProvider>
-              </AuthenticatedTemplate>
-              <UnauthenticatedTemplate>
-                {/* TODO: change this to a login form after the login flow is manual rather than automatic */}
-                <LoadingAccount />
-              </UnauthenticatedTemplate>
-            </AuthProvider>
+                      </MenuToggleProvider>
+                    </QueryClientProvider>
+                  </ThemeProvider>
+                </AuthenticatedTemplate>
+                <UnauthenticatedTemplate>
+                  {/* TODO: change this to a login form after the login flow is manual rather than automatic */}
+                  <LoadingAccount message="Unauthenticated Moda user.  Redirecting to login..." />
+                </UnauthenticatedTemplate>
+              </AuthProvider>
+            </MsalProvider>
           </Provider>
         </AntdRegistry>
       </body>

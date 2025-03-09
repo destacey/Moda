@@ -1,8 +1,13 @@
 import { Spin } from 'antd'
 
-const LoadingAccount = () => {
+interface LoadingAccountProps {
+  message?: string
+}
+
+const LoadingAccount: React.FC<LoadingAccountProps> = (props) => {
+  const message = props.message || "Loading Moda user's account..."
   return (
-    <Spin tip="Loading Moda user's account..." size="large">
+    <Spin tip={message} size="large">
       <div
         style={{
           minHeight: '100vh',
