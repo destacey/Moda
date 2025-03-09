@@ -8,9 +8,7 @@ export const employeeApi = apiSlice.injectEndpoints({
     getEmployeeOptions: builder.query<BaseOptionType[], boolean>({
       queryFn: async (includeInactive) => {
         try {
-          const employees = await (
-            await getEmployeesClient()
-          ).getList(includeInactive)
+          const employees = await getEmployeesClient().getList(includeInactive)
           const data: BaseOptionType[] = employees
             .sort((a, b) => a.displayName.localeCompare(b.displayName))
             .map((employee) => ({

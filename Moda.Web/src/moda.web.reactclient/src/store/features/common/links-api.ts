@@ -22,7 +22,7 @@ export const linksApi = apiSlice.injectEndpoints({
     getLinks: builder.query<any, string>({
       queryFn: async (objectId: string) => {
         try {
-          const data = await (await getLinksClient()).getList(objectId)
+          const data = await getLinksClient().getList(objectId)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -41,7 +41,7 @@ export const linksApi = apiSlice.injectEndpoints({
     getLink: builder.query<any, string>({
       queryFn: async (id: string) => {
         try {
-          const data = await (await getLinksClient()).getById(id)
+          const data = await getLinksClient().getById(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -54,7 +54,7 @@ export const linksApi = apiSlice.injectEndpoints({
     createLink: builder.mutation<any, CreateLinkRequest>({
       queryFn: async (request) => {
         try {
-          const data = await (await getLinksClient()).create(request)
+          const data = await getLinksClient().create(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -70,34 +70,31 @@ export const linksApi = apiSlice.injectEndpoints({
     updateLink: builder.mutation<LinkDto, StoreUpdateLinkRequest>({
       queryFn: async ({ request }) => {
         try {
-          const data = await (
-            await getLinksClient()
-          ).update(request.id, request)
+          const data = await getLinksClient().update(request.id, request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
-      invalidatesTags: (result, error, request) => [
-        { type: QueryTags.Links, id: request.request.id },
-        { type: QueryTags.Links, id: request.objectId },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.Links, id: arg.request.id },
+        { type: QueryTags.Links, id: arg.objectId },
       ],
     }),
 
     deleteLink: builder.mutation<void, StoreDeleteLinkRequest>({
       queryFn: async ({ id }) => {
         try {
-          const data = await (await getLinksClient()).delete(id)
+          const data = await getLinksClient().delete(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
-      invalidatesTags: (result, error, { id, objectId }) => [
-        { type: QueryTags.Links, id },
-        { type: QueryTags.Links, id: objectId },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.Links, id: arg.id },
       ],
     }),
   }),

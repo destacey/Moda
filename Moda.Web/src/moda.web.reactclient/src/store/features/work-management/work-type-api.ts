@@ -12,9 +12,7 @@ export const workTypeApi = apiSlice.injectEndpoints({
     getWorkTypes: builder.query<WorkTypeDto[], boolean>({
       queryFn: async (includeInactive) => {
         try {
-          const data = await (
-            await getWorkTypesClient()
-          ).getList(includeInactive)
+          const data = await getWorkTypesClient().getList(includeInactive)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -29,7 +27,7 @@ export const workTypeApi = apiSlice.injectEndpoints({
     getWorkType: builder.query<WorkTypeLevelDto, number>({
       queryFn: async (id: number) => {
         try {
-          const data = await (await getWorkTypesClient()).getById(id)
+          const data = await getWorkTypesClient().getById(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -41,9 +39,7 @@ export const workTypeApi = apiSlice.injectEndpoints({
     updateWorkType: builder.mutation<void, UpdateWorkTypeRequest>({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getWorkTypesClient()
-          ).update(request.id, request)
+          const data = await getWorkTypesClient().update(request.id, request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)

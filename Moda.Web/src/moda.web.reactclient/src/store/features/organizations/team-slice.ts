@@ -33,12 +33,10 @@ const teamSlice = createCrudSlice({
   getData: async (arg, { getState, rejectWithValue }) => {
     try {
       const { team: teamState } = getState() as { team: TeamState }
-      const teams = await (
-        await getTeamsClient()
-      ).getList(teamState.includeInactive)
-      const teamsOfTeams = await (
-        await getTeamsOfTeamsClient()
-      ).getList(teamState.includeInactive)
+      const teams = await getTeamsClient().getList(teamState.includeInactive)
+      const teamsOfTeams = await getTeamsOfTeamsClient().getList(
+        teamState.includeInactive,
+      )
       return [...(teams as TeamListItem[]), ...(teamsOfTeams as TeamListItem[])]
     } catch (error) {
       return rejectWithValue({ error })
@@ -51,9 +49,9 @@ const teamSlice = createCrudSlice({
     try {
       switch (teamRequest.type) {
         case 'Team':
-          return await (await getTeamsClient()).getById(teamRequest.key)
+          return await getTeamsClient().getById(teamRequest.key)
         case 'Team of Teams':
-          return await (await getTeamsOfTeamsClient()).getById(teamRequest.key)
+          return await getTeamsOfTeamsClient().getById(teamRequest.key)
       }
     } catch (error) {
       return rejectWithValue({ error })
@@ -68,9 +66,9 @@ const teamSlice = createCrudSlice({
       }
       switch (activeTeam.type) {
         case 'Team':
-          return await (await getTeamsClient()).getById(activeTeam.key)
+          return await getTeamsClient().getById(activeTeam.key)
         case 'Team of Teams':
-          return await (await getTeamsOfTeamsClient()).getById(activeTeam.key)
+          return await getTeamsOfTeamsClient().getById(activeTeam.key)
       }
     } catch (error) {
       return rejectWithValue({ error })
@@ -79,9 +77,7 @@ const teamSlice = createCrudSlice({
   createDetail: async (newTeam: CreateTeamFormValues, { rejectWithValue }) => {
     try {
       const teamClient =
-        newTeam.type == 'Team'
-          ? await getTeamsClient()
-          : await getTeamsOfTeamsClient()
+        newTeam.type == 'Team' ? getTeamsClient() : getTeamsOfTeamsClient()
 
       const request = {
         ...newTeam,
@@ -101,9 +97,7 @@ const teamSlice = createCrudSlice({
   ) => {
     try {
       const teamClient =
-        team.type == 'Team'
-          ? await getTeamsClient()
-          : await getTeamsOfTeamsClient()
+        team.type == 'Team' ? getTeamsClient() : getTeamsOfTeamsClient()
 
       await teamClient.update(team.id, team)
       const { team: teamState } = getState() as { team: TeamState }

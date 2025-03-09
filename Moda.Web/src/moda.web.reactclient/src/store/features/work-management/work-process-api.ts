@@ -48,7 +48,7 @@ export const workProcessApi = apiSlice.injectEndpoints({
     getWorkProcess: builder.query<WorkProcessDto, string>({
       queryFn: async (idOrKey: string) => {
         try {
-          const data = await (await getWorkProcessesClient()).get(idOrKey)
+          const data = await getWorkProcessesClient().get(idOrKey)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -67,9 +67,9 @@ export const workProcessApi = apiSlice.injectEndpoints({
         try {
           let data
           if (isActive) {
-            data = await (await getWorkProcessesClient()).activate(id)
+            data = await getWorkProcessesClient().activate(id)
           } else {
-            data = await (await getWorkProcessesClient()).deactivate(id)
+            data = await getWorkProcessesClient().deactivate(id)
           }
           return { data }
         } catch (error) {
@@ -84,9 +84,7 @@ export const workProcessApi = apiSlice.injectEndpoints({
     getWorkProcessSchemes: builder.query<WorkProcessSchemeDto[], string>({
       queryFn: async (workProcessId: string) => {
         try {
-          const data = await (
-            await getWorkProcessesClient()
-          ).getSchemes(workProcessId)
+          const data = await getWorkProcessesClient().getSchemes(workProcessId)
 
           data.sort((a, b) => a.workType.name.localeCompare(b.workType.name))
 

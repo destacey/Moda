@@ -29,91 +29,75 @@ import auth from './auth'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL
 
-const createDefaultAxiosInstance = async (accessToken?: string) => {
-  const token = accessToken ?? (await auth.acquireToken())?.token
+const axiosClient = axios.create({
+  baseURL: apiUrl,
+  // Ensuring that responses are processed correctly.
+  transformResponse: (data) => data,
+})
 
-  if (!token) {
-    throw new Error('Unable to acquire token. User might not be authenticated.')
-  }
+axiosClient.interceptors.request.use(
+  async (config) => {
+    const token = (await auth.acquireToken())?.token
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    } else {
+      throw new Error(
+        'Unable to acquire token. User might not be authenticated.',
+      )
+    }
+    return config
+  },
+  (error) => Promise.reject(error),
+)
 
-  return axios.create({
-    baseURL: apiUrl,
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    //Removing the transformResponse will cause the response to be a string instead of an object
-    transformResponse: (data) => data,
-  })
-}
+// API Clients
+export const getAzureDevOpsBoardsConnectionsClient = () =>
+  new AzureDevOpsBoardsConnectionsClient('', axiosClient)
 
-export const getAzureDevOpsBoardsConnectionsClient = async (
-  accessToken?: string,
-) =>
-  new AzureDevOpsBoardsConnectionsClient(
-    '',
-    await createDefaultAxiosInstance(accessToken),
-  )
+export const getBackgroundJobsClient = () =>
+  new BackgroundJobsClient('', axiosClient)
 
-export const getBackgroundJobsClient = async (accessToken?: string) =>
-  new BackgroundJobsClient('', await createDefaultAxiosInstance(accessToken))
+export const getHealthChecksClient = () =>
+  new HealthChecksClient('', axiosClient)
 
-export const getHealthChecksClient = async (accessToken?: string) =>
-  new HealthChecksClient('', await createDefaultAxiosInstance(accessToken))
-
-export const getLinksClient = async (accessToken?: string) =>
-  new LinksClient('', await createDefaultAxiosInstance(accessToken))
+export const getLinksClient = () => new LinksClient('', axiosClient)
 
 // ORGANIZATION
-export const getEmployeesClient = async (accessToken?: string) =>
-  new EmployeesClient('', await createDefaultAxiosInstance(accessToken))
-export const getTeamsClient = async (accessToken?: string) =>
-  new TeamsClient('', await createDefaultAxiosInstance(accessToken))
-export const getTeamsOfTeamsClient = async (accessToken?: string) =>
-  new TeamsOfTeamsClient('', await createDefaultAxiosInstance(accessToken))
+export const getEmployeesClient = () => new EmployeesClient('', axiosClient)
+export const getTeamsClient = () => new TeamsClient('', axiosClient)
+export const getTeamsOfTeamsClient = () =>
+  new TeamsOfTeamsClient('', axiosClient)
 
 // PLANNING
-export const getPlanningIntervalsClient = async (accessToken?: string) =>
-  new PlanningIntervalsClient('', await createDefaultAxiosInstance(accessToken))
-export const getRisksClient = async (accessToken?: string) =>
-  new RisksClient('', await createDefaultAxiosInstance(accessToken))
-export const getRoadmapsClient = async (accessToken?: string) =>
-  new RoadmapsClient('', await createDefaultAxiosInstance(accessToken))
+export const getPlanningIntervalsClient = () =>
+  new PlanningIntervalsClient('', axiosClient)
+export const getRisksClient = () => new RisksClient('', axiosClient)
+export const getRoadmapsClient = () => new RoadmapsClient('', axiosClient)
 
 // PPM
-export const getExpenditureCategoriesClient = async (accessToken?: string) =>
-  new ExpenditureCategoriesClient(
-    '',
-    await createDefaultAxiosInstance(accessToken),
-  )
-export const getPortfoliosClient = async (accessToken?: string) =>
-  new PortfoliosClient('', await createDefaultAxiosInstance(accessToken))
-export const getProjectsClient = async (accessToken?: string) =>
-  new ProjectsClient('', await createDefaultAxiosInstance(accessToken))
+export const getExpenditureCategoriesClient = () =>
+  new ExpenditureCategoriesClient('', axiosClient)
+export const getPortfoliosClient = () => new PortfoliosClient('', axiosClient)
+export const getProjectsClient = () => new ProjectsClient('', axiosClient)
 
 // STRATEGIC MANAGEMENT
-export const getStrategicThemesClient = async (accessToken?: string) =>
-  new StrategicThemesClient('', await createDefaultAxiosInstance(accessToken))
+export const getStrategicThemesClient = () =>
+  new StrategicThemesClient('', axiosClient)
 
 // WORK MANAGEMENT
-export const getWorkProcessesClient = async (accessToken?: string) =>
-  new WorkProcessesClient('', await createDefaultAxiosInstance(accessToken))
-export const getWorkspacesClient = async (accessToken?: string) =>
-  new WorkspacesClient('', await createDefaultAxiosInstance(accessToken))
-export const getWorkStatusesClient = async (accessToken?: string) =>
-  new WorkStatusesClient('', await createDefaultAxiosInstance(accessToken))
-export const getWorkTypeLevelsClient = async (accessToken?: string) =>
-  new WorkTypeLevelsClient('', await createDefaultAxiosInstance(accessToken))
-export const getWorkTypesClient = async (accessToken?: string) =>
-  new WorkTypesClient('', await createDefaultAxiosInstance(accessToken))
-export const getWorkTypeTiersClient = async (accessToken?: string) =>
-  new WorkTypeTiersClient('', await createDefaultAxiosInstance(accessToken))
+export const getWorkProcessesClient = () =>
+  new WorkProcessesClient('', axiosClient)
+export const getWorkspacesClient = () => new WorkspacesClient('', axiosClient)
+export const getWorkStatusesClient = () =>
+  new WorkStatusesClient('', axiosClient)
+export const getWorkTypeLevelsClient = () =>
+  new WorkTypeLevelsClient('', axiosClient)
+export const getWorkTypesClient = () => new WorkTypesClient('', axiosClient)
+export const getWorkTypeTiersClient = () =>
+  new WorkTypeTiersClient('', axiosClient)
 
 // USER MANAGEMENT
-export const getPermissionsClient = async (accessToken?: string) =>
-  new PermissionsClient('', await createDefaultAxiosInstance(accessToken))
-export const getProfileClient = async (accessToken?: string) =>
-  new ProfileClient('', await createDefaultAxiosInstance(accessToken))
-export const getRolesClient = async (accessToken?: string) =>
-  new RolesClient('', await createDefaultAxiosInstance(accessToken))
-export const getUsersClient = async (accessToken?: string) =>
-  new UsersClient('', await createDefaultAxiosInstance(accessToken))
+export const getPermissionsClient = () => new PermissionsClient('', axiosClient)
+export const getProfileClient = () => new ProfileClient('', axiosClient)
+export const getRolesClient = () => new RolesClient('', axiosClient)
+export const getUsersClient = () => new UsersClient('', axiosClient)

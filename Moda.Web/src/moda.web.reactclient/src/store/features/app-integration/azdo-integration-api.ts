@@ -23,9 +23,10 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     getAzdoConnections: builder.query<ConnectionListDto[], boolean>({
       queryFn: async (includeDisabled: boolean = false) => {
         try {
-          const data = await (
-            await getAzureDevOpsBoardsConnectionsClient()
-          ).getList(includeDisabled)
+          const data =
+            await getAzureDevOpsBoardsConnectionsClient().getList(
+              includeDisabled,
+            )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -43,9 +44,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (id: string) => {
         try {
-          const data = await (
-            await getAzureDevOpsBoardsConnectionsClient()
-          ).getById(id)
+          const data = await getAzureDevOpsBoardsConnectionsClient().getById(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -63,9 +62,8 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getAzureDevOpsBoardsConnectionsClient()
-          ).create(request)
+          const data =
+            await getAzureDevOpsBoardsConnectionsClient().create(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -82,9 +80,10 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getAzureDevOpsBoardsConnectionsClient()
-          ).update(request.id, request)
+          const data = await getAzureDevOpsBoardsConnectionsClient().update(
+            request.id,
+            request,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -101,9 +100,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     deleteAzdoConnection: builder.mutation<void, string>({
       queryFn: async (id) => {
         try {
-          const data = await (
-            await getAzureDevOpsBoardsConnectionsClient()
-          ).delete(id)
+          const data = await getAzureDevOpsBoardsConnectionsClient().delete(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -123,9 +120,11 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getAzureDevOpsBoardsConnectionsClient()
-          ).updateSyncState(request.connectionId, request.isSyncEnabled)
+          const data =
+            await getAzureDevOpsBoardsConnectionsClient().updateSyncState(
+              request.connectionId,
+              request.isSyncEnabled,
+            )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -142,9 +141,10 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     syncAzdoConnectionOrganization: builder.mutation<void, string>({
       queryFn: async (connectionId) => {
         try {
-          const data = await (
-            await getAzureDevOpsBoardsConnectionsClient()
-          ).syncOrganizationConfiguration(connectionId)
+          const data =
+            await getAzureDevOpsBoardsConnectionsClient().syncOrganizationConfiguration(
+              connectionId,
+            )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -161,9 +161,11 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getAzureDevOpsBoardsConnectionsClient()
-          ).initWorkProcesssIntegration(request.id, request)
+          const data =
+            await getAzureDevOpsBoardsConnectionsClient().initWorkProcesssIntegration(
+              request.id,
+              request,
+            )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -180,9 +182,11 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getAzureDevOpsBoardsConnectionsClient()
-          ).initWorkspaceIntegration(request.id, request)
+          const data =
+            await getAzureDevOpsBoardsConnectionsClient().initWorkspaceIntegration(
+              request.id,
+              request,
+            )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -200,9 +204,11 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request: GetAzdoConnectionTeamsRequest) => {
         try {
-          const data = await (
-            await getAzureDevOpsBoardsConnectionsClient()
-          ).getConnectionTeams(request.connectionId, request.workspaceId)
+          const data =
+            await getAzureDevOpsBoardsConnectionsClient().getConnectionTeams(
+              request.connectionId,
+              request.workspaceId,
+            )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -223,9 +229,11 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getAzureDevOpsBoardsConnectionsClient()
-          ).mapConnectionTeams(request.connectionId, request)
+          const data =
+            await getAzureDevOpsBoardsConnectionsClient().mapConnectionTeams(
+              request.connectionId,
+              request,
+            )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -242,9 +250,8 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getAzureDevOpsBoardsConnectionsClient()
-          ).testConfig(request)
+          const data =
+            await getAzureDevOpsBoardsConnectionsClient().testConfig(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)

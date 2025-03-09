@@ -13,7 +13,7 @@ export const rolesApi = apiSlice.injectEndpoints({
     getRoles: builder.query<RoleListDto[], void>({
       queryFn: async () => {
         try {
-          const data = await (await getRolesClient()).getList()
+          const data = await getRolesClient().getList()
           return {
             data: data.sort((a, b) => a.name.localeCompare(b.name)),
           }
@@ -31,7 +31,7 @@ export const rolesApi = apiSlice.injectEndpoints({
     getRole: builder.query<RoleDto, string>({
       queryFn: async (id: string) => {
         try {
-          const data = await (await getRolesClient()).getByIdWithPermissions(id)
+          const data = await getRolesClient().getByIdWithPermissions(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -44,7 +44,7 @@ export const rolesApi = apiSlice.injectEndpoints({
     upsertRole: builder.mutation<string, CreateOrUpdateRoleRequest>({
       queryFn: async (request) => {
         try {
-          const data = await (await getRolesClient()).createOrUpdate(request)
+          const data = await getRolesClient().createOrUpdate(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -60,12 +60,13 @@ export const rolesApi = apiSlice.injectEndpoints({
     updatePermissions: builder.mutation<void, UpdateRolePermissionsRequest>({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getRolesClient()
-          ).updatePermissions(request.roleId, {
-            roleId: request.roleId,
-            permissions: request.permissions,
-          })
+          const data = await getRolesClient().updatePermissions(
+            request.roleId,
+            {
+              roleId: request.roleId,
+              permissions: request.permissions,
+            },
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -80,7 +81,7 @@ export const rolesApi = apiSlice.injectEndpoints({
     deleteRole: builder.mutation<void, string>({
       queryFn: async (id: string) => {
         try {
-          const data = await (await getRolesClient()).delete(id)
+          const data = await getRolesClient().delete(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)

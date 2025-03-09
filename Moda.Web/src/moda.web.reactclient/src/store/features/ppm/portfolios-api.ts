@@ -17,9 +17,8 @@ export const portfoliosApi = apiSlice.injectEndpoints({
       {
         queryFn: async (portfolioState = undefined) => {
           try {
-            const data = await (
-              await getPortfoliosClient()
-            ).getPortfolios(portfolioState)
+            const data =
+              await getPortfoliosClient().getPortfolios(portfolioState)
             return { data }
           } catch (error) {
             console.error('API Error:', error)
@@ -32,9 +31,7 @@ export const portfoliosApi = apiSlice.injectEndpoints({
     getPortfolio: builder.query<ProjectPortfolioDetailsDto, number>({
       queryFn: async (key) => {
         try {
-          const data = await (
-            await getPortfoliosClient()
-          ).getPortfolio(key.toString())
+          const data = await getPortfoliosClient().getPortfolio(key.toString())
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -48,7 +45,7 @@ export const portfoliosApi = apiSlice.injectEndpoints({
     createPortfolio: builder.mutation<ObjectIdAndKey, CreatePortfolioRequest>({
       queryFn: async (request) => {
         try {
-          const data = await (await getPortfoliosClient()).create(request)
+          const data = await getPortfoliosClient().create(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -65,9 +62,7 @@ export const portfoliosApi = apiSlice.injectEndpoints({
     >({
       queryFn: async ({ request, cacheKey }) => {
         try {
-          const data = await (
-            await getPortfoliosClient()
-          ).update(request.id, request)
+          const data = await getPortfoliosClient().update(request.id, request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -85,7 +80,7 @@ export const portfoliosApi = apiSlice.injectEndpoints({
       {
         queryFn: async ({ id }) => {
           try {
-            const data = await (await getPortfoliosClient()).activate(id)
+            const data = await getPortfoliosClient().activate(id)
             return { data }
           } catch (error) {
             console.error('API Error:', error)
@@ -103,7 +98,7 @@ export const portfoliosApi = apiSlice.injectEndpoints({
     closePortfolio: builder.mutation<void, { id: string; cacheKey: number }>({
       queryFn: async ({ id }) => {
         try {
-          const data = await (await getPortfoliosClient()).close(id)
+          const data = await getPortfoliosClient().close(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -120,7 +115,7 @@ export const portfoliosApi = apiSlice.injectEndpoints({
     archivePortfolio: builder.mutation<void, { id: string; cacheKey: number }>({
       queryFn: async ({ id }) => {
         try {
-          const data = await (await getPortfoliosClient()).archive(id)
+          const data = await getPortfoliosClient().archive(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -140,7 +135,7 @@ export const portfoliosApi = apiSlice.injectEndpoints({
     >({
       queryFn: async ({ portfolioId }) => {
         try {
-          const data = await (await getPortfoliosClient()).delete(portfolioId)
+          const data = await getPortfoliosClient().delete(portfolioId)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -154,9 +149,7 @@ export const portfoliosApi = apiSlice.injectEndpoints({
     getPortfolioProjects: builder.query<ProjectListDto[], string>({
       queryFn: async (portfolioIdOrKey) => {
         try {
-          const data = await (
-            await getPortfoliosClient()
-          ).getProjects(portfolioIdOrKey)
+          const data = await getPortfoliosClient().getProjects(portfolioIdOrKey)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -171,9 +164,7 @@ export const portfoliosApi = apiSlice.injectEndpoints({
     getPortfolioOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
-          const portfolios = await (
-            await getPortfoliosClient()
-          ).getPortfolioOptions()
+          const portfolios = await getPortfoliosClient().getPortfolioOptions()
 
           const data: BaseOptionType[] = portfolios
             .sort((a, b) => a.name.localeCompare(b.name))

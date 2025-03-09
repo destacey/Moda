@@ -14,7 +14,7 @@ export const projectsApi = apiSlice.injectEndpoints({
     getProjects: builder.query<ProjectListDto[], number | undefined>({
       queryFn: async (status = undefined) => {
         try {
-          const data = await (await getProjectsClient()).getProjects(status)
+          const data = await getProjectsClient().getProjects(status)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -26,9 +26,7 @@ export const projectsApi = apiSlice.injectEndpoints({
     getProject: builder.query<ProjectDetailsDto, number>({
       queryFn: async (key) => {
         try {
-          const data = await (
-            await getProjectsClient()
-          ).getProject(key.toString())
+          const data = await getProjectsClient().getProject(key.toString())
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -42,7 +40,7 @@ export const projectsApi = apiSlice.injectEndpoints({
     createProject: builder.mutation<ObjectIdAndKey, CreateProjectRequest>({
       queryFn: async (request) => {
         try {
-          const data = await (await getProjectsClient()).create(request)
+          const data = await getProjectsClient().create(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -59,9 +57,7 @@ export const projectsApi = apiSlice.injectEndpoints({
     >({
       queryFn: async ({ request, cacheKey }) => {
         try {
-          const data = await (
-            await getProjectsClient()
-          ).update(request.id, request)
+          const data = await getProjectsClient().update(request.id, request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -78,7 +74,7 @@ export const projectsApi = apiSlice.injectEndpoints({
     activateProject: builder.mutation<void, { id: string; cacheKey: number }>({
       queryFn: async ({ id }) => {
         try {
-          const data = await (await getProjectsClient()).activate(id)
+          const data = await getProjectsClient().activate(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -95,7 +91,7 @@ export const projectsApi = apiSlice.injectEndpoints({
     completeProject: builder.mutation<void, { id: string; cacheKey: number }>({
       queryFn: async ({ id }) => {
         try {
-          const data = await (await getProjectsClient()).complete(id)
+          const data = await getProjectsClient().complete(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -112,7 +108,7 @@ export const projectsApi = apiSlice.injectEndpoints({
     cancelProject: builder.mutation<void, { id: string; cacheKey: number }>({
       queryFn: async ({ id }) => {
         try {
-          const data = await (await getProjectsClient()).cancel(id)
+          const data = await getProjectsClient().cancel(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -129,7 +125,7 @@ export const projectsApi = apiSlice.injectEndpoints({
     deleteProject: builder.mutation<void, string>({
       queryFn: async (id) => {
         try {
-          const data = await (await getProjectsClient()).delete(id)
+          const data = await getProjectsClient().delete(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)

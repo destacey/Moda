@@ -48,7 +48,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         msalInstance.getActiveAccount() ?? msalInstance.getAllAccounts()[0]
       if (activeAccount) {
         const accessToken = await acquireToken()
-        const profileClient = await getProfileClient(accessToken)
+        const profileClient = getProfileClient()
         const permissions = await profileClient.getPermissions()
         const decodedClaims = jwtDecode(accessToken ?? '') as {
           [key: string]: string

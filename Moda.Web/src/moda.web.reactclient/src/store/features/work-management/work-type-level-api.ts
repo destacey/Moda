@@ -17,7 +17,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
     getWorkTypeLevels: builder.query<WorkTypeLevelDto[], null>({
       queryFn: async () => {
         try {
-          const data = await (await getWorkTypeLevelsClient()).getList()
+          const data = await getWorkTypeLevelsClient().getList()
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -32,8 +32,8 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
     getWorkTypeLevelOptions: builder.query<BaseOptionType[], null>({
       queryFn: async () => {
         try {
-          const tiers = await (await getWorkTypeTiersClient()).getList()
-          const levels = await (await getWorkTypeLevelsClient()).getList()
+          const tiers = await getWorkTypeTiersClient().getList()
+          const levels = await getWorkTypeLevelsClient().getList()
 
           const data: BaseOptionType[] = tiers
             .sort((a, b) => a.order - b.order)
@@ -65,7 +65,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
     getWorkTypeLevel: builder.query<WorkTypeLevelDto, number>({
       queryFn: async (id: number) => {
         try {
-          const data = await (await getWorkTypeLevelsClient()).getById(id)
+          const data = await getWorkTypeLevelsClient().getById(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -79,7 +79,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
     createWorkTypeLevel: builder.mutation<number, CreateWorkTypeLevelRequest>({
       queryFn: async (request) => {
         try {
-          const data = await (await getWorkTypeLevelsClient()).create(request)
+          const data = await getWorkTypeLevelsClient().create(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -94,7 +94,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
     updateWorkTypeLevel: builder.mutation<null, UpdateWorkTypeLevelRequest>({
       queryFn: async (request) => {
         try {
-          await (await getWorkTypeLevelsClient()).update(request.id, request)
+          await getWorkTypeLevelsClient().update(request.id, request)
           return { data: null }
         } catch (error) {
           console.error('API Error:', error)
@@ -112,9 +112,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getWorkTypeLevelsClient()
-          ).updateOrder(request)
+          const data = await getWorkTypeLevelsClient().updateOrder(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
