@@ -31,19 +31,24 @@ const ProfileMenu = () => {
     [themeToggleMenuItem],
   )
 
-  const menuActions: Record<string, () => void> = {
-    profile: () => router.push('/account/profile'),
-    logout: handleLogout,
-  }
-
-  const handleMenuItemClicked = (info: { key: string }) => {
-    const action = menuActions[info.key]
-    if (action) {
-      action()
-    } else {
-      console.warn(`No action found for menu key: ${info.key}`)
+  const menuActions: Record<string, () => void> = useMemo(() => {
+    return {
+      profile: () => router.push('/account/profile'),
+      logout: handleLogout,
     }
-  }
+  }, [router, handleLogout])
+
+  const handleMenuItemClicked = useCallback(
+    (info: { key: string }) => {
+      const action = menuActions[info.key]
+      if (action) {
+        action()
+      } else {
+        console.warn(`No action found for menu key: ${info.key}`)
+      }
+    },
+    [menuActions],
+  )
 
   return (
     <>

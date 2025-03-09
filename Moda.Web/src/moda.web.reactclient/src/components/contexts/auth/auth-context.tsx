@@ -45,14 +45,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } catch (error) {
         console.error('handleRedirectPromise error:', error)
         setAuthStatus('Error processing redirect.')
-      } finally {
-        if (!instance.getAllAccounts().length) {
-          setAuthStatus('No accounts found. Redirecting to login...')
-          await instance.loginRedirect()
-        } else {
-          setAuthStatus('Redirect handled. Setting up account...')
+      }
+      // If no accounts are available, attempt a silent SSO before falling back to interactive login.
+      if (!instance.getAllAccounts().length) {
+        try {
+          setAuthStatus('Attempting silent SSO...')
+          // ssoSilent will try to obtain an account using an iframe.
+          const ssoResponse = await instance.ssoSilent(tokenRequest)
+          if (ssoResponse && ssoResponse.account) {
+            instance.setActiveAccount(ssoResponse.account)
+          }
+          setAuthStatus('Silent SSO successful. Setting up account...')
           setRedirectHandled(true)
+        } catch (ssoError) {
+          console.warn(
+            'ssoSilent failed, falling back to interactive login:',
+            ssoError,
+          )
+          setAuthStatus('Silent SSO failed. Redirecting to login...')
+          await instance.loginRedirect()
         }
+      } else {
+        setAuthStatus('Redirect handled. Setting up account...')
+        setRedirectHandled(true)
       }
     }
     initializeMsal()
