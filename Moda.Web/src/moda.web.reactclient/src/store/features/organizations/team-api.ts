@@ -1,7 +1,7 @@
 import {
   DeactivateTeamOfTeamsRequest,
   DeactivateTeamRequest,
-  FunctionalOrganizationChartDto
+  FunctionalOrganizationChartDto,
 } from './../../../services/moda-api'
 import { TeamListItem } from '@/src/app/organizations/types'
 import { apiSlice } from '../apiSlice'
@@ -15,10 +15,9 @@ export const teamApi = apiSlice.injectEndpoints({
     getTeams: builder.query<TeamListItem[], boolean>({
       queryFn: async (includeInactive) => {
         try {
-          const teams = await (await getTeamsClient()).getList(includeInactive)
-          const teamsOfTeams = await (
-            await getTeamsOfTeamsClient()
-          ).getList(includeInactive)
+          const teams = await getTeamsClient().getList(includeInactive)
+          const teamsOfTeams =
+            await getTeamsOfTeamsClient().getList(includeInactive)
           const data = [
             ...(teams as TeamListItem[]),
             ...(teamsOfTeams as TeamListItem[]),
@@ -37,9 +36,7 @@ export const teamApi = apiSlice.injectEndpoints({
     deactivateTeam: builder.mutation<void, DeactivateTeamRequest>({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getTeamsClient()
-          ).deactivate(request.id, request)
+          const data = await getTeamsClient().deactivate(request.id, request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -51,9 +48,10 @@ export const teamApi = apiSlice.injectEndpoints({
       {
         queryFn: async (request) => {
           try {
-            const data = await (
-              await getTeamsOfTeamsClient()
-            ).deactivate(request.id, request)
+            const data = await getTeamsOfTeamsClient().deactivate(
+              request.id,
+              request,
+            )
             return { data }
           } catch (error) {
             console.error('API Error:', error)
@@ -65,10 +63,9 @@ export const teamApi = apiSlice.injectEndpoints({
     getTeamOptions: builder.query<BaseOptionType[], boolean>({
       queryFn: async (includeInactive) => {
         try {
-          const teams = await (await getTeamsClient()).getList(includeInactive)
-          const teamsOfTeams = await (
-            await getTeamsOfTeamsClient()
-          ).getList(includeInactive)
+          const teams = await getTeamsClient().getList(includeInactive)
+          const teamsOfTeams =
+            await getTeamsOfTeamsClient().getList(includeInactive)
           const teamsData = [
             ...(teams as TeamListItem[]),
             ...(teamsOfTeams as TeamListItem[]),
@@ -93,7 +90,7 @@ export const teamApi = apiSlice.injectEndpoints({
     getTeamBacklog: builder.query<WorkItemBacklogItemDto[], string>({
       queryFn: async (idOrCode: string) => {
         try {
-          const data = await (await getTeamsClient()).getTeamBacklog(idOrCode)
+          const data = await getTeamsClient().getTeamBacklog(idOrCode)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -108,7 +105,7 @@ export const teamApi = apiSlice.injectEndpoints({
     getTeamDependencies: builder.query<DependencyDto[], string>({
       queryFn: async (id: string) => {
         try {
-          const data = await (await getTeamsClient()).getTeamDependencies(id)
+          const data = await getTeamsClient().getTeamDependencies(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -129,9 +126,8 @@ export const teamApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (asOfDate?: Date | null) => {
         try {
-          const data = await (
-            await getTeamsClient()
-          ).getFunctionalOrganizationChart(asOfDate)
+          const data =
+            await getTeamsClient().getFunctionalOrganizationChart(asOfDate)
           return { data }
         } catch (error) {
           console.error('API Error:', error)

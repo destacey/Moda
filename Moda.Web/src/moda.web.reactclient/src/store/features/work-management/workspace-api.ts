@@ -36,9 +36,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
     getWorkspaces: builder.query<WorkspaceListDto[], boolean>({
       queryFn: async (includeInactive) => {
         try {
-          const data = await (
-            await getWorkspacesClient()
-          ).getList(includeInactive)
+          const data = await getWorkspacesClient().getList(includeInactive)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -52,7 +50,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
     getWorkspace: builder.query<WorkspaceDto, string>({
       queryFn: async (idOrKey: string) => {
         try {
-          const data = await (await getWorkspacesClient()).get(idOrKey)
+          const data = await getWorkspacesClient().get(idOrKey)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -69,9 +67,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          await (
-            await getWorkspacesClient()
-          ).setExternalUrlTemplates(
+          await getWorkspacesClient().setExternalUrlTemplates(
             request.workspaceId,
             request.externalUrlTemplatesRequest,
           )
@@ -87,7 +83,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
     getWorkItems: builder.query<WorkItemListDto[], string>({
       queryFn: async (idOrKey: string) => {
         try {
-          const data = await (await getWorkspacesClient()).getWorkItems(idOrKey)
+          const data = await getWorkspacesClient().getWorkItems(idOrKey)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -102,9 +98,10 @@ export const workspaceApi = apiSlice.injectEndpoints({
     getWorkItem: builder.query<WorkItemDetailsDto, GetWorkItemRequest>({
       queryFn: async (request: GetWorkItemRequest) => {
         try {
-          const data = await (
-            await getWorkspacesClient()
-          ).getWorkItem(request.idOrKey, request.workItemKey)
+          const data = await getWorkspacesClient().getWorkItem(
+            request.idOrKey,
+            request.workItemKey,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -121,9 +118,10 @@ export const workspaceApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request: GetChildWorkItemsRequest) => {
         try {
-          const data = await (
-            await getWorkspacesClient()
-          ).getChildWorkItems(request.idOrKey, request.workItemKey)
+          const data = await getWorkspacesClient().getChildWorkItems(
+            request.idOrKey,
+            request.workItemKey,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -141,9 +139,10 @@ export const workspaceApi = apiSlice.injectEndpoints({
     >({
       queryFn: async ({ workspaceIdOrKey, workItemKey }) => {
         try {
-          const data = await (
-            await getWorkspacesClient()
-          ).getWorkItemDependencies(workspaceIdOrKey, workItemKey)
+          const data = await getWorkspacesClient().getWorkItemDependencies(
+            workspaceIdOrKey,
+            workItemKey,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -165,9 +164,10 @@ export const workspaceApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request: GetMetricsRequest) => {
         try {
-          const data = await (
-            await getWorkspacesClient()
-          ).getMetrics(request.idOrKey, request.workItemKey)
+          const data = await getWorkspacesClient().getMetrics(
+            request.idOrKey,
+            request.workItemKey,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -181,9 +181,10 @@ export const workspaceApi = apiSlice.injectEndpoints({
     searchWorkItems: builder.query<WorkItemListDto[], string>({
       queryFn: async (searchTerm: string) => {
         try {
-          const data = await (
-            await getWorkspacesClient()
-          ).searchWorkItems(searchTerm, 50)
+          const data = await getWorkspacesClient().searchWorkItems(
+            searchTerm,
+            50,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)

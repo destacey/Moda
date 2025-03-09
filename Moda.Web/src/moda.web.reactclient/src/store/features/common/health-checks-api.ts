@@ -8,9 +8,7 @@ export const healthChecksApi = apiSlice.injectEndpoints({
     getHealthReport: builder.query<HealthCheckDto[], string>({
       queryFn: async (objectId: string) => {
         try {
-          const data = await (
-            await getHealthChecksClient()
-          ).getHealthReport(objectId)
+          const data = await getHealthChecksClient().getHealthReport(objectId)
           return { data }
         } catch (error) {
           console.error('API Error:', error)

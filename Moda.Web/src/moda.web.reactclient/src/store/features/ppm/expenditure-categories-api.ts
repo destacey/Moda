@@ -15,9 +15,8 @@ export const expenditureCategoriesApi = apiSlice.injectEndpoints({
       {
         queryFn: async () => {
           try {
-            const data = await (
-              await getExpenditureCategoriesClient()
-            ).getExpenditureCategories()
+            const data =
+              await getExpenditureCategoriesClient().getExpenditureCategories()
             return { data }
           } catch (error) {
             console.error('API Error:', error)
@@ -35,9 +34,8 @@ export const expenditureCategoriesApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (id) => {
         try {
-          const data = await (
-            await getExpenditureCategoriesClient()
-          ).getExpenditureCategory(id)
+          const data =
+            await getExpenditureCategoriesClient().getExpenditureCategory(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -54,9 +52,7 @@ export const expenditureCategoriesApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getExpenditureCategoriesClient()
-          ).create(request)
+          const data = await getExpenditureCategoriesClient().create(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -73,9 +69,10 @@ export const expenditureCategoriesApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getExpenditureCategoriesClient()
-          ).update(request.id, request)
+          const data = await getExpenditureCategoriesClient().update(
+            request.id,
+            request,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -92,9 +89,7 @@ export const expenditureCategoriesApi = apiSlice.injectEndpoints({
     activateExpenditureCategory: builder.mutation<void, number>({
       queryFn: async (id) => {
         try {
-          const data = await (
-            await getExpenditureCategoriesClient()
-          ).activate(id)
+          const data = await getExpenditureCategoriesClient().activate(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -111,9 +106,7 @@ export const expenditureCategoriesApi = apiSlice.injectEndpoints({
     archiveExpenditureCategory: builder.mutation<void, number>({
       queryFn: async (id) => {
         try {
-          const data = await (
-            await getExpenditureCategoriesClient()
-          ).archive(id)
+          const data = await getExpenditureCategoriesClient().archive(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -130,7 +123,7 @@ export const expenditureCategoriesApi = apiSlice.injectEndpoints({
     deleteExpenditureCategory: builder.mutation<void, number>({
       queryFn: async (id) => {
         try {
-          const data = await (await getExpenditureCategoriesClient()).delete(id)
+          const data = await getExpenditureCategoriesClient().delete(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -147,9 +140,10 @@ export const expenditureCategoriesApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (includeArchived = false) => {
         try {
-          const categories = await (
-            await getExpenditureCategoriesClient()
-          ).getExpenditureCategoryOptions(includeArchived)
+          const categories =
+            await getExpenditureCategoriesClient().getExpenditureCategoryOptions(
+              includeArchived,
+            )
 
           const data: BaseOptionType[] = categories
             .sort((a, b) => a.name.localeCompare(b.name))

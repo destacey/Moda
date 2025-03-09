@@ -20,7 +20,7 @@ const stateOrder = ['Active', 'Future', 'Completed']
 export const useGetPlanningIntervals = () => {
   return useQuery({
     queryKey: [QK.PLANNING_INTERVALS],
-    queryFn: async () => (await getPlanningIntervalsClient()).getList(),
+    queryFn: async () => getPlanningIntervalsClient().getList(),
     select: (data) =>
       data?.sort((a, b) => {
         const aStateIndex = stateOrder.indexOf(a.state)
@@ -39,7 +39,7 @@ export const useGetPlanningInterval = (idOrKey: string) => {
   return useQuery({
     queryKey: [QK.PLANNING_INTERVALS, idOrKey],
     queryFn: async () =>
-      (await getPlanningIntervalsClient()).getPlanningInterval(idOrKey),
+      getPlanningIntervalsClient().getPlanningInterval(idOrKey),
     // staleTime: 60000,
     enabled: !!idOrKey,
   })
@@ -48,7 +48,7 @@ export const useGetPlanningInterval = (idOrKey: string) => {
 export const useGetPlanningIntervalCalendar = (id: string) => {
   return useQuery({
     queryKey: [QK.PLANNING_INTERVAL_CALENDAR, id],
-    queryFn: async () => (await getPlanningIntervalsClient()).getCalendar(id),
+    queryFn: async () => getPlanningIntervalsClient().getCalendar(id),
     enabled: !!id,
   })
 }
@@ -56,8 +56,7 @@ export const useGetPlanningIntervalCalendar = (id: string) => {
 export const useGetPlanningIntervalPredictability = (id: string) => {
   return useQuery({
     queryKey: [QK.PLANNING_INTERVAL_PREDICTABILITY, id],
-    queryFn: async () =>
-      (await getPlanningIntervalsClient()).getPredictability(id),
+    queryFn: async () => getPlanningIntervalsClient().getPredictability(id),
     enabled: !!id,
   })
 }
@@ -66,7 +65,7 @@ export const useCreatePlanningIntervalMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (planningInterval: CreatePlanningIntervalRequest) =>
-      (await getPlanningIntervalsClient()).create(planningInterval),
+      getPlanningIntervalsClient().create(planningInterval),
     onSuccess: () => {
       queryClient.invalidateQueries(QK.PLANNING_INTERVALS)
     },
@@ -77,7 +76,7 @@ export const useUpdatePlanningIntervalMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (planningInterval: UpdatePlanningIntervalRequest) =>
-      (await getPlanningIntervalsClient()).update(
+      getPlanningIntervalsClient().update(
         planningInterval.id,
         planningInterval,
       ),
@@ -94,7 +93,7 @@ export const useManagePlanningIntervalDatesMutation = () => {
     mutationFn: async (
       planningIntervalDates: ManagePlanningIntervalDatesRequest,
     ) =>
-      (await getPlanningIntervalsClient()).manageDates(
+      getPlanningIntervalsClient().manageDates(
         planningIntervalDates.id,
         planningIntervalDates,
       ),
@@ -116,7 +115,7 @@ export const useManagePlanningIntervalDatesMutation = () => {
 export const useGetPlanningIntervalIterations = (id: string) => {
   return useQuery({
     queryKey: [QK.PLANNING_INTERVAL_ITERATIONS, id],
-    queryFn: async () => (await getPlanningIntervalsClient()).getIterations(id),
+    queryFn: async () => getPlanningIntervalsClient().getIterations(id),
     enabled: !!id,
   })
 }
@@ -124,8 +123,7 @@ export const useGetPlanningIntervalIterations = (id: string) => {
 export const useGetPlanningIntervalIterationTypeOptions = () => {
   return useQuery({
     queryKey: [QK.PLANNING_INTERVAL_ITERATION_TYPE_OPTIONS],
-    queryFn: async () =>
-      (await getPlanningIntervalsClient()).getIterationTypes(),
+    queryFn: async () => getPlanningIntervalsClient().getIterationTypes(),
     select: (data) => {
       const statuses = _.sortBy(data, ['order'])
       const options: OptionModel<number>[] = statuses.map((s) => ({
@@ -145,7 +143,7 @@ export const useGetPlanningIntervalTeams = (
 ) => {
   return useQuery({
     queryKey: [QK.PLANNING_INTERVAL_TEAMS, id],
-    queryFn: async () => (await getPlanningIntervalsClient()).getTeams(id),
+    queryFn: async () => getPlanningIntervalsClient().getTeams(id),
     // staleTime: 60000,
     enabled: !!id && enabled,
   })
@@ -160,10 +158,7 @@ export const useGetPlanningIntervalObjectivesHealthReport = (
   return useQuery({
     queryKey: [QK.PLANNING_INTERVAL_OBJECTIVES_HEALTH_REPORT, idOrKey, teamId],
     queryFn: async () =>
-      (await getPlanningIntervalsClient()).getObjectivesHealthReport(
-        idOrKey,
-        teamId,
-      ),
+      getPlanningIntervalsClient().getObjectivesHealthReport(idOrKey, teamId),
     // staleTime: 20000,
     enabled: !!idOrKey && enabled,
   })
@@ -176,7 +171,7 @@ export const useGetPlanningIntervalObjectiveById = (
   return useQuery({
     queryKey: [QK.PLANNING_INTERVAL_OBJECTIVES, id, objectiveId],
     queryFn: async () =>
-      (await getPlanningIntervalsClient()).getObjectiveById(id, objectiveId),
+      getPlanningIntervalsClient().getObjectiveById(id, objectiveId),
     onError: (error) => {
       console.log(error)
     },
@@ -192,7 +187,7 @@ export const useGetPlanningIntervalObjectiveByKey = (
   return useQuery({
     queryKey: [QK.PLANNING_INTERVAL_OBJECTIVES, key, objectiveKey],
     queryFn: async () =>
-      (await getPlanningIntervalsClient()).getObjectiveByKey(key, objectiveKey),
+      getPlanningIntervalsClient().getObjectiveByKey(key, objectiveKey),
     // staleTime: 10000,
     enabled: !!key && !!objectiveKey,
   })
@@ -203,8 +198,7 @@ export const useGetPlanningIntervalObjectiveStatuses = (
 ) => {
   return useQuery({
     queryKey: [QK.PLANNING_INTERVAL_OBJECTIVE_STATUSES],
-    queryFn: async () =>
-      (await getPlanningIntervalsClient()).getObjectiveStatuses(),
+    queryFn: async () => getPlanningIntervalsClient().getObjectiveStatuses(),
     // staleTime: 300000,
     enabled: enabled,
   })
@@ -213,8 +207,7 @@ export const useGetPlanningIntervalObjectiveStatuses = (
 export const useGetPlanningIntervalObjectiveStatusOptions = () => {
   return useQuery({
     queryKey: [QK.PLANNING_INTERVAL_OBJECTIVE_STATUS_OPTIONS],
-    queryFn: async () =>
-      (await getPlanningIntervalsClient()).getObjectiveStatuses(),
+    queryFn: async () => getPlanningIntervalsClient().getObjectiveStatuses(),
     select: (data) => {
       const statuses = _.sortBy(data, ['order'])
       const options: OptionModel<number>[] = statuses.map((s) => ({
@@ -234,7 +227,7 @@ export const useGetTeamPlanningIntervalPredictability = (
   return useQuery({
     queryKey: [QK.PLANNING_INTERVAL_TEAM_PREDICTABILITY, id, teamId],
     queryFn: async () =>
-      (await getPlanningIntervalsClient()).getTeamPredictability(id, teamId),
+      getPlanningIntervalsClient().getTeamPredictability(id, teamId),
     //staleTime: 30000,
     enabled: !!id && !!teamId,
   })
@@ -249,7 +242,7 @@ export const useCreatePlanningIntervalObjectiveMutation = () => {
   const queryClient = useQueryClient()
   return useMutation(
     async (request: CreatePlanningIntervalObjectiveMutationRequest) =>
-      (await getPlanningIntervalsClient()).createObjective(
+      getPlanningIntervalsClient().createObjective(
         request.objective.planningIntervalId,
         request.objective,
       ),
@@ -282,7 +275,7 @@ export const useUpdatePlanningIntervalObjectiveMutation = () => {
   const queryClient = useQueryClient()
   return useMutation(
     async (request: UpdatePlanningIntervalObjectiveMutationRequest) =>
-      (await getPlanningIntervalsClient()).updateObjective(
+      getPlanningIntervalsClient().updateObjective(
         request.objective.planningIntervalId,
         request.objective.objectiveId,
         request.objective,
@@ -333,7 +326,7 @@ export const useGetPlanningIntervalRisks = (
       { includeClosed: includeClosed },
     ],
     queryFn: async () =>
-      (await getPlanningIntervalsClient()).getRisks(id, null, includeClosed),
+      getPlanningIntervalsClient().getRisks(id, null, includeClosed),
     // staleTime: 10000,
     enabled: !!id && enabled,
   })
@@ -353,7 +346,7 @@ export const useGetPlanningIntervalRisksByTeamId = (
       { includeClosed: includeClosed },
     ],
     queryFn: async () =>
-      (await getPlanningIntervalsClient()).getRisks(id, teamId, includeClosed),
+      getPlanningIntervalsClient().getRisks(id, teamId, includeClosed),
     // staleTime: 20000,
     enabled: !!id && !!teamId && enabled,
   })
@@ -363,7 +356,7 @@ export const useGetPlanningIntervalRisksByTeamId = (
 export const useGetRisk = (idOrKey: string) => {
   return useQuery({
     queryKey: [QK.RISKS, idOrKey],
-    queryFn: async () => (await getRisksClient()).getRisk(idOrKey),
+    queryFn: async () => getRisksClient().getRisk(idOrKey),
     // staleTime: 10000,
     enabled: !!idOrKey,
   })
@@ -372,7 +365,7 @@ export const useGetRisk = (idOrKey: string) => {
 export const useGetMyRisks = () => {
   return useQuery({
     queryKey: [QK.MY_RISKS],
-    queryFn: async () => (await getRisksClient()).getMyRisks(),
+    queryFn: async () => getRisksClient().getMyRisks(),
     // staleTime: 10000,
   })
 }
@@ -380,7 +373,7 @@ export const useGetMyRisks = () => {
 export const useGetRiskStatusOptions = () => {
   return useQuery({
     queryKey: [QK.RISK_STATUS_OPTIONS],
-    queryFn: async () => (await getRisksClient()).getStatuses(),
+    queryFn: async () => getRisksClient().getStatuses(),
     select: (data) => {
       const statuses = _.sortBy(data, ['order'])
       const options: OptionModel<number>[] = statuses.map((c) => ({
@@ -396,7 +389,7 @@ export const useGetRiskStatusOptions = () => {
 export const useGetRiskCategoryOptions = () => {
   return useQuery({
     queryKey: [QK.RISK_CATEGORY_OPTIONS],
-    queryFn: async () => (await getRisksClient()).getCategories(),
+    queryFn: async () => getRisksClient().getCategories(),
     select: (data) => {
       const categories = _.sortBy(data, ['order'])
       const options: OptionModel<number>[] = categories.map((c) => ({
@@ -412,7 +405,7 @@ export const useGetRiskCategoryOptions = () => {
 export const useGetRiskGradeOptions = () => {
   return useQuery({
     queryKey: [QK.RISK_GRADE_OPTIONS],
-    queryFn: async () => (await getRisksClient()).getGrades(),
+    queryFn: async () => getRisksClient().getGrades(),
     select: (data) => {
       const grades = _.sortBy(data, ['order'])
       const options: OptionModel<number>[] = grades.map((c) => ({
@@ -429,7 +422,7 @@ export const useCreateRiskMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (risk: CreateRiskRequest) =>
-      (await getRisksClient()).createRisk(risk),
+      getRisksClient().createRisk(risk),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries([QK.PLANNING_INTERVAL_RISKS])
       queryClient.invalidateQueries([QK.TEAM_RISKS])
@@ -445,7 +438,7 @@ export const useUpdateRiskMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (risk: UpdateRiskRequest) =>
-      (await getRisksClient()).update(risk.riskId, risk),
+      getRisksClient().update(risk.riskId, risk),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries([QK.RISKS, variables.riskId])
       queryClient.invalidateQueries([QK.PLANNING_INTERVAL_RISKS])

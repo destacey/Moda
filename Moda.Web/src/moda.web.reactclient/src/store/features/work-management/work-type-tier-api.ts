@@ -8,7 +8,7 @@ export const workTypeTierApi = apiSlice.injectEndpoints({
     getWorkTypeTiers: builder.query<WorkTypeTierDto[], null>({
       queryFn: async () => {
         try {
-          const data = await (await getWorkTypeTiersClient()).getList()
+          const data = await getWorkTypeTiersClient().getList()
           return { data }
         } catch (error) {
           console.error('API Error:', error)

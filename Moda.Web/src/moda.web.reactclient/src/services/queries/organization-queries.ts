@@ -17,8 +17,7 @@ import { TeamTypeName } from '@/src/app/organizations/types'
 export const useGetTeamOfTeamsOptions = (includeInactive: boolean = false) => {
   return useQuery({
     queryKey: [QK.TEAM_OF_TEAMS_OPTIONS],
-    queryFn: async () =>
-      (await getTeamsOfTeamsClient()).getList(includeInactive),
+    queryFn: async () => getTeamsOfTeamsClient().getList(includeInactive),
     select: (data) => {
       const teams = _.sortBy(data, ['name'])
       const options: OptionModel[] = teams.map((t) => ({
@@ -34,7 +33,7 @@ export const useGetTeamOfTeamsOptions = (includeInactive: boolean = false) => {
 export const useGetTeamMemberships = (teamId: string, enabled: boolean) => {
   return useQuery({
     queryKey: [QK.TEAM_MEMBERSHIPS, teamId],
-    queryFn: async () => (await getTeamsClient()).getTeamMemberships(teamId),
+    queryFn: async () => getTeamsClient().getTeamMemberships(teamId),
     staleTime: 10000,
     enabled: !!teamId && enabled,
   })
@@ -46,8 +45,7 @@ export const useGetTeamOfTeamsMemberships = (
 ) => {
   return useQuery({
     queryKey: [QK.TEAM_MEMBERSHIPS, teamId],
-    queryFn: async () =>
-      (await getTeamsOfTeamsClient()).getTeamMemberships(teamId),
+    queryFn: async () => getTeamsOfTeamsClient().getTeamMemberships(teamId),
     staleTime: 10000,
     enabled: !!teamId && enabled,
   })
@@ -65,12 +63,9 @@ export const useCreateTeamMembershipMutation = () => {
       teamType,
     }: CreateTeamMembershipMutationRequest) => {
       if (teamType === 'Team') {
-        return (await getTeamsClient()).addTeamMembership(
-          membership.teamId,
-          membership,
-        )
+        return getTeamsClient().addTeamMembership(membership.teamId, membership)
       } else if (teamType === 'Team of Teams') {
-        return (await getTeamsOfTeamsClient()).addTeamMembership(
+        return getTeamsOfTeamsClient().addTeamMembership(
           membership.teamId,
           membership,
         )
@@ -101,13 +96,13 @@ export const useUpdateTeamMembershipMutation = () => {
   return useMutation({
     mutationFn: async (request: UpdateTeamMembershipMutationRequest) => {
       if (request.teamType === 'Team') {
-        return (await getTeamsClient()).updateTeamMembership(
+        return getTeamsClient().updateTeamMembership(
           request.membership.teamId,
           request.membership.teamMembershipId,
           request.membership,
         )
       } else if (request.teamType === 'Team of Teams') {
-        return (await getTeamsOfTeamsClient()).updateTeamMembership(
+        return getTeamsOfTeamsClient().updateTeamMembership(
           request.membership.teamId,
           request.membership.teamMembershipId,
           request.membership,
@@ -140,12 +135,12 @@ export const useDeleteTeamMembershipMutation = () => {
   return useMutation({
     mutationFn: async (request: DeleteTeamMembershipMutationRequest) => {
       if (request.teamType === 'Team') {
-        return (await getTeamsClient()).removeTeamMembership(
+        return getTeamsClient().removeTeamMembership(
           request.teamId,
           request.teamMembershipId,
         )
       } else if (request.teamType === 'Team of Teams') {
-        return (await getTeamsOfTeamsClient()).removeTeamMembership(
+        return getTeamsOfTeamsClient().removeTeamMembership(
           request.teamId,
           request.teamMembershipId,
         )
@@ -171,7 +166,7 @@ export const useGetTeamRisks = (
 ) => {
   return useQuery({
     queryKey: [QK.TEAM_RISKS, id, includeClosed],
-    queryFn: async () => (await getTeamsClient()).getRisks(id, includeClosed),
+    queryFn: async () => getTeamsClient().getRisks(id, includeClosed),
     staleTime: 10000,
     enabled: !!id && enabled,
   })
@@ -185,8 +180,7 @@ export const useGetTeamOfTeamsRisks = (
 ) => {
   return useQuery({
     queryKey: [QK.TEAM_OF_TEAMS_RISKS, id, includeClosed],
-    queryFn: async () =>
-      (await getTeamsOfTeamsClient()).getRisks(id, includeClosed),
+    queryFn: async () => getTeamsOfTeamsClient().getRisks(id, includeClosed),
     staleTime: 10000,
     enabled: !!id && enabled,
   })
@@ -196,7 +190,7 @@ export const useGetTeamOfTeamsRisks = (
 export const useGetEmployees = (includeInactive: boolean = false) => {
   return useQuery({
     queryKey: [QK.EMPLOYEES, includeInactive],
-    queryFn: async () => (await getEmployeesClient()).getList(includeInactive),
+    queryFn: async () => getEmployeesClient().getList(includeInactive),
     select: (data) => _.sortBy(data, ['displayName']),
     staleTime: 60000,
   })
@@ -205,7 +199,7 @@ export const useGetEmployees = (includeInactive: boolean = false) => {
 export const useGetEmployeeOptions = (includeInactive: boolean = false) => {
   return useQuery({
     queryKey: [QK.EMPLOYEE_OPTIONS, includeInactive],
-    queryFn: async () => (await getEmployeesClient()).getList(includeInactive),
+    queryFn: async () => getEmployeesClient().getList(includeInactive),
     select: (data) => {
       const statuses = _.sortBy(data, ['displayName'])
       const options: OptionModel[] = statuses.map((e) => ({

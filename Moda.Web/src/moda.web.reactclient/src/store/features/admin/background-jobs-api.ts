@@ -12,7 +12,7 @@ export const backgroundJobsApi = apiSlice.injectEndpoints({
     getRunningJobs: builder.query<BackgroundJobDto[], null>({
       queryFn: async () => {
         try {
-          const data = await (await getBackgroundJobsClient()).getRunningJobs()
+          const data = await getBackgroundJobsClient().getRunningJobs()
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -27,7 +27,7 @@ export const backgroundJobsApi = apiSlice.injectEndpoints({
     getJobTypes: builder.query<BackgroundJobTypeDto[], void>({
       queryFn: async () => {
         try {
-          const data = await (await getBackgroundJobsClient()).getJobTypes()
+          const data = await getBackgroundJobsClient().getJobTypes()
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -42,7 +42,7 @@ export const backgroundJobsApi = apiSlice.injectEndpoints({
     runJob: builder.mutation<void, number>({
       queryFn: async (jobTypeId) => {
         try {
-          await (await getBackgroundJobsClient()).run(jobTypeId)
+          await getBackgroundJobsClient().run(jobTypeId)
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -52,7 +52,7 @@ export const backgroundJobsApi = apiSlice.injectEndpoints({
     createRecurringJob: builder.mutation<void, CreateRecurringJobRequest>({
       queryFn: async (request) => {
         try {
-          await (await getBackgroundJobsClient()).create(request)
+          await getBackgroundJobsClient().create(request)
         } catch (error) {
           console.error('API Error:', error)
           return { error }

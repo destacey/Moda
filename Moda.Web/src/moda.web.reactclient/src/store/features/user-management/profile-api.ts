@@ -6,7 +6,7 @@ export const profileApi = apiSlice.injectEndpoints({
     getInternalEmployeeId: builder.query<string, void>({
       queryFn: async () => {
         try {
-          const data = await (await getProfileClient()).getInternalEmployeeId()
+          const data = await getProfileClient().getInternalEmployeeId()
           return { data }
         } catch (error) {
           console.error('API Error:', error)

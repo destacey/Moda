@@ -11,11 +11,16 @@ import AppHeader from './_components/app-header'
 import AppSideNav from './_components/menu/app-side-nav'
 import AppBreadcrumb from './_components/app-breadcrumb'
 import { ThemeProvider } from '../components/contexts/theme'
-import { AuthProvider } from '../components/contexts/auth'
 import { MenuToggleProvider } from '../components/contexts/menu-toggle'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import LoadingAccount from '../components/common/loading-account'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
+import { AuthProvider, msalInstance } from '../components/contexts/auth'
+import {
+  AuthenticatedTemplate,
+  MsalProvider,
+  UnauthenticatedTemplate,
+} from '@azure/msal-react'
+import { LoadingAccount } from '../components/common'
 
 const { Content } = Layout
 
@@ -50,31 +55,34 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
     <html lang="en">
       <body className={inter.className}>
         <AntdRegistry>
-          <QueryClientProvider client={queryClient}>
-            <Provider store={store}>
+          <Provider store={store}>
+            <MsalProvider instance={msalInstance}>
               <AuthProvider>
-                <ThemeProvider>
-                  <MenuToggleProvider>
-                    {/* Main Layout */}
-                    <Layout>
-                      {/* Fixed Header */}
-                      <AppHeader />
-                      <LoadingAccount>
-                        {/* Sidebar and Content */}
-                        <Layout hasSider className="app-main-layout">
-                          <AppSideNav isMobile={isMobile} />
-                          <Content className="app-main-content">
-                            <AppBreadcrumb />
-                            {children}
-                          </Content>
+                <AuthenticatedTemplate>
+                  <ThemeProvider>
+                    <QueryClientProvider client={queryClient}>
+                      <MenuToggleProvider>
+                        <Layout>
+                          <AppHeader />
+                          <Layout hasSider className="app-main-layout">
+                            <AppSideNav isMobile={isMobile} />
+                            <Content className="app-main-content">
+                              <AppBreadcrumb />
+                              {children}
+                            </Content>
+                          </Layout>
                         </Layout>
-                      </LoadingAccount>
-                    </Layout>
-                  </MenuToggleProvider>
-                </ThemeProvider>
+                      </MenuToggleProvider>
+                    </QueryClientProvider>
+                  </ThemeProvider>
+                </AuthenticatedTemplate>
+                <UnauthenticatedTemplate>
+                  {/* TODO: change this to a login form after the login flow is manual rather than automatic */}
+                  <LoadingAccount message="Unauthenticated Moda user.  Redirecting to login..." />
+                </UnauthenticatedTemplate>
               </AuthProvider>
-            </Provider>
-          </QueryClientProvider>
+            </MsalProvider>
+          </Provider>
         </AntdRegistry>
       </body>
     </html>

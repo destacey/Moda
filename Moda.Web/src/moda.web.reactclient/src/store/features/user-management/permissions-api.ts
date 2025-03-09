@@ -8,7 +8,7 @@ export const permissionsApi = apiSlice.injectEndpoints({
     getPermissions: builder.query<ApplicationPermission[], void>({
       queryFn: async () => {
         try {
-          const data = await (await getPermissionsClient()).getList()
+          const data = await getPermissionsClient().getList()
           return { data }
         } catch (error) {
           console.error('API Error:', error)

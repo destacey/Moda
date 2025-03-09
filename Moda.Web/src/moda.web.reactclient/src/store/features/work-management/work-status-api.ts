@@ -8,9 +8,7 @@ export const workStatusApi = apiSlice.injectEndpoints({
     getWorkStatuses: builder.query<WorkStatusDto[], boolean>({
       queryFn: async (includeInactive) => {
         try {
-          const data = await (
-            await getWorkStatusesClient()
-          ).getList(includeInactive)
+          const data = await getWorkStatusesClient().getList(includeInactive)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -25,7 +23,7 @@ export const workStatusApi = apiSlice.injectEndpoints({
     getWorkStatus: builder.query<WorkStatusDto, number>({
       queryFn: async (id: number) => {
         try {
-          const data = await (await getWorkStatusesClient()).getById(id)
+          const data = await getWorkStatusesClient().getById(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)

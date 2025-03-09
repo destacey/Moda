@@ -12,7 +12,7 @@ export const usersApi = apiSlice.injectEndpoints({
     getUsers: builder.query<UserDetailsDto[], void>({
       queryFn: async () => {
         try {
-          const data = await (await getUsersClient()).getList()
+          const data = await getUsersClient().getList()
           data.sort((a, b) => a.userName.localeCompare(b.userName))
           return { data }
         } catch (error) {
@@ -25,7 +25,7 @@ export const usersApi = apiSlice.injectEndpoints({
     getUser: builder.query<UserDetailsDto, string>({
       queryFn: async (id: string) => {
         try {
-          const data = await (await getUsersClient()).getById(id)
+          const data = await getUsersClient().getById(id)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -40,9 +40,10 @@ export const usersApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getUsersClient()
-          ).getRoles(request.id, request.includeUnassigned ?? false)
+          const data = await getUsersClient().getRoles(
+            request.id,
+            request.includeUnassigned ?? false,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -57,9 +58,10 @@ export const usersApi = apiSlice.injectEndpoints({
     manageUserRoles: builder.mutation<void, AssignUserRolesRequest>({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getUsersClient()
-          ).manageRoles(request.userId, request)
+          const data = await getUsersClient().manageRoles(
+            request.userId,
+            request,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)

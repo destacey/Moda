@@ -1,26 +1,24 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
-export const useLocalStorageState = <T = any>(
+export const useLocalStorageState = <T>(
   key: string,
   defaultValue: T,
-): [T, (value: T) => void] => {
+): [T, React.Dispatch<React.SetStateAction<T>>] => {
   const [value, setValue] = useState<T>(() => {
-    // Safe access to localStorage
     if (typeof window === 'undefined') {
-      return defaultValue // Return default value during SSR
+      return defaultValue
     }
-
     try {
       const storedValue = window.localStorage.getItem(key)
-      return storedValue ? JSON.parse(storedValue) : defaultValue
+      return storedValue !== null ? JSON.parse(storedValue) : defaultValue
     } catch (error) {
       console.error(`Error reading localStorage key "${key}":`, error)
       return defaultValue
     }
   })
 
+  // Update localStorage when value changes.
   useEffect(() => {
-    // Update localStorage only if value changes
     try {
       window.localStorage.setItem(key, JSON.stringify(value))
     } catch (error) {
@@ -28,16 +26,48 @@ export const useLocalStorageState = <T = any>(
     }
   }, [key, value])
 
-  return [
-    value,
-    (newValue: T) => {
-      setValue((prevValue) => {
-        // Prevent redundant updates to localStorage
-        if (JSON.stringify(prevValue) !== JSON.stringify(newValue)) {
-          return newValue
+  // Listen for changes to localStorage from other tabs/windows.
+  useEffect(() => {
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === key) {
+        try {
+          const newValue = event.newValue
+            ? JSON.parse(event.newValue)
+            : defaultValue
+          setValue(newValue)
+        } catch (error) {
+          console.error(
+            `Error parsing localStorage key "${key}" on storage event:`,
+            error,
+          )
         }
-        return prevValue
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [key, defaultValue])
+
+  const setLocalStorageValue = useCallback(
+    (newValue: React.SetStateAction<T>) => {
+      setValue((prevValue) => {
+        const valueToStore =
+          typeof newValue === 'function'
+            ? (newValue as (prevState: T) => T)(prevValue)
+            : newValue
+
+        // Only update if value actually changed.
+        if (JSON.stringify(prevValue) === JSON.stringify(valueToStore)) {
+          return prevValue
+        }
+
+        return valueToStore
       })
     },
-  ]
+    [],
+  )
+
+  return [value, setLocalStorageValue]
 }

@@ -1,6 +1,5 @@
 'use client'
 
-import Profile from './Profile'
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -11,6 +10,7 @@ import { Layout, Button, Typography, Dropdown, Menu, Flex } from 'antd'
 import useMenuToggle from '../../components/contexts/menu-toggle'
 import { useMediaQuery } from 'react-responsive'
 import { useAppMenuItems } from './menu'
+import ProfileMenu from './profile-menu'
 
 const { Header } = Layout
 const { Title } = Typography
@@ -22,7 +22,7 @@ const AppHeader: FC = React.memo(() => {
   const menuItems = useAppMenuItems()
 
   // Avoid re-renders when authentication state changes
-  const profileComponent = useMemo(() => <Profile />, [])
+  const profileComponent = useMemo(() => <ProfileMenu />, [])
 
   const handleDropdownOpen = (open: boolean) => {
     setDropdownOpen(open)

@@ -1,13 +1,19 @@
 import { Spin } from 'antd'
-import { AuthenticatedTemplate } from '@azure/msal-react'
-import useAuth from '../contexts/auth/use-auth'
 
-const LoadingAccount = ({ children }: { children: React.ReactNode }) => {
-  const { isLoading } = useAuth()
+interface LoadingAccountProps {
+  message?: string
+}
 
+const LoadingAccount: React.FC<LoadingAccountProps> = (props) => {
+  const message = props.message || "Loading Moda user's account..."
   return (
-    <Spin spinning={isLoading} tip="Loading account..." size="large">
-      <AuthenticatedTemplate>{children}</AuthenticatedTemplate>
+    <Spin tip={message} size="large">
+      <div
+        style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(to right, #fff, #2196f3)',
+        }}
+      />
     </Spin>
   )
 }

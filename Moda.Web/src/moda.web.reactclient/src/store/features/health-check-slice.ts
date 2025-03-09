@@ -22,7 +22,7 @@ interface HealthCheckState extends CrudState<HealthCheckDto> {
 export const getHealthCheckStatusOptions = createAsyncThunk(
   'healthCheck/getHealthCheckStatusOptions',
   async () => {
-    return await (await getHealthChecksClient()).getStatuses()
+    return await getHealthChecksClient().getStatuses()
   },
 )
 
@@ -81,16 +81,16 @@ const healthCheckSlice = createCrudSlice({
       const { healthCheck: healthCheckState } = getState() as {
         healthCheck: HealthCheckState
       }
-      return await (
-        await getHealthChecksClient()
-      ).getHealthReport(healthCheckState.objectId)
+      return await getHealthChecksClient().getHealthReport(
+        healthCheckState.objectId,
+      )
     } catch (error) {
       return rejectWithValue({ error })
     }
   },
   getDetail: async (id: string, { rejectWithValue }) => {
     try {
-      return await (await getHealthChecksClient()).getById(id)
+      return await getHealthChecksClient().getById(id)
     } catch (error) {
       return rejectWithValue({ error })
     }
@@ -107,8 +107,8 @@ const healthCheckSlice = createCrudSlice({
         ...newHealthCheck,
         ...healthCheckState.createContext,
       }
-      const id = await (await getHealthChecksClient()).create(healthCheck)
-      return await (await getHealthChecksClient()).getById(id)
+      const id = await getHealthChecksClient().create(healthCheck)
+      return await getHealthChecksClient().getById(id)
     } catch (error) {
       return rejectWithValue({ error })
     }
@@ -118,8 +118,8 @@ const healthCheckSlice = createCrudSlice({
     { rejectWithValue },
   ) => {
     try {
-      await (await getHealthChecksClient()).update(healthCheck.id, healthCheck)
-      return await (await getHealthChecksClient()).getById(healthCheck.id)
+      await getHealthChecksClient().update(healthCheck.id, healthCheck)
+      return await getHealthChecksClient().getById(healthCheck.id)
     } catch (error) {
       return rejectWithValue({ error })
     }

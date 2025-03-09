@@ -28,7 +28,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
     getRoadmaps: builder.query<RoadmapListDto[], void>({
       queryFn: async () => {
         try {
-          const data = await (await getRoadmapsClient()).getRoadmaps()
+          const data = await getRoadmapsClient().getRoadmaps()
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -40,7 +40,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
     getRoadmap: builder.query<RoadmapDetailsDto, string>({
       queryFn: async (idOrKey: string) => {
         try {
-          const data = await (await getRoadmapsClient()).getRoadmap(idOrKey)
+          const data = await getRoadmapsClient().getRoadmap(idOrKey)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -52,7 +52,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
     createRoadmap: builder.mutation<ObjectIdAndKey, CreateRoadmapRequest>({
       queryFn: async (request) => {
         try {
-          const data = await (await getRoadmapsClient()).create(request)
+          const data = await getRoadmapsClient().create(request)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -72,9 +72,10 @@ export const roadmapApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (mutationRequest) => {
         try {
-          const data = await (
-            await getRoadmapsClient()
-          ).update(mutationRequest.request.id, mutationRequest.request)
+          const data = await getRoadmapsClient().update(
+            mutationRequest.request.id,
+            mutationRequest.request,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -91,7 +92,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
     deleteRoadmap: builder.mutation<void, string>({
       queryFn: async (roadmapId) => {
         try {
-          const data = await (await getRoadmapsClient()).delete(roadmapId)
+          const data = await getRoadmapsClient().delete(roadmapId)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -105,7 +106,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
     getRoadmapItems: builder.query<RoadmapItemListDto[], string>({
       queryFn: async (roadmapId: string) => {
         try {
-          const data = await (await getRoadmapsClient()).getItems(roadmapId)
+          const data = await getRoadmapsClient().getItems(roadmapId)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -122,9 +123,10 @@ export const roadmapApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getRoadmapsClient()
-          ).getItem(request.roadmapId, request.itemId)
+          const data = await getRoadmapsClient().getItem(
+            request.roadmapId,
+            request.itemId,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -138,9 +140,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
     getRoadmapActivities: builder.query<RoadmapActivityListDto[], string>({
       queryFn: async (roadmapId: string) => {
         try {
-          const data = await (
-            await getRoadmapsClient()
-          ).getActivities(roadmapId)
+          const data = await getRoadmapsClient().getActivities(roadmapId)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -159,9 +159,10 @@ export const roadmapApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getRoadmapsClient()
-          ).createItem(request.roadmapId, request)
+          const data = await getRoadmapsClient().createItem(
+            request.roadmapId,
+            request,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -180,9 +181,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (mutationRequest) => {
         try {
-          const data = await (
-            await getRoadmapsClient()
-          ).updateItem(
+          const data = await getRoadmapsClient().updateItem(
             mutationRequest.roadmapId,
             mutationRequest.itemId,
             mutationRequest,
@@ -208,9 +207,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (mutationRequest) => {
         try {
-          const data = await (
-            await getRoadmapsClient()
-          ).reorganizeActivity(
+          const data = await getRoadmapsClient().reorganizeActivity(
             mutationRequest.request.roadmapId,
             mutationRequest.request.activityId,
             mutationRequest.request,
@@ -237,9 +234,10 @@ export const roadmapApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          const data = await (
-            await getRoadmapsClient()
-          ).deleteItem(request.roadmapId, request.itemId)
+          const data = await getRoadmapsClient().deleteItem(
+            request.roadmapId,
+            request.itemId,
+          )
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -256,9 +254,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
     getVisibilityOptions: builder.query<OptionModel<number>[], void>({
       queryFn: async () => {
         try {
-          const visibilities = await (
-            await getRoadmapsClient()
-          ).getVisibilityOptions()
+          const visibilities = await getRoadmapsClient().getVisibilityOptions()
           const data: OptionModel<number>[] = visibilities
             .sort((a, b) => a.order - b.order)
             .map((s) => ({
