@@ -4,7 +4,7 @@ using Moda.Common.Domain.Interfaces;
 using Moda.Goals.Domain.Enums;
 
 namespace Moda.Goals.Domain.Models;
-public class Objective : BaseSoftDeletableEntity<Guid>, HasIdAndKey
+public class Objective : BaseSoftDeletableEntity<Guid>, IHasIdAndKey
 {
     private string _name = default!;
     private string? _description;

@@ -3,7 +3,7 @@ using Moda.Common.Domain.Interfaces;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Domain.Models;
-public class PlanningIntervalObjective : BaseSoftDeletableEntity<Guid>, HasIdAndKey
+public class PlanningIntervalObjective : BaseSoftDeletableEntity<Guid>, IHasIdAndKey
 {
     private PlanningIntervalObjective() { }
 

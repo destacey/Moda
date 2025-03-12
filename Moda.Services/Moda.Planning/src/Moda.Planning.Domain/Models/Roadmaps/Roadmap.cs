@@ -7,7 +7,7 @@ using Moda.Planning.Domain.Interfaces;
 using Moda.Planning.Domain.Interfaces.Roadmaps;
 
 namespace Moda.Planning.Domain.Models.Roadmaps;
-public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, HasIdAndKey
+public class Roadmap : BaseAuditableEntity<Guid>, ILocalSchedule, IHasIdAndKey
 {
     private readonly bool _objectConstruction = false;
     private string _name = default!;

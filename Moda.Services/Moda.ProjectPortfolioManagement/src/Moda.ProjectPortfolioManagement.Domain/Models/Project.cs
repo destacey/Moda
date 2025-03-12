@@ -8,7 +8,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents an individual project within a portfolio or program.
 /// </summary>
-public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
+public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
 {
     private string _name = default!;
     private string _description = default!;
@@ -83,7 +83,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     public LocalDateRange? DateRange { get; private set; }
 
     /// <summary>
-    /// The ID of the expenditure category associated with the project.
+    /// The Id of the expenditure category associated with the project.
     /// </summary>
     public int ExpenditureCategoryId { get; private set; }
 
@@ -93,7 +93,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     public ExpenditureCategory? ExpenditureCategory { get; private set; }
 
     /// <summary>
-    /// The ID of the portfolio to which this project belongs.
+    /// The Id of the portfolio to which this project belongs.
     /// </summary>
     public Guid PortfolioId { get; private set; }
 
@@ -103,7 +103,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     public ProjectPortfolio? Portfolio { get; private set; }
 
     /// <summary>
-    /// The ID of the program to which this project belongs (optional).
+    /// The Id of the program to which this project belongs (optional).
     /// </summary>
     public Guid? ProgramId { get; private set; }
 

@@ -7,7 +7,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents a strategic theme within the PPM domain.  The primary StrategicTheme entity is defined in the StrategicManagement domain.
 /// </summary>
-public class StrategicTheme : IStrategicThemeData, HasIdAndKey
+public class StrategicTheme : IStrategicThemeData, IHasIdAndKey
 {
     private StrategicTheme() { }
 

@@ -1,5 +1,5 @@
 ﻿namespace Moda.Common.Domain.Interfaces;
-public interface HasIdAndKey
+public interface IHasIdAndKey
 {
     Guid Id { get; }
     int Key { get; }

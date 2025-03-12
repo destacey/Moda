@@ -8,7 +8,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents a collection of projects or programs that are managed together to achieve strategic results.
 /// </summary>
-public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
+public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
 {
     private const string ReadOnlyErrorMessage = "Project Portfolio is readonly and cannot be updated.";
 
@@ -297,9 +297,9 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
     /// </summary>
     /// <param name="name">The name of the project.</param>
     /// <param name="description">The description of the project.</param>
-    /// <param name="expenditureCategory">The ID of the expenditure category associated with the project.</param>
+    /// <param name="expenditureCategory">The Id of the expenditure category associated with the project.</param>
     /// <param name="dateRange">The date range of the project (optional).</param>
-    /// <param name="programId">The ID of the program the project should be associated with (optional).</param>
+    /// <param name="programId">The Id of the program the project should be associated with (optional).</param>
     /// <param name="roles">The roles associated with the project (optional).</param>
     /// <param name="strategicThemes">The strategic themes associated with the project (optional).</param>
     /// <returns>A result containing the created project or an error.</returns>
@@ -310,7 +310,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, HasId
             return Result.Failure<Project>("Projects can only be created in active or on-hold portfolios.");
         }
 
-        // Validate the program ID if provided
+        // Validate the program Id if provided
         Program? program = null;
         if (programId.HasValue)
         {
