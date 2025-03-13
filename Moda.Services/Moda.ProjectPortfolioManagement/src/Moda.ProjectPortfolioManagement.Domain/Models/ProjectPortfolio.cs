@@ -18,6 +18,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
     private readonly HashSet<RoleAssignment<ProjectPortfolioRole>> _roles = [];
     private readonly HashSet<Program> _programs = [];
     private readonly HashSet<Project> _projects = [];
+    private readonly HashSet<StrategicInitiative> _strategicInitiatives = [];
 
     private ProjectPortfolio() { }
 
@@ -92,6 +93,11 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
     /// The projects associated with this portfolio.
     /// </summary>
     public IReadOnlyCollection<Project> Projects => _projects;
+
+    /// <summary>
+    /// The strategic initiatives associated with this portfolio.
+    /// </summary>
+    public IReadOnlyCollection<StrategicInitiative> StrategicInitiatives => _strategicInitiatives;
 
     /// <summary>
     /// Indicates whether the portfolio is readonly.

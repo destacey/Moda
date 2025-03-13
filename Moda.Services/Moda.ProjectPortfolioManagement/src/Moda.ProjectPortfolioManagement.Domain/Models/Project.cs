@@ -15,6 +15,7 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     
     private readonly HashSet<RoleAssignment<ProjectRole>> _roles = [];
     private readonly HashSet<StrategicThemeTag<Project>> _strategicThemeTags = [];
+    private readonly HashSet<StrategicInitiative> _strategicInitiatives = [];
 
     private Project() { }
 
@@ -121,6 +122,11 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     /// The strategic theme tags associated with this project.
     /// </summary>
     public IReadOnlyCollection<StrategicThemeTag<Project>> StrategicThemeTags => _strategicThemeTags;
+
+    /// <summary>
+    /// The strategic initiatives associated with this project.
+    /// </summary>
+    public IReadOnlyCollection<StrategicInitiative> StrategicInitiatives => _strategicInitiatives;
 
     /// <summary>
     /// Indicates whether the project can be deleted.
