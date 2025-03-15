@@ -168,6 +168,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.ProjectPortfolioManage
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.ProjectPortfolioManagement.Application", "Moda.Services\Moda.ProjectPortfolioManagement\src\Moda.ProjectPortfolioManagement.Application\Moda.ProjectPortfolioManagement.Application.csproj", "{C58A5706-0B90-4F3D-8FC0-CC0B580E1A38}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moda.Common.Domain.Tests", "Moda.Common\tests\Moda.Common.Domain.Tests\Moda.Common.Domain.Tests.csproj", "{E15D0144-C7DD-4302-9616-35359C33489A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -332,6 +334,10 @@ Global
 		{C58A5706-0B90-4F3D-8FC0-CC0B580E1A38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C58A5706-0B90-4F3D-8FC0-CC0B580E1A38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C58A5706-0B90-4F3D-8FC0-CC0B580E1A38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E15D0144-C7DD-4302-9616-35359C33489A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E15D0144-C7DD-4302-9616-35359C33489A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E15D0144-C7DD-4302-9616-35359C33489A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E15D0144-C7DD-4302-9616-35359C33489A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -411,6 +417,7 @@ Global
 		{6FDD8F88-A313-4226-AB23-8680514FE803} = {E7DE7780-8BAD-4177-B872-751CB6896331}
 		{8629E348-3A8D-4466-8B74-1210C5922F5E} = {3C17D935-F66D-49E5-8011-06B60D237AA3}
 		{C58A5706-0B90-4F3D-8FC0-CC0B580E1A38} = {E7DE7780-8BAD-4177-B872-751CB6896331}
+		{E15D0144-C7DD-4302-9616-35359C33489A} = {13A71673-06F8-4099-BAB7-962DA8E5F0F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A287E480-E0D5-4A33-9958-D4A8F7DC3F31}

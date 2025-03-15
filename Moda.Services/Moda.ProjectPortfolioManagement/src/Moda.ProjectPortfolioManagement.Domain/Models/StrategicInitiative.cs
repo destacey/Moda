@@ -11,6 +11,7 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
     private LocalDateRange _dateRange = default!;
 
     private readonly HashSet<RoleAssignment<StrategicInitiativeRole>> _roles = [];
+    private readonly HashSet<StrategicInitiativeKpi> _kpis = [];
     private readonly HashSet<Project> _projects = [];
 
     private StrategicInitiative() { }
@@ -83,6 +84,11 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
     public IReadOnlyCollection<RoleAssignment<StrategicInitiativeRole>> Roles => _roles;
 
     /// <summary>
+    /// The KPIs associated with this strategic initiative.
+    /// </summary>
+    public IReadOnlyCollection<StrategicInitiativeKpi> Kpis => _kpis;
+
+    /// <summary>
     /// The projects associated with this strategic initiative.
     /// </summary>
     public IReadOnlyCollection<Project> Projects => _projects;
@@ -96,4 +102,9 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
     /// </summary>
     /// <returns></returns>
     public bool CanBeDeleted() => Status is StrategicInitiativeStatus.Proposed or StrategicInitiativeStatus.Approved;
+
+    public static StrategicInitiative Create(string name, string? description, StrategicInitiativeStatus status, LocalDateRange dateRange, Guid portfolioId, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
+    {
+        return new StrategicInitiative(name, description, status, dateRange, portfolioId, roles);
+    }
 }
