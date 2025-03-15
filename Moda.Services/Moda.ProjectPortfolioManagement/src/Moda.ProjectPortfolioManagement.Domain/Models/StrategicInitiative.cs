@@ -12,7 +12,7 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
 
     private readonly HashSet<RoleAssignment<StrategicInitiativeRole>> _roles = [];
     private readonly HashSet<StrategicInitiativeKpi> _kpis = [];
-    private readonly HashSet<Project> _projects = [];
+    private readonly HashSet<StrategicInitiativeProject> _strategicInitiativeProjects = [];
 
     private StrategicInitiative() { }
 
@@ -91,7 +91,7 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
     /// <summary>
     /// The projects associated with this strategic initiative.
     /// </summary>
-    public IReadOnlyCollection<Project> Projects => _projects;
+    public IReadOnlyCollection<StrategicInitiativeProject> StrategicInitiativeProjects => _strategicInitiativeProjects;
 
     /// <summary>
     /// Indicates if the strategic initiative is in a closed state.
