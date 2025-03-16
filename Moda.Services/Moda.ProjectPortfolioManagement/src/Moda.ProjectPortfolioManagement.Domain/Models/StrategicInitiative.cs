@@ -103,8 +103,8 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
     /// <returns></returns>
     public bool CanBeDeleted() => Status is StrategicInitiativeStatus.Proposed or StrategicInitiativeStatus.Approved;
 
-    public static StrategicInitiative Create(string name, string? description, StrategicInitiativeStatus status, LocalDateRange dateRange, Guid portfolioId, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
+    public static StrategicInitiative Create(string name, string? description, LocalDateRange dateRange, Guid portfolioId, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
     {
-        return new StrategicInitiative(name, description, status, dateRange, portfolioId, roles);
+        return new StrategicInitiative(name, description, StrategicInitiativeStatus.Proposed, dateRange, portfolioId, roles);
     }
 }
