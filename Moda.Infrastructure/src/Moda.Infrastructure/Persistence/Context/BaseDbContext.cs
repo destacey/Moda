@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
+using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 using Moda.Infrastructure.Common.Services;
 using Moda.Infrastructure.Persistence.Extensions;
 using NodaTime;
@@ -41,6 +42,10 @@ public abstract class BaseDbContext : IdentityDbContext<ApplicationUser, Applica
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        //modelBuilder.Entity<Kpi>().UseTpcMappingStrategy();
+        //modelBuilder.Entity<KpiCheckpoint>().UseTpcMappingStrategy();
+        //modelBuilder.Entity<KpiMeasurement>().UseTpcMappingStrategy();
+
         // QueryFilters need to be applied before base.OnModelCreating
         modelBuilder.AppendGlobalQueryFilter<ISoftDelete>(s => !s.IsDeleted);
 

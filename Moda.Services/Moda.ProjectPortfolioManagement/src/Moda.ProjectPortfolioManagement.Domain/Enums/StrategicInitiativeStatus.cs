@@ -2,6 +2,8 @@
 
 namespace Moda.ProjectPortfolioManagement.Domain.Enums;
 
+// max length of 32 characters
+
 /// <summary>
 /// Represents the status of a strategic initiative in its lifecycle.
 /// </summary>
