@@ -2,6 +2,8 @@
 
 namespace Moda.Common.Domain.Models.KeyPerformanceIndicators;
 
+// max length of 32 characters
+
 /// <summary>
 /// Defines the units of measurement for KPIs.
 /// </summary>
