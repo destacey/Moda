@@ -100,7 +100,7 @@ internal sealed class UpdateProjectCommandHandler(
 
             _logger.LogInformation("Project {ProjectId} updated.", request.Id);
 
-            return Result.Success(new ObjectIdAndKey(project.Id, project.Key));
+            return Result.Success();
         }
         catch (Exception ex)
         {
