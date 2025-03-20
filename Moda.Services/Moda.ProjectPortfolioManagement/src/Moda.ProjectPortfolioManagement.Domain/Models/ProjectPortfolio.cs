@@ -102,6 +102,11 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
     /// <summary>
     /// Indicates whether the portfolio is readonly.
     /// </summary>
+    public bool IsActive => Status is ProjectPortfolioStatus.Active or ProjectPortfolioStatus.OnHold;
+
+    /// <summary>
+    /// Indicates whether the portfolio is readonly.
+    /// </summary>
     public bool IsReadOnly => Status is ProjectPortfolioStatus.Archived;
 
     /// <summary>
@@ -286,7 +291,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
     /// <returns>A result containing the created program or an error.</returns>
     public Result<Program> CreateProgram(string name, string description, LocalDateRange? dateRange, Dictionary<ProgramRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
     {
-        if (Status != ProjectPortfolioStatus.Active && Status != ProjectPortfolioStatus.OnHold)
+        if (!IsActive)
         {
             return Result.Failure<Program>("Programs can only be created in active or on-hold portfolios.");
         }
@@ -296,7 +301,6 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
 
         return Result.Success(program);
     }
-
 
     /// <summary>
     /// Creates and adds a new project to the portfolio, optionally associating it with a valid and accepting program.
@@ -311,7 +315,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
     /// <returns>A result containing the created project or an error.</returns>
     public Result<Project> CreateProject(string name, string description, int expenditureCategory, LocalDateRange? dateRange, Guid? programId = null, Dictionary<ProjectRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
     {
-        if (Status != ProjectPortfolioStatus.Active && Status != ProjectPortfolioStatus.OnHold)
+        if (!IsActive)
         {
             return Result.Failure<Project>("Projects can only be created in active or on-hold portfolios.");
         }
@@ -446,6 +450,55 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
         }
 
         _projects.Remove(project);
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Creates and adds a new strategic initiative to the portfolio.
+    /// </summary>
+    /// <param name="name">The name of the strategic initiative.</param>
+    /// <param name="description">The description of the strategic initiative.</param>
+    /// <param name="dateRange">The date range of the strategic initiative.</param>
+    /// <param name="roles">The roles associated with the strategic initiative (optional).</param>
+    /// <returns>A result containing the created strategic initiative or an error.</returns>
+    public Result<StrategicInitiative> CreateStrategicInitiative(string name, string? description, LocalDateRange dateRange, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
+    {
+        if (!IsActive)
+        {
+            return Result.Failure<StrategicInitiative>("Strategic initiatives can only be created in active or on-hold portfolios.");
+        }
+
+        var initiative = StrategicInitiative.Create(name, description, dateRange, Id, roles);
+        _strategicInitiatives.Add(initiative);
+
+        return Result.Success(initiative);
+    }
+
+    /// <summary>
+    /// Deletes the specified strategic initiative from the portfolio.
+    /// </summary>
+    /// <param name="strategicInitiativeId"></param>
+    /// <returns></returns>
+    public Result DeleteStrategicInitiative(Guid strategicInitiativeId)
+    {
+        var strategicInitiative = _strategicInitiatives.SingleOrDefault(p => p.Id == strategicInitiativeId);
+        if (strategicInitiative is null)
+        {
+            return Result.Failure("The specified strategic initiative does not belong to this portfolio.");
+        }
+
+        if (IsReadOnly)
+        {
+            return Result.Failure(ReadOnlyErrorMessage);
+        }
+
+        if (!strategicInitiative.CanBeDeleted())
+        {
+            return Result.Failure("The strategic initiative cannot be deleted.");
+        }
+
+        _strategicInitiatives.Remove(strategicInitiative);
 
         return Result.Success();
     }

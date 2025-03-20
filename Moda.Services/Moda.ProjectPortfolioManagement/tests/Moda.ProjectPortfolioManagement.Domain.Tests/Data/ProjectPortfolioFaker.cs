@@ -3,7 +3,6 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.Tests.Shared;
 using Moda.Tests.Shared.Data;
-using Moda.Tests.Shared.Extensions;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 
@@ -66,7 +65,7 @@ public static class ProjectPortfolioFakerExtensions
     /// <summary>
     /// Generates a proposed portfolio.
     /// </summary>
-    public static ProjectPortfolio ProposedPortfolio(this ProjectPortfolioFaker faker)
+    public static ProjectPortfolio AsProposed(this ProjectPortfolioFaker faker)
     {
         return faker.WithData(status: ProjectPortfolioStatus.Proposed).Generate();
     }
@@ -74,7 +73,7 @@ public static class ProjectPortfolioFakerExtensions
     /// <summary>
     /// Generates an active portfolio with a start date 10 days ago.
     /// </summary>
-    public static ProjectPortfolio ActivePortfolio(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
+    public static ProjectPortfolio AsActive(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
     {
         var now = dateTimeProvider.Today;
         var defaultStartDate = now.PlusDays(-10);
@@ -88,7 +87,7 @@ public static class ProjectPortfolioFakerExtensions
     /// <summary>
     /// Generates a closed portfolio with a start date 20 days ago and end date 10 days ago.
     /// </summary>
-    public static ProjectPortfolio ClosedPortfolio(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
+    public static ProjectPortfolio AsClosed(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
     {
         var now = dateTimeProvider.Today;
         var defaultStartDate = now.PlusDays(-20);
@@ -103,7 +102,7 @@ public static class ProjectPortfolioFakerExtensions
     /// <summary>
     /// Generates an archived portfolio with a start date 20 days ago and end date 10 days ago.
     /// </summary>
-    public static ProjectPortfolio ArchivedPortfolio(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
+    public static ProjectPortfolio AsArchived(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider)
     {
         var now = dateTimeProvider.Today;
         var defaultStartDate = now.PlusDays(-20);
@@ -115,39 +114,5 @@ public static class ProjectPortfolioFakerExtensions
         ).Generate();
     }
 
-    /// <summary>
-    /// Generates a portfolio with programs and projects.
-    /// </summary>
-    public static ProjectPortfolio PortfolioWithProgramsAndProjects(this ProjectPortfolioFaker faker, TestingDateTimeProvider dateTimeProvider, int programCount = 2, int projectCount = 5)
-    {
-        var portfolio = faker.ActivePortfolio(dateTimeProvider);
-
-        if (programCount > 0)
-        {
-            var programFaker = new ProgramFaker();
-
-            var programsList = GenericExtensions.GetPrivateHashSet<Program>(portfolio, "_programs");
-
-            for (int i = 0; i < programCount; i++)
-            {
-                var program = programFaker.ActiveProgram(dateTimeProvider, portfolio.Id);
-                programsList.Add(program);
-            }
-        }
-
-        if (projectCount > 0)
-        {
-            var projectFaker = new ProjectFaker();
-
-            var projectsList = GenericExtensions.GetPrivateHashSet<Project>(portfolio, "_projects");
-
-            for (int i = 0; i < projectCount; i++)
-            {
-                var project = projectFaker.ActiveProject(dateTimeProvider, portfolio.Id);
-                projectsList.Add(project);
-            }
-        }
-
-        return portfolio;
-    }
+    
 }

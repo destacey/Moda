@@ -52,6 +52,7 @@ public static class StrategicInitiativeFakerExtensions
             {
                 faker.RuleFor(x => x.Id, initiativeId);
             }
+
             HashSet<RoleAssignment<StrategicInitiativeRole>> updatedRoles = new();
             foreach (var role in roles)
             {
@@ -61,9 +62,25 @@ public static class StrategicInitiativeFakerExtensions
                     updatedRoles.Add(new RoleAssignment<StrategicInitiativeRole>(initiativeId, role.Key, userId));
                 }
             }
-            faker.RuleFor(x => x.Roles, updatedRoles);
+
+            faker.RuleFor("_roles", x => updatedRoles);
         }
         return faker;
+    }
+
+    public static StrategicInitiative AsProposed(
+        this StrategicInitiativeFaker faker,
+        TestingDateTimeProvider dateTimeProvider, 
+        Guid? portfolioId = null)
+    { 
+        var start = dateTimeProvider.Now.Plus(Duration.FromDays(10)).InUtc().LocalDateTime.Date;
+    var end = start.PlusDays(200);
+
+        return faker.WithData(
+            status: StrategicInitiativeStatus.Proposed,
+            dateRange: new LocalDateRange(start, end),
+            portfolioId: portfolioId
+        ).Generate();
     }
 
     /// <summary>
@@ -73,7 +90,7 @@ public static class StrategicInitiativeFakerExtensions
     /// <param name="dateTimeProvider"></param>
     /// <param name="portfolioId"></param>
     /// <returns></returns>
-    public static StrategicInitiative Active(
+    public static StrategicInitiative AsActive(
         this StrategicInitiativeFaker faker,
         TestingDateTimeProvider dateTimeProvider, 
         Guid? portfolioId = null)
@@ -95,7 +112,7 @@ public static class StrategicInitiativeFakerExtensions
     /// <param name="dateTimeProvider"></param>
     /// <param name="portfolioId"></param>
     /// <returns></returns>
-    public static StrategicInitiative Completed(
+    public static StrategicInitiative AsCompleted(
         this StrategicInitiativeFaker faker,
         TestingDateTimeProvider dateTimeProvider,
         Guid? portfolioId = null)
@@ -117,7 +134,7 @@ public static class StrategicInitiativeFakerExtensions
     /// <param name="dateTimeProvider"></param>
     /// <param name="portfolioId"></param>
     /// <returns></returns>
-    public static StrategicInitiative Cancelled(
+    public static StrategicInitiative AsCancelled(
         this StrategicInitiativeFaker faker,
         TestingDateTimeProvider dateTimeProvider,
         Guid? portfolioId = null)

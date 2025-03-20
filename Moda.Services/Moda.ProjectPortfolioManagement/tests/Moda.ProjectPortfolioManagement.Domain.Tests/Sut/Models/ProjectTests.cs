@@ -100,7 +100,7 @@ public class ProjectTests
     public void UpdateTimeline_ShouldFail_WhenProjectIsActive_AndDatesAreNull()
     {
         // Arrange
-        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
+        var project = _projectFaker.AsActive(_dateTimeProvider, Guid.NewGuid());
 
         // Act
         var result = project.UpdateTimeline(null);
@@ -114,7 +114,7 @@ public class ProjectTests
     public void UpdateTimeline_ShouldFail_WhenProjectIsCompleted_AndDatesAreNull()
     {
         // Arrange
-        var project = _projectFaker.CompletedProject(_dateTimeProvider, Guid.NewGuid());
+        var project = _projectFaker.AsCompleted(_dateTimeProvider, Guid.NewGuid());
 
         // Act
         var result = project.UpdateTimeline(null);
@@ -128,7 +128,7 @@ public class ProjectTests
     public void UpdateTimeline_ShouldUpdateSuccessfully_WhenProjectIsActive_AndDatesAreValid()
     {
         // Arrange
-        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
+        var project = _projectFaker.AsActive(_dateTimeProvider, Guid.NewGuid());
         var startDate = _dateTimeProvider.Today;
         var endDate = _dateTimeProvider.Today.PlusDays(60);
         var dateRange = new LocalDateRange(startDate, endDate);
@@ -350,7 +350,7 @@ public class ProjectTests
     public void Activate_ShouldFail_WhenProjectIsNotProposed()
     {
         // Arrange
-        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
+        var project = _projectFaker.AsActive(_dateTimeProvider, Guid.NewGuid());
 
         // Act
         var result = project.Activate();
@@ -364,7 +364,7 @@ public class ProjectTests
     public void Complete_ShouldCompleteActiveProjectSuccessfully()
     {
         // Arrange
-        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
+        var project = _projectFaker.AsActive(_dateTimeProvider, Guid.NewGuid());
 
         // Act
         var result = project.Complete();
@@ -393,7 +393,7 @@ public class ProjectTests
     public void Cancel_ShouldCancelActiveProjectSuccessfully()
     {
         // Arrange
-        var project = _projectFaker.ActiveProject(_dateTimeProvider, Guid.NewGuid());
+        var project = _projectFaker.AsActive(_dateTimeProvider, Guid.NewGuid());
 
         // Act
         var result = project.Cancel();
@@ -407,7 +407,7 @@ public class ProjectTests
     public void Cancel_ShouldFail_WhenProjectIsAlreadyCompletedOrCancelled()
     {
         // Arrange
-        var project = _projectFaker.CancelledProject(_dateTimeProvider, Guid.NewGuid());
+        var project = _projectFaker.AsCancelled(_dateTimeProvider, Guid.NewGuid());
         var endDate = _dateTimeProvider.Today.PlusDays(10);
 
         // Act

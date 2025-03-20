@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using Ardalis.GuardClauses;
+using CSharpFunctionalExtensions;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Models;
@@ -103,7 +104,49 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
     /// <returns></returns>
     public bool CanBeDeleted() => Status is StrategicInitiativeStatus.Proposed or StrategicInitiativeStatus.Approved;
 
-    public static StrategicInitiative Create(string name, string? description, LocalDateRange dateRange, Guid portfolioId, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
+    /// <summary>
+    /// Updates the details of the strategic initiative.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="description"></param>
+    /// <param name="dateRange"></param>
+    /// <returns></returns>
+    public Result UpdateDetails(string name, string? description, LocalDateRange dateRange)
+    {
+        Name = name;
+        Description = description;
+        DateRange = dateRange;
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Assigns an employee to a specific role within the strategic initiative, allowing multiple employees per role.
+    /// </summary>
+    public Result AssignRole(StrategicInitiativeRole role, Guid employeeId)
+    {
+        return RoleManager.AssignRole(_roles, Id, role, employeeId);
+    }
+
+    /// <summary>
+    /// Removes an employee from a specific role.
+    /// </summary>
+    public Result RemoveRole(StrategicInitiativeRole role, Guid employeeId)
+    {
+        return RoleManager.RemoveAssignment(_roles, role, employeeId);
+    }
+
+    /// <summary>
+    /// Updates the roles for the strategic initiative.
+    /// </summary>
+    /// <param name="updatedRoles"></param>
+    /// <returns></returns>
+    public Result UpdateRoles(Dictionary<StrategicInitiativeRole, HashSet<Guid>> updatedRoles)
+    {
+        return RoleManager.UpdateRoles(_roles, Id, updatedRoles);
+    }
+
+    internal static StrategicInitiative Create(string name, string? description, LocalDateRange dateRange, Guid portfolioId, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
     {
         return new StrategicInitiative(name, description, StrategicInitiativeStatus.Proposed, dateRange, portfolioId, roles);
     }

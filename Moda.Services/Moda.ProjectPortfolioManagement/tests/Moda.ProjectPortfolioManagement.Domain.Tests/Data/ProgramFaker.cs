@@ -62,9 +62,20 @@ public static class ProgramFakerExtensions
     }
 
     /// <summary>
+    /// Generates a proposed program without a date range.
+    /// </summary>
+    public static Program AsProposed(this ProgramFaker faker, Guid? portfolioId = null)
+    {
+        return faker.WithData(
+            status: ProgramStatus.Proposed,
+            portfolioId: portfolioId
+        ).Generate();
+    }
+
+    /// <summary>
     /// Generates an active program with a start date 10 days ago.
     /// </summary>
-    public static Program ActiveProgram(this ProgramFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null)
+    public static Program AsActive(this ProgramFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null)
     {
         var now = dateTimeProvider.Today;
         var startDate = now.PlusDays(-10);
@@ -80,7 +91,7 @@ public static class ProgramFakerExtensions
     /// <summary>
     /// Generates a completed program with a start date 20 days ago and end date 10 days ago.
     /// </summary>
-    public static Program CompletedProgram(this ProgramFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null)
+    public static Program AsCompleted(this ProgramFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null)
     {
         var now = dateTimeProvider.Today;
         var startDate = now.PlusDays(-20);
@@ -94,20 +105,9 @@ public static class ProgramFakerExtensions
     }
 
     /// <summary>
-    /// Generates a proposed program without a date range.
-    /// </summary>
-    public static Program ProposedProgram(this ProgramFaker faker, Guid? portfolioId = null)
-    {
-        return faker.WithData(
-            status: ProgramStatus.Proposed,
-            portfolioId: portfolioId
-        ).Generate();
-    }
-
-    /// <summary>
     /// Generates a cancelled program with a start date 15 days ago and an end date 5 days ago.
     /// </summary>
-    public static Program CancelledProgram(this ProgramFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null)
+    public static Program AsCancelled(this ProgramFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null)
     {
         var now = dateTimeProvider.Today;
         var startDate = now.PlusDays(-15);
