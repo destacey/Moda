@@ -53,7 +53,7 @@ public static class StrategicInitiativeFakerExtensions
                 faker.RuleFor(x => x.Id, initiativeId);
             }
 
-            HashSet<RoleAssignment<StrategicInitiativeRole>> updatedRoles = new();
+            HashSet<RoleAssignment<StrategicInitiativeRole>> updatedRoles = [];
             foreach (var role in roles)
             {
                 var roleId = Guid.NewGuid();
@@ -68,6 +68,13 @@ public static class StrategicInitiativeFakerExtensions
         return faker;
     }
 
+    /// <summary>
+    /// Creates a strategic initiative with the status of Proposed.
+    /// </summary>
+    /// <param name="faker"></param>
+    /// <param name="dateTimeProvider"></param>
+    /// <param name="portfolioId"></param>
+    /// <returns></returns>
     public static StrategicInitiative AsProposed(
         this StrategicInitiativeFaker faker,
         TestingDateTimeProvider dateTimeProvider, 
@@ -78,6 +85,28 @@ public static class StrategicInitiativeFakerExtensions
 
         return faker.WithData(
             status: StrategicInitiativeStatus.Proposed,
+            dateRange: new LocalDateRange(start, end),
+            portfolioId: portfolioId
+        ).Generate();
+    }
+
+    /// <summary>
+    /// Creates a strategic initiative with the status of Approved.
+    /// </summary>
+    /// <param name="faker"></param>
+    /// <param name="dateTimeProvider"></param>
+    /// <param name="portfolioId"></param>
+    /// <returns></returns>
+    public static StrategicInitiative AsApproved(
+        this StrategicInitiativeFaker faker,
+        TestingDateTimeProvider dateTimeProvider,
+        Guid? portfolioId = null)
+    {
+        var start = dateTimeProvider.Now.Plus(Duration.FromDays(10)).InUtc().LocalDateTime.Date;
+        var end = start.PlusDays(200);
+
+        return faker.WithData(
+            status: StrategicInitiativeStatus.Approved,
             dateRange: new LocalDateRange(start, end),
             portfolioId: portfolioId
         ).Generate();

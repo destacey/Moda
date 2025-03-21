@@ -146,6 +146,70 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
         return RoleManager.UpdateRoles(_roles, Id, updatedRoles);
     }
 
+    #region Lifecycle
+
+    /// <summary>
+    /// Approves the strategic initiative.
+    /// </summary>
+    public Result Approve()
+    {
+        if (Status != StrategicInitiativeStatus.Proposed)
+        {
+            return Result.Failure("Only proposed strategic initiatives can be approved.");
+        }
+
+        Status = StrategicInitiativeStatus.Approved;
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Activates the strategic initiative.
+    /// </summary>
+    public Result Activate()
+    {
+        if (Status != StrategicInitiativeStatus.Approved)
+        {
+            return Result.Failure("Only approved strategic initiatives can be activated.");
+        }
+
+        Status = StrategicInitiativeStatus.Active;
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Marks the strategic initiative as completed.
+    /// </summary>
+    public Result Complete()
+    {
+        if (Status is not StrategicInitiativeStatus.Active or StrategicInitiativeStatus.OnHold)
+        {
+            return Result.Failure("Only active strategic initiatives can be completed.");
+        }
+
+        Status = StrategicInitiativeStatus.Completed;
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Cancels the strategic initiative.
+    /// </summary>
+    public Result Cancel()
+    {
+        if (Status is StrategicInitiativeStatus.Completed or StrategicInitiativeStatus.Cancelled)
+        {
+            return Result.Failure("The strategic initiative is already completed or cancelled.");
+        }
+
+        Status = StrategicInitiativeStatus.Cancelled;
+
+        return Result.Success();
+    }
+
+    #endregion Lifecycle
+
     internal static StrategicInitiative Create(string name, string? description, LocalDateRange dateRange, Guid portfolioId, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
     {
         return new StrategicInitiative(name, description, StrategicInitiativeStatus.Proposed, dateRange, portfolioId, roles);

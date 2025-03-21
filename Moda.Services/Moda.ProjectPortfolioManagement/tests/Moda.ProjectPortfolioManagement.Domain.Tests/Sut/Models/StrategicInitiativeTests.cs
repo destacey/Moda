@@ -251,4 +251,106 @@ public sealed class StrategicInitiativeTests
     }
 
     #endregion Roles
+
+    #region Lifecycle Tests
+
+    [Fact]
+    public void Approve_ShouldApproveProposedStrategicInitiativeSuccessfully()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsProposed(_dateTimeProvider);
+
+        // Act
+        var result = initiative.Approve();
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        initiative.Status.Should().Be(StrategicInitiativeStatus.Approved);
+    }
+
+    [Fact]
+    public void Activate_ShouldActivateApprovedStrategicInitiativeSuccessfully()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsApproved(_dateTimeProvider);
+
+        // Act
+        var result = initiative.Activate();
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        initiative.Status.Should().Be(StrategicInitiativeStatus.Active);
+    }
+
+    [Fact]
+    public void Activate_ShouldFail_WhenStrategicInitiativeIsNotApproved()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsProposed(_dateTimeProvider);
+
+        // Act
+        var result = initiative.Activate();
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Only approved strategic initiatives can be activated.");
+    }
+
+    [Fact]
+    public void Complete_ShouldCompleteActiveStrategicInitiativeSuccessfully()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsActive(_dateTimeProvider);
+
+        // Act
+        var result = initiative.Complete();
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        initiative.Status.Should().Be(StrategicInitiativeStatus.Completed);
+    }
+
+    [Fact]
+    public void Complete_ShouldFail_WhenStrategicInitiativeIsNotActive()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.Generate();
+
+        // Act
+        var result = initiative.Complete();
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Only active strategic initiatives can be completed.");
+    }
+
+    [Fact]
+    public void Cancel_ShouldCancelActiveStrategicInitiativeSuccessfully()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsActive(_dateTimeProvider);
+
+        // Act
+        var result = initiative.Cancel();
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        initiative.Status.Should().Be(StrategicInitiativeStatus.Cancelled);
+    }
+
+    [Fact]
+    public void Cancel_ShouldFail_WhenStrategicInitiativeIsAlreadyCompletedOrCancelled()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsCancelled(_dateTimeProvider);
+
+        // Act
+        var result = initiative.Cancel();
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The strategic initiative is already completed or cancelled.");
+    }
+
+    #endregion Lifecycle Tests
 }
