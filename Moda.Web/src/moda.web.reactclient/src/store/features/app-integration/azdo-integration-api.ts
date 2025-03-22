@@ -34,8 +34,8 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result) => [
-        QueryTags.Connections,
-        ...result.map(({ id }) => ({ type: QueryTags.Connections, id })),
+        QueryTags.Connection,
+        ...result.map(({ id }) => ({ type: QueryTags.Connection, id })),
       ],
     }),
     getAzdoConnection: builder.query<
@@ -52,8 +52,8 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result, error, arg) => [
-        { type: QueryTags.ConnectionDetails, id: arg }, // typically arg is the key
-        { type: QueryTags.Connections, id: arg }, // typically arg is the key
+        { type: QueryTags.ConnectionDetail, id: arg }, // typically arg is the key
+        { type: QueryTags.Connection, id: arg }, // typically arg is the key
       ],
     }),
     createAzdoConnection: builder.mutation<
@@ -71,7 +71,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.Connections }]
+        return [{ type: QueryTags.Connection }]
       },
     }),
     updateAzdoConnection: builder.mutation<
@@ -92,8 +92,8 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: (result, error, arg) => {
         return [
-          { type: QueryTags.Connections, id: arg.id },
-          { type: QueryTags.ConnectionDetails, id: arg.id },
+          { type: QueryTags.Connection, id: arg.id },
+          { type: QueryTags.ConnectionDetail, id: arg.id },
         ]
       },
     }),
@@ -108,7 +108,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.Connections }]
+        return [{ type: QueryTags.Connection }]
       },
     }),
     updateAzdoConnectionSyncState: builder.mutation<
@@ -133,8 +133,8 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: (result, error, arg) => {
         return [
-          { type: QueryTags.Connections, id: arg.connectionId },
-          { type: QueryTags.ConnectionDetails, id: arg.connectionId },
+          { type: QueryTags.Connection, id: arg.connectionId },
+          { type: QueryTags.ConnectionDetail, id: arg.connectionId },
         ]
       },
     }),
@@ -152,7 +152,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.ConnectionDetails, id: arg }]
+        return [{ type: QueryTags.ConnectionDetail, id: arg }]
       },
     }),
     initAzdoConnectionWorkProcess: builder.mutation<
@@ -173,7 +173,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.ConnectionDetails, id: arg.id }]
+        return [{ type: QueryTags.ConnectionDetail, id: arg.id }]
       },
     }),
     initAzdoConnectionWorkspace: builder.mutation<
@@ -194,7 +194,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.ConnectionDetails, id: arg.id }]
+        return [{ type: QueryTags.ConnectionDetail, id: arg.id }]
       },
     }),
 
@@ -216,9 +216,9 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result, error, arg) => [
-        QueryTags.AzdoConnectionTeams,
+        QueryTags.AzdoConnectionTeam,
         ...result.map(() => ({
-          type: QueryTags.AzdoConnectionTeams,
+          type: QueryTags.AzdoConnectionTeam,
           id: arg.connectionId,
         })),
       ],
@@ -241,7 +241,7 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.AzdoConnectionTeams, id: arg.connectionId }]
+        return [{ type: QueryTags.AzdoConnectionTeam, id: arg.connectionId }]
       },
     }),
     testAzdoConfiguration: builder.mutation<

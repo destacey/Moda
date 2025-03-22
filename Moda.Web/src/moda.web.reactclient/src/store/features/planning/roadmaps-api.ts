@@ -114,7 +114,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result, error, arg) => [
-        { type: QueryTags.RoadmapItems, id: arg },
+        { type: QueryTags.RoadmapItem, id: arg },
       ],
     }),
     getRoadmapItem: builder.query<
@@ -134,7 +134,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result, error, arg) => [
-        { type: QueryTags.RoadmapItems, id: arg.itemId },
+        { type: QueryTags.RoadmapItem, id: arg.itemId },
       ],
     }),
     getRoadmapActivities: builder.query<RoadmapActivityListDto[], string>({
@@ -148,7 +148,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result, error, arg) => [
-        { type: QueryTags.RoadmapItems, id: arg },
+        { type: QueryTags.RoadmapItem, id: arg },
       ],
     }),
     createRoadmapItem: builder.mutation<
@@ -170,7 +170,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.RoadmapItems, id: arg.roadmapId }] // TODO: add a cache key to invalidate only the specific roadmap by the key instead of id
+        return [{ type: QueryTags.RoadmapItem, id: arg.roadmapId }] // TODO: add a cache key to invalidate only the specific roadmap by the key instead of id
       },
     }),
     updateRoadmapItem: builder.mutation<
@@ -194,8 +194,8 @@ export const roadmapApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: (result, error, arg) => {
         return [
-          { type: QueryTags.RoadmapItems, id: arg.roadmapId },
-          { type: QueryTags.RoadmapItems, id: arg.itemId },
+          { type: QueryTags.RoadmapItem, id: arg.roadmapId },
+          { type: QueryTags.RoadmapItem, id: arg.itemId },
         ]
       },
     }),
@@ -220,8 +220,8 @@ export const roadmapApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: (result, error, arg) => {
         return [
-          { type: QueryTags.RoadmapItems, id: arg.request.roadmapId },
-          { type: QueryTags.RoadmapItems, id: arg.request.activityId },
+          { type: QueryTags.RoadmapItem, id: arg.request.roadmapId },
+          { type: QueryTags.RoadmapItem, id: arg.request.activityId },
         ]
       },
     }),
@@ -246,8 +246,8 @@ export const roadmapApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: (result, error, arg) => {
         return [
-          { type: QueryTags.RoadmapItems, id: arg.roadmapId },
-          { type: QueryTags.RoadmapItems, id: arg.itemId },
+          { type: QueryTags.RoadmapItem, id: arg.roadmapId },
+          { type: QueryTags.RoadmapItem, id: arg.itemId },
         ]
       },
     }),

@@ -4,55 +4,56 @@ export enum QueryTags {
   BackgroundJobType = 'Admin.BackgroundJobType',
 
   // APP INTEGRATION
-  Connections = 'AppIntegration.Connections',
-  ConnectionDetails = 'AppIntegration.ConnectionDetails',
-  AzdoConnectionTeams = 'AppIntegration.AzdoConnectionTeams',
-  AzdoConnectionsConfigurations = 'AppIntegration.AzdoConnectionsConfigurations',
+  Connection = 'AppIntegration.Connection',
+  ConnectionDetail = 'AppIntegration.ConnectionDetail',
+  AzdoConnectionTeam = 'AppIntegration.AzdoConnectionTeam',
+  AzdoConnectionsConfiguration = 'AppIntegration.AzdoConnectionsConfiguration',
   AzdoConnectionsConfigurationTest = 'AppIntegration.AzdoConnectionsConfigurationTest',
 
   // COMMON
   Links = 'Common.Links',
-  HealthChecks = 'Common.HealthChecks',
+  HealthCheck = 'Common.HealthCheck',
   HealthChecksHealthReport = 'Common.HealthChecks.HealthReport',
   HealthChecksStatusOptions = 'Common.HealthChecks.StatusOptions',
 
   // ORGANIZATIONS
-  EmployeeOptions = 'Organizations.EmployeeOptions',
+  EmployeeOption = 'Organizations.EmployeeOption',
   Team = 'Organizations.Team',
   TeamBacklog = 'Organizations.TeamBacklog',
-  TeamDependencies = 'Organizations.TeamDependencies',
+  TeamDependency = 'Organizations.TeamDependency',
   FunctionalOrganizationChart = 'Organizations.FunctionalOrganizationChart',
 
   // PLANNING
   PlanningInterval = 'Planning.PlanningInterval',
   PlanningIntervalObjective = 'Planning.PlanningIntervalObjective',
   PlanningIntervalObjectiveWorkItemsSummary = 'Planning.PlanningIntervalObjective.WorkItemsSummary',
-  PlanningIntervalObjectiveWorkItemMetrics = 'Planning.PlanningIntervalObjective.WorkItemMetrics',
+  PlanningIntervalObjectiveWorkItemMetric = 'Planning.PlanningIntervalObjective.WorkItemMetric',
   Roadmap = 'Planning.Roadmap',
-  RoadmapItems = 'Planning.RoadmapItems',
-  RoadmapActivities = 'Planning.RoadmapActivities',
+  RoadmapItem = 'Planning.RoadmapItem',
+  RoadmapActivity = 'Planning.RoadmapActivity',
   RoadmapVisibility = 'Planning.RoadmapVisibility',
 
   // PPM
   ExpenditureCategory = 'Ppm.ExpenditureCategory',
   Portfolio = 'Ppm.Portfolio',
-  PortfolioProjects = 'Ppm.Portfolio.Projects',
+  PortfolioProjects = 'Ppm.Portfolio.Project',
   Project = 'Ppm.Project',
+  StrategicInitiative = 'Ppm.StrategicInitiative',
 
   // STRATEGIC MANAGEMENT
   StrategicTheme = 'StrategicManagement.StrategicTheme',
   StrategicThemState = 'StrategicManagement.StrategicThemeState',
 
   // USER MANAGEMENT
-  Users = 'UserManagement.Users',
-  UserRoles = 'UserManagement.UserRoles',
-  Roles = 'UserManagement.Roles',
-  Permissions = 'UserManagement.Permissions',
+  User = 'UserManagement.User',
+  UserRole = 'UserManagement.UserRole',
+  Role = 'UserManagement.Role',
+  Permission = 'UserManagement.Permission',
 
   // WORK MANAGEMENT
   WorkItem = 'Work.WorkItem',
   WorkItemChildren = 'Work.WorkItem.Children',
-  WorkItemDependencies = 'Work.WorkItem.Dependencies',
+  WorkItemDependency = 'Work.WorkItem.Dependency',
   WorkItemMetrics = 'Work.WorkItem.Metrics',
   WorkItemSearch = 'Work.WorkItem.Search',
   WorkProcess = 'Work.WorkProcess',

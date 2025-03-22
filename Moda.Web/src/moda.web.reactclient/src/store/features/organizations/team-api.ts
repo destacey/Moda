@@ -113,9 +113,9 @@ export const teamApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result) => [
-        QueryTags.TeamDependencies,
+        QueryTags.TeamDependency,
         ...result.map((result, error, arg) => ({
-          type: QueryTags.TeamDependencies,
+          type: QueryTags.TeamDependency,
           arg,
         })),
       ],
