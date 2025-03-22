@@ -8,7 +8,7 @@ jest.mock('@azure/msal-react', () => ({
 }))
 
 import { AuthContext, AuthContextType } from '../contexts/auth'
-import withAuthorization, { WithAuthorizationProps } from './withAuthorization'
+import withAuthorization, { WithAuthorizationProps } from './with-authorization'
 
 describe('withAuthorization', () => {
   const MockComponent = () => <div>Authorized</div>
