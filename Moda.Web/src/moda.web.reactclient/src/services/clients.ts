@@ -24,6 +24,7 @@ import {
   PortfoliosClient,
   ExpenditureCategoriesClient,
   ProjectsClient,
+  StrategicInitiativesClient,
 } from './moda-api'
 import { tokenRequest } from '@/auth-config'
 import { InteractionRequiredAuthError } from '@azure/msal-browser'
@@ -94,6 +95,8 @@ export const getExpenditureCategoriesClient = () =>
   new ExpenditureCategoriesClient('', axiosClient)
 export const getPortfoliosClient = () => new PortfoliosClient('', axiosClient)
 export const getProjectsClient = () => new ProjectsClient('', axiosClient)
+export const getStrategicInitiativesClient = () =>
+  new StrategicInitiativesClient('', axiosClient)
 
 // STRATEGIC MANAGEMENT
 export const getStrategicThemesClient = () =>
