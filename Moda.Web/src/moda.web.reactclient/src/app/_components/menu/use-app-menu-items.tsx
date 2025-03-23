@@ -14,6 +14,7 @@ import {
   Item,
   menuItem,
   MenuItem,
+  restrictedMenuSection,
   restrictedPermissionMenuItem,
 } from './menu-helper'
 import { useMemo } from 'react'
@@ -42,7 +43,7 @@ const menuItems: (Item | MenuItem)[] = [
       '/organizations/functional-org-chart',
     ),
   ]),
-  menuItem('Planning', 'plan', null, menuIcons.planning, [
+  restrictedMenuSection('Planning', 'plan', null, menuIcons.planning, [
     restrictedPermissionMenuItem(
       'Permissions.PlanningIntervals.View',
       'Planning Intervals',
@@ -58,7 +59,7 @@ const menuItems: (Item | MenuItem)[] = [
     // menuItem('Increments', 'plan.increments'),
     // menuItem('Sprints', 'plan.sprints'),
   ]),
-  menuItem('Work Management', 'work', null, menuIcons.work, [
+  restrictedMenuSection('Work Management', 'work', null, menuIcons.work, [
     restrictedPermissionMenuItem(
       'Permissions.Workspaces.View',
       'Workspaces',
@@ -76,15 +77,21 @@ const menuItems: (Item | MenuItem)[] = [
   //     { type: 'divider' },
   //     menuItem('Requirements Management', 'pdc.requirements-management'),
   // ]),
-  menuItem('Strategic Management', 'strategy', null, menuIcons.strategy, [
-    restrictedPermissionMenuItem(
-      'Permissions.StrategicThemes.View',
-      'Strategic Themes',
-      'strategy.strategic-themes',
-      '/strategic-management/strategic-themes',
-    ),
-  ]),
-  menuItem('PPM', 'ppm', null, menuIcons.ppm, [
+  restrictedMenuSection(
+    'Strategic Management',
+    'strategy',
+    null,
+    menuIcons.strategy,
+    [
+      restrictedPermissionMenuItem(
+        'Permissions.StrategicThemes.View',
+        'Strategic Themes',
+        'strategy.strategic-themes',
+        '/strategic-management/strategic-themes',
+      ),
+    ],
+  ),
+  restrictedMenuSection('PPM', 'ppm', null, menuIcons.ppm, [
     restrictedPermissionMenuItem(
       'Permissions.ProjectPortfolios.View',
       'Portfolios',

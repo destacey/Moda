@@ -12,6 +12,7 @@ export interface Item {
   children?: (Item | MenuItem)[]
   authClaimValue?: string
   authClaimType?: string
+  restrictedSection?: boolean
 }
 
 export const menuItem = (
@@ -20,6 +21,7 @@ export const menuItem = (
   route?: string,
   icon?: React.ReactNode,
   children?: (Item | MenuItem)[],
+  restrictedSection?: boolean,
 ) => {
   return {
     display,
@@ -27,6 +29,19 @@ export const menuItem = (
     route,
     icon,
     children,
+    restrictedSection,
+  }
+}
+
+export const restrictedMenuSection = (
+  display: string,
+  key: string,
+  route?: string,
+  icon?: React.ReactNode,
+  children?: (Item | MenuItem)[],
+) => {
+  return {
+    ...menuItem(display, key, route, icon, children, true),
   }
 }
 
@@ -83,27 +98,58 @@ export const filterAndTransformMenuItem = (
   acc: ItemType<MenuItemType>[],
   item: Item | MenuItem,
   claimCheck: (claimType: string, claimValue: string) => boolean,
-) => {
+): ItemType<MenuItemType>[] => {
   if ('type' in item) {
+    // For items like dividers that already have a type.
     acc.push(item)
-  } else if ('authClaimValue' in item && item.authClaimType) {
-    if (claimCheck(item.authClaimType, item.authClaimValue)) {
-      const children = item.children
-        ? item.children.reduce(
-            (acc, item) => filterAndTransformMenuItem(acc, item, claimCheck),
-            [],
-          )
-        : undefined
-      acc.push(getItem(item.display, item.key, item.route, item.icon, children))
-    }
-  } else if ('display' in item) {
-    const children = item.children
-      ? item.children.reduce(
-          (acc, item) => filterAndTransformMenuItem(acc, item, claimCheck),
-          [],
+  } else {
+    const menuItemItem = item as Item
+    // Safely access children now.
+    const children = menuItemItem.children
+      ? menuItemItem.children.reduce(
+          (childAcc, child) =>
+            filterAndTransformMenuItem(childAcc, child, claimCheck),
+          [] as ItemType<MenuItemType>[],
         )
       : undefined
-    acc.push(getItem(item.display, item.key, item.route, item.icon, children))
+
+    if ('authClaimValue' in menuItemItem && menuItemItem.authClaimType) {
+      if (claimCheck(menuItemItem.authClaimType, menuItemItem.authClaimValue)) {
+        if (
+          menuItemItem.restrictedSection &&
+          (!children || children.length === 0)
+        ) {
+          // Skip the top-level restricted section if no children pass the check.
+        } else {
+          acc.push(
+            getItem(
+              menuItemItem.display,
+              menuItemItem.key,
+              menuItemItem.route,
+              menuItemItem.icon,
+              children,
+            ),
+          )
+        }
+      }
+    } else if ('display' in menuItemItem) {
+      if (
+        menuItemItem.restrictedSection &&
+        (!children || children.length === 0)
+      ) {
+        // Skip the top-level restricted section if no children pass the check.
+      } else {
+        acc.push(
+          getItem(
+            menuItemItem.display,
+            menuItemItem.key,
+            menuItemItem.route,
+            menuItemItem.icon,
+            children,
+          ),
+        )
+      }
+    }
   }
   return acc
 }
