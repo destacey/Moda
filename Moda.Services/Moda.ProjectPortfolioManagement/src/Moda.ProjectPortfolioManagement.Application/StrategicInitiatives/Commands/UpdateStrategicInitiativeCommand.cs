@@ -3,7 +3,7 @@ using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
 
-public sealed record UpdateStrategicInitiativeCommand(Guid Id, string Name, string? Description, LocalDateRange DateRange, List<Guid>? SponsorIds, List<Guid>? OwnerIds) : ICommand;
+public sealed record UpdateStrategicInitiativeCommand(Guid Id, string Name, string Description, LocalDateRange DateRange, List<Guid>? SponsorIds, List<Guid>? OwnerIds) : ICommand;
 
 public sealed class UpdateStrategicInitiativeCommandValidator : AbstractValidator<UpdateStrategicInitiativeCommand>
 {
@@ -17,7 +17,8 @@ public sealed class UpdateStrategicInitiativeCommandValidator : AbstractValidato
             .MaximumLength(128);
 
         RuleFor(x => x.Description)
-            .MaximumLength(1024);
+            .NotEmpty()
+            .MaximumLength(2048);
 
         RuleFor(x => x.DateRange)
             .NotNull();

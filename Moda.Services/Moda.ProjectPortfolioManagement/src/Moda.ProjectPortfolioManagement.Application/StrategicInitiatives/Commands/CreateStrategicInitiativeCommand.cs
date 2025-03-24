@@ -3,7 +3,7 @@ using Moda.ProjectPortfolioManagement.Domain.Enums;
 
 namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
 
-public sealed record CreateStrategicInitiativeCommand(string Name, string? Description, LocalDateRange DateRange, Guid PortfolioId, List<Guid>? SponsorIds, List<Guid>? OwnerIds) : ICommand<ObjectIdAndKey>;
+public sealed record CreateStrategicInitiativeCommand(string Name, string Description, LocalDateRange DateRange, Guid PortfolioId, List<Guid>? SponsorIds, List<Guid>? OwnerIds) : ICommand<ObjectIdAndKey>;
 
 public sealed class CreateStrategicInitiativeCommandValidator : AbstractValidator<CreateStrategicInitiativeCommand>
 {
@@ -14,7 +14,8 @@ public sealed class CreateStrategicInitiativeCommandValidator : AbstractValidato
             .MaximumLength(128);
 
         RuleFor(x => x.Description)
-            .MaximumLength(1024);
+            .NotEmpty()
+            .MaximumLength(2048);
 
         RuleFor(x => x.DateRange)
             .NotNull();

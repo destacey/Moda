@@ -7,12 +7,12 @@ public class CreateStrategicInitiativeRequest
     /// <summary>
     /// The name of the strategic initiative.
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>
     /// A detailed explanation of what the strategic initiative aims to achieve.
     /// </summary>
-    public string? Description { get; set; }
+    public string Description { get; set; } = default!;
 
     /// <summary>
     /// The start date of the strategic initiative.
@@ -54,7 +54,8 @@ public sealed class CreateStrategicInitiativeRequestValidator : AbstractValidato
             .MaximumLength(128);
 
         RuleFor(x => x.Description)
-            .MaximumLength(1024);
+            .NotEmpty()
+            .MaximumLength(2048);
 
         RuleFor(x => x.Start)
             .NotNull();

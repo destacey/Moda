@@ -8,7 +8,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
 {
     private string _name = default!;
-    private string? _description;
+    private string _description = default!;
     private LocalDateRange _dateRange = default!;
 
     private readonly HashSet<RoleAssignment<StrategicInitiativeRole>> _roles = [];
@@ -17,7 +17,7 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
 
     private StrategicInitiative() { }
 
-    private StrategicInitiative(string name, string? description, StrategicInitiativeStatus status, LocalDateRange dateRange, Guid portfolioId, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
+    private StrategicInitiative(string name, string description, StrategicInitiativeStatus status, LocalDateRange dateRange, Guid portfolioId, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
     {
         Name = name;
         Description = description;
@@ -49,10 +49,10 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
     /// <summary>
     /// A detailed explanation of what the strategic initiative aims to achieve.
     /// </summary>
-    public string? Description
+    public string Description
     {
         get => _description;
-        private set => _description = value.NullIfWhiteSpacePlusTrim();
+        private set => _description = Guard.Against.NullOrWhiteSpace(value, nameof(Description)).Trim();
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
     /// <param name="description"></param>
     /// <param name="dateRange"></param>
     /// <returns></returns>
-    public Result UpdateDetails(string name, string? description, LocalDateRange dateRange)
+    public Result UpdateDetails(string name, string description, LocalDateRange dateRange)
     {
         Name = name;
         Description = description;
@@ -210,7 +210,7 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
 
     #endregion Lifecycle
 
-    internal static StrategicInitiative Create(string name, string? description, LocalDateRange dateRange, Guid portfolioId, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
+    internal static StrategicInitiative Create(string name, string description, LocalDateRange dateRange, Guid portfolioId, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
     {
         return new StrategicInitiative(name, description, StrategicInitiativeStatus.Proposed, dateRange, portfolioId, roles);
     }

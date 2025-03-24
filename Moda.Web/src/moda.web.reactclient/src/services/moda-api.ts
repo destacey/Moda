@@ -3734,6 +3734,70 @@ export class PortfoliosClient {
     }
 
     /**
+     * Get a list of strategic initiatives for the portfolio.
+     * @param status (optional) 
+     */
+    getStrategicInitiatives(idOrKey: string, status: number | null | undefined, cancelToken?: CancelToken): Promise<StrategicInitiativeListDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/portfolios/{idOrKey}/strategic-initiatives?";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (status !== undefined && status !== null)
+            url_ += "status=" + encodeURIComponent("" + status) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetStrategicInitiatives(_response);
+        });
+    }
+
+    protected processGetStrategicInitiatives(response: AxiosResponse): Promise<StrategicInitiativeListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<StrategicInitiativeListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<StrategicInitiativeListDto[]>(null as any);
+    }
+
+    /**
      * Get a list of project portfolio options.
      */
     getPortfolioOptions( cancelToken?: CancelToken): Promise<ProjectPortfolioOptionDto[]> {
@@ -14544,6 +14608,18 @@ export interface ProjectListDto {
     strategicThemes?: NavigationDto[];
 }
 
+export interface StrategicInitiativeListDto {
+    id?: string;
+    key?: number;
+    name?: string;
+    status?: SimpleNavigationDto;
+    start?: Date | undefined;
+    end?: Date | undefined;
+    portfolio?: NavigationDto;
+    strategicInitiativeSponsors?: EmployeeNavigationDto[];
+    strategicInitiativeOwners?: EmployeeNavigationDto[];
+}
+
 export interface ProjectPortfolioOptionDto {
     id?: string;
     name?: string;
@@ -14613,18 +14689,6 @@ export interface UpdateProjectRequest {
     strategicThemeIds?: string[] | undefined;
 }
 
-export interface StrategicInitiativeListDto {
-    id?: string;
-    key?: number;
-    name?: string;
-    status?: SimpleNavigationDto;
-    start?: Date | undefined;
-    end?: Date | undefined;
-    portfolio?: NavigationDto;
-    strategicInitiativeSponsors?: EmployeeNavigationDto[];
-    strategicInitiativeOwners?: EmployeeNavigationDto[];
-}
-
 export interface StrategicInitiativeDetailsDto {
     id?: string;
     key?: number;
@@ -14642,7 +14706,7 @@ export interface CreateStrategicInitiativeRequest {
     /** The name of the strategic initiative. */
     name: string;
     /** A detailed explanation of what the strategic initiative aims to achieve. */
-    description?: string | undefined;
+    description: string;
     /** The start date of the strategic initiative. */
     start: Date;
     /** The end date of the strategic initiative. */
@@ -14660,7 +14724,7 @@ export interface UpdateStrategicInitiativeRequest {
     /** The name of the strategic initiative. */
     name: string;
     /** A detailed explanation of what the strategic initiative aims to achieve. */
-    description?: string | undefined;
+    description: string;
     /** The start date of the strategic initiative. */
     start: Date;
     /** The end date of the strategic initiative. */
