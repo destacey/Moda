@@ -4,6 +4,7 @@ import { getStrategicInitiativesClient } from '@/src/services/clients'
 import {
   CreateStrategicInitiativeRequest,
   ObjectIdAndKey,
+  StrategicInitiativeDetailsDto,
   StrategicInitiativeListDto,
   UpdateStrategicInitiativeRequest,
 } from '@/src/services/moda-api'
@@ -28,7 +29,10 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
       },
       providesTags: () => [{ type: QueryTags.StrategicInitiative, id: 'LIST' }],
     }),
-    getStrategicInitiative: builder.query<StrategicInitiativeListDto, number>({
+    getStrategicInitiative: builder.query<
+      StrategicInitiativeDetailsDto,
+      number
+    >({
       queryFn: async (key) => {
         try {
           const data =
@@ -59,7 +63,10 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.StrategicInitiative, id: 'LIST' }]
+        return [
+          { type: QueryTags.StrategicInitiative, id: 'LIST' },
+          { type: QueryTags.PortfolioStrategicInitiatives, id: 'LIST' },
+        ]
       },
     }),
     updateStrategicInitiative: builder.mutation<
@@ -82,6 +89,7 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.StrategicInitiative, id: 'LIST' },
           { type: QueryTags.StrategicInitiative, id: cacheKey },
+          { type: QueryTags.PortfolioStrategicInitiatives, id: 'LIST' },
         ]
       },
     }),
@@ -102,6 +110,7 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.StrategicInitiative, id: 'LIST' },
           { type: QueryTags.StrategicInitiative, id: cacheKey },
+          { type: QueryTags.PortfolioStrategicInitiatives, id: 'LIST' },
         ]
       },
     }),
@@ -122,6 +131,7 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.StrategicInitiative, id: 'LIST' },
           { type: QueryTags.StrategicInitiative, id: cacheKey },
+          { type: QueryTags.PortfolioStrategicInitiatives, id: 'LIST' },
         ]
       },
     }),
@@ -142,6 +152,7 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.StrategicInitiative, id: 'LIST' },
           { type: QueryTags.StrategicInitiative, id: cacheKey },
+          { type: QueryTags.PortfolioStrategicInitiatives, id: 'LIST' },
         ]
       },
     }),
@@ -162,6 +173,7 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.StrategicInitiative, id: 'LIST' },
           { type: QueryTags.StrategicInitiative, id: cacheKey },
+          { type: QueryTags.PortfolioStrategicInitiatives, id: 'LIST' },
         ]
       },
     }),
@@ -176,7 +188,10 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: () => {
-        return [{ type: QueryTags.StrategicInitiative, id: 'LIST' }]
+        return [
+          { type: QueryTags.StrategicInitiative, id: 'LIST' },
+          { type: QueryTags.PortfolioStrategicInitiatives, id: 'LIST' },
+        ]
       },
     }),
   }),

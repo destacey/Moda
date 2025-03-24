@@ -48,7 +48,10 @@ export const projectsApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.Project, id: 'LIST' }]
+        return [
+          { type: QueryTags.Project, id: 'LIST' },
+          { type: QueryTags.PortfolioProjects, id: 'LIST' },
+        ]
       },
     }),
     updateProject: builder.mutation<
@@ -68,6 +71,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
+          { type: QueryTags.PortfolioProjects, id: 'LIST' },
         ]
       },
     }),
@@ -85,6 +89,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
+          { type: QueryTags.PortfolioProjects, id: 'LIST' },
         ]
       },
     }),
@@ -102,6 +107,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
+          { type: QueryTags.PortfolioProjects, id: 'LIST' },
         ]
       },
     }),
@@ -119,6 +125,7 @@ export const projectsApi = apiSlice.injectEndpoints({
         return [
           { type: QueryTags.Project, id: 'LIST' },
           { type: QueryTags.Project, id: cacheKey },
+          { type: QueryTags.PortfolioProjects, id: 'LIST' },
         ]
       },
     }),

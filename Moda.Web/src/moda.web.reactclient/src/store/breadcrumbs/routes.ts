@@ -46,6 +46,10 @@ const routes = {
     title: 'Projects',
     href: '/ppm/projects',
   },
+  'strategic-initiatives': {
+    title: 'Strategic Initiatives',
+    href: '/ppm/strategic-initiatives',
+  },
 
   'strategic-management': {
     title: 'Strategic Management',

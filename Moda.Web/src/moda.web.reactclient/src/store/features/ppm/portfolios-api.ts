@@ -6,6 +6,7 @@ import {
   ProjectListDto,
   ProjectPortfolioDetailsDto,
   ProjectPortfolioListDto,
+  StrategicInitiativeListDto,
   UpdatePortfolioRequest,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
@@ -161,6 +162,27 @@ export const portfoliosApi = apiSlice.injectEndpoints({
         { type: QueryTags.PortfolioProjects, id: arg },
       ],
     }),
+    getPortfolioStrategicInitiatives: builder.query<
+      StrategicInitiativeListDto[],
+      string
+    >({
+      queryFn: async (portfolioIdOrKey) => {
+        try {
+          const data = await getPortfoliosClient().getStrategicInitiatives(
+            portfolioIdOrKey,
+            null,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.PortfolioStrategicInitiatives, id: 'LIST' },
+        { type: QueryTags.PortfolioStrategicInitiatives, id: arg },
+      ],
+    }),
     getPortfolioOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
@@ -193,5 +215,6 @@ export const {
   useArchivePortfolioMutation,
   useDeletePortfolioMutation,
   useGetPortfolioProjectsQuery,
+  useGetPortfolioStrategicInitiativesQuery,
   useGetPortfolioOptionsQuery,
 } = portfoliosApi

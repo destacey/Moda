@@ -139,9 +139,10 @@ const ProjectDetailsPage = ({ params }) => {
     }
 
     if (
-      (canUpdateProject && availableActions.includes(ProjectAction.Activate)) ||
-      availableActions.includes(ProjectAction.Complete) ||
-      availableActions.includes(ProjectAction.Cancel)
+      canUpdateProject &&
+      (availableActions.includes(ProjectAction.Activate) ||
+        availableActions.includes(ProjectAction.Complete) ||
+        availableActions.includes(ProjectAction.Cancel))
     ) {
       items.push({
         key: 'manage-divider',

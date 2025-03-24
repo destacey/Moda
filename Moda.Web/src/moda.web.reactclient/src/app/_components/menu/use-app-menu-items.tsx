@@ -77,20 +77,6 @@ const menuItems: (Item | MenuItem)[] = [
   //     { type: 'divider' },
   //     menuItem('Requirements Management', 'pdc.requirements-management'),
   // ]),
-  restrictedMenuSection(
-    'Strategic Management',
-    'strategy',
-    null,
-    menuIcons.strategy,
-    [
-      restrictedPermissionMenuItem(
-        'Permissions.StrategicThemes.View',
-        'Strategic Themes',
-        'strategy.strategic-themes',
-        '/strategic-management/strategic-themes',
-      ),
-    ],
-  ),
   restrictedMenuSection('PPM', 'ppm', null, menuIcons.ppm, [
     restrictedPermissionMenuItem(
       'Permissions.ProjectPortfolios.View',
@@ -105,7 +91,27 @@ const menuItems: (Item | MenuItem)[] = [
       'ppm.projects',
       '/ppm/projects',
     ),
+    restrictedPermissionMenuItem(
+      'Permissions.StrategicInitiatives.View',
+      'Strategic Initiatives',
+      'ppm.strategic-initiatives',
+      '/ppm/strategic-initiatives',
+    ),
   ]),
+  restrictedMenuSection(
+    'Strategic Management',
+    'strategy',
+    null,
+    menuIcons.strategy,
+    [
+      restrictedPermissionMenuItem(
+        'Permissions.StrategicThemes.View',
+        'Strategic Themes',
+        'strategy.strategic-themes',
+        '/strategic-management/strategic-themes',
+      ),
+    ],
+  ),
   { key: 'settings-divider', type: 'divider' },
   menuItem('Settings', 'settings', '/settings', menuIcons.settings),
 ]

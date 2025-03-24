@@ -80,7 +80,6 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = (
     refetch()
   }, [refetch])
 
-  // TODO: pass the viewSelector to the grid once the timeline is ready.
   return (
     <>
       <ModaGrid

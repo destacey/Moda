@@ -2,6 +2,7 @@
 
 import useAuth from '@/src/components/contexts/auth'
 import { Button, Card, Flex, Typography } from 'antd'
+import Image from 'next/image'
 
 const { Title } = Typography
 
@@ -36,7 +37,7 @@ const Login: React.FC = () => {
       <Card>
         <Flex vertical align="center" justify="center">
           <Flex align="center" justify="center">
-            <img
+            <Image
               src={'/moda-icon.png'}
               alt="Moda Icon"
               style={{ width: '40px', height: '40px', marginRight: '10px' }}

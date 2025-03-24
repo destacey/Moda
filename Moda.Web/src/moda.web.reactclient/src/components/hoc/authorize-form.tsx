@@ -11,7 +11,7 @@ import { MessageInstance } from 'antd/es/message/interface'
  * @template P - The props of the wrapped form component.
  * @param {React.ComponentType<P>} WrappedForm - The form component to be wrapped.
  * @param {() => void} onNotAuthorized - Callback to be called when the user is not authorized.
- * @param {string} [requiredClaimType] - The type of claim required to access the form. Defaults to "Permission".
+ * @param {string} [requiredClaimType] - The type of claim required to access the form.
  * @param {string} [requiredClaimValue] - The value of the claim required to access the form.
  * @returns {React.FC<P>} - A new component that either renders the form or calls the callback and renders nothing.
  */
@@ -19,7 +19,7 @@ const authorizeForm = <P extends object>(
   WrappedForm: ComponentType<P>,
   onNotAuthorized: () => void,
   messageApi: MessageInstance,
-  requiredClaimType: string = 'Permission',
+  requiredClaimType: string,
   requiredClaimValue: string,
 ): FC<P> => {
   // Compute the name outside the component render to avoid reassigning on each render.
