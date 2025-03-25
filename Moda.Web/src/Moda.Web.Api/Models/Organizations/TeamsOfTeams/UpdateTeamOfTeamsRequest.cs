@@ -10,11 +10,11 @@ public sealed record UpdateTeamOfTeamsRequest
 
     /// <summary>Gets the team name.</summary>
     /// <value>The team name.</value>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>Gets the code.</summary>
     /// <value>The code.</value>
-    public required string Code { get; set; }
+    public string Code { get; set; } = default!;
 
     /// <summary>Gets the team description.</summary>
     /// <value>The team description.</value>

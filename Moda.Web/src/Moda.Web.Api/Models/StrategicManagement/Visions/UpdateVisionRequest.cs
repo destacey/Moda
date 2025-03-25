@@ -12,7 +12,7 @@ public sealed record UpdateVisionRequest
     /// <summary>
     /// A concise statement describing the vision of the organization.
     /// </summary>
-    public required string Description { get; set; }
+    public string Description { get; set; } = default!;
 
     public UpdateVisionCommand ToUpdateVisionCommand()
     {

@@ -6,7 +6,7 @@ public sealed record CreateWorkTypeRequest
 {
     /// <summary>The name of the work type.  The name cannot be changed.</summary>
     /// <value>The name.</value>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>The description of the work type.</summary>
     /// <value>The description.</value>

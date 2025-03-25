@@ -10,7 +10,7 @@ public sealed record PlanningIntervalIterationUpsertRequest
     /// <summary>
     /// The name of the iteration.
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>
     /// The type of iteration.

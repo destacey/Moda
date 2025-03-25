@@ -2,7 +2,7 @@
 
 public sealed record AssignUserRolesRequest
 {
-    public required string UserId { get; set; }
+    public string UserId { get; set; } = default!;
     public List<string> RoleNames { get; set; } = [];
 
     public AssignUserRolesCommand ToAssignUserRolesRequest()

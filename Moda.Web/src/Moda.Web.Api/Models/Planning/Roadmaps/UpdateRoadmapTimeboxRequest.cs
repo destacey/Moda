@@ -9,12 +9,12 @@ public sealed record UpdateRoadmapTimeboxRequest : UpdateRoadmapItemRequest
     /// <summary>
     /// The Roadmap Item start date.
     /// </summary>
-    public required LocalDate Start { get; set; }
+    public LocalDate Start { get; set; }
 
     /// <summary>
     /// The Roadmap Item end date.
     /// </summary>
-    public required LocalDate End { get; set; }
+    public LocalDate End { get; set; }
 
     public UpdateRoadmapItemCommand ToUpdateRoadmapItemCommand()
     {

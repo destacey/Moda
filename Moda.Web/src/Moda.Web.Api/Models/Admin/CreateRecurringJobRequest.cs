@@ -2,7 +2,7 @@
 
 public class CreateRecurringJobRequest
 {
-    public required string JobId { get; set; }
+    public string JobId { get; set; } = default!;
     public int JobTypeId { get; set; }
-    public required string CronExpression { get; set; }
+    public string CronExpression { get; set; } = default!;
 }

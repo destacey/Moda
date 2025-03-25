@@ -15,7 +15,7 @@ public abstract record CreateRoadmapItemRequest
     /// <summary>
     /// The name of the Roadmap Item.
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>
     /// The description of the Roadmap Item.

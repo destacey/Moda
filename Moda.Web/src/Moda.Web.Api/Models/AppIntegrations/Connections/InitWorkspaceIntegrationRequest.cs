@@ -17,12 +17,12 @@ public sealed record InitWorkspaceIntegrationRequest
     /// <summary>
     /// The key for the workspace.
     /// </summary>
-    public required string WorkspaceKey { get; set; }
+    public string WorkspaceKey { get; set; } = default!;
 
     /// <summary>
     /// The name for the workspace.
     /// </summary>
-    public required string WorkspaceName { get; set; }
+    public string WorkspaceName { get; set; } = default!;
 
     /// <summary>
     /// A url template for external work items.  This template plus the work item external id will create a url to view the work item in the external system.

@@ -9,7 +9,7 @@ public sealed record UpdateRoadmapMilestoneRequest : UpdateRoadmapItemRequest
     /// <summary>
     /// The Milestone date.
     /// </summary>
-    public required LocalDate Date { get; set; }
+    public LocalDate Date { get; set; }
 
     public UpdateRoadmapItemCommand ToUpdateRoadmapItemCommand()
     {

@@ -6,7 +6,7 @@ public class CreatePlanningIntervalObjectiveRequest
 {
     public Guid PlanningIntervalId { get; set; }
     public Guid TeamId { get; set; }
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
     public string? Description { get; set; }
     public LocalDate? StartDate { get; set; }
     public LocalDate? TargetDate { get; set; }

@@ -7,12 +7,12 @@ public sealed record CreatePortfolioRequest
     /// <summary>
     /// The name of the portfolio.
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>
     /// A detailed description of the portfolio’s purpose.
     /// </summary>
-    public required string Description { get; set; }
+    public string Description { get; set; } = default!;
 
     /// <summary>
     /// The sponsors of the portfolio.

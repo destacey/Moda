@@ -4,7 +4,7 @@ public sealed record CreateAzureDevOpsBoardConnectionRequest
 {
     /// <summary>Gets or sets the name of the connection.</summary>
     /// <value>The name of the connection.</value>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>Gets or sets the description.</summary>
     /// <value>The connection description.</value>
@@ -12,11 +12,11 @@ public sealed record CreateAzureDevOpsBoardConnectionRequest
 
     /// <summary>Gets the organization.</summary>
     /// <value>The Azure DevOps Organization name.</value>
-    public required string Organization { get; set; }
+    public string Organization { get; set; } = default!;
 
     /// <summary>Gets the personal access token.</summary>
     /// <value>The personal access token that enables access to Azure DevOps Boards data.</value>
-    public required string PersonalAccessToken { get; set; }
+    public string PersonalAccessToken { get; set; } = default!;
 
     public CreateAzureDevOpsBoardsConnectionCommand ToCreateAzureDevOpsBoardsConnectionCommand()
         => new(Name, Description, Organization, PersonalAccessToken);

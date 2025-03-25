@@ -9,7 +9,7 @@ public class ImportPlanningIntervalObjectivesRequest
     public int ImportId { get; set; }
     public Guid PlanningIntervalId { get; set; }
     public Guid TeamId { get; set; }
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
     public string? Description { get; set; }
     public int StatusId { get; set; }
     public double Progress { get; set; }

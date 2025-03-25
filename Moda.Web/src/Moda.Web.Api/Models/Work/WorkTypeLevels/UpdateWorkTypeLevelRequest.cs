@@ -8,7 +8,7 @@ public sealed record UpdateWorkTypeLevelRequest
 
     /// <summary>The name of the work type level.  The name cannot be changed.</summary>
     /// <value>The name.</value>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>The description of the work type level.</summary>
     /// <value>The description.</value>

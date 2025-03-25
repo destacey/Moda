@@ -10,7 +10,7 @@ public sealed record UpdatePlanningIntervalRequest
 
     /// <summary>Gets the team name.</summary>
     /// <value>The team name.</value>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>Gets the team description.</summary>
     /// <value>The team description.</value>
