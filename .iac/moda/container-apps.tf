@@ -157,6 +157,7 @@ resource "azurerm_container_app" "moda_backend" {
         timeout                 = 3
         failure_count_threshold = 5
         interval_seconds        = 30
+        initial_delay           = 60
       }
 
       startup_probe {
@@ -166,6 +167,7 @@ resource "azurerm_container_app" "moda_backend" {
         timeout                 = 2
         failure_count_threshold = 5
         interval_seconds        = 10
+        initial_delay           = 60
       }
 
       env {
