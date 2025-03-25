@@ -1,4 +1,6 @@
-﻿namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
+﻿using Moda.ProjectPortfolioManagement.Domain.Models;
+
+namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 
 public sealed record DeleteProjectCommand(Guid Id) : ICommand;
 
@@ -20,11 +22,7 @@ internal sealed class DeleteProjectCommandHandler(IProjectPortfolioManagementDbC
     {
         try
         {
-            // TODO: rethink this approach
             var project = await _projectPortfolioManagementDbContext.Projects
-                .Include(p => p.Portfolio)
-                .Include(p => p.Program)
-                .Include(p => p.ExpenditureCategory)
                 .Include(p => p.Roles)
                 .Include(p => p.StrategicThemeTags)
                 .FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
@@ -34,16 +32,31 @@ internal sealed class DeleteProjectCommandHandler(IProjectPortfolioManagementDbC
                 return Result.Failure("Project not found.");
             }
 
-            var portfolio = project.Portfolio;
+            var portfolioQuery = _projectPortfolioManagementDbContext.Portfolios
+                    .Include(p => p.Projects.Where(p => p.Id == request.Id))
+                        // The rest of the project relationships are already include from the initial project query
+                    .AsQueryable();
+            if (project.ProgramId.HasValue)
+            {
+                portfolioQuery = portfolioQuery
+                    .Include(p => p.Programs.Where(p => p.Id == project.ProgramId));
+            }
 
-            var deleteResult = portfolio!.DeleteProject(project.Id);
+            var portfolio = await portfolioQuery
+                    .FirstOrDefaultAsync(p => p.Id == project.PortfolioId, cancellationToken);
+            if (portfolio == null)
+            {
+                _logger.LogInformation("Portfolio with Id {PortfolioId} not found.", project.PortfolioId);
+                return Result.Failure("Portfolio not found.");
+            }
+
+            var deleteResult = portfolio.DeleteProject(project.Id);
             if (deleteResult.IsFailure)
             {
                 _logger.LogInformation("Error deleting project {ProjectId}.", request.Id);
                 return Result.Failure(deleteResult.Error);
             }
 
-            //_projectPortfolioManagementDbContext.Projects.Remove(project);
             await _projectPortfolioManagementDbContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("Project {ProjectId} deleted. Key: {ProjectKey}, Name: {ProjectName}", project.Id, project.Key, project.Name);

@@ -43,6 +43,8 @@
         <ProjectReference Include="..\..\..\Moda.Services\Moda.Links\src\Moda.Links\Moda.Links.csproj" />
         <ProjectReference Include="..\..\..\Moda.Services\Moda.Organization\src\Moda.Organization.Application\Moda.Organization.Application.csproj" />
         <ProjectReference Include="..\..\..\Moda.Services\Moda.Planning\src\Moda.Planning.Application\Moda.Planning.Application.csproj" />
+        <ProjectReference Include="..\..\..\Moda.Services\Moda.ProjectPortfolioManagement\src\Moda.ProjectPortfolioManagement.Application\Moda.ProjectPortfolioManagement.Application.csproj" />
+        <ProjectReference Include="..\..\..\Moda.Services\Moda.ProjectPortfolioManagement\src\Moda.ProjectPortfolioManagement.Domain\Moda.ProjectPortfolioManagement.Domain.csproj" />
         <ProjectReference Include="..\..\..\Moda.Services\Moda.StrategicManagement\src\Moda.StrategicManagement.Application\Moda.StrategicManagement.Application.csproj" />
         <ProjectReference Include="..\..\..\Moda.Services\Moda.Work\src\Moda.Work.Application\Moda.Work.Application.csproj" />
         <ProjectReference Include="..\..\..\Moda.Services\Moda.Work\src\Moda.Work.Domain\Moda.Work.Domain.csproj" />

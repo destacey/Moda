@@ -8,7 +8,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents a program consisting of related projects within a portfolio, designed to achieve strategic objectives.
 /// </summary>
-public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
+public sealed class Program : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
 {
     private string _name = default!;
     private string _description = default!;
@@ -81,7 +81,7 @@ public sealed class Program : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
     public LocalDateRange? DateRange { get; private set; }
 
     /// <summary>
-    /// The ID of the portfolio to which this program belongs.
+    /// The Id of the portfolio to which this program belongs.
     /// </summary>
     public Guid PortfolioId { get; private set; }
 

@@ -18,18 +18,22 @@ import {
 import {
   useGetPortfolioProjectsQuery,
   useGetPortfolioQuery,
+  useGetPortfolioStrategicInitiativesQuery,
 } from '@/src/store/features/ppm/portfolios-api'
 import ChangePortfolioStatusForm, {
   PortfolioStatusAction,
 } from '../_components/change-portfolio-status-form'
-import ProjectsGrid from '../../_components/projects-grid'
-import ProjectViewManager from '../../_components/project-view-manager'
+import {
+  ProjectViewManager,
+  StrategicInitiativeViewManager,
+} from '../../_components'
 
 const { Item } = Descriptions
 
 enum PortfolioTabs {
   Details = 'details',
   Projects = 'projects',
+  StrategicInitiatives = 'strategicInitiatives',
 }
 
 enum MenuActions {
@@ -43,6 +47,10 @@ enum MenuActions {
 const PortfolioDetailsPage = ({ params }) => {
   useDocumentTitle('Portfolio Details')
   const [activeTab, setActiveTab] = useState(PortfolioTabs.Details)
+  const [projectsQueried, setProjectsQueried] = useState(false)
+  const [strategicInitiativesQueried, setStrategicInitiativesQueried] =
+    useState(false)
+
   const [openEditPortfolioForm, setOpenEditPortfolioForm] =
     useState<boolean>(false)
   const [openActivatePortfolioForm, setOpenActivatePortfolioForm] =
@@ -81,7 +89,16 @@ const PortfolioDetailsPage = ({ params }) => {
     isLoading: isLoadingProjects,
     error: errorProjects,
     refetch: refetchProjects,
-  } = useGetPortfolioProjectsQuery(params.key)
+  } = useGetPortfolioProjectsQuery(params.key, { skip: !projectsQueried })
+
+  const {
+    data: strategicInitiativeData,
+    isLoading: isLoadingStrategicInitiatives,
+    error: errorStrategicInitiatives,
+    refetch: refetchStrategicInitiatives,
+  } = useGetPortfolioStrategicInitiativesQuery(params.key, {
+    skip: !strategicInitiativesQueried,
+  })
 
   useEffect(() => {
     if (!portfolioData) return
@@ -126,14 +143,29 @@ const PortfolioDetailsPage = ({ params }) => {
           />
         ),
       },
+      {
+        key: PortfolioTabs.StrategicInitiatives,
+        label: 'Strategic Initiatives',
+        content: (
+          <StrategicInitiativeViewManager
+            strategicInitiatives={strategicInitiativeData}
+            isLoading={isLoadingStrategicInitiatives}
+            refetch={refetchStrategicInitiatives}
+            messageApi={messageApi}
+          />
+        ),
+      },
     ]
     return pageTabs
   }, [
     isLoadingProjects,
+    isLoadingStrategicInitiatives,
     messageApi,
     portfolioData,
     projectData,
     refetchProjects,
+    refetchStrategicInitiatives,
+    strategicInitiativeData,
   ])
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
@@ -166,8 +198,9 @@ const PortfolioDetailsPage = ({ params }) => {
     }
 
     if (
-      (canUpdatePortfolio && availableActions.includes(MenuActions.Activate)) ||
-      availableActions.includes(MenuActions.Archive)
+      canUpdatePortfolio &&
+      (availableActions.includes(MenuActions.Activate) ||
+        availableActions.includes(MenuActions.Archive))
     ) {
       items.push({
         key: 'manage-divider',
@@ -203,9 +236,20 @@ const PortfolioDetailsPage = ({ params }) => {
   }, [canDeletePortfolio, canUpdatePortfolio, portfolioData?.status.name])
 
   // doesn't trigger on first render
-  const onTabChange = useCallback((tabKey) => {
-    setActiveTab(tabKey)
-  }, [])
+  const onTabChange = useCallback(
+    (tabKey) => {
+      if (tabKey === PortfolioTabs.Projects && !projectsQueried) {
+        setProjectsQueried(true)
+      } else if (
+        tabKey === PortfolioTabs.StrategicInitiatives &&
+        !strategicInitiativesQueried
+      ) {
+        setStrategicInitiativesQueried(true)
+      }
+      setActiveTab(tabKey)
+    },
+    [projectsQueried, strategicInitiativesQueried],
+  )
 
   const onEditPortfolioFormClosed = useCallback(
     (wasSaved: boolean) => {

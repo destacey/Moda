@@ -6,6 +6,8 @@ using Moda.ProjectPortfolioManagement.Application.Portfolios.Dtos;
 using Moda.ProjectPortfolioManagement.Application.Portfolios.Queries;
 using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
+using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
+using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Queries;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Ppm.Portfolios;
@@ -149,6 +151,20 @@ public class PortfoliosController(ILogger<PortfoliosController> logger, ISender 
         var projects = await _sender.Send(new GetProjectsQuery(PortfolioIdOrKey: idOrKey), cancellationToken);
 
         return Ok(projects);
+    }
+
+    [HttpGet("{idOrKey}/strategic-initiatives")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Get a list of strategic initiatives for the portfolio.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeListDto>>> GetStrategicInitiatives(string idOrKey, CancellationToken cancellationToken, [FromQuery] int? status = null)
+    {
+        StrategicInitiativeStatus? filter = status.HasValue ? (StrategicInitiativeStatus)status.Value : null;
+
+        var initiatives = await _sender.Send(new GetStrategicInitiativesQuery(filter, idOrKey), cancellationToken);
+
+        return Ok(initiatives);
     }
 
     [HttpGet("options")]

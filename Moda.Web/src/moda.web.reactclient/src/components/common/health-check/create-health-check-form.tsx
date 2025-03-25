@@ -6,7 +6,7 @@ import useAuth from '../../contexts/auth'
 import dayjs from 'dayjs'
 import { SystemContext } from '@/src/components/constants'
 import { useAppDispatch, useAppSelector } from '@/src/hooks'
-import withModalForm from '../../hoc/withModalForm'
+import withModalForm from '../../hoc/with-modal-form'
 import {
   createHealthCheck,
   selectHealthCheckEditContext,

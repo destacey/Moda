@@ -150,10 +150,10 @@ export const workspaceApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result, error, { workItemKey }) => [
-        QueryTags.WorkItemDependencies,
+        QueryTags.WorkItemDependency,
         // Use workItemKey instead of id for cache invalidation
         ...(result?.map(() => ({
-          type: QueryTags.WorkItemDependencies,
+          type: QueryTags.WorkItemDependency,
           id: workItemKey,
         })) ?? []),
       ],

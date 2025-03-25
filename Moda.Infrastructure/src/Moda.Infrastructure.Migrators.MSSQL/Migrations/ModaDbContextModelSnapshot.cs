@@ -19,10 +19,12 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.HasSequence("StrategicInitiativeKpiSequence");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
@@ -1857,6 +1859,252 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("ProjectRoleAssignments", "Ppm");
                 });
 
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.StrategicInitiativeRole>", b =>
+                {
+                    b.Property<Guid>("ObjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Role")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ObjectId", "EmployeeId", "Role");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ObjectId");
+
+                    b.ToTable("StrategicInitiativeRoleAssignments", "Ppm");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiative", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<int>("Key")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<Guid>("PortfolioId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("Key");
+
+                    b.HasIndex("PortfolioId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("StrategicInitiatives", "Ppm");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpi", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<int>("Key")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [Work].[StrategicInitiativeKpiSequence]");
+
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Key"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<Guid>("StrategicInitiativeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TargetDirection")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<double>("TargetValue")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("Key");
+
+                    b.HasIndex("StrategicInitiativeId");
+
+                    b.ToTable("StrategicInitiativeKpis", "Ppm");
+
+                    b.UseTpcMappingStrategy();
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpiCheckpoint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CheckpointDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("KpiId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("TargetValue")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KpiId");
+
+                    b.ToTable("StrategicInitiativeKpiCheckpoints", "Ppm");
+
+                    b.UseTpcMappingStrategy();
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpiMeasurement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("ActualValue")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("KpiId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MeasuredById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("MeasurementDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemCreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("SystemLastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KpiId");
+
+                    b.HasIndex("MeasuredById");
+
+                    b.ToTable("StrategicInitiativeKpiMeasurements", "Ppm");
+
+                    b.UseTpcMappingStrategy();
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeProject", b =>
+                {
+                    b.Property<Guid>("StrategicInitiativeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("StrategicInitiativeId", "ProjectId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("StrategicInitiativeId");
+
+                    b.ToTable("StrategicInitiativeProjects", "Ppm");
+                });
+
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3411,6 +3659,112 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Employee");
                 });
 
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.RoleAssignment<Moda.ProjectPortfolioManagement.Domain.Enums.StrategicInitiativeRole>", b =>
+                {
+                    b.HasOne("Moda.Common.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiative", null)
+                        .WithMany("Roles")
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiative", b =>
+                {
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", "Portfolio")
+                        .WithMany("StrategicInitiatives")
+                        .HasForeignKey("PortfolioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("Moda.Common.Models.LocalDateRange", "DateRange", b1 =>
+                        {
+                            b1.Property<Guid>("StrategicInitiativeId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTime>("End")
+                                .HasColumnType("date")
+                                .HasColumnName("End");
+
+                            b1.Property<DateTime>("Start")
+                                .HasColumnType("date")
+                                .HasColumnName("Start");
+
+                            b1.HasKey("StrategicInitiativeId");
+
+                            b1.ToTable("StrategicInitiatives", "Ppm");
+
+                            b1.WithOwner()
+                                .HasForeignKey("StrategicInitiativeId");
+                        });
+
+                    b.Navigation("DateRange")
+                        .IsRequired();
+
+                    b.Navigation("Portfolio");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpi", b =>
+                {
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiative", null)
+                        .WithMany("Kpis")
+                        .HasForeignKey("StrategicInitiativeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpiCheckpoint", b =>
+                {
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpi", null)
+                        .WithMany("Checkpoints")
+                        .HasForeignKey("KpiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpiMeasurement", b =>
+                {
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpi", null)
+                        .WithMany("Measurements")
+                        .HasForeignKey("KpiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Moda.Common.Domain.Employees.Employee", "MeasuredBy")
+                        .WithMany()
+                        .HasForeignKey("MeasuredById")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("MeasuredBy");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeProject", b =>
+                {
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Project", "Project")
+                        .WithMany("StrategicInitiativeProjects")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiative", "StrategicInitiative")
+                        .WithMany("StrategicInitiativeProjects")
+                        .HasForeignKey("StrategicInitiativeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("StrategicInitiative");
+                });
+
             modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicThemeTag<Moda.ProjectPortfolioManagement.Domain.Models.Program>", b =>
                 {
                     b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Program", "Object")
@@ -3933,6 +4287,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                 {
                     b.Navigation("Roles");
 
+                    b.Navigation("StrategicInitiativeProjects");
+
                     b.Navigation("StrategicThemeTags");
                 });
 
@@ -3943,6 +4299,24 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Projects");
 
                     b.Navigation("Roles");
+
+                    b.Navigation("StrategicInitiatives");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiative", b =>
+                {
+                    b.Navigation("Kpis");
+
+                    b.Navigation("Roles");
+
+                    b.Navigation("StrategicInitiativeProjects");
+                });
+
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpi", b =>
+                {
+                    b.Navigation("Checkpoints");
+
+                    b.Navigation("Measurements");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkItem", b =>

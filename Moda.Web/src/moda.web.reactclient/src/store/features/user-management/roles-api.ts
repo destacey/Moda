@@ -23,8 +23,8 @@ export const rolesApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result = []) => [
-        { type: QueryTags.Roles, id: 'LIST' },
-        ...result.map(({ id }) => ({ type: QueryTags.Roles, id })),
+        { type: QueryTags.Role, id: 'LIST' },
+        ...result.map(({ id }) => ({ type: QueryTags.Role, id })),
       ],
     }),
 
@@ -38,7 +38,7 @@ export const rolesApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result, error, id) => [{ type: QueryTags.Roles, id }],
+      providesTags: (result, error, id) => [{ type: QueryTags.Role, id }],
     }),
 
     upsertRole: builder.mutation<string, CreateOrUpdateRoleRequest>({
@@ -52,8 +52,8 @@ export const rolesApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, { id }) => [
-        { type: QueryTags.Roles, id: 'LIST' },
-        { type: QueryTags.Roles, id: id ?? 'NEW' },
+        { type: QueryTags.Role, id: 'LIST' },
+        { type: QueryTags.Role, id: id ?? 'NEW' },
       ],
     }),
 
@@ -74,7 +74,7 @@ export const rolesApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, { roleId }) => [
-        { type: QueryTags.Roles, id: roleId },
+        { type: QueryTags.Role, id: roleId },
       ],
     }),
 
@@ -89,7 +89,7 @@ export const rolesApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, id) => [
-        { type: QueryTags.Roles, id: 'LIST' },
+        { type: QueryTags.Role, id: 'LIST' },
       ],
     }),
   }),

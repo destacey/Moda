@@ -8,4 +8,5 @@ public interface IProjectPortfolioManagementDbContext : IModaDbContext
     DbSet<Program> Programs { get; }
     DbSet<Project> Projects { get; }
     DbSet<StrategicTheme> PpmStrategicThemes { get; }
+    DbSet<StrategicInitiative> StrategicInitiatives { get; }
 }

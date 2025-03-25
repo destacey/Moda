@@ -4,7 +4,9 @@ import { Form, Input } from 'antd'
 import { useCallback, useEffect } from 'react'
 import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/moda-api'
 import { EditTeamFormValues } from '../types'
-import withModalForm, { FormProps } from '../../../components/hoc/withModalForm'
+import withModalForm, {
+  FormProps,
+} from '../../../components/hoc/with-modal-form'
 import {
   setEditMode,
   updateTeam,

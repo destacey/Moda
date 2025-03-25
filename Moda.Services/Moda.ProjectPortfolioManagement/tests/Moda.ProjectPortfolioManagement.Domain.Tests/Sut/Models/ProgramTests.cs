@@ -100,7 +100,7 @@ public class ProgramTests
     public void UpdateTimeline_ShouldFail_WhenProgramIsActive_AndDatesAreNull()
     {
         // Arrange
-        var program = _programFaker.ActiveProgram(_dateTimeProvider, Guid.NewGuid());
+        var program = _programFaker.AsActive(_dateTimeProvider, Guid.NewGuid());
 
         // Act
         var result = program.UpdateTimeline(null);
@@ -114,7 +114,7 @@ public class ProgramTests
     public void UpdateTimeline_ShouldFail_WhenProgramIsCompleted_AndDatesAreNull()
     {
         // Arrange
-        var program = _programFaker.CompletedProgram(_dateTimeProvider, Guid.NewGuid());
+        var program = _programFaker.AsCompleted(_dateTimeProvider, Guid.NewGuid());
 
         // Act
         var result = program.UpdateTimeline(null);
@@ -128,7 +128,7 @@ public class ProgramTests
     public void UpdateTimeline_ShouldUpdateSuccessfully_WhenProgramIsActive_AndDatesAreValid()
     {
         // Arrange
-        var program = _programFaker.ActiveProgram(_dateTimeProvider, Guid.NewGuid());
+        var program = _programFaker.AsActive(_dateTimeProvider, Guid.NewGuid());
         var startDate = _dateTimeProvider.Today;
         var endDate = _dateTimeProvider.Today.PlusDays(60);
         var dateRange = new LocalDateRange(startDate, endDate);
@@ -347,7 +347,7 @@ public class ProgramTests
     public void Activate_ShouldFail_WhenProgramIsAlreadyActive()
     {
         // Arrange
-        var program = _programFaker.ActiveProgram(_dateTimeProvider);
+        var program = _programFaker.AsActive(_dateTimeProvider);
 
         // Act
         var result = program.Activate();
@@ -361,7 +361,7 @@ public class ProgramTests
     public void Complete_ShouldCompleteActiveProgramSuccessfully()
     {
         // Arrange
-        var program = _programFaker.ActiveProgram(_dateTimeProvider);
+        var program = _programFaker.AsActive(_dateTimeProvider);
 
         // Act
         var result = program.Complete();
@@ -375,7 +375,7 @@ public class ProgramTests
     public void Complete_ShouldFail_WhenProgramIsAlreadyCompleted()
     {
         // Arrange
-        var program = _programFaker.CompletedProgram(_dateTimeProvider);
+        var program = _programFaker.AsCompleted(_dateTimeProvider);
 
         // Act
         var result = program.Complete();
@@ -389,7 +389,7 @@ public class ProgramTests
     public void Cancel_ShouldCancelActiveProgramSuccessfully()
     {
         // Arrange
-        var program = _programFaker.ActiveProgram(_dateTimeProvider);
+        var program = _programFaker.AsActive(_dateTimeProvider);
 
         // Act
         var result = program.Cancel();
@@ -403,8 +403,8 @@ public class ProgramTests
     public void Cancel_ShouldFail_WhenProgramHasActiveProjects()
     {
         // Arrange
-        var program = _programFaker.ActiveProgram(_dateTimeProvider);
-        var project = _projectFaker.ActiveProject(_dateTimeProvider, program.PortfolioId);
+        var program = _programFaker.AsActive(_dateTimeProvider);
+        var project = _projectFaker.AsActive(_dateTimeProvider, program.PortfolioId);
         program.AddProject(project);
 
         // Act
@@ -419,7 +419,7 @@ public class ProgramTests
     public void Cancel_ShouldFail_WhenProgramIsAlreadyCancelled()
     {
         // Arrange
-        var program = _programFaker.CancelledProgram(_dateTimeProvider);
+        var program = _programFaker.AsCancelled(_dateTimeProvider);
 
         // Act
         var result = program.Cancel();
@@ -438,7 +438,7 @@ public class ProgramTests
     {
         // Arrange
         Guid portfolioId = Guid.NewGuid();
-        var program = _programFaker.ActiveProgram(_dateTimeProvider, portfolioId);
+        var program = _programFaker.AsActive(_dateTimeProvider, portfolioId);
         var project = _projectFaker.WithData(portfolioId: portfolioId).Generate();
 
         // Act
@@ -455,7 +455,7 @@ public class ProgramTests
     {
         // Arrange
         Guid portfolioId = Guid.NewGuid();
-        var program = _programFaker.CompletedProgram(_dateTimeProvider, portfolioId);
+        var program = _programFaker.AsCompleted(_dateTimeProvider, portfolioId);
         var project = _projectFaker.WithData(portfolioId: portfolioId).Generate();
 
         // Act
@@ -472,7 +472,7 @@ public class ProgramTests
         // Arrange
         Guid portfolioId1 = Guid.NewGuid();
         Guid portfolioId2 = Guid.NewGuid();
-        var program = _programFaker.ActiveProgram(_dateTimeProvider, portfolioId1);
+        var program = _programFaker.AsActive(_dateTimeProvider, portfolioId1);
         var project = _projectFaker.WithData(portfolioId: portfolioId2).Generate();
 
         // Act
@@ -488,7 +488,7 @@ public class ProgramTests
     {
         // Arrange
         Guid portfolioId = Guid.NewGuid();
-        var program = _programFaker.ActiveProgram(_dateTimeProvider, portfolioId);
+        var program = _programFaker.AsActive(_dateTimeProvider, portfolioId);
         var project = _projectFaker.WithData(portfolioId: portfolioId).Generate();
 
         program.AddProject(project);
@@ -505,7 +505,7 @@ public class ProgramTests
     public void RemoveProject_ShouldFail_WhenProjectIsNotInProgram()
     {
         // Arrange
-        var program = _programFaker.ActiveProgram(_dateTimeProvider);
+        var program = _programFaker.AsActive(_dateTimeProvider);
         var project = _projectFaker.Generate();
 
         // Act

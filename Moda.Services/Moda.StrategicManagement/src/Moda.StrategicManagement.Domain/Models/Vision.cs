@@ -9,7 +9,7 @@ namespace Moda.StrategicManagement.Domain.Models;
 /// Represents the overarching purpose and direction of the organization.
 /// Operates independently of the Strategy entity, allowing flexibility for different organizational use cases.
 /// </summary>
-public sealed class Vision : BaseEntity<Guid>, ISystemAuditable, HasIdAndKey
+public sealed class Vision : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
 {
     private string _description = default!;
 

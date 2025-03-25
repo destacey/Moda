@@ -20,7 +20,7 @@ export const usersApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: () => [{ type: QueryTags.Users, id: 'LIST' }],
+      providesTags: () => [{ type: QueryTags.User, id: 'LIST' }],
     }),
     getUser: builder.query<UserDetailsDto, string>({
       queryFn: async (id: string) => {
@@ -32,7 +32,7 @@ export const usersApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result) => [{ type: QueryTags.Users, id: result?.id }],
+      providesTags: (result) => [{ type: QueryTags.User, id: result?.id }],
     }),
     getUserRoles: builder.query<
       UserRoleDto[],
@@ -52,7 +52,7 @@ export const usersApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         // TODO: should we include includeUnassigned in the tag?
-        { type: QueryTags.UserRoles, id: arg.id },
+        { type: QueryTags.UserRole, id: arg.id },
       ],
     }),
     manageUserRoles: builder.mutation<void, AssignUserRolesRequest>({
@@ -69,7 +69,7 @@ export const usersApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.UserRoles, id: arg.userId }]
+        return [{ type: QueryTags.UserRole, id: arg.userId }]
       },
     }),
   }),

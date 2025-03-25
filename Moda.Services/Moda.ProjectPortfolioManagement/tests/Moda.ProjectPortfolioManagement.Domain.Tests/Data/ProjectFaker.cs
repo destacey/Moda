@@ -55,7 +55,7 @@ public static class ProjectFakerExtensions
                 faker.RuleFor(x => x.Id, projectId);
             }
 
-            HashSet<RoleAssignment<ProjectRole>> updatedRoles = new();
+            HashSet<RoleAssignment<ProjectRole>> updatedRoles = [];
             foreach (var role in roles)
             {
                 foreach (var employeeId in role.Value)
@@ -71,9 +71,31 @@ public static class ProjectFakerExtensions
     }
 
     /// <summary>
+    /// Generates a proposed project with a start date 10 days from now and an end date 5 months from now.
+    /// </summary>
+    /// <param name="faker"></param>
+    /// <param name="dateTimeProvider"></param>
+    /// <param name="portfolioId"></param>
+    /// <param name="programId"></param>
+    /// <returns></returns>
+    public static Project AsProposed(this ProjectFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null, Guid? programId = null)
+    {
+        var now = dateTimeProvider.Today;
+        var startDate = now.PlusDays(10);
+        var endDate = startDate.PlusMonths(5);
+
+        return faker.WithData(
+            status: ProjectStatus.Proposed,
+            dateRange: new LocalDateRange(startDate, endDate),
+            portfolioId: portfolioId,
+            programId: programId
+        ).Generate();
+    }
+
+    /// <summary>
     /// Generates an active project with a start date 10 days ago.
     /// </summary>
-    public static Project ActiveProject(this ProjectFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null, Guid? programId = null)
+    public static Project AsActive(this ProjectFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null, Guid? programId = null)
     {
         var now = dateTimeProvider.Today;
         var startDate = now.PlusDays(-10);
@@ -90,7 +112,7 @@ public static class ProjectFakerExtensions
     /// <summary>
     /// Generates a completed project with a start date 20 days ago and an end date 10 days ago.
     /// </summary>
-    public static Project CompletedProject(this ProjectFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null, Guid? programId = null)
+    public static Project AsCompleted(this ProjectFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null, Guid? programId = null)
     {
         var now = dateTimeProvider.Today;
         var startDate = now.PlusDays(-20);
@@ -105,21 +127,9 @@ public static class ProjectFakerExtensions
     }
 
     /// <summary>
-    /// Generates a proposed project without a date range.
-    /// </summary>
-    public static Project ProposedProject(this ProjectFaker faker, Guid? portfolioId = null, Guid? programId = null)
-    {
-        return faker.WithData(
-            status: ProjectStatus.Proposed,
-            portfolioId: portfolioId,
-            programId: programId
-        ).Generate();
-    }
-
-    /// <summary>
     /// Generates a cancelled project with a start date 15 days ago and an end date 5 days ago.
     /// </summary>
-    public static Project CancelledProject(this ProjectFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null, Guid? programId = null)
+    public static Project AsCancelled(this ProjectFaker faker, TestingDateTimeProvider dateTimeProvider, Guid? portfolioId = null, Guid? programId = null)
     {
         var now = dateTimeProvider.Today;
         var startDate = now.PlusDays(-15);

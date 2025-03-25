@@ -15,7 +15,7 @@ export const permissionsApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: () => [{ type: QueryTags.Permissions, id: 'LIST' }],
+      providesTags: () => [{ type: QueryTags.Permission, id: 'LIST' }],
     }),
   }),
 })

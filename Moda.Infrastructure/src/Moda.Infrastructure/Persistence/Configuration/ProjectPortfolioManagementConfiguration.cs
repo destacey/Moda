@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Moda.Common.Domain.Enums.StrategicManagement;
-using Moda.ProjectPortfolioManagement.Domain;
+using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 
@@ -88,6 +88,11 @@ public class ProjectPortfolioConfiguration : IEntityTypeConfiguration<ProjectPor
         builder.HasMany(p => p.Programs)
             .WithOne(prg => prg.Portfolio)
             .HasForeignKey(p => p.PortfolioId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.StrategicInitiatives)
+            .WithOne(i => i.Portfolio)
+            .HasForeignKey(i => i.PortfolioId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(p => p.Roles)
@@ -182,6 +187,154 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .WithOne(t => t.Object)
             .HasForeignKey(r => r.ObjectId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.StrategicInitiativeProjects)
+            .WithOne(i => i.Project)
+            .HasForeignKey(i => i.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class StrategicInitiativeConfiguration : IEntityTypeConfiguration<StrategicInitiative>
+{
+    public void Configure(EntityTypeBuilder<StrategicInitiative> builder)
+    {
+        builder.ToTable("StrategicInitiatives", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(i => i.Id);
+        builder.HasAlternateKey(i => i.Key);
+
+        builder.HasIndex(i => i.Status);
+
+        builder.Property(i => i.Key).ValueGeneratedOnAdd();
+        builder.Property(i => i.Name).HasMaxLength(128).IsRequired();
+        builder.Property(i => i.Description).HasMaxLength(2048).IsRequired();
+        builder.Property(i => i.Status).IsRequired()
+            .HasConversion<EnumConverter<StrategicInitiativeStatus>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        // Value Objects
+        builder.OwnsOne(r => r.DateRange, options =>
+        {
+            options.Property(d => d.Start).HasColumnName("Start");
+            options.Property(d => d.End).HasColumnName("End");
+        });
+
+        // Relationships
+        builder.HasMany(i => i.Roles)
+            .WithOne()
+            .HasForeignKey(r => r.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(i => i.Kpis)
+            .WithOne()
+            .HasForeignKey(i => i.StrategicInitiativeId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class StrategicInitiativeKpiConfiguration : IEntityTypeConfiguration<StrategicInitiativeKpi>
+{
+    public void Configure(EntityTypeBuilder<StrategicInitiativeKpi> builder)
+    {
+        builder.UseTpcMappingStrategy();
+        builder.ToTable("StrategicInitiativeKpis", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(k => k.Id);
+        builder.HasAlternateKey(k => k.Key);
+
+        builder.HasIndex(k => k.StrategicInitiativeId);
+
+        builder.Property(k => k.Key).ValueGeneratedOnAdd();
+        builder.Property(k => k.Name).HasMaxLength(64).IsRequired();
+        builder.Property(k => k.Description).HasMaxLength(512).IsRequired();
+        builder.Property(k => k.TargetValue).IsRequired();
+
+        builder.Property(k => k.Unit).IsRequired()
+            .HasConversion<EnumConverter<KpiUnit>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        builder.Property(k => k.TargetDirection).IsRequired()
+            .HasConversion<EnumConverter<KpiTargetDirection>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        // Relationships
+        builder.HasMany(k => k.Checkpoints)
+            .WithOne()
+            .HasForeignKey(k => k.KpiId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(k => k.Measurements)
+            .WithOne()
+            .HasForeignKey(k => k.KpiId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class StrategicInitiativeKpiCheckpointConfiguration : IEntityTypeConfiguration<StrategicInitiativeKpiCheckpoint>
+{
+    public void Configure(EntityTypeBuilder<StrategicInitiativeKpiCheckpoint> builder)
+    {
+        builder.UseTpcMappingStrategy();
+        builder.ToTable("StrategicInitiativeKpiCheckpoints", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(k => k.Id);
+
+        builder.HasIndex(k => k.KpiId);
+
+        builder.Property(k => k.TargetValue).IsRequired();
+        builder.Property(k => k.CheckpointDate).IsRequired();
+    }
+}
+
+public class StrategicInitiativeKpiMeasurementConfiguration : IEntityTypeConfiguration<StrategicInitiativeKpiMeasurement>
+{
+    public void Configure(EntityTypeBuilder<StrategicInitiativeKpiMeasurement> builder)
+    {
+        builder.UseTpcMappingStrategy();
+        builder.ToTable("StrategicInitiativeKpiMeasurements", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(m => m.Id);
+
+        builder.HasIndex(m => m.KpiId);
+
+        builder.Property(m => m.ActualValue).IsRequired();
+        builder.Property(m => m.MeasurementDate).IsRequired();
+        builder.Property(m => m.Note).HasMaxLength(1024);
+
+        // Relationships
+        builder.HasOne(p => p.MeasuredBy)
+            .WithMany()
+            .HasForeignKey(p => p.MeasuredById)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}
+
+
+public class StrategicInitiativeProjectConfiguration : IEntityTypeConfiguration<StrategicInitiativeProject>
+{
+    public void Configure(EntityTypeBuilder<StrategicInitiativeProject> builder)
+    {
+        builder.ToTable("StrategicInitiativeProjects", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(i => new { i.StrategicInitiativeId, i.ProjectId });
+
+        builder.HasIndex(i => i.StrategicInitiativeId);
+        builder.HasIndex(i => i.ProjectId);
+
+        // Relationships
+        builder.HasOne(i => i.StrategicInitiative)
+            .WithMany(i => i.StrategicInitiativeProjects)
+            .HasForeignKey(i => i.StrategicInitiativeId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(i => i.Project)
+            .WithMany(i => i.StrategicInitiativeProjects)
+            .HasForeignKey(i => i.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
@@ -248,6 +401,30 @@ public class ProjectRoleAssignmentConfiguration : IEntityTypeConfiguration<RoleA
 
         builder.Property(p => p.Role).IsRequired()
             .HasConversion<EnumConverter<ProjectRole>>()
+            .HasMaxLength(32)
+            .HasColumnType("varchar");
+
+        // Relationships
+        builder.HasOne(rm => rm.Employee)
+            .WithMany()
+            .HasForeignKey(rm => rm.EmployeeId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}
+
+public class StrategicInitiativeRoleAssignmentConfiguration : IEntityTypeConfiguration<RoleAssignment<StrategicInitiativeRole>>
+{
+    public void Configure(EntityTypeBuilder<RoleAssignment<StrategicInitiativeRole>> builder)
+    {
+        builder.ToTable("StrategicInitiativeRoleAssignments", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(r => new { r.ObjectId, r.EmployeeId, r.Role });
+
+        builder.HasIndex(r => r.ObjectId);
+        builder.HasIndex(r => r.EmployeeId);
+
+        builder.Property(p => p.Role).IsRequired()
+            .HasConversion<EnumConverter<StrategicInitiativeRole>>()
             .HasMaxLength(32)
             .HasColumnType("varchar");
 

@@ -12,7 +12,7 @@ namespace Moda.Work.Domain.Models;
 /// </summary>
 /// <seealso cref="Moda.Common.Domain.Data.BaseSoftDeletableEntity&lt;System.Guid&gt;" />
 /// <seealso cref="Moda.Common.Domain.Interfaces.IActivatable" />
-public sealed class Workflow : BaseSoftDeletableEntity<Guid>, IActivatable, HasIdAndKey
+public sealed class Workflow : BaseSoftDeletableEntity<Guid>, IActivatable, IHasIdAndKey
 {
     private readonly List<WorkflowScheme> _schemes = [];
     private string _name = null!;

@@ -7,7 +7,9 @@ import {
   setEditMode,
   selectEditTeamContext,
 } from '../../../store/features/organizations/team-slice'
-import withModalForm, { FormProps } from '../../../components/hoc/withModalForm'
+import withModalForm, {
+  FormProps,
+} from '../../../components/hoc/with-modal-form'
 import { useAppSelector } from '../../../hooks'
 import { MarkdownEditor } from '../../../components/common/markdown'
 

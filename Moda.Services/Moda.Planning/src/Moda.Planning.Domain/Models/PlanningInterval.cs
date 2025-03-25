@@ -7,7 +7,7 @@ using Moda.Planning.Domain.Interfaces;
 using NodaTime;
 
 namespace Moda.Planning.Domain.Models;
-public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, HasIdAndKey
+public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, IHasIdAndKey
 {
     private string _name = default!;
     private string? _description;

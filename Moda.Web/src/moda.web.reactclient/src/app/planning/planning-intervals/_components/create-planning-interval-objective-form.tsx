@@ -228,6 +228,7 @@ const CreatePlanningIntervalObjectiveForm = ({
       <Modal
         title="Create PI Objective"
         open={isOpen}
+        width={'60vw'}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
         okText="Create"

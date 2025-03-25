@@ -145,7 +145,7 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         {
-          type: QueryTags.PlanningIntervalObjectiveWorkItemMetrics,
+          type: QueryTags.PlanningIntervalObjectiveWorkItemMetric,
           id: arg.objectiveId,
         },
       ],

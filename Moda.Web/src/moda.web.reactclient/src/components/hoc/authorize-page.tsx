@@ -17,12 +17,11 @@ const authorizePage = <P extends object>(
   requiredClaimType?: string,
   requiredClaimValue?: string,
 ): FC<P> => {
+  const wrappedPageName =
+    WrappedPage.displayName || WrappedPage.name || 'Component'
+
   const AuthorizePage: ComponentType<P> = ({ ...props }) => {
     const { hasClaim } = useAuth()
-    const wrappedPageName =
-      WrappedPage.displayName || WrappedPage.name || 'Component'
-
-    AuthorizePage.displayName = `authorizedPage(${wrappedPageName})`
 
     return hasClaim(requiredClaimType ?? 'Permission', requiredClaimValue) ? (
       <WrappedPage {...(props as P)} />
@@ -30,6 +29,9 @@ const authorizePage = <P extends object>(
       <NotAuthorized />
     )
   }
+
+  AuthorizePage.displayName = `authorizedPage(${wrappedPageName})`
+
   return AuthorizePage
 }
 

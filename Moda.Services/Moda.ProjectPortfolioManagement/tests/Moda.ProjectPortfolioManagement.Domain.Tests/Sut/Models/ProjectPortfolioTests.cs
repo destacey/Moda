@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
-using Moda.Common.Domain.Employees;
 using Moda.Common.Models;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+using Moda.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
@@ -68,7 +68,7 @@ public class ProjectPortfolioTests
     public void Update_ShouldFail_WhenPortfolioIsReadonly()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ArchivedPortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsArchived(_dateTimeProvider);
         var updatedName = "Updated Portfolio";
         var updatedDescription = "Updated Description";
 
@@ -123,7 +123,7 @@ public class ProjectPortfolioTests
     public void AssignRole_ShouldFail_WhenPortfolioIsReadonly()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ArchivedPortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsArchived(_dateTimeProvider);
 
         // Act
         var result = portfolio.AssignRole(ProjectPortfolioRole.Owner, Guid.NewGuid());
@@ -191,7 +191,7 @@ public class ProjectPortfolioTests
     public void RemoveRole_ShouldFail_WhenPortfolioIsReadonly()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ArchivedPortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsArchived(_dateTimeProvider);
 
         // Act
         var result = portfolio.RemoveRole(ProjectPortfolioRole.Owner, Guid.NewGuid());
@@ -293,7 +293,7 @@ public class ProjectPortfolioTests
     public void UpdateRoles_ShouldFail_WhenPortfolioIsReadonly()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ArchivedPortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsArchived(_dateTimeProvider);
 
         var updatedRoles = new Dictionary<ProjectPortfolioRole, HashSet<Guid>>
         {
@@ -333,8 +333,8 @@ public class ProjectPortfolioTests
     public void Close_ShouldFail_WhenPortfolioHasOpenProjectsOrPrograms()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
-        var project = _projectFaker.ActiveProject(_dateTimeProvider, portfolio.Id);
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
+        var project = _projectFaker.AsActive(_dateTimeProvider, portfolio.Id);
         portfolio.CreateProject(project.Name, project.Description, 1, null);
 
         var endDate = _dateTimeProvider.Today.PlusDays(10);
@@ -351,9 +351,9 @@ public class ProjectPortfolioTests
     public void Close_ShouldClosePortfolioSuccessfully()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
 
-        var fakeProject = _projectFaker.ProposedProject(portfolio.Id);
+        var fakeProject = _projectFaker.AsProposed(_dateTimeProvider, portfolio.Id);
         var projectDateRange = new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusMonths(3));
         var createProjectReult = portfolio.CreateProject(fakeProject.Name, fakeProject.Description, 1, projectDateRange);
         var project = createProjectReult.Value;
@@ -379,7 +379,7 @@ public class ProjectPortfolioTests
     public void Archive_ShouldFail_WhenPortfolioIsNotClosed()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
 
         // Act
         var result = portfolio.Archive();
@@ -393,7 +393,7 @@ public class ProjectPortfolioTests
     public void Archive_ShouldArchiveCompletedPortfolioSuccessfully()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ClosedPortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsClosed(_dateTimeProvider);
 
         // Act
         var result = portfolio.Archive();
@@ -425,7 +425,7 @@ public class ProjectPortfolioTests
     public void CreateProgram_ShouldAddProgramToPortfolio()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
 
         // Act
         var result = portfolio.CreateProgram("Test Program", "Test Description", null);
@@ -440,9 +440,9 @@ public class ProjectPortfolioTests
     public void Close_ShouldFail_WhenPortfolioHasProgramsWithOpenProjects()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
         var program = portfolio.CreateProgram("Test Program", "Description", null).Value;
-        var project = _projectFaker.ActiveProject(_dateTimeProvider, portfolio.Id);
+        var project = _projectFaker.AsActive(_dateTimeProvider, portfolio.Id);
 
         program.AddProject(project);
 
@@ -465,7 +465,7 @@ public class ProjectPortfolioTests
     public void CreateProject_ShouldAddProjectToPortfolio()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
 
         // Act
         var result = portfolio.CreateProject("Test Project", "Test Description", 1, null);
@@ -480,7 +480,7 @@ public class ProjectPortfolioTests
     public void CreateProject_ShouldFail_WhenProgramDoesNotBelongToPortfolio()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
         var program = _programFaker.Generate();
 
         // Act
@@ -495,7 +495,7 @@ public class ProjectPortfolioTests
     public void CreateProject_ShouldFail_WhenProgramIsNotAcceptingProjects()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
         var fakeProgram = _programFaker.Generate();
 
         var createProgramResult = portfolio.CreateProgram(fakeProgram.Name, fakeProgram.Description, null);
@@ -514,7 +514,7 @@ public class ProjectPortfolioTests
     public void ChangeProjectProgram_ShouldMoveProjectToNewProgram()
     {
         // Arrange
-        var portfolio = _portfolioFaker.PortfolioWithProgramsAndProjects(_dateTimeProvider, 2, 0);
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider).AddPrograms(2, _dateTimeProvider);
 
         var program1 = portfolio.Programs.First();
         var program2 = portfolio.Programs.Last();
@@ -536,7 +536,7 @@ public class ProjectPortfolioTests
     public void ChangeProjectProgram_ShouldRemoveProjectFromProgram()
     {
         // Arrange
-        var portfolio = _portfolioFaker.PortfolioWithProgramsAndProjects(_dateTimeProvider, 1, 0);
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider).AddPrograms(1, _dateTimeProvider);
 
         var program = portfolio.Programs.First();
 
@@ -556,7 +556,7 @@ public class ProjectPortfolioTests
     public void ChangeProjectProgram_ShouldFail_WhenProjectAlreadyInProgram()
     {
         // Arrange
-        var portfolio = _portfolioFaker.PortfolioWithProgramsAndProjects(_dateTimeProvider, 1, 0);
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider).AddPrograms(1, _dateTimeProvider);
 
         var program = portfolio.Programs.First();
 
@@ -575,11 +575,11 @@ public class ProjectPortfolioTests
     public void ChangeProjectProgram_ShouldFail_WhenProgramNotInPortfolio()
     {
         // Arrange
-        var portfolio1 = _portfolioFaker.PortfolioWithProgramsAndProjects(_dateTimeProvider, 1, 0);
+        var portfolio1 = _portfolioFaker.AsActive(_dateTimeProvider).AddPrograms(1, _dateTimeProvider);
 
         var program1 = portfolio1.Programs.First();
 
-        var program2 = _programFaker.ActiveProgram(_dateTimeProvider, Guid.NewGuid());
+        var program2 = _programFaker.AsActive(_dateTimeProvider, Guid.NewGuid());
 
         var projectResult = portfolio1.CreateProject("Test Project", "Description", 1, null, program1.Id);
         projectResult.IsSuccess.Should().BeTrue();
@@ -596,7 +596,7 @@ public class ProjectPortfolioTests
     public void ChangeProjectProgram_ShouldFail_WhenProjectHasNoProgramAndIsRemovedAgain()
     {
         // Arrange
-        var portfolio = _portfolioFaker.ActivePortfolio(_dateTimeProvider);
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
         var project = portfolio.CreateProject("Test Project", "Description", 1, null).Value;
 
         // Act
@@ -607,6 +607,137 @@ public class ProjectPortfolioTests
         result.Error.Should().Be("The project is not currently assigned to a program.");
     }
 
+    [Fact]
+    public void DeleteProject_ShouldRemoveProjectFromPortfolio()
+    {
+        // Arrange
+        var initialCount = 5;
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider).AddProjects(initialCount, _dateTimeProvider);
+        var project = portfolio.Projects.First(i => i.Status == ProjectStatus.Proposed);
+
+        // Act
+        var result = portfolio.DeleteProject(project.Id);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        portfolio.Projects.Should().HaveCount(initialCount - 1);
+        portfolio.Projects.Any(i => i.Id == project.Id).Should().BeFalse();
+    }
+
+    [Fact]
+    public void DeleteProject_ShouldFail_WhenPorjectIsNotInPortfolio()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.Generate();
+
+        // Act
+        var result = portfolio.DeleteProject(Guid.NewGuid());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The specified project does not belong to this portfolio.");
+    }
+
+    [Fact]
+    public void DeleteProject_ShouldFail_WhenPortfolioIsReadonly()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.AsArchived(_dateTimeProvider).AddProjects(3, _dateTimeProvider);
+        var initiative = portfolio.Projects.First();
+
+        // Act
+        var result = portfolio.DeleteProject(initiative.Id);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Project Portfolio is readonly and cannot be updated.");
+    }
+
 
     #endregion Project Management
+
+    #region Strategic Initiative Management
+
+    [Fact]
+    public void CreateStrategicInitiative_ShouldAddInitiativeToPortfolio()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider);
+        var dateRange = new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusMonths(3));
+
+        // Act
+        var result = portfolio.CreateStrategicInitiative("Test Initiative", "Test Description", dateRange);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        portfolio.StrategicInitiatives.Should().ContainSingle();
+
+        var initiative = result.Value;
+        initiative.Name.Should().Be("Test Initiative");
+        initiative.Description.Should().Be("Test Description");
+        initiative.DateRange.Should().Be(dateRange);
+    }
+
+    [Fact]
+    public void CreateStrategicInitiative_ShouldFail_WhenPortfolioIsNotActive()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.AsProposed();
+        var dateRange = new LocalDateRange(_dateTimeProvider.Today, _dateTimeProvider.Today.PlusMonths(3));
+
+        // Act
+        var result = portfolio.CreateStrategicInitiative("Test Initiative", "Test Description", dateRange);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Strategic initiatives can only be created in active or on-hold portfolios.");
+    }
+
+    [Fact]
+    public void DeleteStrategicInitiative_ShouldRemoveInitiativeFromPortfolio()
+    {
+        // Arrange
+        var initialCount = 5;
+        var portfolio = _portfolioFaker.AsActive(_dateTimeProvider).AddStrategicThemes(initialCount, _dateTimeProvider);
+        var initiative = portfolio.StrategicInitiatives.First(i => i.Status == StrategicInitiativeStatus.Proposed);
+
+        // Act
+        var result = portfolio.DeleteStrategicInitiative(initiative.Id);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        portfolio.StrategicInitiatives.Should().HaveCount(initialCount - 1);
+        portfolio.StrategicInitiatives.Any(i => i.Id == initiative.Id).Should().BeFalse();
+    }
+
+    [Fact]
+    public void DeleteStrategicInitiative_ShouldFail_WhenInitiativeIsNotInPortfolio()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.Generate();
+
+        // Act
+        var result = portfolio.DeleteStrategicInitiative(Guid.NewGuid());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The specified strategic initiative does not belong to this portfolio.");
+    }
+
+    [Fact]
+    public void DeleteStrategicInitiative_ShouldFail_WhenPortfolioIsReadonly()
+    {
+        // Arrange
+        var portfolio = _portfolioFaker.AsArchived(_dateTimeProvider).AddStrategicThemes(3, _dateTimeProvider);
+        var initiative = portfolio.StrategicInitiatives.First();
+
+        // Act
+        var result = portfolio.DeleteStrategicInitiative(initiative.Id);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Project Portfolio is readonly and cannot be updated.");
+    }
+
+    #endregion Strategic Initiative Management
 }

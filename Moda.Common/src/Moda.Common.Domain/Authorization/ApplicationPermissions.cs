@@ -48,6 +48,7 @@ public static class ApplicationResource
     public const string Projects = nameof(Projects);
     public const string Programs = nameof(Programs);
     public const string PpmStrategicThemes = nameof(PpmStrategicThemes);
+    public const string StrategicInitiatives = nameof(StrategicInitiatives);
 
     public const string StrategicThemes = nameof(StrategicThemes);
     public const string Strategies = nameof(Strategies);
@@ -182,6 +183,11 @@ public static class ApplicationPermissions
         new ("Create Projects", ApplicationAction.Create, ApplicationResource.Projects),
         new ("Update Projects", ApplicationAction.Update, ApplicationResource.Projects),
         new ("Delete Projects", ApplicationAction.Delete, ApplicationResource.Projects),
+
+        new ("View Strategic Initiatives", ApplicationAction.View, ApplicationResource.StrategicInitiatives),
+        new ("Create Strategic Initiatives", ApplicationAction.Create, ApplicationResource.StrategicInitiatives),
+        new ("Update Strategic Initiatives", ApplicationAction.Update, ApplicationResource.StrategicInitiatives),
+        new ("Delete Strategic Initiatives", ApplicationAction.Delete, ApplicationResource.StrategicInitiatives),
     ];
 
     private static readonly ApplicationPermission[] _strategicManagement =
@@ -239,7 +245,7 @@ public static class ApplicationPermissions
         new("Delete WorkTypes", ApplicationAction.Delete, ApplicationResource.WorkTypes),
     ];
 
-    private static readonly ApplicationPermission[] _all = _common
+    private static readonly ApplicationPermission[] _all = [.. _common
         .Union(_backgroundJobs)
         .Union(_identity)
         .Union(_appIntegration)
@@ -249,13 +255,12 @@ public static class ApplicationPermissions
         .Union(_planning)
         .Union(_projectPortfolioManagement)
         .Union(_strategicManagement)
-        .Union(_work)
-        .ToArray();
+        .Union(_work)];
 
     public static IReadOnlyList<ApplicationPermission> All { get; } = new ReadOnlyCollection<ApplicationPermission>(_all);
-    public static IReadOnlyList<ApplicationPermission> Root { get; } = new ReadOnlyCollection<ApplicationPermission>(_all.Where(p => p.IsRoot).ToArray());
-    public static IReadOnlyList<ApplicationPermission> Admin { get; } = new ReadOnlyCollection<ApplicationPermission>(_all.Where(p => !p.IsRoot).ToArray());
-    public static IReadOnlyList<ApplicationPermission> Basic { get; } = new ReadOnlyCollection<ApplicationPermission>(_all.Where(p => p.IsBasic).ToArray());
+    public static IReadOnlyList<ApplicationPermission> Root { get; } = new ReadOnlyCollection<ApplicationPermission>([.. _all.Where(p => p.IsRoot)]);
+    public static IReadOnlyList<ApplicationPermission> Admin { get; } = new ReadOnlyCollection<ApplicationPermission>([.. _all.Where(p => !p.IsRoot)]);
+    public static IReadOnlyList<ApplicationPermission> Basic { get; } = new ReadOnlyCollection<ApplicationPermission>([.. _all.Where(p => p.IsBasic)]);
 }
 
 public record ApplicationPermission(string Description, string Action, string Resource, bool IsBasic = false, bool IsRoot = false)
