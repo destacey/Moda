@@ -462,7 +462,7 @@ public sealed class ProjectPortfolio : BaseEntity<Guid>, ISystemAuditable, IHasI
     /// <param name="dateRange">The date range of the strategic initiative.</param>
     /// <param name="roles">The roles associated with the strategic initiative (optional).</param>
     /// <returns>A result containing the created strategic initiative or an error.</returns>
-    public Result<StrategicInitiative> CreateStrategicInitiative(string name, string? description, LocalDateRange dateRange, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
+    public Result<StrategicInitiative> CreateStrategicInitiative(string name, string description, LocalDateRange dateRange, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
     {
         if (!IsActive)
         {

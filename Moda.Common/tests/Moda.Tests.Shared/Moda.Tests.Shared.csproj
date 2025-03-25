@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.2" />
-    <PackageReference Include="NodaTime.Testing" Version="3.2.1" />
+    <PackageReference Include="NodaTime.Testing" Version="3.2.2" />
   </ItemGroup>
 
   <ItemGroup>
