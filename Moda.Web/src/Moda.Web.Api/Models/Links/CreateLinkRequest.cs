@@ -5,8 +5,8 @@ namespace Moda.Web.Api.Models.Links;
 public sealed record CreateLinkRequest
 {
     public Guid ObjectId { get; set; }
-    public required string Name { get; set; }
-    public required string Url { get; set; }
+    public string Name { get; set; } = default!;
+    public string Url { get; set; } = default!;
 
     public CreateLinkCommand ToCreateLinkCommand()
     {

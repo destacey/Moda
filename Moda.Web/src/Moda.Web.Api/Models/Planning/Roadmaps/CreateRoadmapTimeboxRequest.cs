@@ -9,12 +9,12 @@ public sealed record CreateRoadmapTimeboxRequest : CreateRoadmapItemRequest
     /// <summary>
     /// The Timebox start date.
     /// </summary>
-    public required LocalDate Start { get; set; }
+    public LocalDate Start { get; set; }
 
     /// <summary>
     /// The Timebox end date.
     /// </summary>
-    public required LocalDate End { get; set; }
+    public LocalDate End { get; set; }
 
     public CreateRoadmapItemCommand ToCreateRoadmapItemCommand()
     {

@@ -2,7 +2,7 @@
 
 public sealed record ToggleUserStatusRequest
 {
-    public string UserId { get; set; } = null!;
+    public string UserId { get; set; } = default!;
     public bool ActivateUser { get; set; }
 
     public ToggleUserStatusCommand ToToggleUserStatusCommand()

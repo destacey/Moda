@@ -9,12 +9,12 @@ public sealed record CreateRoadmapActivityRequest : CreateRoadmapItemRequest
     /// <summary>
     /// The Activity start date.
     /// </summary>
-    public required LocalDate Start { get; set; }
+    public LocalDate Start { get; set; }
 
     /// <summary>
     /// The Activity end date.
     /// </summary>
-    public required LocalDate End { get; set; }
+    public LocalDate End { get; set; }
 
     public CreateRoadmapItemCommand ToCreateRoadmapItemCommand()
     {

@@ -8,7 +8,7 @@ public sealed record CreateRoadmapRequest
     /// <summary>
     /// The name of the Roadmap.
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>
     /// The description of the Roadmap.
@@ -18,17 +18,17 @@ public sealed record CreateRoadmapRequest
     /// <summary>
     /// The Roadmap start date.
     /// </summary>
-    public required LocalDate Start { get; set; }
+    public LocalDate Start { get; set; }
 
     /// <summary>
     /// The Roadmap end date.
     /// </summary>
-    public required LocalDate End { get; set; }
+    public LocalDate End { get; set; }
 
     /// <summary>
     /// The managers of the Roadmap.
     /// </summary>
-    public required List<Guid> RoadmapManagerIds { get; set; }
+    public List<Guid> RoadmapManagerIds { get; set; } = default!;
 
     /// <summary>
     /// The visibility id for the Roadmap. If the Roadmap is public, all users can see the Roadmap. Otherwise, only the Roadmap Managers can see the Roadmap.

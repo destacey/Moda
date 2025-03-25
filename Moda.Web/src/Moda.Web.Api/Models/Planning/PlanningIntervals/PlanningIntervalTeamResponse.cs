@@ -18,15 +18,15 @@ public class PlanningIntervalTeamResponse : IMapFrom<TeamListDto>, IMapFrom<Team
     /// <summary>
     /// The name of the workspace.
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>Gets the code.</summary>
     /// <value>The code.</value>
-    public required string Code { get; set; }
+    public string Code { get; set; } = default!;
 
     /// <summary>Gets the team type.</summary>
     /// <value>The team type.</value>
-    public required string Type { get; set; }
+    public string Type { get; set; } = default!;
 
     /// <summary>
     /// Indicates whether the organization is active or not.  

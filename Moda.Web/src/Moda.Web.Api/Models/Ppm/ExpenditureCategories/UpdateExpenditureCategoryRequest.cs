@@ -9,12 +9,12 @@ public sealed record UpdateExpenditureCategoryRequest
     /// <summary>
     /// The name of the expenditure category (e.g., "Opex", "Capex", "Hybrid", etc.).
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>
     /// Detailed description of what qualifies under this expenditure category.
     /// </summary>
-    public required string Description { get; set; }
+    public string Description { get; set; } = default!;
 
     /// <summary>
     /// Defines whether the expenditure is treated as capitalizable.

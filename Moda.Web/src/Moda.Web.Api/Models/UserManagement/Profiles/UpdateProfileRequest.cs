@@ -2,10 +2,10 @@
 
 public sealed record UpdateProfileRequest
 {
-    public required string Id { get; set; }
-    public required string FirstName { get; set; }
-    public required string LastName { get; set; }
-    public required string Email { get; set; }
+    public string Id { get; set; } = default!;
+    public string FirstName { get; set; } = default!;
+    public string LastName { get; set; } = default!;
+    public string Email { get; set; } = default!;
     public string? PhoneNumber { get; set; }
 
     public UpdateUserCommand ToUpdateUserCommand()

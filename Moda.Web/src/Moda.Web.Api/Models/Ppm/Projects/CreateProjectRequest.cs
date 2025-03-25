@@ -8,12 +8,12 @@ public sealed record CreateProjectRequest
     /// <summary>
     /// The name of the project.
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>
     /// A detailed description of the project’s purpose.
     /// </summary>
-    public required string Description { get; set; }
+    public string Description { get; set; } = default!;
 
     /// <summary>
     /// The ID of the expenditure category associated with the project.

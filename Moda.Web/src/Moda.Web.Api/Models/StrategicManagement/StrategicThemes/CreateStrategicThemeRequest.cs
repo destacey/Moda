@@ -8,12 +8,12 @@ public sealed record CreateStrategicThemeRequest
     /// <summary>
     /// The name of the strategic theme, highlighting its focus or priority.
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>
     /// A detailed description of the strategic theme and its importance.
     /// </summary>
-    public required string Description { get; set; }
+    public string Description { get; set; } = default!;
 
     public CreateStrategicThemeCommand ToCreateStrategicThemeCommand()
     {

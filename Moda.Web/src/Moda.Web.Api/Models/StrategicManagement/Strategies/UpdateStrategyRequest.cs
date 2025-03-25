@@ -13,12 +13,12 @@ public sealed record UpdateStrategyRequest
     /// <summary>
     /// The concise statement describing the strategy and its purpose or focus area.
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>
     /// A concise statement describing the strategy of the organization.
     /// </summary>
-    public required string Description { get; set; }
+    public string Description { get; set; } = default!;
 
     /// <summary>
     /// The current status id of the strategy.
