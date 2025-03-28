@@ -70,7 +70,7 @@ const RoadmapDetailsPage = ({ params }) => {
     data: roadmapItems,
     isFetching: isRoadmapItemsLoading,
     refetch: refetchRoadmapItems,
-  } = useGetRoadmapItemsQuery(params.key, {
+  } = useGetRoadmapItemsQuery(roadmapData?.id, {
     skip: !roadmapData,
   })
 
