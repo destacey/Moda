@@ -198,9 +198,7 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
         title: 'Color',
         sorter: (a, b) => a.color?.localeCompare(b.color),
         render: (value) =>
-          value && (
-            <ColorPicker defaultValue={value} size="small" showText disabled />
-          ),
+          value && <ColorPicker value={value} size="small" showText disabled />,
         width: 100,
       },
     ] as TableColumnsType<RoadmapItemDataType>
