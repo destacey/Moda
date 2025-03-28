@@ -238,10 +238,8 @@ export const RoadmapRangeItemTemplate: TimelineTemplate<
 
 const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [isLoading, setIsLoading] = useState(true)
-  const [timelineStart, setTimelineStart] = useState<Date | undefined>(
-    undefined,
-  )
-  const [timelineEnd, setTimelineEnd] = useState<Date | undefined>(undefined)
+  const [timelineStart, setTimelineStart] = useState<Date>(dayjs().toDate())
+  const [timelineEnd, setTimelineEnd] = useState<Date>(dayjs().toDate())
   const [currentLevel, setCurrentLevel] = useState<number | undefined>(1)
   const [hasUserChangedLevel, setHasUserChangedLevel] = useState(false)
 

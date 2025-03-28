@@ -99,8 +99,8 @@ const PlanningIntervalObjectivesTimeline = ({
   viewSelector,
 }: PlanningIntervalObjectivesTimelineProps) => {
   const [isLoading, setIsLoading] = useState(true)
-  const [piStart, setPiStart] = useState<Date | undefined>(undefined)
-  const [piEnd, setPiEnd] = useState<Date | undefined>(undefined)
+  const [piStart, setPiStart] = useState<Date>(dayjs().toDate())
+  const [piEnd, setPiEnd] = useState<Date>(dayjs().toDate())
   const [iterations, setIterations] = useState<ObjectiveDataItem[]>([])
   const [objectives, setObjectives] = useState<ObjectiveDataItem[]>([])
 
