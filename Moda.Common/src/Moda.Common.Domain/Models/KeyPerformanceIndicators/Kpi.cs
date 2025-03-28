@@ -57,6 +57,11 @@ public abstract class Kpi : BaseEntity<Guid>
     public double TargetValue { get; protected set; }
 
     /// <summary>
+    /// The actual value of the KPI.
+    /// </summary>
+    public double? ActualValue { get; protected set; }
+
+    /// <summary>
     /// Gets the unit of measurement for the KPI.
     /// </summary>
     public KpiUnit Unit { get; protected set; }

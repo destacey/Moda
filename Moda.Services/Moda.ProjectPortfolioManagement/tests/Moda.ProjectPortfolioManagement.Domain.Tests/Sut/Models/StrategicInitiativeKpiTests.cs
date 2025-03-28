@@ -38,7 +38,7 @@ public sealed class StrategicInitiativeKpiTests
         kpi.Name.Should().Be(expectedKpi.Name);
         kpi.Description.Should().Be(expectedKpi.Description);
         kpi.TargetValue.Should().Be(expectedKpi.TargetValue);
-        kpi.CurrentValue.Should().BeNull();
+        kpi.ActualValue.Should().BeNull();
         kpi.Unit.Should().Be(expectedKpi.Unit);
         kpi.TargetDirection.Should().Be(expectedKpi.TargetDirection);
         kpi.StrategicInitiativeId.Should().Be(expectedKpi.StrategicInitiativeId);
@@ -77,14 +77,12 @@ public sealed class StrategicInitiativeKpiTests
         var measurement1 = _measurementFaker.WithData(kpiId: kpi.Id, measurementDate: _dateTimeProvider.Now.Minus(Duration.FromDays(10))).Generate();
         var measurement2 = _measurementFaker.WithData(kpiId: kpi.Id, measurementDate: _dateTimeProvider.Now.Minus(Duration.FromDays(5))).Generate();
 
+        // Act
         kpi.AddMeasurement(measurement1);
         kpi.AddMeasurement(measurement2);
 
-        // Act
-        var currentValue = kpi.CurrentValue;
-
         // Assert
-        currentValue.Should().Be(measurement2.ActualValue);
+        kpi.ActualValue.Should().Be(measurement2.ActualValue);
     }
 
     #region Checkpoints
@@ -165,7 +163,7 @@ public sealed class StrategicInitiativeKpiTests
         // Assert
         addResult.IsSuccess.Should().BeTrue();
         kpi.Measurements.Should().Contain(measurement);
-        kpi.CurrentValue.Should().Be(measurement.ActualValue);
+        kpi.ActualValue.Should().Be(measurement.ActualValue);
     }
 
     [Fact]
@@ -196,7 +194,7 @@ public sealed class StrategicInitiativeKpiTests
         // Assert
         removeResult.IsSuccess.Should().BeTrue();
         kpi.Measurements.Should().NotContain(measurement);
-        kpi.CurrentValue.Should().BeNull();
+        kpi.ActualValue.Should().BeNull();
     }
 
     [Fact]

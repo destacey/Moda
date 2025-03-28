@@ -250,6 +250,7 @@ public class StrategicInitiativeKpiConfiguration : IEntityTypeConfiguration<Stra
         builder.Property(k => k.Name).HasMaxLength(64).IsRequired();
         builder.Property(k => k.Description).HasMaxLength(512).IsRequired();
         builder.Property(k => k.TargetValue).IsRequired();
+        builder.Property(k => k.ActualValue);
 
         builder.Property(k => k.Unit).IsRequired()
             .HasConversion<EnumConverter<KpiUnit>>()

@@ -33,13 +33,6 @@ public class StrategicInitiativeKpi : Kpi, ISystemAuditable
     public IReadOnlyCollection<StrategicInitiativeKpiMeasurement> Measurements => _measurements;
 
     /// <summary>
-    /// Computes the current value of the KPI based on the latest measurement entry.
-    /// </summary>
-    public double? CurrentValue => _measurements
-        .OrderByDescending(m => m.MeasurementDate)
-        .FirstOrDefault()?.ActualValue;
-
-    /// <summary>
     /// Adds a new checkpoint entry to the KPI.
     /// </summary>
     /// <param name="checkpoint">The KPI checkpoint entry to add.</param>
@@ -86,6 +79,8 @@ public class StrategicInitiativeKpi : Kpi, ISystemAuditable
 
         _measurements.Add(measurement);
 
+        SetActualValueFromMeasurements();
+
         return Result.Success();
     }
 
@@ -104,7 +99,21 @@ public class StrategicInitiativeKpi : Kpi, ISystemAuditable
 
         _measurements.Remove(measurement);
 
+        SetActualValueFromMeasurements();
+
         return Result.Success();
+    }
+
+    /// <summary>
+    /// Sets the actual value of the KPI based on the latest measurement entry.
+    /// </summary>
+    private void SetActualValueFromMeasurements()
+    {
+        var latestMeasurement = _measurements
+            .OrderByDescending(m => m.MeasurementDate)
+            .First();
+
+        ActualValue = latestMeasurement.ActualValue;
     }
 
     /// <summary>
