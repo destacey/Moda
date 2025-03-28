@@ -295,10 +295,7 @@ const EditRoadmapActivityForm = (props: EditRoadmapActivityFormProps) => {
             <DatePicker />
           </Item>
           <Item name="color" label="Color">
-            <ModaColorPicker
-              color={form.getFieldValue('color')}
-              onChange={onColorChange}
-            />
+            <ModaColorPicker />
           </Item>
         </Form>
       </Modal>

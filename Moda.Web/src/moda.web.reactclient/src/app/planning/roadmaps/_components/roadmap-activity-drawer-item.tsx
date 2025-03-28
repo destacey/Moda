@@ -30,7 +30,7 @@ const RoadmapActivityDrawerItem: React.FC<RoadmapActivityDrawerItemProps> = (
         <DescriptionsItem label="Color">
           {activity?.color && (
             <ColorPicker
-              defaultValue={activity.color}
+              value={activity.color}
               size="small"
               showText
               disabled
