@@ -18,8 +18,9 @@ import { useState } from 'react'
 import { Color } from 'antd/es/color-picker'
 
 export interface ModaColorPickerProps {
-  color?: string | undefined
-  onChange: (color: string) => void
+  id?: string // required by antd for custom form controls
+  value?: string // required by antd for custom form controls
+  onChange?: (value: string | undefined) => void // required by antd for custom form controls
 }
 
 type Presets = Required<ColorPickerProps>['presets'][number]
@@ -47,7 +48,7 @@ const customPanelRender: ColorPickerProps['panelRender'] = (
 
 const ModaColorPicker = (props: ModaColorPickerProps) => {
   const [selectedColor, setSelectedColor] = useState<string | undefined>(
-    props.color,
+    props.value,
   )
   const { token } = useTheme()
 
@@ -69,14 +70,16 @@ const ModaColorPicker = (props: ModaColorPickerProps) => {
     ],
   })
 
-  const onPickerChange = (color: Color) => {
-    const colorValue = color.toHexString()
+  const onPickerChange = (color: Color | undefined) => {
+    const colorValue = color?.toHexString()
     if (colorValue !== selectedColor) {
       setSelectedColor(colorValue)
+      props.onChange(colorValue)
     } else {
+      // Clear the color if the same color is selected
       setSelectedColor(undefined)
+      props.onChange(undefined)
     }
-    props.onChange(colorValue)
   }
 
   return (
