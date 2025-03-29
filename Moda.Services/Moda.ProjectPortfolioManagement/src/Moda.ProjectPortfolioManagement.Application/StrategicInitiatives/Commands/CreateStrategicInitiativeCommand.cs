@@ -65,7 +65,7 @@ internal sealed class CreateStrategicInitiativeCommandHandler(
                 roles);
             if (createResult.IsFailure)
             {
-                _logger.LogInformation("Error creating strategic initiative {StrategicInitiativeName} for Portfolio {PortfolioId}.", request.Name, request.PortfolioId);
+                _logger.LogError("Error creating strategic initiative {StrategicInitiativeName} for Portfolio {PortfolioId}. Error message: {Error}", request.Name, request.PortfolioId, createResult.Error);
                 return Result.Failure<ObjectIdAndKey>(createResult.Error);
             }
 

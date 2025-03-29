@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Moda.Common.Application.Models;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Queries;
 
