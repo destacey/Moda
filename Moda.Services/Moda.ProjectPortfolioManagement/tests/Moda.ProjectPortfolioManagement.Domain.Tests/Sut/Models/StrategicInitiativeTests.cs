@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+using Moda.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
 using Moda.Tests.Shared;
 using NodaTime.Extensions;
 using NodaTime.Testing;
@@ -12,11 +13,13 @@ public sealed class StrategicInitiativeTests
 {
     private readonly TestingDateTimeProvider _dateTimeProvider;
     private readonly StrategicInitiativeFaker _strategicInitiativeFaker;
+    private readonly StrategicInitiativeKpiFaker _kpiFaker;
 
     public StrategicInitiativeTests()
     {
         _dateTimeProvider = new TestingDateTimeProvider(new FakeClock(DateTime.UtcNow.ToInstant()));
         _strategicInitiativeFaker = new StrategicInitiativeFaker(_dateTimeProvider);
+        _kpiFaker = new StrategicInitiativeKpiFaker();
     }
 
     [Fact]
@@ -353,4 +356,126 @@ public sealed class StrategicInitiativeTests
     }
 
     #endregion Lifecycle Tests
+
+    #region KPI Tests
+
+    [Fact]
+    public void CreateKpi_ShouldCreateKpiSuccessfully()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.Generate();
+        var expectedKpiParameters = _kpiFaker.Generate().ToUpsertParameters();
+
+        // Act
+        var result = initiative.CreateKpi(expectedKpiParameters);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        initiative.Kpis.Should().ContainSingle();
+
+        var kpi = result.Value;
+        kpi.Name.Should().Be(expectedKpiParameters.Name);
+        kpi.Description.Should().Be(expectedKpiParameters.Description);
+        kpi.TargetValue.Should().Be(expectedKpiParameters.TargetValue);
+        kpi.Unit.Should().Be(expectedKpiParameters.Unit);
+        kpi.TargetDirection.Should().Be(expectedKpiParameters.TargetDirection);
+    }
+
+    [Fact]
+    public void CreateKpi_ShouldFail_WhenInCompletedStatus()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsCompleted(_dateTimeProvider);
+        var expectedKpiParameters = _kpiFaker.Generate().ToUpsertParameters();
+
+        // Act
+        var result = initiative.CreateKpi(expectedKpiParameters);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("KPIs cannot be created for closed strategic initiatives.");
+        initiative.Kpis.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void CreateKpi_ShouldFail_WhenInCancelledStatus()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsCancelled(_dateTimeProvider);
+        var expectedKpiParameters = _kpiFaker.Generate().ToUpsertParameters();
+
+        // Act
+        var result = initiative.CreateKpi(expectedKpiParameters);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("KPIs cannot be created for closed strategic initiatives.");
+        initiative.Kpis.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void DeleteKpi_ShouldDeleteKpiSuccessfully()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.Generate().AddKpis(1);
+        var kpi = initiative.Kpis.First();
+
+        // Act
+        var result = initiative.DeleteKpi(kpi.Id);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        initiative.Kpis.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void DeleteKpi_ShouldFail_WhenInCompletedStatus()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsCompleted(_dateTimeProvider).AddKpis(1);
+        var kpi = initiative.Kpis.First();
+
+        // Act
+        var result = initiative.DeleteKpi(kpi.Id);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("KPIs cannot be deleted for closed strategic initiatives.");
+        initiative.Kpis.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public void DeleteKpi_ShouldFail_WhenInCancelledStatus()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsCancelled(_dateTimeProvider).AddKpis(1);
+        var kpi = initiative.Kpis.First();
+
+        // Act
+        var result = initiative.DeleteKpi(kpi.Id);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("KPIs cannot be deleted for closed strategic initiatives.");
+        initiative.Kpis.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public void DeleteKpi_ShouldFail_WhenKpiNotFound()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.Generate().AddKpis(1);
+        var kpi = _kpiFaker.Generate();
+
+        // Act
+        var result = initiative.DeleteKpi(kpi.Id);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("KPI not found.");
+        initiative.Kpis.Should().NotBeEmpty();
+    }
+
+
+    #endregion KPI Tests
 }

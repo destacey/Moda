@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Moda.Common.Domain.Models.KeyPerformanceIndicators;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+using Moda.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
 using Moda.Tests.Shared;
 using NodaTime;
 using NodaTime.Extensions;
@@ -29,9 +30,10 @@ public sealed class StrategicInitiativeKpiTests
     {
         // Arrange
         var expectedKpi = _kpiFaker.Generate();
+        var kpiParameters = expectedKpi.ToUpsertParameters();
 
         // Act
-        var kpi = StrategicInitiativeKpi.Create(expectedKpi.Name, expectedKpi.Description, expectedKpi.TargetValue, expectedKpi.Unit, expectedKpi.TargetDirection, expectedKpi.StrategicInitiativeId);
+        var kpi = StrategicInitiativeKpi.Create(expectedKpi.StrategicInitiativeId, kpiParameters);
 
         // Assert
         kpi.Should().NotBeNull();
@@ -49,23 +51,27 @@ public sealed class StrategicInitiativeKpiTests
     {
         // Arrange
         var kpi = _kpiFaker.Generate();
-        var newName = "Updated KPI";
-        var newDescription = "Updated description";
-        var newTargetValue = 85.0;
-        var newUnit = KpiUnit.Percentage;
-        var newTargetDirection = kpi.TargetDirection is KpiTargetDirection.Increase ? KpiTargetDirection.Decrease : KpiTargetDirection.Increase;
+        var kpiParameters = kpi.ToUpsertParameters() with
+        {
+            Name = "Updated KPI",
+            Description = "Updated description",
+            TargetValue = 85.0,
+            Unit = KpiUnit.Percentage,
+            TargetDirection = kpi.TargetDirection is KpiTargetDirection.Increase ? KpiTargetDirection.Decrease : KpiTargetDirection.Increase
+        };
+
         var expectedStrategicInitiativeId = kpi.StrategicInitiativeId;
 
         // Act
-        var updateResult = kpi.Update(newName, newDescription, newTargetValue, newUnit, newTargetDirection);
+        var updateResult = kpi.Update(kpiParameters);
 
         // Assert
         updateResult.IsSuccess.Should().BeTrue();
-        kpi.Name.Should().Be(newName);
-        kpi.Description.Should().Be(newDescription);
-        kpi.TargetValue.Should().Be(newTargetValue);
-        kpi.Unit.Should().Be(newUnit);
-        kpi.TargetDirection.Should().Be(newTargetDirection);
+        kpi.Name.Should().Be(kpiParameters.Name);
+        kpi.Description.Should().Be(kpiParameters.Description);
+        kpi.TargetValue.Should().Be(kpiParameters.TargetValue);
+        kpi.Unit.Should().Be(kpiParameters.Unit);
+        kpi.TargetDirection.Should().Be(kpiParameters.TargetDirection);
         kpi.StrategicInitiativeId.Should().Be(expectedStrategicInitiativeId);
     }
 

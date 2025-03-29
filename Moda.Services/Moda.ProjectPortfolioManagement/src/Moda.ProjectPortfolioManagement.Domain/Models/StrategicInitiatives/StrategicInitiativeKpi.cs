@@ -1,10 +1,11 @@
-﻿using Ardalis.GuardClauses;
+﻿using System.Data;
+using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models;
+namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-public class StrategicInitiativeKpi : Kpi, ISystemAuditable
+public sealed class StrategicInitiativeKpi : Kpi, ISystemAuditable
 {
     private readonly HashSet<StrategicInitiativeKpiCheckpoint> _checkpoints = [];
     private readonly HashSet<StrategicInitiativeKpiMeasurement> _measurements = [];
@@ -20,7 +21,7 @@ public class StrategicInitiativeKpi : Kpi, ISystemAuditable
     /// <summary>
     /// The unique identifier of the associated Strategic Initiative.
     /// </summary>
-    public Guid StrategicInitiativeId { get; protected set; }
+    public Guid StrategicInitiativeId { get; private set; }
 
     /// <summary>
     /// The collection of KPI checkpoints.
@@ -33,10 +34,22 @@ public class StrategicInitiativeKpi : Kpi, ISystemAuditable
     public IReadOnlyCollection<StrategicInitiativeKpiMeasurement> Measurements => _measurements;
 
     /// <summary>
+    /// Updates the KPI with the provided parameters.
+    /// </summary>
+    /// <param name="parameters"></param>
+    /// <returns></returns>
+    public Result Update(StrategicInitiativeKpiUpsertParameters parameters)
+    {
+        Guard.Against.Null(parameters, nameof(parameters));
+
+        return base.Update(parameters.Name, parameters.Description, parameters.TargetValue, parameters.Unit, parameters.TargetDirection);
+    }
+
+    /// <summary>
     /// Adds a new checkpoint entry to the KPI.
     /// </summary>
     /// <param name="checkpoint">The KPI checkpoint entry to add.</param>
-    public virtual Result AddCheckpoint(StrategicInitiativeKpiCheckpoint checkpoint)
+    public Result AddCheckpoint(StrategicInitiativeKpiCheckpoint checkpoint)
     {
         Guard.Against.Null(checkpoint, nameof(checkpoint));
 
@@ -53,7 +66,7 @@ public class StrategicInitiativeKpi : Kpi, ISystemAuditable
     /// </summary>
     /// <param name="checkpointId"></param>
     /// <returns></returns>
-    public virtual Result RemoveCheckpoint(Guid checkpointId)
+    public Result RemoveCheckpoint(Guid checkpointId)
     {
         Guard.Against.NullOrEmpty(checkpointId, nameof(checkpointId));
 
@@ -70,7 +83,7 @@ public class StrategicInitiativeKpi : Kpi, ISystemAuditable
     /// Adds a new measurement entry to the KPI.
     /// </summary>
     /// <param name="measurement">The KPI measurement entry to add.</param>
-    public virtual Result AddMeasurement(StrategicInitiativeKpiMeasurement measurement)
+    public Result AddMeasurement(StrategicInitiativeKpiMeasurement measurement)
     {
         Guard.Against.Null(measurement, nameof(measurement));
 
@@ -89,7 +102,7 @@ public class StrategicInitiativeKpi : Kpi, ISystemAuditable
     /// </summary>
     /// <param name="measurementId"></param>
     /// <returns></returns>
-    public virtual Result RemoveMeasurement(Guid measurementId)
+    public Result RemoveMeasurement(Guid measurementId)
     {
         Guard.Against.NullOrEmpty(measurementId, nameof(measurementId));
 
@@ -111,23 +124,19 @@ public class StrategicInitiativeKpi : Kpi, ISystemAuditable
     {
         var latestMeasurement = _measurements
             .OrderByDescending(m => m.MeasurementDate)
-            .First();
+            .FirstOrDefault();
 
-        ActualValue = latestMeasurement.ActualValue;
+        ActualValue = latestMeasurement?.ActualValue;
     }
 
     /// <summary>
     /// Factory method to create a new instance of <see cref="StrategicInitiativeKpi"/>.
     /// </summary>
-    /// <param name="name">The name of the KPI.</param>
-    /// <param name="description">A description of what the KPI measures.</param>
-    /// <param name="targetValue">The target value that defines success for the KPI.</param>
-    /// <param name="unit">The unit of measurement for the KPI.</param>
-    /// <param name="direction">The target direction for the KPI.</param>
     /// <param name="strategicInitiativeId">The unique identifier of the associated Strategic Initiative.</param>
+    /// <param name="parameters">The KPI upsert parameters.</param>
     /// <returns></returns>
-    public static StrategicInitiativeKpi Create(string name, string? description, double targetValue, KpiUnit unit, KpiTargetDirection direction, Guid strategicInitiativeId)
+    internal static StrategicInitiativeKpi Create(Guid strategicInitiativeId, StrategicInitiativeKpiUpsertParameters parameters)
     {
-        return new StrategicInitiativeKpi(name, description, targetValue, unit, direction, strategicInitiativeId);
+        return new StrategicInitiativeKpi(parameters.Name, parameters.Description, parameters.TargetValue, parameters.Unit, parameters.TargetDirection, strategicInitiativeId);
     }
 }

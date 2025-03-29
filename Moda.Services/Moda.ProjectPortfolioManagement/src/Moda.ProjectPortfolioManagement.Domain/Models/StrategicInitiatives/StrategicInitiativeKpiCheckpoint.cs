@@ -1,9 +1,9 @@
 ﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 using NodaTime;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models;
+namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
-public class StrategicInitiativeKpiCheckpoint : KpiCheckpoint, ISystemAuditable
+public sealed class StrategicInitiativeKpiCheckpoint : KpiCheckpoint, ISystemAuditable
 {
     private StrategicInitiativeKpiCheckpoint() : base() { }
 

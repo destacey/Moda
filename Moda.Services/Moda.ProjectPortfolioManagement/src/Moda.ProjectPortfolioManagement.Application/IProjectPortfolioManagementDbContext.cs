@@ -1,4 +1,5 @@
 ﻿using Moda.ProjectPortfolioManagement.Domain.Models;
+using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 namespace Moda.ProjectPortfolioManagement.Application;
 public interface IProjectPortfolioManagementDbContext : IModaDbContext
