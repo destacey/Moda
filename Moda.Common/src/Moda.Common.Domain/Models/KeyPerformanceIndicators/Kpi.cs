@@ -97,7 +97,7 @@ public abstract class Kpi : BaseEntity<Guid>
     /// <param name="unit"></param>
     /// <param name="targetDirection"></param>
     /// <returns></returns>
-    public virtual Result Update(string name, string? description, double targetValue, KpiUnit unit, KpiTargetDirection targetDirection)
+    protected virtual Result Update(string name, string? description, double targetValue, KpiUnit unit, KpiTargetDirection targetDirection)
     {
         Name = name;
         Description = description;
