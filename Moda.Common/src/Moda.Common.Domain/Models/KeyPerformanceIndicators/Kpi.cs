@@ -8,7 +8,7 @@ namespace Moda.Common.Domain.Models.KeyPerformanceIndicators;
 /// <summary>
 /// Represents the common properties and behavior for a Key Performance Indicator (KPI).
 /// </summary>
-public abstract class Kpi : BaseEntity<Guid>
+public abstract class Kpi : BaseEntity<Guid>, IHasIdAndKey
 {
     protected string _name = default!;
     protected string? _description;
