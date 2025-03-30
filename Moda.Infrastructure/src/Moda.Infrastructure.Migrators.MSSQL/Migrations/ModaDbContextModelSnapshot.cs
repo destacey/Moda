@@ -1892,7 +1892,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("StrategicInitiativeRoleAssignments", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiative", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1945,7 +1945,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("StrategicInitiatives", "Ppm");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpi", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2010,7 +2010,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.UseTpcMappingStrategy();
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpiCheckpoint", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpiCheckpoint", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2018,6 +2018,11 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.Property<DateTime>("CheckpointDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("DateLabel")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
 
                     b.Property<Guid>("KpiId")
                         .HasColumnType("uniqueidentifier");
@@ -2046,7 +2051,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.UseTpcMappingStrategy();
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpiMeasurement", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpiMeasurement", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2091,7 +2096,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.UseTpcMappingStrategy();
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeProject", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeProject", b =>
                 {
                     b.Property<Guid>("StrategicInitiativeId")
                         .HasColumnType("uniqueidentifier");
@@ -3670,7 +3675,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiative", null)
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", null)
                         .WithMany("Roles")
                         .HasForeignKey("ObjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3679,7 +3684,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiative", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", b =>
                 {
                     b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.ProjectPortfolio", "Portfolio")
                         .WithMany("StrategicInitiatives")
@@ -3714,27 +3719,27 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Portfolio");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpi", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", b =>
                 {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiative", null)
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", null)
                         .WithMany("Kpis")
                         .HasForeignKey("StrategicInitiativeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpiCheckpoint", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpiCheckpoint", b =>
                 {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpi", null)
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", null)
                         .WithMany("Checkpoints")
                         .HasForeignKey("KpiId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpiMeasurement", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpiMeasurement", b =>
                 {
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpi", null)
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", null)
                         .WithMany("Measurements")
                         .HasForeignKey("KpiId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3749,7 +3754,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("MeasuredBy");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeProject", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeProject", b =>
                 {
                     b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.Project", "Project")
                         .WithMany("StrategicInitiativeProjects")
@@ -3757,7 +3762,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiative", "StrategicInitiative")
+                    b.HasOne("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", "StrategicInitiative")
                         .WithMany("StrategicInitiativeProjects")
                         .HasForeignKey("StrategicInitiativeId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -4306,7 +4311,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("StrategicInitiatives");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiative", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiative", b =>
                 {
                     b.Navigation("Kpis");
 
@@ -4315,7 +4320,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("StrategicInitiativeProjects");
                 });
 
-            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiativeKpi", b =>
+            modelBuilder.Entity("Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives.StrategicInitiativeKpi", b =>
                 {
                     b.Navigation("Checkpoints");
 
