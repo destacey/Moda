@@ -230,5 +230,29 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpGet("kpi-units")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Get a list of KPI units.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeKpiUnitDto>>> GetKpiUnits(CancellationToken cancellationToken)
+    {
+        var units = await _sender.Send(new GetStrategicInitiativeKpiUnitsQuery(), cancellationToken);
+
+        return Ok(units);
+    }
+
+    [HttpGet("kpi-target-directions")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Get a list of KPI target directions.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeKpiTargetDirectionDto>>> GetKpiTargetDirections(CancellationToken cancellationToken)
+    {
+        var targetDirections = await _sender.Send(new GetStrategicInitiativeKpiTargetDirectionsQuery(), cancellationToken);
+
+        return Ok(targetDirections);
+    }
+
     #endregion KPIs
 }
