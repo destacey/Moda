@@ -4,8 +4,9 @@ import { ModaDateRange, ResponsiveFlex } from '@/src/components/common'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { StrategicInitiativeDetailsDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
-import { Descriptions } from 'antd'
+import { Descriptions, List } from 'antd'
 import Link from 'next/link'
+import { StrategicInitiativeKpiListCard } from '.'
 
 const { Item } = Descriptions
 
@@ -28,31 +29,36 @@ const StrategicInitiativeDetails: React.FC<StrategicInitiativeDetailsProps> = ({
       : 'No owners assigned'
 
   return (
-    <ResponsiveFlex gap="middle" align="start">
-      <Descriptions column={1} size="small">
-        <Item label="Status">{strategicInitiative.status.name}</Item>
-        <Item label="Portfolio">
-          <Link href={`/ppm/portfolios/${strategicInitiative.portfolio.key}`}>
-            {strategicInitiative.portfolio.name}
-          </Link>
-        </Item>
-        <Item label="Dates">
-          <ModaDateRange
-            dateRange={{
-              start: strategicInitiative.start,
-              end: strategicInitiative.end,
-            }}
-          />
-        </Item>
-        <Item label="Sponsors">{sponsorNames}</Item>
-        <Item label="Owners">{ownerNames}</Item>
-      </Descriptions>
-      <Descriptions layout="vertical" size="small">
-        <Item label="Description">
-          <MarkdownRenderer markdown={strategicInitiative.description} />
-        </Item>
-      </Descriptions>
-    </ResponsiveFlex>
+    <>
+      <ResponsiveFlex gap="middle" align="start">
+        <Descriptions column={1} size="small">
+          <Item label="Status">{strategicInitiative.status.name}</Item>
+          <Item label="Portfolio">
+            <Link href={`/ppm/portfolios/${strategicInitiative.portfolio.key}`}>
+              {strategicInitiative.portfolio.name}
+            </Link>
+          </Item>
+          <Item label="Dates">
+            <ModaDateRange
+              dateRange={{
+                start: strategicInitiative.start,
+                end: strategicInitiative.end,
+              }}
+            />
+          </Item>
+          <Item label="Sponsors">{sponsorNames}</Item>
+          <Item label="Owners">{ownerNames}</Item>
+        </Descriptions>
+        <Descriptions layout="vertical" size="small">
+          <Item label="Description">
+            <MarkdownRenderer markdown={strategicInitiative.description} />
+          </Item>
+        </Descriptions>
+      </ResponsiveFlex>
+      <StrategicInitiativeKpiListCard
+        strategicInitiativeId={strategicInitiative.id}
+      />
+    </>
   )
 }
 

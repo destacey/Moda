@@ -124,10 +124,6 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     setActiveTab(tabKey)
   }, [])
 
-  const missingDates =
-    strategicInitiativeData?.start === null ||
-    strategicInitiativeData?.end === null
-
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const currentStatus = strategicInitiativeData?.status.name
     const availableActions =
@@ -314,7 +310,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
       {contextHolder}
       <PageTitle
         title={`${strategicInitiativeData?.key} - ${strategicInitiativeData?.name}`}
-        subtitle="StrategicInitiative Details"
+        subtitle="Strategic Initiative Details"
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card
