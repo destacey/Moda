@@ -33,7 +33,7 @@ enum StrategicInitiativeAction {
 }
 
 const StrategicInitiativeDetailsPage = ({ params }) => {
-  useDocumentTitle('StrategicInitiative Details')
+  useDocumentTitle('Strategic Initiative Details')
   const [activeTab, setActiveTab] = useState(StrategicInitiativeTabs.Details)
   const [openEditStrategicInitiativeForm, setOpenEditStrategicInitiativeForm] =
     useState<boolean>(false)
