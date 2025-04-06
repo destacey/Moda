@@ -247,7 +247,7 @@ const EditPlanningIntervalObjectiveForm = ({
             <Alert message="PI Objectives are locked." type="info" showIcon />
           )}
           <Descriptions size="small" column={1}>
-            <Item label="Number">{objectiveData?.key}</Item>
+            <Item label="Key">{objectiveData?.key}</Item>
             <Item label="Team">{objectiveData?.team.name}</Item>
           </Descriptions>
           <FormItem name="objectiveId" hidden={true}>

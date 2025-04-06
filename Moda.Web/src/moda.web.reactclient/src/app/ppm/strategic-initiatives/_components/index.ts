@@ -1,3 +1,4 @@
+export { default as AddStrategicInitiativeKpiMeasurementForm } from './add-strategic-initiative-kpi-measurement-form'
 export { default as ChangeStrategicInitiativeStatusForm } from './change-strategic-initiative-status-form'
 export { default as CreateStrategicInitiativeForm } from './create-strategic-initiative-form'
 export { default as CreateStrategicInitiativeKpiForm } from './create-strategic-initiative-kpi-form'

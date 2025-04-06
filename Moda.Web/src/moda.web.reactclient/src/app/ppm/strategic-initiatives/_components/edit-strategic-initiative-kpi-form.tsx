@@ -159,7 +159,7 @@ const EditStrategicInitiativeKpiForm = (
     } catch (error) {
       console.error('handleOk error', error)
       messageApi.error(
-        'An error occurred while creating the KPI. Please try again.',
+        'An error occurred while updating the KPI. Please try again.',
       )
     } finally {
       setIsSaving(false)
@@ -181,7 +181,7 @@ const EditStrategicInitiativeKpiForm = (
       }
     } else {
       onFormCancel()
-      messageApi.error('You do not have permission to create KPIs.')
+      messageApi.error('You do not have permission to update KPIs.')
     }
   }, [
     canUpdateKpis,
@@ -250,7 +250,7 @@ const EditStrategicInitiativeKpiForm = (
             name="description"
             label="Description"
             rules={[
-              { required: true, message: 'Name is required' },
+              { required: true, message: 'Description is required' },
               { max: 512 },
             ]}
           >

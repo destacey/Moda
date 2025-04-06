@@ -10,11 +10,9 @@ import {
   useGetStrategicInitiativeKpiUnitOptionsQuery,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { toFormErrors } from '@/src/utils'
-import { Form, FormItemProps, InputNumber, Modal, Select } from 'antd'
+import { Form, InputNumber, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { useCallback, useEffect, useState } from 'react'
-
-const { Item } = Form
 
 export interface CreateStrategicInitiativeKpiFormProps {
   strategicInitiativeId: string
@@ -207,7 +205,7 @@ const CreateStrategicInitiativeKpiForm = (
             name="description"
             label="Description"
             rules={[
-              { required: true, message: 'Name is required' },
+              { required: true, message: 'Description is required' },
               { max: 512 },
             ]}
           >

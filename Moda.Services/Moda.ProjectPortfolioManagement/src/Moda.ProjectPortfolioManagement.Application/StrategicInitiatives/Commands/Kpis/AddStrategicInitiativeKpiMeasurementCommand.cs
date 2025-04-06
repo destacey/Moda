@@ -63,7 +63,8 @@ internal sealed class AddStrategicInitiativeKpiMeasurementCommandHandler(
                 return Result.Failure("KPI not found.");
             }
 
-            var measurementResult = StrategicInitiativeKpiMeasurement.Create(request.KpiId, request.ActualValue, request.MeasurementDate, _currentUser.GetUserId(), request.Note, _dateTimeProvider.Now);
+            var employeeId = _currentUser.GetEmployeeId() ?? throw new InvalidOperationException("Current user does not have an employee ID.");
+            var measurementResult = StrategicInitiativeKpiMeasurement.Create(request.KpiId, request.ActualValue, request.MeasurementDate, employeeId, request.Note, _dateTimeProvider.Now);
             if (measurementResult.IsFailure)
             {
                 _logger.LogError("Error creating KPI measurement for Strategic Initiative {StrategicInitiativeId}. Error message: {Error}", request.StrategicInitiativeId, measurementResult.Error);

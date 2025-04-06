@@ -1,4 +1,5 @@
 import {
+  AddStrategicInitiativeKpiMeasurementRequest,
   CreateStrategicInitiativeKpiRequest,
   StrategicInitiativeKpiDetailsDto,
   StrategicInitiativeKpiListDto,
@@ -319,6 +320,33 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+    addStrategicInitiativeKpiMeasurement: builder.mutation<
+      void,
+      AddStrategicInitiativeKpiMeasurementRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await getStrategicInitiativesClient().addKpiMeasurement(
+            request.strategicInitiativeId,
+            request.kpiId,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          {
+            type: QueryTags.StrategicInitiativeKpi,
+            id: arg.strategicInitiativeId,
+          },
+          { type: QueryTags.StrategicInitiativeKpi, id: arg.kpiId },
+        ]
+      },
+    }),
     getStrategicInitiativeKpiUnitOptions: builder.query<BaseOptionType[], void>(
       {
         queryFn: async () => {
@@ -387,6 +415,7 @@ export const {
   useCreateStrategicInitiativeKpiMutation,
   useUpdateStrategicInitiativeKpiMutation,
   useDeleteStrategicInitiativeKpiMutation,
+  useAddStrategicInitiativeKpiMeasurementMutation,
   useGetStrategicInitiativeKpiUnitOptionsQuery,
   useGetStrategicInitiativeKpiTargetDirectionOptionsQuery,
 } = strategicInitiativesApi
