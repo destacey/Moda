@@ -228,7 +228,7 @@ const EditPortfolioForm = (props: EditPortfolioFormProps) => {
           form={form}
           size="small"
           layout="vertical"
-          name="update-portfolio-form"
+          name="edit-portfolio-form"
         >
           <Item
             label="Name"

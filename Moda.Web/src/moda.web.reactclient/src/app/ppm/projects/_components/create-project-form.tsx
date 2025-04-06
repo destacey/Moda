@@ -217,12 +217,6 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
               allowClear
               options={portfolioData ?? []}
               placeholder="Select Portfolio"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label?.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
             />
           </Item>
           <Item
@@ -324,7 +318,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
               allowClear
               options={strategicThemeData ?? []}
               placeholder="Select Strategic Themes"
-              optionFilterProp="children"
+              optionFilterProp="label"
               filterOption={(input, option) =>
                 (option?.label?.toLowerCase() ?? '').includes(
                   input.toLowerCase(),

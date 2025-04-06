@@ -237,7 +237,7 @@ const PortfolioDetailsPage = ({ params }) => {
 
   // doesn't trigger on first render
   const onTabChange = useCallback(
-    (tabKey) => {
+    (tabKey: PortfolioTabs) => {
       if (tabKey === PortfolioTabs.Projects && !projectsQueried) {
         setProjectsQueried(true)
       } else if (

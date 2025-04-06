@@ -19,9 +19,11 @@ const ContainerCard: FC<ContainerCardProps> = (props) => {
   const cardTitle = useMemo(() => {
     const showBadge = count !== undefined && count > 0
     return (
-      <Flex align="center" gap={8}>
+      <Flex align="center" gap="small">
         {title}
-        {showBadge && <Badge color={badgeColor} size="small" count={count} />}
+        {showBadge && (
+          <Badge color={badgeColor} size="small" count={count} title="" />
+        )}
       </Flex>
     )
   }, [title, count, badgeColor])

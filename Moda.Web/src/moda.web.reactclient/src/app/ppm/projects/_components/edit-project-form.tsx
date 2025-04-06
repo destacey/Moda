@@ -278,12 +278,6 @@ const EditProjectForm = (props: EditProjectFormProps) => {
               allowClear
               options={expenditureData ?? []}
               placeholder="Select Expenditure Category"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label?.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
             />
           </Item>
           <Item
@@ -373,7 +367,7 @@ const EditProjectForm = (props: EditProjectFormProps) => {
               allowClear
               options={strategicThemeData ?? []}
               placeholder="Select Strategic Themes"
-              optionFilterProp="children"
+              optionFilterProp="label"
               filterOption={(input, option) =>
                 (option?.label?.toLowerCase() ?? '').includes(
                   input.toLowerCase(),
