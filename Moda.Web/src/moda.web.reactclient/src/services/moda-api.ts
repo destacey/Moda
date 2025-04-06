@@ -15224,9 +15224,9 @@ export interface CreateStrategicInitiativeKpiRequest {
     /** The target value that defines success for the KPI. */
     targetValue: number;
     /** The ID of the unit of measurement for the KPI. */
-    unit: number;
+    unitId: number;
     /** The ID of the target direction for the KPI. */
-    targetDirection: number;
+    targetDirectionId: number;
 }
 
 export interface UpdateStrategicInitiativeKpiRequest {
@@ -15241,9 +15241,9 @@ export interface UpdateStrategicInitiativeKpiRequest {
     /** The target value that defines success for the KPI. */
     targetValue: number;
     /** The ID of the unit of measurement for the KPI. */
-    unit: number;
+    unitId: number;
     /** The ID of the target direction for the KPI. */
-    targetDirection: number;
+    targetDirectionId: number;
 }
 
 export interface StrategicInitiativeKpiUnitDto extends CommonEnumDto {

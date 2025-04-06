@@ -14031,8 +14031,8 @@
           "name",
           "description",
           "targetValue",
-          "unit",
-          "targetDirection"
+          "unitId",
+          "targetDirectionId"
         ],
         "properties": {
           "strategicInitiativeId": {
@@ -14064,12 +14064,12 @@
             "minLength": 1,
             "nullable": false
           },
-          "unit": {
+          "unitId": {
             "type": "integer",
             "description": "The ID of the unit of measurement for the KPI.",
             "format": "int32"
           },
-          "targetDirection": {
+          "targetDirectionId": {
             "type": "integer",
             "description": "The ID of the target direction for the KPI.",
             "format": "int32"
@@ -14085,8 +14085,8 @@
           "name",
           "description",
           "targetValue",
-          "unit",
-          "targetDirection"
+          "unitId",
+          "targetDirectionId"
         ],
         "properties": {
           "strategicInitiativeId": {
@@ -14126,12 +14126,12 @@
             "minLength": 1,
             "nullable": false
           },
-          "unit": {
+          "unitId": {
             "type": "integer",
             "description": "The ID of the unit of measurement for the KPI.",
             "format": "int32"
           },
-          "targetDirection": {
+          "targetDirectionId": {
             "type": "integer",
             "description": "The ID of the target direction for the KPI.",
             "format": "int32"

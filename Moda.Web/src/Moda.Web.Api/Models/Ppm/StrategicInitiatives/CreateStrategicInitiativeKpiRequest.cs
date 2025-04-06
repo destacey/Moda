@@ -29,16 +29,16 @@ public sealed record CreateStrategicInitiativeKpiRequest
     /// <summary>
     /// The ID of the unit of measurement for the KPI.
     /// </summary>
-    public int Unit { get; set; }
+    public int UnitId { get; set; }
 
     /// <summary>
     /// The ID of the target direction for the KPI.
     /// </summary>
-    public int TargetDirection { get; set; }
+    public int TargetDirectionId { get; set; }
 
     public CreateStrategicInitiativeKpiCommand ToCreateStrategicInitiativeKpiCommand()
     {
-        var parameters = new StrategicInitiativeKpiUpsertParameters(Name, Description, TargetValue, (KpiUnit)Unit, (KpiTargetDirection)TargetDirection);
+        var parameters = new StrategicInitiativeKpiUpsertParameters(Name, Description, TargetValue, (KpiUnit)UnitId, (KpiTargetDirection)TargetDirectionId);
 
         return new CreateStrategicInitiativeKpiCommand(StrategicInitiativeId, parameters);
     }
@@ -62,11 +62,11 @@ public sealed class CreateStrategicInitiativeKpiRequestValidator : AbstractValid
         RuleFor(x => x.TargetValue)
             .NotEmpty();
 
-        RuleFor(x => (KpiUnit)x.Unit)
+        RuleFor(x => (KpiUnit)x.UnitId)
             .IsInEnum()
             .WithMessage("A valid KPI unit must be selected.");
 
-        RuleFor(x => (KpiTargetDirection)x.TargetDirection)
+        RuleFor(x => (KpiTargetDirection)x.TargetDirectionId)
             .IsInEnum()
             .WithMessage("A valid KPI direction must be selected.");
     }
