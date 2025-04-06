@@ -5278,6 +5278,77 @@ export class StrategicInitiativesClient {
     }
 
     /**
+     * Add a measurement to the strategic initiative KPI.
+     */
+    addKpiMeasurement(id: string, kpiId: string, request: AddStrategicInitiativeKpiMeasurementRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/measurements";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (kpiId === undefined || kpiId === null)
+            throw new Error("The parameter 'kpiId' must be defined.");
+        url_ = url_.replace("{kpiId}", encodeURIComponent("" + kpiId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAddKpiMeasurement(_response);
+        });
+    }
+
+    protected processAddKpiMeasurement(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = JSON.parse(resultData422);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Get a list of KPI units.
      */
     getKpiUnits( cancelToken?: CancelToken): Promise<StrategicInitiativeKpiUnitDto[]> {
@@ -15244,6 +15315,19 @@ export interface UpdateStrategicInitiativeKpiRequest {
     unitId: number;
     /** The ID of the target direction for the KPI. */
     targetDirectionId: number;
+}
+
+export interface AddStrategicInitiativeKpiMeasurementRequest {
+    /** The ID of the strategic initiative to which this KPI belongs. */
+    strategicInitiativeId: string;
+    /** The ID of the KPI. */
+    kpiId: string;
+    /** The actual measured value for the KPI at this check-in. */
+    actualValue: number;
+    /** The date and time (in UTC) when the measurement was taken. */
+    measurementDate: Date;
+    /** Optional note providing context for the measurement. */
+    note?: string | undefined;
 }
 
 export interface StrategicInitiativeKpiUnitDto extends CommonEnumDto {

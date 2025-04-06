@@ -230,6 +230,24 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPost("{id}/kpis/{kpiId}/measurements")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Add a measurement to the strategic initiative KPI.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> AddKpiMeasurement(Guid id, Guid kpiId, [FromBody] AddStrategicInitiativeKpiMeasurementRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.StrategicInitiativeId || kpiId != request.KpiId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
+
+        var result = await _sender.Send(request.ToAddStrategicInitiativeKpiMeasurementCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpGet("kpi-units")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
     [OpenApiOperation("Get a list of KPI units.", "")]

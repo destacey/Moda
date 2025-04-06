@@ -4085,6 +4085,83 @@
         ]
       }
     },
+    "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/measurements": {
+      "post": {
+        "tags": [
+          "StrategicInitiatives"
+        ],
+        "summary": "Add a measurement to the strategic initiative KPI.",
+        "operationId": "StrategicInitiatives_AddKpiMeasurement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "kpiId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddStrategicInitiativeKpiMeasurementRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/ppm/strategic-initiatives/kpi-units": {
       "get": {
         "tags": [
@@ -14135,6 +14212,55 @@
             "type": "integer",
             "description": "The ID of the target direction for the KPI.",
             "format": "int32"
+          }
+        }
+      },
+      "AddStrategicInitiativeKpiMeasurementRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "strategicInitiativeId",
+          "kpiId",
+          "actualValue",
+          "measurementDate"
+        ],
+        "properties": {
+          "strategicInitiativeId": {
+            "type": "string",
+            "description": "The ID of the strategic initiative to which this KPI belongs.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "kpiId": {
+            "type": "string",
+            "description": "The ID of the KPI.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "actualValue": {
+            "type": "number",
+            "description": "The actual measured value for the KPI at this check-in.",
+            "format": "double",
+            "minLength": 1,
+            "nullable": false
+          },
+          "measurementDate": {
+            "type": "string",
+            "description": "The date and time (in UTC) when the measurement was taken.",
+            "format": "date-time",
+            "minLength": 1,
+            "nullable": false
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional note providing context for the measurement.",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
           }
         }
       },
