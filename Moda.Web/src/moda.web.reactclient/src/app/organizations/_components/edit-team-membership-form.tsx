@@ -1,6 +1,6 @@
 'use client'
 
-import { DatePicker, Descriptions, Form, Modal, message } from 'antd'
+import { DatePicker, Descriptions, Form, Modal } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../../components/contexts/auth'
 import {
@@ -14,6 +14,7 @@ import {
 } from '@/src/services/queries/organization-queries'
 import { TeamTypeName } from '../types'
 import dayjs from 'dayjs'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Descriptions
 const { Item: FormItem } = Form
@@ -55,7 +56,7 @@ const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<UpdateTeamMembershipFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const updateTeamMembership = useUpdateTeamMembershipMutation()
 
@@ -157,56 +158,53 @@ const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Edit Team Membership"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Save"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+    <Modal
+      title="Edit Team Membership"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Save"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="edit-team-membership-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="edit-team-membership-form"
+        <Descriptions size="small" column={1}>
+          <Item label="Team">{props.membership?.child.name}</Item>
+          <Item label="Parent Team">{props.membership?.parent.name}</Item>
+        </Descriptions>
+        <FormItem label="Start" name="start" rules={[{ required: true }]}>
+          <DatePicker />
+        </FormItem>
+        <FormItem
+          label="End"
+          name="end"
+          dependencies={['start']}
+          rules={[
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                const start = getFieldValue('start')
+                if (!value || !start || start < value) {
+                  return Promise.resolve()
+                }
+                return Promise.reject(
+                  new Error('End date must be after start date'),
+                )
+              },
+            }),
+          ]}
         >
-          <Descriptions size="small" column={1}>
-            <Item label="Team">{props.membership?.child.name}</Item>
-            <Item label="Parent Team">{props.membership?.parent.name}</Item>
-          </Descriptions>
-          <FormItem label="Start" name="start" rules={[{ required: true }]}>
-            <DatePicker />
-          </FormItem>
-          <FormItem
-            label="End"
-            name="end"
-            dependencies={['start']}
-            rules={[
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  const start = getFieldValue('start')
-                  if (!value || !start || start < value) {
-                    return Promise.resolve()
-                  }
-                  return Promise.reject(
-                    new Error('End date must be after start date'),
-                  )
-                },
-              }),
-            ]}
-          >
-            <DatePicker />
-          </FormItem>
-        </Form>
-      </Modal>
-    </>
+          <DatePicker />
+        </FormItem>
+      </Form>
+    </Modal>
   )
 }
 

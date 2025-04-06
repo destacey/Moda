@@ -5,7 +5,7 @@ import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetPortfoliosQuery } from '@/src/store/features/ppm/portfolios-api'
 import { AppstoreOutlined, MenuOutlined } from '@ant-design/icons'
-import { Button, message } from 'antd'
+import { Button } from 'antd'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -14,6 +14,7 @@ import {
   PortfoliosGrid,
 } from './_components'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 enum Views {
   Cards,
@@ -36,7 +37,7 @@ const PortfoliosPage: React.FC = () => {
   const [currentView, setCurrentView] = useState<string | number>(Views.Cards)
   const [openCreatePortfolioForm, setOpenCreatePortfolioForm] =
     useState<boolean>(false)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const { hasPermissionClaim } = useAuth()
   const canCreatePortfolio = hasPermissionClaim(
@@ -91,7 +92,6 @@ const PortfoliosPage: React.FC = () => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle title="Portfolios" actions={actions} />
       {currentView === Views.Cards ? (
         <PortfoliosCardGrid

@@ -1,6 +1,6 @@
 'use client'
 
-import { DatePicker, Form, Modal, Select, message } from 'antd'
+import { DatePicker, Form, Modal, Select } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../../components/contexts/auth'
 import { AddTeamMembershipRequest } from '@/src/services/moda-api'
@@ -11,6 +11,7 @@ import {
   useGetTeamOfTeamsOptions,
 } from '@/src/services/queries/organization-queries'
 import { TeamTypeName } from '../types'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item: FormItem } = Form
 
@@ -46,7 +47,7 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreateTeamMembershipFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   // TODO: only get teams that are not in the hierarchy
   const { data: teamOptions } = useGetTeamOfTeamsOptions(false)
@@ -132,74 +133,69 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Create Team Membership"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Create"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+    <Modal
+      title="Create Team Membership"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Create"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="create-team-membership-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="create-team-membership-form"
+        <FormItem
+          name="parentTeamId"
+          label="Parent Team"
+          rules={[{ required: true }]}
         >
-          <FormItem
-            name="parentTeamId"
-            label="Parent Team"
-            rules={[{ required: true }]}
-          >
-            <Select
-              showSearch
-              placeholder="Select a parent team"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
+          <Select
+            showSearch
+            placeholder="Select a parent team"
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              (option?.label.toLowerCase() ?? '').includes(input.toLowerCase())
+            }
+            filterSort={(optionA, optionB) =>
+              (optionA?.label ?? '')
+                .toLowerCase()
+                .localeCompare((optionB?.label ?? '').toLowerCase())
+            }
+            options={teamOptions?.filter((t) => t.value !== props.teamId)}
+          />
+        </FormItem>
+        <FormItem label="Start" name="start" rules={[{ required: true }]}>
+          <DatePicker />
+        </FormItem>
+        <FormItem
+          label="End"
+          name="end"
+          dependencies={['start']}
+          rules={[
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                const start = getFieldValue('start')
+                if (!value || !start || start < value) {
+                  return Promise.resolve()
+                }
+                return Promise.reject(
+                  new Error('End date must be after start date'),
                 )
-              }
-              filterSort={(optionA, optionB) =>
-                (optionA?.label ?? '')
-                  .toLowerCase()
-                  .localeCompare((optionB?.label ?? '').toLowerCase())
-              }
-              options={teamOptions?.filter((t) => t.value !== props.teamId)}
-            />
-          </FormItem>
-          <FormItem label="Start" name="start" rules={[{ required: true }]}>
-            <DatePicker />
-          </FormItem>
-          <FormItem
-            label="End"
-            name="end"
-            dependencies={['start']}
-            rules={[
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  const start = getFieldValue('start')
-                  if (!value || !start || start < value) {
-                    return Promise.resolve()
-                  }
-                  return Promise.reject(
-                    new Error('End date must be after start date'),
-                  )
-                },
-              }),
-            ]}
-          >
-            <DatePicker />
-          </FormItem>
-        </Form>
-      </Modal>
-    </>
+              },
+            }),
+          ]}
+        >
+          <DatePicker />
+        </FormItem>
+      </Form>
+    </Modal>
   )
 }
 

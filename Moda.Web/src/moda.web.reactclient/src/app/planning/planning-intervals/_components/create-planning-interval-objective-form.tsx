@@ -1,6 +1,6 @@
 'use client'
 
-import { DatePicker, Form, Input, Modal, Select, Switch, message } from 'antd'
+import { DatePicker, Form, Input, Modal, Select, Switch } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../../../components/contexts/auth'
 import { CreatePlanningIntervalObjectiveRequest } from '@/src/services/moda-api'
@@ -15,6 +15,7 @@ import {
   useGetPlanningIntervalTeams,
 } from '@/src/services/queries/planning-queries'
 import { MarkdownEditor } from '@/src/components/common/markdown'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item: FormItem } = Form
 const { TextArea } = Input
@@ -79,7 +80,7 @@ const CreatePlanningIntervalObjectiveForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreatePlanningIntervalObjectiveFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
   const [teams, setTeams] = useState<PlanningIntervalTeamSelectItem[]>([])
   const [defaultStatusId, setDefaultStatusId] = useState<number>(null)
 
@@ -224,7 +225,6 @@ const CreatePlanningIntervalObjectiveForm = ({
 
   return (
     <>
-      {contextHolder}
       <Modal
         title="Create PI Objective"
         open={isOpen}

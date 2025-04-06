@@ -1,6 +1,7 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { UpdateWorkTypeRequest, WorkTypeDto } from '@/src/services/moda-api'
 import {
   useGetWorkTypeQuery,
@@ -8,7 +9,7 @@ import {
 } from '@/src/store/features/work-management/work-type-api'
 import { useGetWorkTypeLevelOptionsQuery } from '@/src/store/features/work-management/work-type-level-api'
 import { toFormErrors } from '@/src/utils'
-import { Descriptions, Form, Input, Modal, Select, message } from 'antd'
+import { Descriptions, Form, Input, Modal, Select } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -44,7 +45,7 @@ const EditWorkTypeForm = (props: EditWorkTypeFormProps) => {
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<EditWorkTypeFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const { data: workTypeData } = useGetWorkTypeQuery(props.workTypeId)
   // TODO: why do I have to pass null here?
@@ -142,8 +143,6 @@ const EditWorkTypeForm = (props: EditWorkTypeFormProps) => {
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
       <Modal
         title="Edit Work Type"
         open={isOpen}
@@ -177,7 +176,6 @@ const EditWorkTypeForm = (props: EditWorkTypeFormProps) => {
           </Item>
         </Form>
       </Modal>
-    </>
   )
 }
 

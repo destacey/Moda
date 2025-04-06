@@ -1,6 +1,6 @@
 'use client'
 
-import { DatePicker, Form, Input, Modal, Radio, Select, message } from 'antd'
+import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
@@ -16,6 +16,7 @@ import {
 } from '@/src/services/queries/planning-queries'
 import { useGetEmployeeOptions } from '@/src/services/queries/organization-queries'
 import { MarkdownEditor } from '../markdown'
+import { useMessage } from '../../contexts/messaging'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -65,7 +66,7 @@ const CreateRiskForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreateRiskFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const [teamOptions, setTeamOptions] = useState<OptionModel[]>()
 
@@ -193,118 +194,104 @@ const CreateRiskForm = ({
   }, [newRiskKey])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Create Team Risk"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Create"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="create-risk-form"
+    <Modal
+      title="Create Team Risk"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Create"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form form={form} size="small" layout="vertical" name="create-risk-form">
+        <Item name="teamId" label="Team" rules={[{ required: true }]}>
+          <Select
+            showSearch
+            disabled={createForTeamId !== undefined}
+            placeholder="Select a team"
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              (option?.label.toLowerCase() ?? '').includes(input.toLowerCase())
+            }
+            filterSort={(optionA, optionB) =>
+              (optionA?.label ?? '')
+                .toLowerCase()
+                .localeCompare((optionB?.label ?? '').toLowerCase())
+            }
+            options={teamOptions}
+          />
+        </Item>
+        <Item label="Summary" name="summary" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 2, maxRows: 4 }}
+            showCount
+            maxLength={256}
+          />
+        </Item>
+        <Item name="description" label="Description" rules={[{ max: 1024 }]}>
+          <MarkdownEditor
+            value={form.getFieldValue('description')}
+            onChange={(value) => form.setFieldValue('description', value || '')}
+            maxLength={1024}
+          />
+        </Item>
+        <Item name="categoryId" label="Category" rules={[{ required: true }]}>
+          <RadioGroup
+            options={riskCategoryOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </Item>
+        <Item name="impactId" label="Impact" rules={[{ required: true }]}>
+          <RadioGroup
+            options={riskGradeOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </Item>
+        <Item
+          name="likelihoodId"
+          label="Likelihood"
+          rules={[{ required: true }]}
         >
-          <Item name="teamId" label="Team" rules={[{ required: true }]}>
-            <Select
-              showSearch
-              disabled={createForTeamId !== undefined}
-              placeholder="Select a team"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
-              filterSort={(optionA, optionB) =>
-                (optionA?.label ?? '')
-                  .toLowerCase()
-                  .localeCompare((optionB?.label ?? '').toLowerCase())
-              }
-              options={teamOptions}
-            />
-          </Item>
-          <Item label="Summary" name="summary" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 2, maxRows: 4 }}
-              showCount
-              maxLength={256}
-            />
-          </Item>
-          <Item name="description" label="Description" rules={[{ max: 1024 }]}>
-            <MarkdownEditor
-              value={form.getFieldValue('description')}
-              onChange={(value) =>
-                form.setFieldValue('description', value || '')
-              }
-              maxLength={1024}
-            />
-          </Item>
-          <Item name="categoryId" label="Category" rules={[{ required: true }]}>
-            <RadioGroup
-              options={riskCategoryOptions}
-              optionType="button"
-              buttonStyle="solid"
-            />
-          </Item>
-          <Item name="impactId" label="Impact" rules={[{ required: true }]}>
-            <RadioGroup
-              options={riskGradeOptions}
-              optionType="button"
-              buttonStyle="solid"
-            />
-          </Item>
-          <Item
-            name="likelihoodId"
-            label="Likelihood"
-            rules={[{ required: true }]}
-          >
-            <RadioGroup
-              options={riskGradeOptions}
-              optionType="button"
-              buttonStyle="solid"
-            />
-          </Item>
-          <Item name="assigneeId" label="Assignee">
-            <Select
-              allowClear
-              showSearch
-              placeholder="Select an assignee"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
-              filterSort={(optionA, optionB) =>
-                (optionA?.label ?? '')
-                  .toLowerCase()
-                  .localeCompare((optionB?.label ?? '').toLowerCase())
-              }
-              options={employeeOptions}
-            />
-          </Item>
-          <Item label="Follow Up" name="followUpDate">
-            <DatePicker />
-          </Item>
-          <Item name="response" label="Response" rules={[{ max: 1024 }]}>
-            <MarkdownEditor
-              value={form.getFieldValue('response')}
-              onChange={(value) => form.setFieldValue('response', value || '')}
-              maxLength={1024}
-            />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+          <RadioGroup
+            options={riskGradeOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </Item>
+        <Item name="assigneeId" label="Assignee">
+          <Select
+            allowClear
+            showSearch
+            placeholder="Select an assignee"
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              (option?.label.toLowerCase() ?? '').includes(input.toLowerCase())
+            }
+            filterSort={(optionA, optionB) =>
+              (optionA?.label ?? '')
+                .toLowerCase()
+                .localeCompare((optionB?.label ?? '').toLowerCase())
+            }
+            options={employeeOptions}
+          />
+        </Item>
+        <Item label="Follow Up" name="followUpDate">
+          <DatePicker />
+        </Item>
+        <Item name="response" label="Response" rules={[{ max: 1024 }]}>
+          <MarkdownEditor
+            value={form.getFieldValue('response')}
+            onChange={(value) => form.setFieldValue('response', value || '')}
+            maxLength={1024}
+          />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

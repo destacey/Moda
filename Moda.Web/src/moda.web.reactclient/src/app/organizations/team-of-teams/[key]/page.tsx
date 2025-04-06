@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { Card, MenuProps, message } from 'antd'
+import { Card, MenuProps } from 'antd'
 import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
 import TeamOfTeamsDetails from './team-of-teams-details'
 import RisksGrid, {
@@ -27,6 +27,7 @@ import { CreateTeamMembershipForm } from '../../_components'
 import { InactiveTag, PageActions } from '@/src/components/common'
 import { ItemType } from 'antd/es/menu/interface'
 import DeactivateTeamOfTeamsForm from '../../_components/deactivate-team-of-teams-form'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 enum TeamOfTeamsTabs {
   Details = 'details',
@@ -47,7 +48,7 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
 
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
@@ -194,7 +195,6 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle
         title={team?.name}
         subtitle="Team of Teams Details"

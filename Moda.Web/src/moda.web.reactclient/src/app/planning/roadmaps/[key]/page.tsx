@@ -13,7 +13,7 @@ import RoadmapDetailsLoading from './loading'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
-import { Descriptions, Divider, MenuProps, message } from 'antd'
+import { Descriptions, Divider, MenuProps } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import {
   DeleteRoadmapForm,
@@ -25,6 +25,7 @@ import { MarkdownRenderer } from '@/src/components/common/markdown'
 import ReorganizeRoadmapActivitiesModal from '../_components/reorganize-roadmap-activities-modal'
 import CreateRoadmapActivityForm from '../_components/create-roadmap-activity-form'
 import CreateRoadmapTimeboxForm from '../_components/create-roadmap-timebox-form'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Descriptions
 
@@ -48,7 +49,7 @@ const RoadmapDetailsPage = ({ params }) => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
 
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -239,7 +240,6 @@ const RoadmapDetailsPage = ({ params }) => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle
         title={`${roadmapData?.key} - ${roadmapData?.name}`}
         subtitle="Roadmap Details"

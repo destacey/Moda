@@ -4,17 +4,18 @@ import PageTitle from '@/src/components/common/page-title'
 import { useCallback, useEffect, useState } from 'react'
 import { useDocumentTitle } from '../../../hooks/use-document-title'
 import useAuth from '../../../components/contexts/auth'
-import { Button, message } from 'antd'
+import { Button } from 'antd'
 import { authorizePage } from '../../../components/hoc'
 import { useGetRoadmapsQuery } from '@/src/store/features/planning/roadmaps-api'
 import { CreateRoadmapForm, RoadmapsGrid } from './_components'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const RoadmapsPage: React.FC = () => {
   useDocumentTitle('Roadmaps')
 
   const [openCreateRoadmapForm, setOpenCreateRoadmapForm] =
     useState<boolean>(false)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const { data: roadmapData, isLoading, error, refetch } = useGetRoadmapsQuery()
 
@@ -51,7 +52,6 @@ const RoadmapsPage: React.FC = () => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle title="Roadmaps" actions={showActions && actions()} />
       <RoadmapsGrid
         roadmapsData={roadmapData || []}

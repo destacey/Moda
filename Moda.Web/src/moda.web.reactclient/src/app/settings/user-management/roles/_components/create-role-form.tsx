@@ -1,6 +1,6 @@
 'use client'
 
-import { Form, Input, Modal, Select, message } from 'antd'
+import { Form, Input, Modal, Select } from 'antd'
 import { useEffect, useState } from 'react'
 import useAuth from '@/src/components/contexts/auth'
 import { toFormErrors } from '@/src/utils'
@@ -10,6 +10,7 @@ import {
   useUpdatePermissionsMutation,
   useUpsertRoleMutation,
 } from '@/src/store/features/user-management/roles-api'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -40,7 +41,7 @@ const CreateRoleForm = ({
   >(null)
   const [form] = Form.useForm<CreateRoleFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const { hasClaim } = useAuth()
   const canCreate = hasClaim('Permission', 'Permissions.Roles.Create')
@@ -143,67 +144,59 @@ const CreateRoleForm = ({
   }
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Create Role"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Create"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="create-role-form"
-        >
-          <Item label="Name" name="name" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 4 }}
-              showCount
-              maxLength={256}
-            />
-          </Item>
+    <Modal
+      title="Create Role"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Create"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form form={form} size="small" layout="vertical" name="create-role-form">
+        <Item label="Name" name="name" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 4 }}
+            showCount
+            maxLength={256}
+          />
+        </Item>
 
-          <Item name="description" label="Description">
-            <TextArea
-              autoSize={{ minRows: 6, maxRows: 10 }}
-              showCount
-              maxLength={1024}
-            />
-          </Item>
+        <Item name="description" label="Description">
+          <TextArea
+            autoSize={{ minRows: 6, maxRows: 10 }}
+            showCount
+            maxLength={1024}
+          />
+        </Item>
 
-          <Item name="isDefault" label="Copy Permissions From">
-            {roles && (
-              <Select
-                allowClear
-                showSearch
-                placeholder="Select a Role"
-                optionFilterProp="children"
-                onChange={setRoleIdToCopyPermissions}
-                filterOption={(input, option) =>
-                  (option?.label ?? '')
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-                options={
-                  roles?.map((role) => ({
-                    value: role.id,
-                    label: role.name,
-                  })) ?? []
-                }
-              />
-            )}
-          </Item>
-        </Form>
-      </Modal>
-    </>
+        <Item name="isDefault" label="Copy Permissions From">
+          {roles && (
+            <Select
+              allowClear
+              showSearch
+              placeholder="Select a Role"
+              optionFilterProp="children"
+              onChange={setRoleIdToCopyPermissions}
+              filterOption={(input, option) =>
+                (option?.label ?? '')
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              options={
+                roles?.map((role) => ({
+                  value: role.id,
+                  label: role.name,
+                })) ?? []
+              }
+            />
+          )}
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

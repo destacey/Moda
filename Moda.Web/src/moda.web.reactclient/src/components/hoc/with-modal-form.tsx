@@ -1,9 +1,10 @@
-import { Form, FormInstance, Modal, message } from 'antd'
+import { Form, FormInstance, Modal } from 'antd'
 import { ComponentType, FC, useEffect, useState } from 'react'
 import { FieldData } from 'rc-field-form/lib/interface'
 import { useAppDispatch } from '../../hooks'
 import { Action, ThunkAction } from '@reduxjs/toolkit'
 import { RootState } from '@/src/store'
+import { useMessage } from '../contexts/messaging'
 
 export interface ModalFormProps<TFormValues> {
   title: string
@@ -41,7 +42,7 @@ const withModalForm = <P extends FormProps<TFormValues>, TFormValues>(
     const [isValid, setIsValid] = useState(false)
     const [form] = Form.useForm<TFormValues>()
     const formValues = Form.useWatch([], form)
-    const [messageApi, contextHolder] = message.useMessage()
+    const messageApi = useMessage()
 
     const dispatch = useAppDispatch()
     const { isInEditMode, isSaving, error, validationErrors } =
@@ -86,23 +87,20 @@ const withModalForm = <P extends FormProps<TFormValues>, TFormValues>(
     }, [validationErrors, messageApi, form])
 
     return (
-      <>
-        {contextHolder}
-        <Modal
-          title={modalFormProps.title}
-          open={isInEditMode}
-          onOk={handleOk}
-          okButtonProps={{ disabled: !isValid }}
-          okText={modalFormProps.okText ?? 'Save'}
-          confirmLoading={isSaving}
-          onCancel={handleCancel}
-          maskClosable={false}
-          keyboard={false} // disable esc key to close modal
-          destroyOnClose={true}
-        >
-          <WrappedForm form={form} {...(props as P)} />
-        </Modal>
-      </>
+      <Modal
+        title={modalFormProps.title}
+        open={isInEditMode}
+        onOk={handleOk}
+        okButtonProps={{ disabled: !isValid }}
+        okText={modalFormProps.okText ?? 'Save'}
+        confirmLoading={isSaving}
+        onCancel={handleCancel}
+        maskClosable={false}
+        keyboard={false} // disable esc key to close modal
+        destroyOnClose={true}
+      >
+        <WrappedForm form={form} {...(props as P)} />
+      </Modal>
     )
   }
   return WithModalForm

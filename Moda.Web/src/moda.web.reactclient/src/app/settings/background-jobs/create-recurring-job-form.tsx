@@ -1,12 +1,13 @@
 'use client'
 
+import { useMessage } from '@/src/components/contexts/messaging'
 import {
   BackgroundJobTypeDto,
   CreateRecurringJobRequest,
 } from '@/src/services/moda-api'
 import { useCreateRecurringJobMutation } from '@/src/store/features/admin/background-jobs-api'
 import { toFormErrors } from '@/src/utils'
-import { Form, Input, Modal, Select, message } from 'antd'
+import { Form, Input, Modal, Select } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -39,7 +40,7 @@ const CreateRecurringJobForm = (props: CreateRecurringJobFormProps) => {
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreateRecurringJobFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const [createRecurringJob, { error: mutationError }] =
     useCreateRecurringJobMutation()
@@ -99,60 +100,55 @@ const CreateRecurringJobForm = (props: CreateRecurringJobFormProps) => {
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Create Recurring Job"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Create"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+    <Modal
+      title="Create Recurring Job"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Create"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="create-recurring-job-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="create-recurring-job-form"
+        <Item label="Job Id" name="jobId" rules={[{ required: true }]}>
+          <Input />
+        </Item>
+        <Item name="jobTypeId" label="Job Type" rules={[{ required: true }]}>
+          <Select
+            showSearch
+            placeholder="Select a Job Type"
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              (option?.label.toLowerCase() ?? '').includes(input.toLowerCase())
+            }
+            filterSort={(optionA, optionB) =>
+              (optionA?.label ?? '')
+                .toLowerCase()
+                .localeCompare((optionB?.label ?? '').toLowerCase())
+            }
+            options={props.jobTypes.map((jobType) => ({
+              value: jobType.id,
+              label: jobType.name,
+            }))}
+          />
+        </Item>
+        <Item
+          label="Cron Expression"
+          name="cronExpression"
+          rules={[{ required: true }]}
         >
-          <Item label="Job Id" name="jobId" rules={[{ required: true }]}>
-            <Input />
-          </Item>
-          <Item name="jobTypeId" label="Job Type" rules={[{ required: true }]}>
-            <Select
-              showSearch
-              placeholder="Select a Job Type"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
-              filterSort={(optionA, optionB) =>
-                (optionA?.label ?? '')
-                  .toLowerCase()
-                  .localeCompare((optionB?.label ?? '').toLowerCase())
-              }
-              options={props.jobTypes.map((jobType) => ({
-                value: jobType.id,
-                label: jobType.name,
-              }))}
-            />
-          </Item>
-          <Item
-            label="Cron Expression"
-            name="cronExpression"
-            rules={[{ required: true }]}
-          >
-            <Input placeholder="Example for Every 5 minutes: */5 * * * *" />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+          <Input placeholder="Example for Every 5 minutes: */5 * * * *" />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

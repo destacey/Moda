@@ -1,9 +1,10 @@
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { CreateWorkTypeLevelRequest } from '@/src/services/moda-api'
 import { useCreateWorkTypeLevelMutation } from '@/src/store/features/work-management/work-type-level-api'
 import { toFormErrors } from '@/src/utils'
-import { Form, Input, Modal, message } from 'antd'
+import { Form, Input, Modal } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -39,7 +40,7 @@ const CreateWorkTypeLevelForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreateWorkTypeLevelFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const [createWorkTypeLevelMutation] = useCreateWorkTypeLevelMutation()
 
@@ -114,50 +115,45 @@ const CreateWorkTypeLevelForm = ({
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Create Work Type Level"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Create"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+    <Modal
+      title="Create Work Type Level"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Create"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="create-work-type-level-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="create-work-type-level-form"
+        <Item label="Name" name="name" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={128}
+          />
+        </Item>
+        <Item
+          name="description"
+          label="Description"
+          initialValue=""
+          rules={[{ max: 1024 }]}
         >
-          <Item label="Name" name="name" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={128}
-            />
-          </Item>
-          <Item
-            name="description"
-            label="Description"
-            initialValue=""
-            rules={[{ max: 1024 }]}
-          >
-            <MarkdownEditor
-              value={form.getFieldValue('description')}
-              onChange={(value) =>
-                form.setFieldValue('description', value || '')
-              }
-              maxLength={1024}
-            />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+          <MarkdownEditor
+            value={form.getFieldValue('description')}
+            onChange={(value) => form.setFieldValue('description', value || '')}
+            maxLength={1024}
+          />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

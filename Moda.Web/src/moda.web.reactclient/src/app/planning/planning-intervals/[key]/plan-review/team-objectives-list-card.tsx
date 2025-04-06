@@ -2,7 +2,7 @@
 
 import { PlanningIntervalObjectiveListDto } from '@/src/services/moda-api'
 import { PlusOutlined } from '@ant-design/icons'
-import { Badge, Button, Card, List, Space, message } from 'antd'
+import { Badge, Button, Card, List, Space } from 'antd'
 import ObjectiveListItem from './objective-list-item'
 import ModaEmpty from '@/src/components/common/moda-empty'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -25,6 +25,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { useUpdateObjectivesOrderMutation } from '@/src/store/features/planning/planning-interval-api'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 export interface TeamObjectivesListCardProps {
   objectivesData: PlanningIntervalObjectiveListDto[]
@@ -68,7 +69,7 @@ const TeamObjectivesListCard = ({
     PlanningIntervalObjectiveListDto[]
   >([])
 
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const { badgeColor } = useTheme()
 
@@ -174,7 +175,6 @@ const TeamObjectivesListCard = ({
 
   return (
     <>
-      {contextHolder}
       <Card
         size="small"
         title={cardTitle}

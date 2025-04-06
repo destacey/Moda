@@ -21,6 +21,7 @@ import {
   UnauthenticatedTemplate,
 } from '@azure/msal-react'
 import { LoadingAccount } from '../components/common'
+import { MessageProvider } from '../components/contexts/messaging'
 
 const { Content } = Layout
 
@@ -62,16 +63,18 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
                   <ThemeProvider>
                     <QueryClientProvider client={queryClient}>
                       <MenuToggleProvider>
-                        <Layout>
-                          <AppHeader />
-                          <Layout hasSider className="app-main-layout">
-                            <AppSideNav isMobile={isMobile} />
-                            <Content className="app-main-content">
-                              <AppBreadcrumb />
-                              {children}
-                            </Content>
+                        <MessageProvider>
+                          <Layout>
+                            <AppHeader />
+                            <Layout hasSider className="app-main-layout">
+                              <AppSideNav isMobile={isMobile} />
+                              <Content className="app-main-content">
+                                <AppBreadcrumb />
+                                {children}
+                              </Content>
+                            </Layout>
                           </Layout>
-                        </Layout>
+                        </MessageProvider>
                       </MenuToggleProvider>
                     </QueryClientProvider>
                   </ThemeProvider>

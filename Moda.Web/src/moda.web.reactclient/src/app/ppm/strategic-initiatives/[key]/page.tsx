@@ -4,7 +4,7 @@ import { PageActions, PageTitle } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
-import { Card, MenuProps, message } from 'antd'
+import { Card, MenuProps } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import StrategicInitiativeDetailsLoading from './loading'
@@ -23,6 +23,7 @@ import {
 } from '../_components'
 import EditStrategicInitiativeForm from '../_components/edit-strategic-initiative-form'
 import { StrategicInitiativeStatusAction } from '../_components/change-strategic-initiative-status-form'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 enum StrategicInitiativeTabs {
   Details = 'details',
@@ -68,7 +69,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
   ] = useState<boolean>(false)
   const [openCreateKpiForm, setOpenCreateKpiForm] = useState(false)
 
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -380,7 +381,6 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle
         title={`${strategicInitiativeData?.key} - ${strategicInitiativeData?.name}`}
         subtitle="Strategic Initiative Details"

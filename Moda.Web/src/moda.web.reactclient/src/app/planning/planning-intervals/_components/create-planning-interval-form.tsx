@@ -1,20 +1,13 @@
 'use client'
 
-import {
-  DatePicker,
-  Form,
-  Input,
-  InputNumber,
-  Modal,
-  Typography,
-  message,
-} from 'antd'
+import { DatePicker, Form, Input, InputNumber, Modal, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import useAuth from '../../../../components/contexts/auth'
 import { CreatePlanningIntervalRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
 import { useCreatePlanningIntervalMutation } from '@/src/services/queries/planning-queries'
 import { MarkdownEditor } from '@/src/components/common/markdown'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -58,7 +51,7 @@ const CreatePlanningIntervalForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreatePlanningIntervalFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const createPlanningInterval = useCreatePlanningIntervalMutation()
 
@@ -132,80 +125,77 @@ const CreatePlanningIntervalForm = ({
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Create Planning Interval"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Create"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+    <Modal
+      title="Create Planning Interval"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Create"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="create-planning-interval-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="create-planning-interval-form"
+        <Item label="Name" name="name" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={128}
+          />
+        </Item>
+        <Item
+          name="description"
+          label="Description"
+          initialValue=""
+          rules={[{ max: 2048 }]}
         >
-          <Item label="Name" name="name" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={128}
-            />
-          </Item>
-          <Item
-            name="description"
-            label="Description"
-            initialValue=""
-            rules={[{ max: 2048 }]}
-          >
-            <MarkdownEditor
-              value={form.getFieldValue('description')}
-              onChange={(value) =>
-                form.setFieldValue('description', value || '')
-              }
-              maxLength={2048}
-            />
-          </Item>
-          <Item label="Start" name="start" rules={[{ required: true }]}>
-            <DatePicker />
-          </Item>
-          <Item label="End" name="end" rules={[{ required: true }]}>
-            <DatePicker />
-          </Item>
-          <Item
-            label="Iteration Weeks"
-            name="iterationWeeks"
-            rules={[{ required: true }]}
-          >
-            <InputNumber min={1} max={10} />
-          </Item>
-          <Item
-            label="Iteration Prefix"
-            name="iterationPrefix"
-            extra="Iteration Name Template: Iteration Prefix + Iteration Number"
-          >
-            <Input />
-          </Item>
-          <>
-            {formValues &&
-              formValues.iterationPrefix &&
-              formValues.iterationPrefix != null && (
-                <Text type="secondary">
-                  Iteration name format: {formValues.iterationPrefix}1,{' '}
-                  {formValues.iterationPrefix}2, ...
-                </Text>
-              )}
-          </>
-        </Form>
-      </Modal>
-    </>
+          <MarkdownEditor
+            value={form.getFieldValue('description')}
+            onChange={(value) =>
+              form.setFieldValue('description', value || '')
+            }
+            maxLength={2048}
+          />
+        </Item>
+        <Item label="Start" name="start" rules={[{ required: true }]}>
+          <DatePicker />
+        </Item>
+        <Item label="End" name="end" rules={[{ required: true }]}>
+          <DatePicker />
+        </Item>
+        <Item
+          label="Iteration Weeks"
+          name="iterationWeeks"
+          rules={[{ required: true }]}
+        >
+          <InputNumber min={1} max={10} />
+        </Item>
+        <Item
+          label="Iteration Prefix"
+          name="iterationPrefix"
+          extra="Iteration Name Template: Iteration Prefix + Iteration Number"
+        >
+          <Input />
+        </Item>
+        <>
+          {formValues &&
+            formValues.iterationPrefix &&
+            formValues.iterationPrefix != null && (
+              <Text type="secondary">
+                Iteration name format: {formValues.iterationPrefix}1,{' '}
+                {formValues.iterationPrefix}2, ...
+              </Text>
+            )}
+        </>
+      </Form>
+    </Modal>
   )
 }
 

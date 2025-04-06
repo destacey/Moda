@@ -8,7 +8,6 @@ import {
   Modal,
   Radio,
   Select,
-  message,
 } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
@@ -24,6 +23,7 @@ import {
 } from '@/src/services/queries/planning-queries'
 import { useGetEmployeeOptions } from '@/src/services/queries/organization-queries'
 import { MarkdownEditor } from '../markdown'
+import { useMessage } from '../../contexts/messaging'
 
 const { Item } = Descriptions
 const { Item: FormItem } = Form
@@ -78,7 +78,7 @@ const EditRiskForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<EditRiskFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const { data: riskData } = useGetRisk(riskId)
   const [riskNumber, setRiskNumber] = useState<number>(undefined)
@@ -196,124 +196,112 @@ const EditRiskForm = ({
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Edit Team Risk"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Save"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="update-risk-form"
+    <Modal
+      title="Edit Team Risk"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Save"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form form={form} size="small" layout="vertical" name="update-risk-form">
+        <Descriptions size="small" column={1}>
+          <Item label="Number">{riskNumber}</Item>
+          <Item label="Team">{teamName}</Item>
+        </Descriptions>
+        <FormItem name="riskId" hidden={true}>
+          <Input />
+        </FormItem>
+        <FormItem name="teamId" hidden={true}>
+          <Input />
+        </FormItem>
+        <FormItem label="Summary" name="summary" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 2, maxRows: 4 }}
+            showCount
+            maxLength={256}
+          />
+        </FormItem>
+        <FormItem
+          name="description"
+          label="Description"
+          rules={[{ max: 1024 }]}
         >
-          <Descriptions size="small" column={1}>
-            <Item label="Number">{riskNumber}</Item>
-            <Item label="Team">{teamName}</Item>
-          </Descriptions>
-          <FormItem name="riskId" hidden={true}>
-            <Input />
-          </FormItem>
-          <FormItem name="teamId" hidden={true}>
-            <Input />
-          </FormItem>
-          <FormItem label="Summary" name="summary" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 2, maxRows: 4 }}
-              showCount
-              maxLength={256}
-            />
-          </FormItem>
-          <FormItem
-            name="description"
-            label="Description"
-            rules={[{ max: 1024 }]}
-          >
-            <MarkdownEditor
-              value={form.getFieldValue('description')}
-              onChange={(value) =>
-                form.setFieldValue('description', value || '')
-              }
-              maxLength={1024}
-            />
-          </FormItem>
-          <FormItem name="statusId" label="Status" rules={[{ required: true }]}>
-            <RadioGroup
-              options={riskStatusOptions}
-              optionType="button"
-              buttonStyle="solid"
-            />
-          </FormItem>
-          <FormItem
-            name="categoryId"
-            label="Category"
-            rules={[{ required: true }]}
-          >
-            <RadioGroup
-              options={riskCategoryOptions}
-              optionType="button"
-              buttonStyle="solid"
-            />
-          </FormItem>
-          <FormItem name="impactId" label="Impact" rules={[{ required: true }]}>
-            <RadioGroup
-              options={riskGradeOptions}
-              optionType="button"
-              buttonStyle="solid"
-            />
-          </FormItem>
-          <FormItem
-            name="likelihoodId"
-            label="Likelihood"
-            rules={[{ required: true }]}
-          >
-            <RadioGroup
-              options={riskGradeOptions}
-              optionType="button"
-              buttonStyle="solid"
-            />
-          </FormItem>
-          <FormItem name="assigneeId" label="Assignee">
-            <Select
-              allowClear
-              showSearch
-              placeholder="Select an assignee"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
-              filterSort={(optionA, optionB) =>
-                (optionA?.label ?? '')
-                  .toLowerCase()
-                  .localeCompare((optionB?.label ?? '').toLowerCase())
-              }
-              options={employeeOptions}
-            />
-          </FormItem>
-          <FormItem label="Follow Up" name="followUpDate">
-            <DatePicker />
-          </FormItem>
-          <FormItem name="response" label="Response" rules={[{ max: 1024 }]}>
-            <MarkdownEditor
-              value={form.getFieldValue('response')}
-              onChange={(value) => form.setFieldValue('response', value || '')}
-              maxLength={1024}
-            />
-          </FormItem>
-        </Form>
-      </Modal>
-    </>
+          <MarkdownEditor
+            value={form.getFieldValue('description')}
+            onChange={(value) => form.setFieldValue('description', value || '')}
+            maxLength={1024}
+          />
+        </FormItem>
+        <FormItem name="statusId" label="Status" rules={[{ required: true }]}>
+          <RadioGroup
+            options={riskStatusOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </FormItem>
+        <FormItem
+          name="categoryId"
+          label="Category"
+          rules={[{ required: true }]}
+        >
+          <RadioGroup
+            options={riskCategoryOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </FormItem>
+        <FormItem name="impactId" label="Impact" rules={[{ required: true }]}>
+          <RadioGroup
+            options={riskGradeOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </FormItem>
+        <FormItem
+          name="likelihoodId"
+          label="Likelihood"
+          rules={[{ required: true }]}
+        >
+          <RadioGroup
+            options={riskGradeOptions}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </FormItem>
+        <FormItem name="assigneeId" label="Assignee">
+          <Select
+            allowClear
+            showSearch
+            placeholder="Select an assignee"
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              (option?.label.toLowerCase() ?? '').includes(input.toLowerCase())
+            }
+            filterSort={(optionA, optionB) =>
+              (optionA?.label ?? '')
+                .toLowerCase()
+                .localeCompare((optionB?.label ?? '').toLowerCase())
+            }
+            options={employeeOptions}
+          />
+        </FormItem>
+        <FormItem label="Follow Up" name="followUpDate">
+          <DatePicker />
+        </FormItem>
+        <FormItem name="response" label="Response" rules={[{ max: 1024 }]}>
+          <MarkdownEditor
+            value={form.getFieldValue('response')}
+            onChange={(value) => form.setFieldValue('response', value || '')}
+            maxLength={1024}
+          />
+        </FormItem>
+      </Form>
+    </Modal>
   )
 }
 

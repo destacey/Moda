@@ -4,15 +4,16 @@ import PageTitle from '@/src/components/common/page-title'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
 import UserDetailsLoading from './loading'
-import { useCallback, useEffect, useState } from 'react'
-import { Card, message } from 'antd'
+import { useEffect, useState } from 'react'
+import { Card } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
 import { UserDetails } from '../_components'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const UserDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const {
     data: userData,
@@ -45,7 +46,6 @@ const UserDetailsPage = ({ params }) => {
 
   return (
     <>
-      {contextHolder}
       <BasicBreadcrumb
         items={[
           { title: 'Settings' },

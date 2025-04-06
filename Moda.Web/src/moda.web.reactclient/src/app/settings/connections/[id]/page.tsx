@@ -3,7 +3,7 @@
 import PageTitle from '@/src/components/common/page-title'
 import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Card, message } from 'antd'
+import { Card } from 'antd'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
@@ -24,6 +24,7 @@ import {
   useSyncAzdoConnectionOrganizationMutation,
   useUpdateAzdoConnectionSyncStateMutation,
 } from '@/src/store/features/app-integration/azdo-integration-api'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -39,7 +40,7 @@ const ConnectionDetailsPage = ({ params }) => {
     useState<boolean>(false)
   const [openDeleteConnectionForm, setOpenDeleteConnectionForm] =
     useState<boolean>(false)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
@@ -222,7 +223,6 @@ const ConnectionDetailsPage = ({ params }) => {
 
   return (
     <>
-      {contextHolder}
       <BasicBreadcrumb
         items={[
           { title: 'Settings' },

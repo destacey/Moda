@@ -1,7 +1,7 @@
 'use client'
 
 import { LinkDto, UpdateLinkRequest } from '@/src/services/moda-api'
-import { Form, Input, Modal, message } from 'antd'
+import { Form, Input, Modal } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
 import { toFormErrors } from '@/src/utils'
@@ -9,6 +9,7 @@ import {
   useGetLinkQuery,
   useUpdateLinkMutation,
 } from '@/src/store/features/common/links-api'
+import { useMessage } from '../../contexts/messaging'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -44,7 +45,7 @@ const EditLinkForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<EditLinkFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateLinks = hasPermissionClaim('Permissions.Links.Update')
@@ -147,34 +148,31 @@ const EditLinkForm = ({
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Edit Link"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Save"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        <Form form={form} size="small" layout="vertical" name="edit-link-form">
-          <Item label="Name" name="name" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={128}
-            />
-          </Item>
-          <Item name="url" label="URL">
-            <TextArea autoSize={{ minRows: 6, maxRows: 10 }} />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+    <Modal
+      title="Edit Link"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Save"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form form={form} size="small" layout="vertical" name="edit-link-form">
+        <Item label="Name" name="name" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={128}
+          />
+        </Item>
+        <Item name="url" label="URL">
+          <TextArea autoSize={{ minRows: 6, maxRows: 10 }} />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

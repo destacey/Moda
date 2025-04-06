@@ -10,7 +10,6 @@ import {
   Radio,
   Slider,
   Switch,
-  message,
 } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../../../components/contexts/auth'
@@ -29,6 +28,7 @@ import {
   useUpdatePlanningIntervalObjectiveMutation,
 } from '@/src/services/queries/planning-queries'
 import { MarkdownEditor } from '@/src/components/common/markdown'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Descriptions
 const { Item: FormItem } = Form
@@ -90,7 +90,7 @@ const EditPlanningIntervalObjectiveForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<EditPlanningIntervalObjectiveFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const { data: planningIntervalData } =
     useGetPlanningInterval(planningIntervalId)
@@ -224,7 +224,6 @@ const EditPlanningIntervalObjectiveForm = ({
 
   return (
     <>
-      {contextHolder}
       <Modal
         title="Edit PI Objective"
         open={isOpen}

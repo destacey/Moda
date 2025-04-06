@@ -1,11 +1,12 @@
 'use client'
 
 import { CreateLinkRequest } from '@/src/services/moda-api'
-import { Form, Input, Modal, message } from 'antd'
+import { Form, Input, Modal } from 'antd'
 import { useEffect, useState } from 'react'
 import useAuth from '../../contexts/auth'
 import { toFormErrors } from '@/src/utils'
 import { useCreateLinkMutation } from '@/src/store/features/common/links-api'
+import { useMessage } from '../../contexts/messaging'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -41,7 +42,7 @@ const CreateLinkForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreateLinkFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const { hasClaim } = useAuth()
   const canCreateLinks = hasClaim('Permission', 'Permissions.Links.Create')
@@ -113,43 +114,35 @@ const CreateLinkForm = ({
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Create Link"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Create"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="create-link-form"
+    <Modal
+      title="Create Link"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Create"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form form={form} size="small" layout="vertical" name="create-link-form">
+        <Item label="Name" name="name" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={128}
+          />
+        </Item>
+        <Item
+          name="url"
+          label="URL"
+          rules={[{ required: true }, { type: 'url' }]}
         >
-          <Item label="Name" name="name" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={128}
-            />
-          </Item>
-          <Item
-            name="url"
-            label="URL"
-            rules={[{ required: true }, { type: 'url' }]}
-          >
-            <TextArea autoSize={{ minRows: 6, maxRows: 10 }} />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+          <TextArea autoSize={{ minRows: 6, maxRows: 10 }} />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 
