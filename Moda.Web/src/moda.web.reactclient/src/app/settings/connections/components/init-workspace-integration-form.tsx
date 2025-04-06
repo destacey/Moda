@@ -1,8 +1,9 @@
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { InitWorkspaceIntegrationRequest } from '@/src/services/moda-api'
 import { useInitAzdoConnectionWorkspaceMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { toFormErrors } from '@/src/utils'
-import { Form, Input, Modal, message } from 'antd'
+import { Form, Input, Modal } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -39,7 +40,7 @@ const InitWorkspaceIntegrationForm = (
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<InitWorkspaceIntegrationFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const { hasClaim } = useAuth()
   const canUpdateConnection = hasClaim(
@@ -131,85 +132,82 @@ const InitWorkspaceIntegrationForm = (
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Initialize Workspace"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Init"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+    <Modal
+      title="Initialize Workspace"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Init"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="init-workspace-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="init-workspace-form"
+        <Item
+          name="workspaceKey"
+          label="Workspace Key"
+          extra="The workspace key is a unique identifier for the workspace. Workspace key's must be uppercase letters and numbers only, start with an uppercase letter, and be between 2-20 characters."
+          rules={[
+            {
+              required: true,
+              message: 'The Workspace Key field is required.',
+            },
+            {
+              min: 2,
+              max: 20,
+              message:
+                'The Workspace Key field must be between 2-20 characters.',
+            },
+            {
+              pattern: /^([A-Z][A-Z0-9]{1,19})$/,
+              message:
+                "The Workspace Key field is invalid. Workspace key's must be uppercase letters and numbers only and start with an uppercase letter.",
+            },
+          ]}
         >
-          <Item
-            name="workspaceKey"
-            label="Workspace Key"
-            extra="The workspace key is a unique identifier for the workspace. Workspace key's must be uppercase letters and numbers only, start with an uppercase letter, and be between 2-20 characters."
-            rules={[
-              {
-                required: true,
-                message: 'The Workspace Key field is required.',
-              },
-              {
-                min: 2,
-                max: 20,
-                message:
-                  'The Workspace Key field must be between 2-20 characters.',
-              },
-              {
-                pattern: /^([A-Z][A-Z0-9]{1,19})$/,
-                message:
-                  "The Workspace Key field is invalid. Workspace key's must be uppercase letters and numbers only and start with an uppercase letter.",
-              },
-            ]}
-          >
-            <Input
-              showCount
-              maxLength={20}
-              onInput={(e) =>
-                ((e.target as HTMLInputElement).value = (
-                  e.target as HTMLInputElement
-                ).value.toUpperCase())
-              }
-            />
-          </Item>
-          <Item
-            label="Workspace Name"
-            name="workspaceName"
-            rules={[{ required: true }]}
-          >
-            <Input showCount maxLength={64} />
-          </Item>
-          <Item
-            label="View Work Item URL Template"
-            name="viewWorkItemUrlTemplate"
-            extra={
-              <span>
-                <br />
-                This template plus the work item external id will create a URL
-                to view the work item in the external system.
-              </span>
+          <Input
+            showCount
+            maxLength={20}
+            onInput={(e) =>
+              ((e.target as HTMLInputElement).value = (
+                e.target as HTMLInputElement
+              ).value.toUpperCase())
             }
-          >
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 4 }}
-              showCount
-              maxLength={256}
-            />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+          />
+        </Item>
+        <Item
+          label="Workspace Name"
+          name="workspaceName"
+          rules={[{ required: true }]}
+        >
+          <Input showCount maxLength={64} />
+        </Item>
+        <Item
+          label="View Work Item URL Template"
+          name="viewWorkItemUrlTemplate"
+          extra={
+            <span>
+              <br />
+              This template plus the work item external id will create a URL to
+              view the work item in the external system.
+            </span>
+          }
+        >
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 4 }}
+            showCount
+            maxLength={256}
+          />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

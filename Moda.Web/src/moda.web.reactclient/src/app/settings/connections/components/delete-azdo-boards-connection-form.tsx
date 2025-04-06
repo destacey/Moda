@@ -1,9 +1,10 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { AzureDevOpsBoardsConnectionDetailsDto } from '@/src/services/moda-api'
 import { useDeleteAzdoConnectionMutation } from '@/src/store/features/app-integration/azdo-integration-api'
-import { Descriptions, Modal, message } from 'antd'
+import { Descriptions, Modal } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Descriptions
@@ -20,7 +21,7 @@ const DeleteAzdoBoardsConnectionForm = (
 ) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const [deleteConnectionMutation, { error: deleteConnectionError }] =
     useDeleteAzdoConnectionMutation()
@@ -90,25 +91,22 @@ const DeleteAzdoBoardsConnectionForm = (
   ])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Are you sure you want to delete this Azure DevOps Boards connection?"
-        open={isOpen}
-        onOk={handleOk}
-        okText="Delete"
-        okType="danger"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        <Descriptions size="small" column={1}>
-          <Item label="Name">{props.connection?.name}</Item>
-        </Descriptions>
-      </Modal>
-    </>
+    <Modal
+      title="Are you sure you want to delete this Azure DevOps Boards connection?"
+      open={isOpen}
+      onOk={handleOk}
+      okText="Delete"
+      okType="danger"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Descriptions size="small" column={1}>
+        <Item label="Name">{props.connection?.name}</Item>
+      </Descriptions>
+    </Modal>
   )
 }
 

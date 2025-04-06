@@ -11,7 +11,7 @@ import {
 } from '@/src/store/features/planning/planning-interval-api'
 import { useSearchWorkItemsQuery } from '@/src/store/features/work-management/workspace-api'
 import { SearchOutlined } from '@ant-design/icons'
-import { Input, message, Modal, Space, Typography } from 'antd'
+import { Input, Modal, Space, Typography } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import { ColDef, RowSelectionOptions } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
@@ -20,6 +20,7 @@ import {
   asDeletableColDefs,
   asDraggableColDefs,
 } from '@/src/components/common/grid/ag-grid-transfer'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Text } = Typography
 
@@ -93,7 +94,7 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
   >([])
   const [sourceWorkItems, setSourceWorkItems] = useState<WorkItemModel[]>([])
   const [targetWorkItems, setTargetWorkItems] = useState<WorkItemModel[]>([])
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const [searchQuery, setSearchQuery] = useState<string>('')
 
@@ -189,52 +190,49 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
   }
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Manage PI Objective Work Items"
-        open={isOpen}
-        width={'80vw'}
-        onOk={handleOk}
-        okText="Save"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        {
-          <Space
-            direction="vertical"
-            style={{ display: 'flex', width: '100%' }}
-          >
-            <Input
-              size="small"
-              placeholder="Search for work items by key, title, or parent key"
-              allowClear
-              onChange={handleSearch}
-              suffix={<SearchOutlined />}
-            />
-            <AgGridTransfer
-              leftGridData={sourceWorkItems}
-              rightGridData={targetWorkItems}
-              leftColumnDef={leftWorkItemColDefs}
-              rightColumnDef={rightWorkItemColDefs}
-              rightGridRef={rightGridRef}
-              removeRowFromSource
-              getRowId={(param) => param.data.id}
-              GridProps={{
-                tooltipShowDelay: 0,
-                tooltipHideDelay: 1000,
-                defaultColDef,
-              }}
-              leftGridRowSelection={leftGridRowSelection}
-            />
-            <Text>Search results are limited to 50 records.</Text>
-          </Space>
-        }
-      </Modal>
-    </>
+    <Modal
+      title="Manage PI Objective Work Items"
+      open={isOpen}
+      width={'80vw'}
+      onOk={handleOk}
+      okText="Save"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      {
+        <Space
+          direction="vertical"
+          style={{ display: 'flex', width: '100%' }}
+        >
+          <Input
+            size="small"
+            placeholder="Search for work items by key, title, or parent key"
+            allowClear
+            onChange={handleSearch}
+            suffix={<SearchOutlined />}
+          />
+          <AgGridTransfer
+            leftGridData={sourceWorkItems}
+            rightGridData={targetWorkItems}
+            leftColumnDef={leftWorkItemColDefs}
+            rightColumnDef={rightWorkItemColDefs}
+            rightGridRef={rightGridRef}
+            removeRowFromSource
+            getRowId={(param) => param.data.id}
+            GridProps={{
+              tooltipShowDelay: 0,
+              tooltipHideDelay: 1000,
+              defaultColDef,
+            }}
+            leftGridRowSelection={leftGridRowSelection}
+          />
+          <Text>Search results are limited to 50 records.</Text>
+        </Space>
+      }
+    </Modal>
   )
 }
 

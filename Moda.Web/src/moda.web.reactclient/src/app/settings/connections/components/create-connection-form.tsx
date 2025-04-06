@@ -1,5 +1,6 @@
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import {
   CreateAzureDevOpsBoardConnectionRequest,
   TestAzureDevOpsBoardConnectionRequest,
@@ -9,7 +10,7 @@ import {
   useTestAzdoConfigurationMutation,
 } from '@/src/store/features/app-integration/azdo-integration-api'
 import { toFormErrors } from '@/src/utils'
-import { Button, Divider, Form, Input, Modal, Typography, message } from 'antd'
+import { Button, Divider, Form, Input, Modal, Typography } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -48,7 +49,7 @@ const CreateConnectionForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreateConnectionFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
   const [testConfigurationResult, setTestConfigurationResult] =
     useState<string>()
   const [isTestingConfiguration, setTestingConfiguration] = useState(false)
@@ -140,95 +141,88 @@ const CreateConnectionForm = ({
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Create Connection"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Create"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+    <Modal
+      title="Create Connection"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Create"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="create-connection-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="create-connection-form"
+        <Item label="Name" name="name" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={128}
+          />
+        </Item>
+        <Item
+          name="description"
+          label="Description"
+          initialValue=""
+          rules={[{ max: 1024 }]}
         >
-          <Item label="Name" name="name" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={128}
-            />
-          </Item>
-          <Item
-            name="description"
-            label="Description"
-            initialValue=""
-            rules={[{ max: 1024 }]}
-          >
-            <MarkdownEditor
-              value={form.getFieldValue('description')}
-              onChange={(value) =>
-                form.setFieldValue('description', value || '')
-              }
-              maxLength={1024}
-            />
-          </Item>
+          <MarkdownEditor
+            value={form.getFieldValue('description')}
+            onChange={(value) => form.setFieldValue('description', value || '')}
+            maxLength={1024}
+          />
+        </Item>
 
-          {/* TODO: make the configuration section dynamic based on the connector  */}
+        {/* TODO: make the configuration section dynamic based on the connector  */}
 
-          <Divider orientation="left" style={{ marginTop: '50px' }}>
-            Azure DevOps Configuration
-          </Divider>
-          <Item
-            label="Organization"
-            name="organization"
-            rules={[{ required: true }]}
-          >
-            <Input showCount maxLength={128} />
-          </Item>
-          <Item
-            label="Personal Access Token"
-            name="personalAccessToken"
-            rules={[{ required: true }]}
-          >
-            <Input showCount maxLength={128} />
-          </Item>
+        <Divider orientation="left" style={{ marginTop: '50px' }}>
+          Azure DevOps Configuration
+        </Divider>
+        <Item
+          label="Organization"
+          name="organization"
+          rules={[{ required: true }]}
+        >
+          <Input showCount maxLength={128} />
+        </Item>
+        <Item
+          label="Personal Access Token"
+          name="personalAccessToken"
+          rules={[{ required: true }]}
+        >
+          <Input showCount maxLength={128} />
+        </Item>
 
-          <Item>
-            <Button
-              type="primary"
-              disabled={
-                !form.getFieldValue('organization') ||
-                !form.getFieldValue('personalAccessToken')
-              }
-              loading={isTestingConfiguration}
-              onClick={() => {
-                setTestingConfiguration(true)
-                testConnectionConfiguration({
-                  organization: form.getFieldValue('organization'),
-                  personalAccessToken: form.getFieldValue(
-                    'personalAccessToken',
-                  ),
-                })
-              }}
-            >
-              Test Configuration
-            </Button>
-            <Text type="secondary" style={{ marginLeft: '10px' }}>
-              {testConfigurationResult}
-            </Text>
-          </Item>
-        </Form>
-      </Modal>
-    </>
+        <Item>
+          <Button
+            type="primary"
+            disabled={
+              !form.getFieldValue('organization') ||
+              !form.getFieldValue('personalAccessToken')
+            }
+            loading={isTestingConfiguration}
+            onClick={() => {
+              setTestingConfiguration(true)
+              testConnectionConfiguration({
+                organization: form.getFieldValue('organization'),
+                personalAccessToken: form.getFieldValue('personalAccessToken'),
+              })
+            }}
+          >
+            Test Configuration
+          </Button>
+          <Text type="secondary" style={{ marginLeft: '10px' }}>
+            {testConfigurationResult}
+          </Text>
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

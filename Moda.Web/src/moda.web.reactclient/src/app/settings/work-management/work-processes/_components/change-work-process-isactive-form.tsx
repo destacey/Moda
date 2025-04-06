@@ -1,6 +1,7 @@
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { useChangeWorkProcessIsActiveMutation } from '@/src/store/features/work-management/work-process-api'
-import { Modal, Typography, message } from 'antd'
+import { Modal, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 
 const { Text } = Typography
@@ -19,7 +20,7 @@ const ChangeWorkProcessIsActiveForm = (
 ) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const action = props.isActive ? 'Deactivate' : 'Activate'
   const actionLowerCase = action.toLowerCase()
@@ -87,24 +88,21 @@ const ChangeWorkProcessIsActiveForm = (
   if (props.isActive === undefined || props.isActive === null) return null
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title={`${action} Work Process`}
-        open={isOpen}
-        onOk={handleOk}
-        okText={action}
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        <Text>
-          {`Are you sure you want to ${actionLowerCase} the work process ${props.workProcessName}?`}
-        </Text>
-      </Modal>
-    </>
+    <Modal
+      title={`${action} Work Process`}
+      open={isOpen}
+      onOk={handleOk}
+      okText={action}
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Text>
+        {`Are you sure you want to ${actionLowerCase} the work process ${props.workProcessName}?`}
+      </Text>
+    </Modal>
   )
 }
 

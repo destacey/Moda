@@ -4,7 +4,7 @@ import { PageActions, PageTitle } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
-import { Card, Descriptions, MenuProps, message, Space } from 'antd'
+import { Card, Descriptions, MenuProps } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import PortfolioDetailsLoading from './loading'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -27,6 +27,7 @@ import {
   ProjectViewManager,
   StrategicInitiativeViewManager,
 } from '../../_components'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Descriptions
 
@@ -62,7 +63,7 @@ const PortfolioDetailsPage = ({ params }) => {
   const [openDeletePortfolioForm, setOpenDeletePortfolioForm] =
     useState<boolean>(false)
 
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -311,7 +312,6 @@ const PortfolioDetailsPage = ({ params }) => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle
         title={`${portfolioData?.key} - ${portfolioData?.name}`}
         subtitle="Portfolio Details"

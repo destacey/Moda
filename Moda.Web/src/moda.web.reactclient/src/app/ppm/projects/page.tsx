@@ -5,16 +5,17 @@ import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetProjectsQuery } from '@/src/store/features/ppm/projects-api'
-import { Button, message } from 'antd'
+import { Button } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { CreateProjectForm } from './_components'
 import { ProjectsGrid } from '../_components'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const ProjectsPage: React.FC = () => {
   useDocumentTitle('Projects')
   const [openCreateProjectForm, setOpenCreateProjectForm] =
     useState<boolean>(false)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const { hasPermissionClaim } = useAuth()
   const canCreateProject = hasPermissionClaim('Permissions.Projects.Create')
@@ -56,7 +57,6 @@ const ProjectsPage: React.FC = () => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle title="Projects" actions={actions} />
       <ProjectsGrid
         projects={projectData}

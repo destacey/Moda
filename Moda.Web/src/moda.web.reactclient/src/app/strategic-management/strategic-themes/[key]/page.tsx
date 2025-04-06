@@ -6,7 +6,7 @@ import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
 import { useGetStrategicThemeQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
-import { Descriptions, MenuProps, message, Space } from 'antd'
+import { Descriptions, MenuProps, Space } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import StrategicThemeDetailsLoading from './loading'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -18,6 +18,7 @@ import {
   EditStrategicThemeForm,
 } from '../_components'
 import { StrategicThemeStateAction } from '../_components/change-strategic-theme-state-form'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Descriptions
 
@@ -39,7 +40,7 @@ const StrategicThemeDetailsPage = ({ params }) => {
   const [openDeleteStrategicThemeForm, setOpenDeleteStrategicThemeForm] =
     useState<boolean>(false)
 
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -203,7 +204,6 @@ const StrategicThemeDetailsPage = ({ params }) => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle
         title={`${strategicThemeData?.key} - ${strategicThemeData?.name}`}
         subtitle="Strategic Theme Details"

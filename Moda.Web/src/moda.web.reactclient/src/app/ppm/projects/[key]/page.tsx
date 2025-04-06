@@ -5,7 +5,7 @@ import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
-import { Alert, Card, MenuProps, message } from 'antd'
+import { Alert, Card, MenuProps } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import ProjectDetailsLoading from './loading'
@@ -18,6 +18,7 @@ import {
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProjectStatusAction } from '../_components/change-project-status-form'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 enum ProjectTabs {
   Details = 'details',
@@ -44,7 +45,7 @@ const ProjectDetailsPage = ({ params }) => {
   const [openDeleteProjectForm, setOpenDeleteProjectForm] =
     useState<boolean>(false)
 
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -242,7 +243,6 @@ const ProjectDetailsPage = ({ params }) => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle
         title={`${projectData?.key} - ${projectData?.name}`}
         subtitle="Project Details"

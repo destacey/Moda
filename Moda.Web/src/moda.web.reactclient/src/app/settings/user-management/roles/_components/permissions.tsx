@@ -1,3 +1,4 @@
+import { useMessage } from '@/src/components/contexts/messaging'
 import useTheme from '@/src/components/contexts/theme'
 import { useGetPermissionsQuery } from '@/src/store/features/user-management/permissions-api'
 import { useUpdatePermissionsMutation } from '@/src/store/features/user-management/roles-api'
@@ -8,7 +9,6 @@ import {
   Switch,
   Badge,
   Button,
-  message,
   Typography,
   Space,
   Spin,
@@ -34,7 +34,7 @@ interface PermissionItem {
 }
 
 const Permissions = (props: PermissionsProps) => {
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
   const theme = useTheme()
 
   const [permissions, setPermissions] = useState<string[]>(props.permissions)
@@ -143,7 +143,6 @@ const Permissions = (props: PermissionsProps) => {
 
   return (
     <div>
-      {contextHolder}
       <Row>
         <Col span={7}>
           <Title level={5}>Permission Groups</Title>

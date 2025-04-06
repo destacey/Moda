@@ -1,11 +1,12 @@
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { CreateOrUpdateRoleRequest, RoleDto } from '@/src/services/moda-api'
 import {
   useDeleteRoleMutation,
   useUpsertRoleMutation,
 } from '@/src/store/features/user-management/roles-api'
 import { toFormErrors } from '@/src/utils'
-import { Button, Form, Input, Popconfirm, Space, message } from 'antd'
+import { Button, Form, Input, Popconfirm, Space } from 'antd'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
@@ -20,7 +21,7 @@ const RoleDetails = (props: RolesDetailProps) => {
   const [role, setRole] = useState<RoleDto>(props.role)
   const [form] = Form.useForm<CreateOrUpdateRoleRequest>()
   const router = useRouter()
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const { hasClaim } = useAuth()
   const canDelete = hasClaim('Permission', 'Permissions.Roles.Delete')
@@ -78,7 +79,6 @@ const RoleDetails = (props: RolesDetailProps) => {
 
   return (
     <div>
-      {contextHolder}
       {role && (
         <Form
           form={form}

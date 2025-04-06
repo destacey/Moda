@@ -5,10 +5,11 @@ import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetStrategicInitiativesQuery } from '@/src/store/features/ppm/strategic-initiatives-api'
-import { Button, message } from 'antd'
+import { Button } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { CreateStrategicInitiativeForm } from './_components'
 import { StrategicInitiativesGrid } from '../_components'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const StrategicInitiativesPage: React.FC = () => {
   useDocumentTitle('Strategic Initiatives')
@@ -16,7 +17,7 @@ const StrategicInitiativesPage: React.FC = () => {
     openCreateStrategicInitiativeForm,
     setOpenCreateStrategicInitiativeForm,
   ] = useState<boolean>(false)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const { hasPermissionClaim } = useAuth()
   const canCreateStrategicInitiative = hasPermissionClaim(
@@ -60,7 +61,6 @@ const StrategicInitiativesPage: React.FC = () => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle title="Strategic Initiatives" actions={actions} />
       <StrategicInitiativesGrid
         strategicInitiatives={strategicInitiativeData}

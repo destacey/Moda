@@ -7,7 +7,7 @@ import {
   getTeamsClient,
   getTeamsOfTeamsClient,
 } from '@/src/services/clients'
-import { Modal, Spin, Table, Transfer, TransferProps, message } from 'antd'
+import { Modal, Spin, Table, Transfer, TransferProps } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import difference from 'lodash/difference'
 import {
@@ -15,6 +15,7 @@ import {
   PlanningIntervalTeamResponse,
 } from '@/src/services/moda-api'
 import type { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 export interface ManagePlanningIntervalTeamsFormProps {
   showForm: boolean
@@ -121,7 +122,7 @@ const ManagePlanningIntervalTeamsForm = ({
   const [isSaving, setIsSaving] = useState(false)
   const [teams, setTeams] = useState<PlanningIntervalTeamModel[]>([])
   const [targetKeys, setTargetKeys] = useState<string[]>([])
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const { hasClaim } = useAuth()
   const canUpdatePI = hasClaim(
@@ -237,44 +238,41 @@ const ManagePlanningIntervalTeamsForm = ({
   }
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Manage Planning Interval Teams"
-        open={isOpen}
-        width={900}
-        onOk={handleOk}
-        okText="Save"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        {
-          <Spin spinning={isLoading} size="large">
-            <TableTransfer
-              dataSource={teams}
-              targetKeys={targetKeys}
-              showSearch={true}
-              onChange={onChange}
-              filterOption={(inputValue, item: PlanningIntervalTeamModel) =>
-                item.name!.toLowerCase().indexOf(inputValue.toLowerCase()) !==
-                  -1 ||
-                item.code!.toLowerCase().indexOf(inputValue.toLowerCase()) !==
-                  -1 ||
-                (item.teamOfTeams &&
-                  item.teamOfTeams
-                    .toLowerCase()
-                    .indexOf(inputValue.toLowerCase()) !== -1)
-              }
-              leftColumns={tableColumns}
-              rightColumns={tableColumns}
-            />
-          </Spin>
-        }
-      </Modal>
-    </>
+    <Modal
+      title="Manage Planning Interval Teams"
+      open={isOpen}
+      width={900}
+      onOk={handleOk}
+      okText="Save"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      {
+        <Spin spinning={isLoading} size="large">
+          <TableTransfer
+            dataSource={teams}
+            targetKeys={targetKeys}
+            showSearch={true}
+            onChange={onChange}
+            filterOption={(inputValue, item: PlanningIntervalTeamModel) =>
+              item.name!.toLowerCase().indexOf(inputValue.toLowerCase()) !==
+                -1 ||
+              item.code!.toLowerCase().indexOf(inputValue.toLowerCase()) !==
+                -1 ||
+              (item.teamOfTeams &&
+                item.teamOfTeams
+                  .toLowerCase()
+                  .indexOf(inputValue.toLowerCase()) !== -1)
+            }
+            leftColumns={tableColumns}
+            rightColumns={tableColumns}
+          />
+        </Spin>
+      }
+    </Modal>
   )
 }
 

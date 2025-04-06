@@ -7,10 +7,11 @@ import { useDocumentTitle } from '@/src/hooks'
 import { ExpenditureCategoryListDto } from '@/src/services/moda-api'
 import { useGetExpenditureCategoriesQuery } from '@/src/store/features/ppm/expenditure-categories-api'
 import { ColDef } from 'ag-grid-community'
-import { Button, message } from 'antd'
+import { Button } from 'antd'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CreateExpenditureCategoryForm } from './_components'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const ExpenditureCategoryCellRenderer = ({ value, data }) => {
   return <Link href={`./expenditure-categories/${data.id}`}>{value}</Link>
@@ -23,7 +24,7 @@ const ExpenditureCategoriesPage = () => {
     setOpenCreateExpenditureCategoryForm,
   ] = useState<boolean>(false)
 
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const {
     data: categoryData,
@@ -94,7 +95,6 @@ const ExpenditureCategoriesPage = () => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle title="Expenditure Categories" actions={actions} />
 
       <ModaGrid

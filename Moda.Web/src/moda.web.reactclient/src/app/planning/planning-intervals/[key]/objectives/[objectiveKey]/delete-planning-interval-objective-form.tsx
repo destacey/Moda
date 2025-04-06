@@ -1,6 +1,7 @@
+import { useMessage } from '@/src/components/contexts/messaging'
 import { getPlanningIntervalsClient } from '@/src/services/clients'
 import { PlanningIntervalObjectiveDetailsDto } from '@/src/services/moda-api'
-import { Modal, message } from 'antd'
+import { Modal } from 'antd'
 import { useEffect, useState } from 'react'
 
 interface DeletePlanningIntervalObjectiveFormProps {
@@ -18,7 +19,7 @@ const DeletePlanningIntervalObjectiveForm = ({
 }: DeletePlanningIntervalObjectiveFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const deleteObjective = async (
     objective: PlanningIntervalObjectiveDetailsDto,
@@ -64,23 +65,20 @@ const DeletePlanningIntervalObjectiveForm = ({
   }, [showForm])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Are you sure you want to delete this PI Objective?"
-        open={isOpen}
-        onOk={handleOk}
-        okText="Delete"
-        okType="danger"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        {objective?.key} - {objective?.name}
-      </Modal>
-    </>
+    <Modal
+      title="Are you sure you want to delete this PI Objective?"
+      open={isOpen}
+      onOk={handleOk}
+      okText="Delete"
+      okType="danger"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      {objective?.key} - {objective?.name}
+    </Modal>
   )
 }
 

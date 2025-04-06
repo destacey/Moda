@@ -9,7 +9,6 @@ import {
   Input,
   Modal,
   Select,
-  message,
 } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '@/src/components/contexts/auth'
@@ -27,6 +26,7 @@ import {
 } from '@/src/services/queries/planning-queries'
 import dayjs from 'dayjs'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item, List } = Form
 
@@ -77,7 +77,7 @@ const ManagePlanningIntervalDatesForm = ({
 
   const [form] = Form.useForm<ManagePlanningIntervalDatesFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const { data: planningIntervalData } = useGetPlanningInterval(id)
   const { data: iterationsData } = useGetPlanningIntervalIterations(id)
@@ -205,136 +205,131 @@ const ManagePlanningIntervalDatesForm = ({
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Manage PI Dates"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Save"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+    <Modal
+      title="Manage PI Dates"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Save"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="manage-planning-interval-dates-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="manage-planning-interval-dates-form"
+        <Item label="Start" name="start" rules={[{ required: true }]}>
+          <DatePicker />
+        </Item>
+        <Item
+          label="End"
+          name="end"
+          dependencies={['start']}
+          rules={[
+            { required: true },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                const start = getFieldValue('start')
+                if (!value || !start || start < value) {
+                  return Promise.resolve()
+                }
+                return Promise.reject(
+                  new Error('End date must be after start date'),
+                )
+              },
+            }),
+          ]}
         >
-          <Item label="Start" name="start" rules={[{ required: true }]}>
-            <DatePicker />
-          </Item>
-          <Item
-            label="End"
-            name="end"
-            dependencies={['start']}
-            rules={[
-              { required: true },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  const start = getFieldValue('start')
-                  if (!value || !start || start < value) {
-                    return Promise.resolve()
-                  }
-                  return Promise.reject(
-                    new Error('End date must be after start date'),
-                  )
-                },
-              }),
-            ]}
-          >
-            <DatePicker />
-          </Item>
+          <DatePicker />
+        </Item>
 
-          <Divider orientation="left">Iterations</Divider>
-          <List name="iterations">
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map(({ key, name, ...restField }) => (
-                  <div key={key}>
-                    <Flex align="center" justify="space-between">
-                      <Flex vertical style={{ width: '90%' }}>
-                        <Flex gap="small">
-                          <Item
-                            {...restField}
-                            name={[name, 'iterationId']}
-                            hidden={true}
-                          >
-                            <Input hidden={true} />
-                          </Item>
-                          <Item
-                            {...restField}
-                            style={{ width: '100%', marginBottom: '10px' }}
-                            name={[name, 'name']}
-                            rules={[{ required: true }]}
-                          >
-                            <Input
-                              showCount
-                              maxLength={128}
-                              placeholder="Iteration Name"
-                            />
-                          </Item>
-                        </Flex>
-                        <Flex gap="small">
-                          <Item
-                            {...restField}
-                            style={{ margin: '0', width: '35%' }}
-                            name={[name, 'typeId']}
-                            rules={[{ required: true }]}
-                          >
-                            <Select
-                              placeholder="Select Type"
-                              options={iterationTypesOptions}
-                            />
-                          </Item>
-                          <Item
-                            {...restField}
-                            style={{ margin: '0' }}
-                            name={[name, 'start']}
-                            rules={[
-                              { required: true, message: 'Missing start' },
-                            ]}
-                          >
-                            <DatePicker />
-                          </Item>
-                          <Item
-                            {...restField}
-                            style={{ margin: '0' }}
-                            name={[name, 'end']}
-                            rules={[{ required: true, message: 'Missing end' }]}
-                          >
-                            <DatePicker />
-                          </Item>
-                        </Flex>
+        <Divider orientation="left">Iterations</Divider>
+        <List name="iterations">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }) => (
+                <div key={key}>
+                  <Flex align="center" justify="space-between">
+                    <Flex vertical style={{ width: '90%' }}>
+                      <Flex gap="small">
+                        <Item
+                          {...restField}
+                          name={[name, 'iterationId']}
+                          hidden={true}
+                        >
+                          <Input hidden={true} />
+                        </Item>
+                        <Item
+                          {...restField}
+                          style={{ width: '100%', marginBottom: '10px' }}
+                          name={[name, 'name']}
+                          rules={[{ required: true }]}
+                        >
+                          <Input
+                            showCount
+                            maxLength={128}
+                            placeholder="Iteration Name"
+                          />
+                        </Item>
                       </Flex>
-                      <MinusCircleOutlined
-                        onClick={() => remove(name)}
-                        title="Remove Iteration"
-                      />
+                      <Flex gap="small">
+                        <Item
+                          {...restField}
+                          style={{ margin: '0', width: '35%' }}
+                          name={[name, 'typeId']}
+                          rules={[{ required: true }]}
+                        >
+                          <Select
+                            placeholder="Select Type"
+                            options={iterationTypesOptions}
+                          />
+                        </Item>
+                        <Item
+                          {...restField}
+                          style={{ margin: '0' }}
+                          name={[name, 'start']}
+                          rules={[{ required: true, message: 'Missing start' }]}
+                        >
+                          <DatePicker />
+                        </Item>
+                        <Item
+                          {...restField}
+                          style={{ margin: '0' }}
+                          name={[name, 'end']}
+                          rules={[{ required: true, message: 'Missing end' }]}
+                        >
+                          <DatePicker />
+                        </Item>
+                      </Flex>
                     </Flex>
-                    <Divider dashed />
-                  </div>
-                ))}
-                <Item>
-                  <Button
-                    type="dashed"
-                    onClick={() => add()}
-                    block
-                    icon={<PlusOutlined />}
-                  >
-                    Add Iteration
-                  </Button>
-                </Item>
-              </>
-            )}
-          </List>
-        </Form>
-      </Modal>
-    </>
+                    <MinusCircleOutlined
+                      onClick={() => remove(name)}
+                      title="Remove Iteration"
+                    />
+                  </Flex>
+                  <Divider dashed />
+                </div>
+              ))}
+              <Item>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  block
+                  icon={<PlusOutlined />}
+                >
+                  Add Iteration
+                </Button>
+              </Item>
+            </>
+          )}
+        </List>
+      </Form>
+    </Modal>
   )
 }
 
