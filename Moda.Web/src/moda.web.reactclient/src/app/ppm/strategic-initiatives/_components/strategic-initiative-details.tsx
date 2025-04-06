@@ -6,7 +6,6 @@ import { StrategicInitiativeDetailsDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
 import { Descriptions, List } from 'antd'
 import Link from 'next/link'
-import { StrategicInitiativeKpiListCard } from '.'
 
 const { Item } = Descriptions
 
@@ -55,9 +54,6 @@ const StrategicInitiativeDetails: React.FC<StrategicInitiativeDetailsProps> = ({
           </Item>
         </Descriptions>
       </ResponsiveFlex>
-      <StrategicInitiativeKpiListCard
-        strategicInitiativeId={strategicInitiative.id}
-      />
     </>
   )
 }

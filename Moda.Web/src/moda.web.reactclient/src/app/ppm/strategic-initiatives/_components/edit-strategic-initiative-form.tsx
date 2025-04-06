@@ -223,7 +223,7 @@ const EditStrategicInitiativeForm = (
           form={form}
           size="small"
           layout="vertical"
-          name="create-strategic-initiative-form"
+          name="edit-strategic-initiative-form"
         >
           <Item
             label="Name"

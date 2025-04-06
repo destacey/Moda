@@ -190,12 +190,6 @@ const CreateStrategicInitiativeForm = (
               allowClear
               options={portfolioData ?? []}
               placeholder="Select Portfolio"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label?.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
             />
           </Item>
           <Item

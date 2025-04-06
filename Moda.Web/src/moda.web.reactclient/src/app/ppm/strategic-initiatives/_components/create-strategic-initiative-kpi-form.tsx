@@ -227,12 +227,6 @@ const CreateStrategicInitiativeKpiForm = (
               allowClear
               options={unitData ?? []}
               placeholder="Select Unit"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label?.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
             />
           </Item>
           <Item
@@ -246,12 +240,6 @@ const CreateStrategicInitiativeKpiForm = (
               allowClear
               options={targetDirectionData ?? []}
               placeholder="Select Target Direction"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label?.toLowerCase() ?? '').includes(
-                  input.toLowerCase(),
-                )
-              }
             />
           </Item>
         </Form>

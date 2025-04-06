@@ -10,17 +10,23 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import StrategicInitiativeDetailsLoading from './loading'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
-import { useGetStrategicInitiativeQuery } from '@/src/store/features/ppm/strategic-initiatives-api'
+import {
+  useGetStrategicInitiativeKpisQuery,
+  useGetStrategicInitiativeQuery,
+} from '@/src/store/features/ppm/strategic-initiatives-api'
 import {
   ChangeStrategicInitiativeStatusForm,
+  CreateStrategicInitiativeKpiForm,
   DeleteStrategicInitiativeForm,
   StrategicInitiativeDetails,
+  StrategicInitiativeKpisGrid,
 } from '../_components'
 import EditStrategicInitiativeForm from '../_components/edit-strategic-initiative-form'
 import { StrategicInitiativeStatusAction } from '../_components/change-strategic-initiative-status-form'
 
 enum StrategicInitiativeTabs {
   Details = 'details',
+  Kpis = 'kpis',
 }
 
 enum StrategicInitiativeAction {
@@ -35,6 +41,8 @@ enum StrategicInitiativeAction {
 const StrategicInitiativeDetailsPage = ({ params }) => {
   useDocumentTitle('Strategic Initiative Details')
   const [activeTab, setActiveTab] = useState(StrategicInitiativeTabs.Details)
+  const [kpisQueried, setKpisQueried] = useState(false)
+
   const [openEditStrategicInitiativeForm, setOpenEditStrategicInitiativeForm] =
     useState<boolean>(false)
   const [
@@ -57,6 +65,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     openDeleteStrategicInitiativeForm,
     setOpenDeleteStrategicInitiativeForm,
   ] = useState<boolean>(false)
+  const [openCreateKpiForm, setOpenCreateKpiForm] = useState(false)
 
   const [messageApi, contextHolder] = message.useMessage()
 
@@ -79,6 +88,15 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     error,
     refetch: refetchStrategicInitiative,
   } = useGetStrategicInitiativeQuery(params.key)
+
+  const {
+    data: kpiData,
+    isLoading: isLoadingKpis,
+    error: kpiError,
+    refetch: refetchKpis,
+  } = useGetStrategicInitiativeKpisQuery(strategicInitiativeData?.id, {
+    skip: !kpisQueried,
+  })
 
   useEffect(() => {
     if (!strategicInitiativeData) return
@@ -115,14 +133,34 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
           />
         ),
       },
+      {
+        key: StrategicInitiativeTabs.Kpis,
+        label: 'KPIs',
+        content: (
+          <StrategicInitiativeKpisGrid
+            kpis={kpiData}
+            isLoading={isLoadingKpis}
+            refetch={refetchKpis}
+            messageApi={messageApi}
+            gridHeight={550}
+          />
+        ),
+      },
     ]
     return pageTabs
-  }, [strategicInitiativeData])
+  }, [isLoadingKpis, kpiData, messageApi, refetchKpis, strategicInitiativeData])
 
   // doesn't trigger on first render
-  const onTabChange = useCallback((tabKey) => {
-    setActiveTab(tabKey)
-  }, [])
+  const onTabChange = useCallback(
+    (tabKey: StrategicInitiativeTabs) => {
+      if (tabKey === StrategicInitiativeTabs.Kpis && !kpisQueried) {
+        setKpisQueried(true)
+      }
+
+      setActiveTab(tabKey)
+    },
+    [kpisQueried],
+  )
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
     const currentStatus = strategicInitiativeData?.status.name
@@ -230,6 +268,21 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
       })
     }
 
+    //KPI actions
+    if (canUpdateStrategicInitiative) {
+      items.push(
+        {
+          key: 'manage-divider-2',
+          type: 'divider',
+        },
+        {
+          key: 'createKpi',
+          label: 'Create KPI',
+          onClick: () => setOpenCreateKpiForm(true),
+        },
+      )
+    }
+
     return items
   }, [
     canDeleteStrategicInitiative,
@@ -296,6 +349,10 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     },
     [router],
   )
+
+  const onCreateKpiFormClosed = useCallback(() => {
+    setOpenCreateKpiForm(false)
+  }, [])
 
   if (isLoading) {
     return <StrategicInitiativeDetailsLoading />
@@ -377,6 +434,15 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
           showForm={openDeleteStrategicInitiativeForm}
           onFormComplete={() => onDeleteStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onDeleteStrategicInitiativeFormClosed(false)}
+          messageApi={messageApi}
+        />
+      )}
+      {openCreateKpiForm && (
+        <CreateStrategicInitiativeKpiForm
+          strategicInitiativeId={strategicInitiativeData?.id}
+          showForm={openCreateKpiForm}
+          onFormComplete={() => onCreateKpiFormClosed()}
+          onFormCancel={() => onCreateKpiFormClosed()}
           messageApi={messageApi}
         />
       )}
