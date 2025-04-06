@@ -1,5 +1,6 @@
 'use client'
 
+import { useMessage } from '@/src/components/contexts/messaging'
 import {
   SetExternalUrlTemplatesRequest,
   WorkspaceDto,
@@ -10,7 +11,7 @@ import {
   useSetWorkspaceExternalUrlTemplatesMutation,
 } from '@/src/store/features/work-management/workspace-api'
 import { toFormErrors } from '@/src/utils'
-import { Form, Input, Modal, message } from 'antd'
+import { Form, Input, Modal } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -47,7 +48,7 @@ const SetWorkspaceExternalUrlTemplatesForm = (
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<SetWorkspaceExternalUrlTemplatesFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const {
     data: workspaceData,
@@ -143,47 +144,44 @@ const SetWorkspaceExternalUrlTemplatesForm = (
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Set External URL Templates"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Save"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        <Form form={form} layout="vertical">
-          <Item
-            label="View Work Item URL"
-            name="externalViewWorkItemUrlTemplate"
-            extra={
-              <span>
-                <br />
-                This template plus the work item external id will create a url
-                to view the work item in the external system.
-              </span>
-            }
-            rules={[
-              {
-                max: 256,
-                message: 'The URL must be equal to or less than 256 characters',
-              },
-            ]}
-          >
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 4 }}
-              showCount
-              maxLength={256}
-            />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+    <Modal
+      title="Set External URL Templates"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Save"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form form={form} layout="vertical">
+        <Item
+          label="View Work Item URL"
+          name="externalViewWorkItemUrlTemplate"
+          extra={
+            <span>
+              <br />
+              This template plus the work item external id will create a url to
+              view the work item in the external system.
+            </span>
+          }
+          rules={[
+            {
+              max: 256,
+              message: 'The URL must be equal to or less than 256 characters',
+            },
+          ]}
+        >
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 4 }}
+            showCount
+            maxLength={256}
+          />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

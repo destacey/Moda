@@ -1,6 +1,6 @@
 'use client'
 
-import { Form, Input, Modal, Switch, message } from 'antd'
+import { Form, Input, Modal, Switch } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import useAuth from '../../../../components/contexts/auth'
 import {
@@ -13,6 +13,7 @@ import {
   useUpdatePlanningIntervalMutation,
 } from '@/src/services/queries/planning-queries'
 import { MarkdownEditor } from '@/src/components/common/markdown'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -51,7 +52,7 @@ const EditPlanningIntervalForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<EditPlanningIntervalFormValues>()
   const formValues = Form.useWatch([], form)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const { data: planningIntervalData } = useGetPlanningInterval(id)
   const updatePlanningInterval = useUpdatePlanningIntervalMutation()
@@ -157,55 +158,50 @@ const EditPlanningIntervalForm = ({
   }, [form, formValues])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Edit Planning Interval"
-        open={isOpen}
-        onOk={handleOk}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Save"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+    <Modal
+      title="Edit Planning Interval"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Save"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="edit-planning-interval-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="edit-planning-interval-form"
+        <Item name="id" hidden={true}>
+          <Input />
+        </Item>
+        <Item label="Name" name="name" rules={[{ required: true }]}>
+          <TextArea
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            showCount
+            maxLength={128}
+          />
+        </Item>
+        <Item name="description" label="Description" rules={[{ max: 2048 }]}>
+          <MarkdownEditor
+            value={form.getFieldValue('description')}
+            onChange={(value) => form.setFieldValue('description', value || '')}
+            maxLength={2048}
+          />
+        </Item>
+        <Item
+          label="Objectives Locked?"
+          name="objectivesLocked"
+          valuePropName="checked"
         >
-          <Item name="id" hidden={true}>
-            <Input />
-          </Item>
-          <Item label="Name" name="name" rules={[{ required: true }]}>
-            <TextArea
-              autoSize={{ minRows: 1, maxRows: 2 }}
-              showCount
-              maxLength={128}
-            />
-          </Item>
-          <Item name="description" label="Description" rules={[{ max: 2048 }]}>
-            <MarkdownEditor
-              value={form.getFieldValue('description')}
-              onChange={(value) =>
-                form.setFieldValue('description', value || '')
-              }
-              maxLength={2048}
-            />
-          </Item>
-          <Item
-            label="Objectives Locked?"
-            name="objectivesLocked"
-            valuePropName="checked"
-          >
-            <Switch checkedChildren="Yes" unCheckedChildren="No" />
-          </Item>
-        </Form>
-      </Modal>
-    </>
+          <Switch checkedChildren="Yes" unCheckedChildren="No" />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

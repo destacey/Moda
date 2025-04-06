@@ -7,7 +7,7 @@ import { authorizePage } from '@/src/components/hoc'
 import Link from 'next/link'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetUsersQuery } from '@/src/store/features/user-management/users-api'
-import { message } from 'antd'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const UserLinkCellRenderer = ({ value, data }) => {
   return <Link href={`users/${data.id}`}>{value}</Link>
@@ -21,7 +21,7 @@ const EmployeeLinkCellRenderer = ({ value, data }) => {
 
 const UsersListPage = () => {
   useDocumentTitle('Users')
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const { data: usersData, isLoading, error, refetch } = useGetUsersQuery()
 
@@ -52,7 +52,6 @@ const UsersListPage = () => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle title="Users" />
 
       <ModaGrid

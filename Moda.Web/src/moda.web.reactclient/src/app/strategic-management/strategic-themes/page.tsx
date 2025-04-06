@@ -5,9 +5,10 @@ import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetStrategicThemesQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
-import { Button, message } from 'antd'
+import { Button } from 'antd'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CreateStrategicThemeForm, StrategicThemesGrid } from './_components'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const StrategicThemesPage: React.FC = () => {
   useDocumentTitle('Strategic Themes')
@@ -15,7 +16,7 @@ const StrategicThemesPage: React.FC = () => {
   const [openCreateStrategicThemeForm, setOpenCreateStrategicThemeForm] =
     useState<boolean>(false)
 
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const { hasPermissionClaim } = useAuth()
   const canCreateStrategicTheme = hasPermissionClaim(
@@ -55,7 +56,6 @@ const StrategicThemesPage: React.FC = () => {
 
   return (
     <>
-      {contextHolder}
       <PageTitle title="Strategic Themes" actions={showActions && actions} />
       <StrategicThemesGrid
         strategicThemesData={strategicThemesData || []}

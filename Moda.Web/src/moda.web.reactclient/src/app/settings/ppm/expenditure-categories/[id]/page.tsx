@@ -4,7 +4,7 @@ import { PageActions, PageTitle } from '@/src/components/common'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
-import { Card, MenuProps, message } from 'antd'
+import { Card, MenuProps } from 'antd'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import ExpenditureCategorieDetailsLoading from './loading'
 import { notFound, useRouter } from 'next/navigation'
@@ -18,6 +18,7 @@ import { ItemType } from 'antd/es/menu/interface'
 import ChangeExpenditureCategoryStateForm, {
   ExpenditureCategoryStateAction,
 } from '../_components/change-expenditure-category-state-form'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 enum MenuActions {
   Edit = 'Edit',
@@ -43,7 +44,7 @@ const ExpenditureCategoryDetailsPage = ({ params }) => {
     setOpenDeleteExpenditureCategoryForm,
   ] = useState<boolean>(false)
 
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const router = useRouter()
 
@@ -200,7 +201,6 @@ const ExpenditureCategoryDetailsPage = ({ params }) => {
 
   return (
     <>
-      {contextHolder}
       <BasicBreadcrumb
         items={[
           { title: 'Settings' },

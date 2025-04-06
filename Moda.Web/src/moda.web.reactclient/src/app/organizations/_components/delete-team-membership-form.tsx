@@ -1,13 +1,14 @@
 import { TeamMembershipDto } from '@/src/services/moda-api'
 import { TeamTypeName } from '../types'
 import { useCallback, useEffect, useState } from 'react'
-import { Descriptions, Modal, message } from 'antd'
+import { Descriptions, Modal } from 'antd'
 import dayjs from 'dayjs'
 import {
   DeleteTeamMembershipMutationRequest,
   useDeleteTeamMembershipMutation,
 } from '@/src/services/queries/organization-queries'
 import useAuth from '../../../components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Descriptions
 
@@ -34,7 +35,7 @@ const mapToRequestValues = (
 const DeleteTeamMembershipForm = (props: DeleteTeamMembershipFormProps) => {
   const [isOpen, setIsOpen] = useState(props.showForm)
   const [isSaving, setIsSaving] = useState(false)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const deleteTeamMembershipMutation = useDeleteTeamMembershipMutation()
 
@@ -98,34 +99,31 @@ const DeleteTeamMembershipForm = (props: DeleteTeamMembershipFormProps) => {
   ])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Are you sure you want to delete this team membership?"
-        open={isOpen}
-        onOk={handleOk}
-        okText="Delete"
-        okType="danger"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        <Descriptions size="small" column={1}>
-          <Item label="Team">{props.membership?.child.name}</Item>
-          <Item label="Parent Team">{props.membership?.parent.name}</Item>
-          <Item label="Start">
-            {dayjs(props.membership?.start).format('M/D/YYYY')}
-          </Item>
-          <Item label="End">
-            {props.membership?.end
-              ? dayjs(props.membership?.end).format('M/D/YYYY')
-              : null}
-          </Item>
-        </Descriptions>
-      </Modal>
-    </>
+    <Modal
+      title="Are you sure you want to delete this team membership?"
+      open={isOpen}
+      onOk={handleOk}
+      okText="Delete"
+      okType="danger"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Descriptions size="small" column={1}>
+        <Item label="Team">{props.membership?.child.name}</Item>
+        <Item label="Parent Team">{props.membership?.parent.name}</Item>
+        <Item label="Start">
+          {dayjs(props.membership?.start).format('M/D/YYYY')}
+        </Item>
+        <Item label="End">
+          {props.membership?.end
+            ? dayjs(props.membership?.end).format('M/D/YYYY')
+            : null}
+        </Item>
+      </Descriptions>
+    </Modal>
   )
 }
 

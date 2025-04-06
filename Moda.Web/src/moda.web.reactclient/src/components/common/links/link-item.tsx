@@ -1,6 +1,6 @@
 import { LinkDto } from '@/src/services/moda-api'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
-import { Button, Popconfirm, Space, message } from 'antd'
+import { Button, Popconfirm, Space } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
 import EditLinkForm from './edit-link-form'
@@ -8,6 +8,7 @@ import {
   StoreDeleteLinkRequest,
   useDeleteLinkMutation,
 } from '@/src/store/features/common/links-api'
+import { useMessage } from '../../contexts/messaging'
 
 export interface LinkItemProps {
   link: LinkDto
@@ -26,7 +27,7 @@ const LinkItem = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false)
   const [deleteConfirmLoading, setDeleteConfirmLoading] =
     useState<boolean>(false)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage();
 
   const [deleteLinkMutation, { error: deleteLinkError }] =
     useDeleteLinkMutation()
@@ -86,7 +87,6 @@ const LinkItem = ({
   } else {
     return (
       <>
-        {contextHolder}
         <Space
           style={{
             display: 'flex',

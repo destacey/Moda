@@ -1,7 +1,8 @@
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { InitWorkProcessIntegrationRequest } from '@/src/services/moda-api'
 import { useInitAzdoConnectionWorkProcessMutation } from '@/src/store/features/app-integration/azdo-integration-api'
-import { Modal, Typography, message } from 'antd'
+import { Modal, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 
 const { Text } = Typography
@@ -19,7 +20,7 @@ const InitWorkProcessIntegrationForm = (
 ) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [messageApi, contextHolder] = message.useMessage()
+  const messageApi = useMessage()
 
   const { hasClaim } = useAuth()
   const canUpdateConnection = hasClaim(
@@ -87,26 +88,23 @@ const InitWorkProcessIntegrationForm = (
   }, [canUpdateConnection, messageApi, props])
 
   return (
-    <>
-      {contextHolder}
-      <Modal
-        title="Initialize Work Process"
-        open={isOpen}
-        onOk={handleOk}
-        okText="Init"
-        confirmLoading={isSaving}
-        onCancel={handleCancel}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
-      >
-        <Text>
-          Initializing the work process will create the necessary work item
-          types, work statuses, workflows, and work process.
-        </Text>
-        {}
-      </Modal>
-    </>
+    <Modal
+      title="Initialize Work Process"
+      open={isOpen}
+      onOk={handleOk}
+      okText="Init"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Text>
+        Initializing the work process will create the necessary work item types,
+        work statuses, workflows, and work process.
+      </Text>
+      {}
+    </Modal>
   )
 }
 
