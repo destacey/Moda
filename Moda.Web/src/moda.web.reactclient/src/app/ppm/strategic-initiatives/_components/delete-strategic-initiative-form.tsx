@@ -25,7 +25,7 @@ const DeleteStrategicInitiativeForm = (
   const [deleteStrategicInitiativeMutation, { error: mutationError }] =
     useDeleteStrategicInitiativeMutation()
 
-  const deleteStrategicInitiative = async (
+  const formAction = async (
     strategicInitiative: StrategicInitiativeDetailsDto,
   ) => {
     try {
@@ -51,7 +51,7 @@ const DeleteStrategicInitiativeForm = (
   const handleOk = async () => {
     setIsSaving(true)
     try {
-      if (await deleteStrategicInitiative(props.strategicInitiative)) {
+      if (await formAction(props.strategicInitiative)) {
         // TODO: not working because the parent page is gone
         props.messageApi.success('Successfully deleted strategic initiative.')
         props.onFormComplete()

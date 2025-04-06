@@ -77,7 +77,7 @@ const CreateStrategicInitiativeForm = (
     error: employeeOptionsError,
   } = useGetEmployeeOptionsQuery(false)
 
-  const create = async (values: CreateStrategicInitiativeFormValues) => {
+  const formAction = async (values: CreateStrategicInitiativeFormValues) => {
     try {
       const request = mapToRequestValues(values)
       const response = await createStrategicInitiative(request)
@@ -109,7 +109,7 @@ const CreateStrategicInitiativeForm = (
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await create(values)) {
+      if (await formAction(values)) {
         setIsOpen(false)
         form.resetFields()
         onFormComplete()

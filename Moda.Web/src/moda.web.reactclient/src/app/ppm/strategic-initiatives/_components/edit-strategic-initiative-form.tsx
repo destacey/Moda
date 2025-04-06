@@ -2,7 +2,6 @@
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
-import { authorizeForm } from '@/src/components/hoc'
 import {
   StrategicInitiativeDetailsDto,
   UpdateStrategicInitiativeRequest,
@@ -112,7 +111,7 @@ const EditStrategicInitiativeForm = (
     [form],
   )
 
-  const update = async (
+  const formAction = async (
     values: EditStrategicInitiativeFormValues,
     strategicInitiative: StrategicInitiativeDetailsDto,
   ) => {
@@ -149,7 +148,7 @@ const EditStrategicInitiativeForm = (
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await update(values, strategicInitiativeData)) {
+      if (await formAction(values, strategicInitiativeData)) {
         setIsOpen(false)
         form.resetFields()
         onFormComplete()

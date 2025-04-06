@@ -138,7 +138,9 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
         label: 'KPIs',
         content: (
           <StrategicInitiativeKpisGrid
+            strategicInitiativeId={strategicInitiativeData?.id}
             kpis={kpiData}
+            canManageKpis={canUpdateStrategicInitiative}
             isLoading={isLoadingKpis}
             refetch={refetchKpis}
             messageApi={messageApi}
@@ -148,7 +150,14 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
       },
     ]
     return pageTabs
-  }, [isLoadingKpis, kpiData, messageApi, refetchKpis, strategicInitiativeData])
+  }, [
+    canUpdateStrategicInitiative,
+    isLoadingKpis,
+    kpiData,
+    messageApi,
+    refetchKpis,
+    strategicInitiativeData,
+  ])
 
   // doesn't trigger on first render
   const onTabChange = useCallback(

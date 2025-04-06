@@ -3,28 +3,33 @@
 import { createTypedFormItem } from '@/src/components/common/forms/utils'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
-import { CreateStrategicInitiativeKpiRequest } from '@/src/services/moda-api'
 import {
-  useCreateStrategicInitiativeKpiMutation,
+  StrategicInitiativeKpiDetailsDto,
+  UpdateStrategicInitiativeKpiRequest,
+} from '@/src/services/moda-api'
+import {
+  useGetStrategicInitiativeKpiQuery,
   useGetStrategicInitiativeKpiTargetDirectionOptionsQuery,
   useGetStrategicInitiativeKpiUnitOptionsQuery,
+  useUpdateStrategicInitiativeKpiMutation,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { toFormErrors } from '@/src/utils'
-import { Form, FormItemProps, InputNumber, Modal, Select } from 'antd'
+import { Form, InputNumber, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
 
-export interface CreateStrategicInitiativeKpiFormProps {
+export interface EditStrategicInitiativeKpiFormProps {
   strategicInitiativeId: string
+  kpiId: string
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
   messageApi: any
 }
 
-interface CreateStrategicInitiativeKpiFormValues {
+interface EditStrategicInitiativeKpiFormValues {
   name: string
   description: string
   targetValue: number
@@ -33,14 +38,16 @@ interface CreateStrategicInitiativeKpiFormValues {
 }
 
 const TypedFormItem =
-  createTypedFormItem<CreateStrategicInitiativeKpiFormValues>()
+  createTypedFormItem<EditStrategicInitiativeKpiFormValues>()
 
 const mapToRequestValues = (
-  values: CreateStrategicInitiativeKpiFormValues,
+  values: EditStrategicInitiativeKpiFormValues,
   strategicInitiativeId: string,
-): CreateStrategicInitiativeKpiRequest => {
+  kpiId: string,
+): UpdateStrategicInitiativeKpiRequest => {
   return {
     strategicInitiativeId: strategicInitiativeId,
+    kpiId: kpiId,
     name: values.name,
     description: values.description,
     targetValue: values.targetValue,
@@ -49,30 +56,37 @@ const mapToRequestValues = (
   }
 }
 
-const CreateStrategicInitiativeKpiForm = (
-  props: CreateStrategicInitiativeKpiFormProps,
+const EditStrategicInitiativeKpiForm = (
+  props: EditStrategicInitiativeKpiFormProps,
 ) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isValid, setIsValid] = useState(false)
-  const [form] = Form.useForm<CreateStrategicInitiativeKpiFormValues>()
-  const formValues = Form.useWatch([], form)
-
   const {
     strategicInitiativeId,
+    kpiId,
     showForm,
     onFormComplete,
     onFormCancel,
     messageApi,
   } = props
 
+  const [isOpen, setIsOpen] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isValid, setIsValid] = useState(false)
+  const [form] = Form.useForm<EditStrategicInitiativeKpiFormValues>()
+  const formValues = Form.useWatch([], form)
+
   const { hasPermissionClaim } = useAuth()
-  const canCreateKpis = hasPermissionClaim(
+  const canUpdateKpis = hasPermissionClaim(
     'Permissions.StrategicInitiatives.Update',
   )
 
-  const [createKpi, { error: mutationError }] =
-    useCreateStrategicInitiativeKpiMutation()
+  const {
+    data: kpiData,
+    isLoading: kpiIsLoading,
+    error: kpiError,
+  } = useGetStrategicInitiativeKpiQuery({ strategicInitiativeId, kpiId })
+
+  const [updateKpi, { error: mutationError }] =
+    useUpdateStrategicInitiativeKpiMutation()
 
   const {
     data: unitData,
@@ -86,19 +100,36 @@ const CreateStrategicInitiativeKpiForm = (
     error: targetDirectionError,
   } = useGetStrategicInitiativeKpiTargetDirectionOptionsQuery()
 
+  const mapToFormValues = useCallback(
+    (kpi: StrategicInitiativeKpiDetailsDto) => {
+      if (!kpi) {
+        throw new Error('KPI not found')
+      }
+      form.setFieldsValue({
+        name: kpi.name,
+        description: kpi.description,
+        targetValue: kpi.targetValue,
+        unitId: kpi.unit.id,
+        targetDirectionId: kpi.targetDirection.id,
+      })
+    },
+    [form],
+  )
+
   const formAction = async (
-    values: CreateStrategicInitiativeKpiFormValues,
+    values: EditStrategicInitiativeKpiFormValues,
     strategicInitiativeId: string,
+    kpiId: string,
   ) => {
     try {
-      const request = mapToRequestValues(values, strategicInitiativeId)
-      const response = await createKpi(request)
+      const request = mapToRequestValues(values, strategicInitiativeId, kpiId)
+      const response = await updateKpi(request)
+
       if (response.error) {
         throw response.error
       }
-      messageApi.success(
-        'KPI created successfully. KPI key: ' + response.data.key,
-      )
+
+      messageApi.success(`KPI updated successfully.`)
 
       return true
     } catch (error) {
@@ -109,7 +140,7 @@ const CreateStrategicInitiativeKpiForm = (
       } else {
         messageApi.error(
           error.detail ??
-            'An error occurred while creating the KPI. Please try again.',
+            'An error occurred while updating the KPI. Please try again.',
         )
       }
       return false
@@ -120,7 +151,7 @@ const CreateStrategicInitiativeKpiForm = (
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await formAction(values, strategicInitiativeId)) {
+      if (await formAction(values, strategicInitiativeId, kpiId)) {
         setIsOpen(false)
         form.resetFields()
         onFormComplete()
@@ -142,25 +173,37 @@ const CreateStrategicInitiativeKpiForm = (
   }, [form, onFormCancel])
 
   useEffect(() => {
-    if (canCreateKpis) {
+    if (!kpiData) return
+    if (canUpdateKpis) {
       setIsOpen(showForm)
+      if (showForm) {
+        mapToFormValues(kpiData)
+      }
     } else {
       onFormCancel()
       messageApi.error('You do not have permission to create KPIs.')
     }
-  }, [canCreateKpis, messageApi, onFormCancel, showForm])
+  }, [
+    canUpdateKpis,
+    kpiData,
+    mapToFormValues,
+    messageApi,
+    onFormCancel,
+    showForm,
+  ])
 
   useEffect(() => {
-    if (unitsError || targetDirectionError) {
-      console.error(unitsError || targetDirectionError)
+    if (kpiError || unitsError || targetDirectionError) {
+      console.error(kpiError || unitsError || targetDirectionError)
       messageApi.error(
-        unitsError.detail ||
+        kpiError ||
+          unitsError.detail ||
           targetDirectionError.detail ||
           'An error occurred while loading form data.',
       )
       onFormCancel()
     }
-  }, [messageApi, onFormCancel, targetDirectionError, unitsError])
+  }, [kpiError, messageApi, onFormCancel, targetDirectionError, unitsError])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -172,11 +215,11 @@ const CreateStrategicInitiativeKpiForm = (
   return (
     <>
       <Modal
-        title="Create Strategic Initiative KPI"
+        title="Edit Strategic Initiative KPI"
         open={isOpen}
         onOk={handleOk}
         okButtonProps={{ disabled: !isValid }}
-        okText="Create"
+        okText="Save"
         confirmLoading={isSaving}
         onCancel={handleCancel}
         maskClosable={false}
@@ -187,7 +230,7 @@ const CreateStrategicInitiativeKpiForm = (
           form={form}
           size="small"
           layout="vertical"
-          name="create-strategic-initiative-kpi-form"
+          name="edit-strategic-initiative-kpi-form"
         >
           <TypedFormItem
             name="name"
@@ -250,4 +293,4 @@ const CreateStrategicInitiativeKpiForm = (
   )
 }
 
-export default CreateStrategicInitiativeKpiForm
+export default EditStrategicInitiativeKpiForm

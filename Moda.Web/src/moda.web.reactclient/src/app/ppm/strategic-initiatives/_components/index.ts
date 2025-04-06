@@ -3,5 +3,6 @@ export { default as CreateStrategicInitiativeForm } from './create-strategic-ini
 export { default as CreateStrategicInitiativeKpiForm } from './create-strategic-initiative-kpi-form'
 export { default as DeleteStrategicInitiativeForm } from './delete-strategic-initiative-form'
 export { default as EditStrategicInitiativeForm } from './edit-strategic-initiative-form'
+export { default as EditStrategicInitiativeKpiForm } from './edit-strategic-initiative-kpi-form'
 export { default as StrategicInitiativeDetails } from './strategic-initiative-details'
 export { default as StrategicInitiativeKpisGrid } from './strategic-initiative-kpis-grid'

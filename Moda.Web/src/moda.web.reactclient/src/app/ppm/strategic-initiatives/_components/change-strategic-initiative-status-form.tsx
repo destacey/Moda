@@ -82,7 +82,7 @@ const ChangeStrategicInitiativeStatusForm = (
     'Permissions.StrategicInitiatives.Update',
   )
 
-  const changeState = async (
+  const formAction = async (
     id: string,
     cacheKey: number,
     statusAction: StrategicInitiativeStatusAction,
@@ -119,7 +119,7 @@ const ChangeStrategicInitiativeStatusForm = (
     setIsSaving(true)
     try {
       if (
-        await changeState(
+        await formAction(
           props.strategicInitiative.id,
           props.strategicInitiative.key,
           props.statusAction,
