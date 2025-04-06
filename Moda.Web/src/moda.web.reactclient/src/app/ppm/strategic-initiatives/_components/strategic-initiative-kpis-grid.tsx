@@ -9,7 +9,10 @@ import { MenuProps } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import { MessageInstance } from 'antd/es/message/interface'
 import { FC, useCallback, useMemo, useState } from 'react'
-import { EditStrategicInitiativeKpiForm } from '.'
+import {
+  DeleteStrategicInitiativeKpiForm,
+  EditStrategicInitiativeKpiForm,
+} from '.'
 
 export interface StrategicInitiativeKpisGridProps {
   strategicInitiativeId: string
@@ -30,10 +33,16 @@ interface RowMenuProps extends MenuProps {
   strategicInitiativeId: string
   canManageKpis: boolean
   onEditKpiMenuClicked: (id: string) => void
+  onDeleteKpiMenuClicked: (id: string) => void
 }
 
 const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
-  if (!props.canManageKpis || !props.kpiId || !props.onEditKpiMenuClicked) {
+  if (
+    !props.canManageKpis ||
+    !props.kpiId ||
+    !props.onEditKpiMenuClicked ||
+    !props.onDeleteKpiMenuClicked
+  ) {
     return null
   }
 
@@ -42,6 +51,11 @@ const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
       key: 'edit-kpi',
       label: 'Edit KPI',
       onClick: () => props.onEditKpiMenuClicked(props.kpiId),
+    },
+    {
+      key: 'delete-kpi',
+      label: 'Delete KPI',
+      onClick: () => props.onDeleteKpiMenuClicked(props.kpiId),
     },
   ]
 }
@@ -61,6 +75,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
 
   const [selectedKpiId, setSelectedKpiId] = useState<string | null>(null)
   const [openEditKpiForm, setOpenEditKpiForm] = useState<boolean>(false)
+  const [openDeleteKpiForm, setOpenDeleteKpiForm] = useState<boolean>(false)
 
   const onEditKpiMenuClicked = useCallback((id: string) => {
     setSelectedKpiId(id)
@@ -69,6 +84,19 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
 
   const onEditKpiFormClosed = (wasSaved: boolean) => {
     setOpenEditKpiForm(false)
+    setSelectedKpiId(null)
+    if (wasSaved) {
+      refresh()
+    }
+  }
+
+  const onDeleteKpiMenuClicked = useCallback((id: string) => {
+    setSelectedKpiId(id)
+    setOpenDeleteKpiForm(true)
+  }, [])
+
+  const onDeleteKpiFormClosed = (wasSaved: boolean) => {
+    setOpenDeleteKpiForm(false)
     setSelectedKpiId(null)
     if (wasSaved) {
       refresh()
@@ -89,6 +117,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
             strategicInitiativeId: strategicInitiativeId,
             canManageKpis,
             onEditKpiMenuClicked,
+            onDeleteKpiMenuClicked,
           })
 
           return RowMenuCellRenderer({ menuItems })
@@ -124,7 +153,12 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         width: 125,
       },
     ],
-    [canManageKpis, strategicInitiativeId, onEditKpiMenuClicked],
+    [
+      canManageKpis,
+      strategicInitiativeId,
+      onEditKpiMenuClicked,
+      onDeleteKpiMenuClicked,
+    ],
   )
 
   const getRowId = useCallback(
@@ -154,6 +188,16 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
           showForm={openEditKpiForm}
           onFormComplete={() => onEditKpiFormClosed(true)}
           onFormCancel={() => onEditKpiFormClosed(false)}
+          messageApi={messageApi}
+        />
+      )}
+      {openDeleteKpiForm && selectedKpiId && (
+        <DeleteStrategicInitiativeKpiForm
+          strategicInitiativeId={strategicInitiativeId}
+          kpi={kpis.find((kpi) => kpi.id === selectedKpiId)}
+          showForm={openDeleteKpiForm}
+          onFormComplete={() => onDeleteKpiFormClosed(true)}
+          onFormCancel={() => onDeleteKpiFormClosed(false)}
           messageApi={messageApi}
         />
       )}

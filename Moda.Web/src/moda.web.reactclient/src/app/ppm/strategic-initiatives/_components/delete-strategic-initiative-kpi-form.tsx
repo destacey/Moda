@@ -1,36 +1,36 @@
 'use client'
 
 import { authorizeForm } from '@/src/components/hoc'
-import { StrategicInitiativeDetailsDto } from '@/src/services/moda-api'
-import { useDeleteStrategicInitiativeMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
+import { StrategicInitiativeKpiListDto } from '@/src/services/moda-api'
+import { useDeleteStrategicInitiativeKpiMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Modal } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 import { FC, useEffect, useState } from 'react'
 
-export interface DeleteStrategicInitiativeFormProps {
-  strategicInitiative: StrategicInitiativeDetailsDto
+export interface DeleteStrategicInitiativeKpiFormProps {
+  strategicInitiativeId: string
+  kpi: StrategicInitiativeKpiListDto
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
   messageApi: MessageInstance
 }
 
-const DeleteStrategicInitiativeForm = (
-  props: DeleteStrategicInitiativeFormProps,
+const DeleteStrategicInitiativeKpiForm = (
+  props: DeleteStrategicInitiativeKpiFormProps,
 ) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
-  const [deleteStrategicInitiativeMutation, { error: mutationError }] =
-    useDeleteStrategicInitiativeMutation()
+  const [deleteKpiMutation, { error: mutationError }] =
+    useDeleteStrategicInitiativeKpiMutation()
 
-  const formAction = async (
-    strategicInitiative: StrategicInitiativeDetailsDto,
-  ) => {
+  const formAction = async (kpi: StrategicInitiativeKpiListDto) => {
     try {
-      const response = await deleteStrategicInitiativeMutation(
-        strategicInitiative.id,
-      )
+      const response = await deleteKpiMutation({
+        strategicInitiativeId: props.strategicInitiativeId,
+        kpiId: kpi.id,
+      })
 
       if (response.error) {
         throw response.error
@@ -39,8 +39,7 @@ const DeleteStrategicInitiativeForm = (
       return true
     } catch (error) {
       props.messageApi.error(
-        error.detail ??
-          'An unexpected error occurred while deleting the strategic initiative.',
+        error.detail ?? 'An unexpected error occurred while deleting the KPI.',
       )
       console.log(error)
       return false
@@ -50,16 +49,16 @@ const DeleteStrategicInitiativeForm = (
   const handleOk = async () => {
     setIsSaving(true)
     try {
-      if (await formAction(props.strategicInitiative)) {
+      if (await formAction(props.kpi)) {
         // TODO: not working because the parent page is gone
-        props.messageApi.success('Successfully deleted strategic initiative.')
+        props.messageApi.success('Successfully deleted KPI.')
         props.onFormComplete()
         setIsOpen(false)
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
       props.messageApi.error(
-        'An unexpected error occurred while deleting the strategic initiative.',
+        'An unexpected error occurred while deleting the KPI.',
       )
     } finally {
       setIsSaving(false)
@@ -72,15 +71,15 @@ const DeleteStrategicInitiativeForm = (
   }
 
   useEffect(() => {
-    if (!props.strategicInitiative) return
+    if (!props.kpi) return
 
     setIsOpen(props.showForm)
-  }, [props.showForm, props.strategicInitiative])
+  }, [props.showForm, props.kpi])
 
   return (
     <>
       <Modal
-        title="Are you sure you want to delete this Strategic Initiative?"
+        title="Are you sure you want to delete this KPI?"
         open={isOpen}
         onOk={handleOk}
         okText="Delete"
@@ -91,24 +90,24 @@ const DeleteStrategicInitiativeForm = (
         keyboard={false} // disable esc key to close modal
         destroyOnClose={true}
       >
-        {props.strategicInitiative?.key} - {props.strategicInitiative?.name}
+        {props.kpi?.key} - {props.kpi?.name}
       </Modal>
     </>
   )
 }
 
-const AuthorizedDeleteStrategicInitiativeForm: FC<
-  DeleteStrategicInitiativeFormProps
+const AuthorizedDeleteStrategicInitiativeKpiForm: FC<
+  DeleteStrategicInitiativeKpiFormProps
 > = (props) => {
   const AuthorizedForm = authorizeForm(
-    DeleteStrategicInitiativeForm,
+    DeleteStrategicInitiativeKpiForm,
     props.onFormCancel,
     props.messageApi,
     'Permission',
-    'Permissions.StrategicInitiatives.Delete',
+    'Permissions.StrategicInitiatives.Update',
   )
 
   return <AuthorizedForm {...props} />
 }
 
-export default AuthorizedDeleteStrategicInitiativeForm
+export default AuthorizedDeleteStrategicInitiativeKpiForm
