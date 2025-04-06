@@ -12005,6 +12005,14 @@
       "ApplicationPermission": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "description",
+          "action",
+          "resource",
+          "isBasic",
+          "isRoot",
+          "name"
+        ],
         "properties": {
           "description": {
             "type": "string"
@@ -12058,6 +12066,10 @@
       "UserDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "isActive"
+        ],
         "properties": {
           "id": {
             "type": "string"
@@ -12198,6 +12210,11 @@
       "AuditDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "userId",
+          "dateTime"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -12244,6 +12261,10 @@
       "RoleListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
         "properties": {
           "id": {
             "type": "string"
@@ -12260,6 +12281,10 @@
       "RoleDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
         "properties": {
           "id": {
             "type": "string"
@@ -12328,6 +12353,9 @@
       "UserRoleDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "enabled"
+        ],
         "properties": {
           "roleId": {
             "type": "string",
@@ -12349,6 +12377,10 @@
       "AssignUserRolesRequest": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "userId",
+          "roleNames"
+        ],
         "properties": {
           "userId": {
             "type": "string"
@@ -12364,6 +12396,10 @@
       "ToggleUserStatusRequest": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "userId",
+          "activateUser"
+        ],
         "properties": {
           "userId": {
             "type": "string"
@@ -12376,6 +12412,12 @@
       "StrategicThemeListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "state"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -12416,6 +12458,13 @@
       "StrategicThemeDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "description",
+          "state"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -12441,6 +12490,10 @@
       "ObjectIdAndKey": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -12514,6 +12567,11 @@
       "StrategicThemeOptionDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "state"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -12543,6 +12601,11 @@
       "CommonEnumDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -12564,6 +12627,12 @@
       "StrategyListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "status"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -12596,6 +12665,13 @@
       "StrategyDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "description",
+          "status"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -12632,7 +12708,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name"
+          "name",
+          "description",
+          "statusId"
         ],
         "properties": {
           "name": {
@@ -12672,7 +12750,9 @@
         "additionalProperties": false,
         "required": [
           "id",
-          "name"
+          "name",
+          "description",
+          "statusId"
         ],
         "properties": {
           "id": {
@@ -12729,6 +12809,12 @@
       "VisionDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "description",
+          "state"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -12813,6 +12899,13 @@
       "ExpenditureCategoryListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "state",
+          "isCapitalizable",
+          "requiresDepreciation"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -12839,6 +12932,14 @@
       "ExpenditureCategoryDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "description",
+          "state",
+          "isCapitalizable",
+          "requiresDepreciation"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -12870,7 +12971,9 @@
         "additionalProperties": false,
         "required": [
           "name",
-          "description"
+          "description",
+          "isCapitalizable",
+          "requiresDepreciation"
         ],
         "properties": {
           "name": {
@@ -12908,8 +13011,11 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "id",
           "name",
-          "description"
+          "description",
+          "isCapitalizable",
+          "requiresDepreciation"
         ],
         "properties": {
           "id": {
@@ -12950,6 +13056,11 @@
       "ExpenditureCategoryOptionDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "state"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -12966,6 +13077,16 @@
       "ProjectPortfolioListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "description",
+          "status",
+          "portfolioSponsors",
+          "portfolioOwners",
+          "portfolioManagers"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -13020,6 +13141,16 @@
       "ProjectPortfolioDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "description",
+          "status",
+          "portfolioSponsors",
+          "portfolioOwners",
+          "portfolioManagers"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -13186,6 +13317,17 @@
       "ProjectListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "status",
+          "portfolio",
+          "projectSponsors",
+          "projectOwners",
+          "projectManagers",
+          "strategicThemes"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -13245,6 +13387,15 @@
       "StrategicInitiativeListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "status",
+          "portfolio",
+          "strategicInitiativeSponsors",
+          "strategicInitiativeOwners"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -13292,6 +13443,10 @@
       "ProjectPortfolioOptionDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -13307,6 +13462,19 @@
       "ProjectDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "description",
+          "status",
+          "expenditureCategory",
+          "portfolio",
+          "projectSponsors",
+          "projectOwners",
+          "projectManagers",
+          "strategicThemes"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -13375,6 +13543,7 @@
         "required": [
           "name",
           "description",
+          "expenditureCategoryId",
           "portfolioId"
         ],
         "properties": {
@@ -13478,7 +13647,8 @@
         "required": [
           "id",
           "name",
-          "description"
+          "description",
+          "expenditureCategoryId"
         ],
         "properties": {
           "id": {
@@ -13571,6 +13741,16 @@
       "StrategicInitiativeDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "description",
+          "status",
+          "portfolio",
+          "strategicInitiativeSponsors",
+          "strategicInitiativeOwners"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -13758,6 +13938,14 @@
       "StrategicInitiativeKpiListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "targetValue",
+          "unit",
+          "targetDirection"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -13792,6 +13980,14 @@
       "StrategicInitiativeKpiDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "targetValue",
+          "unit",
+          "targetDirection"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -13834,7 +14030,9 @@
           "strategicInitiativeId",
           "name",
           "description",
-          "targetValue"
+          "targetValue",
+          "unit",
+          "targetDirection"
         ],
         "properties": {
           "strategicInitiativeId": {
@@ -13886,7 +14084,9 @@
           "kpiId",
           "name",
           "description",
-          "targetValue"
+          "targetValue",
+          "unit",
+          "targetDirection"
         ],
         "properties": {
           "strategicInitiativeId": {
@@ -13963,6 +14163,14 @@
       "PlanningIntervalListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "start",
+          "end",
+          "state"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -13993,6 +14201,15 @@
       "PlanningIntervalDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "start",
+          "end",
+          "state",
+          "objectivesLocked"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -14035,6 +14252,14 @@
       "PlanningIntervalCalendarDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "start",
+          "end",
+          "iterationSchedules"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -14068,6 +14293,13 @@
       "LocalScheduleDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "start",
+          "end"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -14095,6 +14327,9 @@
       "PlanningIntervalPredictabilityDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "teamPredictabilities"
+        ],
         "properties": {
           "predictability": {
             "type": "number",
@@ -14112,6 +14347,9 @@
       "PlanningIntervalTeamPredictabilityDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "team"
+        ],
         "properties": {
           "team": {
             "$ref": "#/components/schemas/PlanningTeamNavigationDto"
@@ -14145,7 +14383,8 @@
         "required": [
           "name",
           "start",
-          "end"
+          "end",
+          "iterationWeeks"
         ],
         "properties": {
           "name": {
@@ -14192,7 +14431,9 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name"
+          "id",
+          "name",
+          "objectivesLocked"
         ],
         "properties": {
           "id": {
@@ -14225,6 +14466,14 @@
       "PlanningIntervalTeamResponse": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "code",
+          "type",
+          "isActive"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -14286,7 +14535,8 @@
         "required": [
           "id",
           "start",
-          "end"
+          "end",
+          "iterations"
         ],
         "properties": {
           "id": {
@@ -14322,6 +14572,7 @@
         "additionalProperties": false,
         "required": [
           "name",
+          "typeId",
           "start",
           "end"
         ],
@@ -14361,6 +14612,10 @@
       "ManagePlanningIntervalTeamsRequest": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "teamIds"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -14382,6 +14637,14 @@
       "PlanningIntervalIterationListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "start",
+          "end",
+          "type"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -14412,6 +14675,11 @@
       "PlanningIntervalIterationTypeDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -14433,6 +14701,17 @@
       "PlanningIntervalObjectiveListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "status",
+          "planningInterval",
+          "team",
+          "progress",
+          "type",
+          "isStretch"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -14494,6 +14773,11 @@
       "PlanningHealthCheckDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "status",
+          "expiration"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -14513,6 +14797,17 @@
       "PlanningIntervalObjectiveDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "status",
+          "progress",
+          "planningInterval",
+          "team",
+          "type",
+          "isStretch"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -14579,8 +14874,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "planningIntervalId",
           "teamId",
-          "name"
+          "name",
+          "isStretch"
         ],
         "properties": {
           "planningIntervalId": {
@@ -14632,7 +14929,12 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name"
+          "planningIntervalId",
+          "objectiveId",
+          "name",
+          "statusId",
+          "progress",
+          "isStretch"
         ],
         "properties": {
           "planningIntervalId": {
@@ -14687,6 +14989,10 @@
       "UpdatePlanningIntervalObjectivesOrderRequest": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "planningIntervalId",
+          "objectives"
+        ],
         "properties": {
           "planningIntervalId": {
             "type": "string",
@@ -14707,6 +15013,17 @@
       "PlanningIntervalObjectiveHealthCheckDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "status",
+          "type",
+          "planningInterval",
+          "team",
+          "progress",
+          "isStretch"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -14792,6 +15109,10 @@
       "WorkItemsSummaryDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "progressSummary",
+          "workItems"
+        ],
         "properties": {
           "progressSummary": {
             "$ref": "#/components/schemas/WorkItemProgressRollupDto"
@@ -14807,6 +15128,12 @@
       "WorkItemProgressRollupDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "proposed",
+          "active",
+          "done",
+          "total"
+        ],
         "properties": {
           "proposed": {
             "type": "integer",
@@ -14829,6 +15156,16 @@
       "WorkItemListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "title",
+          "workspace",
+          "type",
+          "status",
+          "statusCategory",
+          "stackRank"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -14928,6 +15265,12 @@
       "WorkItemNavigationDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "title",
+          "workspaceKey"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -14986,6 +15329,11 @@
       "ManagePlanningIntervalObjectiveWorkItemsRequest": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "planningIntervalId",
+          "objectiveId",
+          "workItemIds"
+        ],
         "properties": {
           "planningIntervalId": {
             "type": "string",
@@ -15013,6 +15361,11 @@
       "PlanningIntervalObjectiveStatusDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -15034,6 +15387,15 @@
       "RiskListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "summary",
+          "reportedOn",
+          "status",
+          "category",
+          "exposure"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -15087,6 +15449,18 @@
       "RiskDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "summary",
+          "reportedOn",
+          "reportedBy",
+          "status",
+          "category",
+          "impact",
+          "likelihood",
+          "exposure"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -15164,7 +15538,10 @@
         "additionalProperties": false,
         "required": [
           "teamId",
-          "summary"
+          "summary",
+          "categoryId",
+          "impactId",
+          "likelihoodId"
         ],
         "properties": {
           "teamId": {
@@ -15221,8 +15598,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "riskId",
           "teamId",
-          "summary"
+          "summary",
+          "statusId",
+          "categoryId",
+          "impactId",
+          "likelihoodId"
         ],
         "properties": {
           "riskId": {
@@ -15288,6 +15670,11 @@
       "RiskStatusDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -15309,6 +15696,11 @@
       "RiskCategoryDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -15330,6 +15722,11 @@
       "RiskGradeDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -15351,6 +15748,15 @@
       "RoadmapListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "start",
+          "end",
+          "visibility",
+          "roadmapManagers"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -15391,6 +15797,15 @@
       "RoadmapDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "start",
+          "end",
+          "visibility",
+          "roadmapManagers"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -15435,7 +15850,8 @@
           "name",
           "start",
           "end",
-          "roadmapManagerIds"
+          "roadmapManagerIds",
+          "visibilityId"
         ],
         "properties": {
           "name": {
@@ -15491,7 +15907,8 @@
           "name",
           "start",
           "end",
-          "roadmapManagerIds"
+          "roadmapManagerIds",
+          "visibilityId"
         ],
         "properties": {
           "id": {
@@ -15559,7 +15976,11 @@
         },
         "additionalProperties": false,
         "required": [
-          "$type"
+          "$type",
+          "id",
+          "roadmapId",
+          "name",
+          "type"
         ],
         "properties": {
           "id": {
@@ -15600,6 +16021,10 @@
       "RoadmapActivityNavigationDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -15693,7 +16118,11 @@
         },
         "additionalProperties": false,
         "required": [
-          "$type"
+          "$type",
+          "id",
+          "roadmapId",
+          "name",
+          "type"
         ],
         "properties": {
           "id": {
@@ -16060,7 +16489,8 @@
         "additionalProperties": false,
         "required": [
           "roadmapId",
-          "activityId"
+          "activityId",
+          "order"
         ],
         "properties": {
           "roadmapId": {
@@ -16105,6 +16535,11 @@
       "TeamTypeDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -16126,6 +16561,13 @@
       "WorkProcessListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "ownership",
+          "isActive"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -16151,6 +16593,13 @@
       "WorkProcessDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "ownership",
+          "isActive"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -16180,6 +16629,12 @@
       "WorkProcessSchemeDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "workType",
+          "workflow",
+          "isActive"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -16201,6 +16656,12 @@
       "WorkTypeDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "level",
+          "isActive"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -16224,6 +16685,14 @@
       "WorkflowDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "ownership",
+          "isActive",
+          "schemes"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -16259,6 +16728,13 @@
       "WorkflowSchemeDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "workStatus",
+          "workStatusCategory",
+          "order",
+          "isActive"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -16284,6 +16760,11 @@
       "WorkStatusDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "isActive"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -16304,6 +16785,13 @@
       "WorkspaceListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "ownership",
+          "isActive"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -16332,6 +16820,14 @@
       "WorkspaceDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "ownership",
+          "workProcess",
+          "isActive"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -16385,6 +16881,18 @@
       "WorkItemDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "title",
+          "workspace",
+          "type",
+          "tier",
+          "status",
+          "statusCategory",
+          "created",
+          "lastModified"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -16490,6 +16998,13 @@
       "ScopedDependencyDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "dependency",
+          "type",
+          "status",
+          "createdOn"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -16527,6 +17042,15 @@
       "WorkItemDetailsNavigationDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "title",
+          "workspaceKey",
+          "type",
+          "status",
+          "statusCategory"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -16579,6 +17103,11 @@
       "WorkStatusCategoryListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -16623,6 +17152,9 @@
       "UpdateWorkStatusRequest": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -16640,6 +17172,12 @@
       "WorkTypeLevelDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "tier",
+          "order"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -16688,6 +17226,7 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "id",
           "name"
         ],
         "properties": {
@@ -16714,6 +17253,9 @@
       "UpdateWorkTypeLevelsOrderRequest": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "levels"
+        ],
         "properties": {
           "levels": {
             "type": "object",
@@ -16728,7 +17270,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name"
+          "name",
+          "levelId"
         ],
         "properties": {
           "name": {
@@ -16757,6 +17300,10 @@
       "UpdateWorkTypeRequest": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "levelId"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -16781,6 +17328,11 @@
       "WorkTypeTierDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -16802,6 +17354,16 @@
       "EmployeeListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "displayName",
+          "firstName",
+          "lastName",
+          "employeeNumber",
+          "email",
+          "isActive"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -16868,6 +17430,17 @@
       "EmployeeDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "displayName",
+          "fullName",
+          "firstName",
+          "lastName",
+          "employeeNumber",
+          "email",
+          "isActive"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -17038,6 +17611,7 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "id",
           "firstName",
           "lastName",
           "employeeNumber",
@@ -17193,7 +17767,8 @@
           "name",
           "code",
           "type",
-          "isActive"
+          "isActive",
+          "activeDate"
         ],
         "properties": {
           "id": {
@@ -17288,6 +17863,7 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "id",
           "name",
           "code"
         ],
@@ -17347,6 +17923,13 @@
       "TeamMembershipDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "child",
+          "parent",
+          "start",
+          "state"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -17447,6 +18030,18 @@
       "WorkItemBacklogItemDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "title",
+          "workspace",
+          "type",
+          "status",
+          "statusCategory",
+          "created",
+          "rank",
+          "stackRank"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -17522,6 +18117,14 @@
       "DependencyDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "source",
+          "target",
+          "linkType",
+          "status",
+          "createdOn"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -17562,6 +18165,12 @@
       "FunctionalOrganizationChartDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "asOfDate",
+          "organization",
+          "total",
+          "maxDepth"
+        ],
         "properties": {
           "asOfDate": {
             "type": "string",
@@ -17586,6 +18195,15 @@
       "OrganizationalUnitDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "code",
+          "type",
+          "level",
+          "path"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -17679,7 +18297,8 @@
           "name",
           "code",
           "type",
-          "isActive"
+          "isActive",
+          "activeDate"
         ],
         "properties": {
           "id": {
@@ -17736,6 +18355,7 @@
         "additionalProperties": false,
         "required": [
           "name",
+          "code",
           "activeDate"
         ],
         "properties": {
@@ -17772,6 +18392,7 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "id",
           "name",
           "code"
         ],
@@ -17831,6 +18452,12 @@
       "LinkDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "objectId",
+          "name",
+          "url"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -17913,6 +18540,14 @@
       "HealthCheckDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "objectId",
+          "status",
+          "reportedBy",
+          "reportedOn",
+          "expiration"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -17951,6 +18586,8 @@
         "additionalProperties": false,
         "required": [
           "objectId",
+          "contextId",
+          "statusId",
           "expiration"
         ],
         "properties": {
@@ -17988,6 +18625,8 @@
         "additionalProperties": false,
         "required": [
           "id",
+          "contextId",
+          "statusId",
           "expiration"
         ],
         "properties": {
@@ -18023,6 +18662,11 @@
       "HealthStatusDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -18044,6 +18688,14 @@
       "ConnectionListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "connector",
+          "isActive",
+          "isValidConfiguration",
+          "isSyncEnabled"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -18071,6 +18723,16 @@
       "AzureDevOpsBoardsConnectionDetailsDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "connector",
+          "configuration",
+          "teamConfiguration",
+          "isActive",
+          "isValidConfiguration",
+          "isSyncEnabled"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -18108,6 +18770,13 @@
       "AzureDevOpsBoardsConnectionConfigurationDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "organization",
+          "personalAccessToken",
+          "organizationUrl",
+          "workProcesses",
+          "workspaces"
+        ],
         "properties": {
           "organization": {
             "type": "string"
@@ -18135,6 +18804,10 @@
       "AzureDevOpsBoardsWorkProcessDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "externalId",
+          "name"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -18168,6 +18841,10 @@
       "IntegrationStateDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "internalId",
+          "isActive"
+        ],
         "properties": {
           "internalId": {
             "type": "string",
@@ -18183,6 +18860,11 @@
       "AzureDevOpsBoardsWorkspaceDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "externalId",
+          "name",
+          "workProcessId"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -18222,6 +18904,9 @@
       "AzureDevOpsBoardsTeamConfigurationDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "workspaceTeams"
+        ],
         "properties": {
           "workspaceTeams": {
             "type": "array",
@@ -18234,6 +18919,11 @@
       "AzureDevOpsBoardsWorkspaceTeamDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "workspaceId",
+          "teamId",
+          "teamName"
+        ],
         "properties": {
           "workspaceId": {
             "type": "string",
@@ -18307,6 +18997,7 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "id",
           "name",
           "organization",
           "personalAccessToken"
@@ -18353,7 +19044,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "connectionId"
+          "connectionId",
+          "teamMappings"
         ],
         "properties": {
           "connectionId": {
@@ -18409,6 +19101,10 @@
       "TestAzureDevOpsBoardConnectionRequest": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "organization",
+          "personalAccessToken"
+        ],
         "properties": {
           "organization": {
             "type": "string",
@@ -18498,6 +19194,10 @@
       "ConnectorListDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -18515,6 +19215,12 @@
       "BackgroundJobTypeDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "order",
+          "groupName"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -18539,6 +19245,14 @@
       "BackgroundJobDto": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "id",
+          "status",
+          "namespace",
+          "type",
+          "action",
+          "inProcessingState"
+        ],
         "properties": {
           "id": {
             "type": "string"
@@ -18568,6 +19282,11 @@
       "CreateRecurringJobRequest": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "jobId",
+          "jobTypeId",
+          "cronExpression"
+        ],
         "properties": {
           "jobId": {
             "type": "string"

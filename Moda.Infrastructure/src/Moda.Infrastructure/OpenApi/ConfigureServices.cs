@@ -21,6 +21,8 @@ internal static class ConfigureServices
             services.AddEndpointsApiExplorer();
             services.AddOpenApiDocument((document, serviceProvider) =>
             {
+                document.SchemaSettings.SchemaProcessors.Add(new MarkAsRequiredIfNonNullableSchemaProcessor());
+
                 document.PostProcess = doc =>
                 {
                     doc.Info.Title = settings.Title;
