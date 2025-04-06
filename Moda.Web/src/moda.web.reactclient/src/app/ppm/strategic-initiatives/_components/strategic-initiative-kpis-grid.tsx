@@ -23,6 +23,7 @@ export interface StrategicInitiativeKpisGridProps {
   refetch: () => void
   messageApi: MessageInstance
   gridHeight?: number | undefined
+  isReadOnly?: boolean
 }
 
 const StatisticNumberCellRenderer = (params) => {
@@ -83,6 +84,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
     refetch,
     messageApi,
     gridHeight,
+    isReadOnly,
   } = props
 
   const [selectedKpiId, setSelectedKpiId] = useState<string | null>(null)
@@ -137,7 +139,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         filter: false,
         sortable: false,
         resizable: false,
-        hide: !canManageKpis,
+        hide: isReadOnly || !canManageKpis,
         cellRenderer: (params) => {
           const menuItems = getRowMenuItems({
             kpiId: params.data.id,

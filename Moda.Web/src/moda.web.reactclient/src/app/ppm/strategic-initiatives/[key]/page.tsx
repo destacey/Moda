@@ -42,6 +42,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
   useDocumentTitle('Strategic Initiative Details')
   const [activeTab, setActiveTab] = useState(StrategicInitiativeTabs.Details)
   const [kpisQueried, setKpisQueried] = useState(false)
+  const [isReadOnly, setIsReadOnly] = useState(false)
 
   const [openEditStrategicInitiativeForm, setOpenEditStrategicInitiativeForm] =
     useState<boolean>(false)
@@ -101,6 +102,9 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
   useEffect(() => {
     if (!strategicInitiativeData) return
 
+    const status = strategicInitiativeData.status.name
+    setIsReadOnly(status === 'Completed' || status === 'Cancelled')
+
     const breadcrumbRoute: BreadcrumbItem[] = [
       {
         title: 'PPM',
@@ -145,6 +149,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
             refetch={refetchKpis}
             messageApi={messageApi}
             gridHeight={550}
+            isReadOnly={isReadOnly}
           />
         ),
       },
@@ -157,6 +162,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     messageApi,
     refetchKpis,
     strategicInitiativeData,
+    isReadOnly,
   ])
 
   // doesn't trigger on first render
@@ -278,7 +284,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     }
 
     //KPI actions
-    if (canUpdateStrategicInitiative) {
+    if (!isReadOnly && canUpdateStrategicInitiative) {
       items.push(
         {
           key: 'manage-divider-2',
@@ -296,6 +302,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
   }, [
     canDeleteStrategicInitiative,
     canUpdateStrategicInitiative,
+    isReadOnly,
     strategicInitiativeData?.status.name,
   ])
 
