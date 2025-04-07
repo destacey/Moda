@@ -3,6 +3,7 @@
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { CreateProjectRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetExpenditureCategoryOptionsQuery } from '@/src/store/features/ppm/expenditure-categories-api'
@@ -12,7 +13,6 @@ import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -21,7 +21,6 @@ export interface CreateProjectFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface CreateProjectFormValues {
@@ -60,6 +59,8 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreateProjectFormValues>()
   const formValues = Form.useWatch([], form)
+
+  const messageApi = useMessage()
 
   const [createProject, { error: mutationError }] = useCreateProjectMutation()
 
@@ -103,7 +104,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
           employeeOptionsError ??
           strategicThemeOptionsError,
       )
-      props.messageApi.error(
+      messageApi.error(
         expenditureOptionsError.detail ??
           portfolioOptionsError.detail ??
           employeeOptionsError.detail ??
@@ -115,7 +116,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
     employeeOptionsError,
     expenditureOptionsError,
     portfolioOptionsError,
-    props.messageApi,
+    messageApi,
     strategicThemeOptionsError,
   ])
 
@@ -126,7 +127,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
       if (response.error) {
         throw response.error
       }
-      props.messageApi.success(
+      messageApi.success(
         'Project created successfully. Project key: ' + response.data.key,
       )
 
@@ -135,9 +136,9 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while creating the project. Please try again.',
         )
@@ -157,7 +158,7 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
       }
     } catch (error) {
       console.error('handleOk error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while creating the project. Please try again.',
       )
     } finally {
@@ -176,9 +177,9 @@ const CreateProjectForm = (props: CreateProjectFormProps) => {
       setIsOpen(props.showForm)
     } else {
       props.onFormCancel()
-      props.messageApi.error('You do not have permission to create projects.')
+      messageApi.error('You do not have permission to create projects.')
     }
-  }, [canCreateProject, props])
+  }, [canCreateProject, messageApi, props])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(

@@ -1,10 +1,10 @@
 'use client'
 
+import { useMessage } from '@/src/components/contexts/messaging'
 import { authorizeForm } from '@/src/components/hoc'
 import { StrategicInitiativeKpiListDto } from '@/src/services/moda-api'
 import { useDeleteStrategicInitiativeKpiMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Modal } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { FC, useEffect, useState } from 'react'
 
 export interface DeleteStrategicInitiativeKpiFormProps {
@@ -13,7 +13,6 @@ export interface DeleteStrategicInitiativeKpiFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 const DeleteStrategicInitiativeKpiForm = (
@@ -21,6 +20,8 @@ const DeleteStrategicInitiativeKpiForm = (
 ) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  const messageApi = useMessage()
 
   const [deleteKpiMutation, { error: mutationError }] =
     useDeleteStrategicInitiativeKpiMutation()
@@ -38,7 +39,7 @@ const DeleteStrategicInitiativeKpiForm = (
 
       return true
     } catch (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ?? 'An unexpected error occurred while deleting the KPI.',
       )
       console.log(error)
@@ -51,15 +52,13 @@ const DeleteStrategicInitiativeKpiForm = (
     try {
       if (await formAction(props.kpi)) {
         // TODO: not working because the parent page is gone
-        props.messageApi.success('Successfully deleted KPI.')
+        messageApi.success('Successfully deleted KPI.')
         props.onFormComplete()
         setIsOpen(false)
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
-      props.messageApi.error(
-        'An unexpected error occurred while deleting the KPI.',
-      )
+      messageApi.error('An unexpected error occurred while deleting the KPI.')
     } finally {
       setIsSaving(false)
     }
@@ -102,7 +101,6 @@ const AuthorizedDeleteStrategicInitiativeKpiForm: FC<
   const AuthorizedForm = authorizeForm(
     DeleteStrategicInitiativeKpiForm,
     props.onFormCancel,
-    props.messageApi,
     'Permission',
     'Permissions.StrategicInitiatives.Update',
   )

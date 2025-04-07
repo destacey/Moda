@@ -206,7 +206,7 @@ const EditPlanningIntervalObjectiveForm = ({
     (current) => {
       return (
         current < dayjs(planningIntervalData?.start) ||
-        current > dayjs(planningIntervalData?.end).add(1, 'day')
+        current > dayjs(planningIntervalData?.end)
       )
     },
     [planningIntervalData?.start, planningIntervalData?.end],
@@ -215,8 +215,8 @@ const EditPlanningIntervalObjectiveForm = ({
   const isDateWithinPiRange = useCallback(
     (date: Date) => {
       return (
-        dayjs(planningIntervalData?.start) <= dayjs(date) &&
-        dayjs(date) < dayjs(planningIntervalData?.end).add(1, 'day')
+        dayjs(planningIntervalData.start) <= dayjs(date) &&
+        dayjs(date) <= dayjs(planningIntervalData.end)
       )
     },
     [planningIntervalData?.start, planningIntervalData?.end],

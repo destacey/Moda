@@ -3,13 +3,13 @@
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { CreatePortfolioRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useCreatePortfolioMutation } from '@/src/store/features/ppm/portfolios-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -18,7 +18,6 @@ export interface CreatePortfolioFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface CreatePortfolioFormValues {
@@ -48,6 +47,8 @@ const CreatePortfolioForm = (props: CreatePortfolioFormProps) => {
   const [form] = Form.useForm<CreatePortfolioFormValues>()
   const formValues = Form.useWatch([], form)
 
+  const messageApi = useMessage()
+
   const [createPortfolio, { error: mutationError }] =
     useCreatePortfolioMutation()
 
@@ -69,7 +70,7 @@ const CreatePortfolioForm = (props: CreatePortfolioFormProps) => {
       if (response.error) {
         throw response.error
       }
-      props.messageApi.success(
+      messageApi.success(
         'Portfolio created successfully. Portfolio key: ' + response.data.key,
       )
 
@@ -78,9 +79,9 @@ const CreatePortfolioForm = (props: CreatePortfolioFormProps) => {
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while creating the portfolio. Please try again.',
         )
@@ -100,7 +101,7 @@ const CreatePortfolioForm = (props: CreatePortfolioFormProps) => {
       }
     } catch (error) {
       console.error('handleOk error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while creating the portfolio. Please try again.',
       )
     } finally {
@@ -119,9 +120,9 @@ const CreatePortfolioForm = (props: CreatePortfolioFormProps) => {
       setIsOpen(props.showForm)
     } else {
       props.onFormCancel()
-      props.messageApi.error('You do not have permission to create portfolios.')
+      messageApi.error('You do not have permission to create portfolios.')
     }
-  }, [canCreatePortfolio, props])
+  }, [canCreatePortfolio, messageApi, props])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(

@@ -1,13 +1,13 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { ExpenditureCategoryDetailsDto } from '@/src/services/moda-api'
 import {
   useActivateExpenditureCategoryMutation,
   useArchiveExpenditureCategoryMutation,
 } from '@/src/store/features/ppm/expenditure-categories-api'
 import { Modal, Space } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
 export enum ExpenditureCategoryStateAction {
@@ -21,7 +21,6 @@ export interface ChangeExpenditureCategoryStateFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 const ChangeExpenditureCategoryStateForm = (
@@ -29,6 +28,8 @@ const ChangeExpenditureCategoryStateForm = (
 ) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  const messageApi = useMessage()
 
   const [activateExpenditureCategoryMutation, { error: activateError }] =
     useActivateExpenditureCategoryMutation()
@@ -58,7 +59,7 @@ const ChangeExpenditureCategoryStateForm = (
 
       return true
     } catch (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           `An unexpected error occurred while ${stateAction}ing the expenditure category.`,
       )
@@ -71,7 +72,7 @@ const ChangeExpenditureCategoryStateForm = (
     setIsSaving(true)
     try {
       if (await changeState(props.expenditureCategory.id, props.stateAction)) {
-        props.messageApi.success(
+        messageApi.success(
           `Successfully ${props.stateAction}d expenditure category.`,
         )
         props.onFormComplete()
@@ -79,7 +80,7 @@ const ChangeExpenditureCategoryStateForm = (
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
-      props.messageApi.error(
+      messageApi.error(
         `An unexpected error occurred while ${props.stateAction}ing the expenditure category.`,
       )
     } finally {

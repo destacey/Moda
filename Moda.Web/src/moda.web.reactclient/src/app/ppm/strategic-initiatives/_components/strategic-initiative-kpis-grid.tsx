@@ -7,7 +7,6 @@ import { StrategicInitiativeKpiListDto } from '@/src/services/moda-api'
 import { ColDef, GetRowIdParams } from 'ag-grid-community'
 import { MenuProps } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import { MessageInstance } from 'antd/es/message/interface'
 import { FC, useCallback, useMemo, useState } from 'react'
 import {
   AddStrategicInitiativeKpiMeasurementForm,
@@ -21,7 +20,6 @@ export interface StrategicInitiativeKpisGridProps {
   canManageKpis: boolean
   isLoading: boolean
   refetch: () => void
-  messageApi: MessageInstance
   gridHeight?: number | undefined
   isReadOnly?: boolean
 }
@@ -82,7 +80,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
     canManageKpis,
     isLoading,
     refetch,
-    messageApi,
     gridHeight,
     isReadOnly,
   } = props
@@ -184,6 +181,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
       },
     ],
     [
+      isReadOnly,
       canManageKpis,
       strategicInitiativeId,
       onEditKpiMenuClicked,
@@ -219,7 +217,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
           showForm={openEditKpiForm}
           onFormComplete={() => onEditKpiFormClosed(true)}
           onFormCancel={() => onEditKpiFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openDeleteKpiForm && selectedKpiId && (
@@ -229,7 +226,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
           showForm={openDeleteKpiForm}
           onFormComplete={() => onDeleteKpiFormClosed(true)}
           onFormCancel={() => onDeleteKpiFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openAddMeasurementForm && selectedKpiId && (
@@ -239,7 +235,6 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
           showForm={openAddMeasurementForm}
           onFormComplete={() => onAddMeasurementFormClosed(true)}
           onFormCancel={() => onAddMeasurementFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
     </>

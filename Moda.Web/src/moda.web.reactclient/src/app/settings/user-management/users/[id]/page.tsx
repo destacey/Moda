@@ -9,11 +9,9 @@ import { Card } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
 import { UserDetails } from '../_components'
-import { useMessage } from '@/src/components/contexts/messaging'
 
 const UserDetailsPage = ({ params }) => {
   const [activeTab, setActiveTab] = useState('details')
-  const messageApi = useMessage();
 
   const {
     data: userData,
@@ -38,7 +36,7 @@ const UserDetailsPage = ({ params }) => {
     {
       key: 'details',
       tab: 'Details',
-      content: <UserDetails user={userData} messageApi={messageApi} />,
+      content: <UserDetails user={userData} />,
     },
   ]
 

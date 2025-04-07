@@ -5,7 +5,6 @@ import { PortfolioLinkCellRenderer } from '@/src/components/common/moda-grid-cel
 import { ProjectPortfolioListDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
-import { MessageInstance } from 'antd/es/message/interface'
 import { ReactElement, useCallback, useMemo } from 'react'
 
 export interface PortfoliosGridProps {
@@ -13,7 +12,6 @@ export interface PortfoliosGridProps {
   viewSelector: ReactElement
   isLoading: boolean
   refetch: () => void
-  messageApi: MessageInstance
 }
 
 const PortfoliosGrid: React.FC<PortfoliosGridProps> = (

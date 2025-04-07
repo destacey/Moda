@@ -80,7 +80,7 @@ const CreatePlanningIntervalObjectiveForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreatePlanningIntervalObjectiveFormValues>()
   const formValues = Form.useWatch([], form)
-  const messageApi = useMessage();
+  const messageApi = useMessage()
   const [teams, setTeams] = useState<PlanningIntervalTeamSelectItem[]>([])
   const [defaultStatusId, setDefaultStatusId] = useState<number>(null)
 
@@ -207,7 +207,7 @@ const CreatePlanningIntervalObjectiveForm = ({
     (current) => {
       return (
         current < dayjs(planningIntervalData?.start) ||
-        current > dayjs(planningIntervalData?.end).add(1, 'day')
+        current > dayjs(planningIntervalData?.end)
       )
     },
     [planningIntervalData?.start, planningIntervalData?.end],
@@ -217,7 +217,7 @@ const CreatePlanningIntervalObjectiveForm = ({
     (date: Date) => {
       return (
         dayjs(planningIntervalData.start) <= dayjs(date) &&
-        dayjs(date) < dayjs(planningIntervalData.end).add(1, 'day')
+        dayjs(date) <= dayjs(planningIntervalData.end)
       )
     },
     [planningIntervalData?.start, planningIntervalData?.end],

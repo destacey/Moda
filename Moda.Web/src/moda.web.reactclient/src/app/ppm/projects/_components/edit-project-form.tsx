@@ -16,10 +16,10 @@ import {
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { toFormErrors } from '@/src/utils'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Form
 
@@ -28,7 +28,6 @@ export interface EditProjectFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface EditProjectFormValues {
@@ -67,6 +66,8 @@ const EditProjectForm = (props: EditProjectFormProps) => {
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<EditProjectFormValues>()
   const formValues = Form.useWatch([], form)
+
+  const messageApi = useMessage()
 
   const [updateProject, { error: mutationError }] = useUpdateProjectMutation()
 
@@ -130,16 +131,16 @@ const EditProjectForm = (props: EditProjectFormProps) => {
       if (response.error) {
         throw response.error
       }
-      props.messageApi.success(`Project updated successfully.`)
+      messageApi.success(`Project updated successfully.`)
       return true
     } catch (error) {
       console.error('update error', error)
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while updating the project. Please try again.',
         )
@@ -159,7 +160,7 @@ const EditProjectForm = (props: EditProjectFormProps) => {
       }
     } catch (error) {
       console.error('handleOk error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while updating the project. Please try again.',
       )
     } finally {
@@ -182,9 +183,9 @@ const EditProjectForm = (props: EditProjectFormProps) => {
       }
     } else {
       props.onFormCancel()
-      props.messageApi.error('You do not have permission to update projects.')
+      messageApi.error('You do not have permission to update projects.')
     }
-  }, [canUpdateProject, mapToFormValues, projectData, props])
+  }, [canUpdateProject, mapToFormValues, messageApi, projectData, props])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -206,7 +207,7 @@ const EditProjectForm = (props: EditProjectFormProps) => {
           employeeOptionsError ??
           strategicThemeOptionsError,
       )
-      props.messageApi.error(
+      messageApi.error(
         expenditureOptionsError.detail ??
           error.detail ??
           employeeOptionsError.detail ??
@@ -218,7 +219,7 @@ const EditProjectForm = (props: EditProjectFormProps) => {
     employeeOptionsError,
     error,
     expenditureOptionsError,
-    props.messageApi,
+    messageApi,
     strategicThemeOptionsError,
   ])
 

@@ -24,7 +24,7 @@ const ExpenditureCategoriesPage = () => {
     setOpenCreateExpenditureCategoryForm,
   ] = useState<boolean>(false)
 
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const {
     data: categoryData,
@@ -109,7 +109,6 @@ const ExpenditureCategoriesPage = () => {
           showForm={openCreateExpenditureCategoryForm}
           onFormComplete={() => onCreateExpenditureCategoryFormClosed(true)}
           onFormCancel={() => onCreateExpenditureCategoryFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
     </>

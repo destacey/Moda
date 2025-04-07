@@ -1,13 +1,13 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { StrategicThemeDetailsDto } from '@/src/services/moda-api'
 import {
   useActivateStrategicThemeMutation,
   useArchiveStrategicThemeMutation,
 } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { Modal, Space } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
 export enum StrategicThemeStateAction {
@@ -21,7 +21,6 @@ export interface ChangeStrategicThemeStateFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 const ChangeStrategicThemeStateForm = (
@@ -29,6 +28,8 @@ const ChangeStrategicThemeStateForm = (
 ) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  const messageApi = useMessage()
 
   const [activateStrategicThemeMutation, { error: activateError }] =
     useActivateStrategicThemeMutation()
@@ -65,7 +66,7 @@ const ChangeStrategicThemeStateForm = (
 
       return true
     } catch (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           `An unexpected error occurred while ${stateAction}ing the strategic theme.`,
       )
@@ -84,7 +85,7 @@ const ChangeStrategicThemeStateForm = (
           props.stateAction,
         )
       ) {
-        props.messageApi.success(
+        messageApi.success(
           `Successfully ${props.stateAction}d Strategic Theme.`,
         )
         props.onFormComplete()
@@ -92,7 +93,7 @@ const ChangeStrategicThemeStateForm = (
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
-      props.messageApi.error(
+      messageApi.error(
         `An unexpected error occurred while ${props.stateAction}ing the strategic theme.`,
       )
     } finally {

@@ -3,6 +3,7 @@
 import { createTypedFormItem } from '@/src/components/common/forms/utils'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { AddStrategicInitiativeKpiMeasurementRequest } from '@/src/services/moda-api'
 import {
   useAddStrategicInitiativeKpiMeasurementMutation,
@@ -21,7 +22,6 @@ export interface AddStrategicInitiativeKpiMeasurementFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: any
 }
 
 interface AddStrategicInitiativeKpiMeasurementFormValues {
@@ -56,7 +56,6 @@ const AddStrategicInitiativeKpiMeasurementForm = (
     showForm,
     onFormComplete,
     onFormCancel,
-    messageApi,
   } = props
 
   const [isOpen, setIsOpen] = useState(false)
@@ -64,6 +63,8 @@ const AddStrategicInitiativeKpiMeasurementForm = (
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<AddStrategicInitiativeKpiMeasurementFormValues>()
   const formValues = Form.useWatch([], form)
+
+  const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateKpis = hasPermissionClaim(

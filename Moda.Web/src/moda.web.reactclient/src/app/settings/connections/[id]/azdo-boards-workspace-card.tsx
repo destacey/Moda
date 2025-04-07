@@ -8,7 +8,6 @@ import { useContext, useState } from 'react'
 import InitWorkspaceIntegrationForm from '../components/init-workspace-integration-form'
 import { AzdoBoardsConnectionContext } from './azdo-boards-connection-context'
 import MapAzdoWorkspaceTeamsForm from '../components/map-azdo-workspace-teams-form'
-import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Descriptions
 const { Text } = Typography
@@ -25,7 +24,6 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
   ] = useState<boolean>(false)
   const [openMapAzdoWorkspaceTeamsForm, setOpenMapAzdoWorkspaceTeamsForm] =
     useState<boolean>(false)
-  const messageApi = useMessage();
 
   const azdoBoardsConnection = useContext(AzdoBoardsConnectionContext)
 
@@ -93,7 +91,6 @@ const AzdoBoardsWorkspaceCard = (props: AzdoBoardsWorkspaceCardProps) => {
           workspaceName={props.workspace.name}
           onFormSave={() => setOpenMapAzdoWorkspaceTeamsForm(false)}
           onFormCancel={() => setOpenMapAzdoWorkspaceTeamsForm(false)}
-          messageApi={messageApi}
         />
       )}
     </>

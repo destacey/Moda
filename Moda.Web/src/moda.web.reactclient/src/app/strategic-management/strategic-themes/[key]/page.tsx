@@ -40,7 +40,7 @@ const StrategicThemeDetailsPage = ({ params }) => {
   const [openDeleteStrategicThemeForm, setOpenDeleteStrategicThemeForm] =
     useState<boolean>(false)
 
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -226,7 +226,6 @@ const StrategicThemeDetailsPage = ({ params }) => {
           showForm={openEditStrategicThemeForm}
           onFormComplete={() => onEditStrategicThemeFormClosed(true)}
           onFormCancel={() => onEditStrategicThemeFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openActivateStrategicThemeForm && (
@@ -236,7 +235,6 @@ const StrategicThemeDetailsPage = ({ params }) => {
           showForm={openActivateStrategicThemeForm}
           onFormComplete={() => onActivateStrategicThemeFormClosed(true)}
           onFormCancel={() => onActivateStrategicThemeFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openArchiveStrategicThemeForm && (
@@ -246,7 +244,6 @@ const StrategicThemeDetailsPage = ({ params }) => {
           showForm={openArchiveStrategicThemeForm}
           onFormComplete={() => onArchiveStrategicThemeFormClosed(true)}
           onFormCancel={() => onArchiveStrategicThemeFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openDeleteStrategicThemeForm && (
@@ -255,7 +252,6 @@ const StrategicThemeDetailsPage = ({ params }) => {
           showForm={openDeleteStrategicThemeForm}
           onFormComplete={() => onDeleteStrategicThemeFormClosed(true)}
           onFormCancel={() => onDeleteStrategicThemeFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
     </>

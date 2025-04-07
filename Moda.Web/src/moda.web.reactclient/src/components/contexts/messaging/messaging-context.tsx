@@ -1,12 +1,10 @@
-import React, { createContext, useContext } from 'react'
+import { createContext, FC, ReactNode, useContext } from 'react'
 import { message } from 'antd'
 import { MessageInstance } from 'antd/es/message/interface'
 
 const MessageContext = createContext<MessageInstance | null>(null)
 
-export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const MessageProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [messageApi, contextHolder] = message.useMessage()
 
   return (
@@ -16,7 +14,6 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     </MessageContext.Provider>
   )
 }
-
 
 export const useMessage = () => {
   const context = useContext(MessageContext)

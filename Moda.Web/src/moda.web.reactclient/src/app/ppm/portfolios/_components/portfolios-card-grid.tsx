@@ -2,7 +2,6 @@
 
 import { ProjectPortfolioListDto } from '@/src/services/moda-api'
 import { Flex, List } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { ReactElement, useMemo } from 'react'
 import PortfolioCard from './portfolio-card'
 import { ModaEmpty } from '@/src/components/common'
@@ -13,7 +12,6 @@ export interface PortfoliosCardGridProps {
   portfolios: ProjectPortfolioListDto[]
   viewSelector: ReactElement
   isLoading: boolean
-  messageApi: MessageInstance
 }
 
 const gridConfig = {

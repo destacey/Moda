@@ -3,6 +3,7 @@
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { CreateRoadmapRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import {
@@ -11,8 +12,7 @@ import {
 } from '@/src/store/features/planning/roadmaps-api'
 import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
+import { DatePicker, Form, Input, Modal, Radio } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -23,7 +23,6 @@ export interface CreateRoadmapFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface CreateRoadmapFormValues {
@@ -54,6 +53,8 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreateRoadmapFormValues>()
   const formValues = Form.useWatch([], form)
+
+  const messageApi = useMessage()
 
   const {
     data: visibilityData,
@@ -94,7 +95,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
         throw response.error
       }
 
-      props.messageApi.success(
+      messageApi.success(
         `Roadmap created successfully. Roadmap key ${response.data.key}`,
       )
 
@@ -103,9 +104,9 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while creating the roadmap. Please try again.',
         )
@@ -125,7 +126,7 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
       }
     } catch (error) {
       console.error('handleOk error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while creating the roadmap. Please try again.',
       )
     } finally {
@@ -147,9 +148,15 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
       }
     } else {
       props.onFormCancel()
-      props.messageApi.error('You do not have permission to create roadmaps.')
+      messageApi.error('You do not have permission to create roadmaps.')
     }
-  }, [canCreateRoadmap, currentUserInternalEmployeeId, mapToFormValues, props])
+  }, [
+    canCreateRoadmap,
+    currentUserInternalEmployeeId,
+    mapToFormValues,
+    messageApi,
+    props,
+  ])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -160,24 +167,30 @@ const CreateRoadmapForm = (props: CreateRoadmapFormProps) => {
 
   useEffect(() => {
     if (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           'An error occurred while loading visibility options. Please try again.',
       )
     }
     if (employeeOptionsError) {
-      props.messageApi.error(
+      messageApi.error(
         employeeOptionsError.supportMessage ??
           'An error occurred while loading employee options. Please try again.',
       )
     }
     if (currentUserInternalEmployeeIdError) {
-      props.messageApi.error(
+      messageApi.error(
         currentUserInternalEmployeeIdError.supportMessage ??
           'An error occurred while loading current user profile data. Please try again.',
       )
     }
-  }, [currentUserInternalEmployeeIdError, employeeOptionsError, error, props])
+  }, [
+    currentUserInternalEmployeeIdError,
+    employeeOptionsError,
+    error,
+    messageApi,
+    props,
+  ])
 
   return (
     <>

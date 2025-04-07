@@ -14,10 +14,10 @@ import {
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Form
 
@@ -26,7 +26,6 @@ export interface EditStrategicInitiativeFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface EditStrategicInitiativeFormValues {
@@ -62,13 +61,10 @@ const EditStrategicInitiativeForm = (
   const [form] = Form.useForm<EditStrategicInitiativeFormValues>()
   const formValues = Form.useWatch([], form)
 
-  const {
-    strategicInitiativeKey,
-    showForm,
-    onFormComplete,
-    onFormCancel,
-    messageApi,
-  } = props
+  const messageApi = useMessage()
+
+  const { strategicInitiativeKey, showForm, onFormComplete, onFormCancel } =
+    props
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateStrategicInitiative = hasPermissionClaim(

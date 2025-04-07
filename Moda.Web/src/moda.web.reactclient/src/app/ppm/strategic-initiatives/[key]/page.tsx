@@ -69,7 +69,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
   ] = useState<boolean>(false)
   const [openCreateKpiForm, setOpenCreateKpiForm] = useState(false)
 
-  const messageApi = useMessage();
+  //const messageApi = useMessage();
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -148,7 +148,6 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
             canManageKpis={canUpdateStrategicInitiative}
             isLoading={isLoadingKpis}
             refetch={refetchKpis}
-            messageApi={messageApi}
             gridHeight={550}
             isReadOnly={isReadOnly}
           />
@@ -160,7 +159,6 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     canUpdateStrategicInitiative,
     isLoadingKpis,
     kpiData,
-    messageApi,
     refetchKpis,
     strategicInitiativeData,
     isReadOnly,
@@ -401,7 +399,6 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
           showForm={openEditStrategicInitiativeForm}
           onFormComplete={() => onEditStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onEditStrategicInitiativeFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openApproveStrategicInitiativeForm && (
@@ -411,7 +408,6 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
           showForm={openApproveStrategicInitiativeForm}
           onFormComplete={() => onApproveStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onApproveStrategicInitiativeFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openActivateStrategicInitiativeForm && (
@@ -421,7 +417,6 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
           showForm={openActivateStrategicInitiativeForm}
           onFormComplete={() => onActivateStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onActivateStrategicInitiativeFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openCompleteStrategicInitiativeForm && (
@@ -431,7 +426,6 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
           showForm={openCompleteStrategicInitiativeForm}
           onFormComplete={() => onCompleteStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onCompleteStrategicInitiativeFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openCancelStrategicInitiativeForm && (
@@ -441,7 +435,6 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
           showForm={openCancelStrategicInitiativeForm}
           onFormComplete={() => onCancelStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onCancelStrategicInitiativeFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openDeleteStrategicInitiativeForm && (
@@ -450,7 +443,6 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
           showForm={openDeleteStrategicInitiativeForm}
           onFormComplete={() => onDeleteStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onDeleteStrategicInitiativeFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openCreateKpiForm && (
@@ -459,7 +451,6 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
           showForm={openCreateKpiForm}
           onFormComplete={() => onCreateKpiFormClosed()}
           onFormCancel={() => onCreateKpiFormClosed()}
-          messageApi={messageApi}
         />
       )}
     </>

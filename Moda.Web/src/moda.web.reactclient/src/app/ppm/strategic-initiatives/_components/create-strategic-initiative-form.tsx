@@ -3,6 +3,7 @@
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { CreateStrategicInitiativeRequest } from '@/src/services/moda-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetPortfolioOptionsQuery } from '@/src/store/features/ppm/portfolios-api'
@@ -10,7 +11,6 @@ import { useCreateStrategicInitiativeMutation } from '@/src/store/features/ppm/s
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -19,7 +19,6 @@ export interface CreateStrategicInitiativeFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface CreateStrategicInitiativeFormValues {
@@ -55,7 +54,9 @@ const CreateStrategicInitiativeForm = (
   const [form] = Form.useForm<CreateStrategicInitiativeFormValues>()
   const formValues = Form.useWatch([], form)
 
-  const { showForm, onFormComplete, onFormCancel, messageApi } = props
+  const messageApi = useMessage()
+
+  const { showForm, onFormComplete, onFormCancel } = props
 
   const { hasPermissionClaim } = useAuth()
   const canCreateStrategicInitiative = hasPermissionClaim(

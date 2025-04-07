@@ -10,7 +10,6 @@ import {
 import { ProjectListDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { ProjectDrawer } from '.'
@@ -21,7 +20,6 @@ export interface ProjectsTimelineProps {
   projects: ProjectListDto[]
   isLoading: boolean
   refetch: () => void
-  messageApi: MessageInstance
   viewSelector?: ReactNode
 }
 
@@ -175,7 +173,6 @@ const ProjectsTimeline: React.FC<ProjectsTimelineProps> = (props) => {
           projectKey={selectedItemKey}
           drawerOpen={drawerOpen}
           onDrawerClose={onDrawerClose}
-          messageApi={props.messageApi}
         />
       )}
     </>

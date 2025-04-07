@@ -8,14 +8,12 @@ import { Button, Card, Descriptions, Flex, List, Space } from 'antd'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { ManageUserRolesForm } from '.'
-import { MessageInstance } from 'antd/es/message/interface'
 
 const { Item } = Descriptions
 const { Item: ListItem } = List
 
 interface UserDetailsProps {
   user: UserDetailsDto
-  messageApi: MessageInstance
 }
 
 const UserDetails = (props: UserDetailsProps) => {
@@ -104,7 +102,6 @@ const UserDetails = (props: UserDetailsProps) => {
           showForm={openManageUserRolesForm}
           onFormComplete={() => onOpenManageUserRolesFormClosed(true)}
           onFormCancel={() => setOpenManageUserRolesForm(false)}
-          messageApi={props.messageApi}
         />
       )}
     </>

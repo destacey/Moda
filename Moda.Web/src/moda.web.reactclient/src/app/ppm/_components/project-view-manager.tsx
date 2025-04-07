@@ -3,7 +3,6 @@
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useMemo, useState } from 'react'
-import { MessageInstance } from 'antd/es/message/interface'
 import { ProjectListDto } from '@/src/services/moda-api'
 import ProjectsGrid from './projects-grid'
 import { ProjectsTimeline } from '.'
@@ -12,7 +11,6 @@ interface ProjectViewManagerProps {
   projects: ProjectListDto[]
   isLoading: boolean
   refetch: () => void
-  messageApi: MessageInstance
 }
 
 const viewSelectorOptions: SegmentedLabeledOption[] = [
@@ -47,7 +45,6 @@ const ProjectViewManager = (props: ProjectViewManagerProps) => {
           projects={props.projects}
           isLoading={props.isLoading}
           refetch={props.refetch}
-          messageApi={props.messageApi}
           hidePortfolio={true}
           gridHeight={550}
           viewSelector={viewSelector}
@@ -58,7 +55,6 @@ const ProjectViewManager = (props: ProjectViewManagerProps) => {
           projects={props.projects}
           isLoading={props.isLoading}
           refetch={props.refetch}
-          messageApi={props.messageApi}
           viewSelector={viewSelector}
         />
       )}

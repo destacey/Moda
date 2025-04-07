@@ -1,12 +1,12 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import {
   useGetUserRolesQuery,
   useManageUserRolesMutation,
 } from '@/src/store/features/user-management/users-api'
 import { Modal, Spin, Transfer, TransferProps } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
 export interface ManageUserRolesFormProps {
@@ -14,7 +14,6 @@ export interface ManageUserRolesFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface RecordType {
@@ -32,6 +31,8 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = (
   const [selectedKeys, setSelectedKeys] = useState<TransferProps['targetKeys']>(
     [],
   )
+
+  const messageApi = useMessage()
 
   const {
     data: userRolesData,
@@ -52,10 +53,10 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = (
     if (canUpdateUserRoles) {
       setIsOpen(props.showForm)
     } else {
-      props.messageApi.error('You do not have permission to update user roles.')
+      messageApi.error('You do not have permission to update user roles.')
       props.onFormCancel()
     }
-  }, [canUpdateUserRoles, props])
+  }, [canUpdateUserRoles, messageApi, props])
 
   useEffect(() => {
     if (!userRolesData) return
@@ -85,11 +86,11 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = (
 
   useEffect(() => {
     if (userRolesError) {
-      props.messageApi.error('Failed to load user roles.')
+      messageApi.error('Failed to load user roles.')
       setIsOpen(false)
       props.onFormCancel()
     }
-  }, [userRolesError, props])
+  }, [userRolesError, props, messageApi])
 
   useEffect(() => {
     setSelectedKeys([])
@@ -108,9 +109,9 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = (
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while updating the user roles. Please try again.',
         )
@@ -124,13 +125,13 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = (
     setIsSaving(true)
     try {
       if (await updateRoles(props.userId, targetKeys)) {
-        props.messageApi.success('Successfully updated user roles.')
+        messageApi.success('Successfully updated user roles.')
         setIsOpen(false)
         props.onFormComplete()
       }
     } catch (error) {
       console.error('handleOk error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while updating user roles. Please try again.',
       )
     } finally {

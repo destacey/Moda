@@ -63,7 +63,7 @@ const PortfolioDetailsPage = ({ params }) => {
   const [openDeletePortfolioForm, setOpenDeletePortfolioForm] =
     useState<boolean>(false)
 
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -140,7 +140,6 @@ const PortfolioDetailsPage = ({ params }) => {
             projects={projectData}
             isLoading={isLoadingProjects}
             refetch={refetchProjects}
-            messageApi={messageApi}
           />
         ),
       },
@@ -152,7 +151,6 @@ const PortfolioDetailsPage = ({ params }) => {
             strategicInitiatives={strategicInitiativeData}
             isLoading={isLoadingStrategicInitiatives}
             refetch={refetchStrategicInitiatives}
-            messageApi={messageApi}
           />
         ),
       },
@@ -161,7 +159,6 @@ const PortfolioDetailsPage = ({ params }) => {
   }, [
     isLoadingProjects,
     isLoadingStrategicInitiatives,
-    messageApi,
     portfolioData,
     projectData,
     refetchProjects,
@@ -332,7 +329,6 @@ const PortfolioDetailsPage = ({ params }) => {
           showForm={openEditPortfolioForm}
           onFormComplete={() => onEditPortfolioFormClosed(true)}
           onFormCancel={() => onEditPortfolioFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openActivatePortfolioForm && (
@@ -342,7 +338,6 @@ const PortfolioDetailsPage = ({ params }) => {
           showForm={openActivatePortfolioForm}
           onFormComplete={() => onActivatePortfolioFormClosed(true)}
           onFormCancel={() => onActivatePortfolioFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openClosePortfolioForm && (
@@ -352,7 +347,6 @@ const PortfolioDetailsPage = ({ params }) => {
           showForm={openClosePortfolioForm}
           onFormComplete={() => onClosePortfolioFormClosed(true)}
           onFormCancel={() => onClosePortfolioFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openArchivePortfolioForm && (
@@ -362,7 +356,6 @@ const PortfolioDetailsPage = ({ params }) => {
           showForm={openArchivePortfolioForm}
           onFormComplete={() => onArchivePortfolioFormClosed(true)}
           onFormCancel={() => onArchivePortfolioFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openDeletePortfolioForm && (
@@ -371,7 +364,6 @@ const PortfolioDetailsPage = ({ params }) => {
           showForm={openDeletePortfolioForm}
           onFormComplete={() => onDeletePortfolioFormClosed(true)}
           onFormCancel={() => onDeletePortfolioFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
     </>

@@ -1,6 +1,7 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import {
   ExpenditureCategoryDetailsDto,
   UpdateExpenditureCategoryRequest,
@@ -12,7 +13,6 @@ import {
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, Switch } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -22,7 +22,6 @@ export interface EditExpenditureCategoryFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface UpdateExpenditureCategoryFormValues {
@@ -56,6 +55,8 @@ const EditExpenditureCategoryForm = (
   const [form] = Form.useForm<UpdateExpenditureCategoryFormValues>()
   const formValues = Form.useWatch([], form)
   const [hideReadOnlyFields, setHideReadOnlyFields] = useState(false)
+
+  const messageApi = useMessage()
 
   const {
     data: categoryData,
@@ -94,16 +95,16 @@ const EditExpenditureCategoryForm = (
       if (response.error) {
         throw response.error
       }
-      props.messageApi.success('Expenditure Category updated successfully.')
+      messageApi.success('Expenditure Category updated successfully.')
 
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while updating the expenditure category. Please try again.',
         )
@@ -124,7 +125,7 @@ const EditExpenditureCategoryForm = (
       }
     } catch (error) {
       console.error('update error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while updating the expenditure category. Please try again.',
       )
     } finally {
@@ -152,11 +153,17 @@ const EditExpenditureCategoryForm = (
       }
     } else {
       props.onFormCancel()
-      props.messageApi.error(
+      messageApi.error(
         'You do not have permission to update expenditure categories.',
       )
     }
-  }, [canUpdateExpenditureCategory, categoryData, mapToFormValues, props])
+  }, [
+    canUpdateExpenditureCategory,
+    categoryData,
+    mapToFormValues,
+    messageApi,
+    props,
+  ])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -167,12 +174,12 @@ const EditExpenditureCategoryForm = (
 
   useEffect(() => {
     if (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           'An error occurred while loading the expenditure category. Please try again.',
       )
     }
-  }, [error, props.messageApi])
+  }, [error, messageApi])
 
   return (
     <>

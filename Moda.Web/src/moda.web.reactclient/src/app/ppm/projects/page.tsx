@@ -15,7 +15,7 @@ const ProjectsPage: React.FC = () => {
   useDocumentTitle('Projects')
   const [openCreateProjectForm, setOpenCreateProjectForm] =
     useState<boolean>(false)
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
   const canCreateProject = hasPermissionClaim('Permissions.Projects.Create')
@@ -62,14 +62,12 @@ const ProjectsPage: React.FC = () => {
         projects={projectData}
         isLoading={isLoading}
         refetch={refetch}
-        messageApi={messageApi}
       />
       {openCreateProjectForm && (
         <CreateProjectForm
           showForm={openCreateProjectForm}
           onFormComplete={() => onCreateProjectFormClosed(true)}
           onFormCancel={() => onCreateProjectFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
     </>

@@ -1,10 +1,10 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { ProjectPortfolioDetailsDto } from '@/src/services/moda-api'
 import { useDeletePortfolioMutation } from '@/src/store/features/ppm/portfolios-api'
 import { Modal } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
 export interface DeletePortfolioFormProps {
@@ -12,12 +12,13 @@ export interface DeletePortfolioFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 const DeletePortfolioForm = (props: DeletePortfolioFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  const messageApi = useMessage()
 
   const [deletePortfolioMutation, { error: mutationError }] =
     useDeletePortfolioMutation()
@@ -40,7 +41,7 @@ const DeletePortfolioForm = (props: DeletePortfolioFormProps) => {
 
       return true
     } catch (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           'An unexpected error occurred while deleting the portfolio.',
       )
@@ -54,13 +55,13 @@ const DeletePortfolioForm = (props: DeletePortfolioFormProps) => {
     try {
       if (await deletePortfolio(props.portfolio)) {
         // TODO: not working because the parent page is gone
-        props.messageApi.success('Successfully deleted Portfolio.')
+        messageApi.success('Successfully deleted Portfolio.')
         props.onFormComplete()
         setIsOpen(false)
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
-      props.messageApi.error(
+      messageApi.error(
         'An unexpected error occurred while deleting the portfolio.',
       )
     } finally {

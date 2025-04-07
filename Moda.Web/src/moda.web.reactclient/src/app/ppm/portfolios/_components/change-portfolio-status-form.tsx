@@ -1,6 +1,7 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { ProjectPortfolioDetailsDto } from '@/src/services/moda-api'
 import {
   useActivatePortfolioMutation,
@@ -8,7 +9,6 @@ import {
   useClosePortfolioMutation,
 } from '@/src/store/features/ppm/portfolios-api'
 import { Modal, Space } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
 export enum PortfolioStatusAction {
@@ -49,12 +49,13 @@ export interface ChangePortfolioStatusFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 const ChangePortfolioStatusForm = (props: ChangePortfolioStatusFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  const messageApi = useMessage()
 
   const [activatePortfolioMutation, { error: activateError }] =
     useActivatePortfolioMutation()
@@ -90,7 +91,7 @@ const ChangePortfolioStatusForm = (props: ChangePortfolioStatusFormProps) => {
 
       return true
     } catch (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           `An unexpected error occurred while ${statusActionToPresentTense(statusAction)} the portfolio.`,
       )
@@ -109,7 +110,7 @@ const ChangePortfolioStatusForm = (props: ChangePortfolioStatusFormProps) => {
           props.statusAction,
         )
       ) {
-        props.messageApi.success(
+        messageApi.success(
           `Successfully ${statusActionToPastTense(props.statusAction)} Portfolio.`,
         )
         props.onFormComplete()
@@ -117,7 +118,7 @@ const ChangePortfolioStatusForm = (props: ChangePortfolioStatusFormProps) => {
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
-      props.messageApi.error(
+      messageApi.error(
         `An unexpected error occurred while ${statusActionToPresentTense(props.statusAction)} the portfolio.`,
       )
     } finally {
@@ -135,9 +136,9 @@ const ChangePortfolioStatusForm = (props: ChangePortfolioStatusFormProps) => {
       setIsOpen(props.showForm)
     } else {
       props.onFormCancel()
-      props.messageApi.error('You do not have permission to update portfolios.')
+      messageApi.error('You do not have permission to update portfolios.')
     }
-  }, [canUpdatePortfolio, props])
+  }, [canUpdatePortfolio, messageApi, props])
 
   return (
     <>

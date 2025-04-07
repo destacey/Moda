@@ -3,6 +3,7 @@
 import { createTypedFormItem } from '@/src/components/common/forms/utils'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import {
   StrategicInitiativeKpiDetailsDto,
   UpdateStrategicInitiativeKpiRequest,
@@ -26,7 +27,6 @@ export interface EditStrategicInitiativeKpiFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: any
 }
 
 interface EditStrategicInitiativeKpiFormValues {
@@ -65,7 +65,6 @@ const EditStrategicInitiativeKpiForm = (
     showForm,
     onFormComplete,
     onFormCancel,
-    messageApi,
   } = props
 
   const [isOpen, setIsOpen] = useState(false)
@@ -73,6 +72,8 @@ const EditStrategicInitiativeKpiForm = (
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<EditStrategicInitiativeKpiFormValues>()
   const formValues = Form.useWatch([], form)
+
+  const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateKpis = hasPermissionClaim(

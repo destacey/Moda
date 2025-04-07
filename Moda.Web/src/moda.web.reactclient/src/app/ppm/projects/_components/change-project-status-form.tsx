@@ -1,6 +1,7 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { ProjectDetailsDto } from '@/src/services/moda-api'
 import {
   useActivateProjectMutation,
@@ -8,7 +9,6 @@ import {
   useCompleteProjectMutation,
 } from '@/src/store/features/ppm/projects-api'
 import { Modal, Space } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
 export enum ProjectStatusAction {
@@ -49,12 +49,13 @@ export interface ChangeProjectStatusFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 const ChangeProjectStatusForm = (props: ChangeProjectStatusFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  const messageApi = useMessage()
 
   const [activateProjectMutation, { error: activateError }] =
     useActivateProjectMutation()
@@ -88,7 +89,7 @@ const ChangeProjectStatusForm = (props: ChangeProjectStatusFormProps) => {
 
       return true
     } catch (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           `An unexpected error occurred while ${statusActionToPresentTense(statusAction)} the project.`,
       )
@@ -107,7 +108,7 @@ const ChangeProjectStatusForm = (props: ChangeProjectStatusFormProps) => {
           props.statusAction,
         )
       ) {
-        props.messageApi.success(
+        messageApi.success(
           `Successfully ${statusActionToPastTense(props.statusAction)} Project.`,
         )
         props.onFormComplete()
@@ -115,7 +116,7 @@ const ChangeProjectStatusForm = (props: ChangeProjectStatusFormProps) => {
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
-      props.messageApi.error(
+      messageApi.error(
         `An unexpected error occurred while ${statusActionToPresentTense(props.statusAction)} the project.`,
       )
     } finally {
@@ -133,16 +134,16 @@ const ChangeProjectStatusForm = (props: ChangeProjectStatusFormProps) => {
       if (props.project.start && props.project.end) {
         setIsOpen(props.showForm)
       } else {
-        props.messageApi.error(
+        messageApi.error(
           'Project start and end dates must be set before activating the project.',
         )
         props.onFormCancel()
       }
     } else {
-      props.messageApi.error('You do not have permission to update projects.')
+      messageApi.error('You do not have permission to update projects.')
       props.onFormCancel()
     }
-  }, [canUpdateProject, props])
+  }, [canUpdateProject, messageApi, props])
 
   return (
     <>

@@ -3,6 +3,7 @@
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import {
   ProjectPortfolioDetailsDto,
   UpdatePortfolioRequest,
@@ -14,7 +15,6 @@ import {
 } from '@/src/store/features/ppm/portfolios-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { BaseOptionType } from 'antd/es/select'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -25,7 +25,6 @@ export interface EditPortfolioFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface UpdatePortfolioFormValues {
@@ -57,6 +56,8 @@ const EditPortfolioForm = (props: EditPortfolioFormProps) => {
   const [form] = Form.useForm<UpdatePortfolioFormValues>()
   const formValues = Form.useWatch([], form)
   const [employees, setEmployees] = useState<BaseOptionType[]>([])
+
+  const messageApi = useMessage()
 
   const {
     data: portfolioData,
@@ -104,16 +105,16 @@ const EditPortfolioForm = (props: EditPortfolioFormProps) => {
       if (response.error) {
         throw response.error
       }
-      props.messageApi.success('Portfolio updated successfully.')
+      messageApi.success('Portfolio updated successfully.')
 
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while updating the Portfolio. Please try again.',
         )
@@ -134,7 +135,7 @@ const EditPortfolioForm = (props: EditPortfolioFormProps) => {
       }
     } catch (error) {
       console.error('update error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while updating the Portfolio. Please try again.',
       )
     } finally {
@@ -158,9 +159,16 @@ const EditPortfolioForm = (props: EditPortfolioFormProps) => {
       }
     } else {
       props.onFormCancel()
-      props.messageApi.error('You do not have permission to update Portfolios.')
+      messageApi.error('You do not have permission to update Portfolios.')
     }
-  }, [canUpdatePortfolio, mapToFormValues, props, portfolioData, employeeData])
+  }, [
+    canUpdatePortfolio,
+    mapToFormValues,
+    props,
+    portfolioData,
+    employeeData,
+    messageApi,
+  ])
 
   useEffect(() => {
     // TODO: how do we make this reusable?  Inside EmployeeSelect? or a custom hook?
@@ -202,12 +210,12 @@ const EditPortfolioForm = (props: EditPortfolioFormProps) => {
 
   useEffect(() => {
     if (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           'An error occurred while loading the Portfolio. Please try again.',
       )
     }
-  }, [error, props.messageApi])
+  }, [error, messageApi])
 
   return (
     <>

@@ -1,14 +1,14 @@
 import { ModaColorPicker } from '@/src/components/common'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { CreateRoadmapActivityRequest } from '@/src/services/moda-api'
 import {
   useCreateRoadmapItemMutation,
   useGetRoadmapActivitiesQuery,
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Input, Modal, Radio, Select, TreeSelect } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
+import { DatePicker, Form, Input, Modal, TreeSelect } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -19,7 +19,6 @@ export interface CreateRoadmapActivityFormProps {
   roadmapId: string
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface CreateRoadmapActivityFormValues {
@@ -54,6 +53,8 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
   const [form] = Form.useForm<CreateRoadmapActivityFormValues>()
   const formValues = Form.useWatch([], form)
 
+  const messageApi = useMessage()
+
   const {
     data: activities,
     isLoading: activitiesIsLoading,
@@ -76,16 +77,16 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
         throw response.error
       }
 
-      props.messageApi.success('Roadmap Activity created successfully.')
+      messageApi.success('Roadmap Activity created successfully.')
 
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while creating the roadmap activity. Please try again.',
         )
@@ -105,7 +106,7 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
       }
     } catch (error) {
       console.error('handleOk error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while creating the roadmap activity. Please try again.',
       )
     } finally {
@@ -124,11 +125,9 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
       setIsOpen(props.showForm)
     } else {
       props.onFormCancel()
-      props.messageApi.error(
-        'You do not have permission to create roadmap items.',
-      )
+      messageApi.error('You do not have permission to create roadmap items.')
     }
-  }, [canManageRoadmapItems, props])
+  }, [canManageRoadmapItems, messageApi, props])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -139,16 +138,12 @@ const CreateRoadmapActivityForm = (props: CreateRoadmapActivityFormProps) => {
 
   useEffect(() => {
     if (activitiesError) {
-      props.messageApi.error(
+      messageApi.error(
         activitiesError.supportMessage ??
           'An error occurred while loading roadmap activities. Please try again.',
       )
     }
-  }, [activitiesError, props.messageApi])
-
-  const onColorChange = (color: string) => {
-    form.setFieldsValue({ color })
-  }
+  }, [activitiesError, messageApi])
 
   return (
     <>

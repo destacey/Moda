@@ -1,6 +1,7 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { StrategicInitiativeDetailsDto } from '@/src/services/moda-api'
 import {
   useActivateStrategicInitiativeMutation,
@@ -9,7 +10,6 @@ import {
   useCompleteStrategicInitiativeMutation,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Modal, Space } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
 export enum StrategicInitiativeStatusAction {
@@ -59,7 +59,6 @@ export interface ChangeStrategicInitiativeStatusFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 const ChangeStrategicInitiativeStatusForm = (
@@ -67,6 +66,8 @@ const ChangeStrategicInitiativeStatusForm = (
 ) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  const messageApi = useMessage()
 
   const [approveStrategicInitiativeMutation, { error: approveError }] =
     useApproveStrategicInitiativeMutation()
@@ -106,7 +107,7 @@ const ChangeStrategicInitiativeStatusForm = (
 
       return true
     } catch (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           `An unexpected error occurred while ${statusActionToPresentTense(statusAction)} the strategic initiative.`,
       )
@@ -125,7 +126,7 @@ const ChangeStrategicInitiativeStatusForm = (
           props.statusAction,
         )
       ) {
-        props.messageApi.success(
+        messageApi.success(
           `Successfully ${statusActionToPastTense(props.statusAction)} Strategic Initiative.`,
         )
         props.onFormComplete()
@@ -133,7 +134,7 @@ const ChangeStrategicInitiativeStatusForm = (
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
-      props.messageApi.error(
+      messageApi.error(
         `An unexpected error occurred while ${statusActionToPresentTense(props.statusAction)} the strategic initiative.`,
       )
     } finally {
@@ -150,12 +151,12 @@ const ChangeStrategicInitiativeStatusForm = (
     if (canUpdateStrategicInitiative) {
       setIsOpen(props.showForm)
     } else {
-      props.messageApi.error(
+      messageApi.error(
         'You do not have permission to update strategic initiatives.',
       )
       props.onFormCancel()
     }
-  }, [canUpdateStrategicInitiative, props])
+  }, [canUpdateStrategicInitiative, messageApi, props])
 
   return (
     <>

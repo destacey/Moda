@@ -10,30 +10,19 @@ import {
   RoadmapMilestoneListDto,
   RoadmapTimeboxListDto,
 } from '@/src/services/moda-api'
-import {
-  ColorPicker,
-  Flex,
-  MenuProps,
-  Table,
-  TableColumnsType,
-  Typography,
-} from 'antd'
+import { ColorPicker, Flex, MenuProps, Table, TableColumnsType } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import EditRoadmapActivityForm from './edit-roadmap-activity-form'
 import DeleteRoadmapItemForm from './delete-roadmap-item-form'
 import EditRoadmapTimeboxForm from './edit-roadmap-timebox-form'
 
-const { Text } = Typography
-
 export interface RoadmapItemsGridProps {
   roadmapId: string
   roadmapItemsData: RoadmapItemListDto[]
   roadmapItemsIsLoading: boolean
   refreshRoadmapItems: () => void
-  messageApi: MessageInstance
   gridHeight?: number | undefined
   viewSelector?: React.ReactNode | undefined
   enableRowDrag?: boolean | undefined
@@ -281,7 +270,6 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
           roadmapId={props.roadmapId}
           onFormComplete={() => onUpdateRoadmapActivityFormClosed(true)}
           onFormCancel={() => onUpdateRoadmapActivityFormClosed(false)}
-          messageApi={props.messageApi}
         />
       )}
       {openUpdateRoadmapTimeboxForm && (
@@ -291,7 +279,6 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
           roadmapId={props.roadmapId}
           onFormComplete={() => onUpdateRoadmapTimeboxFormClosed(true)}
           onFormCancel={() => onUpdateRoadmapTimeboxFormClosed(false)}
-          messageApi={props.messageApi}
         />
       )}
       {openDeleteRoadmapItemForm && (
@@ -301,7 +288,6 @@ const RoadmapItemsGrid: React.FC<RoadmapItemsGridProps> = (
           showForm={openDeleteRoadmapItemForm}
           onFormComplete={() => onDeleteRoadmapItemFormClosed(true)}
           onFormCancel={() => onDeleteRoadmapItemFormClosed(false)}
-          messageApi={props.messageApi}
         />
       )}
     </>

@@ -16,7 +16,7 @@ const StrategicThemesPage: React.FC = () => {
   const [openCreateStrategicThemeForm, setOpenCreateStrategicThemeForm] =
     useState<boolean>(false)
 
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
   const canCreateStrategicTheme = hasPermissionClaim(
@@ -61,14 +61,12 @@ const StrategicThemesPage: React.FC = () => {
         strategicThemesData={strategicThemesData || []}
         strategicThemesLoading={isLoading}
         refreshStrategicThemes={refresh}
-        messageApi={messageApi}
       />
       {openCreateStrategicThemeForm && (
         <CreateStrategicThemeForm
           showForm={openCreateStrategicThemeForm}
           onFormComplete={() => setOpenCreateStrategicThemeForm(false)}
           onFormCancel={() => setOpenCreateStrategicThemeForm(false)}
-          messageApi={messageApi}
         />
       )}
     </>
