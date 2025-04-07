@@ -225,7 +225,6 @@ const TeamOfTeamsDetailsPage = ({ params }) => {
           showForm={openDeactivateTeamForm}
           onFormComplete={() => onDeactivateTeamFormClosed(true)}
           onFormCancel={() => onDeactivateTeamFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
     </>

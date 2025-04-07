@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
 using Moda.Tests.Shared;
 using NodaTime;

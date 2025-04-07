@@ -45,7 +45,7 @@ const EditWorkTypeForm = (props: EditWorkTypeFormProps) => {
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<EditWorkTypeFormValues>()
   const formValues = Form.useWatch([], form)
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const { data: workTypeData } = useGetWorkTypeQuery(props.workTypeId)
   // TODO: why do I have to pass null here?
@@ -143,39 +143,39 @@ const EditWorkTypeForm = (props: EditWorkTypeFormProps) => {
   }, [form, formValues])
 
   return (
-      <Modal
-        title="Edit Work Type"
-        open={isOpen}
-        onOk={handleSave}
-        okButtonProps={{ disabled: !isValid }}
-        okText="Save"
-        onCancel={handleCancel}
-        confirmLoading={isSaving}
-        maskClosable={false}
-        keyboard={false} // disable esc key to close modal
-        destroyOnClose={true}
+    <Modal
+      title="Edit Work Type"
+      open={isOpen}
+      onOk={handleSave}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Save"
+      onCancel={handleCancel}
+      confirmLoading={isSaving}
+      maskClosable={false}
+      keyboard={false} // disable esc key to close modal
+      destroyOnClose={true}
+    >
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="edit-work-type-form"
       >
-        <Form
-          form={form}
-          size="small"
-          layout="vertical"
-          name="edit-work-type-form"
-        >
-          <Descriptions size="small" column={1}>
-            <DescriptionItem label="Name">{workTypeData?.name}</DescriptionItem>
-          </Descriptions>
-          <Item label="Description" name="description">
-            <TextArea
-              autoSize={{ minRows: 4, maxRows: 10 }}
-              showCount
-              maxLength={1024}
-            />
-          </Item>
-          <Item label="Level" name="levelId" rules={[{ required: true }]}>
-            <Select options={workTypeLevelOptions} />
-          </Item>
-        </Form>
-      </Modal>
+        <Descriptions size="small" column={1}>
+          <DescriptionItem label="Name">{workTypeData?.name}</DescriptionItem>
+        </Descriptions>
+        <Item label="Description" name="description">
+          <TextArea
+            autoSize={{ minRows: 4, maxRows: 10 }}
+            showCount
+            maxLength={1024}
+          />
+        </Item>
+        <Item label="Level" name="levelId" rules={[{ required: true }]}>
+          <Select options={workTypeLevelOptions} />
+        </Item>
+      </Form>
+    </Modal>
   )
 }
 

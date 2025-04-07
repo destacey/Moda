@@ -1,6 +1,4 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Models;
-
-namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
+﻿namespace Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 
 public sealed record DeleteProjectCommand(Guid Id) : ICommand;
 
@@ -53,7 +51,7 @@ internal sealed class DeleteProjectCommandHandler(IProjectPortfolioManagementDbC
             var deleteResult = portfolio.DeleteProject(project.Id);
             if (deleteResult.IsFailure)
             {
-                _logger.LogInformation("Error deleting project {ProjectId}.", request.Id);
+                _logger.LogError("Error deleting project {ProjectId}. Error message: {Error}", request.Id, deleteResult.Error);
                 return Result.Failure(deleteResult.Error);
             }
 

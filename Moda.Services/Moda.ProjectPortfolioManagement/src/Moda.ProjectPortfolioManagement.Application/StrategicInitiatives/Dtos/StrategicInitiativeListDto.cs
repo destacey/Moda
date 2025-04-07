@@ -1,7 +1,7 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
 

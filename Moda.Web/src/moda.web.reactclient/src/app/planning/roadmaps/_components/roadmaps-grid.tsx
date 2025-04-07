@@ -3,7 +3,6 @@
 import { ModaGrid } from '@/src/components/common'
 import { RoadmapListDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
-import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo } from 'react'
@@ -12,7 +11,6 @@ export interface RoadmapsGridProps {
   roadmapsData: RoadmapListDto[]
   roadmapsLoading: boolean
   refreshRoadmaps: () => void
-  messageApi: MessageInstance
   gridHeight?: number | undefined
   viewSelector?: React.ReactNode | undefined
   parentRoadmapId?: string | undefined

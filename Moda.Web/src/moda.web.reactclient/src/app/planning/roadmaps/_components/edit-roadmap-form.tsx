@@ -11,14 +11,14 @@ import {
   useGetRoadmapQuery,
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
-import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
+import { DatePicker, Form, Input, Modal, Radio } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetInternalEmployeeIdQuery } from '@/src/store/features/user-management/profile-api'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -29,7 +29,6 @@ export interface EditRoadmapFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface EditRoadmapFormValues {
@@ -62,6 +61,8 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<EditRoadmapFormValues>()
   const formValues = Form.useWatch([], form)
+
+  const messageApi = useMessage()
 
   const {
     data: roadmapData,
@@ -120,16 +121,16 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
       if (response.error) {
         throw response.error
       }
-      props.messageApi.success(`Roadmap updated successfully.`)
+      messageApi.success(`Roadmap updated successfully.`)
       return true
     } catch (error) {
       console.error('update error', error)
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while updating the roadmap. Please try again.',
         )
@@ -149,7 +150,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
       }
     } catch (error) {
       console.error('handleOk error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while updating the roadmap. Please try again.',
       )
     } finally {
@@ -172,9 +173,16 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
       }
     } else {
       props.onFormCancel()
-      props.messageApi.error('You do not have permission to update roadmaps.')
+      messageApi.error('You do not have permission to update roadmaps.')
     }
-  }, [canUpdateRoadmap, mapToFormValues, props, roadmapData, visibilityData])
+  }, [
+    canUpdateRoadmap,
+    mapToFormValues,
+    messageApi,
+    props,
+    roadmapData,
+    visibilityData,
+  ])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -185,25 +193,25 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
 
   useEffect(() => {
     if (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           'An error occurred while loading the roadmap. Please try again.',
       )
     }
     if (visibilityError) {
-      props.messageApi.error(
+      messageApi.error(
         visibilityError.supportMessage ??
           'An error occurred while loading visibility options. Please try again.',
       )
     }
     if (employeeOptionsError) {
-      props.messageApi.error(
+      messageApi.error(
         employeeOptionsError.supportMessage ??
           'An error occurred while loading employee options. Please try again.',
       )
     }
     if (currentUserInternalEmployeeIdError) {
-      props.messageApi.error(
+      messageApi.error(
         currentUserInternalEmployeeIdError.supportMessage ??
           'An error occurred while loading current user profile data. Please try again.',
       )
@@ -212,6 +220,7 @@ const EditRoadmapForm = (props: EditRoadmapFormProps) => {
     currentUserInternalEmployeeIdError,
     employeeOptionsError,
     error,
+    messageApi,
     props,
     visibilityError,
   ])

@@ -45,7 +45,7 @@ const ProjectDetailsPage = ({ params }) => {
   const [openDeleteProjectForm, setOpenDeleteProjectForm] =
     useState<boolean>(false)
 
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -274,7 +274,6 @@ const ProjectDetailsPage = ({ params }) => {
           showForm={openEditProjectForm}
           onFormComplete={() => onEditProjectFormClosed(true)}
           onFormCancel={() => onEditProjectFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openActivateProjectForm && (
@@ -284,7 +283,6 @@ const ProjectDetailsPage = ({ params }) => {
           showForm={openActivateProjectForm}
           onFormComplete={() => onActivateProjectFormClosed(true)}
           onFormCancel={() => onActivateProjectFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openCompleteProjectForm && (
@@ -294,7 +292,6 @@ const ProjectDetailsPage = ({ params }) => {
           showForm={openCompleteProjectForm}
           onFormComplete={() => onCompleteProjectFormClosed(true)}
           onFormCancel={() => onCompleteProjectFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openCancelProjectForm && (
@@ -304,7 +301,6 @@ const ProjectDetailsPage = ({ params }) => {
           showForm={openCancelProjectForm}
           onFormComplete={() => onCancelProjectFormClosed(true)}
           onFormCancel={() => onCancelProjectFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openDeleteProjectForm && (
@@ -313,7 +309,6 @@ const ProjectDetailsPage = ({ params }) => {
           showForm={openDeleteProjectForm}
           onFormComplete={() => onDeleteProjectFormClosed(true)}
           onFormCancel={() => onDeleteProjectFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
     </>

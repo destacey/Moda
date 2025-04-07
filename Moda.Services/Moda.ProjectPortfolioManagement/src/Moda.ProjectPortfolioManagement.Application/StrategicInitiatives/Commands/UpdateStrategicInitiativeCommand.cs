@@ -1,5 +1,5 @@
 ﻿using Moda.ProjectPortfolioManagement.Domain.Enums;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
 

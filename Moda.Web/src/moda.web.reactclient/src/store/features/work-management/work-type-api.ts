@@ -1,11 +1,7 @@
 import { getWorkTypesClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
-import {
-  UpdateWorkTypeRequest,
-  WorkTypeDto,
-  WorkTypeLevelDto,
-} from '@/src/services/moda-api'
+import { UpdateWorkTypeRequest, WorkTypeDto } from '@/src/services/moda-api'
 
 export const workTypeApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -24,7 +20,7 @@ export const workTypeApi = apiSlice.injectEndpoints({
         ...result.map(({ id }) => ({ type: QueryTags.WorkType, id })),
       ],
     }),
-    getWorkType: builder.query<WorkTypeLevelDto, number>({
+    getWorkType: builder.query<WorkTypeDto, number>({
       queryFn: async (id: number) => {
         try {
           const data = await getWorkTypesClient().getById(id)

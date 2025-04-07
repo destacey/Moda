@@ -3,13 +3,13 @@ import {
   NodeChangedCallback,
 } from '@/src/components/common/draggable-tree'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import {
   RoadmapActivityListDto,
   RoadmapItemListDto,
 } from '@/src/services/moda-api'
 import { useReorganizeRoadmapActivityMutation } from '@/src/store/features/planning/roadmaps-api'
 import { Button, Modal, TreeDataNode } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
 interface RoadmapActivityReorganizeModalProps {
@@ -17,7 +17,6 @@ interface RoadmapActivityReorganizeModalProps {
   roadmapId: string
   roadmapItems: RoadmapItemListDto[]
   onClose: () => void
-  messageApi: MessageInstance
 }
 
 interface RoadmpaActivityTreeData extends TreeDataNode {
@@ -51,6 +50,8 @@ const ReorganizeRoadmapActivitiesModal: React.FC<
   const [isOpen, setIsOpen] = useState(false)
   const [activityTreeData, setActivityTreeData] = useState<TreeDataNode[]>([])
 
+  const messageApi = useMessage()
+
   const { hasPermissionClaim } = useAuth()
   const canManageRoadmapItems = hasPermissionClaim(
     'Permissions.Roadmaps.Update',
@@ -65,9 +66,7 @@ const ReorganizeRoadmapActivitiesModal: React.FC<
     if (!canManageRoadmapItems) {
       setIsOpen(false)
       props.onClose()
-      props.messageApi.error(
-        'You do not have permission to update roadmap items.',
-      )
+      messageApi.error('You do not have permission to update roadmap items.')
     }
 
     const activities: RoadmapActivityListDto[] = props.roadmapItems?.filter(
@@ -81,16 +80,16 @@ const ReorganizeRoadmapActivitiesModal: React.FC<
     setActivityTreeData(treeData)
 
     setIsOpen(true)
-  }, [canManageRoadmapItems, props])
+  }, [canManageRoadmapItems, messageApi, props])
 
   useEffect(() => {
     if (reorganizeError) {
       console.error('reorganizeActivity error', reorganizeError)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while reorganizing the roadmap activities. Please refresh and try again.',
       )
     }
-  }, [reorganizeError, props.messageApi])
+  }, [reorganizeError, messageApi])
 
   const onActivityChanged: NodeChangedCallback = async (
     changedKey,
@@ -112,10 +111,10 @@ const ReorganizeRoadmapActivitiesModal: React.FC<
         },
       })
 
-      props.messageApi.success('Roadmap activities reorganized successfully.')
+      messageApi.success('Roadmap activities reorganized successfully.')
     } catch (error) {
       console.error('reorganizeActivity error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while reorganizing the roadmap activities. Please refresh and try again.',
       )
     }

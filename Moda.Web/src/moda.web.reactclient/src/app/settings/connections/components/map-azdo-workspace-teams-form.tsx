@@ -2,6 +2,7 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import {
   AzdoConnectionTeamMappingsRequest,
   AzdoWorkspaceTeamMappingRequest,
@@ -13,8 +14,7 @@ import {
 } from '@/src/store/features/app-integration/azdo-integration-api'
 import { useGetTeamOptionsQuery } from '@/src/store/features/organizations/team-api'
 import { toFormErrors } from '@/src/utils'
-import { Flex, Form, Input, Modal, Select, Typography, message } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
+import { Flex, Form, Input, Modal, Select, Typography } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item, List } = Form
@@ -27,7 +27,6 @@ export interface MapAzdoWorkspaceTeamsFormProps {
   workspaceName: string
   onFormSave: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface AzdoTeamMapping {
@@ -64,6 +63,8 @@ const MapAzdoWorkspaceTeamsForm = (props: MapAzdoWorkspaceTeamsFormProps) => {
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<MapAzdoWorkspaceTeamsFormValues>()
   const formValues = Form.useWatch([], form)
+
+  const messageApi = useMessage()
 
   const { hasClaim } = useAuth()
   const canUpdateConnection = hasClaim(
@@ -105,15 +106,13 @@ const MapAzdoWorkspaceTeamsForm = (props: MapAzdoWorkspaceTeamsFormProps) => {
       }
     } else {
       props.onFormCancel()
-      props.messageApi.error(
-        'You do not have permission to map workspace teams.',
-      )
+      messageApi.error('You do not have permission to map workspace teams.')
     }
   }, [
     canUpdateConnection,
     connectionTeamsData,
     mapToFormValues,
-    props.messageApi,
+    messageApi,
     props,
   ])
 
@@ -142,9 +141,9 @@ const MapAzdoWorkspaceTeamsForm = (props: MapAzdoWorkspaceTeamsFormProps) => {
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while update workspace team mappings.',
         )
@@ -163,9 +162,7 @@ const MapAzdoWorkspaceTeamsForm = (props: MapAzdoWorkspaceTeamsFormProps) => {
         setIsOpen(false)
         form.resetFields()
         props.onFormSave()
-        props.messageApi.success(
-          'Successfully updated workspace team mappings.',
-        )
+        messageApi.success('Successfully updated workspace team mappings.')
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)

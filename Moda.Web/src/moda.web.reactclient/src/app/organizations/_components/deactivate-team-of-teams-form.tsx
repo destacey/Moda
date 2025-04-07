@@ -5,11 +5,11 @@ import {
   TeamDetailsDto,
 } from '@/src/services/moda-api'
 import { useDeactivateTeamOfTeamsMutation } from '@/src/store/features/organizations/team-api'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 import useAuth from '../../../components/contexts/auth'
 import { DatePicker, Form, Modal } from 'antd'
 import { toFormErrors } from '@/src/utils'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Form
 
@@ -18,7 +18,6 @@ interface DeactivateTeamOfTeamsFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface DeactivateTeamFormValues {
@@ -42,6 +41,8 @@ const DeactivateTeamOfTeamsForm = (props: DeactivateTeamOfTeamsFormProps) => {
   const [form] = Form.useForm<DeactivateTeamFormValues>()
   const formValues = Form.useWatch([], form)
 
+  const messageApi = useMessage()
+
   const [deactivateTeam, { error: mutationError }] =
     useDeactivateTeamOfTeamsMutation()
 
@@ -56,16 +57,16 @@ const DeactivateTeamOfTeamsForm = (props: DeactivateTeamOfTeamsFormProps) => {
         throw response.error
       }
 
-      props.messageApi.success('Team deactivated successfully')
+      messageApi.success('Team deactivated successfully')
 
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while deactivating the team. Please try again.',
         )
@@ -85,7 +86,7 @@ const DeactivateTeamOfTeamsForm = (props: DeactivateTeamOfTeamsFormProps) => {
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
-      props.messageApi.error(
+      messageApi.error(
         'An unexpected error occurred while deactivating the team.',
       )
     } finally {
@@ -104,9 +105,9 @@ const DeactivateTeamOfTeamsForm = (props: DeactivateTeamOfTeamsFormProps) => {
       setIsOpen(props.showForm)
     } else {
       props.onFormCancel()
-      props.messageApi.error('You do not have permission to deactive teams.')
+      messageApi.error('You do not have permission to deactive teams.')
     }
-  }, [canUpdateTeam, props])
+  }, [canUpdateTeam, messageApi, props])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(

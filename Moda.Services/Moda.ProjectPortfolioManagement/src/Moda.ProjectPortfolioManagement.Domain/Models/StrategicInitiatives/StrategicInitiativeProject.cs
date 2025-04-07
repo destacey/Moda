@@ -1,4 +1,4 @@
-﻿namespace Moda.ProjectPortfolioManagement.Domain.Models;
+﻿namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 public class StrategicInitiativeProject
 {

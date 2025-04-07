@@ -3,11 +3,11 @@
 import { ModaDateRange } from '@/src/components/common'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
 import { getSortedNames } from '@/src/utils'
 import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
 import { Descriptions, Drawer, Flex, Spin } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo } from 'react'
 
@@ -17,12 +17,13 @@ export interface ProjectDrawerProps {
   projectKey: number
   drawerOpen: boolean
   onDrawerClose: () => void
-  messageApi: MessageInstance
 }
 
 const ProjectDrawer: React.FC<ProjectDrawerProps> = (
   props: ProjectDrawerProps,
 ) => {
+  const messageApi = useMessage()
+
   const {
     data: projectData,
     isLoading,
@@ -37,20 +38,20 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = (
 
   useEffect(() => {
     if (!canViewProject) {
-      props.messageApi.error('You do not have permission to view projects.')
+      messageApi.error('You do not have permission to view projects.')
       props.onDrawerClose()
     }
-  }, [canViewProject, props])
+  }, [canViewProject, messageApi, props])
 
   useEffect(() => {
     if (error) {
       console.error(error)
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           'An error occurred while loading project data. Please try again.',
       )
     }
-  }, [error, props.messageApi])
+  }, [error, messageApi])
 
   const sponsorNames = useMemo(
     () =>

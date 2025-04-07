@@ -51,8 +51,12 @@ interface ManagePlanningIntervalDatesFormValues {
   iterations: UpsertIterationFormValues[]
 }
 
-const mapToRequestValues = (values: ManagePlanningIntervalDatesFormValues) => {
+const mapToRequestValues = (
+  values: ManagePlanningIntervalDatesFormValues,
+  id: string,
+) => {
   return {
+    id,
     start: (values.start as any)?.format('YYYY-MM-DD'),
     end: (values.end as any)?.format('YYYY-MM-DD'),
     iterations: values.iterations.map((iteration) => ({
@@ -61,7 +65,7 @@ const mapToRequestValues = (values: ManagePlanningIntervalDatesFormValues) => {
       typeId: iteration.typeId,
       start: (iteration.start as any)?.format('YYYY-MM-DD'),
       end: (iteration.end as any)?.format('YYYY-MM-DD'),
-    })) as PlanningIntervalIterationListDto[],
+    })),
   } as ManagePlanningIntervalDatesRequest
 }
 
@@ -112,10 +116,10 @@ const ManagePlanningIntervalDatesForm = ({
 
   const update = async (
     values: ManagePlanningIntervalDatesFormValues,
+    id: string,
   ): Promise<boolean> => {
     try {
-      const request = mapToRequestValues(values)
-      request.id = id
+      const request = mapToRequestValues(values, id)
       await managePlanningIntervalDates.mutateAsync(request)
       return true
     } catch (error) {
@@ -138,7 +142,7 @@ const ManagePlanningIntervalDatesForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await update(values)) {
+      if (await update(values, id)) {
         setIsOpen(false)
         form.resetFields()
         onFormSave()

@@ -17,7 +17,8 @@ const StrategicInitiativesPage: React.FC = () => {
     openCreateStrategicInitiativeForm,
     setOpenCreateStrategicInitiativeForm,
   ] = useState<boolean>(false)
-  const messageApi = useMessage();
+
+  const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
   const canCreateStrategicInitiative = hasPermissionClaim(
@@ -66,14 +67,12 @@ const StrategicInitiativesPage: React.FC = () => {
         strategicInitiatives={strategicInitiativeData}
         isLoading={isLoading}
         refetch={refetch}
-        messageApi={messageApi}
       />
       {openCreateStrategicInitiativeForm && (
         <CreateStrategicInitiativeForm
           showForm={openCreateStrategicInitiativeForm}
           onFormComplete={() => onCreateStrategicInitiativeFormClosed(true)}
           onFormCancel={() => onCreateStrategicInitiativeFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
     </>

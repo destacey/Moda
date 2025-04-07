@@ -3,7 +3,6 @@
 import { ModaGrid } from '@/src/components/common'
 import { StrategicThemeListDto } from '@/src/services/moda-api'
 import { ColDef } from 'ag-grid-community'
-import { MessageInstance } from 'antd/es/message/interface'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
@@ -11,7 +10,6 @@ export interface StrategicThemesGridProps {
   strategicThemesData: StrategicThemeListDto[]
   strategicThemesLoading: boolean
   refreshStrategicThemes: () => void
-  messageApi: MessageInstance
   gridHeight?: number | undefined
 }
 

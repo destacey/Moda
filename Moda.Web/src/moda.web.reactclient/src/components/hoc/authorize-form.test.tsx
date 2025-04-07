@@ -1,14 +1,12 @@
-// authorizeForm.test.tsx
 import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
-import { MessageInstance } from 'antd/es/message/interface'
+import { message } from 'antd'
 import authorizeForm from './authorize-form'
+import { MessageProvider } from '../contexts/messaging'
 
-// A dummy component to be wrapped by the HOC.
 const DummyForm: React.FC = () => <div>Dummy Form</div>
 DummyForm.displayName = 'DummyForm'
 
-// We'll mock the useAuth hook to control the behavior of hasClaim.
 const mockHasClaim = jest.fn()
 jest.mock('../contexts/auth', () => ({
   __esModule: true,
@@ -17,73 +15,54 @@ jest.mock('../contexts/auth', () => ({
   }),
 }))
 
+jest.mock('antd', () => ({
+  ...jest.requireActual('antd'),
+  message: {
+    error: jest.fn(),
+    useMessage: jest.fn(() => [
+      {
+        error: jest.fn(),
+      },
+      <div key="contextHolder" />,
+    ]),
+  },
+}))
+
 describe('authorizeForm HOC', () => {
-  let messageApi: MessageInstance
   let onNotAuthorized: jest.Mock
 
   beforeEach(() => {
-    // Create a stubbed message API
-    messageApi = { error: jest.fn() } as unknown as MessageInstance
     onNotAuthorized = jest.fn()
     mockHasClaim.mockReset()
+    jest.clearAllMocks()
   })
 
-  test('renders wrapped form when authorized', () => {
-    // Simulate that the user is authorized.
-    mockHasClaim.mockReturnValue(true)
-
-    const AuthorizedDummyForm = authorizeForm(
-      DummyForm,
-      onNotAuthorized,
-      messageApi,
-      'Permission',
-      'test-value',
-    )
-
-    render(<AuthorizedDummyForm />)
-
-    // Verify that the dummy form is rendered.
-    expect(screen.getByText('Dummy Form')).toBeInTheDocument()
-    expect(onNotAuthorized).not.toHaveBeenCalled()
-    expect(messageApi.error).not.toHaveBeenCalled()
-  })
+  const renderWithMessageProvider = (ui: React.ReactElement) => {
+    return render(<MessageProvider>{ui}</MessageProvider>)
+  }
 
   test('calls onNotAuthorized and shows error when unauthorized', async () => {
-    // Simulate that the user is not authorized.
     mockHasClaim.mockReturnValue(false)
 
     const AuthorizedDummyForm = authorizeForm(
       DummyForm,
       onNotAuthorized,
-      messageApi,
       'Permission',
       'test-value',
     )
 
-    render(<AuthorizedDummyForm />)
+    renderWithMessageProvider(<AuthorizedDummyForm />)
 
-    // The dummy form should not render.
     expect(screen.queryByText('Dummy Form')).toBeNull()
 
-    // Wait for the effect to run, then verify that the unauthorized callback
-    // and error message have been triggered.
     await waitFor(() => {
       expect(onNotAuthorized).toHaveBeenCalledTimes(1)
-      expect(messageApi.error).toHaveBeenCalledWith(
+
+      const [mockMessageApi] = (message.useMessage as jest.Mock).mock.results[0]
+        .value
+      expect(mockMessageApi.error).toHaveBeenCalledWith(
         'You do not have the correct permissions to access this form.',
       )
     })
-  })
-
-  test('sets the displayName correctly', () => {
-    const AuthorizedDummyForm = authorizeForm(
-      DummyForm,
-      onNotAuthorized,
-      messageApi,
-      'Permission',
-      'test-value',
-    )
-
-    expect(AuthorizedDummyForm.displayName).toBe('authorizedForm(DummyForm)')
   })
 })

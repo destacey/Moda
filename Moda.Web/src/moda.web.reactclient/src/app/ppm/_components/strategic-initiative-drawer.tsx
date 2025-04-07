@@ -3,11 +3,11 @@
 import { ModaDateRange } from '@/src/components/common'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetStrategicInitiativeQuery } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { getSortedNames } from '@/src/utils'
 import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
 import { Descriptions, Drawer, Flex, Spin } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo } from 'react'
 
@@ -17,12 +17,13 @@ export interface StrategicInitiativeDrawerProps {
   strategicInitiativeKey: number
   drawerOpen: boolean
   onDrawerClose: () => void
-  messageApi: MessageInstance
 }
 
 const StrategicInitiativeDrawer: React.FC<StrategicInitiativeDrawerProps> = (
   props: StrategicInitiativeDrawerProps,
 ) => {
+  const messageApi = useMessage()
+
   const {
     data: strategicInitiativeData,
     isLoading,
@@ -37,22 +38,22 @@ const StrategicInitiativeDrawer: React.FC<StrategicInitiativeDrawerProps> = (
 
   useEffect(() => {
     if (!canViewStrategicInitiative) {
-      props.messageApi.error(
+      messageApi.error(
         'You do not have permission to view strategic initiatives.',
       )
       props.onDrawerClose()
     }
-  }, [canViewStrategicInitiative, props])
+  }, [canViewStrategicInitiative, messageApi, props])
 
   useEffect(() => {
     if (error) {
       console.error(error)
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           'An error occurred while loading strategic initiative data. Please try again.',
       )
     }
-  }, [error, props.messageApi])
+  }, [error, messageApi])
 
   const sponsorNames = useMemo(
     () =>

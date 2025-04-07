@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Models;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
+using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Queries;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
@@ -61,6 +62,8 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
     [OpenApiOperation("Update a strategic initiative.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdateStrategicInitiativeRequest request, CancellationToken cancellationToken)
     {
         if (id != request.Id)
@@ -146,4 +149,128 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
+
+    #region KPIs
+
+    [HttpGet("{id}/kpis")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Get a list of KPIs for a strategic initiative.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeKpiListDto>>> GetKpis(string id, CancellationToken cancellationToken)
+    {
+        var kpis = await _sender.Send(new GetStrategicInitiativeKpisQuery(id), cancellationToken);
+
+        // TODO: does this return null if the strategic initiative is not found?
+        return kpis is not null
+            ? Ok(kpis)
+            : NotFound();
+    }
+
+    [HttpGet("{id}/kpis/{kpiId}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Get a KPI for a strategic initiative.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<StrategicInitiativeKpiDetailsDto>> GetKpi(string id, string kpiId, CancellationToken cancellationToken)
+    {
+        var kpi = await _sender.Send(new GetStrategicInitiativeKpiQuery(id, kpiId), cancellationToken);
+
+        return kpi is not null
+            ? Ok(kpi)
+            : NotFound();
+    }
+
+    [HttpPost("{id}/kpis")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Create a KPI for a strategic initiative.", "")]
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
+    public async Task<ActionResult<ObjectIdAndKey>> CreateKpi(Guid id, [FromBody] CreateStrategicInitiativeKpiRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.StrategicInitiativeId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
+
+        var result = await _sender.Send(request.ToCreateStrategicInitiativeKpiCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetKpi), new { id = id, kpiId = result.Value }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPut("{id}/kpis/{kpiId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Update a KPI for a strategic initiative.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> UpdateKpi(Guid id, Guid kpiId, [FromBody] UpdateStrategicInitiativeKpiRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.StrategicInitiativeId || kpiId != request.KpiId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
+
+        var result = await _sender.Send(request.ToUpdateStrategicInitiativeKpiCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpDelete("{id}/kpis/{kpiId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Delete a KPI for a strategic initiative.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteKpi(Guid id, Guid kpiId, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeleteStrategicInitiativeKpiCommand(id, kpiId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPost("{id}/kpis/{kpiId}/measurements")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Add a measurement to the strategic initiative KPI.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> AddKpiMeasurement(Guid id, Guid kpiId, [FromBody] AddStrategicInitiativeKpiMeasurementRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.StrategicInitiativeId || kpiId != request.KpiId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
+
+        var result = await _sender.Send(request.ToAddStrategicInitiativeKpiMeasurementCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("kpi-units")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Get a list of KPI units.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeKpiUnitDto>>> GetKpiUnits(CancellationToken cancellationToken)
+    {
+        var units = await _sender.Send(new GetStrategicInitiativeKpiUnitsQuery(), cancellationToken);
+
+        return Ok(units);
+    }
+
+    [HttpGet("kpi-target-directions")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Get a list of KPI target directions.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<StrategicInitiativeKpiTargetDirectionDto>>> GetKpiTargetDirections(CancellationToken cancellationToken)
+    {
+        var targetDirections = await _sender.Send(new GetStrategicInitiativeKpiTargetDirectionsQuery(), cancellationToken);
+
+        return Ok(targetDirections);
+    }
+
+    #endregion KPIs
 }

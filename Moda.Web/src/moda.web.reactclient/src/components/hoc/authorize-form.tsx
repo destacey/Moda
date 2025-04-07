@@ -2,7 +2,7 @@
 
 import { ComponentType, FC, useEffect } from 'react'
 import useAuth from '../contexts/auth'
-import { MessageInstance } from 'antd/es/message/interface'
+import { useMessage } from '../contexts/messaging'
 
 /**
  * A higher-order component that wraps a form component and checks if the user has the required claim.
@@ -18,7 +18,6 @@ import { MessageInstance } from 'antd/es/message/interface'
 const authorizeForm = <P extends object>(
   WrappedForm: ComponentType<P>,
   onNotAuthorized: () => void,
-  messageApi: MessageInstance,
   requiredClaimType: string,
   requiredClaimValue: string,
 ): FC<P> => {
@@ -27,6 +26,8 @@ const authorizeForm = <P extends object>(
     WrappedForm.displayName || WrappedForm.name || 'Component'
 
   const AuthorizedForm: FC<P> = (props: P) => {
+    const messageApi = useMessage()
+
     const { hasClaim } = useAuth()
     const authorized = hasClaim(requiredClaimType, requiredClaimValue)
 
@@ -38,7 +39,7 @@ const authorizeForm = <P extends object>(
           'You do not have the correct permissions to access this form.',
         )
       }
-    }, [authorized])
+    }, [authorized, messageApi])
 
     // If not authorized, do not render the form.
     if (!authorized) {

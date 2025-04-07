@@ -2,7 +2,7 @@
 
 namespace Moda.Web.Api.Models.Ppm.StrategicInitiatives;
 
-public class UpdateStrategicInitiativeRequest
+public sealed record UpdateStrategicInitiativeRequest
 {
     public Guid Id { get; set; }
 

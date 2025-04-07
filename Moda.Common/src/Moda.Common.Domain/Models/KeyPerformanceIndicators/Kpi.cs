@@ -8,7 +8,7 @@ namespace Moda.Common.Domain.Models.KeyPerformanceIndicators;
 /// <summary>
 /// Represents the common properties and behavior for a Key Performance Indicator (KPI).
 /// </summary>
-public abstract class Kpi : BaseEntity<Guid>
+public abstract class Kpi : BaseEntity<Guid>, IHasIdAndKey
 {
     protected string _name = default!;
     protected string? _description;
@@ -57,6 +57,11 @@ public abstract class Kpi : BaseEntity<Guid>
     public double TargetValue { get; protected set; }
 
     /// <summary>
+    /// The actual value of the KPI.
+    /// </summary>
+    public double? ActualValue { get; protected set; }
+
+    /// <summary>
     /// Gets the unit of measurement for the KPI.
     /// </summary>
     public KpiUnit Unit { get; protected set; }
@@ -92,7 +97,7 @@ public abstract class Kpi : BaseEntity<Guid>
     /// <param name="unit"></param>
     /// <param name="targetDirection"></param>
     /// <returns></returns>
-    public virtual Result Update(string name, string? description, double targetValue, KpiUnit unit, KpiTargetDirection targetDirection)
+    protected virtual Result Update(string name, string? description, double targetValue, KpiUnit unit, KpiTargetDirection targetDirection)
     {
         Name = name;
         Description = description;

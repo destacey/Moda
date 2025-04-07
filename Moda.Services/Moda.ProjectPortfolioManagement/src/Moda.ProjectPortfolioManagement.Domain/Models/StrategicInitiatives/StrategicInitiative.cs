@@ -3,7 +3,7 @@ using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 
-namespace Moda.ProjectPortfolioManagement.Domain.Models;
+namespace Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
 {
@@ -210,6 +210,90 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
 
     #endregion Lifecycle
 
+    #region KPIs
+
+    /// <summary>
+    /// Creates a new KPI for the strategic initiative.
+    /// </summary>
+    /// <param name="parameters"></param>
+    /// <returns></returns>
+    public Result<StrategicInitiativeKpi> CreateKpi(StrategicInitiativeKpiUpsertParameters parameters)
+    {
+        Guard.Against.Null(parameters, nameof(parameters));
+
+        if (IsClosed)
+        {
+            return Result.Failure<StrategicInitiativeKpi>("KPIs cannot be created for closed strategic initiatives.");
+        }
+
+        var kpi = StrategicInitiativeKpi.Create(Id, parameters);
+
+        _kpis.Add(kpi);
+
+        return kpi;
+    }
+
+    /// <summary>
+    /// Updates an existing KPI for the strategic initiative.
+    /// </summary>
+    /// <param name="kpiId"></param>
+    /// <param name="parameters"></param>
+    /// <returns></returns>
+    public Result UpdateKpi(Guid kpiId, StrategicInitiativeKpiUpsertParameters parameters)
+    {
+        Guard.Against.NullOrEmpty(kpiId, nameof(kpiId));
+        Guard.Against.Null(parameters, nameof(parameters));
+
+        if (IsClosed)
+        {
+            return Result.Failure("KPIs cannot be updated for closed strategic initiatives.");
+        }
+
+        var kpi = _kpis.FirstOrDefault(k => k.Id == kpiId);
+        if (kpi is null)
+        {
+            return Result.Failure("KPI not found.");
+        }
+
+        return kpi.Update(parameters);
+    }
+
+    /// <summary>
+    /// Deletes a KPI from the strategic initiative.
+    /// </summary>
+    /// <param name="kpiId"></param>
+    /// <returns></returns>
+    public Result DeleteKpi(Guid kpiId)
+    {
+        Guard.Against.NullOrEmpty(kpiId, nameof(kpiId));
+
+        if (IsClosed)
+        {
+            return Result.Failure("KPIs cannot be deleted for closed strategic initiatives.");
+        }
+
+        var kpi = _kpis.FirstOrDefault(k => k.Id == kpiId);
+        if (kpi is null)
+        {
+            return Result.Failure("KPI not found.");
+        }
+
+        _kpis.Remove(kpi);
+
+        return Result.Success();
+    }
+
+    #endregion KPIs
+
+    /// <summary>
+    /// Creates a new strategic initiative.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="description"></param>
+    /// <param name="dateRange"></param>
+    /// <param name="portfolioId"></param>
+    /// <param name="roles"></param>
+    /// <returns></returns>
     internal static StrategicInitiative Create(string name, string description, LocalDateRange dateRange, Guid portfolioId, Dictionary<StrategicInitiativeRole, HashSet<Guid>>? roles = null)
     {
         return new StrategicInitiative(name, description, StrategicInitiativeStatus.Proposed, dateRange, portfolioId, roles);

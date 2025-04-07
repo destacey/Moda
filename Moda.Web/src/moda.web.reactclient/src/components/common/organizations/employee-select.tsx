@@ -28,7 +28,7 @@ const EmployeeSelect: React.FC<EmployeeSelectProps> = ({
         mode={allowMultiple ? 'multiple' : undefined}
         allowClear
         placeholder={selectPlaceholder}
-        optionFilterProp="children"
+        optionFilterProp="label"
         filterOption={(input, option) =>
           (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
         }

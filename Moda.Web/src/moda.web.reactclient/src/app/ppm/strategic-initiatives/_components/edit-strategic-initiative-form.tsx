@@ -2,7 +2,6 @@
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { EmployeeSelect } from '@/src/components/common/organizations'
-import { authorizeForm } from '@/src/components/hoc'
 import {
   StrategicInitiativeDetailsDto,
   UpdateStrategicInitiativeRequest,
@@ -15,10 +14,10 @@ import {
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Form
 
@@ -27,7 +26,6 @@ export interface EditStrategicInitiativeFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface EditStrategicInitiativeFormValues {
@@ -63,13 +61,10 @@ const EditStrategicInitiativeForm = (
   const [form] = Form.useForm<EditStrategicInitiativeFormValues>()
   const formValues = Form.useWatch([], form)
 
-  const {
-    strategicInitiativeKey,
-    showForm,
-    onFormComplete,
-    onFormCancel,
-    messageApi,
-  } = props
+  const messageApi = useMessage()
+
+  const { strategicInitiativeKey, showForm, onFormComplete, onFormCancel } =
+    props
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateStrategicInitiative = hasPermissionClaim(
@@ -112,7 +107,7 @@ const EditStrategicInitiativeForm = (
     [form],
   )
 
-  const update = async (
+  const formAction = async (
     values: EditStrategicInitiativeFormValues,
     strategicInitiative: StrategicInitiativeDetailsDto,
   ) => {
@@ -149,7 +144,7 @@ const EditStrategicInitiativeForm = (
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await update(values, strategicInitiativeData)) {
+      if (await formAction(values, strategicInitiativeData)) {
         setIsOpen(false)
         form.resetFields()
         onFormComplete()
@@ -223,7 +218,7 @@ const EditStrategicInitiativeForm = (
           form={form}
           size="small"
           layout="vertical"
-          name="create-strategic-initiative-form"
+          name="edit-strategic-initiative-form"
         >
           <Item
             label="Name"

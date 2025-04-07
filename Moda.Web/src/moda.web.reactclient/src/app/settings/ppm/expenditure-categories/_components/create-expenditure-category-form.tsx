@@ -1,12 +1,12 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { CreateExpenditureCategoryRequest } from '@/src/services/moda-api'
 import { useCreateExpenditureCategoryMutation } from '@/src/store/features/ppm/expenditure-categories-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal, Switch } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -15,7 +15,6 @@ export interface CreateExpenditureCategoryFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface CreateExpenditureCategoryFormValues {
@@ -47,6 +46,8 @@ const CreateExpenditureCategoryForm = (
   const [form] = Form.useForm<CreateExpenditureCategoryFormValues>()
   const formValues = Form.useWatch([], form)
 
+  const messageApi = useMessage()
+
   const [createExpenditureCategory, { error: mutationError }] =
     useCreateExpenditureCategoryMutation()
 
@@ -62,7 +63,7 @@ const CreateExpenditureCategoryForm = (
       if (response.error) {
         throw response.error
       }
-      props.messageApi.success(
+      messageApi.success(
         'Expenditure Category created successfully. Expenditure Category key: ' +
           response.data,
       )
@@ -72,9 +73,9 @@ const CreateExpenditureCategoryForm = (
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while creating the expenditure category. Please try again.',
         )
@@ -94,7 +95,7 @@ const CreateExpenditureCategoryForm = (
       }
     } catch (error) {
       console.error('handleOk error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while creating the expenditure category. Please try again.',
       )
     } finally {
@@ -113,11 +114,11 @@ const CreateExpenditureCategoryForm = (
       setIsOpen(props.showForm)
     } else {
       props.onFormCancel()
-      props.messageApi.error(
+      messageApi.error(
         'You do not have permission to create expenditure categories.',
       )
     }
-  }, [canCreateExpenditureCategory, props])
+  }, [canCreateExpenditureCategory, messageApi, props])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(

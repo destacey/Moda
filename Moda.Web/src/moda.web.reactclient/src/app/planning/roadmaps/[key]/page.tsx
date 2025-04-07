@@ -49,7 +49,7 @@ const RoadmapDetailsPage = ({ params }) => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
 
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -71,7 +71,7 @@ const RoadmapDetailsPage = ({ params }) => {
     data: roadmapItems,
     isFetching: isRoadmapItemsLoading,
     refetch: refetchRoadmapItems,
-  } = useGetRoadmapItemsQuery(params.key, {
+  } = useGetRoadmapItemsQuery(roadmapData?.id, {
     skip: !roadmapData,
   })
 
@@ -270,7 +270,6 @@ const RoadmapDetailsPage = ({ params }) => {
         refreshRoadmapItems={refetchRoadmapItems}
         canUpdateRoadmap={canUpdateRoadmap}
         openRoadmapItemDrawer={openRoadmapItemDrawer}
-        messageApi={messageApi}
       />
       {openEditRoadmapForm && (
         <EditRoadmapForm
@@ -278,7 +277,6 @@ const RoadmapDetailsPage = ({ params }) => {
           showForm={openEditRoadmapForm}
           onFormComplete={() => onEditRoadmapFormClosed(true)}
           onFormCancel={() => onEditRoadmapFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openDeleteRoadmapForm && (
@@ -287,7 +285,6 @@ const RoadmapDetailsPage = ({ params }) => {
           showForm={openDeleteRoadmapForm}
           onFormComplete={() => onDeleteFormClosed(true)}
           onFormCancel={() => onDeleteFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openReorganizeActivitiesModal && (
@@ -296,7 +293,6 @@ const RoadmapDetailsPage = ({ params }) => {
           roadmapId={roadmapData?.id}
           roadmapItems={roadmapItems}
           onClose={onReorganizeActivitiesModalClose}
-          messageApi={messageApi}
         />
       )}
       {openCreateActivityForm && (
@@ -305,7 +301,6 @@ const RoadmapDetailsPage = ({ params }) => {
           roadmapId={roadmapData?.id}
           onFormComplete={() => onCreateRoadmapActivityFormClosed(true)}
           onFormCancel={() => onCreateRoadmapActivityFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openCreateTimeboxForm && (
@@ -314,7 +309,6 @@ const RoadmapDetailsPage = ({ params }) => {
           roadmapId={roadmapData?.id}
           onFormComplete={() => onCreateRoadmapTimeboxFormClosed(true)}
           onFormCancel={() => onCreateRoadmapTimeboxFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {roadmapData?.id && selectedItemId && (

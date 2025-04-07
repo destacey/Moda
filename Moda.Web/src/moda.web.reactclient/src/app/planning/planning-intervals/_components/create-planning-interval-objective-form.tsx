@@ -80,7 +80,7 @@ const CreatePlanningIntervalObjectiveForm = ({
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<CreatePlanningIntervalObjectiveFormValues>()
   const formValues = Form.useWatch([], form)
-  const messageApi = useMessage();
+  const messageApi = useMessage()
   const [teams, setTeams] = useState<PlanningIntervalTeamSelectItem[]>([])
   const [defaultStatusId, setDefaultStatusId] = useState<number>(null)
 
@@ -207,7 +207,7 @@ const CreatePlanningIntervalObjectiveForm = ({
     (current) => {
       return (
         current < dayjs(planningIntervalData?.start) ||
-        current > dayjs(planningIntervalData?.end).add(1, 'day')
+        current > dayjs(planningIntervalData?.end)
       )
     },
     [planningIntervalData?.start, planningIntervalData?.end],
@@ -217,132 +217,133 @@ const CreatePlanningIntervalObjectiveForm = ({
     (date: Date) => {
       return (
         dayjs(planningIntervalData.start) <= dayjs(date) &&
-        dayjs(date) < dayjs(planningIntervalData.end).add(1, 'day')
+        dayjs(date) <= dayjs(planningIntervalData.end)
       )
     },
     [planningIntervalData?.start, planningIntervalData?.end],
   )
 
   return (
-    <Modal
-      title="Create PI Objective"
-      open={isOpen}
-      width={'60vw'}
-      onOk={handleOk}
-      okButtonProps={{ disabled: !isValid }}
-      okText="Create"
-      confirmLoading={isSaving}
-      onCancel={handleCancel}
-      maskClosable={false}
-      keyboard={false} // disable esc key to close modal
-      destroyOnClose={true}
-    >
-      <Form
-        form={form}
-        size="small"
-        layout="vertical"
-        name="create-objective-form"
-        initialValues={{ isStretch: false }} // used to set default value for switch
+    <>
+      <Modal
+        title="Create PI Objective"
+        open={isOpen}
+        onOk={handleOk}
+        okButtonProps={{ disabled: !isValid }}
+        okText="Create"
+        confirmLoading={isSaving}
+        onCancel={handleCancel}
+        maskClosable={false}
+        keyboard={false} // disable esc key to close modal
+        destroyOnClose={true}
       >
-        <FormItem name="planningIntervalId" hidden={true}>
-          <Input />
-        </FormItem>
-        <FormItem name="statusId" hidden={true}>
-          <Input />
-        </FormItem>
-        <FormItem name="teamId" label="Team" rules={[{ required: true }]}>
-          <Select
-            showSearch
-            disabled={teamId !== undefined}
-            placeholder="Select a team"
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              (option?.label.toLowerCase() ?? '').includes(
-                input.toLowerCase(),
-              )
-            }
-            filterSort={(optionA, optionB) =>
-              (optionA?.label ?? '')
-                .toLowerCase()
-                .localeCompare((optionB?.label ?? '').toLowerCase())
-            }
-            options={teams}
-          />
-        </FormItem>
-        <FormItem label="Name" name="name" rules={[{ required: true }]}>
-          <TextArea
-            autoSize={{ minRows: 2, maxRows: 4 }}
-            showCount
-            maxLength={256}
-          />
-        </FormItem>
-        <FormItem
-          name="description"
-          label="Description"
-          initialValue=""
-          rules={[{ max: 1024 }]}
+        <Form
+          form={form}
+          size="small"
+          layout="vertical"
+          name="create-objective-form"
+          initialValues={{ isStretch: false }} // used to set default value for switch
         >
-          <MarkdownEditor
-            value={form.getFieldValue('description')}
-            onChange={(value) =>
-              form.setFieldValue('description', value || '')
-            }
-            maxLength={1024}
-          />
-        </FormItem>
-        <FormItem
-          label="Is Stretch?"
-          name="isStretch"
-          valuePropName="checked"
-        >
-          <Switch checkedChildren="Yes" unCheckedChildren="No" />
-        </FormItem>
-        <FormItem
-          label="Start"
-          name="startDate"
-          rules={[
-            {
-              validator: (_, value: Date) =>
-                !value || isDateWithinPiRange(value)
-                  ? Promise.resolve()
-                  : Promise.reject(
-                      'The start date must be within the Planning Interval dates.',
-                    ),
-            },
-          ]}
-        >
-          <DatePicker disabledDate={disabledDate} />
-        </FormItem>
-        <FormItem
-          label="Target"
-          name="targetDate"
-          dependencies={['startDate']}
-          rules={[
-            {
-              validator: (_, value: Date) =>
-                !value || isDateWithinPiRange(value)
-                  ? Promise.resolve()
-                  : Promise.reject(
-                      'The target date must be within the Planning Interval dates.',
-                    ),
-            },
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                const start = getFieldValue('startDate')
-                if (!value || !start || start < value) {
-                  return Promise.resolve()
-                }
-                return Promise.reject(
-                  new Error('End date must be after start date'),
+          <FormItem name="planningIntervalId" hidden={true}>
+            <Input />
+          </FormItem>
+          <FormItem name="statusId" hidden={true}>
+            <Input />
+          </FormItem>
+          <FormItem name="teamId" label="Team" rules={[{ required: true }]}>
+            <Select
+              showSearch
+              disabled={teamId !== undefined}
+              placeholder="Select a team"
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.label.toLowerCase() ?? '').includes(
+                  input.toLowerCase(),
                 )
+              }
+              filterSort={(optionA, optionB) =>
+                (optionA?.label ?? '')
+                  .toLowerCase()
+                  .localeCompare((optionB?.label ?? '').toLowerCase())
+              }
+              options={teams}
+            />
+          </FormItem>
+          <FormItem label="Name" name="name" rules={[{ required: true }]}>
+            <TextArea
+              autoSize={{ minRows: 2, maxRows: 4 }}
+              showCount
+              maxLength={256}
+            />
+          </FormItem>
+          <FormItem
+            name="description"
+            label="Description"
+            initialValue=""
+            rules={[{ max: 1024 }]}
+          >
+            <MarkdownEditor
+              value={form.getFieldValue('description')}
+              onChange={(value) =>
+                form.setFieldValue('description', value || '')
+              }
+              maxLength={1024}
+            />
+          </FormItem>
+          <FormItem
+            label="Is Stretch?"
+            name="isStretch"
+            valuePropName="checked"
+          >
+            <Switch checkedChildren="Yes" unCheckedChildren="No" />
+          </FormItem>
+          <FormItem
+            label="Start"
+            name="startDate"
+            rules={[
+              {
+                validator: (_, value: Date) =>
+                  !value || isDateWithinPiRange(value)
+                    ? Promise.resolve()
+                    : Promise.reject(
+                        'The start date must be within the Planning Interval dates.',
+                      ),
               },
-            }),
-          ]}
-        >
-          <DatePicker disabledDate={disabledDate} />
-        </FormItem>
-      </Form>
-    </Modal>
+            ]}
+          >
+            <DatePicker disabledDate={disabledDate} />
+          </FormItem>
+          <FormItem
+            label="Target"
+            name="targetDate"
+            dependencies={['startDate']}
+            rules={[
+              {
+                validator: (_, value: Date) =>
+                  !value || isDateWithinPiRange(value)
+                    ? Promise.resolve()
+                    : Promise.reject(
+                        'The target date must be within the Planning Interval dates.',
+                      ),
+              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const start = getFieldValue('startDate')
+                  if (!value || !start || start < value) {
+                    return Promise.resolve()
+                  }
+                  return Promise.reject(
+                    new Error('End date must be after start date'),
+                  )
+                },
+              }),
+            ]}
+          >
+            <DatePicker disabledDate={disabledDate} />
+          </FormItem>
+        </Form>
+      </Modal>
+    </>
   )
 }
 

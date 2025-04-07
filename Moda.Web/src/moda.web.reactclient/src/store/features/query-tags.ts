@@ -40,6 +40,11 @@ export enum QueryTags {
   PortfolioStrategicInitiatives = 'Ppm.Portfolio.StrategicInitiatives',
   Project = 'Ppm.Project',
   StrategicInitiative = 'Ppm.StrategicInitiative',
+  StrategicInitiativeKpi = 'Ppm.StrategicInitiativeKpi',
+  StrategicInitiativeKpiCheckpoint = 'Ppm.StrategicInitiativeKpiCheckpoint',
+  StrategicInitiativeKpiMeasurement = 'Ppm.StrategicInitiativeKpiMeasurement',
+  StrategicInitiativeKpiUnit = 'Ppm.StrategicInitiativeKpiUnit',
+  StrategicInitiativeKpiTargetDirection = 'Ppm.StrategicInitiativeKpiTargetDirection',
 
   // STRATEGIC MANAGEMENT
   StrategicTheme = 'StrategicManagement.StrategicTheme',

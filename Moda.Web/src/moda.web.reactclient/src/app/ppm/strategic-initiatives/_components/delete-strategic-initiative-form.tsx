@@ -1,11 +1,10 @@
 'use client'
 
-import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { authorizeForm } from '@/src/components/hoc'
 import { StrategicInitiativeDetailsDto } from '@/src/services/moda-api'
 import { useDeleteStrategicInitiativeMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Modal } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { FC, useEffect, useState } from 'react'
 
 export interface DeleteStrategicInitiativeFormProps {
@@ -13,7 +12,6 @@ export interface DeleteStrategicInitiativeFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 const DeleteStrategicInitiativeForm = (
@@ -22,10 +20,12 @@ const DeleteStrategicInitiativeForm = (
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
+  const messageApi = useMessage()
+
   const [deleteStrategicInitiativeMutation, { error: mutationError }] =
     useDeleteStrategicInitiativeMutation()
 
-  const deleteStrategicInitiative = async (
+  const formAction = async (
     strategicInitiative: StrategicInitiativeDetailsDto,
   ) => {
     try {
@@ -39,7 +39,7 @@ const DeleteStrategicInitiativeForm = (
 
       return true
     } catch (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           'An unexpected error occurred while deleting the strategic initiative.',
       )
@@ -51,15 +51,15 @@ const DeleteStrategicInitiativeForm = (
   const handleOk = async () => {
     setIsSaving(true)
     try {
-      if (await deleteStrategicInitiative(props.strategicInitiative)) {
+      if (await formAction(props.strategicInitiative)) {
         // TODO: not working because the parent page is gone
-        props.messageApi.success('Successfully deleted strategic initiative.')
+        messageApi.success('Successfully deleted strategic initiative.')
         props.onFormComplete()
         setIsOpen(false)
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
-      props.messageApi.error(
+      messageApi.error(
         'An unexpected error occurred while deleting the strategic initiative.',
       )
     } finally {
@@ -104,7 +104,6 @@ const AuthorizedDeleteStrategicInitiativeForm: FC<
   const AuthorizedForm = authorizeForm(
     DeleteStrategicInitiativeForm,
     props.onFormCancel,
-    props.messageApi,
     'Permission',
     'Permissions.StrategicInitiatives.Delete',
   )

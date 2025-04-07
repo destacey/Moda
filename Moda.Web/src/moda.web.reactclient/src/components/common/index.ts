@@ -1,3 +1,4 @@
+export { default as ContainerCard } from './container-card'
 export { default as InactiveTag } from './inactive-tag'
 export { default as LoadingAccount } from './loading-account'
 export { default as ModaColorPicker } from './moda-color-picker'

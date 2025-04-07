@@ -1,6 +1,4 @@
-﻿using Moda.Common.Application.Models;
-
-namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
+﻿namespace Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
 
 public sealed record DeleteStrategicInitiativeCommand(Guid Id) : ICommand;
 
@@ -53,13 +51,13 @@ internal sealed class DeleteStrategicInitiativeCommandHandler(
             var deleteResult = portfolio.DeleteStrategicInitiative(strategicInitiative.Id);
             if (deleteResult.IsFailure)
             {
-                _logger.LogInformation("Error deleting Strategic Initiative {StrategicInitiativeId}.", request.Id);
+                _logger.LogError("Error deleting Strategic Initiative {StrategicInitiativeId}. Error message: {Error}", request.Id, deleteResult.Error);
                 return Result.Failure(deleteResult.Error);
             }
 
             await _projectPortfolioManagementDbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Strategic Initiative {StrategicInitiativeId} deleted. Key: {Key}, Name: {Name}", strategicInitiative.Id, strategicInitiative.Key, strategicInitiative.Name);
+            _logger.LogInformation("Strategic Initiative {StrategicInitiativeId} with Key {StrategicInitiativeKey} deleted", strategicInitiative.Id, strategicInitiative.Key);
 
             return Result.Success();
         }

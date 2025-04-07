@@ -1,3 +1,12 @@
+import {
+  AddStrategicInitiativeKpiMeasurementRequest,
+  CreateStrategicInitiativeKpiRequest,
+  StrategicInitiativeKpiDetailsDto,
+  StrategicInitiativeKpiListDto,
+  StrategicInitiativeKpiTargetDirectionDto,
+  StrategicInitiativeKpiUnitDto,
+  UpdateStrategicInitiativeKpiRequest,
+} from './../../../services/moda-api'
 import { apiSlice } from './../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getStrategicInitiativesClient } from '@/src/services/clients'
@@ -8,6 +17,7 @@ import {
   StrategicInitiativeListDto,
   UpdateStrategicInitiativeRequest,
 } from '@/src/services/moda-api'
+import { BaseOptionType } from 'antd/es/select'
 
 export const strategicInitiativesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -194,6 +204,199 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+    getStrategicInitiativeKpis: builder.query<
+      StrategicInitiativeKpiListDto[],
+      string
+    >({
+      queryFn: async (strategicInitiativeId) => {
+        try {
+          const data = await getStrategicInitiativesClient().getKpis(
+            strategicInitiativeId,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.StrategicInitiativeKpi, id: arg },
+      ],
+    }),
+    getStrategicInitiativeKpi: builder.query<
+      StrategicInitiativeKpiDetailsDto,
+      { strategicInitiativeId: string; kpiId: string }
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await getStrategicInitiativesClient().getKpi(
+            request.strategicInitiativeId,
+            request.kpiId,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.StrategicInitiativeKpi, id: arg.kpiId },
+      ],
+    }),
+    createStrategicInitiativeKpi: builder.mutation<
+      ObjectIdAndKey,
+      CreateStrategicInitiativeKpiRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await getStrategicInitiativesClient().createKpi(
+            request.strategicInitiativeId,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          {
+            type: QueryTags.StrategicInitiativeKpi,
+            id: arg.strategicInitiativeId,
+          },
+        ]
+      },
+    }),
+    updateStrategicInitiativeKpi: builder.mutation<
+      void,
+      UpdateStrategicInitiativeKpiRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await getStrategicInitiativesClient().updateKpi(
+            request.strategicInitiativeId,
+            request.kpiId,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          {
+            type: QueryTags.StrategicInitiativeKpi,
+            id: arg.strategicInitiativeId,
+          },
+          { type: QueryTags.StrategicInitiativeKpi, id: arg.kpiId },
+        ]
+      },
+    }),
+    deleteStrategicInitiativeKpi: builder.mutation<
+      void,
+      { strategicInitiativeId: string; kpiId: string }
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await getStrategicInitiativesClient().deleteKpi(
+            request.strategicInitiativeId,
+            request.kpiId,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          {
+            type: QueryTags.StrategicInitiativeKpi,
+            id: arg.strategicInitiativeId,
+          },
+        ]
+      },
+    }),
+    addStrategicInitiativeKpiMeasurement: builder.mutation<
+      void,
+      AddStrategicInitiativeKpiMeasurementRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await getStrategicInitiativesClient().addKpiMeasurement(
+            request.strategicInitiativeId,
+            request.kpiId,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => {
+        return [
+          {
+            type: QueryTags.StrategicInitiativeKpi,
+            id: arg.strategicInitiativeId,
+          },
+          { type: QueryTags.StrategicInitiativeKpi, id: arg.kpiId },
+        ]
+      },
+    }),
+    getStrategicInitiativeKpiUnitOptions: builder.query<BaseOptionType[], void>(
+      {
+        queryFn: async () => {
+          try {
+            const units = await getStrategicInitiativesClient().getKpiUnits()
+
+            const data: BaseOptionType[] = units
+              .sort((a, b) => a.order - b.order)
+              .map((category) => ({
+                label: category.name,
+                value: category.id,
+              }))
+
+            return { data }
+          } catch (error) {
+            console.error('API Error:', error)
+            return { error }
+          }
+        },
+        providesTags: () => [
+          { type: QueryTags.StrategicInitiativeKpiUnit, id: 'LIST' },
+        ],
+      },
+    ),
+    getStrategicInitiativeKpiTargetDirectionOptions: builder.query<
+      BaseOptionType[],
+      void
+    >({
+      queryFn: async () => {
+        try {
+          const targetDirections =
+            await getStrategicInitiativesClient().getKpiTargetDirections()
+
+          const data: BaseOptionType[] = targetDirections
+            .sort((a, b) => a.order - b.order)
+            .map((category) => ({
+              label: category.name,
+              value: category.id,
+            }))
+
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: () => [
+        { type: QueryTags.StrategicInitiativeKpiTargetDirection, id: 'LIST' },
+      ],
+    }),
   }),
 })
 
@@ -207,4 +410,12 @@ export const {
   useCompleteStrategicInitiativeMutation,
   useCancelStrategicInitiativeMutation,
   useDeleteStrategicInitiativeMutation,
+  useGetStrategicInitiativeKpisQuery,
+  useGetStrategicInitiativeKpiQuery,
+  useCreateStrategicInitiativeKpiMutation,
+  useUpdateStrategicInitiativeKpiMutation,
+  useDeleteStrategicInitiativeKpiMutation,
+  useAddStrategicInitiativeKpiMeasurementMutation,
+  useGetStrategicInitiativeKpiUnitOptionsQuery,
+  useGetStrategicInitiativeKpiTargetDirectionOptionsQuery,
 } = strategicInitiativesApi

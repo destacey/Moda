@@ -4,9 +4,9 @@ import { RoadmapDetailsDto, RoadmapItemListDto } from '@/src/services/moda-api'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useEffect, useMemo, useState } from 'react'
-import { MessageInstance } from 'antd/es/message/interface'
 import { RoadmapsTimeline } from '.'
 import RoadmapItemsGrid from './roadmap-items-grid'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 interface RoadmapViewManagerProps {
   roadmap: RoadmapDetailsDto
@@ -15,12 +15,13 @@ interface RoadmapViewManagerProps {
   refreshRoadmapItems: () => void
   canUpdateRoadmap: boolean
   openRoadmapItemDrawer: (itemId: string) => void
-  messageApi: MessageInstance
 }
 
 const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
   const [currentView, setCurrentView] = useState<string | number>('Timeline')
   const [roadmapItems, setRoadmapItems] = useState<RoadmapItemListDto[]>([])
+
+  const messageApi = useMessage()
 
   useEffect(() => {
     setRoadmapItems(props.roadmapItems)
@@ -69,7 +70,6 @@ const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
           roadmapItemsData={roadmapItems}
           roadmapItemsIsLoading={props.isRoadmapItemsLoading}
           refreshRoadmapItems={props.refreshRoadmapItems}
-          messageApi={props.messageApi}
           gridHeight={550}
           viewSelector={viewSelector}
           enableRowDrag={props.canUpdateRoadmap}

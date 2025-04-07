@@ -1,6 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
+using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using NodaTime;
 
 namespace Moda.ProjectPortfolioManagement.Domain.Models;

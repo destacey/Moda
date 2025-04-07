@@ -2,7 +2,7 @@
 
 namespace Moda.Web.Api.Models.Ppm.StrategicInitiatives;
 
-public class CreateStrategicInitiativeRequest
+public sealed record CreateStrategicInitiativeRequest
 {
     /// <summary>
     /// The name of the strategic initiative.

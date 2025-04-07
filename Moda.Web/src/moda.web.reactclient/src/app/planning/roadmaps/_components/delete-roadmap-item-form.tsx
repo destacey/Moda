@@ -1,11 +1,11 @@
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { RoadmapItemListDto } from '@/src/services/moda-api'
 import {
   useDeleteRoadmapItemMutation,
   useGetRoadmapItemQuery,
 } from '@/src/store/features/planning/roadmaps-api'
 import { Modal } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
 export interface DeleteRoadmapItemFormProps {
@@ -14,12 +14,13 @@ export interface DeleteRoadmapItemFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 const DeleteRoadmapItemForm = (props: DeleteRoadmapItemFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  const messageApi = useMessage()
 
   const [deleteRoadmapItemMutation, { error: mutationError }] =
     useDeleteRoadmapItemMutation()
@@ -44,7 +45,7 @@ const DeleteRoadmapItemForm = (props: DeleteRoadmapItemFormProps) => {
       })
       return true
     } catch (error) {
-      props.messageApi.error(
+      messageApi.error(
         'An unexpected error occurred while deleting the roadmap.',
       )
       console.log(error)
@@ -56,13 +57,13 @@ const DeleteRoadmapItemForm = (props: DeleteRoadmapItemFormProps) => {
     setIsSaving(true)
     try {
       if (await deleteRoadmapItem(itemData)) {
-        props.messageApi.success('Successfully deleted Roadmap Item.')
+        messageApi.success('Successfully deleted Roadmap Item.')
         setIsOpen(false)
         props.onFormComplete()
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
-      props.messageApi.error(
+      messageApi.error(
         'An unexpected error occurred while deleting the roadmap item.',
       )
     } finally {
@@ -81,20 +82,18 @@ const DeleteRoadmapItemForm = (props: DeleteRoadmapItemFormProps) => {
       setIsOpen(props.showForm)
     } else {
       props.onFormCancel()
-      props.messageApi.error(
-        'You do not have permission to delete roadmap items.',
-      )
+      messageApi.error('You do not have permission to delete roadmap items.')
     }
-  }, [canDeleteRoadmapItem, itemData, itemDataIsLoading, props])
+  }, [canDeleteRoadmapItem, itemData, itemDataIsLoading, messageApi, props])
 
   useEffect(() => {
     if (itemDataError) {
-      props.messageApi.error(
+      messageApi.error(
         itemDataError.supportMessage ??
           'An error occurred while loading roadmap item. Please try again.',
       )
     }
-  }, [itemDataError, props.messageApi])
+  }, [itemDataError, messageApi])
 
   return (
     <>

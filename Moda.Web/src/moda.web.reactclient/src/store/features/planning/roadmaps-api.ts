@@ -1,4 +1,3 @@
-import { act } from '@testing-library/react'
 import {
   CreateRoadmapActivityRequest,
   CreateRoadmapMilestoneRequest,
@@ -170,7 +169,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
         }
       },
       invalidatesTags: (result, error, arg) => {
-        return [{ type: QueryTags.RoadmapItem, id: arg.roadmapId }] // TODO: add a cache key to invalidate only the specific roadmap by the key instead of id
+        return [{ type: QueryTags.RoadmapItem, id: arg.roadmapId }]
       },
     }),
     updateRoadmapItem: builder.mutation<

@@ -44,7 +44,7 @@ const ExpenditureCategoryDetailsPage = ({ params }) => {
     setOpenDeleteExpenditureCategoryForm,
   ] = useState<boolean>(false)
 
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const router = useRouter()
 
@@ -229,7 +229,6 @@ const ExpenditureCategoryDetailsPage = ({ params }) => {
           showForm={openEditExpenditureCategoryForm}
           onFormComplete={() => onEditExpenditureCategoryFormClosed(true)}
           onFormCancel={() => onEditExpenditureCategoryFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openActivateExpenditureCategoryForm && (
@@ -239,7 +238,6 @@ const ExpenditureCategoryDetailsPage = ({ params }) => {
           showForm={openActivateExpenditureCategoryForm}
           onFormComplete={() => onActivateExpenditureCategoryFormClosed(true)}
           onFormCancel={() => onActivateExpenditureCategoryFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openArchiveExpenditureCategoryForm && (
@@ -249,7 +247,6 @@ const ExpenditureCategoryDetailsPage = ({ params }) => {
           showForm={openArchiveExpenditureCategoryForm}
           onFormComplete={() => onArchiveExpenditureCategoryFormClosed(true)}
           onFormCancel={() => onArchiveExpenditureCategoryFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
       {openDeleteExpenditureCategoryForm && (
@@ -258,7 +255,6 @@ const ExpenditureCategoryDetailsPage = ({ params }) => {
           showForm={openDeleteExpenditureCategoryForm}
           onFormComplete={() => onDeleteExpenditureCategoryFormClosed(true)}
           onFormCancel={() => onDeleteExpenditureCategoryFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
     </>

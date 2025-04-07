@@ -1,3 +1,5 @@
+'use client'
+
 import { PlanningIntervalObjectiveListDto } from '@/src/services/moda-api'
 import {
   Button,

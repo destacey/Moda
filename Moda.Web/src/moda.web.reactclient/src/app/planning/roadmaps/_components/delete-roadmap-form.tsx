@@ -1,10 +1,10 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { RoadmapDetailsDto } from '@/src/services/moda-api'
 import { useDeleteRoadmapMutation } from '@/src/store/features/planning/roadmaps-api'
 import { Modal } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
 export interface DeleteRoadmapFormProps {
@@ -12,12 +12,13 @@ export interface DeleteRoadmapFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  const messageApi = useMessage()
 
   const [deleteRoadmapMutation, { error: mutationError }] =
     useDeleteRoadmapMutation()
@@ -30,7 +31,7 @@ const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
       await deleteRoadmapMutation(roadmap.id)
       return true
     } catch (error) {
-      props.messageApi.error(
+      messageApi.error(
         'An unexpected error occurred while deleting the roadmap.',
       )
       console.log(error)
@@ -43,13 +44,13 @@ const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
     try {
       if (await deleteRoadmap(props.roadmap)) {
         // TODO: not working because the parent page is gone
-        props.messageApi.success('Successfully deleted Roadmap.')
+        messageApi.success('Successfully deleted Roadmap.')
         props.onFormComplete()
         setIsOpen(false)
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
-      props.messageApi.error(
+      messageApi.error(
         'An unexpected error occurred while deleting the roadmap.',
       )
     } finally {
@@ -68,9 +69,9 @@ const DeleteRoadmapForm = (props: DeleteRoadmapFormProps) => {
       setIsOpen(props.showForm)
     } else {
       props.onFormCancel()
-      props.messageApi.error('You do not have permission to delete roadmaps.')
+      messageApi.error('You do not have permission to delete roadmaps.')
     }
-  }, [canDeleteRoadmap, props])
+  }, [canDeleteRoadmap, messageApi, props])
 
   return (
     <>

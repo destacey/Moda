@@ -10,7 +10,6 @@ import {
 import { StrategicInitiativeListDto } from '@/src/services/moda-api'
 import { Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { StrategicInitiativeDrawer } from '.'
@@ -21,7 +20,6 @@ export interface StrategicInitiativesTimelineProps {
   strategicInitiatives: StrategicInitiativeListDto[]
   isLoading: boolean
   refetch: () => void
-  messageApi: MessageInstance
   viewSelector?: ReactNode
 }
 
@@ -185,7 +183,6 @@ const StrategicInitiativesTimeline: React.FC<
           strategicInitiativeKey={selectedItemKey}
           drawerOpen={drawerOpen}
           onDrawerClose={onDrawerClose}
-          messageApi={props.messageApi}
         />
       )}
     </>

@@ -8,7 +8,6 @@ import {
 import { ProjectListDto } from '@/src/services/moda-api'
 import { getSortedNames } from '@/src/utils'
 import { ColDef } from 'ag-grid-community'
-import { MessageInstance } from 'antd/es/message/interface'
 import dayjs from 'dayjs'
 import { useCallback, useMemo } from 'react'
 
@@ -16,7 +15,6 @@ export interface ProjectsGridProps {
   projects: ProjectListDto[]
   isLoading: boolean
   refetch: () => void
-  messageApi: MessageInstance
   hidePortfolio?: boolean
   gridHeight?: number | undefined
   viewSelector?: React.ReactNode | undefined

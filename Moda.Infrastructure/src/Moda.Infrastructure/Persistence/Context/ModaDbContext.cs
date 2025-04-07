@@ -14,6 +14,7 @@ using Moda.Planning.Domain.Models;
 using Moda.Planning.Domain.Models.Roadmaps;
 using Moda.ProjectPortfolioManagement.Application;
 using Moda.ProjectPortfolioManagement.Domain.Models;
+using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using Moda.StrategicManagement.Application;
 using Moda.StrategicManagement.Domain.Models;
 using Moda.Work.Domain.Models;

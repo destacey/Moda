@@ -1,4 +1,5 @@
-﻿using Moda.Common.Domain.Models.KeyPerformanceIndicators;
+﻿using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 
 namespace Moda.Common.Domain.Tests.Data.Models;
 
@@ -12,6 +13,11 @@ public sealed class TestKpi : Kpi
     private TestKpi(string name, string? description, double targetValue, KpiUnit unit, KpiTargetDirection direction)
         : base(name, description, targetValue, unit, direction)
     {
+    }
+
+    public new Result Update(string name, string? description, double targetValue, KpiUnit unit, KpiTargetDirection direction)
+    {
+        return base.Update(name, description, targetValue, unit, direction);
     }
 
     public static TestKpi Create(string name, string? description, double targetValue, KpiUnit unit, KpiTargetDirection direction)

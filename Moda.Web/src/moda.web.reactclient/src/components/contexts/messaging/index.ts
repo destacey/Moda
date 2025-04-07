@@ -1,1 +1,1 @@
-export * from './messaging.context';
+export * from './messaging-context'

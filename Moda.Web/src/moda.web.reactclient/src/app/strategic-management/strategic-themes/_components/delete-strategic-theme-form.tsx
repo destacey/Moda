@@ -1,10 +1,10 @@
 'use client'
 
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { StrategicThemeDetailsDto } from '@/src/services/moda-api'
 import { useDeleteStrategicThemeMutation } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { Modal } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useEffect, useState } from 'react'
 
 export interface DeleteStrategicThemeFormProps {
@@ -12,12 +12,13 @@ export interface DeleteStrategicThemeFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 const DeleteStrategicThemeForm = (props: DeleteStrategicThemeFormProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  const messageApi = useMessage()
 
   const [deleteStrategicThemeMutation, { error: mutationError }] =
     useDeleteStrategicThemeMutation()
@@ -42,7 +43,7 @@ const DeleteStrategicThemeForm = (props: DeleteStrategicThemeFormProps) => {
 
       return true
     } catch (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           'An unexpected error occurred while deleting the strategic theme.',
       )
@@ -56,13 +57,13 @@ const DeleteStrategicThemeForm = (props: DeleteStrategicThemeFormProps) => {
     try {
       if (await deleteStrategicTheme(props.strategicTheme)) {
         // TODO: not working because the parent page is gone
-        props.messageApi.success('Successfully deleted Strategic Theme.')
+        messageApi.success('Successfully deleted Strategic Theme.')
         props.onFormComplete()
         setIsOpen(false)
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
-      props.messageApi.error(
+      messageApi.error(
         'An unexpected error occurred while deleting the strategic theme.',
       )
     } finally {

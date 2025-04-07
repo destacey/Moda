@@ -74,6 +74,22 @@ public static class IdOrKeyExtensions
     }
 
     /// <summary>
+    /// Creates a delegate based on the values from the IdOrKey for objects that implement HasIdAndKey.
+    /// 
+    /// In-Memory Execution: When used with Entity Framework Core, delegates result in in-memory filtering, which means the entire dataset must be loaded into memory before filtering. This can be inefficient for large datasets.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="idOrKey"></param>
+    /// <returns></returns>
+    public static Func<T, bool> CreateFilterDelegate<T>(this IdOrKey idOrKey) where T : IHasIdAndKey
+    {
+        return idOrKey.Match<Func<T, bool>>(
+            id => (x => x.Id == id),
+            key => (x => x.Key == key)
+        );
+    }
+
+    /// <summary>
     /// Creates an expression based on the values from the IdOrKey and selectors.
     /// </summary>
     /// <typeparam name="T"></typeparam>

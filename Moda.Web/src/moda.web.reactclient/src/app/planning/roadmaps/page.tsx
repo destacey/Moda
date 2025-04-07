@@ -15,7 +15,7 @@ const RoadmapsPage: React.FC = () => {
 
   const [openCreateRoadmapForm, setOpenCreateRoadmapForm] =
     useState<boolean>(false)
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const { data: roadmapData, isLoading, error, refetch } = useGetRoadmapsQuery()
 
@@ -57,14 +57,12 @@ const RoadmapsPage: React.FC = () => {
         roadmapsData={roadmapData || []}
         roadmapsLoading={isLoading}
         refreshRoadmaps={refresh}
-        messageApi={messageApi}
       />
       {openCreateRoadmapForm && (
         <CreateRoadmapForm
           showForm={openCreateRoadmapForm}
           onFormComplete={() => onCreateRoadmapFormClosed(true)}
           onFormCancel={() => onCreateRoadmapFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
     </>

@@ -254,6 +254,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     const roadmapAsItem: RoadmapActivityListDto = {
       $type: RoadmapItemType.Roadmap,
       id: props.roadmap.id,
+      roadmapId: props.roadmap.id,
       name: props.roadmap.name,
       type: {
         id: 1,

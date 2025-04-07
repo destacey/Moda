@@ -12,9 +12,9 @@ import Link from 'next/link'
 import { MarkdownRenderer } from './markdown'
 
 export interface HealthCheckStatusColumn {
-  id?: string
-  status?: SimpleNavigationDto
-  expiration?: Date
+  id: string
+  status: SimpleNavigationDto
+  expiration: Date
 }
 
 export interface NestedHealthCheckStatusCellRendererProps {

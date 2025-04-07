@@ -1,4 +1,4 @@
-﻿using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using Moda.Tests.Shared;
 using Moda.Tests.Shared.Data;
 using NodaTime;

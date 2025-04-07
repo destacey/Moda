@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Moda.Common.Domain.Models.KeyPerformanceIndicators;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using Moda.ProjectPortfolioManagement.Domain.Tests.Data;
+using Moda.ProjectPortfolioManagement.Domain.Tests.Data.Extensions;
 using Moda.Tests.Shared;
 using NodaTime;
 using NodaTime.Extensions;
@@ -29,16 +30,17 @@ public sealed class StrategicInitiativeKpiTests
     {
         // Arrange
         var expectedKpi = _kpiFaker.Generate();
+        var kpiParameters = expectedKpi.ToUpsertParameters();
 
         // Act
-        var kpi = StrategicInitiativeKpi.Create(expectedKpi.Name, expectedKpi.Description, expectedKpi.TargetValue, expectedKpi.Unit, expectedKpi.TargetDirection, expectedKpi.StrategicInitiativeId);
+        var kpi = StrategicInitiativeKpi.Create(expectedKpi.StrategicInitiativeId, kpiParameters);
 
         // Assert
         kpi.Should().NotBeNull();
         kpi.Name.Should().Be(expectedKpi.Name);
         kpi.Description.Should().Be(expectedKpi.Description);
         kpi.TargetValue.Should().Be(expectedKpi.TargetValue);
-        kpi.CurrentValue.Should().BeNull();
+        kpi.ActualValue.Should().BeNull();
         kpi.Unit.Should().Be(expectedKpi.Unit);
         kpi.TargetDirection.Should().Be(expectedKpi.TargetDirection);
         kpi.StrategicInitiativeId.Should().Be(expectedKpi.StrategicInitiativeId);
@@ -49,23 +51,27 @@ public sealed class StrategicInitiativeKpiTests
     {
         // Arrange
         var kpi = _kpiFaker.Generate();
-        var newName = "Updated KPI";
-        var newDescription = "Updated description";
-        var newTargetValue = 85.0;
-        var newUnit = KpiUnit.Percentage;
-        var newTargetDirection = kpi.TargetDirection is KpiTargetDirection.Increase ? KpiTargetDirection.Decrease : KpiTargetDirection.Increase;
+        var kpiParameters = kpi.ToUpsertParameters() with
+        {
+            Name = "Updated KPI",
+            Description = "Updated description",
+            TargetValue = 85.0,
+            Unit = KpiUnit.Percentage,
+            TargetDirection = kpi.TargetDirection is KpiTargetDirection.Increase ? KpiTargetDirection.Decrease : KpiTargetDirection.Increase
+        };
+
         var expectedStrategicInitiativeId = kpi.StrategicInitiativeId;
 
         // Act
-        var updateResult = kpi.Update(newName, newDescription, newTargetValue, newUnit, newTargetDirection);
+        var updateResult = kpi.Update(kpiParameters);
 
         // Assert
         updateResult.IsSuccess.Should().BeTrue();
-        kpi.Name.Should().Be(newName);
-        kpi.Description.Should().Be(newDescription);
-        kpi.TargetValue.Should().Be(newTargetValue);
-        kpi.Unit.Should().Be(newUnit);
-        kpi.TargetDirection.Should().Be(newTargetDirection);
+        kpi.Name.Should().Be(kpiParameters.Name);
+        kpi.Description.Should().Be(kpiParameters.Description);
+        kpi.TargetValue.Should().Be(kpiParameters.TargetValue);
+        kpi.Unit.Should().Be(kpiParameters.Unit);
+        kpi.TargetDirection.Should().Be(kpiParameters.TargetDirection);
         kpi.StrategicInitiativeId.Should().Be(expectedStrategicInitiativeId);
     }
 
@@ -77,14 +83,12 @@ public sealed class StrategicInitiativeKpiTests
         var measurement1 = _measurementFaker.WithData(kpiId: kpi.Id, measurementDate: _dateTimeProvider.Now.Minus(Duration.FromDays(10))).Generate();
         var measurement2 = _measurementFaker.WithData(kpiId: kpi.Id, measurementDate: _dateTimeProvider.Now.Minus(Duration.FromDays(5))).Generate();
 
+        // Act
         kpi.AddMeasurement(measurement1);
         kpi.AddMeasurement(measurement2);
 
-        // Act
-        var currentValue = kpi.CurrentValue;
-
         // Assert
-        currentValue.Should().Be(measurement2.ActualValue);
+        kpi.ActualValue.Should().Be(measurement2.ActualValue);
     }
 
     #region Checkpoints
@@ -165,7 +169,7 @@ public sealed class StrategicInitiativeKpiTests
         // Assert
         addResult.IsSuccess.Should().BeTrue();
         kpi.Measurements.Should().Contain(measurement);
-        kpi.CurrentValue.Should().Be(measurement.ActualValue);
+        kpi.ActualValue.Should().Be(measurement.ActualValue);
     }
 
     [Fact]
@@ -196,7 +200,7 @@ public sealed class StrategicInitiativeKpiTests
         // Assert
         removeResult.IsSuccess.Should().BeTrue();
         kpi.Measurements.Should().NotContain(measurement);
-        kpi.CurrentValue.Should().BeNull();
+        kpi.ActualValue.Should().BeNull();
     }
 
     [Fact]

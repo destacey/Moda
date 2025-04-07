@@ -4,6 +4,7 @@ using Moda.Common.Domain.Enums.StrategicManagement;
 using Moda.Common.Domain.Models.KeyPerformanceIndicators;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models;
+using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 
 namespace Moda.Infrastructure.Persistence.Configuration;
 
@@ -250,6 +251,7 @@ public class StrategicInitiativeKpiConfiguration : IEntityTypeConfiguration<Stra
         builder.Property(k => k.Name).HasMaxLength(64).IsRequired();
         builder.Property(k => k.Description).HasMaxLength(512).IsRequired();
         builder.Property(k => k.TargetValue).IsRequired();
+        builder.Property(k => k.ActualValue);
 
         builder.Property(k => k.Unit).IsRequired()
             .HasConversion<EnumConverter<KpiUnit>>()
@@ -287,6 +289,7 @@ public class StrategicInitiativeKpiCheckpointConfiguration : IEntityTypeConfigur
 
         builder.Property(k => k.TargetValue).IsRequired();
         builder.Property(k => k.CheckpointDate).IsRequired();
+        builder.Property(k => k.DateLabel).HasMaxLength(16).IsRequired();
     }
 }
 

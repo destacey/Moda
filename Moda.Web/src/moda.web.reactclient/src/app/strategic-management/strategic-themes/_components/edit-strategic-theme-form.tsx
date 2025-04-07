@@ -2,6 +2,7 @@
 
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
+import { useMessage } from '@/src/components/contexts/messaging'
 import {
   StrategicThemeDetailsDto,
   UpdateStrategicThemeRequest,
@@ -12,7 +13,6 @@ import {
 } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { toFormErrors } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 
 const { Item } = Form
@@ -22,7 +22,6 @@ export interface EditStrategicThemeFormProps {
   showForm: boolean
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface UpdateStrategicThemeFormValues {
@@ -47,6 +46,8 @@ const EditStrategicThemeForm = (props: EditStrategicThemeFormProps) => {
   const [isValid, setIsValid] = useState(false)
   const [form] = Form.useForm<UpdateStrategicThemeFormValues>()
   const formValues = Form.useWatch([], form)
+
+  const messageApi = useMessage()
 
   const {
     data: strategicThemeData,
@@ -85,16 +86,16 @@ const EditStrategicThemeForm = (props: EditStrategicThemeFormProps) => {
       if (response.error) {
         throw response.error
       }
-      props.messageApi.success('Strategic Theme updated successfully.')
+      messageApi.success('Strategic Theme updated successfully.')
 
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while updating the Strategic Theme. Please try again.',
         )
@@ -115,7 +116,7 @@ const EditStrategicThemeForm = (props: EditStrategicThemeFormProps) => {
       }
     } catch (error) {
       console.error('update error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while updating the Strategic Theme. Please try again.',
       )
     } finally {
@@ -139,11 +140,15 @@ const EditStrategicThemeForm = (props: EditStrategicThemeFormProps) => {
       }
     } else {
       props.onFormCancel()
-      props.messageApi.error(
-        'You do not have permission to update Strategic Themes.',
-      )
+      messageApi.error('You do not have permission to update Strategic Themes.')
     }
-  }, [canUpdateStrategicTheme, mapToFormValues, props, strategicThemeData])
+  }, [
+    canUpdateStrategicTheme,
+    mapToFormValues,
+    messageApi,
+    props,
+    strategicThemeData,
+  ])
 
   useEffect(() => {
     form.validateFields({ validateOnly: true }).then(
@@ -154,12 +159,12 @@ const EditStrategicThemeForm = (props: EditStrategicThemeFormProps) => {
 
   useEffect(() => {
     if (error) {
-      props.messageApi.error(
+      messageApi.error(
         error.detail ??
           'An error occurred while loading the Strategic Theme. Please try again.',
       )
     }
-  }, [error, props.messageApi])
+  }, [error, messageApi])
 
   return (
     <>

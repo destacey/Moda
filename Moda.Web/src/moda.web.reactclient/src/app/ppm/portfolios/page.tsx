@@ -37,7 +37,7 @@ const PortfoliosPage: React.FC = () => {
   const [currentView, setCurrentView] = useState<string | number>(Views.Cards)
   const [openCreatePortfolioForm, setOpenCreatePortfolioForm] =
     useState<boolean>(false)
-  const messageApi = useMessage();
+  const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
   const canCreatePortfolio = hasPermissionClaim(
@@ -98,7 +98,6 @@ const PortfoliosPage: React.FC = () => {
           portfolios={portfolioData}
           viewSelector={viewSelector}
           isLoading={isLoading}
-          messageApi={messageApi}
         />
       ) : (
         <PortfoliosGrid
@@ -106,7 +105,6 @@ const PortfoliosPage: React.FC = () => {
           viewSelector={viewSelector}
           isLoading={isLoading}
           refetch={refetch}
-          messageApi={messageApi}
         />
       )}
       {openCreatePortfolioForm && (
@@ -114,7 +112,6 @@ const PortfoliosPage: React.FC = () => {
           showForm={openCreatePortfolioForm}
           onFormComplete={() => onCreatePortfolioFormClosed(true)}
           onFormCancel={() => onCreatePortfolioFormClosed(false)}
-          messageApi={messageApi}
         />
       )}
     </>

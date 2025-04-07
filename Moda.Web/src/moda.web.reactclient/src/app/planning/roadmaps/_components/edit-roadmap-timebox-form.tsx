@@ -1,4 +1,3 @@
-import { ModaColorPicker } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import {
   RoadmapTimeboxDetailsDto,
@@ -12,10 +11,10 @@ import {
 } from '@/src/store/features/planning/roadmaps-api'
 import { toFormErrors } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, TreeSelect } from 'antd'
-import { MessageInstance } from 'antd/es/message/interface'
 import { useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { MarkdownEditor } from '@/src/components/common/markdown'
+import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -26,7 +25,6 @@ export interface EditRoadmapTimeboxFormProps {
   roadmapId: string
   onFormComplete: () => void
   onFormCancel: () => void
-  messageApi: MessageInstance
 }
 
 interface EditRoadmapTimeboxFormValues {
@@ -65,6 +63,8 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
   const [activitiesTree, setActivitiesTree] = useState<RoadmapTimeboxListDto[]>(
     [],
   )
+
+  const messageApi = useMessage()
 
   const {
     data: timeboxData,
@@ -117,16 +117,16 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
         throw response.error
       }
 
-      props.messageApi.success('Roadmap Timebox updated successfully.')
+      messageApi.success('Roadmap Timebox updated successfully.')
 
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
         const formErrors = toFormErrors(error.errors)
         form.setFields(formErrors)
-        props.messageApi.error('Correct the validation error(s) to continue.')
+        messageApi.error('Correct the validation error(s) to continue.')
       } else {
-        props.messageApi.error(
+        messageApi.error(
           error.detail ??
             'An error occurred while updating the roadmap timebox. Please try again.',
         )
@@ -146,7 +146,7 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
       }
     } catch (error) {
       console.error('handleOk error', error)
-      props.messageApi.error(
+      messageApi.error(
         'An error occurred while updating the roadmap timebox. Please try again.',
       )
     } finally {
@@ -172,9 +172,7 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
       }
     } else {
       props.onFormCancel()
-      props.messageApi.error(
-        'You do not have permission to update roadmap items.',
-      )
+      messageApi.error('You do not have permission to update roadmap items.')
     }
   }, [
     activities,
@@ -183,6 +181,7 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
     canManageRoadmapItems,
     mapToFormValues,
     props,
+    messageApi,
   ])
 
   useEffect(() => {
@@ -194,22 +193,18 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
 
   useEffect(() => {
     if (timeboxDataError) {
-      props.messageApi.error(
+      messageApi.error(
         timeboxDataError.supportMessage ??
           'An error occurred while loading roadmap timebox. Please try again.',
       )
     }
     if (activitiesError) {
-      props.messageApi.error(
+      messageApi.error(
         activitiesError.supportMessage ??
           'An error occurred while loading roadmap activities. Please try again.',
       )
     }
-  }, [activitiesError, timeboxDataError, props.messageApi])
-
-  const onColorChange = (color: string) => {
-    form.setFieldsValue({ color })
-  }
+  }, [activitiesError, timeboxDataError, messageApi])
 
   return (
     <>
@@ -284,12 +279,6 @@ const EditRoadmapTimeboxForm = (props: EditRoadmapTimeboxFormProps) => {
           >
             <DatePicker />
           </Item>
-          {/* <Item name="color" label="Color">
-            <ModaColorPicker
-              color={form.getFieldValue('color')}
-              onChange={onColorChange}
-            />
-          </Item> */}
         </Form>
       </Modal>
     </>
