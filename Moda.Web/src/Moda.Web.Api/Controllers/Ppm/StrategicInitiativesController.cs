@@ -1,4 +1,6 @@
 ﻿using Moda.Common.Application.Models;
+using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
+using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
@@ -273,4 +275,22 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
     }
 
     #endregion KPIs
+
+    #region Projects
+
+    [HttpGet("{idOrKey}/projects")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get a list of projects for the strategic initiative.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects(string idOrKey, CancellationToken cancellationToken)
+    {
+        var projects = await _sender.Send(new GetStrategicInitiativeProjectsQuery(idOrKey), cancellationToken);
+
+        return projects is not null
+            ? Ok(projects)
+            : NotFound();
+    }
+
+    #endregion Projects
 }

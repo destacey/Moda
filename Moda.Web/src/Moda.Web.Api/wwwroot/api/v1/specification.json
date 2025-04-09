@@ -4240,6 +4240,56 @@
         ]
       }
     },
+    "/api/ppm/strategic-initiatives/{idOrKey}/projects": {
+      "get": {
+        "tags": [
+          "StrategicInitiatives"
+        ],
+        "summary": "Get a list of projects for the strategic initiative.",
+        "operationId": "StrategicInitiatives_GetProjects",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/planning-intervals": {
       "get": {
         "tags": [
