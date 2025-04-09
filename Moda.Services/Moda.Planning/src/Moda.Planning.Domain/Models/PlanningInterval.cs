@@ -199,6 +199,8 @@ public class PlanningInterval : BaseSoftDeletableEntity<Guid>, ILocalSchedule, I
     /// <returns></returns>
     public Result ManageTeams(IEnumerable<Guid> teamIds)
     {
+        Guard.Against.Null(teamIds, nameof(teamIds));
+
         var removedTeams = _teams.Where(x => !teamIds.Contains(x.TeamId)).ToList();
         foreach (var removedTeam in removedTeams)
         {

@@ -4290,6 +4290,71 @@
         ]
       }
     },
+    "/api/ppm/strategic-initiatives/{id}/projects": {
+      "post": {
+        "tags": [
+          "StrategicInitiatives"
+        ],
+        "summary": "Manage projects for the strategic initiative.",
+        "operationId": "StrategicInitiatives_ManageProjects",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageStrategicInitiativeProjectsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/planning/planning-intervals": {
       "get": {
         "tags": [
@@ -14336,6 +14401,35 @@
           }
         ]
       },
+      "ManageStrategicInitiativeProjectsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "projectIds"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the strategic initiative to manage projects for.",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "projectIds": {
+            "type": "array",
+            "description": "The list of project IDs to be associated with the strategic initiative.",
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
+          }
+        }
+      },
       "PlanningIntervalListDto": {
         "type": "object",
         "additionalProperties": false,
@@ -14795,12 +14889,14 @@
         "properties": {
           "id": {
             "type": "string",
+            "description": "The ID of the planning interval to manage teams for.",
             "format": "guid",
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "teamIds": {
             "type": "array",
+            "description": "The list of team IDs to be associated with the planning interval.",
             "items": {
               "type": "string",
               "format": "guid",

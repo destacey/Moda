@@ -478,4 +478,82 @@ public sealed class StrategicInitiativeTests
 
 
     #endregion KPI Tests
+
+    #region Project Tests
+
+    [Fact]
+    public void ManageProjects_ShouldAddProjectsSuccessfully()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsActive(_dateTimeProvider).AddProjects(3, _dateTimeProvider);
+
+        var existingProjectIds = initiative.StrategicInitiativeProjects.Select(p => p.ProjectId).ToArray();
+        var newProjectIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+
+        var allProjectIds = existingProjectIds.Concat(newProjectIds).ToList();
+
+        // Act
+        var result = initiative.ManageProjects(allProjectIds);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        initiative.StrategicInitiativeProjects.Should().HaveCount(5);
+        initiative.StrategicInitiativeProjects.Should().OnlyContain(p => allProjectIds.Contains(p.ProjectId));
+    }
+
+    [Fact]
+    public void ManageProjects_ShouldRemoveProjectsSuccessfully()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsActive(_dateTimeProvider).AddProjects(3, _dateTimeProvider);
+
+        var existingProjectIds = initiative.StrategicInitiativeProjects.Select(p => p.ProjectId).ToArray();
+
+        // remove one project
+        var projectToRemove = existingProjectIds.First();
+        var remainingProjectIds = existingProjectIds.Where(id => id != projectToRemove).ToList();
+
+        // Act
+        var result = initiative.ManageProjects(remainingProjectIds);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        initiative.StrategicInitiativeProjects.Should().HaveCount(2);
+        initiative.StrategicInitiativeProjects.Should().OnlyContain(p => remainingProjectIds.Contains(p.ProjectId));
+    }
+
+    [Fact]
+    public void ManageProjects_ShouldAddAndRemoveProjectsSuccessfully()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsActive(_dateTimeProvider).AddProjects(3, _dateTimeProvider);
+
+        var expectedProjectId = Guid.NewGuid();
+
+        // Act
+        var result = initiative.ManageProjects([expectedProjectId]);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        initiative.StrategicInitiativeProjects.Should().HaveCount(1);
+        initiative.StrategicInitiativeProjects.Should().ContainSingle(p => p.ProjectId == expectedProjectId);
+    }
+
+    [Fact]
+    public void ManageProjects_ShouldFail_WhenInCompletedStatus()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsCompleted(_dateTimeProvider).AddProjects(3, _dateTimeProvider);
+
+        // Act
+        var result = initiative.ManageProjects([Guid.NewGuid()]);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Projects cannot be added or removed for closed strategic initiatives.");
+        initiative.StrategicInitiativeProjects.Should().HaveCount(3);
+    }
+
+
+    #endregion Project Tests
 }

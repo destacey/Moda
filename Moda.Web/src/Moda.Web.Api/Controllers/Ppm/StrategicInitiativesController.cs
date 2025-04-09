@@ -279,7 +279,7 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
     #region Projects
 
     [HttpGet("{idOrKey}/projects")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
     [OpenApiOperation("Get a list of projects for the strategic initiative.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -290,6 +290,24 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
         return projects is not null
             ? Ok(projects)
             : NotFound();
+    }
+
+    [HttpPost("{id}/projects")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Manage projects for the strategic initiative.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ManageProjects(Guid id, [FromBody] ManageStrategicInitiativeProjectsRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
+
+        var result = await _sender.Send(request.ToManageStrategicInitiativeProjectsCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     #endregion Projects

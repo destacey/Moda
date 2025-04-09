@@ -285,6 +285,38 @@ public sealed class StrategicInitiative : BaseEntity<Guid>, ISystemAuditable, IH
 
     #endregion KPIs
 
+    #region Projects
+
+    /// <summary>
+    /// Manages the projects associated with the strategic initiative.
+    /// </summary>
+    /// <param name="projectIds"></param>
+    /// <returns></returns>
+    public Result ManageProjects(IEnumerable<Guid> projectIds)
+    {
+        Guard.Against.Null(projectIds, nameof(projectIds));
+
+        if (IsClosed)
+        {
+            return Result.Failure("Projects cannot be added or removed for closed strategic initiatives.");
+        }
+
+        var projectIdSet = projectIds.ToHashSet();
+        var existingProjectIds = _strategicInitiativeProjects.Select(p => p.ProjectId).ToHashSet();
+
+        // Remove projects that are no longer in the provided list
+        _strategicInitiativeProjects.RemoveWhere(p => !projectIdSet.Contains(p.ProjectId));
+
+        // Add new projects that are not already associated
+        var newProjects = projectIdSet.Except(existingProjectIds)
+                                      .Select(id => StrategicInitiativeProject.Create(Id, id));
+        _strategicInitiativeProjects.UnionWith(newProjects);
+
+        return Result.Success();
+    }
+
+    #endregion Projects
+
     /// <summary>
     /// Creates a new strategic initiative.
     /// </summary>

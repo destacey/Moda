@@ -12,11 +12,11 @@ public class StrategicInitiativeProject
 
     public Guid StrategicInitiativeId { get; private init; }
 
-    public StrategicInitiative? StrategicInitiative { get; set; }
+    public StrategicInitiative? StrategicInitiative { get; private set; }
 
     public Guid ProjectId { get; private init; }
 
-    public Project? Project { get; set; }
+    public Project? Project { get; private set; }
 
     internal static StrategicInitiativeProject Create(Guid strategicInitiativeId, Guid projectId)
     {
