@@ -100,7 +100,7 @@ const PlanningIntervalObjectiveWorkItemsCard = (
           planningIntervalId={props.planningIntervalId}
           objectiveId={props.objectiveId}
           showForm={openManageWorkItemsForm}
-          onFormSave={() => onManageWorkItemsFormClosed(true)}
+          onFormComplete={() => onManageWorkItemsFormClosed(true)}
           onFormCancel={() => onManageWorkItemsFormClosed(false)}
         />
       )}

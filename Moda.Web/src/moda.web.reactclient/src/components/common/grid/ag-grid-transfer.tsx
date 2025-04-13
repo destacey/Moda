@@ -8,7 +8,7 @@ import {
 } from 'ag-grid-community'
 import { DeleteOutlined } from '@ant-design/icons'
 import useTheme from '@/src/components/contexts/theme'
-import React, { useCallback, useRef } from 'react'
+import React, { ReactNode, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { Flex } from 'antd'
 import { AgGridReactProps } from 'ag-grid-react/dist/types/src/shared/interfaces'
@@ -18,7 +18,7 @@ export const asDraggableColDefs = <TData extends object>(
 ): ColDef<TData>[] => [
   {
     rowDrag: true,
-    maxWidth: 50,
+    maxWidth: 40,
     filter: false,
     sortable: false,
     suppressHeaderMenuButton: true,
@@ -34,6 +34,7 @@ export const asDraggableColDefs = <TData extends object>(
 
 export const asDeletableColDefs = <TData extends object>(
   colDefs: ColDef<TData>[],
+  onDelete: (item: TData) => void,
 ): ColDef<TData>[] => [
   {
     maxWidth: 50,
@@ -44,11 +45,7 @@ export const asDeletableColDefs = <TData extends object>(
     cellRenderer: (props: ICellRendererParams<TData>) => (
       <DeleteOutlined
         onClick={() => {
-          props.api.applyTransaction({ remove: [props.data] })
-
-          props.context.leftGridRef?.current?.api?.applyTransaction({
-            add: [props.data],
-          })
+          onDelete(props.data)
         }}
       />
     ),
@@ -62,8 +59,7 @@ interface GridTransferProps<TData extends object> {
   leftColumnDef: ColDef<TData>[]
   rightColumnDef: ColDef<TData>[]
   getRowId: (params: GetRowIdParams<TData>) => string
-  removeRowFromSource?: boolean
-  includeCheckboxes?: boolean
+  onDragStop?: (items: TData[]) => void
   leftGridRef?: React.MutableRefObject<AgGridReact<TData>>
   rightGridRef?: React.MutableRefObject<AgGridReact<TData>>
   GridProps?: AgGridReactProps<TData>
@@ -71,15 +67,26 @@ interface GridTransferProps<TData extends object> {
   rightGridRowSelection?: RowSelectionOptions<TData> | 'single' | 'multiple'
 }
 
-const defaultColDef: ColDef = {
-  flex: 1,
-  minWidth: 50,
-  filter: false,
-}
-
 export const AgGridTransfer = <TData extends object>(
   props: GridTransferProps<TData>,
-): React.ReactNode => {
+): ReactNode => {
+  const {
+    leftGridData,
+    rightGridData,
+    leftColumnDef,
+    rightColumnDef,
+    getRowId,
+    onDragStop,
+    GridProps = {},
+    leftGridRowSelection = {
+      mode: 'multiRow',
+      checkboxes: true,
+      headerCheckbox: true,
+      enableClickSelection: false,
+    } as RowSelectionOptions<TData>,
+    rightGridRowSelection,
+  } = props
+
   const { agGridTheme } = useTheme()
 
   const localLeftGridRef = useRef<AgGridReact<TData>>(null)
@@ -88,19 +95,17 @@ export const AgGridTransfer = <TData extends object>(
   const leftGridRef = props.leftGridRef ?? localLeftGridRef
   const rightGridRef = props.rightGridRef ?? localRightGridRef
 
-  const onDragStop = useCallback(
-    (params: RowDragEndEvent) => {
-      if (props.removeRowFromSource)
-        leftGridRef.current.api?.applyTransaction({
-          remove: params.nodes.map((node) => node.data),
-        })
-      else
+  const onDragStopInternal = useCallback(
+    (params: RowDragEndEvent<TData>) => {
+      if (onDragStop) {
+        onDragStop(params.nodes.map((node) => node.data))
+      } else
         leftGridRef.current.api?.setNodesSelected({
           nodes: params.nodes,
           newValue: false,
         })
     },
-    [leftGridRef, props.removeRowFromSource],
+    [leftGridRef, onDragStop],
   )
 
   const onGridReady = useCallback(
@@ -108,13 +113,13 @@ export const AgGridTransfer = <TData extends object>(
       if (leftGridRef.current === null || rightGridRef.current === null) return
 
       const dropZoneParams = rightGridRef.current.api.getRowDropZoneParams({
-        onDragStop,
+        onDragStop: onDragStopInternal,
       })
 
       leftGridRef.current.api.removeRowDropZone(dropZoneParams)
       leftGridRef.current.api.addRowDropZone(dropZoneParams)
     },
-    [leftGridRef, onDragStop, rightGridRef],
+    [leftGridRef, onDragStopInternal, rightGridRef],
   )
 
   const getGrid = useCallback(
@@ -122,26 +127,23 @@ export const AgGridTransfer = <TData extends object>(
       <div style={{ minHeight: 400, width: '100%' }}>
         <AgGridReact
           ref={isLeft ? leftGridRef : rightGridRef}
-          getRowId={props.getRowId}
+          getRowId={getRowId}
           rowDragManaged={true}
-          rowSelection={
-            isLeft ? props.leftGridRowSelection : props.rightGridRowSelection
-          }
+          rowSelection={isLeft ? leftGridRowSelection : rightGridRowSelection}
           theme={agGridTheme}
           rowDragMultiRow={isLeft}
           suppressMoveWhenRowDragging={isLeft}
-          rowData={isLeft ? props.leftGridData : props.rightGridData}
-          columnDefs={isLeft ? props.leftColumnDef : props.rightColumnDef}
+          rowData={isLeft ? leftGridData : rightGridData}
+          columnDefs={isLeft ? leftColumnDef : rightColumnDef}
           onGridReady={onGridReady}
           context={
             isLeft
               ? { rightGridRef: rightGridRef }
               : { leftGridRef: leftGridRef }
           }
-          {...props.GridProps}
+          {...GridProps}
           defaultColDef={{
-            ...defaultColDef,
-            ...(props?.GridProps?.defaultColDef ?? {}),
+            ...(GridProps?.defaultColDef ?? {}),
           }}
         />
       </div>
@@ -150,14 +152,14 @@ export const AgGridTransfer = <TData extends object>(
       agGridTheme,
       leftGridRef,
       rightGridRef,
-      props.getRowId,
-      props.leftGridRowSelection,
-      props.rightGridRowSelection,
-      props.leftGridData,
-      props.rightGridData,
-      props.leftColumnDef,
-      props.rightColumnDef,
-      props.GridProps,
+      getRowId,
+      leftGridRowSelection,
+      rightGridRowSelection,
+      leftGridData,
+      rightGridData,
+      leftColumnDef,
+      rightColumnDef,
+      GridProps,
       onGridReady,
     ],
   )

@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Application.Models;
+using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;
@@ -273,4 +274,40 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
     }
 
     #endregion KPIs
+
+    #region Projects
+
+    [HttpGet("{idOrKey}/projects")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Get a list of projects for the strategic initiative.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ProjectListDto>>> GetProjects(string idOrKey, CancellationToken cancellationToken)
+    {
+        var projects = await _sender.Send(new GetStrategicInitiativeProjectsQuery(idOrKey), cancellationToken);
+
+        return projects is not null
+            ? Ok(projects)
+            : NotFound();
+    }
+
+    [HttpPost("{id}/projects")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Manage projects for the strategic initiative.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ManageProjects(Guid id, [FromBody] ManageStrategicInitiativeProjectsRequest request, CancellationToken cancellationToken)
+    {
+        if (id != request.Id)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
+
+        var result = await _sender.Send(request.ToManageStrategicInitiativeProjectsCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    #endregion Projects
 }

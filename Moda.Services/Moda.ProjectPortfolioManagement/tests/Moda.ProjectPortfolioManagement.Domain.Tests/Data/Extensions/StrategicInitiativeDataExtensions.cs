@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moda.ProjectPortfolioManagement.Domain.Models;
+﻿using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using Moda.Tests.Shared;
 using Moda.Tests.Shared.Extensions;
@@ -34,19 +29,28 @@ public static class StrategicInitiativeDataExtensions
 
         var projectFaker = new ProjectFaker();
 
-        var projectsList = GenericExtensions.GetPrivateHashSet<Project>(strategicInitiative, "_projects");
+        var projectsList = GenericExtensions.GetPrivateHashSet<StrategicInitiativeProject>(strategicInitiative, "_strategicInitiativeProjects");
 
         // TODO: add logic based on the current status of the strategic initiative
         for (int i = 0; i < count - 1; i++)
         {
-            var project = projectFaker.AsActive(dateTimeProvider, strategicInitiative.Id);
-            projectsList.Add(project);
+            var project = projectFaker.AsActive(dateTimeProvider, strategicInitiative.PortfolioId);
+            projectsList.Add(CreateStrategicInitiativeProject(strategicInitiative.Id, project));
         }
 
         // Add a proposed strategic initiative as the last one
-        var lastProject = projectFaker.AsProposed(dateTimeProvider, strategicInitiative.Id);
-        projectsList.Add(lastProject);
+        var lastProject = projectFaker.AsProposed(dateTimeProvider, strategicInitiative.PortfolioId);
+        projectsList.Add(CreateStrategicInitiativeProject(strategicInitiative.Id, lastProject));
 
         return strategicInitiative;
+    }
+
+    private static StrategicInitiativeProject CreateStrategicInitiativeProject(Guid strategicInitiativeId, Project project)
+    {
+        var strategicInitiativeProject = StrategicInitiativeProject.Create(strategicInitiativeId, project.Id);
+
+        strategicInitiativeProject.SetPrivate(p => p.Project, project);
+
+        return strategicInitiativeProject;
     }
 }

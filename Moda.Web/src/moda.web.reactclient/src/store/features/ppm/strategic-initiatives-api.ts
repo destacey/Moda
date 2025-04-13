@@ -1,10 +1,10 @@
 import {
   AddStrategicInitiativeKpiMeasurementRequest,
   CreateStrategicInitiativeKpiRequest,
+  ManageStrategicInitiativeProjectsRequest,
+  ProjectListDto,
   StrategicInitiativeKpiDetailsDto,
   StrategicInitiativeKpiListDto,
-  StrategicInitiativeKpiTargetDirectionDto,
-  StrategicInitiativeKpiUnitDto,
   UpdateStrategicInitiativeKpiRequest,
 } from './../../../services/moda-api'
 import { apiSlice } from './../apiSlice'
@@ -397,6 +397,43 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         { type: QueryTags.StrategicInitiativeKpiTargetDirection, id: 'LIST' },
       ],
     }),
+    getStrategicInitiativeProjects: builder.query<ProjectListDto[], string>({
+      queryFn: async (idOrKey) => {
+        try {
+          const data =
+            await getStrategicInitiativesClient().getProjects(idOrKey)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.StrategicInitiativeProject, id: 'LIST' },
+        { type: QueryTags.StrategicInitiativeProject, id: arg },
+      ],
+    }),
+    manageStrategicInitiativeProjects: builder.mutation<
+      void,
+      ManageStrategicInitiativeProjectsRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await getStrategicInitiativesClient().manageProjects(
+            request.id,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.StrategicInitiativeProject, id: 'LIST' },
+        { type: QueryTags.StrategicInitiativeProject, id: arg.id },
+      ],
+    }),
   }),
 })
 
@@ -418,4 +455,6 @@ export const {
   useAddStrategicInitiativeKpiMeasurementMutation,
   useGetStrategicInitiativeKpiUnitOptionsQuery,
   useGetStrategicInitiativeKpiTargetDirectionOptionsQuery,
+  useGetStrategicInitiativeProjectsQuery,
+  useManageStrategicInitiativeProjectsMutation,
 } = strategicInitiativesApi

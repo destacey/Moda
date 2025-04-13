@@ -12,22 +12,25 @@ import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import {
   useGetStrategicInitiativeKpisQuery,
+  useGetStrategicInitiativeProjectsQuery,
   useGetStrategicInitiativeQuery,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
 import {
   ChangeStrategicInitiativeStatusForm,
   CreateStrategicInitiativeKpiForm,
   DeleteStrategicInitiativeForm,
+  ManageStrategicInitiativeProjectsForm,
   StrategicInitiativeDetails,
   StrategicInitiativeKpisGrid,
 } from '../_components'
 import EditStrategicInitiativeForm from '../_components/edit-strategic-initiative-form'
 import { StrategicInitiativeStatusAction } from '../_components/change-strategic-initiative-status-form'
-import { useMessage } from '@/src/components/contexts/messaging'
+import { ProjectViewManager } from '../../_components'
 
 enum StrategicInitiativeTabs {
   Details = 'details',
   Kpis = 'kpis',
+  Projects = 'projects',
 }
 
 enum StrategicInitiativeAction {
@@ -43,6 +46,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
   useDocumentTitle('Strategic Initiative Details')
   const [activeTab, setActiveTab] = useState(StrategicInitiativeTabs.Details)
   const [kpisQueried, setKpisQueried] = useState(false)
+  const [projectsQueried, setProjectsQueried] = useState(false)
   const [isReadOnly, setIsReadOnly] = useState(false)
 
   const [openEditStrategicInitiativeForm, setOpenEditStrategicInitiativeForm] =
@@ -68,8 +72,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     setOpenDeleteStrategicInitiativeForm,
   ] = useState<boolean>(false)
   const [openCreateKpiForm, setOpenCreateKpiForm] = useState(false)
-
-  //const messageApi = useMessage();
+  const [openManageProjectsForm, setOpenManageProjectsForm] = useState(false)
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -98,6 +101,15 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     refetch: refetchKpis,
   } = useGetStrategicInitiativeKpisQuery(strategicInitiativeData?.id, {
     skip: !kpisQueried,
+  })
+
+  const {
+    data: projectData,
+    isLoading: isLoadingProjects,
+    error: errorProjects,
+    refetch: refetchProjects,
+  } = useGetStrategicInitiativeProjectsQuery(strategicInitiativeData?.id, {
+    skip: !projectsQueried,
   })
 
   useEffect(() => {
@@ -153,15 +165,29 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
           />
         ),
       },
+      {
+        key: StrategicInitiativeTabs.Projects,
+        label: 'Projects',
+        content: (
+          <ProjectViewManager
+            projects={projectData}
+            isLoading={isLoadingProjects}
+            refetch={refetchProjects}
+          />
+        ),
+      },
     ]
     return pageTabs
   }, [
+    strategicInitiativeData,
+    kpiData,
     canUpdateStrategicInitiative,
     isLoadingKpis,
-    kpiData,
     refetchKpis,
-    strategicInitiativeData,
     isReadOnly,
+    projectData,
+    isLoadingProjects,
+    refetchProjects,
   ])
 
   // doesn't trigger on first render
@@ -169,11 +195,16 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     (tabKey: StrategicInitiativeTabs) => {
       if (tabKey === StrategicInitiativeTabs.Kpis && !kpisQueried) {
         setKpisQueried(true)
+      } else if (
+        tabKey === StrategicInitiativeTabs.Projects &&
+        !projectsQueried
+      ) {
+        setProjectsQueried(true)
       }
 
       setActiveTab(tabKey)
     },
-    [kpisQueried],
+    [kpisQueried, projectsQueried],
   )
 
   const actionsMenuItems: MenuProps['items'] = useMemo(() => {
@@ -282,17 +313,26 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
       })
     }
 
-    //KPI actions
+    //KPI and Project actions
     if (!isReadOnly && canUpdateStrategicInitiative) {
       items.push(
         {
-          key: 'manage-divider-2',
+          key: 'manage-divider-kps',
           type: 'divider',
         },
         {
           key: 'createKpi',
           label: 'Create KPI',
           onClick: () => setOpenCreateKpiForm(true),
+        },
+        {
+          key: 'manage-divider-projects',
+          type: 'divider',
+        },
+        {
+          key: 'manageProjects',
+          label: 'Manage Projects',
+          onClick: () => setOpenManageProjectsForm(true),
         },
       )
     }
@@ -451,6 +491,15 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
           showForm={openCreateKpiForm}
           onFormComplete={() => onCreateKpiFormClosed()}
           onFormCancel={() => onCreateKpiFormClosed()}
+        />
+      )}
+      {openManageProjectsForm && (
+        <ManageStrategicInitiativeProjectsForm
+          strategicInitiativeId={strategicInitiativeData?.id}
+          portfolioKey={strategicInitiativeData?.portfolio.key}
+          showForm={openManageProjectsForm}
+          onFormComplete={() => setOpenManageProjectsForm(false)}
+          onFormCancel={() => setOpenManageProjectsForm(false)}
         />
       )}
     </>
