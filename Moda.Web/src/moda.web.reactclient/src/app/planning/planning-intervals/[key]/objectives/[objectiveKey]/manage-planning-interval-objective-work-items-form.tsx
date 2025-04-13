@@ -11,16 +11,16 @@ import {
 } from '@/src/store/features/planning/planning-interval-api'
 import { useSearchWorkItemsQuery } from '@/src/store/features/work-management/workspace-api'
 import { SearchOutlined } from '@ant-design/icons'
-import { Input, Modal, Space, Typography } from 'antd'
-import { useEffect, useRef, useState } from 'react'
-import { ColDef, RowSelectionOptions } from 'ag-grid-community'
-import { AgGridReact } from 'ag-grid-react'
+import { Flex, Input, Modal, Typography } from 'antd'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { ColDef } from 'ag-grid-community'
 import {
   AgGridTransfer,
   asDeletableColDefs,
   asDraggableColDefs,
 } from '@/src/components/common/grid/ag-grid-transfer'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { workItemKeyComparator } from '@/src/components/common/work'
 
 const { Text } = Typography
 
@@ -28,85 +28,82 @@ export interface ManagePlanningIntervalObjectiveWorkItemsFormProps {
   showForm: boolean
   planningIntervalId: string
   objectiveId: string
-  onFormSave: () => void
+  onFormComplete: () => void
   onFormCancel: () => void
 }
 
-type WorkItemModel = WorkItemListDto & {
-  disabled: boolean
-}
-
-const workItemColDefs: ColDef<WorkItemModel>[] = [
+const workItemColDefs: ColDef<WorkItemListDto>[] = [
   {
     field: 'key',
     headerName: 'Key',
-    minWidth: 100,
+    width: 125,
   },
   {
     field: 'title',
     headerName: 'Title',
-    minWidth: 250,
+    width: 250,
   },
   {
     field: 'type',
     headerName: 'Type',
-    minWidth: 100,
+    width: 100,
   },
   {
     field: 'status',
     headerName: 'Status',
-    minWidth: 100,
+    width: 100,
   },
   {
     field: 'team.name',
     headerName: 'Team',
-    minWidth: 100,
+    width: 150,
   },
   {
     field: 'parent.key',
     headerName: 'Parent Key',
-    minWidth: 100,
+    width: 125,
   },
 ]
 
-const leftWorkItemColDefs = [...asDraggableColDefs(workItemColDefs)]
+const leftColDefs = [...asDraggableColDefs(workItemColDefs)]
 
-const leftGridRowSelection: RowSelectionOptions<WorkItemModel> = {
-  mode: 'multiRow',
-  checkboxes: true,
-  headerCheckbox: true,
-  enableClickSelection: false,
+const defaultSort = (a: WorkItemListDto, b: WorkItemListDto) => {
+  return workItemKeyComparator(a.key, b.key)
 }
 
 const defaultColDef: ColDef = {
-  tooltipValueGetter: (params) => params.value,
+  filter: false,
 }
-
-const rightWorkItemColDefs = asDeletableColDefs(workItemColDefs)
 
 const ManagePlanningIntervalObjectiveWorkItemsForm = (
   props: ManagePlanningIntervalObjectiveWorkItemsFormProps,
 ) => {
-  const [isOpen, setIsOpen] = useState(props.showForm)
+  const {
+    showForm,
+    planningIntervalId,
+    objectiveId,
+    onFormComplete,
+    onFormCancel,
+  } = props
+
+  const [isOpen, setIsOpen] = useState(showForm)
   const [isSaving, setIsSaving] = useState(false)
   const [searchResultWorkItems, setSearchResultWorkItems] = useState<
-    WorkItemModel[]
+    WorkItemListDto[]
   >([])
-  const [sourceWorkItems, setSourceWorkItems] = useState<WorkItemModel[]>([])
-  const [targetWorkItems, setTargetWorkItems] = useState<WorkItemModel[]>([])
+  const [sourceWorkItems, setSourceWorkItems] = useState<WorkItemListDto[]>([])
+  const [targetWorkItems, setTargetWorkItems] = useState<WorkItemListDto[]>([])
   const messageApi = useMessage()
 
   const [searchQuery, setSearchQuery] = useState<string>('')
-
-  const rightGridRef = useRef<AgGridReact<WorkItemModel>>(null)
 
   const {
     data: existingWorkItemsData,
     isLoading: existingWorkItemsQueryIsLoading,
     isError: existingWorkItemsQueryIsError,
   } = useGetObjectiveWorkItemsQuery({
-    planningIntervalId: props.planningIntervalId,
-    objectiveId: props.objectiveId,
+    planningIntervalId: planningIntervalId,
+    objectiveId: objectiveId,
   })
 
   const debounceSearchQuery = useDebounce(searchQuery, 500)
@@ -120,38 +117,62 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
   useEffect(() => {
     if (!existingWorkItemsData) return
     setTargetWorkItems(
-      existingWorkItemsData?.workItems.map((item) => ({
-        ...item,
-        disabled: false,
-      })) ?? [],
+      existingWorkItemsData?.workItems?.slice().sort(defaultSort) ?? [],
     )
   }, [existingWorkItemsData])
 
   useEffect(() => {
     if (!searchResult) return
 
-    setSearchResultWorkItems(
-      searchResult?.map((item) => ({ ...item, disabled: false })) ?? [],
-    )
+    setSearchResultWorkItems(searchResult ?? [])
   }, [searchResult])
 
   useEffect(() => {
-    const selectedIds = []
-    rightGridRef.current?.api?.forEachNode((n) => selectedIds.push(n.data.id))
+    const selectedIds =
+      existingWorkItemsData?.workItems?.map((item) => item.id) ?? []
 
-    setSourceWorkItems(
-      searchResultWorkItems.filter((item) => !selectedIds.includes(item.id)),
+    const filteredWorkItems = searchResultWorkItems
+      .filter((item) => !selectedIds.includes(item.id))
+      .sort(defaultSort)
+
+    setSourceWorkItems(filteredWorkItems)
+  }, [existingWorkItemsData, searchResultWorkItems])
+
+  const onDragStop = useCallback((items: WorkItemListDto[]) => {
+    // using the functional update form of setState to ensure we are using the latest state
+    if (items.length === 0) return
+
+    setSourceWorkItems((prevSource) =>
+      prevSource.filter((p) => !items.some((i) => i.id === p.id)),
     )
-  }, [searchQuery, searchResultWorkItems, targetWorkItems])
 
-  const saveWorkItemChanges = async (): Promise<boolean> => {
+    setTargetWorkItems((prevTarget) =>
+      [...prevTarget, ...items].sort(defaultSort),
+    )
+  }, [])
+
+  const handleDelete = useCallback((item: WorkItemListDto) => {
+    // using the functional update form of setState to ensure we are using the latest state
+    if (!item) return
+
+    setTargetWorkItems((prevTarget) =>
+      prevTarget.filter((p) => p.id !== item.id),
+    )
+
+    setSourceWorkItems((prevSource) => [...prevSource, item].sort(defaultSort))
+  }, [])
+
+  const rightColDefs = useMemo(
+    () => asDeletableColDefs(workItemColDefs, handleDelete),
+    [handleDelete],
+  )
+
+  const formAction = async (): Promise<boolean> => {
     try {
-      const workItemIds = []
-      rightGridRef.current?.api.forEachNode((n) => workItemIds.push(n.data.id))
       const request: ManagePlanningIntervalObjectiveWorkItemsRequest = {
-        planningIntervalId: props.planningIntervalId,
-        objectiveId: props.objectiveId,
-        workItemIds,
+        planningIntervalId: planningIntervalId,
+        objectiveId: objectiveId,
+        workItemIds: targetWorkItems.map((item) => item.id),
       }
       await manageObjectiveWorkItems(request)
       messageApi.success('Successfully updated objective work items.')
@@ -168,22 +189,24 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
   const handleOk = async () => {
     setIsSaving(true)
     try {
-      if (await saveWorkItemChanges()) {
+      if (await formAction()) {
         setIsOpen(false)
-        setIsSaving(false)
-        props.onFormSave()
-      } else {
-        setIsSaving(false)
+        onFormComplete()
       }
-    } catch (errorInfo) {
+    } catch (error) {
+      console.error(error)
+      messageApi.error(
+        'An error occurred while managing the work items. Please try again.',
+      )
+    } finally {
       setIsSaving(false)
     }
   }
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setIsOpen(false)
-    props.onFormCancel()
-  }
+    onFormCancel()
+  }, [onFormCancel])
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value)
@@ -203,10 +226,7 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
       destroyOnClose={true}
     >
       {
-        <Space
-          direction="vertical"
-          style={{ display: 'flex', width: '100%' }}
-        >
+        <Flex gap="small" vertical>
           <Input
             size="small"
             placeholder="Search for work items by key, title, or parent key"
@@ -217,20 +237,16 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
           <AgGridTransfer
             leftGridData={sourceWorkItems}
             rightGridData={targetWorkItems}
-            leftColumnDef={leftWorkItemColDefs}
-            rightColumnDef={rightWorkItemColDefs}
-            rightGridRef={rightGridRef}
-            removeRowFromSource
+            leftColumnDef={leftColDefs}
+            rightColumnDef={rightColDefs}
+            onDragStop={onDragStop}
             getRowId={(param) => param.data.id}
             GridProps={{
-              tooltipShowDelay: 0,
-              tooltipHideDelay: 1000,
               defaultColDef,
             }}
-            leftGridRowSelection={leftGridRowSelection}
           />
           <Text>Search results are limited to 50 records.</Text>
-        </Space>
+        </Flex>
       }
     </Modal>
   )
