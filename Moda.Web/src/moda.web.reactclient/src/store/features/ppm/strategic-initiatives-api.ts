@@ -1,6 +1,7 @@
 import {
   AddStrategicInitiativeKpiMeasurementRequest,
   CreateStrategicInitiativeKpiRequest,
+  ManageStrategicInitiativeProjectsRequest,
   ProjectListDto,
   StrategicInitiativeKpiDetailsDto,
   StrategicInitiativeKpiListDto,
@@ -412,6 +413,27 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         { type: QueryTags.StrategicInitiativeProject, id: arg },
       ],
     }),
+    manageStrategicInitiativeProjects: builder.mutation<
+      void,
+      ManageStrategicInitiativeProjectsRequest
+    >({
+      queryFn: async (request) => {
+        try {
+          const data = await getStrategicInitiativesClient().manageProjects(
+            request.id,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.StrategicInitiativeProject, id: 'LIST' },
+        { type: QueryTags.StrategicInitiativeProject, id: arg.id },
+      ],
+    }),
   }),
 })
 
@@ -434,4 +456,5 @@ export const {
   useGetStrategicInitiativeKpiUnitOptionsQuery,
   useGetStrategicInitiativeKpiTargetDirectionOptionsQuery,
   useGetStrategicInitiativeProjectsQuery,
+  useManageStrategicInitiativeProjectsMutation,
 } = strategicInitiativesApi

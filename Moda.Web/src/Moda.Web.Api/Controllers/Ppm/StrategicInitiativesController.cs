@@ -1,6 +1,5 @@
 ﻿using Moda.Common.Application.Models;
 using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
-using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Commands.Kpis;
 using Moda.ProjectPortfolioManagement.Application.StrategicInitiatives.Dtos;

@@ -19,6 +19,7 @@ import {
   ChangeStrategicInitiativeStatusForm,
   CreateStrategicInitiativeKpiForm,
   DeleteStrategicInitiativeForm,
+  ManageStrategicInitiativeProjectsForm,
   StrategicInitiativeDetails,
   StrategicInitiativeKpisGrid,
 } from '../_components'
@@ -71,6 +72,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     setOpenDeleteStrategicInitiativeForm,
   ] = useState<boolean>(false)
   const [openCreateKpiForm, setOpenCreateKpiForm] = useState(false)
+  const [openManageProjectsForm, setOpenManageProjectsForm] = useState(false)
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -106,7 +108,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     isLoading: isLoadingProjects,
     error: errorProjects,
     refetch: refetchProjects,
-  } = useGetStrategicInitiativeProjectsQuery(params.key, {
+  } = useGetStrategicInitiativeProjectsQuery(strategicInitiativeData?.id, {
     skip: !projectsQueried,
   })
 
@@ -311,17 +313,26 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
       })
     }
 
-    //KPI actions
+    //KPI and Project actions
     if (!isReadOnly && canUpdateStrategicInitiative) {
       items.push(
         {
-          key: 'manage-divider-2',
+          key: 'manage-divider-kps',
           type: 'divider',
         },
         {
           key: 'createKpi',
           label: 'Create KPI',
           onClick: () => setOpenCreateKpiForm(true),
+        },
+        {
+          key: 'manage-divider-projects',
+          type: 'divider',
+        },
+        {
+          key: 'manageProjects',
+          label: 'Manage Projects',
+          onClick: () => setOpenManageProjectsForm(true),
         },
       )
     }
@@ -480,6 +491,15 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
           showForm={openCreateKpiForm}
           onFormComplete={() => onCreateKpiFormClosed()}
           onFormCancel={() => onCreateKpiFormClosed()}
+        />
+      )}
+      {openManageProjectsForm && (
+        <ManageStrategicInitiativeProjectsForm
+          strategicInitiativeId={strategicInitiativeData?.id}
+          portfolioKey={strategicInitiativeData?.portfolio.key}
+          showForm={openManageProjectsForm}
+          onFormComplete={() => setOpenManageProjectsForm(false)}
+          onFormCancel={() => setOpenManageProjectsForm(false)}
         />
       )}
     </>
