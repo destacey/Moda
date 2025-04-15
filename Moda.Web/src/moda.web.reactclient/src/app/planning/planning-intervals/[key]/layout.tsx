@@ -6,7 +6,7 @@ import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
-const PlanninIntervalLayout = ({
+const PlanningIntervalLayout = ({
   params,
   children,
 }: {
@@ -96,4 +96,4 @@ const PlanninIntervalLayout = ({
   )
 }
 
-export default PlanninIntervalLayout
+export default PlanningIntervalLayout
