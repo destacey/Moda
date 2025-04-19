@@ -37,7 +37,6 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   useDocumentTitle('Connection Details')
 
   const [activeTab, setActiveTab] = useState(ConnectionTabs.Details)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isSyncingOrganization, setIsSyncingOrganization] = useState(false)
   const [openEditConnectionForm, setOpenEditConnectionForm] =
     useState<boolean>(false)
