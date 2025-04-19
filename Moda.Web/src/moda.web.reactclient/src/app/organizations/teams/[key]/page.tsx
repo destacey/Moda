@@ -41,7 +41,6 @@ import TeamDependencyManagement from './team-dependency-management'
 import { ItemType } from 'antd/es/menu/interface'
 import { InactiveTag, PageActions } from '@/src/components/common'
 import DeactivateTeamForm from '../../_components/deactivate-team-form'
-import { useMessage } from '@/src/components/contexts/messaging'
 
 enum TeamTabs {
   Details = 'details',
@@ -65,8 +64,6 @@ const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     useState<boolean>(false)
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
-
-  const messageApi = useMessage()
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')

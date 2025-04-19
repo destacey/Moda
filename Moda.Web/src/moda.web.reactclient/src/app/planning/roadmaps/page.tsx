@@ -8,14 +8,12 @@ import { Button } from 'antd'
 import { authorizePage } from '../../../components/hoc'
 import { useGetRoadmapsQuery } from '@/src/store/features/planning/roadmaps-api'
 import { CreateRoadmapForm, RoadmapsGrid } from './_components'
-import { useMessage } from '@/src/components/contexts/messaging'
 
 const RoadmapsPage: React.FC = () => {
   useDocumentTitle('Roadmaps')
 
   const [openCreateRoadmapForm, setOpenCreateRoadmapForm] =
     useState<boolean>(false)
-  const messageApi = useMessage()
 
   const { data: roadmapData, isLoading, error, refetch } = useGetRoadmapsQuery()
 

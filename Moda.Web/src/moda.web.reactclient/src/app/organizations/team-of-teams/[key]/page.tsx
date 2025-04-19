@@ -34,7 +34,6 @@ import { CreateTeamMembershipForm } from '../../_components'
 import { InactiveTag, PageActions } from '@/src/components/common'
 import { ItemType } from 'antd/es/menu/interface'
 import DeactivateTeamOfTeamsForm from '../../_components/deactivate-team-of-teams-form'
-import { useMessage } from '@/src/components/contexts/messaging'
 
 enum TeamOfTeamsTabs {
   Details = 'details',
@@ -58,8 +57,6 @@ const TeamOfTeamsDetailsPage = (props: {
     useState<boolean>(false)
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
-
-  const messageApi = useMessage()
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')

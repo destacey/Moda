@@ -6,7 +6,6 @@ import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { memo, useEffect, useMemo, useState } from 'react'
 import { RoadmapsTimeline } from '.'
 import RoadmapItemsGrid from './roadmap-items-grid'
-import { useMessage } from '@/src/components/contexts/messaging'
 
 interface RoadmapViewManagerProps {
   roadmap: RoadmapDetailsDto
@@ -20,8 +19,6 @@ interface RoadmapViewManagerProps {
 const RoadmapViewManager = (props: RoadmapViewManagerProps) => {
   const [currentView, setCurrentView] = useState<string | number>('Timeline')
   const [roadmapItems, setRoadmapItems] = useState<RoadmapItemListDto[]>([])
-
-  const messageApi = useMessage()
 
   useEffect(() => {
     setRoadmapItems(props.roadmapItems)
