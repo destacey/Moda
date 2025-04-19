@@ -2,6 +2,7 @@ import { themeBalham } from 'ag-grid-community'
 import useTheme, { ThemeContextType } from '../../components/contexts/theme'
 import useThemeToggleMenuItem from './use-theme-toggle-menu-item'
 import { Mock } from 'jest-mock'
+import { HighlightFilled, HighlightOutlined } from '@ant-design/icons'
 
 jest.mock('../../components/contexts/theme', () => ({
   __esModule: true,
@@ -71,7 +72,7 @@ describe('useThemeToggleMenuItem', () => {
 
   it('uses the correct icon for the light theme', () => {
     const themeToggle = useThemeToggleMenuItem()
-    expect(themeToggle.icon).toMatchSnapshot()
+    expect(themeToggle.icon.type).toBe(HighlightOutlined)
   })
 
   it('uses the correct icon for the dark theme', () => {
@@ -81,6 +82,6 @@ describe('useThemeToggleMenuItem', () => {
     })
 
     const themeToggle = useThemeToggleMenuItem()
-    expect(themeToggle.icon).toMatchSnapshot()
+    expect(themeToggle.icon.type).toBe(HighlightFilled)
   })
 })

@@ -1,5 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`useThemeToggleMenuItem uses the correct icon for the dark theme 1`] = `<HighlightFilled />`;
-
-exports[`useThemeToggleMenuItem uses the correct icon for the light theme 1`] = `<HighlightOutlined />`;
