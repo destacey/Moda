@@ -9,7 +9,7 @@ import { useGetStrategicThemeQuery } from '@/src/store/features/strategic-manage
 import { Descriptions, MenuProps, Space } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import StrategicThemeDetailsLoading from './loading'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import {
@@ -18,7 +18,6 @@ import {
   EditStrategicThemeForm,
 } from '../_components'
 import { StrategicThemeStateAction } from '../_components/change-strategic-theme-state-form'
-import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Descriptions
 
@@ -29,8 +28,13 @@ enum MenuActions {
   Archive = 'Archive',
 }
 
-const StrategicThemeDetailsPage = ({ params }) => {
+const StrategicThemeDetailsPage = (props: {
+  params: Promise<{ key: number }>
+}) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('Strategic Theme Details')
+
   const [openEditStrategicThemeForm, setOpenEditStrategicThemeForm] =
     useState<boolean>(false)
   const [openActivateStrategicThemeForm, setOpenActivateStrategicThemeForm] =
@@ -39,8 +43,6 @@ const StrategicThemeDetailsPage = ({ params }) => {
     useState<boolean>(false)
   const [openDeleteStrategicThemeForm, setOpenDeleteStrategicThemeForm] =
     useState<boolean>(false)
-
-  const messageApi = useMessage()
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -60,7 +62,7 @@ const StrategicThemeDetailsPage = ({ params }) => {
     isLoading,
     error,
     refetch: refetchStrategicTheme,
-  } = useGetStrategicThemeQuery(params.key)
+  } = useGetStrategicThemeQuery(key)
 
   useEffect(() => {
     if (!strategicThemeData) return

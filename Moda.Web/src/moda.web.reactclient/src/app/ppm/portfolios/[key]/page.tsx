@@ -4,10 +4,10 @@ import { PageActions, PageTitle } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
-import { Card, Descriptions, MenuProps } from 'antd'
+import { Card, MenuProps } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import PortfolioDetailsLoading from './loading'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import {
@@ -27,9 +27,6 @@ import {
   ProjectViewManager,
   StrategicInitiativeViewManager,
 } from '../../_components'
-import { useMessage } from '@/src/components/contexts/messaging'
-
-const { Item } = Descriptions
 
 enum PortfolioTabs {
   Details = 'details',
@@ -45,8 +42,11 @@ enum MenuActions {
   Archive = 'Archive',
 }
 
-const PortfolioDetailsPage = ({ params }) => {
+const PortfolioDetailsPage = (props: { params: Promise<{ key: number }> }) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('Portfolio Details')
+
   const [activeTab, setActiveTab] = useState(PortfolioTabs.Details)
   const [projectsQueried, setProjectsQueried] = useState(false)
   const [strategicInitiativesQueried, setStrategicInitiativesQueried] =
@@ -62,8 +62,6 @@ const PortfolioDetailsPage = ({ params }) => {
     useState<boolean>(false)
   const [openDeletePortfolioForm, setOpenDeletePortfolioForm] =
     useState<boolean>(false)
-
-  const messageApi = useMessage()
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -83,21 +81,21 @@ const PortfolioDetailsPage = ({ params }) => {
     isLoading,
     error,
     refetch: refetchPortfolio,
-  } = useGetPortfolioQuery(params.key)
+  } = useGetPortfolioQuery(key)
 
   const {
     data: projectData,
     isLoading: isLoadingProjects,
     error: errorProjects,
     refetch: refetchProjects,
-  } = useGetPortfolioProjectsQuery(params.key, { skip: !projectsQueried })
+  } = useGetPortfolioProjectsQuery(key.toString(), { skip: !projectsQueried })
 
   const {
     data: strategicInitiativeData,
     isLoading: isLoadingStrategicInitiatives,
     error: errorStrategicInitiatives,
     refetch: refetchStrategicInitiatives,
-  } = useGetPortfolioStrategicInitiativesQuery(params.key, {
+  } = useGetPortfolioStrategicInitiativesQuery(key.toString(), {
     skip: !strategicInitiativesQueried,
   })
 

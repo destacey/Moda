@@ -2,7 +2,14 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import { Card, MenuProps } from 'antd'
-import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  createElement,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import TeamOfTeamsDetails from './team-of-teams-details'
 import RisksGrid, {
   RisksGridProps,
@@ -35,9 +42,13 @@ enum TeamOfTeamsTabs {
   TeamMemberships = 'team-memberships',
 }
 
-const TeamOfTeamsDetailsPage = ({ params }) => {
+const TeamOfTeamsDetailsPage = (props: {
+  params: Promise<{ key: number }>
+}) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('Team of Teams Details')
-  const { key } = params
+
   const [activeTab, setActiveTab] = useState(TeamOfTeamsTabs.Details)
   const [openCreateTeamMembershipForm, setOpenCreateTeamMembershipForm] =
     useState<boolean>(false)

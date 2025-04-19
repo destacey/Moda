@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import AzdoBoardsConnectionDetails from './azdo-boards-connection-details'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { Card } from 'antd'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
@@ -31,8 +31,11 @@ enum ConnectionTabs {
   OrganizationConfiguration = 'organization-configuration',
 }
 
-const ConnectionDetailsPage = ({ params }) => {
+const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
+  const { id } = use(props.params)
+
   useDocumentTitle('Connection Details')
+
   const [activeTab, setActiveTab] = useState(ConnectionTabs.Details)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isSyncingOrganization, setIsSyncingOrganization] = useState(false)
@@ -40,7 +43,8 @@ const ConnectionDetailsPage = ({ params }) => {
     useState<boolean>(false)
   const [openDeleteConnectionForm, setOpenDeleteConnectionForm] =
     useState<boolean>(false)
-  const messageApi = useMessage();
+
+  const messageApi = useMessage()
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
@@ -59,7 +63,7 @@ const ConnectionDetailsPage = ({ params }) => {
     data: connectionData,
     isLoading,
     refetch,
-  } = useGetAzdoConnectionQuery(params.id)
+  } = useGetAzdoConnectionQuery(id)
   const azdoOrgUrl = connectionData?.configuration?.organizationUrl
 
   const [
@@ -127,7 +131,7 @@ const ConnectionDetailsPage = ({ params }) => {
   const updateSyncState = useCallback(async () => {
     try {
       const response = await updateAzdoConnectionSyncState({
-        connectionId: params.id,
+        connectionId: id,
         isSyncEnabled: !connectionData?.isSyncEnabled,
       })
       if (response.error) {
@@ -145,13 +149,13 @@ const ConnectionDetailsPage = ({ params }) => {
   }, [
     connectionData?.isSyncEnabled,
     messageApi,
-    params.id,
+    id,
     updateAzdoConnectionSyncState,
   ])
 
   const syncOrganizationConfiguration = useCallback(async () => {
     try {
-      const response = await syncAzdoConnectionOrganization(params.id)
+      const response = await syncAzdoConnectionOrganization(id)
       if (response.error) {
         throw response.error
       }
@@ -165,7 +169,7 @@ const ConnectionDetailsPage = ({ params }) => {
       )
     }
     setIsSyncingOrganization(false)
-  }, [syncAzdoConnectionOrganization, messageApi, params.id])
+  }, [syncAzdoConnectionOrganization, messageApi, id])
 
   const actionsMenuItems = useMemo(() => {
     const items = [] as ItemType[]
@@ -250,7 +254,7 @@ const ConnectionDetailsPage = ({ params }) => {
       />
       <AzdoBoardsConnectionContext.Provider
         value={{
-          connectionId: params.id,
+          connectionId: id,
           organizationUrl: azdoOrgUrl,
           reloadConnectionData: refetch,
         }}

@@ -4,21 +4,18 @@ import PageTitle from '@/src/components/common/page-title'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
 import UserDetailsLoading from './loading'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { Card } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
 import { UserDetails } from '../_components'
 
-const UserDetailsPage = ({ params }) => {
+const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
+  const { id } = use(props.params)
+
   const [activeTab, setActiveTab] = useState('details')
 
-  const {
-    data: userData,
-    isLoading,
-    error,
-    refetch,
-  } = useGetUserQuery(params.id)
+  const { data: userData, isLoading, error, refetch } = useGetUserQuery(id)
 
   useEffect(() => {
     error && console.error(error)

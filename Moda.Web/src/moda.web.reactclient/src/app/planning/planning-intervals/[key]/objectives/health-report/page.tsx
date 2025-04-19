@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { useCallback, useMemo } from 'react'
+import { use, useCallback, useMemo } from 'react'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import { authorizePage } from '@/src/components/hoc'
 import {
@@ -37,7 +37,11 @@ const ProgressCellRenderer = ({ value, data }) => {
   return <Progress percent={value} size="small" status={progressStatus} />
 }
 
-const ObjectiveHealthReportPage = ({ params }) => {
+const ObjectiveHealthReportPage = (props: {
+  params: Promise<{ key: number }>
+}) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('PI Objectives Health Report')
 
   const {
@@ -45,14 +49,14 @@ const ObjectiveHealthReportPage = ({ params }) => {
     isLoading: piIsLoading,
     isFetching: piIsFetching,
     refetch: refetchPlanningInterval,
-  } = useGetPlanningInterval(params.key)
+  } = useGetPlanningInterval(key.toString())
 
   const {
     data: healthReport,
     isLoading,
     isFetching,
     refetch,
-  } = useGetPlanningIntervalObjectivesHealthReport(params.key, null, true)
+  } = useGetPlanningIntervalObjectivesHealthReport(key.toString(), null, true)
 
   const columnDefs = useMemo(
     () => [

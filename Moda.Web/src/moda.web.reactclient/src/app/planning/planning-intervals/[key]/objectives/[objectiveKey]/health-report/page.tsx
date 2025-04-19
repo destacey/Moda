@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { useEffect } from 'react'
+import { use, useEffect } from 'react'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import { authorizePage } from '@/src/components/hoc'
 import { useGetPlanningIntervalObjectiveByKey } from '@/src/services/queries/planning-queries'
@@ -11,14 +11,18 @@ import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
 import HealthReportGrid from '@/src/components/common/health-check/health-report-grid'
 
-const ObjectiveHealthReportPage = ({ params }) => {
+const ObjectiveHealthReportPage = (props: {
+  params: Promise<{ key: number; objectiveKey: number }>
+}) => {
+  const { key, objectiveKey } = use(props.params)
+
   useDocumentTitle('PI Objective Health Report')
 
   const {
     data: objectiveData,
     isLoading,
     isFetching,
-  } = useGetPlanningIntervalObjectiveByKey(params.key, params.objectiveKey)
+  } = useGetPlanningIntervalObjectiveByKey(key, objectiveKey)
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()

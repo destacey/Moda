@@ -5,13 +5,17 @@ import {
   useGetPlanningInterval,
   useGetPlanningIntervalRisks,
 } from '@/src/services/queries/planning-queries'
-import { useCallback, useState } from 'react'
+import { use, useCallback, useState } from 'react'
 import { PageTitle } from '@/src/components/common'
 import { notFound } from 'next/navigation'
 import RisksGrid from '@/src/components/common/planning/risks-grid'
 import { authorizePage } from '@/src/components/hoc'
 
-const PlanningIntervalRisksPage = ({ params }) => {
+const PlanningIntervalRisksPage = (props: {
+  params: Promise<{ key: number }>
+}) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('PI Risks')
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
 
@@ -19,7 +23,7 @@ const PlanningIntervalRisksPage = ({ params }) => {
     data: planningIntervalData,
     isLoading,
     isFetching,
-  } = useGetPlanningInterval(params.key)
+  } = useGetPlanningInterval(key.toString())
 
   const risksQuery = useGetPlanningIntervalRisks(
     planningIntervalData?.id,

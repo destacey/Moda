@@ -1,7 +1,7 @@
 'use client'
 
 import PageTitle from '@/src/components/common/page-title'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import RiskDetails from './risk-details'
 import { Button, Card } from 'antd'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
@@ -13,18 +13,22 @@ import { useGetRisk } from '@/src/services/queries/planning-queries'
 import { useAppDispatch } from '@/src/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 
-const RiskDetailsPage = ({ params }) => {
+const RiskDetailsPage = (props: { params: Promise<{ key: number }> }) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('Risk Details')
+
+  const [activeTab, setActiveTab] = useState('details')
+  const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
+  const dispatch = useAppDispatch()
+  const pathname = usePathname()
+
   const {
     data: riskData,
     isLoading,
     isFetching,
     refetch,
-  } = useGetRisk(params.key)
-  const [activeTab, setActiveTab] = useState('details')
-  const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
-  const dispatch = useAppDispatch()
-  const pathname = usePathname()
+  } = useGetRisk(key.toString())
 
   const { hasClaim } = useAuth()
   const canUpdateRisks = hasClaim('Permission', 'Permissions.Risks.Update')

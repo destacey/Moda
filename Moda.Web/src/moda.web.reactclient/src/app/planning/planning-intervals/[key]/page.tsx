@@ -2,7 +2,14 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import { Card } from 'antd'
-import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  createElement,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import TeamsGrid, {
   TeamsGridProps,
 } from '@/src/components/common/organizations/teams-grid'
@@ -31,8 +38,13 @@ enum PlanningIntervalTabs {
   Teams = 'teams',
 }
 
-const PlanningIntervalDetailsPage = ({ params }) => {
+const PlanningIntervalDetailsPage = (props: {
+  params: Promise<{ key: number }>
+}) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('PI Details')
+
   const [activeTab, setActiveTab] = useState(PlanningIntervalTabs.Details)
   const [openEditPlanningIntervalForm, setOpenEditPlanningIntervalForm] =
     useState<boolean>(false)
@@ -57,7 +69,7 @@ const PlanningIntervalDetailsPage = ({ params }) => {
     isLoading,
     isFetching,
     refetch: refetchPlanningInterval,
-  } = useGetPlanningInterval(params.key)
+  } = useGetPlanningInterval(key.toString())
 
   const teamsQuery = useGetPlanningIntervalTeams(
     planningIntervalData?.id,
