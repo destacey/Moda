@@ -4,16 +4,17 @@ import { useGetPlanningInterval } from '@/src/services/queries/planning-queries'
 import { Menu } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useMemo, use } from 'react'
 
-const PlanninIntervalLayout = ({
-  params,
-  children,
-}: {
-  params: any
+const PlanningIntervalLayout = (props: {
+  params: Promise<{ key: string }>
   children: React.ReactNode
 }) => {
-  const { data: planningIntervalData } = useGetPlanningInterval(params.key)
+  const { key } = use(props.params)
+
+  const { children } = props
+
+  const { data: planningIntervalData } = useGetPlanningInterval(key)
 
   const items = useMemo(
     () =>
@@ -26,17 +27,13 @@ const PlanninIntervalLayout = ({
         },
         {
           label: (
-            <Link href={`/planning/planning-intervals/${params.key}`}>
-              PI Details
-            </Link>
+            <Link href={`/planning/planning-intervals/${key}`}>PI Details</Link>
           ),
           key: 'pi-details',
         },
         {
           label: (
-            <Link
-              href={`/planning/planning-intervals/${params.key}/plan-review`}
-            >
+            <Link href={`/planning/planning-intervals/${key}/plan-review`}>
               Plan Review
             </Link>
           ),
@@ -44,9 +41,7 @@ const PlanninIntervalLayout = ({
         },
         {
           label: (
-            <Link
-              href={`/planning/planning-intervals/${params.key}/objectives`}
-            >
+            <Link href={`/planning/planning-intervals/${key}/objectives`}>
               Objectives
             </Link>
           ),
@@ -54,7 +49,7 @@ const PlanninIntervalLayout = ({
         },
         {
           label: (
-            <Link href={`/planning/planning-intervals/${params.key}/risks`}>
+            <Link href={`/planning/planning-intervals/${key}/risks`}>
               Risks
             </Link>
           ),
@@ -67,7 +62,7 @@ const PlanninIntervalLayout = ({
             {
               label: (
                 <Link
-                  href={`/planning/planning-intervals/${params.key}/objectives/health-report`}
+                  href={`/planning/planning-intervals/${key}/objectives/health-report`}
                 >
                   Health Report
                 </Link>
@@ -77,7 +72,7 @@ const PlanninIntervalLayout = ({
           ],
         },
       ] as ItemType[],
-    [planningIntervalData?.name, params.key],
+    [planningIntervalData?.name, key],
   )
 
   return (
@@ -96,4 +91,4 @@ const PlanninIntervalLayout = ({
   )
 }
 
-export default PlanninIntervalLayout
+export default PlanningIntervalLayout

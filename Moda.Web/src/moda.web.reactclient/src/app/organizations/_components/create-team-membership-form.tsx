@@ -92,7 +92,6 @@ const CreateTeamMembershipForm = (props: CreateTeamMembershipFormProps) => {
         setIsOpen(false)
         form.resetFields()
         props.onFormCreate()
-        // TODO: this message is not displaying
         messageApi.success('Successfully created team membership.')
       }
     } catch (errorInfo) {

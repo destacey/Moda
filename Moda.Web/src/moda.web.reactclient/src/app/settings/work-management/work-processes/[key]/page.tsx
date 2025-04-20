@@ -3,7 +3,7 @@
 import PageTitle from '@/src/components/common/page-title'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useMemo, useState } from 'react'
 import { Card } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import WorkProcessDetailsLoading from './loading'
@@ -14,7 +14,11 @@ import { useGetWorkProcessQuery } from '@/src/store/features/work-management/wor
 import { ItemType } from 'antd/es/menu/interface'
 import { WorkProcessDetails } from '../_components'
 
-const WorkProcessDetailsPage = ({ params }) => {
+const WorkProcessDetailsPage = (props: {
+  params: Promise<{ key: number }>
+}) => {
+  const { key } = use(props.params)
+
   const [activeTab, setActiveTab] = useState('details')
   const [
     openChangeWorkProcessIsActiveForm,
@@ -31,7 +35,7 @@ const WorkProcessDetailsPage = ({ params }) => {
     isLoading,
     error,
     refetch,
-  } = useGetWorkProcessQuery(params.key)
+  } = useGetWorkProcessQuery(key.toString())
 
   useEffect(() => {
     error && console.error(error)

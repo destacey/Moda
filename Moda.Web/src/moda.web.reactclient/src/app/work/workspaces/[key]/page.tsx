@@ -10,7 +10,7 @@ import {
 } from '@/src/store/features/work-management/workspace-api'
 import { Button, Card } from 'antd'
 import { notFound, usePathname } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { use, useCallback, useEffect, useState } from 'react'
 import WorkspaceDetailsLoading from './loading'
 import WorkspaceDetails from './workspace-details'
 import useAuth from '@/src/components/contexts/auth'
@@ -22,8 +22,11 @@ enum WorkspaceTabs {
   WorkItems = 'workItems',
 }
 
-const WorkspaceDetailsPage = ({ params }) => {
-  const workspaceKey = params.key.toUpperCase()
+const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
+  const { key } = use(props.params)
+
+  const workspaceKey = key.toUpperCase()
+
   useDocumentTitle('Workspace Details')
 
   const [activeTab, setActiveTab] = useState(WorkspaceTabs.Details)

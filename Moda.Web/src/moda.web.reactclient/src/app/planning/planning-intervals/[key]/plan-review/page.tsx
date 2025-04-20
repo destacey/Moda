@@ -2,7 +2,7 @@
 
 import { useDocumentTitle } from '@/src/hooks'
 import { PlanningIntervalTeamResponse } from '@/src/services/moda-api'
-import { useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useMemo, useState } from 'react'
 import { Alert, Card, Tag } from 'antd'
 import TeamPlanReview from './team-plan-review'
 import { notFound, useRouter } from 'next/navigation'
@@ -14,7 +14,11 @@ import {
 import PlanningIntervalPlanReviewLoading from './loading'
 import { authorizePage } from '@/src/components/hoc'
 
-const PlanningIntervalPlanReviewPage = ({ params }) => {
+const PlanningIntervalPlanReviewPage = (props: {
+  params: Promise<{ key: number }>
+}) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('PI Plan Review')
   const [teams, setTeams] = useState<PlanningIntervalTeamResponse[]>([])
   const [activeTab, setActiveTab] = useState<string>(null)
@@ -27,7 +31,7 @@ const PlanningIntervalPlanReviewPage = ({ params }) => {
     isLoading,
     isFetching,
     refetch: refetchPlanningInterval,
-  } = useGetPlanningInterval(params.key)
+  } = useGetPlanningInterval(key.toString())
 
   const { data: teamData, isLoading: teamsIsLoading } =
     useGetPlanningIntervalTeams(planningIntervalData?.id, true)

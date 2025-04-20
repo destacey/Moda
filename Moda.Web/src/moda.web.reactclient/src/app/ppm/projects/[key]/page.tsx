@@ -7,7 +7,7 @@ import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
 import { Alert, Card, MenuProps } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import ProjectDetailsLoading from './loading'
 import {
   ChangeProjectStatusForm,
@@ -18,7 +18,6 @@ import {
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProjectStatusAction } from '../_components/change-project-status-form'
-import { useMessage } from '@/src/components/contexts/messaging'
 
 enum ProjectTabs {
   Details = 'details',
@@ -32,8 +31,11 @@ enum ProjectAction {
   Cancel = 'Cancel',
 }
 
-const ProjectDetailsPage = ({ params }) => {
+const ProjectDetailsPage = (props: { params: Promise<{ key: number }> }) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('Project Details')
+
   const [activeTab, setActiveTab] = useState(ProjectTabs.Details)
   const [openEditProjectForm, setOpenEditProjectForm] = useState<boolean>(false)
   const [openActivateProjectForm, setOpenActivateProjectForm] =
@@ -44,8 +46,6 @@ const ProjectDetailsPage = ({ params }) => {
     useState<boolean>(false)
   const [openDeleteProjectForm, setOpenDeleteProjectForm] =
     useState<boolean>(false)
-
-  const messageApi = useMessage()
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -61,7 +61,7 @@ const ProjectDetailsPage = ({ params }) => {
     isLoading,
     error,
     refetch: refetchProject,
-  } = useGetProjectQuery(params.key)
+  } = useGetProjectQuery(key)
 
   useEffect(() => {
     if (!projectData) return

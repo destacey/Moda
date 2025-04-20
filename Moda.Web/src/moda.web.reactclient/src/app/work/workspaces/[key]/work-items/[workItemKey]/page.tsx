@@ -7,7 +7,7 @@ import {
   useGetWorkItemQuery,
 } from '@/src/store/features/work-management/workspace-api'
 import { notFound, usePathname } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { use, useCallback, useEffect, useState } from 'react'
 import WorkItemDetailsLoading from './loading'
 import { PageTitle } from '@/src/components/common'
 import { Card } from 'antd'
@@ -25,22 +25,31 @@ enum WorkItemTabs {
   Dependencies = 'dependencies',
 }
 
-const WorkItemDetailsPage = ({ params }) => {
-  const workspaceKey = params.key.toUpperCase()
-  const workItemKey = params.workItemKey.toUpperCase()
+const WorkItemDetailsPage = (props: {
+  params: Promise<{ key: string; workItemKey: string }>
+}) => {
+  const { key, workItemKey } = use(props.params)
+
+  const upperWorkspaceKey = key.toUpperCase()
+  const upperWorkItemKey = workItemKey.toUpperCase()
+
   useDocumentTitle('Work Item Details')
+
   const [activeTab, setActiveTab] = useState(WorkItemTabs.Details)
 
   const {
     data: workItemData,
     error,
     isLoading,
-  } = useGetWorkItemQuery({ idOrKey: workspaceKey, workItemKey: workItemKey })
+  } = useGetWorkItemQuery({
+    idOrKey: upperWorkspaceKey,
+    workItemKey: upperWorkItemKey,
+  })
 
   const childWorkItemsQuery = useGetChildWorkItemsQuery(
     {
-      idOrKey: workspaceKey,
-      workItemKey: workItemKey,
+      idOrKey: upperWorkspaceKey,
+      workItemKey: upperWorkItemKey,
     },
     { skip: !workItemData },
   )
@@ -58,17 +67,17 @@ const WorkItemDetailsPage = ({ params }) => {
         href: '/work/workspaces',
       },
       {
-        title: workspaceKey,
-        href: `/work/workspaces/${workspaceKey}`,
+        title: upperWorkspaceKey,
+        href: `/work/workspaces/${upperWorkspaceKey}`,
       },
       {
-        title: workItemKey,
+        title: upperWorkItemKey,
         href: null,
       },
     ]
 
     dispatch(setBreadcrumbRoute({ pathname, route: breadcrumbRoute }))
-  }, [dispatch, pathname, workItemKey, workspaceKey])
+  }, [dispatch, pathname, upperWorkItemKey, upperWorkspaceKey])
 
   useEffect(() => {
     // TODO: this isn't getting called on hook error

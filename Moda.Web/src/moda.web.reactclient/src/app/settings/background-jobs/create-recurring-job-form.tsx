@@ -49,7 +49,11 @@ const CreateRecurringJobForm = (props: CreateRecurringJobFormProps) => {
     setIsSaving(true)
     try {
       const request = mapToRequestValues(values)
-      await createRecurringJob(request)
+      const response = await createRecurringJob(request)
+      if (response.error) {
+        throw response.error
+      }
+
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -76,7 +80,7 @@ const CreateRecurringJobForm = (props: CreateRecurringJobFormProps) => {
         setIsOpen(false)
         form.resetFields()
         props.onFormCreate()
-        // TODO: this message is not displaying
+
         messageApi.success('Successfully created recurring job.')
       }
     } catch (errorInfo) {

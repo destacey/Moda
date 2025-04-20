@@ -9,7 +9,7 @@ import {
 } from '@/src/services/queries/planning-queries'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
-import { useCallback, useMemo, useState } from 'react'
+import { use, useCallback, useMemo, useState } from 'react'
 import {
   CreatePlanningIntervalObjectiveForm,
   PlanningIntervalObjectivesTimeline,
@@ -32,7 +32,11 @@ const viewSelectorOptions: SegmentedLabeledOption[] = [
   },
 ]
 
-const PlanningIntervalObjectivesPage = ({ params }) => {
+const PlanningIntervalObjectivesPage = (props: {
+  params: Promise<{ key: number }>
+}) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('PI Objectives')
   const [currentView, setCurrentView] = useState<string | number>('List')
   const [openCreateObjectiveForm, setOpenCreateObjectiveForm] =
@@ -43,7 +47,7 @@ const PlanningIntervalObjectivesPage = ({ params }) => {
     isLoading,
     isFetching,
     refetch: refetchPlanningInterval,
-  } = useGetPlanningInterval(params.key)
+  } = useGetPlanningInterval(key.toString())
 
   const {
     data: objectivesData,

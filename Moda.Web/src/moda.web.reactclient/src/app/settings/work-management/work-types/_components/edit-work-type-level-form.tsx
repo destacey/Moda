@@ -177,11 +177,7 @@ const EditWorkTypeLevelForm = (props: EditWorkTypeLevelFormProps) => {
           />
         </Item>
         <Item name="description" label="Description" rules={[{ max: 1024 }]}>
-          <MarkdownEditor
-            value={form.getFieldValue('description')}
-            onChange={(value) => form.setFieldValue('description', value || '')}
-            maxLength={1024}
-          />
+          <MarkdownEditor maxLength={1024} />
         </Item>
       </Form>
     </Modal>

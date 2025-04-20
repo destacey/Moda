@@ -6,7 +6,7 @@ import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
 import { Card, MenuProps } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import StrategicInitiativeDetailsLoading from './loading'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
@@ -42,8 +42,13 @@ enum StrategicInitiativeAction {
   Cancel = 'Cancel',
 }
 
-const StrategicInitiativeDetailsPage = ({ params }) => {
+const StrategicInitiativeDetailsPage = (props: {
+  params: Promise<{ key: number }>
+}) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('Strategic Initiative Details')
+
   const [activeTab, setActiveTab] = useState(StrategicInitiativeTabs.Details)
   const [kpisQueried, setKpisQueried] = useState(false)
   const [projectsQueried, setProjectsQueried] = useState(false)
@@ -92,7 +97,7 @@ const StrategicInitiativeDetailsPage = ({ params }) => {
     isLoading,
     error,
     refetch: refetchStrategicInitiative,
-  } = useGetStrategicInitiativeQuery(params.key)
+  } = useGetStrategicInitiativeQuery(key)
 
   const {
     data: kpiData,

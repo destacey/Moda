@@ -10,7 +10,7 @@ import {
 } from '@/src/store/features/planning/roadmaps-api'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import RoadmapDetailsLoading from './loading'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
 import { Descriptions, Divider, MenuProps } from 'antd'
@@ -25,7 +25,6 @@ import { MarkdownRenderer } from '@/src/components/common/markdown'
 import ReorganizeRoadmapActivitiesModal from '../_components/reorganize-roadmap-activities-modal'
 import CreateRoadmapActivityForm from '../_components/create-roadmap-activity-form'
 import CreateRoadmapTimeboxForm from '../_components/create-roadmap-timebox-form'
-import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item } = Descriptions
 
@@ -33,7 +32,9 @@ const visibilityTitle = (visibility: string, managersInfo: string) => {
   return `This roadmap is set to ${visibility}.\n\nThe roadmap managers are: ${managersInfo}`
 }
 
-const RoadmapDetailsPage = ({ params }) => {
+const RoadmapDetailsPage = (props: { params: Promise<{ key: number }> }) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('Roadmap Details')
   const [managersInfo, setManagersInfo] = useState('Unknown')
   const [children, setChildren] = useState([])
@@ -49,8 +50,6 @@ const RoadmapDetailsPage = ({ params }) => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
 
-  const messageApi = useMessage()
-
   const pathname = usePathname()
   const dispatch = useAppDispatch()
 
@@ -65,7 +64,7 @@ const RoadmapDetailsPage = ({ params }) => {
     isLoading,
     error,
     refetch: refetchRoadmap,
-  } = useGetRoadmapQuery(params.key)
+  } = useGetRoadmapQuery(key.toString())
 
   const {
     data: roadmapItems,

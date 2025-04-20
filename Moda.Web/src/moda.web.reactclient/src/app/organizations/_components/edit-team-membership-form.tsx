@@ -114,7 +114,7 @@ const EditTeamMembershipForm = (props: UpdateTeamMembershipFormProps) => {
         setIsOpen(false)
         form.resetFields()
         props.onFormSave()
-        // TODO: this message is not displaying
+
         messageApi.success('Successfully updated team membership.')
       }
     } catch (errorInfo) {

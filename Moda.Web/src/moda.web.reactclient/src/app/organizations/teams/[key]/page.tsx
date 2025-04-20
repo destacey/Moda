@@ -2,7 +2,14 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import { Card, MenuProps } from 'antd'
-import { createElement, useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  createElement,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import TeamDetails from './team-details'
 import RisksGrid, {
   RisksGridProps,
@@ -34,7 +41,6 @@ import TeamDependencyManagement from './team-dependency-management'
 import { ItemType } from 'antd/es/menu/interface'
 import { InactiveTag, PageActions } from '@/src/components/common'
 import DeactivateTeamForm from '../../_components/deactivate-team-form'
-import { useMessage } from '@/src/components/contexts/messaging'
 
 enum TeamTabs {
   Details = 'details',
@@ -44,9 +50,11 @@ enum TeamTabs {
   TeamMemberships = 'team-memberships',
 }
 
-const TeamDetailsPage = ({ params }) => {
+const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('Team Details')
-  const { key } = params
+
   const [activeTab, setActiveTab] = useState(TeamTabs.Details)
   const [openCreateTeamMembershipForm, setOpenCreateTeamMembershipForm] =
     useState<boolean>(false)
@@ -56,8 +64,6 @@ const TeamDetailsPage = ({ params }) => {
     useState<boolean>(false)
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
-
-  const messageApi = useMessage()
 
   const { hasClaim } = useAuth()
   const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')

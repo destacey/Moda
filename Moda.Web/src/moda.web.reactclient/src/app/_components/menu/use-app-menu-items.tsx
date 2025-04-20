@@ -36,12 +36,13 @@ const menuItems: (Item | MenuItem)[] = [
   menuItem('Organizations', 'org', null, menuIcons.org, [
     menuItem('Teams', 'org.teams', '/organizations/teams'),
     menuItem('Employees', 'org.employees', '/organizations/employees'),
-    { key: 'org-settings-divider-1', type: 'divider' },
-    menuItem(
-      'Functional Org Chart',
-      'org.functional-org-chart',
-      '/organizations/functional-org-chart',
-    ),
+    // TODO: add back once the react 19 issue is resolved
+    // { key: 'org-settings-divider-1', type: 'divider' },
+    // menuItem(
+    //   'Functional Org Chart',
+    //   'org.functional-org-chart',
+    //   '/organizations/functional-org-chart',
+    // ),
   ]),
   restrictedMenuSection('Planning', 'plan', null, menuIcons.planning, [
     restrictedPermissionMenuItem(

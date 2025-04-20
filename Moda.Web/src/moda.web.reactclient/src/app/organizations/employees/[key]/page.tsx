@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import { EmployeeDetailsDto } from '@/src/services/moda-api'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import EmployeeDetails from './employee-details'
 import { getEmployeesClient } from '@/src/services/clients'
 import { Card } from 'antd'
@@ -13,11 +13,13 @@ import { useAppDispatch } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import { InactiveTag } from '@/src/components/common'
 
-const EmployeeDetailsPage = ({ params }) => {
+const EmployeeDetailsPage = (props: { params: Promise<{ key: number }> }) => {
+  const { key } = use(props.params)
+
   useDocumentTitle('Employee Details')
+
   const [activeTab, setActiveTab] = useState('details')
   const [employee, setEmployee] = useState<EmployeeDetailsDto | null>(null)
-  const { key } = params
   const [employeeNotFound, setEmployeeNotFound] = useState<boolean>(false)
   const pathname = usePathname()
   const dispatch = useAppDispatch()
@@ -32,7 +34,7 @@ const EmployeeDetailsPage = ({ params }) => {
 
   useEffect(() => {
     const getEmployee = async () => {
-      const employeesClient = await getEmployeesClient()
+      const employeesClient = getEmployeesClient()
       const employeeDto = await employeesClient.getById(key)
       setEmployee(employeeDto)
       dispatch(setBreadcrumbTitle({ title: employeeDto.displayName, pathname }))

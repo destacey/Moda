@@ -122,12 +122,13 @@ export const teamApi = apiSlice.injectEndpoints({
     }),
     getFunctionalOrganizationChart: builder.query<
       FunctionalOrganizationChartDto,
-      Date | null | undefined
+      string | null | undefined
     >({
-      queryFn: async (asOfDate?: Date | null) => {
+      queryFn: async (asOfDate: string) => {
         try {
+          const date = asOfDate ? new Date(asOfDate) : undefined
           const data =
-            await getTeamsClient().getFunctionalOrganizationChart(asOfDate)
+            await getTeamsClient().getFunctionalOrganizationChart(date)
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -137,7 +138,7 @@ export const teamApi = apiSlice.injectEndpoints({
       providesTags: (result, error, arg) => [
         {
           type: QueryTags.FunctionalOrganizationChart,
-          id: arg ? arg.toISOString() : 'default',
+          id: arg,
         },
       ],
     }),

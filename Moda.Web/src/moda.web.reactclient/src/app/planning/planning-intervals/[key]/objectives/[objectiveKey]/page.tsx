@@ -2,7 +2,7 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import { Card, MenuProps } from 'antd'
-import { useMemo, useState } from 'react'
+import { use, useMemo, useState } from 'react'
 import PlanningIntervalObjectiveDetails from './planning-interval-objective-details'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
@@ -21,7 +21,11 @@ import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import Link from 'next/link'
 import { PageActions } from '@/src/components/common'
 
-const ObjectiveDetailsPage = ({ params }) => {
+const ObjectiveDetailsPage = (props: {
+  params: Promise<{ key: number; objectiveKey: number }>
+}) => {
+  const { key, objectiveKey } = use(props.params)
+
   useDocumentTitle('PI Objective Details')
 
   const [activeTab, setActiveTab] = useState('details')
@@ -35,7 +39,7 @@ const ObjectiveDetailsPage = ({ params }) => {
     isLoading,
     isFetching,
     refetch: refetchObjective,
-  } = useGetPlanningIntervalObjectiveByKey(params.key, params.objectiveKey)
+  } = useGetPlanningIntervalObjectiveByKey(key, objectiveKey)
 
   const router = useRouter()
   const { hasClaim } = useAuth()
@@ -77,7 +81,7 @@ const ObjectiveDetailsPage = ({ params }) => {
     setOpenDeleteObjectiveForm(false)
     if (wasSaved) {
       // redirect to the PI details page
-      router.push(`/planning/planning-intervals/${params.key}`)
+      router.push(`/planning/planning-intervals/${key}`)
     }
   }
 
@@ -123,7 +127,7 @@ const ObjectiveDetailsPage = ({ params }) => {
       key: 'healthReport',
       label: (
         <Link
-          href={`/planning/planning-intervals/${params.key}/objectives/${params.objectiveKey}/health-report`}
+          href={`/planning/planning-intervals/${key}/objectives/${objectiveKey}/health-report`}
         >
           Health Report
         </Link>
@@ -136,8 +140,8 @@ const ObjectiveDetailsPage = ({ params }) => {
     canManageObjectives,
     dispatch,
     objectiveData?.id,
-    params.key,
-    params.objectiveKey,
+    key,
+    objectiveKey,
   ])
 
   if (isLoading) {

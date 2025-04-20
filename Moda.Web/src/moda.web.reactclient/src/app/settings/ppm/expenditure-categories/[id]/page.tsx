@@ -5,7 +5,7 @@ import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { Card, MenuProps } from 'antd'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import ExpenditureCategorieDetailsLoading from './loading'
 import { notFound, useRouter } from 'next/navigation'
 import {
@@ -27,7 +27,11 @@ enum MenuActions {
   Archive = 'Archive',
 }
 
-const ExpenditureCategoryDetailsPage = ({ params }) => {
+const ExpenditureCategoryDetailsPage = (props: {
+  params: Promise<{ id: number }>
+}) => {
+  const { id } = use(props.params)
+
   const [activeTab, setActiveTab] = useState('details')
   const [openEditExpenditureCategoryForm, setOpenEditExpenditureCategoryForm] =
     useState<boolean>(false)
@@ -53,7 +57,7 @@ const ExpenditureCategoryDetailsPage = ({ params }) => {
     isLoading,
     error,
     refetch,
-  } = useGetExpenditureCategoryQuery(params.id)
+  } = useGetExpenditureCategoryQuery(id)
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateExpenditureCategories = hasPermissionClaim(

@@ -55,13 +55,17 @@ export const useMarkdownComponents = (): Components => {
         </AntDLink>
       ),
       hr: (props) => <Divider {...props} />,
-      img: (props) => (
-        <Image
-          {...props}
-          alt={props.alt || 'Image'}
-          fallback="/images/fallback-image.png"
-        />
-      ), // TODO: needs improvement, especially for background
+      img: (props) => {
+        const src = typeof props.src === 'string' ? props.src : undefined
+        return (
+          <Image
+            {...props}
+            src={src}
+            alt={props.alt || 'Image'}
+            fallback="/images/fallback-image.png"
+          />
+        )
+      }, // TODO: needs improvement, especially for background
       table: (props) => <MarkdownTable {...props} />,
     }
   }, [token])

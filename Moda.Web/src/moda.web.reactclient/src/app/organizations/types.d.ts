@@ -1,4 +1,3 @@
-import { TeamNavigationDto } from './../../services/moda-api'
 import { TeamNavigationDto } from '@/src/services/moda-api'
 
 export interface TeamListItem extends TeamNavigationDto {
