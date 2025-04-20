@@ -110,6 +110,16 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
     // TODO: other systems will use different types.  How to handle this?
     public double StackRank { get; private set; }
 
+    public Guid? ProjectId { get; private set; }
+
+    public WorkProject? Project { get; private set; }
+
+    public Guid? ParentProjectId { get; private set; }
+
+    public WorkProject? ParentProject { get; private set; }
+
+    public Guid? CurrentProjectId => ProjectId ?? ParentProjectId;
+
     public Instant? ActivatedTimestamp { get; private set; }
 
     public Instant? DoneTimestamp { get; private set; }
