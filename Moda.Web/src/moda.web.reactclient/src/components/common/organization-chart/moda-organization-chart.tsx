@@ -1,4 +1,4 @@
-import { ComponentType, useMemo, useRef } from 'react'
+import { FC, ComponentType, useMemo, useRef } from 'react'
 import useTheme from '../../contexts/theme'
 import { OrganizationChart, OrganizationChartOptions } from '@ant-design/graphs'
 import {
@@ -20,7 +20,7 @@ export interface ModaOrganizationChartProps<T = any> {
   nodeSize?: [number, number]
 }
 
-const ModaOrganizationChart: React.FC<ModaOrganizationChartProps> = ({
+const ModaOrganizationChart: FC<ModaOrganizationChartProps> = ({
   data,
   NodeComponent,
   nodeSize = [250, 80],

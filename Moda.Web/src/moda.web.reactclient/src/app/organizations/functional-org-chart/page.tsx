@@ -94,7 +94,9 @@ const FunctionalOrgChartPage: React.FC = () => {
     data: orgChartData,
     isLoading,
     isError,
-  } = useGetFunctionalOrganizationChartQuery(asOfDate?.toDate())
+  } = useGetFunctionalOrganizationChartQuery(asOfDate?.toISOString(), {
+    skip: !asOfDate,
+  })
 
   const data = useMemo<TeamOrganizationGraphData>(() => {
     return orgChartData ? transformOrganizationToGraph(orgChartData) : undefined

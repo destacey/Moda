@@ -1,17 +1,18 @@
 import { ExportOutlined } from '@ant-design/icons'
 import Link from 'next/link'
+import { ReactNode } from 'react'
 
 export interface ExternalIconLinkProps {
-  content: string | JSX.Element
-  url?: string | undefined
-  tooltip?: string | undefined
+  content: string | ReactNode
+  url?: string
+  tooltip?: string
 }
 
 const ExternalIconLink = ({
   content,
   url,
   tooltip,
-}: ExternalIconLinkProps): string | JSX.Element => {
+}: ExternalIconLinkProps): ReactNode => {
   if (!url) return content
 
   return (
