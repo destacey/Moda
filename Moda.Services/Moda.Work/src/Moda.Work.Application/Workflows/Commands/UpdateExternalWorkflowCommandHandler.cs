@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.Workflows.Commands;
 

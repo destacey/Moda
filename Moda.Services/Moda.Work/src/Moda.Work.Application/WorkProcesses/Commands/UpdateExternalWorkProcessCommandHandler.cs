@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Common.Application.Requests.WorkManagement.Interfaces;
+using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkProcesses.Commands;
 

@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Work.Application.Persistence;
 using Moda.Work.Application.Workspaces.Validators;
 
 namespace Moda.Work.Application.Workspaces.Commands;

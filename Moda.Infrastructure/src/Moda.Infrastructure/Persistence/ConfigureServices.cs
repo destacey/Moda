@@ -7,6 +7,7 @@ using Moda.Links;
 using Moda.Planning.Application.Persistence;
 using Moda.ProjectPortfolioManagement.Application;
 using Moda.StrategicManagement.Application;
+using Moda.Work.Application.Persistence;
 using Serilog;
 
 namespace Moda.Infrastructure.Persistence;

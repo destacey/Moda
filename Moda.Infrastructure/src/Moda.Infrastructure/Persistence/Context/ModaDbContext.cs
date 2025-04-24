@@ -17,6 +17,7 @@ using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using Moda.StrategicManagement.Application;
 using Moda.StrategicManagement.Domain.Models;
+using Moda.Work.Application.Persistence;
 using Moda.Work.Domain.Models;
 using PpmStrategicTheme = Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme;
 using StrategicTheme = Moda.StrategicManagement.Domain.Models.StrategicTheme;

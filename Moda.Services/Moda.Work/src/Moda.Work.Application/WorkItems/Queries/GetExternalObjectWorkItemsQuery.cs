@@ -1,4 +1,5 @@
-﻿using Moda.Work.Application.WorkItems.Dtos;
+﻿using Moda.Work.Application.Persistence;
+using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Queries;
 public sealed record GetExternalObjectWorkItemsQuery(Guid ObjectId) : IQuery<WorkItemsSummaryDto>;

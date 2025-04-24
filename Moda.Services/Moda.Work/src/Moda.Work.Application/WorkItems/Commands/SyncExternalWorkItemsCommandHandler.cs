@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Enums.Work;
+using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Domain.Interfaces;
 

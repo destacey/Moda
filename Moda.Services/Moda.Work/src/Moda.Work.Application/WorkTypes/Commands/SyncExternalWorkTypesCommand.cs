@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
+using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkTypes.Validators;
 
 namespace Moda.Work.Application.WorkTypes.Commands;

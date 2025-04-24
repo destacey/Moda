@@ -1,4 +1,6 @@
-﻿namespace Moda.Work.Application.WorkTypes.Commands;
+﻿using Moda.Work.Application.Persistence;
+
+namespace Moda.Work.Application.WorkTypes.Commands;
 public sealed record UpdateWorkTypeCommand(int Id, string? Description, int LevelId) : ICommand<int>;
 
 public sealed class UpdateWorkTypeCommandValidator : CustomValidator<UpdateWorkTypeCommand>

@@ -1,4 +1,6 @@
-﻿namespace Moda.Work.Application.Workspaces.Commands;
+﻿using Moda.Work.Application.Persistence;
+
+namespace Moda.Work.Application.Workspaces.Commands;
 public sealed record SetExternalViewWorkItemUrlTemplateCommand(Guid WorkspaceId, string? ExternalViewWorkItemUrlTemplate) : ICommand;
 
 internal sealed class SetExternalViewWorkItemUrlTemplateCommandHandler(IWorkDbContext workDbContext, ILogger<SetExternalViewWorkItemUrlTemplateCommandHandler> logger, IDateTimeProvider dateTimeProvider) : ICommandHandler<SetExternalViewWorkItemUrlTemplateCommand>

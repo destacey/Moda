@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Moda.Common.Domain.Enums.Work;
+using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.Workspaces.Models;
 

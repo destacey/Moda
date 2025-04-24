@@ -1,4 +1,5 @@
-﻿using Moda.Work.Application.WorkTypeLevels.Dtos;
+﻿using Moda.Work.Application.Persistence;
+using Moda.Work.Application.WorkTypeLevels.Dtos;
 
 namespace Moda.Work.Application.WorkTypeLevels.Queries;
 public sealed record GetWorkTypeLevelQuery(int Id) : IQuery<WorkTypeLevelDto?>;

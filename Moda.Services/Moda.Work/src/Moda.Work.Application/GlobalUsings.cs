@@ -1,5 +1,4 @@
-﻿global using Moda.AppIntegration.Application.Persistence;
-global using Moda.Common.Application.Interfaces;
+﻿global using Moda.Common.Application.Interfaces;
 global using Moda.Common.Application.Persistence;
 global using Moda.Common.Application.Validation;
 global using Moda.Common.Extensions;

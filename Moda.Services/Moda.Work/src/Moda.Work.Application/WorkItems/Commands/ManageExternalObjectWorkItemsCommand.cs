@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Domain.Enums;
+using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkItems.Commands;
 public sealed record ManageExternalObjectWorkItemsCommand(Guid PlanningIntervalId, Guid ObjectiveId, SystemContext Context, IEnumerable<Guid> WorkItemIds) : ICommand;

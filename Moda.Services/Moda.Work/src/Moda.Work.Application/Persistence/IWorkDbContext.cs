@@ -1,4 +1,4 @@
-﻿namespace Moda.AppIntegration.Application.Persistence;
+﻿namespace Moda.Work.Application.Persistence;
 public interface IWorkDbContext : IModaDbContext
 {
     DbSet<WorkTypeHierarchy> WorkTypeHierarchies { get; }
