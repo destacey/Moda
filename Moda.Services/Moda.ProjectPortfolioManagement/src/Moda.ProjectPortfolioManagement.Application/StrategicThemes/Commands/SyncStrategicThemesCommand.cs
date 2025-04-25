@@ -1,5 +1,4 @@
-﻿using Moda.Common.Application.Models;
-using Moda.Common.Domain.Interfaces.StrategicManagement;
+﻿using Moda.Common.Domain.Interfaces.StrategicManagement;
 using Moda.ProjectPortfolioManagement.Domain.Models;
 
 namespace Moda.ProjectPortfolioManagement.Application.StrategicThemes.Commands;
@@ -77,7 +76,7 @@ internal sealed class SyncStrategicThemesCommandHandler(
         catch (Exception ex)
         {
             _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
-            return Result.Failure<ObjectIdAndKey>($"Error handling {AppRequestName} command.");
+            return Result.Failure($"Error handling {AppRequestName} command.");
         }
     }
 }

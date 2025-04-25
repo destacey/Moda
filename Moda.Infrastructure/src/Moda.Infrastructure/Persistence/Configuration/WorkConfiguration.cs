@@ -395,6 +395,7 @@ public class WorkProjectConfig : IEntityTypeConfiguration<WorkProject>
 
         // Properties
         builder.Property(w => w.Name).IsRequired().HasMaxLength(128);
+        builder.Property(p => p.Description).HasMaxLength(2048).IsRequired();
     }
 }
 

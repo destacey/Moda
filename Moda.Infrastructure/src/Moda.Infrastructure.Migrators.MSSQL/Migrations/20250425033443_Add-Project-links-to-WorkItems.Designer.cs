@@ -13,7 +13,7 @@ using Moda.Infrastructure.Persistence.Context;
 namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 {
     [DbContext(typeof(ModaDbContext))]
-    [Migration("20250420145319_Add-Project-links-to-WorkItems")]
+    [Migration("20250425033443_Add-Project-links-to-WorkItems")]
     partial class AddProjectlinkstoWorkItems
     {
         /// <inheritdoc />
@@ -2735,8 +2735,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<int>("Key")
                         .HasColumnType("int");

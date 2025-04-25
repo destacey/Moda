@@ -1,4 +1,5 @@
-﻿using Moda.Common.Domain.Interfaces.Ppm;
+﻿using Moda.Common.Domain.Events.ProjectPortfolioManagement;
+using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
 
 namespace Moda.Work.Domain.Models;
 
@@ -14,21 +15,23 @@ public class WorkProject : ISimpleProject, IHasIdAndKey
         Id = project.Id;
         Key = project.Key;
         Name = project.Name;
+        Description = project.Description;
     }
 
     public Guid Id { get; private set; }
     public int Key { get; private set; }
     public string Name { get; private set; } = default!;
-    public bool IsActive { get; private set; }
+    public string Description { get; private set; } = default!;
 
     /// <summary>
-    /// Updates the specified project from a PPM ISimpleProject.
+    /// Updates the specified project basic details from a PPM ISimpleProject.
     /// </summary>
     /// <param name="project"></param>
-    public void Update(ISimpleProject project)
+    public void UpdateDetails(ISimpleProject project)
     {
         Id = project.Id;
         Key = project.Key;
         Name = project.Name;
+        Description = project.Description;
     }
 }

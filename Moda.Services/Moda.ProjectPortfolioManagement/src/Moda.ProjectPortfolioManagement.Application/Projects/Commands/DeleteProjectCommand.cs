@@ -11,11 +11,13 @@ public sealed class DeleteProjectCommandValidator : AbstractValidator<DeleteProj
     }
 }
 
-internal sealed class DeleteProjectCommandHandler(IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext, ILogger<DeleteProjectCommandHandler> logger) : ICommandHandler<DeleteProjectCommand>
+internal sealed class DeleteProjectCommandHandler(IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext, ILogger<DeleteProjectCommandHandler> logger, IDateTimeProvider dateTimeProvider) : ICommandHandler<DeleteProjectCommand>
 {
     private const string AppRequestName = nameof(DeleteProjectCommand);
     private readonly IProjectPortfolioManagementDbContext _projectPortfolioManagementDbContext = projectPortfolioManagementDbContext;
     private readonly ILogger<DeleteProjectCommandHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
+
     public async Task<Result> Handle(DeleteProjectCommand request, CancellationToken cancellationToken)
     {
         try
@@ -48,7 +50,7 @@ internal sealed class DeleteProjectCommandHandler(IProjectPortfolioManagementDbC
                 return Result.Failure("Portfolio not found.");
             }
 
-            var deleteResult = portfolio.DeleteProject(project.Id);
+            var deleteResult = portfolio.DeleteProject(project.Id, _dateTimeProvider.Now);
             if (deleteResult.IsFailure)
             {
                 _logger.LogError("Error deleting project {ProjectId}. Error message: {Error}", request.Id, deleteResult.Error);

@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using Hangfire;
 using Moda.Common.Application.BackgroundJobs;
 using Moda.Common.Application.Enums;
 using Moda.Web.Api.Extensions;
@@ -73,6 +72,9 @@ public class BackgroundJobsController : ControllerBase
                 break;
             case BackgroundJobType.StrategicThemesSync:
                 _jobService.Enqueue(() => jobManager.RunSyncStrategicThemes(cancellationToken));
+                break;
+            case BackgroundJobType.ProjectsSync:
+                _jobService.Enqueue(() => jobManager.RunSyncProjects(cancellationToken));
                 break;
             default:
                 _logger.LogWarning("Unknown job type {jobType} requested", jobType);

@@ -8,4 +8,5 @@ public interface IJobManager
     Task RunSyncAzureDevOpsBoards(SyncType syncType, CancellationToken cancellationToken);
     Task RunSyncTeamsWithGraphTables(CancellationToken cancellationToken);
     Task RunSyncStrategicThemes(CancellationToken cancellationToken);
+    Task RunSyncProjects(CancellationToken cancellationToken);
 }

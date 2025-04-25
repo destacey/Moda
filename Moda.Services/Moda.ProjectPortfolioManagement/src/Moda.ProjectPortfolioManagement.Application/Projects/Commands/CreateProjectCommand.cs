@@ -48,13 +48,15 @@ public sealed class CreateProjectCommandValidator : AbstractValidator<CreateProj
 
 internal sealed class CreateProjectCommandHandler(
     IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext,
-    ILogger<CreateProjectCommandHandler> logger)
+    ILogger<CreateProjectCommandHandler> logger,
+    IDateTimeProvider dateTimeProvider)
     : ICommandHandler<CreateProjectCommand, ObjectIdAndKey>
 {
     private const string AppRequestName = nameof(CreateProjectCommand);
 
     private readonly IProjectPortfolioManagementDbContext _projectPortfolioManagementDbContext = projectPortfolioManagementDbContext;
     private readonly ILogger<CreateProjectCommandHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<Result<ObjectIdAndKey>> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
     {
@@ -108,7 +110,8 @@ internal sealed class CreateProjectCommandHandler(
                 request.DateRange,
                 request.ProgramId,
                 roles,
-                [.. strategicThemes.Select(st => st.Id)]
+                [.. strategicThemes.Select(st => st.Id)],
+                _dateTimeProvider.Now
                 );
             if (createResult.IsFailure)
             {

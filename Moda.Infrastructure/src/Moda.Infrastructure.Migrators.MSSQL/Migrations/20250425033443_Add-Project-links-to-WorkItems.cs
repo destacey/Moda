@@ -52,7 +52,7 @@ public partial class AddProjectlinkstoWorkItems : Migration
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 Key = table.Column<int>(type: "int", nullable: false),
                 Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                IsActive = table.Column<bool>(type: "bit", nullable: false)
+                Description = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false)
             },
             constraints: table =>
             {

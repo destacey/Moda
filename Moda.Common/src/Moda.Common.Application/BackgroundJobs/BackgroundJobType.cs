@@ -21,5 +21,8 @@ public enum BackgroundJobType
     TeamGraphSync = 1000,
 
     [Display(Name = "Strategic Themes Sync", Description = "Synchronize the latest strategic themes data.", Order = 1001, GroupName = "Data Replication Jobs")]
-    StrategicThemesSync = 1001
+    StrategicThemesSync = 1001,
+
+    [Display(Name = "Projects Sync", Description = "Synchronize the latest projects data.", Order = 1002, GroupName = "Data Replication Jobs")]
+    ProjectsSync = 1002,
 }
