@@ -192,23 +192,32 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
     // TODO: Running into EF issues when set the WorkType directly. So adding it for the check.
     public Result UpdateParent(IWorkItemParentInfo? parentInfo, WorkType currentWorkType)
     {
-        if (parentInfo is not null && parentInfo.Tier == WorkTypeTier.Portfolio)
+        if (currentWorkType?.Level?.Tier is null)
         {
-            if (currentWorkType?.Level?.Tier is null)
+            return Result.Failure("Unable to set the work item parent without the type and level.");
+        }
+
+        if (parentInfo is not null)
+        {
+            if (parentInfo.Tier != WorkTypeTier.Portfolio)
             {
-                return Result.Failure("Unable to set the work item parent without the type and level.");
+                return Result.Failure("Only portfolio tier work items can be parents.");
             }
-            else if (currentWorkType!.Level!.Tier == WorkTypeTier.Portfolio && currentWorkType.Level.Order <= parentInfo.LevelOrder)
+
+            if (currentWorkType.Level.Tier == WorkTypeTier.Portfolio && currentWorkType.Level.Order <= parentInfo.LevelOrder)
             {
                 return Result.Failure("The parent must be a higher level than the work item.");
             }
         }
-        else if (parentInfo is not null)
-        {
-            return Result.Failure("Only portfolio tier work items can be parents.");
-        }
 
         ParentId = parentInfo?.Id;
+
+        // Project Ids are not set for WorkTypes in the Other tier
+        if (currentWorkType.Level.Tier is not WorkTypeTier.Other)
+        {
+            ParentProjectId = parentInfo?.ProjectId;
+        }
+
         return Result.Success();
     }
 

@@ -35,18 +35,16 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
 
         try
         {
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
             var workProcess = await _workDbContext.WorkProcesses
                 .AsNoTracking()
                 .Include(p => p.Schemes)
                     .ThenInclude(s => s.WorkType)
-                        .ThenInclude(t => t.Level)
+                        .ThenInclude(t => t!.Level)
                 .Include(p => p.Schemes)
                     .ThenInclude(s => s.Workflow)
-                        .ThenInclude(wf => wf.Schemes)
+                        .ThenInclude(wf => wf!.Schemes)
                             .ThenInclude(wfs => wfs.WorkStatus)
                 .FirstOrDefaultAsync(wp => wp.Id == workspace.WorkProcessId, cancellationToken);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
             if (workProcess is null)
             {
                 _logger.LogWarning("Unable to sync external work items for workspace {WorkspaceId} because the workspace does not have a work process.", workspace.Id);
@@ -209,6 +207,7 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
             }
 
             await MapMissingParents(workspace, missingParents, cancellationToken);
+            await SyncParentProjectIds(workspace, workTypes, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -271,6 +270,66 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
         }
 
         await _workDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task SyncParentProjectIds(Workspace workspace, HashSet<WorkType> workTypes, CancellationToken cancellationToken)
+    {
+        _logger.LogDebug("Syncing parent project ids for workspace {WorkspaceId}.", workspace.Id);
+
+        if (workTypes.Any(t => t.Level is null))
+        {
+            _logger.LogError("Unable to sync parent project ids for workspace {WorkspaceId} because one or more work types do not have a level.", workspace.Id);
+            return;
+        }
+
+        int updateCount = 0;
+
+        // WorkTypeTier.Other tier is not a valid target for project ids
+        WorkTypeTier[] tiers = [WorkTypeTier.Portfolio, WorkTypeTier.Requirement, WorkTypeTier.Task];
+        var topTierLevelSkipped = false;
+        foreach (var tier in tiers)
+        {            
+            var types = workTypes.Where(t => t.Level!.Tier == tier).OrderBy(t => t.Level!.Order);
+            foreach (var workType in types)
+            {
+                if (!topTierLevelSkipped)
+                {
+                    topTierLevelSkipped = true;
+                    continue;
+                }
+                int typeUpdateCount = 0;
+
+                // get workitems for the work type that have a parent and the workitem.parentprojectid doesn't match the parent workitem projectId ?? parentProjectId
+                var workItems = await _workDbContext.WorkItems
+                    .Include(i => i.Type)
+                        .ThenInclude(t => t.Level)
+                    .Include(i => i.Status)
+                    .Include(i => i.Parent)
+                        .ThenInclude(p => p!.Type)
+                            .ThenInclude(t => t.Level)
+                    .Where(wi => wi.WorkspaceId == workspace.Id
+                        && wi.TypeId == workType.Id
+                        && wi.Parent != null
+                        && wi.ParentProjectId != (wi.Parent.ProjectId ?? wi.Parent.ParentProjectId))
+                    .ToListAsync(cancellationToken);
+
+                foreach (var workItem in workItems)
+                {
+                    var parentInfo = workItem.Parent.Adapt<WorkItemParentInfo>();
+                    workItem.UpdateParent(parentInfo, workType);
+
+                    typeUpdateCount++;
+                }
+
+                if (typeUpdateCount > 0)
+                {
+                    await _workDbContext.SaveChangesAsync(cancellationToken);
+                    updateCount += typeUpdateCount;
+                }
+            }
+        }
+
+        _logger.LogDebug("Synced {UpdateCount} parent project ids for workspace {WorkspaceId}.", updateCount, workspace.Id);
     }
 
     private sealed record WorkStatusMapping(int WorkTypeId, WorkStatus WorkStatus, WorkStatusCategory WorkStatusCategory);

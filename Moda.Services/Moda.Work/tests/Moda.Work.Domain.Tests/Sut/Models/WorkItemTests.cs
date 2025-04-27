@@ -30,23 +30,25 @@ public class WorkItemTests
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.IsSuccess.Should().BeTrue();
         workItem.ParentId.Should().BeNull();
+        workItem.ParentProjectId.Should().BeNull();
     }
 
     [Fact]
     public void UpdateParent_WithParent_SetNullParent_ShouldSucceed()
     {
         // Arrange
-        var workItem = _workItemFaker.WithData(parentId: Guid.NewGuid()).Generate();
+        var workItem = _workItemFaker.WithData(parentId: Guid.NewGuid(), parentProjectId: Guid.NewGuid()).Generate();
         IWorkItemParentInfo? parentInfo = null;
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.IsSuccess.Should().BeTrue();
         workItem.ParentId.Should().BeNull();
+        workItem.ParentProjectId.Should().BeNull();
     }
 
     [Fact]
@@ -56,14 +58,15 @@ public class WorkItemTests
         var storyWorkType = _workTypeFaker.AsStory().Generate();
         var epicWorkType = _workTypeFaker.AsEpic().Generate();
         var workItem = _workItemFaker.WithData(type: storyWorkType).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, epicWorkType.Level!.Tier, epicWorkType.Level.Order);
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, epicWorkType.Level!.Tier, epicWorkType.Level.Order);
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.IsSuccess.Should().BeTrue();
         workItem.ParentId.Should().Be(parentInfo.Id);
+        workItem.ParentProjectId.Should().BeNull();
     }
 
     [Fact]
@@ -72,15 +75,19 @@ public class WorkItemTests
         // Arrange
         var featureWorkType = _workTypeFaker.AsFeature().Generate();
         var epicWorkType = _workTypeFaker.AsEpic().Generate();
-        var workItem = _workItemFaker.WithData(type: featureWorkType).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, epicWorkType.Level!.Tier, epicWorkType.Level.Order);
+        var projectId = Guid.NewGuid();
+        var workItem = _workItemFaker.WithData(type: featureWorkType, projectId: projectId).Generate();
+        var parentProjectId = Guid.NewGuid();
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, epicWorkType.Level!.Tier, epicWorkType.Level.Order, parentProjectId);
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.IsSuccess.Should().BeTrue();
         workItem.ParentId.Should().Be(parentInfo.Id);
+        workItem.ParentProjectId.Should().Be(parentProjectId);
+        workItem.ProjectId.Should().Be(projectId);
     }
 
     [Fact]
@@ -89,14 +96,15 @@ public class WorkItemTests
         // Arrange
         var storyWorkType = _workTypeFaker.AsStory().Generate();
         var workItem = _workItemFaker.WithData(type: storyWorkType).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, storyWorkType.Level!.Tier, storyWorkType.Level.Order);
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, storyWorkType.Level!.Tier, storyWorkType.Level.Order);
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsFailure);
+        result.IsFailure.Should().BeTrue();
         workItem.ParentId.Should().BeNull();
+        workItem.ParentProjectId.Should().BeNull();
         result.Error.Should().Be("Only portfolio tier work items can be parents.");
     }
 
@@ -107,14 +115,15 @@ public class WorkItemTests
         var storyWorkType = _workTypeFaker.AsStory().Generate();
         var otherWorkType = _workTypeFaker.AsOther().Generate();
         var workItem = _workItemFaker.WithData(type: storyWorkType).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, otherWorkType.Level!.Tier, otherWorkType.Level.Order);
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, otherWorkType.Level!.Tier, otherWorkType.Level.Order);
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsFailure);
+        result.IsFailure.Should().BeTrue();
         workItem.ParentId.Should().BeNull();
+        workItem.ParentProjectId.Should().BeNull();
         result.Error.Should().Be("Only portfolio tier work items can be parents.");
     }
 
@@ -125,14 +134,15 @@ public class WorkItemTests
         var featureWorkType = _workTypeFaker.AsFeature().Generate();
         var otherWorkType = _workTypeFaker.AsOther().Generate();
         var workItem = _workItemFaker.WithData(type: featureWorkType).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, otherWorkType.Level!.Tier, otherWorkType.Level.Order);
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, otherWorkType.Level!.Tier, otherWorkType.Level.Order);
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsFailure);
+        result.IsFailure.Should().BeTrue();
         workItem.ParentId.Should().BeNull();
+        workItem.ParentProjectId.Should().BeNull();
         result.Error.Should().Be("Only portfolio tier work items can be parents.");
     }
 
@@ -143,14 +153,15 @@ public class WorkItemTests
         var featureWorkType = _workTypeFaker.AsFeature().Generate();
         var storyWorkType = _workTypeFaker.AsStory().Generate();
         var workItem = _workItemFaker.WithData(type: featureWorkType).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, storyWorkType.Level!.Tier, storyWorkType.Level.Order);
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, storyWorkType.Level!.Tier, storyWorkType.Level.Order);
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsFailure);
+        result.IsFailure.Should().BeTrue();
         workItem.ParentId.Should().BeNull();
+        workItem.ParentProjectId.Should().BeNull();
         result.Error.Should().Be("Only portfolio tier work items can be parents.");
     }
 
@@ -160,14 +171,15 @@ public class WorkItemTests
         // Arrange
         var featureWorkType = _workTypeFaker.AsFeature().Generate();
         var workItem = _workItemFaker.WithData(type: featureWorkType).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, featureWorkType.Level!.Tier, featureWorkType.Level.Order);
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, featureWorkType.Level!.Tier, featureWorkType.Level.Order);
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsFailure);
+        result.IsFailure.Should().BeTrue();
         workItem.ParentId.Should().BeNull();
+        workItem.ParentProjectId.Should().BeNull();
         result.Error.Should().Be("The parent must be a higher level than the work item.");
     }
 
@@ -178,14 +190,15 @@ public class WorkItemTests
         var storyWorkType = _workTypeFaker.AsStory().Generate();
         var epicWorkType = _workTypeFaker.AsEpic().Generate();
         var workItem = _workItemFaker.WithData(type: storyWorkType, parentId: Guid.NewGuid()).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, epicWorkType.Level!.Tier, epicWorkType.Level.Order);
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, epicWorkType.Level!.Tier, epicWorkType.Level.Order, Guid.NewGuid());
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.IsSuccess.Should().BeTrue();
         workItem.ParentId.Should().Be(parentInfo.Id);
+        workItem.ParentProjectId.Should().Be(parentInfo.ProjectId);
     }
 
     [Fact]
@@ -195,14 +208,15 @@ public class WorkItemTests
         var featureWorkType = _workTypeFaker.AsFeature().Generate();
         var epicWorkType = _workTypeFaker.AsEpic().Generate();
         var workItem = _workItemFaker.WithData(type: featureWorkType, parentId: Guid.NewGuid()).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, epicWorkType.Level!.Tier, epicWorkType.Level.Order);
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, epicWorkType.Level!.Tier, epicWorkType.Level.Order, Guid.NewGuid());
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.IsSuccess.Should().BeTrue();
         workItem.ParentId.Should().Be(parentInfo.Id);
+        workItem.ParentProjectId.Should().Be(parentInfo.ProjectId);
     }
 
     [Fact]
@@ -211,15 +225,17 @@ public class WorkItemTests
         // Arrange
         var storyWorkType = _workTypeFaker.AsStory().Generate();
         var expectedParentId = Guid.NewGuid();
-        var workItem = _workItemFaker.WithData(type: storyWorkType, parentId: expectedParentId).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, storyWorkType.Level!.Tier, storyWorkType.Level.Order);
+        var expectedParentProjectId = Guid.NewGuid();
+        var workItem = _workItemFaker.WithData(type: storyWorkType, parentId: expectedParentId, parentProjectId: expectedParentProjectId).Generate();
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, storyWorkType.Level!.Tier, storyWorkType.Level.Order);
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsFailure);
+        result.IsFailure.Should().BeTrue();
         workItem.ParentId.Should().Be(expectedParentId);
+        workItem.ParentProjectId.Should().Be(expectedParentProjectId);
         result.Error.Should().Be("Only portfolio tier work items can be parents.");
     }
 
@@ -230,15 +246,17 @@ public class WorkItemTests
         var storyWorkType = _workTypeFaker.AsStory().Generate();
         var otherWorkType = _workTypeFaker.AsOther().Generate();
         var expectedParentId = Guid.NewGuid();
-        var workItem = _workItemFaker.WithData(type: storyWorkType, parentId: expectedParentId).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, otherWorkType.Level!.Tier, otherWorkType.Level.Order);
+        var expectedParentProjectId = Guid.NewGuid();
+        var workItem = _workItemFaker.WithData(type: storyWorkType, parentId: expectedParentId, parentProjectId: expectedParentProjectId).Generate();
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, otherWorkType.Level!.Tier, otherWorkType.Level.Order);
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsFailure);
+        result.IsFailure.Should().BeTrue();
         workItem.ParentId.Should().Be(expectedParentId);
+        workItem.ParentProjectId.Should().Be(expectedParentProjectId);
         result.Error.Should().Be("Only portfolio tier work items can be parents.");
     }
 
@@ -250,14 +268,15 @@ public class WorkItemTests
         var otherWorkType = _workTypeFaker.AsOther().Generate();
         var expectedParentId = Guid.NewGuid();
         var workItem = _workItemFaker.WithData(type: featureWorkType, parentId: expectedParentId).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, otherWorkType.Level!.Tier, otherWorkType.Level.Order);
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, otherWorkType.Level!.Tier, otherWorkType.Level.Order, Guid.NewGuid());
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsFailure);
+        result.IsFailure.Should().BeTrue();
         workItem.ParentId.Should().Be(expectedParentId);
+        workItem.ParentProjectId.Should().BeNull();
         result.Error.Should().Be("Only portfolio tier work items can be parents.");
     }
 
@@ -269,14 +288,15 @@ public class WorkItemTests
         var storyWorkType = _workTypeFaker.AsStory().Generate();
         var expectedParentId = Guid.NewGuid();
         var workItem = _workItemFaker.WithData(type: featureWorkType, parentId: expectedParentId).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, storyWorkType.Level!.Tier, storyWorkType.Level.Order);
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, storyWorkType.Level!.Tier, storyWorkType.Level.Order, Guid.NewGuid());
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsFailure);
+        result.IsFailure.Should().BeTrue();
         workItem.ParentId.Should().Be(expectedParentId);
+        workItem.ParentProjectId.Should().BeNull();
         result.Error.Should().Be("Only portfolio tier work items can be parents.");
     }
 
@@ -287,14 +307,15 @@ public class WorkItemTests
         var featureWorkType = _workTypeFaker.AsFeature().Generate();
         var expectedParentId = Guid.NewGuid();
         var workItem = _workItemFaker.WithData(type: featureWorkType, parentId: expectedParentId).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, featureWorkType.Level!.Tier, featureWorkType.Level.Order);
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, featureWorkType.Level!.Tier, featureWorkType.Level.Order, Guid.NewGuid());
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsFailure);
+        result.IsFailure.Should().BeTrue();
         workItem.ParentId.Should().Be(expectedParentId);
+        workItem.ParentProjectId.Should().BeNull();
         result.Error.Should().Be("The parent must be a higher level than the work item.");
     }
 
@@ -309,28 +330,19 @@ public class WorkItemTests
 
         var expectedParentId = Guid.NewGuid();
         var workItem = _workItemFaker.WithData(type: workItemType, parentId: expectedParentId).Generate();
-        var parentInfo = new MockParentInfo(Guid.NewGuid(), 123456, parentType.Level!.Tier, parentType.Level.Order);
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, parentType.Level!.Tier, parentType.Level.Order, Guid.NewGuid());
 
         // Act
         var result = workItem.UpdateParent(parentInfo, workItem.Type);
 
         // Assert
-        Assert.True(result.IsFailure);
+        result.IsFailure.Should().BeTrue();
         workItem.ParentId.Should().Be(expectedParentId);
+        workItem.ParentProjectId.Should().BeNull();
         result.Error.Should().Be("Unable to set the work item parent without the type and level.");
     }
 
     #endregion UpdateParent
 
-    public sealed record MockParentInfo(Guid Id, int? ExternalId, WorkTypeTier Tier, int LevelOrder) : IWorkItemParentInfo;
-    public sealed record MockBadParentInfo : IWorkItemParentInfo
-    {
-        public Guid Id { get; set; }
-
-        public int? ExternalId { get; set; }
-
-        public WorkTypeTier Tier { get; set; }
-
-        public int LevelOrder { get; set; }
-    }
+    public sealed record TestParentInfo(Guid Id, int? ExternalId, WorkTypeTier Tier, int LevelOrder, Guid? ProjectId = null) : IWorkItemParentInfo;
 }

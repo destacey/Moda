@@ -60,6 +60,9 @@ public class WorkItemFaker : PrivateConstructorFaker<WorkItem>
         RuleFor(x => x.Priority, f => f.Random.Int(1, 4));
         RuleFor(x => x.StackRank, f => f.Random.Double(1000, 100000));
 
+        RuleFor(x => x.ProjectId, f => null);
+        RuleFor(x => x.ParentProjectId, f => null);
+
         RuleFor(x => x.Created, created);
         RuleFor(x => x.CreatedById, f => f.Random.Guid());
         RuleFor(x => x.LastModified, f => f.Date.Recent().AsUtc().ToInstant());
@@ -73,7 +76,7 @@ public class WorkItemFaker : PrivateConstructorFaker<WorkItem>
 
 public static class WorkItemFakerExtensions
 {
-    public static WorkItemFaker WithData(this WorkItemFaker faker, Guid? workspaceId = null, string? title = null, WorkType? type = null, WorkStatus? status = null, WorkStatusCategory? statusCategory = null, Guid? parentId = null, Instant? created = null, Guid? createdById = null, Instant? lastModified = null, Guid? lastModifiedById = null, Guid? assignedToId = null, int? priority = null, double? stackRank = null, Instant? activatedTimestamp = null, Instant? doneTimestamp = null)
+    public static WorkItemFaker WithData(this WorkItemFaker faker, Guid? workspaceId = null, string? title = null, WorkType? type = null, WorkStatus? status = null, WorkStatusCategory? statusCategory = null, Guid? parentId = null, Instant? created = null, Guid? createdById = null, Instant? lastModified = null, Guid? lastModifiedById = null, Guid? assignedToId = null, int? priority = null, double? stackRank = null, Guid? projectId = null, Guid? parentProjectId = null, Instant? activatedTimestamp = null, Instant? doneTimestamp = null)
     {
         if (workspaceId.HasValue) { faker.RuleFor(x => x.WorkspaceId, workspaceId.Value); }
         if (!string.IsNullOrWhiteSpace(title)) { faker.RuleFor(x => x.Title, title); }
@@ -88,6 +91,8 @@ public static class WorkItemFakerExtensions
         if (assignedToId.HasValue) { faker.RuleFor(x => x.AssignedToId, assignedToId.Value); }
         if (priority.HasValue) { faker.RuleFor(x => x.Priority, priority.Value); }
         if (stackRank.HasValue) { faker.RuleFor(x => x.StackRank, stackRank.Value); }
+        if (projectId.HasValue) { faker.RuleFor(x => x.ProjectId, projectId.Value); }
+        if (parentProjectId.HasValue) { faker.RuleFor(x => x.ParentProjectId, parentProjectId.Value); }
         if (activatedTimestamp.HasValue) { faker.RuleFor(x => x.ActivatedTimestamp, activatedTimestamp.Value); }
         if (doneTimestamp.HasValue) { faker.RuleFor(x => x.DoneTimestamp, doneTimestamp.Value); }
 
