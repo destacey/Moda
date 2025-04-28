@@ -1,10 +1,13 @@
 ﻿using Moda.Common.Application.Models;
+using Moda.Planning.Application.PlanningIntervals.Queries;
 using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Ppm.Projects;
+using Moda.Work.Application.WorkItems.Dtos;
+using Moda.Work.Application.WorkItems.Queries;
 
 namespace Moda.Web.Api.Controllers.Ppm;
 
@@ -131,6 +134,21 @@ public class ProjectsController(ILogger<ProjectsController> logger, ISender send
 
         return result.IsSuccess
             ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("{id}/work-items")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Projects)]
+    [OpenApiOperation("Get work items for a project.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IEnumerable<WorkItemListDto>>> GetProjectWorkItems(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new GetProjectWorkItemsQuery(id), cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(result.Value.OrderBy(w => w.StackRank))
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 }

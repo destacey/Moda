@@ -39,6 +39,7 @@ export enum QueryTags {
   PortfolioProjects = 'Ppm.Portfolio.Project',
   PortfolioStrategicInitiatives = 'Ppm.Portfolio.StrategicInitiatives',
   Project = 'Ppm.Project',
+  ProjectWorkItems = 'Ppm.Project.WorkItems',
   StrategicInitiative = 'Ppm.StrategicInitiative',
   StrategicInitiativeKpi = 'Ppm.StrategicInitiativeKpi',
   StrategicInitiativeKpiCheckpoint = 'Ppm.StrategicInitiativeKpiCheckpoint',

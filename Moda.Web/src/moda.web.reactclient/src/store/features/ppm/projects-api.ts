@@ -6,6 +6,7 @@ import {
   ProjectListDto,
   ProjectDetailsDto,
   UpdateProjectRequest,
+  WorkItemListDto,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
 
@@ -146,6 +147,21 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+    getProjectWorkItems: builder.query<WorkItemListDto[], string>({
+      queryFn: async (id) => {
+        try {
+          const data = await getProjectsClient().getProjectWorkItems(id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result) => [
+        QueryTags.WorkItem,
+        ...result.map(({ key }) => ({ type: QueryTags.ProjectWorkItems, key })),
+      ],
+    }),
   }),
 })
 
@@ -158,4 +174,5 @@ export const {
   useCompleteProjectMutation,
   useCancelProjectMutation,
   useDeleteProjectMutation,
+  useGetProjectWorkItemsQuery,
 } = projectsApi

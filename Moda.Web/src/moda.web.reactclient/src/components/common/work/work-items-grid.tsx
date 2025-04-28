@@ -19,6 +19,7 @@ export interface WorkItemsGridProps {
   workItems: WorkItemListDto[]
   isLoading: boolean
   refetch: () => void
+  hideProjectColumn?: boolean
 }
 
 const WorkItemLinkCellRenderer = ({ value, data }) => {
@@ -125,6 +126,7 @@ const WorkItemsGrid = (props: WorkItemsGridProps) => {
         field: 'project.name',
         headerName: 'Project',
         width: 300,
+        hide: props.hideProjectColumn,
         cellRenderer: ProjectLinkCellRenderer,
       },
     ],
