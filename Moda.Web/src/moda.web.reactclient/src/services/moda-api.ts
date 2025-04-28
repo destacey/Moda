@@ -15734,6 +15734,7 @@ export interface WorkItemListDto {
     team?: WorkTeamNavigationDto | undefined;
     assignedTo?: EmployeeNavigationDto | undefined;
     stackRank: number;
+    project?: WorkProjectNavigationDto | undefined;
     externalViewWorkItemUrl?: string | undefined;
 }
 
@@ -15756,6 +15757,9 @@ export interface WorkItemNavigationDto {
 
 export interface WorkTeamNavigationDto extends NavigationDto {
     type?: string;
+}
+
+export interface WorkProjectNavigationDto extends NavigationDto {
 }
 
 export interface WorkItemProgressDailyRollupDto extends WorkItemProgressRollupDto {
@@ -16153,6 +16157,7 @@ export interface WorkItemDetailsDto {
     lastModifiedBy?: EmployeeNavigationDto | undefined;
     activatedTimestamp?: Date | undefined;
     doneTimestamp?: Date | undefined;
+    project?: WorkProjectNavigationDto | undefined;
     externalViewWorkItemUrl?: string | undefined;
 }
 
@@ -16431,6 +16436,7 @@ export interface WorkItemBacklogItemDto {
     created: Date;
     rank: number;
     parentRank?: number | undefined;
+    project?: WorkProjectNavigationDto | undefined;
     externalViewWorkItemUrl?: string | undefined;
     stackRank: number;
 }

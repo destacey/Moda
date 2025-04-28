@@ -1,5 +1,4 @@
-﻿using Moda.Common.Domain.Events.ProjectPortfolioManagement;
-using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
+﻿using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
 
 namespace Moda.Work.Domain.Models;
 

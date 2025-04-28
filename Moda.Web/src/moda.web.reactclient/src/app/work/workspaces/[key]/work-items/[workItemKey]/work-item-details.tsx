@@ -42,6 +42,15 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
             'No Parent'
           )}
         </Item>
+        <Item label="Project">
+          {workItem.project ? (
+            <Link href={`/ppm/projects/${workItem.project.key}`}>
+              {workItem.project.name}
+            </Link>
+          ) : (
+            'No Parent'
+          )}
+        </Item>
         <Item label="Assigned To">
           {workItem.assignedTo ? (
             <Link href={`/organizations/employees/${workItem.assignedTo.key}`}>

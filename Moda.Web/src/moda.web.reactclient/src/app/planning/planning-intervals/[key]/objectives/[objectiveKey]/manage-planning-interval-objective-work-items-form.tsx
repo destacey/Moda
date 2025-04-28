@@ -63,6 +63,11 @@ const workItemColDefs: ColDef<WorkItemListDto>[] = [
     headerName: 'Parent Key',
     width: 125,
   },
+  {
+    field: 'project.name',
+    headerName: 'Project',
+    width: 200,
+  },
 ]
 
 const leftColDefs = [...asDraggableColDefs(workItemColDefs)]

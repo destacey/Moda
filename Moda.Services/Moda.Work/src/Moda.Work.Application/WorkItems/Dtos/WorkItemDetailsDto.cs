@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
+using Moda.Work.Application.WorkProjects.Dtos;
 using Moda.Work.Application.Workspaces.Dtos;
 using Moda.Work.Application.WorkTeams.Dtos;
 
@@ -25,6 +26,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
     public EmployeeNavigationDto? LastModifiedBy { get; set; }
     public Instant? ActivatedTimestamp { get; set; }
     public Instant? DoneTimestamp { get; set; }
+    public WorkProjectNavigationDto? Project { get; set; }
     public string? ExternalViewWorkItemUrl { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
@@ -38,6 +40,11 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))
             .Map(dest => dest.CreatedBy, src => src.CreatedBy == null ? null : EmployeeNavigationDto.From(src.CreatedBy))
             .Map(dest => dest.LastModifiedBy, src => src.LastModifiedBy == null ? null : EmployeeNavigationDto.From(src.LastModifiedBy))
+            .Map(dest => dest.Project, src => src.Project != null
+                ? WorkProjectNavigationDto.From(src.Project)
+                : src.ParentProject != null
+                    ? WorkProjectNavigationDto.From(src.ParentProject)
+                    : null)
             .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}");
     }
 }

@@ -15491,6 +15491,14 @@
             "type": "number",
             "format": "double"
           },
+          "project": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkProjectNavigationDto"
+              }
+            ]
+          },
           "externalViewWorkItemUrl": {
             "type": "string",
             "nullable": true
@@ -15578,6 +15586,17 @@
                 "type": "string"
               }
             }
+          }
+        ]
+      },
+      "WorkProjectNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
           }
         ]
       },
@@ -17261,6 +17280,14 @@
             "format": "date-time",
             "nullable": true
           },
+          "project": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkProjectNavigationDto"
+              }
+            ]
+          },
           "externalViewWorkItemUrl": {
             "type": "string",
             "nullable": true
@@ -18375,6 +18402,14 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "project": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkProjectNavigationDto"
+              }
+            ]
           },
           "externalViewWorkItemUrl": {
             "type": "string",
