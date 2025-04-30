@@ -275,6 +275,13 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
     /// <returns></returns>
     public Result UpdateProjectId(Guid? projectId)
     {
+        Guard.Against.Null(Type?.Level, nameof(Type.Level));
+
+        if (Type.Level.Tier is not WorkTypeTier.Portfolio)
+        {
+            return Result.Failure("Only portfolio tier work items can have a project id.");
+        }
+
         ProjectId = projectId;
 
         TryResetProjectId();
