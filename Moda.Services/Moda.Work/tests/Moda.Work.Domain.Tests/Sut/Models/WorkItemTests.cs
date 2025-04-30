@@ -220,6 +220,46 @@ public class WorkItemTests
     }
 
     [Fact]
+    public void UpdateParent_FeatureWithProjectId_SetEpicParentWithDifferentProjectId_ShouldSucceed()
+    {
+        // Arrange
+        var featureWorkType = _workTypeFaker.AsFeature().Generate();
+        var epicWorkType = _workTypeFaker.AsEpic().Generate();
+        var featureProjectId = Guid.NewGuid();
+        var workItem = _workItemFaker.WithData(type: featureWorkType, parentId: Guid.NewGuid(), projectId: featureProjectId).Generate();
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, epicWorkType.Level!.Tier, epicWorkType.Level.Order, Guid.NewGuid());
+
+        // Act
+        var result = workItem.UpdateParent(parentInfo, workItem.Type);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        workItem.ParentId.Should().Be(parentInfo.Id);
+        workItem.ParentProjectId.Should().Be(parentInfo.ProjectId);
+        workItem.ProjectId.Should().Be(featureProjectId);
+    }
+
+    [Fact]
+    public void UpdateParent_FeatureWithProjectId_SetEpicParentWithSameProjectId_ShouldSucceed()
+    {
+        // Arrange
+        var featureWorkType = _workTypeFaker.AsFeature().Generate();
+        var epicWorkType = _workTypeFaker.AsEpic().Generate();
+        var projectId = Guid.NewGuid();
+        var workItem = _workItemFaker.WithData(type: featureWorkType, parentId: Guid.NewGuid(), projectId: projectId).Generate();
+        var parentInfo = new TestParentInfo(Guid.NewGuid(), 123456, epicWorkType.Level!.Tier, epicWorkType.Level.Order, projectId);
+
+        // Act
+        var result = workItem.UpdateParent(parentInfo, workItem.Type);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        workItem.ParentId.Should().Be(parentInfo.Id);
+        workItem.ParentProjectId.Should().Be(projectId);
+        workItem.ProjectId.Should().BeNull();
+    }
+
+    [Fact]
     public void UpdateParent_StoryWithParent_SetStoryParent_ShouldFail()
     {
         // Arrange

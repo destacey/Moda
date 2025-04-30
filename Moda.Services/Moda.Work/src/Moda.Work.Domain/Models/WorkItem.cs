@@ -216,6 +216,8 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         if (currentWorkType.Level.Tier is not WorkTypeTier.Other)
         {
             ParentProjectId = parentInfo?.ProjectId;
+
+            TryResetProjectId();
         }
 
         return Result.Success();
@@ -273,6 +275,17 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         }
 
         return Result.Success();
+    }
+
+    /// <summary>
+    /// Resets the project id if the parent project id is the same as the work item project id.
+    /// </summary>
+    private void TryResetProjectId()
+    {
+        if (ProjectId.HasValue && ProjectId == ParentProjectId)
+        {
+            ProjectId = null;
+        }
     }
 
     private void SetActivatedTimestamp(Instant? activatedTimestamp, Instant created, Instant? doneTimestamp)
