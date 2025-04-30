@@ -7832,7 +7832,7 @@
         ]
       }
     },
-    "/api/work/workspaces/{id}/work-items/{workItemKey}/update-project": {
+    "/api/work/workspaces/{id}/work-items/{workItemId}/update-project": {
       "put": {
         "tags": [
           "Workspaces"
@@ -7853,11 +7853,14 @@
             "x-position": 1
           },
           {
-            "name": "workItemKey",
+            "name": "workItemId",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
             },
             "x-position": 2
           }
@@ -17526,14 +17529,15 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "workItemKey"
+          "workItemId"
         ],
         "properties": {
-          "workItemKey": {
+          "workItemId": {
             "type": "string",
-            "maxLength": 256,
+            "format": "guid",
             "minLength": 1,
-            "nullable": false
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
           },
           "projectId": {
             "type": "string",

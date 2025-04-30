@@ -65,10 +65,9 @@ const TeamDetailsPage = (props: { params: Promise<{ key: number }> }) => {
   const [risksQueryEnabled, setRisksQueryEnabled] = useState<boolean>(false)
   const [includeClosedRisks, setIncludeClosedRisks] = useState<boolean>(false)
 
-  const { hasClaim } = useAuth()
-  const canUpdateTeam = hasClaim('Permission', 'Permissions.Teams.Update')
-  const canManageTeamMemberships = hasClaim(
-    'Permission',
+  const { hasPermissionClaim } = useAuth()
+  const canUpdateTeam = hasPermissionClaim('Permissions.Teams.Update')
+  const canManageTeamMemberships = hasPermissionClaim(
     'Permissions.Teams.ManageTeamMemberships',
   )
 

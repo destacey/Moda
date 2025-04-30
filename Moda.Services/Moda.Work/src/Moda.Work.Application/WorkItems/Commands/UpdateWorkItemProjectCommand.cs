@@ -4,13 +4,13 @@ using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Commands;
 
-public sealed record UpdateWorkItemProjectCommand(WorkItemKey WorkItemKey, Guid? ProjectId) : ICommand;
+public sealed record UpdateWorkItemProjectCommand(Guid WorkItemId, Guid? ProjectId) : ICommand;
 
 public sealed class UpdateWorkItemProjectCommandValidator : AbstractValidator<UpdateWorkItemProjectCommand>
 {
     public UpdateWorkItemProjectCommandValidator()
     {
-        RuleFor(x => x.WorkItemKey)
+        RuleFor(x => x.WorkItemId)
             .NotNull();
 
         When(x => x.ProjectId.HasValue, () =>
@@ -36,12 +36,14 @@ internal sealed class UpdateWorkItemProjectCommandHandler(
             var workItem = await _workDbContext.WorkItems
                 .Include(i => i.Type)
                     .ThenInclude(t => t.Level)
-                .FirstOrDefaultAsync(w => w.Key == request.WorkItemKey, cancellationToken);
+                .FirstOrDefaultAsync(w => w.Id == request.WorkItemId, cancellationToken);
             if (workItem is null)
             {
-                _logger.LogInformation("Work item {WorkItemKey} not found.", request.WorkItemKey);
+                _logger.LogInformation("Work item {WorkItemId} not found.", request.WorkItemId);
                 return Result.Failure("Work item not found.");
             }
+
+            var originalProjectId = workItem.ProjectId;
 
             var result = workItem.UpdateProjectId(request.ProjectId);
             if (result.IsFailure)
@@ -50,17 +52,20 @@ internal sealed class UpdateWorkItemProjectCommandHandler(
                 await _workDbContext.Entry(workItem).ReloadAsync(cancellationToken);
                 workItem.ClearDomainEvents();
 
-                _logger.LogError("Unable to update work item {WorkItemKey} project id to {ProjectId}. Error message: {Error}", request.WorkItemKey, request.ProjectId?.ToString() ?? "null", result.Error);
+                _logger.LogError("Unable to update work item {WorkItemId} project id to {ProjectId}. Error message: {Error}", request.WorkItemId, request.ProjectId?.ToString() ?? "null", result.Error);
                 return Result.Failure(result.Error);
             }
 
             await _workDbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Work item {WorkItemKey} project id updated.", request.WorkItemKey);
+            _logger.LogInformation("Work item {WorkItemId} project id updated.", request.WorkItemId);
 
-            await UpdateChildren(workItem.Adapt<WorkItemParentInfo>(), cancellationToken);
+            if (originalProjectId != workItem.ProjectId)
+            {
+                await UpdateChildren(workItem.Adapt<WorkItemParentInfo>(), cancellationToken);
 
-            _logger.LogInformation("Work item {WorkItemKey} descendants updated.", request.WorkItemKey);
+                _logger.LogInformation("Work item {WorkItemId} descendants updated.", request.WorkItemId);
+            }
 
             return Result.Success();
         }

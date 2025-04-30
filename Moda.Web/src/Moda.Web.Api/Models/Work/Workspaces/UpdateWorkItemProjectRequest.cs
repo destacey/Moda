@@ -1,16 +1,15 @@
 ﻿using Moda.Work.Application.WorkItems.Commands;
-using Moda.Work.Domain.Models;
 
 namespace Moda.Web.Api.Models.Work.Workspaces;
 
 public class UpdateWorkItemProjectRequest
 {
-    public string WorkItemKey { get; set; } = default!;
+    public Guid WorkItemId { get; set; }
     public Guid? ProjectId { get; set; }
 
     public UpdateWorkItemProjectCommand ToUpdateWorkItemProjectCommand()
     {
-        return new UpdateWorkItemProjectCommand(new WorkItemKey(WorkItemKey), ProjectId);
+        return new UpdateWorkItemProjectCommand(WorkItemId, ProjectId);
     }
 }
 
@@ -18,9 +17,8 @@ public sealed class UpdateWorkItemProjectRequestValidator : CustomValidator<Upda
 {
     public UpdateWorkItemProjectRequestValidator()
     {
-        RuleFor(c => c.WorkItemKey)
-            .NotEmpty()
-            .MaximumLength(256);
+        RuleFor(c => c.WorkItemId)
+            .NotEmpty();
 
         When(x => x.ProjectId.HasValue, () =>
         {

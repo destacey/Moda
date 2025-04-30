@@ -9655,14 +9655,14 @@ export class WorkspacesClient {
     /**
      * Update the project for a work item.
      */
-    updateWorkItemProject(id: string, workItemKey: string, request: UpdateWorkItemProjectRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/work/workspaces/{id}/work-items/{workItemKey}/update-project";
+    updateWorkItemProject(id: string, workItemId: string, request: UpdateWorkItemProjectRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/work/workspaces/{id}/work-items/{workItemId}/update-project";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        if (workItemKey === undefined || workItemKey === null)
-            throw new Error("The parameter 'workItemKey' must be defined.");
-        url_ = url_.replace("{workItemKey}", encodeURIComponent("" + workItemKey));
+        if (workItemId === undefined || workItemId === null)
+            throw new Error("The parameter 'workItemId' must be defined.");
+        url_ = url_.replace("{workItemId}", encodeURIComponent("" + workItemId));
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -16372,7 +16372,7 @@ export interface WorkItemProjectInfoDto {
 }
 
 export interface UpdateWorkItemProjectRequest {
-    workItemKey: string;
+    workItemId: string;
     projectId?: string | undefined;
 }
 

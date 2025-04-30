@@ -69,10 +69,11 @@ export const workspaceApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          await getWorkspacesClient().setExternalUrlTemplates(
+          const data = await getWorkspacesClient().setExternalUrlTemplates(
             request.workspaceId,
             request.externalUrlTemplatesRequest,
           )
+          return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -136,15 +137,20 @@ export const workspaceApi = apiSlice.injectEndpoints({
     }),
     updateWorkItemProject: builder.mutation<
       void,
-      { workspaceIdOrKey: string; request: UpdateWorkItemProjectRequest }
+      {
+        workspaceId: string
+        request: UpdateWorkItemProjectRequest
+        cacheKey: string
+      }
     >({
-      queryFn: async ({ workspaceIdOrKey, request }) => {
+      queryFn: async ({ workspaceId, request }) => {
         try {
-          await getWorkspacesClient().updateWorkItemProject(
-            workspaceIdOrKey,
-            request.workItemKey,
+          const data = await getWorkspacesClient().updateWorkItemProject(
+            workspaceId,
+            request.workItemId,
             request,
           )
+          return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -152,8 +158,8 @@ export const workspaceApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: (result, error, arg) => [
         // TODO: there are a few more tags that need to be invalidated here
-        { type: QueryTags.WorkItem, id: arg.request.workItemKey },
-        { type: QueryTags.WorkItemChildren, id: arg.request.workItemKey },
+        { type: QueryTags.WorkItem, id: arg.cacheKey },
+        { type: QueryTags.WorkItemChildren, id: arg.cacheKey },
       ],
     }),
     getChildWorkItems: builder.query<
@@ -249,6 +255,7 @@ export const {
   useGetWorkItemsQuery,
   useGetWorkItemQuery,
   useGetWorkItemProjectInfoQuery,
+  useUpdateWorkItemProjectMutation,
   useGetChildWorkItemsQuery,
   useGetWorkItemDependenciesQuery,
   useGetWorkItemMetricsQuery,
