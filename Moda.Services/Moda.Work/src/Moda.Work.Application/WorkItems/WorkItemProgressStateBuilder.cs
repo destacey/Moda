@@ -10,9 +10,9 @@ internal sealed class WorkItemProgressStateBuilder(IWorkDbContext workDbContext,
 
     public async Task<List<WorkItemProgressStateDto>> Build(CancellationToken cancellationToken)
     {
-        var removedCategory = WorkStatusCategory.Removed; // temporary filter until we get the date from history
-        var requirementTier = WorkTypeTier.Requirement;
-        var portfolioTier = WorkTypeTier.Portfolio;
+        const WorkStatusCategory removedCategory = WorkStatusCategory.Removed;  // temporary filter until we get the date from history
+        const WorkTypeTier requirementTier = WorkTypeTier.Requirement;
+        const WorkTypeTier portfolioTier = WorkTypeTier.Portfolio;
 
         // TODO: should work types in the Task or Other Tier be excluded from the rollup?
         var initialWorkItems = await _workItemsQuery
@@ -25,7 +25,7 @@ internal sealed class WorkItemProgressStateBuilder(IWorkDbContext workDbContext,
             return initialWorkItems;
 
         var portfolioItems = (await _workDbContext.WorkTypeHierarchies
-            .SelectMany(h => h.Levels.Where(l => l.Tier == WorkTypeTier.Portfolio))
+            .SelectMany(h => h.Levels.Where(l => l.Tier == portfolioTier))
             .Select(w => w.Order)
             .Distinct()
             .ToArrayAsync(cancellationToken))
@@ -36,22 +36,21 @@ internal sealed class WorkItemProgressStateBuilder(IWorkDbContext workDbContext,
         var rollupItemIds = new HashSet<Guid>();
         foreach (var item in initialWorkItems)
         {
-            if (item.Tier == WorkTypeTier.Portfolio)
+            if (item.Tier == portfolioTier)
             {
                 UpdatePortfolioItems(portfolioItems, item);
             }
-            else if (!rollupItemIds.Contains(item.Id))
+            else if (rollupItemIds.Add(item.Id))
             {
                 rollupItems.Add(item);
-                rollupItemIds.Add(item.Id);
             }
         }
 
-        var startingLevel = portfolioItems.Keys.Min();
-        var endingLevel = portfolioItems.Keys.Max();
-
         if (portfolioItems.Count != 0)
         {
+            var startingLevel = portfolioItems.Keys.Min();
+            var endingLevel = portfolioItems.Keys.Max();
+
             for (var i = startingLevel; i < (endingLevel + 1); i++)
             {
                 // this assumes that the levels are in order and there are no gaps in the levels.
@@ -66,17 +65,16 @@ internal sealed class WorkItemProgressStateBuilder(IWorkDbContext workDbContext,
 
                 foreach (var item in levelItems)
                 {
-                    if (item.Tier == WorkTypeTier.Portfolio)
+                    if (item.Tier == portfolioTier)
                     {
                         if (item.LevelOrder <= i)
                             continue;  // skip items that are not in the next level.  This should not happen, but just in case. Work Items shouldn't have parents in a higher level.
 
                         UpdatePortfolioItems(portfolioItems, item);
                     }
-                    else if (!rollupItemIds.Contains(item.Id))
+                    else if (rollupItemIds.Add(item.Id))
                     {
                         rollupItems.Add(item);
-                        rollupItemIds.Add(item.Id);
                     }
                 }
             }

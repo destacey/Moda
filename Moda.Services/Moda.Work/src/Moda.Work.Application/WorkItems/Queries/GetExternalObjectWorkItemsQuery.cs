@@ -4,12 +4,9 @@ using Moda.Work.Application.WorkItems.Dtos;
 namespace Moda.Work.Application.WorkItems.Queries;
 public sealed record GetExternalObjectWorkItemsQuery(Guid ObjectId) : IQuery<WorkItemsSummaryDto>;
 
-internal sealed class GetExternalObjectWorkItemsQueryHandler(IWorkDbContext workDbContext, ILogger<GetExternalObjectWorkItemsQueryHandler> logger) : IQueryHandler<GetExternalObjectWorkItemsQuery, WorkItemsSummaryDto>
+internal sealed class GetExternalObjectWorkItemsQueryHandler(IWorkDbContext workDbContext) : IQueryHandler<GetExternalObjectWorkItemsQuery, WorkItemsSummaryDto>
 {
-    private const string AppRequestName = nameof(GetExternalObjectWorkItemsQuery);
-
     private readonly IWorkDbContext _workDbContext = workDbContext;
-    private readonly ILogger<GetExternalObjectWorkItemsQueryHandler> _logger = logger;
 
     public async Task<WorkItemsSummaryDto> Handle(GetExternalObjectWorkItemsQuery request, CancellationToken cancellationToken)
     {

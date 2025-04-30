@@ -29,43 +29,25 @@ public record WorkItemProgressRollupDto
 
     public static WorkItemProgressRollupDto Create(List<WorkItemProgressStateDto> workItems)
     {
-        int proposed = 0, active = 0, done = 0;
+        var counts = workItems
+            .GroupBy(w => w.StatusCategory)
+            .ToDictionary(g => g.Key, g => g.Count());
 
-        foreach (var workItem in workItems)
+        return new WorkItemProgressRollupDto
         {
-            switch (workItem.StatusCategory)
-            {
-                case WorkStatusCategory.Proposed:
-                    proposed++;
-                    break;
-                case WorkStatusCategory.Active:
-                    active++;
-                    break;
-                case WorkStatusCategory.Done:
-                    done++;
-                    break;
-            }
-        }
-
-        return Create(proposed, active, done);
+            Proposed = counts.GetValueOrDefault(WorkStatusCategory.Proposed, 0),
+            Active = counts.GetValueOrDefault(WorkStatusCategory.Active, 0),
+            Done = counts.GetValueOrDefault(WorkStatusCategory.Done, 0)
+        };
     }
 
     public static WorkItemProgressRollupDto Create(List<WorkItemProgressRollupDto> rollups)
     {
-        int proposed = 0, active = 0, done = 0;
-
-        foreach (var rollup in rollups)
-        {
-            proposed += rollup.Proposed;
-            active += rollup.Active;
-            done += rollup.Done;
-        }
-
         return new WorkItemProgressRollupDto
         {
-            Proposed = proposed,
-            Active = active,
-            Done = done
+            Proposed = rollups.Sum(r => r.Proposed),
+            Active = rollups.Sum(r => r.Active),
+            Done = rollups.Sum(r => r.Done)
         };
     }
 }
