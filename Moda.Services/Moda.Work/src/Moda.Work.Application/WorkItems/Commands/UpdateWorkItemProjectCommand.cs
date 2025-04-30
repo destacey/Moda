@@ -1,4 +1,5 @@
 ﻿using Moda.Work.Application.Persistence;
+using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Commands;
 
@@ -32,6 +33,8 @@ internal sealed class UpdateWorkItemProjectCommandHandler(
         try
         {
             var workItem = await _workDbContext.WorkItems
+                .Include(i => i.Type)
+                    .ThenInclude(t => t.Level)
                 .FirstOrDefaultAsync(w => w.Key == request.WorkItemKey, cancellationToken);
             if (workItem is null)
             {

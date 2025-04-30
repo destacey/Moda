@@ -7766,6 +7766,72 @@
         ]
       }
     },
+    "/api/work/workspaces/{idOrKey}/work-items/{workItemKey}/project-info": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get a work item's project info.",
+        "operationId": "Workspaces_GetWorkItemProjectInfo",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "workItemKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkItemProjectInfoDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/work/workspaces/{id}/work-items/{workItemKey}/update-project": {
       "put": {
         "tags": [
@@ -17418,6 +17484,41 @@
           "externalViewWorkItemUrl": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "WorkItemProjectInfoDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "project": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkProjectNavigationDto"
+              }
+            ]
+          },
+          "parentProject": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkProjectNavigationDto"
+              }
+            ]
           }
         }
       },

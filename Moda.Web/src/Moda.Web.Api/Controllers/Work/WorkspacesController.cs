@@ -137,6 +137,39 @@ public class WorkspacesController(ISender sender) : ControllerBase
                 : NotFound();
     }
 
+    [HttpGet("{idOrKey}/work-items/{workItemKey}/project-info")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
+    [OpenApiOperation("Get a work item's project info.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<WorkItemProjectInfoDto>> GetWorkItemProjectInfo(string idOrKey, string workItemKey, CancellationToken cancellationToken)
+    {
+        // TODO: allow work item key or id
+        var key = new WorkItemKey(workItemKey);
+        GetWorkItemProjectInfoQuery query;
+        if (Guid.TryParse(idOrKey, out Guid guidId))
+        {
+            query = new GetWorkItemProjectInfoQuery(guidId, key);
+        }
+        else if (idOrKey.IsValidWorkspaceKeyFormat())
+        {
+            query = new GetWorkItemProjectInfoQuery(new WorkspaceKey(idOrKey), key);
+        }
+        else
+        {
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
+        }
+
+        var result = await _sender.Send(query, cancellationToken);
+
+        return result.IsFailure
+            ? BadRequest(result.ToBadRequestObject(HttpContext))
+            : result.Value is not null
+                ? result.Value
+                : NotFound();
+    }
+
     [HttpPut("{id}/work-items/{workItemKey}/update-project")]
     [MustHavePermission(ApplicationAction.ManageProjectWorkItems, ApplicationResource.Projects)]
     [OpenApiOperation("Update the project for a work item.", "")]
