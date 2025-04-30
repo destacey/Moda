@@ -7766,6 +7766,70 @@
         ]
       }
     },
+    "/api/work/workspaces/{id}/work-items/{workItemKey}/update-project": {
+      "put": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Update the project for a work item.",
+        "operationId": "Workspaces_UpdateProjectId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "workItemKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkItemProjectRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/work/workspaces/{idOrKey}/work-items/{workItemKey}/children": {
       "get": {
         "tags": [
@@ -17354,6 +17418,27 @@
           "externalViewWorkItemUrl": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "UpdateWorkItemProjectRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workItemKey"
+        ],
+        "properties": {
+          "workItemKey": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "nullable": false
+          },
+          "projectId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           }
         }
       },

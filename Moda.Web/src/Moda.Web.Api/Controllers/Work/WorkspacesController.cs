@@ -1,6 +1,7 @@
 ﻿using Moda.Common.Extensions;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Work.Workspaces;
+using Moda.Work.Application.WorkItems.Commands;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
 using Moda.Work.Application.Workspaces.Commands;
@@ -134,6 +135,22 @@ public class WorkspacesController(ISender sender) : ControllerBase
             : result.Value is not null
                 ? result.Value
                 : NotFound();
+    }
+
+    [HttpPut("{id}/work-items/{workItemKey}/update-project")]
+    [MustHavePermission(ApplicationAction.ManageProjectWorkItems, ApplicationResource.Projects)]
+    [OpenApiOperation("Update the project for a work item.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdateProjectId(Guid id, string workItemKey, [FromBody] UpdateWorkItemProjectRequest request, CancellationToken cancellationToken)
+    {
+        if (workItemKey != request.WorkItemKey)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
+
+        var result = await _sender.Send(request.ToUpdateWorkItemProjectCommand(), cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpGet("{idOrKey}/work-items/{workItemKey}/children")]

@@ -110,6 +110,9 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
     // TODO: other systems will use different types.  How to handle this?
     public double StackRank { get; private set; }
 
+    /// <summary>
+    /// The overriding project id of the work item.  It is used to override the project id coming from the parent work item.
+    /// </summary>
     public Guid? ProjectId { get; private set; }
 
     public WorkProject? Project { get; private set; }
@@ -118,6 +121,10 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
 
     public WorkProject? ParentProject { get; private set; }
 
+    /// <summary>
+    /// Returns the effective project for this work item, with priority given to direct assignment.
+    /// Uses this work item's ProjectId if set, otherwise falls back to the ParentProjectId inheritance.
+    /// </summary>
     public Guid? CurrentProjectId => ProjectId ?? ParentProjectId;
 
     public Instant? ActivatedTimestamp { get; private set; }
@@ -171,22 +178,6 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         {
             ExtendedProps = null;
         }
-    }
-
-    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
-    {
-        Guard.Against.Null(workspace, nameof(workspace));
-        Guard.Against.Null(workType, nameof(workType));
-
-        if (workspace.Ownership != Ownership.Managed)
-        {
-            throw new InvalidOperationException("Only managed workspaces can have external work items.");
-        }
-        
-        var key = new WorkItemKey(workspace.Key, externalId);
-        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, teamId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, activatedTimestamp, doneTimestamp, extendedProps);
-
-        //var result = workspace.AddWorkItem(workItem);  // this is handled in the handler for performance reasons
     }
 
     // TODO: Running into EF issues when set the WorkType directly. So adding it for the check.
@@ -275,6 +266,36 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         }
 
         return Result.Success();
+    }
+
+    /// <summary>
+    /// Updates the project id of the work item.  If the project id is the same as the parent project id, it will be set to null.
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <returns></returns>
+    public Result UpdateProjectId(Guid? projectId)
+    {
+        ProjectId = projectId;
+
+        TryResetProjectId();
+
+        return Result.Success();
+    }
+
+    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    {
+        Guard.Against.Null(workspace, nameof(workspace));
+        Guard.Against.Null(workType, nameof(workType));
+
+        if (workspace.Ownership != Ownership.Managed)
+        {
+            throw new InvalidOperationException("Only managed workspaces can have external work items.");
+        }
+
+        var key = new WorkItemKey(workspace.Key, externalId);
+        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, teamId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, activatedTimestamp, doneTimestamp, extendedProps);
+
+        //var result = workspace.AddWorkItem(workItem);  // this is handled in the handler for performance reasons
     }
 
     /// <summary>
