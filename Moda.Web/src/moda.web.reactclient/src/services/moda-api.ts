@@ -9655,7 +9655,7 @@ export class WorkspacesClient {
     /**
      * Update the project for a work item.
      */
-    updateProjectId(id: string, workItemKey: string, request: UpdateWorkItemProjectRequest, cancelToken?: CancelToken): Promise<void> {
+    updateWorkItemProject(id: string, workItemKey: string, request: UpdateWorkItemProjectRequest, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/work/workspaces/{id}/work-items/{workItemKey}/update-project";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -9684,11 +9684,11 @@ export class WorkspacesClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processUpdateProjectId(_response);
+            return this.processUpdateWorkItemProject(_response);
         });
     }
 
-    protected processUpdateProjectId(response: AxiosResponse): Promise<void> {
+    protected processUpdateWorkItemProject(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {

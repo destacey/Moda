@@ -7838,7 +7838,7 @@
           "Workspaces"
         ],
         "summary": "Update the project for a work item.",
-        "operationId": "Workspaces_UpdateProjectId",
+        "operationId": "Workspaces_UpdateWorkItemProject",
         "parameters": [
           {
             "name": "id",

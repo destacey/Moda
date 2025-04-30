@@ -175,7 +175,7 @@ public class WorkspacesController(ISender sender) : ControllerBase
     [OpenApiOperation("Update the project for a work item.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> UpdateProjectId(Guid id, string workItemKey, [FromBody] UpdateWorkItemProjectRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateWorkItemProject(Guid id, string workItemKey, [FromBody] UpdateWorkItemProjectRequest request, CancellationToken cancellationToken)
     {
         if (workItemKey != request.WorkItemKey)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));

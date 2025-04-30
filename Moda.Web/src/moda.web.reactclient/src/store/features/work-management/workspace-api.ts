@@ -4,9 +4,11 @@ import { QueryTags } from '../query-tags'
 import {
   ScopedDependencyDto,
   SetExternalUrlTemplatesRequest,
+  UpdateWorkItemProjectRequest,
   WorkItemDetailsDto,
   WorkItemListDto,
   WorkItemProgressDailyRollupDto,
+  WorkItemProjectInfoDto,
   WorkspaceDto,
   WorkspaceListDto,
 } from '@/src/services/moda-api'
@@ -112,6 +114,48 @@ export const workspaceApi = apiSlice.injectEndpoints({
         { type: QueryTags.WorkItem, id: arg.workItemKey }, // typically arg is the key
       ],
     }),
+    getWorkItemProjectInfo: builder.query<
+      WorkItemProjectInfoDto,
+      GetWorkItemRequest
+    >({
+      queryFn: async (request: GetWorkItemRequest) => {
+        try {
+          const data = await getWorkspacesClient().getWorkItemProjectInfo(
+            request.idOrKey,
+            request.workItemKey,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.WorkItem, id: arg.workItemKey }, // typically arg is the key
+      ],
+    }),
+    updateWorkItemProject: builder.mutation<
+      void,
+      { workspaceIdOrKey: string; request: UpdateWorkItemProjectRequest }
+    >({
+      queryFn: async ({ workspaceIdOrKey, request }) => {
+        try {
+          await getWorkspacesClient().updateWorkItemProject(
+            workspaceIdOrKey,
+            request.workItemKey,
+            request,
+          )
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        // TODO: there are a few more tags that need to be invalidated here
+        { type: QueryTags.WorkItem, id: arg.request.workItemKey },
+        { type: QueryTags.WorkItemChildren, id: arg.request.workItemKey },
+      ],
+    }),
     getChildWorkItems: builder.query<
       WorkItemListDto[],
       GetChildWorkItemsRequest
@@ -204,6 +248,7 @@ export const {
   useGetWorkspaceQuery,
   useGetWorkItemsQuery,
   useGetWorkItemQuery,
+  useGetWorkItemProjectInfoQuery,
   useGetChildWorkItemsQuery,
   useGetWorkItemDependenciesQuery,
   useGetWorkItemMetricsQuery,
