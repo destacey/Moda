@@ -1,6 +1,8 @@
-﻿using Moda.Common.Extensions;
+﻿using CSharpFunctionalExtensions;
+using Moda.Common.Extensions;
 using Moda.Web.Api.Extensions;
 using Moda.Web.Api.Models.Work.Workspaces;
+using Moda.Work.Application.WorkItems.Commands;
 using Moda.Work.Application.WorkItems.Dtos;
 using Moda.Work.Application.WorkItems.Queries;
 using Moda.Work.Application.Workspaces.Commands;
@@ -134,6 +136,56 @@ public class WorkspacesController(ISender sender) : ControllerBase
             : result.Value is not null
                 ? result.Value
                 : NotFound();
+    }
+
+    [HttpGet("{idOrKey}/work-items/{workItemKey}/project-info")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.WorkItems)]
+    [OpenApiOperation("Get a work item's project info.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<WorkItemProjectInfoDto>> GetWorkItemProjectInfo(string idOrKey, string workItemKey, CancellationToken cancellationToken)
+    {
+        // TODO: allow work item key or id
+        var key = new WorkItemKey(workItemKey);
+        GetWorkItemProjectInfoQuery query;
+        if (Guid.TryParse(idOrKey, out Guid guidId))
+        {
+            query = new GetWorkItemProjectInfoQuery(guidId, key);
+        }
+        else if (idOrKey.IsValidWorkspaceKeyFormat())
+        {
+            query = new GetWorkItemProjectInfoQuery(new WorkspaceKey(idOrKey), key);
+        }
+        else
+        {
+            return BadRequest(ProblemDetailsExtensions.ForUnknownIdOrKeyType(HttpContext));
+        }
+
+        var result = await _sender.Send(query, cancellationToken);
+
+        return result.IsFailure
+            ? BadRequest(result.ToBadRequestObject(HttpContext))
+            : result.Value is not null
+                ? result.Value
+                : NotFound();
+    }
+
+    [HttpPut("{id}/work-items/{workItemId}/update-project")]
+    [MustHavePermission(ApplicationAction.ManageProjectWorkItems, ApplicationResource.Projects)]
+    [OpenApiOperation("Update the project for a work item.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdateWorkItemProject(Guid id, Guid workItemId, [FromBody] UpdateWorkItemProjectRequest request, CancellationToken cancellationToken)
+    {
+        if (workItemId != request.WorkItemId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(HttpContext));
+
+        var result = await _sender.Send(request.ToUpdateWorkItemProjectCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
     [HttpGet("{idOrKey}/work-items/{workItemKey}/children")]

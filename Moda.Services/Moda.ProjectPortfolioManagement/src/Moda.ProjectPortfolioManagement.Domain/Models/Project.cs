@@ -1,5 +1,7 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Moda.Common.Domain.Events.ProjectPortfolioManagement;
+using Moda.Common.Domain.Interfaces.ProjectPortfolioManagement;
 using Moda.ProjectPortfolioManagement.Domain.Enums;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using NodaTime;
@@ -9,7 +11,7 @@ namespace Moda.ProjectPortfolioManagement.Domain.Models;
 /// <summary>
 /// Represents an individual project within a portfolio or program.
 /// </summary>
-public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
+public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey, ISimpleProject
 {
     private string _name = default!;
     private string _description = default!;
@@ -136,13 +138,20 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     public bool CanBeDeleted() => Status is ProjectStatus.Proposed;
 
     /// <summary>
-    /// Updates the project details.
+    /// Updates the project's basic details.
     /// </summary>
-    public Result UpdateDetails(string name, string description, int expenditureCategoryId)
+    /// <param name="name"></param>
+    /// <param name="description"></param>
+    /// <param name="expenditureCategoryId"></param>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    public Result UpdateDetails(string name, string description, int expenditureCategoryId, Instant timestamp)
     {
         Name = name;
         Description = description;
         ExpenditureCategoryId = expenditureCategoryId;
+
+        AddDomainEvent(new ProjectDetailsUpdatedEvent(this, ExpenditureCategoryId, timestamp));
 
         return Result.Success();
     }
@@ -320,9 +329,28 @@ public sealed class Project : BaseEntity<Guid>, ISystemAuditable, IHasIdAndKey
     /// <param name="programId"></param>
     /// <param name="roles"></param>
     /// <param name="strategicThemes"></param>
+    /// <param name="timestamp"></param>
     /// <returns></returns>
-    internal static Project Create(string name, string description, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId, Dictionary<ProjectRole, HashSet<Guid>>? roles = null, HashSet<Guid>? strategicThemes = null)
+    internal static Project Create(string name, string description, int expenditureCategoryId, LocalDateRange? dateRange, Guid portfolioId, Guid? programId, Dictionary<ProjectRole, HashSet<Guid>>? roles, HashSet<Guid>? strategicThemes, Instant timestamp)
     {
-        return new Project(name, description, ProjectStatus.Proposed, expenditureCategoryId, dateRange, portfolioId, programId, roles, strategicThemes);
+        var project = new Project(name, description, ProjectStatus.Proposed, expenditureCategoryId, dateRange, portfolioId, programId, roles, strategicThemes);
+
+        project.AddPostPersistenceAction(() => project.AddDomainEvent(
+            new ProjectCreatedEvent
+            (
+                project, 
+                project.ExpenditureCategoryId, 
+                (int)project.Status, 
+                project.DateRange, 
+                project.PortfolioId, 
+                project.ProgramId,
+                project.Roles
+                    .GroupBy(x => (int)x.Role)
+                    .ToDictionary(x => x.Key, x => x.Select(y => y.EmployeeId).ToArray()),
+                [.. project.StrategicThemeTags.Select(x => x.StrategicThemeId)],
+                timestamp
+            )));
+
+        return project;
     }
 }

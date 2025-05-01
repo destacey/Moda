@@ -3,6 +3,7 @@ using Moda.Common.Domain.Enums;
 using Moda.Common.Domain.Events;
 using Moda.Common.Domain.Interfaces.Organization;
 using Moda.Organization.Domain.Models;
+using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkTeams.EventHandlers;
 

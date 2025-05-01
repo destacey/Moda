@@ -44,13 +44,15 @@ public sealed class UpdateProjectCommandValidator : AbstractValidator<UpdateProj
 
 internal sealed class UpdateProjectCommandHandler(
     IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext,
-    ILogger<UpdateProjectCommandHandler> logger)
+    ILogger<UpdateProjectCommandHandler> logger,
+    IDateTimeProvider dateTimeProvider)
     : ICommandHandler<UpdateProjectCommand>
 {
     private const string AppRequestName = nameof(UpdateProjectCommand);
 
     private readonly IProjectPortfolioManagementDbContext _projectPortfolioManagementDbContext = projectPortfolioManagementDbContext;
     private readonly ILogger<UpdateProjectCommandHandler> _logger = logger;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<Result> Handle(UpdateProjectCommand request, CancellationToken cancellationToken)
     {
@@ -69,7 +71,8 @@ internal sealed class UpdateProjectCommandHandler(
             var updateResult = project.UpdateDetails(
                 request.Name,
                 request.Description,
-                request.ExpenditureCategoryId
+                request.ExpenditureCategoryId,
+                _dateTimeProvider.Now
             );
             if (updateResult.IsFailure)
             {

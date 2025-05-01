@@ -110,6 +110,23 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
     // TODO: other systems will use different types.  How to handle this?
     public double StackRank { get; private set; }
 
+    /// <summary>
+    /// The overriding project id of the work item.  It is used to override the project id coming from the parent work item.
+    /// </summary>
+    public Guid? ProjectId { get; private set; }
+
+    public WorkProject? Project { get; private set; }
+
+    public Guid? ParentProjectId { get; private set; }
+
+    public WorkProject? ParentProject { get; private set; }
+
+    /// <summary>
+    /// Returns the effective project for this work item, with priority given to direct assignment.
+    /// Uses this work item's ProjectId if set, otherwise falls back to the ParentProjectId inheritance.
+    /// </summary>
+    public Guid? CurrentProjectId => ProjectId ?? ParentProjectId;
+
     public Instant? ActivatedTimestamp { get; private set; }
 
     public Instant? DoneTimestamp { get; private set; }
@@ -163,42 +180,37 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         }
     }
 
-    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
-    {
-        Guard.Against.Null(workspace, nameof(workspace));
-        Guard.Against.Null(workType, nameof(workType));
-
-        if (workspace.Ownership != Ownership.Managed)
-        {
-            throw new InvalidOperationException("Only managed workspaces can have external work items.");
-        }
-        
-        var key = new WorkItemKey(workspace.Key, externalId);
-        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, teamId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, activatedTimestamp, doneTimestamp, extendedProps);
-
-        //var result = workspace.AddWorkItem(workItem);  // this is handled in the handler for performance reasons
-    }
-
     // TODO: Running into EF issues when set the WorkType directly. So adding it for the check.
     public Result UpdateParent(IWorkItemParentInfo? parentInfo, WorkType currentWorkType)
     {
-        if (parentInfo is not null && parentInfo.Tier == WorkTypeTier.Portfolio)
+        if (currentWorkType?.Level?.Tier is null)
         {
-            if (currentWorkType?.Level?.Tier is null)
+            return Result.Failure("Unable to set the work item parent without the type and level.");
+        }
+
+        if (parentInfo is not null)
+        {
+            if (parentInfo.Tier != WorkTypeTier.Portfolio)
             {
-                return Result.Failure("Unable to set the work item parent without the type and level.");
+                return Result.Failure("Only portfolio tier work items can be parents.");
             }
-            else if (currentWorkType!.Level!.Tier == WorkTypeTier.Portfolio && currentWorkType.Level.Order <= parentInfo.LevelOrder)
+
+            if (currentWorkType.Level.Tier == WorkTypeTier.Portfolio && currentWorkType.Level.Order <= parentInfo.LevelOrder)
             {
                 return Result.Failure("The parent must be a higher level than the work item.");
             }
         }
-        else if (parentInfo is not null)
-        {
-            return Result.Failure("Only portfolio tier work items can be parents.");
-        }
 
         ParentId = parentInfo?.Id;
+
+        // Project Ids are not set for WorkTypes in the Other tier
+        if (currentWorkType.Level.Tier is not WorkTypeTier.Other)
+        {
+            ParentProjectId = parentInfo?.ProjectId;
+
+            TryResetProjectId();
+        }
+
         return Result.Success();
     }
 
@@ -254,6 +266,54 @@ public sealed class WorkItem : BaseEntity<Guid>, ISystemAuditable, HasWorkspace
         }
 
         return Result.Success();
+    }
+
+    /// <summary>
+    /// Updates the project id of the work item.  If the project id is the same as the parent project id, it will be set to null.
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <returns></returns>
+    public Result UpdateProjectId(Guid? projectId)
+    {
+        Guard.Against.Null(Type?.Level, nameof(Type.Level));
+
+        if (Type.Level.Tier is not WorkTypeTier.Portfolio)
+        {
+            return Result.Failure("Only portfolio tier work items can have a project id.");
+        }
+
+        ProjectId = projectId;
+
+        TryResetProjectId();
+
+        return Result.Success();
+    }
+
+    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    {
+        Guard.Against.Null(workspace, nameof(workspace));
+        Guard.Against.Null(workType, nameof(workType));
+
+        if (workspace.Ownership != Ownership.Managed)
+        {
+            throw new InvalidOperationException("Only managed workspaces can have external work items.");
+        }
+
+        var key = new WorkItemKey(workspace.Key, externalId);
+        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, teamId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, activatedTimestamp, doneTimestamp, extendedProps);
+
+        //var result = workspace.AddWorkItem(workItem);  // this is handled in the handler for performance reasons
+    }
+
+    /// <summary>
+    /// Resets the project id if the parent project id is the same as the work item project id.
+    /// </summary>
+    private void TryResetProjectId()
+    {
+        if (ProjectId.HasValue && ProjectId == ParentProjectId)
+        {
+            ProjectId = null;
+        }
     }
 
     private void SetActivatedTimestamp(Instant? activatedTimestamp, Instant created, Instant? doneTimestamp)

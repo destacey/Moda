@@ -1,4 +1,6 @@
-﻿namespace Moda.Work.Application.WorkStatuses.Commands;
+﻿using Moda.Work.Application.Persistence;
+
+namespace Moda.Work.Application.WorkStatuses.Commands;
 public sealed record CreateWorkStatusCommand : ICommand<int>
 {
     public CreateWorkStatusCommand(string name, string? description)

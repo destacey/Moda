@@ -4,7 +4,10 @@ import { PageActions, PageTitle } from '@/src/components/common'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { useAppDispatch, useDocumentTitle } from '@/src/hooks'
-import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
+import {
+  useGetProjectQuery,
+  useGetProjectWorkItemsQuery,
+} from '@/src/store/features/ppm/projects-api'
 import { Alert, Card, MenuProps } from 'antd'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
@@ -18,9 +21,11 @@ import {
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
 import { ItemType } from 'antd/es/menu/interface'
 import { ProjectStatusAction } from '../_components/change-project-status-form'
+import { WorkItemsGrid } from '@/src/components/common/work'
 
 enum ProjectTabs {
   Details = 'details',
+  WorkItems = 'workItems',
 }
 
 enum ProjectAction {
@@ -63,6 +68,13 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: number }> }) => {
     refetch: refetchProject,
   } = useGetProjectQuery(key)
 
+  const {
+    data: workItemsData,
+    isLoading: workItemsDataIsLoading,
+    error: workItemsDataError,
+    refetch: refetchWorkItemsData,
+  } = useGetProjectWorkItemsQuery(projectData?.id, { skip: !projectData?.id })
+
   useEffect(() => {
     if (!projectData) return
 
@@ -94,9 +106,21 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: number }> }) => {
         label: 'Details',
         content: <ProjectDetails project={projectData} />,
       },
+      {
+        key: ProjectTabs.WorkItems,
+        tab: 'Work Items',
+        content: (
+          <WorkItemsGrid
+            workItems={workItemsData}
+            isLoading={workItemsDataIsLoading}
+            refetch={refetchWorkItemsData}
+            hideProjectColumn={true}
+          />
+        ),
+      },
     ]
     return pageTabs
-  }, [projectData])
+  }, [projectData, refetchWorkItemsData, workItemsData, workItemsDataIsLoading])
 
   // doesn't trigger on first render
   const onTabChange = useCallback((tabKey) => {

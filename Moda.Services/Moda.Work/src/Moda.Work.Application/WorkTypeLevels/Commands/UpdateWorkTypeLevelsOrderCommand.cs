@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkTypeLevels.Commands;
 public sealed record UpdateWorkTypeLevelsOrderCommand(Dictionary<int, int> Levels) : ICommand;

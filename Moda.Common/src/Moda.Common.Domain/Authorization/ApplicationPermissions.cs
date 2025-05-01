@@ -19,6 +19,7 @@ public static class ApplicationAction
 
     // Specific
     public const string ManageTeamMemberships = nameof(ManageTeamMemberships);
+    public const string ManageProjectWorkItems = nameof(ManageProjectWorkItems);
 }
 
 public static class ApplicationResource
@@ -183,6 +184,7 @@ public static class ApplicationPermissions
         new ("Create Projects", ApplicationAction.Create, ApplicationResource.Projects),
         new ("Update Projects", ApplicationAction.Update, ApplicationResource.Projects),
         new ("Delete Projects", ApplicationAction.Delete, ApplicationResource.Projects),
+        new ("Manage Project Work Items", ApplicationAction.ManageProjectWorkItems, ApplicationResource.Projects),
 
         new ("View Strategic Initiatives", ApplicationAction.View, ApplicationResource.StrategicInitiatives),
         new ("Create Strategic Initiatives", ApplicationAction.Create, ApplicationResource.StrategicInitiatives),

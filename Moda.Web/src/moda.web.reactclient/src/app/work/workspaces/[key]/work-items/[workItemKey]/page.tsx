@@ -7,16 +7,19 @@ import {
   useGetWorkItemQuery,
 } from '@/src/store/features/work-management/workspace-api'
 import { notFound, usePathname } from 'next/navigation'
-import { use, useCallback, useEffect, useState } from 'react'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import WorkItemDetailsLoading from './loading'
-import { PageTitle } from '@/src/components/common'
-import { Card } from 'antd'
+import { PageActions, PageTitle } from '@/src/components/common'
+import { Card, MenuProps } from 'antd'
 import { authorizePage } from '@/src/components/hoc'
 import WorkItemDetails from './work-item-details'
 import ExternalIconLink from '@/src/components/common/external-icon-link'
 import { WorkItemsGrid } from '@/src/components/common/work'
 import WorkItemDashboard from './work-item-dashboard'
 import WorkItemDependencies from './work-item-dependencies'
+import useAuth from '@/src/components/contexts/auth'
+import { ItemType } from 'antd/es/menu/interface'
+import EditWorkItemProjectForm from '../../../_components/edit-workitem-project-form'
 
 enum WorkItemTabs {
   Details = 'details',
@@ -36,6 +39,13 @@ const WorkItemDetailsPage = (props: {
   useDocumentTitle('Work Item Details')
 
   const [activeTab, setActiveTab] = useState(WorkItemTabs.Details)
+  const [openEditWorkItemProjectForm, setOpenEditWorkItemProjectForm] =
+    useState<boolean>(false)
+
+  const { hasPermissionClaim } = useAuth()
+  const canManageProjectWorkItems = hasPermissionClaim(
+    'Permissions.Projects.ManageProjectWorkItems',
+  )
 
   const {
     data: workItemData,
@@ -56,6 +66,20 @@ const WorkItemDetailsPage = (props: {
 
   const dispatch = useAppDispatch()
   const pathname = usePathname()
+
+  const actionsMenuItems: MenuProps['items'] = useMemo(() => {
+    const items: ItemType[] = []
+
+    if (canManageProjectWorkItems && workItemData?.tier === 'Portfolio') {
+      items.push({
+        key: 'edit-project',
+        label: 'Edit Project',
+        onClick: () => setOpenEditWorkItemProjectForm(true),
+      })
+    }
+
+    return items
+  }, [canManageProjectWorkItems, workItemData?.tier])
 
   useEffect(() => {
     const breadcrumbRoute: BreadcrumbItem[] = [
@@ -145,6 +169,7 @@ const WorkItemDetailsPage = (props: {
           />
         }
         subtitle={`${workItemData?.type ?? 'Work Item'} Details`}
+        actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card
         style={{ width: '100%' }}
@@ -154,6 +179,18 @@ const WorkItemDetailsPage = (props: {
       >
         {tabs.find((t) => t.key === activeTab)?.content}
       </Card>
+      {openEditWorkItemProjectForm && (
+        <EditWorkItemProjectForm
+          workItemId={workItemData.id}
+          workItemKey={workItemData.key}
+          workspaceId={workItemData.workspace.id}
+          onFormCancel={() => setOpenEditWorkItemProjectForm(false)}
+          onFormComplete={() => {
+            setOpenEditWorkItemProjectForm(false)
+            childWorkItemsQuery.refetch()
+          }}
+        />
+      )}
     </>
   )
 }

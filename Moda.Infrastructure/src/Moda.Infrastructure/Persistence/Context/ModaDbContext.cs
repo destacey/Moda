@@ -17,6 +17,7 @@ using Moda.ProjectPortfolioManagement.Domain.Models;
 using Moda.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
 using Moda.StrategicManagement.Application;
 using Moda.StrategicManagement.Domain.Models;
+using Moda.Work.Application.Persistence;
 using Moda.Work.Domain.Models;
 using PpmStrategicTheme = Moda.ProjectPortfolioManagement.Domain.Models.StrategicTheme;
 using StrategicTheme = Moda.StrategicManagement.Domain.Models.StrategicTheme;
@@ -106,6 +107,7 @@ public class ModaDbContext : BaseDbContext, IAppIntegrationDbContext, IGoalsDbCo
     public DbSet<WorkItem> WorkItems => Set<WorkItem>();
     public DbSet<WorkItemLink> WorkItemLinks => Set<WorkItemLink>();
     public DbSet<WorkProcess> WorkProcesses => Set<WorkProcess>();
+    public DbSet<WorkProject> WorkProjects => Set<WorkProject>();
     public DbSet<Workspace> Workspaces => Set<Workspace>();
     public DbSet<WorkStatus> WorkStatuses => Set<WorkStatus>();
     public DbSet<WorkTeam> WorkTeams => Set<WorkTeam>();

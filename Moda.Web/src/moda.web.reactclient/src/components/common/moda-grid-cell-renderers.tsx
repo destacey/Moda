@@ -138,13 +138,21 @@ export const PortfolioLinkCellRenderer = ({
 }
 
 export interface ProjectLinkCellRendererProps {
-  data: NavigationDto
+  data: NavigationDto | { project: NavigationDto | null } | null
 }
+
 export const ProjectLinkCellRenderer = ({
   data,
 }: ProjectLinkCellRendererProps) => {
   if (!data) return null
-  return <Link href={`/ppm/projects/${data.key}`}>{data.name}</Link>
+
+  // Handle both direct NavigationDto and nested project cases
+  const projectData = 'project' in data ? data.project : data
+  if (!projectData) return null
+
+  return (
+    <Link href={`/ppm/projects/${projectData.key}`}>{projectData.name}</Link>
+  )
 }
 
 export interface RowMenuCellRendererProps {

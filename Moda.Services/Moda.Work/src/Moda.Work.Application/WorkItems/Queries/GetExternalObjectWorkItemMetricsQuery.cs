@@ -1,14 +1,12 @@
-﻿using Moda.Work.Application.WorkItems.Dtos;
+﻿using Moda.Work.Application.Persistence;
+using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Queries;
 public sealed record GetExternalObjectWorkItemMetricsQuery(Guid ObjectiveId, DateOnly Start, DateOnly End) : IQuery<List<WorkItemProgressDailyRollupDto>>;
 
-internal sealed class GetExternalObjectWorkItemMetricsQueryHandler(IWorkDbContext workDbContext, ILogger<GetExternalObjectWorkItemMetricsQueryHandler> logger) : IQueryHandler<GetExternalObjectWorkItemMetricsQuery, List<WorkItemProgressDailyRollupDto>>
+internal sealed class GetExternalObjectWorkItemMetricsQueryHandler(IWorkDbContext workDbContext) : IQueryHandler<GetExternalObjectWorkItemMetricsQuery, List<WorkItemProgressDailyRollupDto>>
 {
-    private const string AppRequestName = nameof(GetExternalObjectWorkItemMetricsQuery);
-
     private readonly IWorkDbContext _workDbContext = workDbContext;
-    private readonly ILogger<GetExternalObjectWorkItemMetricsQueryHandler> _logger = logger;
 
     public async Task<List<WorkItemProgressDailyRollupDto>> Handle(GetExternalObjectWorkItemMetricsQuery request, CancellationToken cancellationToken)
     {

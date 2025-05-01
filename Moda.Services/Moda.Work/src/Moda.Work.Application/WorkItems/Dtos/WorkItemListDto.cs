@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Dtos;
 using Moda.Common.Application.Employees.Dtos;
+using Moda.Work.Application.WorkProjects.Dtos;
 using Moda.Work.Application.Workspaces.Dtos;
 using Moda.Work.Application.WorkTeams.Dtos;
 
@@ -17,6 +18,7 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
     public WorkTeamNavigationDto? Team { get; set; }
     public EmployeeNavigationDto? AssignedTo { get; set; }
     public double StackRank { get; set; }
+    public WorkProjectNavigationDto? Project { get; set; }
     public string? ExternalViewWorkItemUrl { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
@@ -27,6 +29,11 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
             .Map(dest => dest.Status, src => src.Status.Name)
             .Map(dest => dest.StatusCategory, src => SimpleNavigationDto.FromEnum(src.StatusCategory))
             .Map(dest => dest.AssignedTo, src => src.AssignedTo == null ? null : EmployeeNavigationDto.From(src.AssignedTo))
+            .Map(dest => dest.Project, src => src.Project != null 
+                ? WorkProjectNavigationDto.From(src.Project) 
+                : src.ParentProject != null 
+                    ? WorkProjectNavigationDto.From(src.ParentProject) 
+                    : null)
             .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}");
     }
 }

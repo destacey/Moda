@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Common.Application.Requests.WorkManagement.Interfaces;
+using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkTypeLevels.Queries;
 

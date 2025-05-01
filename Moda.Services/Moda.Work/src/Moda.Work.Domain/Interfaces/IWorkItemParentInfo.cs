@@ -7,4 +7,5 @@ public interface IWorkItemParentInfo
     int? ExternalId { get; }
     WorkTypeTier Tier { get; }
     int LevelOrder { get; }
+    Guid? ProjectId { get; }
 }

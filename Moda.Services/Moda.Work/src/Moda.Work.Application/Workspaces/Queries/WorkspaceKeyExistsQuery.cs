@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Models;
+using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.Workspaces.Queries;
 public sealed record WorkspaceKeyExistsQuery : IQuery<bool>

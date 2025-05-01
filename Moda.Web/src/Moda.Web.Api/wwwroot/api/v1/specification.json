@@ -3319,6 +3319,69 @@
         ]
       }
     },
+    "/api/ppm/projects/{id}/work-items": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Get work items for a project.",
+        "operationId": "Projects_GetProjectWorkItems",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkItemListDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/ppm/strategic-initiatives": {
       "get": {
         "tags": [
@@ -7684,6 +7747,139 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/work/workspaces/{idOrKey}/work-items/{workItemKey}/project-info": {
+      "get": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Get a work item's project info.",
+        "operationId": "Workspaces_GetWorkItemProjectInfo",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "workItemKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkItemProjectInfoDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/work/workspaces/{id}/work-items/{workItemId}/update-project": {
+      "put": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Update the project for a work item.",
+        "operationId": "Workspaces_UpdateWorkItemProject",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "workItemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkItemProjectRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "204": {
+            "description": ""
           },
           "400": {
             "description": "",
@@ -13930,6 +14126,181 @@
           }
         }
       },
+      "WorkItemListDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "title",
+          "workspace",
+          "type",
+          "status",
+          "statusCategory",
+          "stackRank"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/WorkspaceNavigationDto"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "statusCategory": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "parent": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkItemNavigationDto"
+              }
+            ]
+          },
+          "team": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkTeamNavigationDto"
+              }
+            ]
+          },
+          "assignedTo": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeNavigationDto"
+              }
+            ]
+          },
+          "stackRank": {
+            "type": "number",
+            "format": "double"
+          },
+          "project": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkProjectNavigationDto"
+              }
+            ]
+          },
+          "externalViewWorkItemUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "WorkspaceNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDtoOfGuidAndString"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
+      "NavigationDtoOfGuidAndString": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "WorkItemNavigationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "title",
+          "workspaceKey"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "workspaceKey": {
+            "type": "string"
+          },
+          "externalViewWorkItemUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "WorkTeamNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "WorkProjectNavigationDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false
+          }
+        ]
+      },
       "StrategicInitiativeDetailsDto": {
         "type": "object",
         "additionalProperties": false,
@@ -15424,162 +15795,6 @@
             "format": "int32"
           }
         }
-      },
-      "WorkItemListDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "key",
-          "title",
-          "workspace",
-          "type",
-          "status",
-          "statusCategory",
-          "stackRank"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "key": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "workspace": {
-            "$ref": "#/components/schemas/WorkspaceNavigationDto"
-          },
-          "type": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "statusCategory": {
-            "$ref": "#/components/schemas/SimpleNavigationDto"
-          },
-          "parent": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/WorkItemNavigationDto"
-              }
-            ]
-          },
-          "team": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/WorkTeamNavigationDto"
-              }
-            ]
-          },
-          "assignedTo": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/EmployeeNavigationDto"
-              }
-            ]
-          },
-          "stackRank": {
-            "type": "number",
-            "format": "double"
-          },
-          "externalViewWorkItemUrl": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "WorkspaceNavigationDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/NavigationDtoOfGuidAndString"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false
-          }
-        ]
-      },
-      "NavigationDtoOfGuidAndString": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "key",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "minLength": 1,
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "key": {
-            "type": "string",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1
-          }
-        }
-      },
-      "WorkItemNavigationDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "key",
-          "title",
-          "workspaceKey"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "key": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "workspaceKey": {
-            "type": "string"
-          },
-          "externalViewWorkItemUrl": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "WorkTeamNavigationDto": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/NavigationDto"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "type": {
-                "type": "string"
-              }
-            }
-          }
-        ]
       },
       "WorkItemProgressDailyRollupDto": {
         "allOf": [
@@ -17261,9 +17476,74 @@
             "format": "date-time",
             "nullable": true
           },
+          "project": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkProjectNavigationDto"
+              }
+            ]
+          },
           "externalViewWorkItemUrl": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "WorkItemProjectInfoDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "key": {
+            "type": "string"
+          },
+          "project": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkProjectNavigationDto"
+              }
+            ]
+          },
+          "parentProject": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkProjectNavigationDto"
+              }
+            ]
+          }
+        }
+      },
+      "UpdateWorkItemProjectRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workItemId"
+        ],
+        "properties": {
+          "workItemId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1,
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": true,
+            "example": "00000000-0000-0000-0000-000000000000"
           }
         }
       },
@@ -18375,6 +18655,14 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "project": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WorkProjectNavigationDto"
+              }
+            ]
           },
           "externalViewWorkItemUrl": {
             "type": "string",

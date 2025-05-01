@@ -34,7 +34,7 @@ public class ProjectTests
         var expenditureCategoryId = 1;
 
         // Act
-        var project = Project.Create(name, description, expenditureCategoryId, null, portfolioId, null);
+        var project = Project.Create(name, description, expenditureCategoryId, null, portfolioId, null, null, null, _dateTimeProvider.Now);
 
         // Assert
         project.Should().NotBeNull();
@@ -54,7 +54,7 @@ public class ProjectTests
         var project = _projectFaker.Generate();
 
         // Act
-        Action action = () => project.UpdateDetails("", "Valid Description", project.ExpenditureCategoryId);
+        Action action = () => project.UpdateDetails("", "Valid Description", project.ExpenditureCategoryId, _dateTimeProvider.Now);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Required input Name was empty. (Parameter 'Name')");
@@ -67,7 +67,7 @@ public class ProjectTests
         var project = _projectFaker.Generate();
 
         // Act
-        Action action = () => project.UpdateDetails("Valid Name", "", project.ExpenditureCategoryId);
+        Action action = () => project.UpdateDetails("Valid Name", "", project.ExpenditureCategoryId, _dateTimeProvider.Now);
 
         // Assert
         action.Should().Throw<ArgumentException>().WithMessage("Required input Description was empty. (Parameter 'Description')");

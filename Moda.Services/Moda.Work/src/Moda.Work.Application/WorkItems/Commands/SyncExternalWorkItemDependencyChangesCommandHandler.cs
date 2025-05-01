@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Interfaces.ExternalWork;
 using Moda.Common.Application.Requests.WorkManagement;
+using Moda.Work.Application.Persistence;
 
 namespace Moda.Work.Application.WorkItems.Commands;
 internal sealed class SyncExternalWorkItemDependencyChangesCommandHandler(IWorkDbContext workDbContext, ILogger<SyncExternalWorkItemDependencyChangesCommandHandler> logger) : ICommandHandler<SyncExternalWorkItemDependencyChangesCommand>

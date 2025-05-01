@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Application.Exceptions;
+using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkStatuses.Dtos;
 
 namespace Moda.Work.Application.WorkStatuses.Queries;

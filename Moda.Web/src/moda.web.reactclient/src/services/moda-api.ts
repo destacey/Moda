@@ -4369,6 +4369,74 @@ export class ProjectsClient {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    /**
+     * Get work items for a project.
+     */
+    getProjectWorkItems(id: string, cancelToken?: CancelToken): Promise<WorkItemListDto[]> {
+        let url_ = this.baseUrl + "/api/ppm/projects/{id}/work-items";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetProjectWorkItems(_response);
+        });
+    }
+
+    protected processGetProjectWorkItems(response: AxiosResponse): Promise<WorkItemListDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<WorkItemListDto[]>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<WorkItemListDto[]>(null as any);
+    }
 }
 
 export class StrategicInitiativesClient {
@@ -9511,6 +9579,141 @@ export class WorkspacesClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<WorkItemDetailsDto>(null as any);
+    }
+
+    /**
+     * Get a work item's project info.
+     */
+    getWorkItemProjectInfo(idOrKey: string, workItemKey: string, cancelToken?: CancelToken): Promise<WorkItemProjectInfoDto> {
+        let url_ = this.baseUrl + "/api/work/workspaces/{idOrKey}/work-items/{workItemKey}/project-info";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        if (workItemKey === undefined || workItemKey === null)
+            throw new Error("The parameter 'workItemKey' must be defined.");
+        url_ = url_.replace("{workItemKey}", encodeURIComponent("" + workItemKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetWorkItemProjectInfo(_response);
+        });
+    }
+
+    protected processGetWorkItemProjectInfo(response: AxiosResponse): Promise<WorkItemProjectInfoDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<WorkItemProjectInfoDto>(result200);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = JSON.parse(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<WorkItemProjectInfoDto>(null as any);
+    }
+
+    /**
+     * Update the project for a work item.
+     */
+    updateWorkItemProject(id: string, workItemId: string, request: UpdateWorkItemProjectRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/work/workspaces/{id}/work-items/{workItemId}/update-project";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (workItemId === undefined || workItemId === null)
+            throw new Error("The parameter 'workItemId' must be defined.");
+        url_ = url_.replace("{workItemId}", encodeURIComponent("" + workItemId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateWorkItemProject(_response);
+        });
+    }
+
+    protected processUpdateWorkItemProject(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
     }
 
     /**
@@ -15347,6 +15550,46 @@ export interface UpdateProjectRequest {
     strategicThemeIds?: string[] | undefined;
 }
 
+export interface WorkItemListDto {
+    id: string;
+    key: string;
+    title: string;
+    workspace: WorkspaceNavigationDto;
+    type: string;
+    status: string;
+    statusCategory: SimpleNavigationDto;
+    parent?: WorkItemNavigationDto | undefined;
+    team?: WorkTeamNavigationDto | undefined;
+    assignedTo?: EmployeeNavigationDto | undefined;
+    stackRank: number;
+    project?: WorkProjectNavigationDto | undefined;
+    externalViewWorkItemUrl?: string | undefined;
+}
+
+export interface NavigationDtoOfGuidAndString {
+    id: string;
+    key: string;
+    name: string;
+}
+
+export interface WorkspaceNavigationDto extends NavigationDtoOfGuidAndString {
+}
+
+export interface WorkItemNavigationDto {
+    id: string;
+    key: string;
+    title: string;
+    workspaceKey: string;
+    externalViewWorkItemUrl?: string | undefined;
+}
+
+export interface WorkTeamNavigationDto extends NavigationDto {
+    type?: string;
+}
+
+export interface WorkProjectNavigationDto extends NavigationDto {
+}
+
 export interface StrategicInitiativeDetailsDto {
     id: string;
     key: number;
@@ -15720,42 +15963,6 @@ export interface WorkItemProgressRollupDto {
     active: number;
     done: number;
     total: number;
-}
-
-export interface WorkItemListDto {
-    id: string;
-    key: string;
-    title: string;
-    workspace: WorkspaceNavigationDto;
-    type: string;
-    status: string;
-    statusCategory: SimpleNavigationDto;
-    parent?: WorkItemNavigationDto | undefined;
-    team?: WorkTeamNavigationDto | undefined;
-    assignedTo?: EmployeeNavigationDto | undefined;
-    stackRank: number;
-    externalViewWorkItemUrl?: string | undefined;
-}
-
-export interface NavigationDtoOfGuidAndString {
-    id: string;
-    key: string;
-    name: string;
-}
-
-export interface WorkspaceNavigationDto extends NavigationDtoOfGuidAndString {
-}
-
-export interface WorkItemNavigationDto {
-    id: string;
-    key: string;
-    title: string;
-    workspaceKey: string;
-    externalViewWorkItemUrl?: string | undefined;
-}
-
-export interface WorkTeamNavigationDto extends NavigationDto {
-    type?: string;
 }
 
 export interface WorkItemProgressDailyRollupDto extends WorkItemProgressRollupDto {
@@ -16153,7 +16360,20 @@ export interface WorkItemDetailsDto {
     lastModifiedBy?: EmployeeNavigationDto | undefined;
     activatedTimestamp?: Date | undefined;
     doneTimestamp?: Date | undefined;
+    project?: WorkProjectNavigationDto | undefined;
     externalViewWorkItemUrl?: string | undefined;
+}
+
+export interface WorkItemProjectInfoDto {
+    id: string;
+    key: string;
+    project?: WorkProjectNavigationDto | undefined;
+    parentProject?: WorkProjectNavigationDto | undefined;
+}
+
+export interface UpdateWorkItemProjectRequest {
+    workItemId: string;
+    projectId?: string | undefined;
 }
 
 export interface ScopedDependencyDto {
@@ -16431,6 +16651,7 @@ export interface WorkItemBacklogItemDto {
     created: Date;
     rank: number;
     parentRank?: number | undefined;
+    project?: WorkProjectNavigationDto | undefined;
     externalViewWorkItemUrl?: string | undefined;
     stackRank: number;
 }

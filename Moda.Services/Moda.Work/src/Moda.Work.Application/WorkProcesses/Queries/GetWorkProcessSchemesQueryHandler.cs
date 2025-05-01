@@ -1,5 +1,6 @@
 ﻿using Moda.Common.Application.Requests.WorkManagement;
 using Moda.Common.Application.Requests.WorkManagement.Interfaces;
+using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkProcesses.Dtos;
 
 namespace Moda.Work.Application.WorkProcesses.Queries;

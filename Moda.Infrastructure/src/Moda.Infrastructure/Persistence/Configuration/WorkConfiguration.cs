@@ -86,10 +86,10 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
         builder.HasAlternateKey(w => w.Key);
 
         builder.HasIndex(w => w.Id)
-            .IncludeProperties(w => new { w.Key, w.Title, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp });
+            .IncludeProperties(w => new { w.Key, w.Title, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp, w.ProjectId, w.ParentProjectId });
 
         builder.HasIndex(w => w.Key)
-            .IncludeProperties(w => new { w.Id, w.Title, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp });
+            .IncludeProperties(w => new { w.Id, w.Title, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp, w.ProjectId, w.ParentProjectId });
 
         builder.HasIndex(w => w.WorkspaceId)
             .IncludeProperties(w => new { w.Id, w.Key, w.Title, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp });
@@ -98,10 +98,10 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .IncludeProperties(w => new { w.Id, w.WorkspaceId, w.ExternalId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp });
 
         builder.HasIndex(w => w.ExternalId)
-            .IncludeProperties(w => new { w.Id, w.Key , w.Title, w.WorkspaceId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp });
+            .IncludeProperties(w => new { w.Id, w.Key , w.Title, w.WorkspaceId, w.AssignedToId, w.TypeId, w.StatusId, w.StatusCategory, w.ActivatedTimestamp, w.DoneTimestamp, w.ProjectId, w.ParentProjectId });
 
         builder.HasIndex(w => w.StatusCategory)
-            .IncludeProperties(w => new { w.Id, w.Key, w.Title, w.WorkspaceId, w.AssignedToId, w.TypeId, w.StatusId, w.ActivatedTimestamp, w.DoneTimestamp });
+            .IncludeProperties(w => new { w.Id, w.Key, w.Title, w.WorkspaceId, w.AssignedToId, w.TypeId, w.StatusId, w.ActivatedTimestamp, w.DoneTimestamp, w.ProjectId, w.ParentProjectId });
 
         builder.HasIndex(w => new { w.WorkspaceId, w.ExternalId })
             .IncludeProperties(w => new
@@ -132,6 +132,13 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
                 w.TypeId
             })
             .HasFilter("[ExternalId] IS NOT NULL");
+
+        // Composite index for ProjectId and ParentProjectId
+        builder.HasIndex(w => new { w.ProjectId, w.ParentProjectId });
+
+        // Filtered index for cases where ProjectId is NULL
+        builder.HasIndex(w => w.ParentProjectId)
+            .HasFilter("[ProjectId] IS NULL");
 
         // Properties
         builder.Property(w => w.Key).IsRequired()
@@ -210,6 +217,16 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             .WithOne()
             .HasForeignKey<WorkItemExtended>(w => w.Id)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(w => w.Project)
+            .WithMany()
+            .HasForeignKey(w => w.ProjectId)
+            .OnDelete(DeleteBehavior.ClientSetNull);
+
+        builder.HasOne(w => w.ParentProject)
+            .WithMany()
+            .HasForeignKey(w => w.ParentProjectId)
+            .OnDelete(DeleteBehavior.ClientSetNull);
     }
 }
 
@@ -361,6 +378,24 @@ public class WorkProcessSchemeConfig : IEntityTypeConfiguration<WorkProcessSchem
             .WithMany()
             .HasForeignKey(w => w.WorkflowId)
             .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+public class WorkProjectConfig : IEntityTypeConfiguration<WorkProject>
+{
+    public void Configure(EntityTypeBuilder<WorkProject> builder)
+    {
+        builder.ToTable("WorkProjects", SchemaNames.Work);
+
+        builder.HasKey(w => w.Id);
+        builder.HasAlternateKey(w => w.Key);
+
+        builder.Property(w => w.Id).ValueGeneratedNever();
+        builder.Property(w => w.Key).ValueGeneratedNever();
+
+        // Properties
+        builder.Property(w => w.Name).IsRequired().HasMaxLength(128);
+        builder.Property(p => p.Description).HasMaxLength(2048).IsRequired();
     }
 }
 

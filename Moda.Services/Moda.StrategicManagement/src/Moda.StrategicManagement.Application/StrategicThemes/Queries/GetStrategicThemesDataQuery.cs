@@ -18,6 +18,6 @@ internal sealed class GetStrategicThemesDataQueryHandler(IStrategicManagementDbC
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        return themes.OfType<IStrategicThemeData>().ToList();
+        return [.. themes.OfType<IStrategicThemeData>()];
     }
 }

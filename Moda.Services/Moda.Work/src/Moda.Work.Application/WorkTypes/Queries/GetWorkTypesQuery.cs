@@ -1,4 +1,5 @@
-﻿using Moda.Work.Application.WorkTypes.Dtos;
+﻿using Moda.Work.Application.Persistence;
+using Moda.Work.Application.WorkTypes.Dtos;
 
 namespace Moda.Work.Application.WorkTypes.Queries;
 public sealed record GetWorkTypesQuery : IQuery<IReadOnlyList<WorkTypeDto>>

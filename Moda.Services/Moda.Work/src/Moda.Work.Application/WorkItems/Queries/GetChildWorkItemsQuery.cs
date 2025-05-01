@@ -1,4 +1,5 @@
 ﻿using Moda.Common.Models;
+using Moda.Work.Application.Persistence;
 using Moda.Work.Application.WorkItems.Dtos;
 
 namespace Moda.Work.Application.WorkItems.Queries;

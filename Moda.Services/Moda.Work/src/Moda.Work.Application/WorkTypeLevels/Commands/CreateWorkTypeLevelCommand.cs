@@ -1,4 +1,6 @@
-﻿namespace Moda.Work.Application.WorkTypeLevels.Commands;
+﻿using Moda.Work.Application.Persistence;
+
+namespace Moda.Work.Application.WorkTypeLevels.Commands;
 public sealed record CreateWorkTypeLevelCommand(string Name, string? Description) : ICommand<int>;
 
 public sealed class CreateWorkTypeLevelCommandValidator : CustomValidator<CreateWorkTypeLevelCommand>

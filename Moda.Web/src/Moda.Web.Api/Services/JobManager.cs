@@ -4,9 +4,10 @@ using Moda.Common.Application.Enums;
 using Moda.Common.Application.Exceptions;
 using Moda.Common.Application.Interfaces;
 using Moda.Organization.Application.Teams.Commands;
+using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
 using Moda.StrategicManagement.Application.StrategicThemes.Queries;
 using Moda.Web.Api.Interfaces;
-
+using Moda.Work.Application.WorkProjects.Commands;
 using PpmSyncStrategicThemesCommand = Moda.ProjectPortfolioManagement.Application.StrategicThemes.Commands.SyncStrategicThemesCommand;
 
 namespace Moda.Web.Api.Services;
@@ -86,5 +87,21 @@ public class JobManager(ILogger<JobManager> logger, IEmployeeService employeeSer
         }
 
         _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncStrategicThemes));
+    }
+
+    [DisableConcurrentExecution(60 * 3)]
+    public async Task RunSyncProjects(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Running {BackgroundJob} job", nameof(RunSyncProjects));
+
+        var projects = await _sender.Send(new GetSimpleProjectsQuery(), cancellationToken);
+
+        var result = await _sender.Send(new SyncWorkProjectsCommand(projects), cancellationToken);
+        if (result.IsFailure)
+        {
+            _logger.LogError("Failed to sync projects: {Error}", result.Error);
+            throw new InternalServerException($"Failed to sync projects. Error: {result.Error}");
+        }
+        _logger.LogInformation("Completed {BackgroundJob} job", nameof(RunSyncProjects));
     }
 }

@@ -6,8 +6,10 @@ import {
   ProjectListDto,
   ProjectDetailsDto,
   UpdateProjectRequest,
+  WorkItemListDto,
 } from '@/src/services/moda-api'
 import { QueryTags } from '../query-tags'
+import { BaseOptionType } from 'antd/es/select'
 
 export const projectsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -146,6 +148,40 @@ export const projectsApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+    getProjectWorkItems: builder.query<WorkItemListDto[], string>({
+      queryFn: async (id) => {
+        try {
+          const data = await getProjectsClient().getProjectWorkItems(id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result) => [
+        QueryTags.WorkItem,
+        ...result.map(({ key }) => ({ type: QueryTags.ProjectWorkItems, key })),
+      ],
+    }),
+    getProjectOptions: builder.query<BaseOptionType[], void>({
+      queryFn: async () => {
+        try {
+          const portfolios = await getProjectsClient().getProjects(null)
+
+          const data: BaseOptionType[] = portfolios
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((category) => ({
+              label: category.name,
+              value: category.id,
+            }))
+
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+    }),
   }),
 })
 
@@ -158,4 +194,6 @@ export const {
   useCompleteProjectMutation,
   useCancelProjectMutation,
   useDeleteProjectMutation,
+  useGetProjectWorkItemsQuery,
+  useGetProjectOptionsQuery,
 } = projectsApi

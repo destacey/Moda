@@ -4,9 +4,11 @@ import { QueryTags } from '../query-tags'
 import {
   ScopedDependencyDto,
   SetExternalUrlTemplatesRequest,
+  UpdateWorkItemProjectRequest,
   WorkItemDetailsDto,
   WorkItemListDto,
   WorkItemProgressDailyRollupDto,
+  WorkItemProjectInfoDto,
   WorkspaceDto,
   WorkspaceListDto,
 } from '@/src/services/moda-api'
@@ -67,10 +69,11 @@ export const workspaceApi = apiSlice.injectEndpoints({
     >({
       queryFn: async (request) => {
         try {
-          await getWorkspacesClient().setExternalUrlTemplates(
+          const data = await getWorkspacesClient().setExternalUrlTemplates(
             request.workspaceId,
             request.externalUrlTemplatesRequest,
           )
+          return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -110,6 +113,53 @@ export const workspaceApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         { type: QueryTags.WorkItem, id: arg.workItemKey }, // typically arg is the key
+      ],
+    }),
+    getWorkItemProjectInfo: builder.query<
+      WorkItemProjectInfoDto,
+      GetWorkItemRequest
+    >({
+      queryFn: async (request: GetWorkItemRequest) => {
+        try {
+          const data = await getWorkspacesClient().getWorkItemProjectInfo(
+            request.idOrKey,
+            request.workItemKey,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.WorkItem, id: arg.workItemKey }, // typically arg is the key
+      ],
+    }),
+    updateWorkItemProject: builder.mutation<
+      void,
+      {
+        workspaceId: string
+        request: UpdateWorkItemProjectRequest
+        cacheKey: string
+      }
+    >({
+      queryFn: async ({ workspaceId, request }) => {
+        try {
+          const data = await getWorkspacesClient().updateWorkItemProject(
+            workspaceId,
+            request.workItemId,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        // TODO: there are a few more tags that need to be invalidated here
+        { type: QueryTags.WorkItem, id: arg.cacheKey },
+        { type: QueryTags.WorkItemChildren, id: arg.cacheKey },
       ],
     }),
     getChildWorkItems: builder.query<
@@ -204,6 +254,8 @@ export const {
   useGetWorkspaceQuery,
   useGetWorkItemsQuery,
   useGetWorkItemQuery,
+  useGetWorkItemProjectInfoQuery,
+  useUpdateWorkItemProjectMutation,
   useGetChildWorkItemsQuery,
   useGetWorkItemDependenciesQuery,
   useGetWorkItemMetricsQuery,

@@ -19,7 +19,7 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "9.0.3")
+                .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -2379,8 +2379,14 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ParentProjectId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int?>("Priority")
                         .HasColumnType("int");
+
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<double>("StackRank")
                         .HasColumnType("float");
@@ -2429,23 +2435,26 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
 
                     b.HasIndex("ExternalId");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ExternalId"), new[] { "Id", "Key", "Title", "WorkspaceId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ExternalId"), new[] { "Id", "Key", "Title", "WorkspaceId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp", "ProjectId", "ParentProjectId" });
 
                     b.HasIndex("Id");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Key", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "Key", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp", "ProjectId", "ParentProjectId" });
 
                     b.HasIndex("Key");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key"), new[] { "Id", "Title", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp", "ProjectId", "ParentProjectId" });
 
                     b.HasIndex("LastModifiedById");
 
                     b.HasIndex("ParentId");
 
+                    b.HasIndex("ParentProjectId")
+                        .HasFilter("[ProjectId] IS NULL");
+
                     b.HasIndex("StatusCategory");
 
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("StatusCategory"), new[] { "Id", "Key", "Title", "WorkspaceId", "AssignedToId", "TypeId", "StatusId", "ActivatedTimestamp", "DoneTimestamp" });
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("StatusCategory"), new[] { "Id", "Key", "Title", "WorkspaceId", "AssignedToId", "TypeId", "StatusId", "ActivatedTimestamp", "DoneTimestamp", "ProjectId", "ParentProjectId" });
 
                     b.HasIndex("StatusId");
 
@@ -2460,6 +2469,8 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("Key", "Title");
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Key", "Title"), new[] { "Id", "WorkspaceId", "ExternalId", "AssignedToId", "TypeId", "StatusId", "StatusCategory", "ActivatedTimestamp", "DoneTimestamp" });
+
+                    b.HasIndex("ProjectId", "ParentProjectId");
 
                     b.HasIndex("WorkspaceId", "ExternalId")
                         .HasFilter("[ExternalId] IS NOT NULL");
@@ -2714,6 +2725,31 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("WorkProcessId", "IsDeleted"), new[] { "Id", "WorkTypeId", "WorkflowId", "IsActive" });
 
                     b.ToTable("WorkProcessSchemes", "Work");
+                });
+
+            modelBuilder.Entity("Moda.Work.Domain.Models.WorkProject", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<int>("Key")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("Key");
+
+                    b.ToTable("WorkProjects", "Work");
                 });
 
             modelBuilder.Entity("Moda.Work.Domain.Models.WorkStatus", b =>
@@ -3883,6 +3919,14 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                         .WithMany("Children")
                         .HasForeignKey("ParentId");
 
+                    b.HasOne("Moda.Work.Domain.Models.WorkProject", "ParentProject")
+                        .WithMany()
+                        .HasForeignKey("ParentProjectId");
+
+                    b.HasOne("Moda.Work.Domain.Models.WorkProject", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId");
+
                     b.HasOne("Moda.Work.Domain.Models.WorkStatus", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
@@ -3912,6 +3956,10 @@ namespace Moda.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("LastModifiedBy");
 
                     b.Navigation("Parent");
+
+                    b.Navigation("ParentProject");
+
+                    b.Navigation("Project");
 
                     b.Navigation("Status");
 

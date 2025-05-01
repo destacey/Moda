@@ -1,4 +1,6 @@
-﻿namespace Moda.Work.Application.WorkProcesses.Queries;
+﻿using Moda.Work.Application.Persistence;
+
+namespace Moda.Work.Application.WorkProcesses.Queries;
 public sealed record ExternalWorkProcessExistsQuery(Guid ExternalId) : IQuery<bool>;
 
 internal sealed class ExternalWorkProcessExistsQueryHandler : IQueryHandler<ExternalWorkProcessExistsQuery, bool>
