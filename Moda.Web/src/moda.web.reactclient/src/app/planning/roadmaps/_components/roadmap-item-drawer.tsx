@@ -11,7 +11,7 @@ import {
   RoadmapMilestoneDrawerItem,
   RoadmapTimeboxDrawerItem,
 } from '.'
-import { useEffect } from 'react'
+import { FC, useEffect } from 'react'
 
 interface RoadmapItemDrawerProps {
   roadmapId: string
@@ -21,7 +21,7 @@ interface RoadmapItemDrawerProps {
   openRoadmapItemDrawer: (itemId: string) => void
 }
 
-const RoadmapItemDrawer: React.FC<RoadmapItemDrawerProps> = (
+const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
   props: RoadmapItemDrawerProps,
 ) => {
   const {

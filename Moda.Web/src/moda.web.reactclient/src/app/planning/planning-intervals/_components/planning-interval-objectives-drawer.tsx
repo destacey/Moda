@@ -1,12 +1,13 @@
 'use client'
 
 import { useGetPlanningIntervalObjectiveQuery } from '@/src/store/features/planning/planning-interval-api'
-import { Descriptions, Drawer, Space } from 'antd'
+import { Descriptions, Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import PlanningIntervalObjectiveWorkItemsCard from '../[key]/objectives/[objectiveKey]/planning-interval-objective-work-items-card'
 import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
+import { FC } from 'react'
 
 const { Item: DescriptionsItem } = Descriptions
 
@@ -18,9 +19,9 @@ interface PlanningIntervalObjectiveDetailsDrawerProps {
   canManageObjectives: boolean
 }
 
-const PlanningIntervalObjectiveDetailsDrawer = (
-  props: PlanningIntervalObjectiveDetailsDrawerProps,
-) => {
+const PlanningIntervalObjectiveDetailsDrawer: FC<
+  PlanningIntervalObjectiveDetailsDrawerProps
+> = (props: PlanningIntervalObjectiveDetailsDrawerProps) => {
   const { data: objectiveData, isLoading: objectiveDataIsLoading } =
     useGetPlanningIntervalObjectiveQuery(
       {
@@ -46,50 +47,50 @@ const PlanningIntervalObjectiveDetailsDrawer = (
       loading={objectiveDataIsLoading}
       width={getDrawerWidthPercentage()}
     >
-      <Space direction="vertical">
-        <Descriptions column={1}>
-          <DescriptionsItem label="Key">
-            {objectiveData && (
-              <Link
-                href={`/planning/planning-intervals/${objectiveData.planningInterval.key}/objectives/${objectiveData.key}`}
-              >
-                {objectiveData.key}
-              </Link>
-            )}
-          </DescriptionsItem>
-          <DescriptionsItem label="Is Stretch?">
-            {objectiveData?.isStretch ? 'Yes' : 'No'}
-          </DescriptionsItem>
-          <DescriptionsItem label="Status">
-            {objectiveData?.status.name}
-          </DescriptionsItem>
-        </Descriptions>
-        <Descriptions column={1} layout="vertical" style={{ paddingTop: 8 }}>
-          <DescriptionsItem label="Description">
-            <MarkdownRenderer markdown={objectiveData?.description} />
-          </DescriptionsItem>
-        </Descriptions>
-        <Descriptions column={1}>
-          <DescriptionsItem label="Start Date">
-            {objectiveData?.startDate &&
-              dayjs(objectiveData?.startDate).format('MMM D, YYYY')}
-          </DescriptionsItem>
-          <DescriptionsItem label="Target Date">
-            {objectiveData?.targetDate &&
-              dayjs(objectiveData?.targetDate).format('MMM D, YYYY')}
-          </DescriptionsItem>
-          {objectiveData?.closedDate && (
-            <DescriptionsItem label="Closed Date">
-              {dayjs(objectiveData?.closedDate).format('MMM D, YYYY')}
+      <Flex vertical gap="middle">
+        <Flex vertical gap="middle">
+          <Descriptions column={1} size="small">
+            <DescriptionsItem label="Key">
+              {objectiveData && (
+                <Link
+                  href={`/planning/planning-intervals/${objectiveData.planningInterval.key}/objectives/${objectiveData.key}`}
+                >
+                  {objectiveData.key}
+                </Link>
+              )}
             </DescriptionsItem>
-          )}
-        </Descriptions>
+            <DescriptionsItem label="Is Stretch?">
+              {objectiveData?.isStretch ? 'Yes' : 'No'}
+            </DescriptionsItem>
+            <DescriptionsItem label="Status">
+              {objectiveData?.status.name}
+            </DescriptionsItem>
+            <DescriptionsItem label="Start Date">
+              {objectiveData?.startDate &&
+                dayjs(objectiveData?.startDate).format('MMM D, YYYY')}
+            </DescriptionsItem>
+            <DescriptionsItem label="Target Date">
+              {objectiveData?.targetDate &&
+                dayjs(objectiveData?.targetDate).format('MMM D, YYYY')}
+            </DescriptionsItem>
+            {objectiveData?.closedDate && (
+              <DescriptionsItem label="Closed Date">
+                {dayjs(objectiveData?.closedDate).format('MMM D, YYYY')}
+              </DescriptionsItem>
+            )}
+          </Descriptions>
+          <Descriptions column={1} layout="vertical" size="small">
+            <DescriptionsItem label="Description">
+              <MarkdownRenderer markdown={objectiveData?.description} />
+            </DescriptionsItem>
+          </Descriptions>
+        </Flex>
         <PlanningIntervalObjectiveWorkItemsCard
           planningIntervalId={props.planningIntervalId}
           objectiveId={props.objectiveId}
           canLinkWorkItems={props.canManageObjectives}
         />
-      </Space>
+      </Flex>
     </Drawer>
   )
 }
