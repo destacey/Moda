@@ -25,7 +25,15 @@ export enum QueryTags {
 
   // PLANNING
   PlanningInterval = 'Planning.PlanningInterval',
+  PlanningIntervalCalendar = 'Planning.PlanningInterval.Calendar',
+  PlanningIntervalIteration = 'Planning.PlanningInterval.Iteration',
+  PlanningIntervalIterationTypeOptions = 'Planning.PlanningInterval.IterationTypeOptions',
+  PlanningIntervalTeam = 'Planning.PlanningInterval.Team',
+  PlanningIntervalPredictability = 'Planning.PlanningInterval.Predictability',
+  PlanningIntervalTeamPredictability = 'Planning.PlanningInterval.TeamPredictability',
   PlanningIntervalObjective = 'Planning.PlanningIntervalObjective',
+  PlanningIntervalObjectiveStatus = 'Planning.PlanningIntervalObjectiveStatus',
+  PlanningIntervalObjectiveStatusOptions = 'Planning.PlanningIntervalObjectiveStatusOptions',
   PlanningIntervalObjectiveWorkItemsSummary = 'Planning.PlanningIntervalObjective.WorkItemsSummary',
   PlanningIntervalObjectiveWorkItemMetric = 'Planning.PlanningIntervalObjective.WorkItemMetric',
   Roadmap = 'Planning.Roadmap',

@@ -1,5 +1,7 @@
-﻿namespace Moda.Planning.Application.PlanningIntervals.Commands;
-public sealed record CreatePlanningIntervalCommand(string Name, string? Description, LocalDateRange DateRange, int IterationWeeks, string? IterationPrefix) : ICommand<int>;
+﻿using Moda.Common.Application.Models;
+
+namespace Moda.Planning.Application.PlanningIntervals.Commands;
+public sealed record CreatePlanningIntervalCommand(string Name, string? Description, LocalDateRange DateRange, int IterationWeeks, string? IterationPrefix) : ICommand<ObjectIdAndKey>;
 
 public sealed class CreatePlanningIntervalCommandValidator : CustomValidator<CreatePlanningIntervalCommand>
 {
@@ -31,47 +33,44 @@ public sealed class CreatePlanningIntervalCommandValidator : CustomValidator<Cre
     }
 }
 
-internal sealed class CreatePlanningIntervalCommandHandler : ICommandHandler<CreatePlanningIntervalCommand, int>
+internal sealed class CreatePlanningIntervalCommandHandler(IPlanningDbContext planningDbContext, ILogger<CreatePlanningIntervalCommandHandler> logger) : ICommandHandler<CreatePlanningIntervalCommand, ObjectIdAndKey>
 {
-    private readonly IPlanningDbContext _planningDbContext;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<CreatePlanningIntervalCommandHandler> _logger;
+    private const string AppRequestName = nameof(CreatePlanningIntervalCommand);
 
-    public CreatePlanningIntervalCommandHandler(IPlanningDbContext planningDbContext, IDateTimeProvider dateTimeProvider, ILogger<CreatePlanningIntervalCommandHandler> logger)
-    {
-        _planningDbContext = planningDbContext;
-        _dateTimeProvider = dateTimeProvider;
-        _logger = logger;
-    }
+    private readonly IPlanningDbContext _planningDbContext = planningDbContext;
+    private readonly ILogger<CreatePlanningIntervalCommandHandler> _logger = logger;
 
-    public async Task<Result<int>> Handle(CreatePlanningIntervalCommand request, CancellationToken cancellationToken)
+    public async Task<Result<ObjectIdAndKey>> Handle(CreatePlanningIntervalCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var result = PlanningInterval.Create(
+            var createResult = PlanningInterval.Create(
                 request.Name,
                 request.Description,
                 request.DateRange,
                 request.IterationWeeks,
                 request.IterationPrefix
                 );
-            if (result.IsFailure)
-                return Result.Failure<int>(result.Error);
+            if (createResult.IsFailure)
+            {
+                _logger.LogError("Error creating planning interval {ProjectName}. Error message: {Error}", request.Name, createResult.Error);
+                return Result.Failure<ObjectIdAndKey>(createResult.Error);
+            }
 
+            var planningInterval = createResult.Value;
 
-            await _planningDbContext.PlanningIntervals.AddAsync(result.Value, cancellationToken);
+            await _planningDbContext.PlanningIntervals.AddAsync(planningInterval, cancellationToken);
 
             await _planningDbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(result.Value.Key);
+            _logger.LogInformation("Planning interval {PlanningIntervalId} created with Key {PlanningIntervalKey}.", planningInterval.Id, planningInterval.Key);
+
+            return new ObjectIdAndKey(planningInterval.Id, planningInterval.Key);
         }
         catch (Exception ex)
         {
-            var requestName = request.GetType().Name;
-
-            _logger.LogError(ex, "Moda Request: Exception for Request {Name} {@Request}", requestName, request);
-
-            return Result.Failure<int>($"Moda Request: Exception for Request {requestName} {request}");
+            _logger.LogError(ex, "Exception handling {CommandName} command for request {@Request}.", AppRequestName, request);
+            return Result.Failure<ObjectIdAndKey>($"Error handling {AppRequestName} command.");
         }
     }
 }

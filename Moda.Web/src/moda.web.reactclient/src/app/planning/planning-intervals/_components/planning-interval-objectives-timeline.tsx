@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Card, Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { UseQueryResult } from 'react-query'
 import { DataGroup } from 'vis-timeline/standalone/esm/vis-timeline-graph2d'
 import {
   PlanningIntervalCalendarDto,
@@ -22,10 +21,7 @@ const { Text } = Typography
 
 interface PlanningIntervalObjectivesTimelineProps {
   objectivesData: PlanningIntervalObjectiveListDto[]
-  planningIntervalCalendarQuery: UseQueryResult<
-    PlanningIntervalCalendarDto,
-    unknown
-  >
+  planningIntervalCalendar: PlanningIntervalCalendarDto
   enableGroups?: boolean
   teamNames?: string[]
   viewSelector?: React.ReactNode
@@ -93,7 +89,7 @@ const getDataGroups = (
 
 const PlanningIntervalObjectivesTimeline = ({
   objectivesData,
-  planningIntervalCalendarQuery,
+  planningIntervalCalendar: planningIntervalCalendar,
   enableGroups = false,
   teamNames,
   viewSelector,
@@ -119,16 +115,16 @@ const PlanningIntervalObjectivesTimeline = ({
   )
 
   useEffect(() => {
-    if (!objectivesData || !planningIntervalCalendarQuery?.data) return
+    if (!objectivesData || !planningIntervalCalendar) return
 
-    setPiStart(planningIntervalCalendarQuery.data.start)
-    setPiEnd(planningIntervalCalendarQuery.data.end)
+    setPiStart(planningIntervalCalendar.start)
+    setPiEnd(planningIntervalCalendar.end)
 
     setIterations(
-      planningIntervalCalendarQuery.data.iterationSchedules?.map(
+      planningIntervalCalendar.iterationSchedules?.map(
         (i): ObjectiveDataItem => ({
           id: i.key,
-          planningIntervalKey: planningIntervalCalendarQuery.data.key,
+          planningIntervalKey: planningIntervalCalendar.key,
           title: i.name,
           content: i.name ?? '',
           start: dayjs(i.start).toDate(),
@@ -147,11 +143,9 @@ const PlanningIntervalObjectivesTimeline = ({
             title: `${obj.name} (${obj.status?.name}) - ${obj.progress}%`,
             content: obj.name ?? '',
             start: dayjs(
-              obj.startDate ?? planningIntervalCalendarQuery.data.start,
+              obj.startDate ?? planningIntervalCalendar.start,
             ).toDate(),
-            end: dayjs(
-              obj.targetDate ?? planningIntervalCalendarQuery.data.end,
-            ).toDate(),
+            end: dayjs(obj.targetDate ?? planningIntervalCalendar.end).toDate(),
             group: obj.team?.name,
             type: 'range',
             zIndex: 1,
@@ -161,11 +155,7 @@ const PlanningIntervalObjectivesTimeline = ({
     )
 
     setIsLoading(false)
-  }, [
-    objectivesData,
-    planningIntervalCalendarQuery,
-    planningIntervalCalendarQuery.data,
-  ])
+  }, [objectivesData, planningIntervalCalendar])
 
   return (
     <>
@@ -174,7 +164,7 @@ const PlanningIntervalObjectivesTimeline = ({
           {viewSelector}
         </Flex>
       )}
-      <Card size="small" bordered={false}>
+      <Card size="small" variant="borderless">
         <ModaTimeline
           data={[...iterations, ...objectives]}
           groups={

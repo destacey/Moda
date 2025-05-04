@@ -14,9 +14,11 @@ import {
 } from 'antd'
 import dayjs from 'dayjs'
 import { daysRemaining } from '@/src/utils'
-import { useGetPlanningIntervalPredictability } from '@/src/services/queries/planning-queries'
 import { useMemo } from 'react'
-import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
+import {
+  useGetPlanningIntervalObjectivesQuery,
+  useGetPlanningIntervalPredictabilityQuery,
+} from '@/src/store/features/planning/planning-interval-api'
 import {
   ObjectiveHealthChart,
   ObjectiveHealthChartDataItem,
@@ -37,7 +39,9 @@ const PlanningIntervalDetails = ({
   planningInterval,
 }: PlanningIntervalDetailsProps) => {
   const { data: piPredictabilityData, isLoading: isLoadingPiPredictability } =
-    useGetPlanningIntervalPredictability(planningInterval?.id)
+    useGetPlanningIntervalPredictabilityQuery(planningInterval?.key, {
+      skip: !planningInterval?.key,
+    })
 
   const {
     data: objectivesData,
@@ -45,10 +49,12 @@ const PlanningIntervalDetails = ({
     refetch: refectchObjectives,
   } = useGetPlanningIntervalObjectivesQuery(
     {
-      planningIntervalId: planningInterval?.id,
+      planningIntervalKey: planningInterval?.key,
       teamId: null,
     },
-    { skip: !planningInterval?.id || planningInterval?.state === 'Future' },
+    {
+      skip: !planningInterval?.key || planningInterval?.state === 'Future',
+    },
   )
 
   const detailsItems: DescriptionsProps['items'] = [
@@ -165,7 +171,9 @@ const PlanningIntervalDetails = ({
           )}
         </Col>
         <Col xs={24} sm={24} md={13} lg={11} xl={8}>
-          <PlanningIntervalIterationsList id={planningInterval.id} />
+          <PlanningIntervalIterationsList
+            planningIntervalKey={planningInterval?.key}
+          />
         </Col>
       </Row>
       <Divider />

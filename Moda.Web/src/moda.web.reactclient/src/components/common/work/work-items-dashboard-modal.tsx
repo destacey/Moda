@@ -7,8 +7,8 @@ import { useGetObjectiveWorkItemMetricsQuery } from '@/src/store/features/planni
 
 export interface WorkItemsDashboardModalProps {
   showDashboard: boolean
-  planningIntervalId: string
-  objectiveId: string
+  planningIntervalKey: number
+  objectiveKey: number
   onModalClose: () => void
 }
 
@@ -18,8 +18,8 @@ const WorkItemsDashboardModal = (props: WorkItemsDashboardModalProps) => {
     isLoading,
     isError,
   } = useGetObjectiveWorkItemMetricsQuery({
-    planningIntervalId: props.planningIntervalId,
-    objectiveId: props.objectiveId,
+    planningIntervalKey: props.planningIntervalKey.toString(),
+    objectiveKey: props.objectiveKey.toString(),
   })
 
   useEffect(() => {

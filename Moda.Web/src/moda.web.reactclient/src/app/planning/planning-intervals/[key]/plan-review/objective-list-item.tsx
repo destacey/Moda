@@ -37,7 +37,7 @@ export interface ObjectiveListItemProps {
   canUpdateObjectives: boolean
   canCreateHealthChecks: boolean
   refreshObjectives: () => void
-  onObjectiveClick: (objectiveId: string) => void
+  onObjectiveClick: (objectiveKey: number) => void
 }
 
 const ObjectiveListItem = ({
@@ -197,7 +197,7 @@ const ObjectiveListItem = ({
         style={sortableStyle}
         styles={{ body: { padding: 0 } }}
         hoverable
-        onClick={() => onObjectiveClick(objective.id)}
+        onClick={() => onObjectiveClick(objective.key)}
       >
         <Item key={objective.key}>
           {canUpdateObjectives && (
@@ -224,8 +224,8 @@ const ObjectiveListItem = ({
       {openUpdateObjectiveForm && (
         <EditPlanningIntervalObjectiveForm
           showForm={openUpdateObjectiveForm}
-          objectiveId={objective?.id}
-          planningIntervalId={objective?.planningInterval?.id}
+          objectiveKey={objective?.key}
+          planningIntervalKey={objective?.planningInterval?.key}
           onFormSave={() => onEditObjectiveFormClosed(true)}
           onFormCancel={() => onEditObjectiveFormClosed(false)}
         />

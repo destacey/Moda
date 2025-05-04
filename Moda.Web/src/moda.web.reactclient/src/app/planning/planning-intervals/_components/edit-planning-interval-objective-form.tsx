@@ -20,15 +20,14 @@ import {
 import { toFormErrors } from '@/src/utils'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
-import {
-  UpdatePlanningIntervalObjectiveMutationRequest,
-  useGetPlanningInterval,
-  useGetPlanningIntervalObjectiveById,
-  useGetPlanningIntervalObjectiveStatusOptions,
-  useUpdatePlanningIntervalObjectiveMutation,
-} from '@/src/services/queries/planning-queries'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
+import {
+  useGetPlanningIntervalObjectiveQuery,
+  useGetPlanningIntervalObjectiveStatusOptionsQuery,
+  useGetPlanningIntervalQuery,
+  useUpdatePlanningIntervalObjectiveMutation,
+} from '@/src/store/features/planning/planning-interval-api'
 
 const { Item } = Descriptions
 const { Item: FormItem } = Form
@@ -37,8 +36,8 @@ const { Group: RadioGroup } = Radio
 
 export interface EditPlanningIntervalObjectiveFormProps {
   showForm: boolean
-  planningIntervalId: string
-  objectiveId: string
+  planningIntervalKey: number
+  objectiveKey: number
   onFormSave: () => void
   onFormCancel: () => void
 }
@@ -58,30 +57,34 @@ interface EditPlanningIntervalObjectiveFormValues {
 
 const mapToRequestValues = (
   values: EditPlanningIntervalObjectiveFormValues,
+  objectiveKey: number,
   planningIntervalKey: number,
+  teamId: string,
 ) => {
   const objective = {
-    objectiveId: values.objectiveId,
     planningIntervalId: values.planningIntervalId,
-    teamId: values.teamId,
+    objectiveId: values.objectiveId,
     name: values.name,
-    statusId: values.statusId,
     description: values.description,
-    isStretch: values.isStretch,
+    statusId: values.statusId,
     progress: values.progress,
     startDate: (values.startDate as any)?.format('YYYY-MM-DD'),
     targetDate: (values.targetDate as any)?.format('YYYY-MM-DD'),
+    isStretch: values.isStretch,
   } as UpdatePlanningIntervalObjectiveRequest
+
   return {
-    objective,
+    request: objective,
+    objectiveKey,
     planningIntervalKey,
-  } as UpdatePlanningIntervalObjectiveMutationRequest
+    teamId,
+  }
 }
 
 const EditPlanningIntervalObjectiveForm = ({
   showForm,
-  planningIntervalId,
-  objectiveId,
+  planningIntervalKey,
+  objectiveKey,
   onFormSave,
   onFormCancel,
 }: EditPlanningIntervalObjectiveFormProps) => {
@@ -93,13 +96,17 @@ const EditPlanningIntervalObjectiveForm = ({
   const messageApi = useMessage()
 
   const { data: planningIntervalData } =
-    useGetPlanningInterval(planningIntervalId)
-  const { data: objectiveData } = useGetPlanningIntervalObjectiveById(
-    planningIntervalId,
-    objectiveId,
-  )
-  const { data: statusOptions } = useGetPlanningIntervalObjectiveStatusOptions()
-  const updateObjective = useUpdatePlanningIntervalObjectiveMutation()
+    useGetPlanningIntervalQuery(planningIntervalKey)
+
+  const { data: objectiveData } = useGetPlanningIntervalObjectiveQuery({
+    planningIntervalKey: planningIntervalKey.toString(),
+    objectiveKey: objectiveKey.toString(),
+  })
+
+  const { data: statusOptions } =
+    useGetPlanningIntervalObjectiveStatusOptionsQuery()
+  const [updateObjective, { error: mutationError }] =
+    useUpdatePlanningIntervalObjectiveMutation()
 
   const { hasPermissionClaim } = useAuth()
   const canManageObjectives = hasPermissionClaim(
@@ -131,11 +138,24 @@ const EditPlanningIntervalObjectiveForm = ({
 
   const update = async (
     values: EditPlanningIntervalObjectiveFormValues,
+    objectiveKey: number,
     planningIntervalKey: number,
+    teamId: string,
   ) => {
     try {
-      const request = mapToRequestValues(values, planningIntervalKey)
-      await updateObjective.mutateAsync(request)
+      const request = mapToRequestValues(
+        values,
+        objectiveKey,
+        planningIntervalKey,
+        teamId,
+      )
+      const response = await updateObjective(request)
+      if (response.error) {
+        throw response.error
+      }
+
+      messageApi.success('PI objective updated successfully.')
+
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -156,11 +176,17 @@ const EditPlanningIntervalObjectiveForm = ({
     setIsSaving(true)
     try {
       const values = await form.validateFields()
-      if (await update(values, objectiveData?.planningInterval.key)) {
+      if (
+        await update(
+          values,
+          objectiveKey,
+          planningIntervalKey,
+          objectiveData?.team.id,
+        )
+      ) {
         setIsOpen(false)
         onFormSave()
         form.resetFields()
-        messageApi.success('Successfully updated PI objective.')
       }
     } catch (errorInfo) {
       console.error('handleOk error', errorInfo)

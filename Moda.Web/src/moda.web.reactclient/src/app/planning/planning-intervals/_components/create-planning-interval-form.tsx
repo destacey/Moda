@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react'
 import useAuth from '../../../../components/contexts/auth'
 import { CreatePlanningIntervalRequest } from '@/src/services/moda-api'
 import { toFormErrors } from '@/src/utils'
-import { useCreatePlanningIntervalMutation } from '@/src/services/queries/planning-queries'
 import { MarkdownEditor } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { useCreatePlanningIntervalMutation } from '@/src/store/features/planning/planning-interval-api'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -53,11 +53,11 @@ const CreatePlanningIntervalForm = ({
   const formValues = Form.useWatch([], form)
   const messageApi = useMessage()
 
-  const createPlanningInterval = useCreatePlanningIntervalMutation()
+  const [createPlanningInterval, { error: mutationError }] =
+    useCreatePlanningIntervalMutation()
 
-  const { hasClaim } = useAuth()
-  const canCreatePlanningInterval = hasClaim(
-    'Permission',
+  const { hasPermissionClaim } = useAuth()
+  const canCreatePlanningInterval = hasPermissionClaim(
     'Permissions.PlanningIntervals.Create',
   )
 
@@ -66,7 +66,12 @@ const CreatePlanningIntervalForm = ({
   ): Promise<boolean> => {
     try {
       const request = mapToRequestValues(values)
-      await createPlanningInterval.mutateAsync(request)
+      const response = await createPlanningInterval(request)
+      if (response.error) {
+        throw response.error
+      }
+      messageApi.success('Successfully created planning interval.')
+
       return true
     } catch (error) {
       if (error.status === 422 && error.errors) {
@@ -75,7 +80,7 @@ const CreatePlanningIntervalForm = ({
         messageApi.error('Correct the validation error(s) to continue.')
       } else {
         messageApi.error(
-          'An unexpected error occurred while creating the planning interval.',
+          'An error occurred while creating the planning interval. Please try again.',
         )
         console.error(error)
       }
@@ -91,10 +96,12 @@ const CreatePlanningIntervalForm = ({
         setIsOpen(false)
         form.resetFields()
         onFormCreate()
-        messageApi.success('Successfully created planning interval.')
       }
     } catch (errorInfo) {
       console.log('handleOk error', errorInfo)
+      messageApi.error(
+        'An error occurred while creating the planning interval. Please try again.',
+      )
     } finally {
       setIsSaving(false)
     }
@@ -158,9 +165,7 @@ const CreatePlanningIntervalForm = ({
         >
           <MarkdownEditor
             value={form.getFieldValue('description')}
-            onChange={(value) =>
-              form.setFieldValue('description', value || '')
-            }
+            onChange={(value) => form.setFieldValue('description', value || '')}
             maxLength={2048}
           />
         </Item>

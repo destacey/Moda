@@ -7,6 +7,7 @@ import {
 } from '@/src/services/moda-api'
 import {
   useGetObjectiveWorkItemsQuery,
+  useGetPlanningIntervalObjectiveQuery,
   useManageObjectiveWorkItemsMutation,
 } from '@/src/store/features/planning/planning-interval-api'
 import { useSearchWorkItemsQuery } from '@/src/store/features/work-management/workspace-api'
@@ -26,8 +27,8 @@ const { Text } = Typography
 
 export interface ManagePlanningIntervalObjectiveWorkItemsFormProps {
   showForm: boolean
-  planningIntervalId: string
-  objectiveId: string
+  planningIntervalKey: number
+  objectiveKey: number
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -85,8 +86,8 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
 ) => {
   const {
     showForm,
-    planningIntervalId,
-    objectiveId,
+    planningIntervalKey,
+    objectiveKey,
     onFormComplete,
     onFormCancel,
   } = props
@@ -102,13 +103,18 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
 
   const [searchQuery, setSearchQuery] = useState<string>('')
 
+  const { data: objectiveData } = useGetPlanningIntervalObjectiveQuery({
+    planningIntervalKey: planningIntervalKey.toString(),
+    objectiveKey: objectiveKey.toString(),
+  })
+
   const {
     data: existingWorkItemsData,
     isLoading: existingWorkItemsQueryIsLoading,
     isError: existingWorkItemsQueryIsError,
   } = useGetObjectiveWorkItemsQuery({
-    planningIntervalId: planningIntervalId,
-    objectiveId: objectiveId,
+    planningIntervalKey: planningIntervalKey.toString(),
+    objectiveKey: objectiveKey.toString(),
   })
 
   const debounceSearchQuery = useDebounce(searchQuery, 500)
@@ -174,12 +180,16 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = (
 
   const formAction = async (): Promise<boolean> => {
     try {
+      // TODO: get the objectiveData from the API and use it to get the work items
       const request: ManagePlanningIntervalObjectiveWorkItemsRequest = {
-        planningIntervalId: planningIntervalId,
-        objectiveId: objectiveId,
+        planningIntervalId: objectiveData?.planningInterval.id,
+        objectiveId: objectiveData?.id,
         workItemIds: targetWorkItems.map((item) => item.id),
       }
-      await manageObjectiveWorkItems(request)
+      await manageObjectiveWorkItems({
+        request,
+        cacheKey: objectiveKey.toString(),
+      })
       messageApi.success('Successfully updated objective work items.')
       return true
     } catch (error) {

@@ -15,12 +15,12 @@ import {
   PlanningIntervalObjectiveDetailsDrawer,
   PlanningIntervalObjectivesTimeline,
 } from '../../_components'
+import { useGetPlanningIntervalRisksByTeamId } from '@/src/services/queries/planning-queries'
 import {
-  useGetPlanningIntervalCalendar,
-  useGetPlanningIntervalRisksByTeamId,
-  useGetTeamPlanningIntervalPredictability,
-} from '@/src/services/queries/planning-queries'
-import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
+  useGetPlanningIntervalCalendarQuery,
+  useGetPlanningIntervalObjectivesQuery,
+  useGetPlanningIntervalTeamPredictabilityQuery,
+} from '@/src/store/features/planning/planning-interval-api'
 import useAuth from '@/src/components/contexts/auth'
 
 const { Title } = Typography
@@ -49,16 +49,21 @@ const TeamPlanReview = ({
 }: TeamPlanReviewProps) => {
   const [currentView, setCurrentView] = useState<string | number>('List')
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [selectedObjectiveId, setSelectedObjectiveId] = useState<string | null>(
-    null,
-  )
+  const [selectedObjectiveKey, setSelectedObjectiveKey] = useState<
+    number | null
+  >(null)
 
-  const calendarQuery = useGetPlanningIntervalCalendar(planningInterval?.id)
+  const { data: calendarData } = useGetPlanningIntervalCalendarQuery(
+    planningInterval?.key,
+    {
+      skip: !planningInterval?.key,
+    },
+  )
 
   const { data: objectivesData, refetch: refetchObjectives } =
     useGetPlanningIntervalObjectivesQuery(
       {
-        planningIntervalId: planningInterval?.id,
+        planningIntervalKey: planningInterval?.key,
         teamId: team?.id,
       },
       { skip: !planningInterval?.id || !team?.id },
@@ -69,10 +74,11 @@ const TeamPlanReview = ({
     team?.id,
   )
 
-  const predictabilityQuery = useGetTeamPlanningIntervalPredictability(
-    planningInterval?.id,
-    team?.id,
-  )
+  const { data: teamPredictabilityData } =
+    useGetPlanningIntervalTeamPredictabilityQuery(
+      { planningIntervalKey: planningInterval?.key, teamId: team?.id },
+      { skip: !planningInterval?.key || !team?.id },
+    )
 
   const { hasPermissionClaim } = useAuth()
   const canManageObjectives = hasPermissionClaim(
@@ -101,11 +107,14 @@ const TeamPlanReview = ({
 
   const onDrawerClose = () => {
     setDrawerOpen(false)
-    setSelectedObjectiveId(null)
+    setSelectedObjectiveKey(null)
+
+    // TODO: why isn't this refetching automatically on the invalidation?
+    refetchObjectives()
   }
 
-  const onObjectiveClick = (objectiveId: string) => {
-    setSelectedObjectiveId(objectiveId)
+  const onObjectiveClick = (objectiveKey: number) => {
+    setSelectedObjectiveKey(objectiveKey)
     showDrawer()
   }
 
@@ -120,8 +129,8 @@ const TeamPlanReview = ({
           <Title level={3} style={{ margin: '0' }}>
             <Link href={`/organizations/teams/${team?.key}`}>{team?.name}</Link>
           </Title>
-          {objectivesData?.length > 0 && predictabilityQuery?.data != null && (
-            <Tag title="PI Predictability">{`${predictabilityQuery?.data}%`}</Tag>
+          {objectivesData?.length > 0 && teamPredictabilityData && (
+            <Tag title="PI Predictability">{`${teamPredictabilityData}%`}</Tag>
           )}
         </Space>
         {viewSelector}
@@ -134,6 +143,7 @@ const TeamPlanReview = ({
               refreshObjectives={refetchObjectives}
               teamId={team?.id}
               planningIntervalId={planningInterval?.id}
+              planningIntervalKey={planningInterval?.key}
               newObjectivesAllowed={
                 planningInterval && !planningInterval.objectivesLocked
               }
@@ -155,13 +165,13 @@ const TeamPlanReview = ({
       ) : (
         <PlanningIntervalObjectivesTimeline
           objectivesData={objectivesData}
-          planningIntervalCalendarQuery={calendarQuery}
+          planningIntervalCalendar={calendarData}
         />
       )}
-      {planningInterval?.id && selectedObjectiveId && (
+      {planningInterval?.key && selectedObjectiveKey && (
         <PlanningIntervalObjectiveDetailsDrawer
-          planningIntervalId={planningInterval?.id}
-          objectiveId={selectedObjectiveId}
+          planningIntervalKey={planningInterval?.key}
+          objectiveKey={selectedObjectiveKey}
           drawerOpen={drawerOpen}
           onDrawerClose={onDrawerClose}
           canManageObjectives={canManageObjectives}

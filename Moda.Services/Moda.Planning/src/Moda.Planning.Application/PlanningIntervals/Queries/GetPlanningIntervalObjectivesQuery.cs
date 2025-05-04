@@ -1,5 +1,7 @@
-﻿using MediatR;
+﻿using System.Linq.Expressions;
+using MediatR;
 using Moda.Common.Application.Dtos;
+using Moda.Common.Application.Models;
 using Moda.Goals.Application.Objectives.Queries;
 using Moda.Planning.Application.PlanningIntervals.Dtos;
 
@@ -7,37 +9,22 @@ namespace Moda.Planning.Application.PlanningIntervals.Queries;
 
 public sealed record GetPlanningIntervalObjectivesQuery : IQuery<IReadOnlyList<PlanningIntervalObjectiveListDto>>
 {
-    public GetPlanningIntervalObjectivesQuery(Guid id, Guid? teamId)
+    public GetPlanningIntervalObjectivesQuery(IdOrKey idOrKey, Guid? teamId)
     {
-        Id = id;
+        PlanningIntervalIdOrKeyFilter = idOrKey.CreateFilter<PlanningInterval>();
         TeamId = teamId;
     }
 
-    public GetPlanningIntervalObjectivesQuery(int key, Guid? teamId)
-    {
-        Key = key;
-        TeamId = teamId;
-    }
-
-    public Guid? Id { get; set; }
-    public int? Key { get; set; }
+    public Expression<Func<PlanningInterval, bool>> PlanningIntervalIdOrKeyFilter { get; }
     public Guid? TeamId { get; set; }
 }
 
-internal sealed class GetPlanningIntervalObjectivesQueryHandler : IQueryHandler<GetPlanningIntervalObjectivesQuery, IReadOnlyList<PlanningIntervalObjectiveListDto>>
+internal sealed class GetPlanningIntervalObjectivesQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalObjectivesQueryHandler> logger, ISender sender, IDateTimeProvider dateTimeProvider) : IQueryHandler<GetPlanningIntervalObjectivesQuery, IReadOnlyList<PlanningIntervalObjectiveListDto>>
 {
-    private readonly IPlanningDbContext _planningDbContext;
-    private readonly ILogger<GetPlanningIntervalObjectivesQueryHandler> _logger;
-    private readonly ISender _sender;
-    private readonly IDateTimeProvider _dateTimeProvider;
-
-    public GetPlanningIntervalObjectivesQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalObjectivesQueryHandler> logger, ISender sender, IDateTimeProvider dateTimeProvider)
-    {
-        _planningDbContext = planningDbContext;
-        _logger = logger;
-        _sender = sender;
-        _dateTimeProvider = dateTimeProvider;
-    }
+    private readonly IPlanningDbContext _planningDbContext = planningDbContext;
+    private readonly ILogger<GetPlanningIntervalObjectivesQueryHandler> _logger = logger;
+    private readonly ISender _sender = sender;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<IReadOnlyList<PlanningIntervalObjectiveListDto>> Handle(GetPlanningIntervalObjectivesQuery request, CancellationToken cancellationToken)
     {
@@ -46,10 +33,11 @@ internal sealed class GetPlanningIntervalObjectivesQueryHandler : IQueryHandler<
         if (request.TeamId.HasValue)
         {
             var piTeamExists = await _planningDbContext.PlanningIntervals
-                .AnyAsync(p => p.Id == request.Id && p.Teams.Any(t => t.TeamId == request.TeamId.Value), cancellationToken);
+                .Where(request.PlanningIntervalIdOrKeyFilter)
+                .AnyAsync(p => p.Teams.Any(t => t.TeamId == request.TeamId.Value), cancellationToken);
             if (!piTeamExists)
             {
-                ThrowAndLogException(request, $"Planning interval {request.Id} does not have team {request.TeamId}.");
+                ThrowAndLogException(request, $"Planning interval does not have team {request.TeamId}.");
             }
 
             query = query
@@ -67,20 +55,8 @@ internal sealed class GetPlanningIntervalObjectivesQueryHandler : IQueryHandler<
                     .ThenInclude(o => o.HealthCheck);
         }
 
-        if (request.Id.HasValue)
-        {
-            query = query.Where(p => p.Id == request.Id.Value);
-        }
-        else if (request.Key.HasValue)
-        {
-            query = query.Where(p => p.Key == request.Key.Value);
-        }
-        else
-        {
-            ThrowAndLogException(request, "No planning interval id or local id provided.");
-        }
-
         var planningInterval = await query
+            .Where(request.PlanningIntervalIdOrKeyFilter)
             .AsNoTrackingWithIdentityResolution()
             .FirstOrDefaultAsync(cancellationToken);
         if (planningInterval is null || planningInterval.Objectives.Count == 0)

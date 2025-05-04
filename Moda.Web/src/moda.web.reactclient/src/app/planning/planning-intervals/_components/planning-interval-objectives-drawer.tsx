@@ -1,19 +1,20 @@
 'use client'
 
 import { useGetPlanningIntervalObjectiveQuery } from '@/src/store/features/planning/planning-interval-api'
-import { Descriptions, Drawer, Flex } from 'antd'
+import { Button, Descriptions, Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import PlanningIntervalObjectiveWorkItemsCard from '../[key]/objectives/[objectiveKey]/planning-interval-objective-work-items-card'
 import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
-import { FC } from 'react'
+import { FC, useState } from 'react'
+import { EditPlanningIntervalObjectiveForm } from '.'
 
 const { Item: DescriptionsItem } = Descriptions
 
 interface PlanningIntervalObjectiveDetailsDrawerProps {
-  planningIntervalId: string
-  objectiveId: string
+  planningIntervalKey: number
+  objectiveKey: number
   drawerOpen: boolean
   onDrawerClose: () => void
   canManageObjectives: boolean
@@ -22,76 +23,99 @@ interface PlanningIntervalObjectiveDetailsDrawerProps {
 const PlanningIntervalObjectiveDetailsDrawer: FC<
   PlanningIntervalObjectiveDetailsDrawerProps
 > = (props: PlanningIntervalObjectiveDetailsDrawerProps) => {
+  const [openEditObjectiveForm, setOpenEditObjectiveForm] =
+    useState<boolean>(false)
+
   const { data: objectiveData, isLoading: objectiveDataIsLoading } =
     useGetPlanningIntervalObjectiveQuery(
       {
-        planningIntervalId: props.planningIntervalId,
-        objectiveId: props.objectiveId,
+        planningIntervalKey: props.planningIntervalKey.toString(),
+        objectiveKey: props.objectiveKey.toString(),
       },
-      { skip: !props.planningIntervalId || !props.objectiveId },
+      { skip: !props.planningIntervalKey || !props.objectiveKey },
     )
 
-  if (!props.planningIntervalId || !props.objectiveId) {
+  if (!props.planningIntervalKey || !props.objectiveKey) {
     return null
   }
 
   if (!objectiveDataIsLoading && !objectiveData) return null
 
+  const onEditObjectiveFormClosed = (wasSaved: boolean) => {
+    setOpenEditObjectiveForm(false)
+  }
+
   return (
-    <Drawer
-      title={objectiveData?.name ?? 'Objective'}
-      placement="right"
-      onClose={props.onDrawerClose}
-      open={props.drawerOpen}
-      destroyOnClose={true}
-      loading={objectiveDataIsLoading}
-      width={getDrawerWidthPercentage()}
-    >
-      <Flex vertical gap="middle">
+    <>
+      <Drawer
+        title={objectiveData?.name ?? 'Objective'}
+        placement="right"
+        onClose={props.onDrawerClose}
+        open={props.drawerOpen}
+        destroyOnClose={true}
+        loading={objectiveDataIsLoading}
+        width={getDrawerWidthPercentage()}
+        extra={
+          props.canManageObjectives && (
+            <Button onClick={() => setOpenEditObjectiveForm(true)}>Edit</Button>
+          )
+        }
+      >
         <Flex vertical gap="middle">
-          <Descriptions column={1} size="small">
-            <DescriptionsItem label="Key">
-              {objectiveData && (
-                <Link
-                  href={`/planning/planning-intervals/${objectiveData.planningInterval.key}/objectives/${objectiveData.key}`}
-                >
-                  {objectiveData.key}
-                </Link>
-              )}
-            </DescriptionsItem>
-            <DescriptionsItem label="Is Stretch?">
-              {objectiveData?.isStretch ? 'Yes' : 'No'}
-            </DescriptionsItem>
-            <DescriptionsItem label="Status">
-              {objectiveData?.status.name}
-            </DescriptionsItem>
-            <DescriptionsItem label="Start Date">
-              {objectiveData?.startDate &&
-                dayjs(objectiveData?.startDate).format('MMM D, YYYY')}
-            </DescriptionsItem>
-            <DescriptionsItem label="Target Date">
-              {objectiveData?.targetDate &&
-                dayjs(objectiveData?.targetDate).format('MMM D, YYYY')}
-            </DescriptionsItem>
-            {objectiveData?.closedDate && (
-              <DescriptionsItem label="Closed Date">
-                {dayjs(objectiveData?.closedDate).format('MMM D, YYYY')}
+          <Flex vertical gap="middle">
+            <Descriptions column={1} size="small">
+              <DescriptionsItem label="Key">
+                {objectiveData && (
+                  <Link
+                    href={`/planning/planning-intervals/${objectiveData.planningInterval.key}/objectives/${objectiveData.key}`}
+                  >
+                    {objectiveData.key}
+                  </Link>
+                )}
               </DescriptionsItem>
-            )}
-          </Descriptions>
-          <Descriptions column={1} layout="vertical" size="small">
-            <DescriptionsItem label="Description">
-              <MarkdownRenderer markdown={objectiveData?.description} />
-            </DescriptionsItem>
-          </Descriptions>
+              <DescriptionsItem label="Is Stretch?">
+                {objectiveData?.isStretch ? 'Yes' : 'No'}
+              </DescriptionsItem>
+              <DescriptionsItem label="Status">
+                {objectiveData?.status.name}
+              </DescriptionsItem>
+              <DescriptionsItem label="Start Date">
+                {objectiveData?.startDate &&
+                  dayjs(objectiveData?.startDate).format('MMM D, YYYY')}
+              </DescriptionsItem>
+              <DescriptionsItem label="Target Date">
+                {objectiveData?.targetDate &&
+                  dayjs(objectiveData?.targetDate).format('MMM D, YYYY')}
+              </DescriptionsItem>
+              {objectiveData?.closedDate && (
+                <DescriptionsItem label="Closed Date">
+                  {dayjs(objectiveData?.closedDate).format('MMM D, YYYY')}
+                </DescriptionsItem>
+              )}
+            </Descriptions>
+            <Descriptions column={1} layout="vertical" size="small">
+              <DescriptionsItem label="Description">
+                <MarkdownRenderer markdown={objectiveData?.description} />
+              </DescriptionsItem>
+            </Descriptions>
+          </Flex>
+          <PlanningIntervalObjectiveWorkItemsCard
+            planningIntervalKey={props.planningIntervalKey}
+            objectiveKey={props.objectiveKey}
+            canLinkWorkItems={props.canManageObjectives}
+          />
         </Flex>
-        <PlanningIntervalObjectiveWorkItemsCard
-          planningIntervalId={props.planningIntervalId}
-          objectiveId={props.objectiveId}
-          canLinkWorkItems={props.canManageObjectives}
+      </Drawer>
+      {openEditObjectiveForm && (
+        <EditPlanningIntervalObjectiveForm
+          showForm={openEditObjectiveForm}
+          objectiveKey={props.objectiveKey}
+          planningIntervalKey={props.planningIntervalKey}
+          onFormSave={() => onEditObjectiveFormClosed(true)}
+          onFormCancel={() => onEditObjectiveFormClosed(false)}
         />
-      </Flex>
-    </Drawer>
+      )}
+    </>
   )
 }
 
