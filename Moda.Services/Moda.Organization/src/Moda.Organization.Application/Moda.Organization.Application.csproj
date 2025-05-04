@@ -6,6 +6,7 @@
         <PackageReference Include="MediatR" Version="12.5.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.4" />
+        <PackageReference Include="Neo4jClient" Version="5.1.20" />
     </ItemGroup>
 
     <ItemGroup>

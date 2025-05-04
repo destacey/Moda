@@ -41,6 +41,17 @@ public class TeamsController : ControllerBase
         return Ok(teams.OrderBy(e => e.Name));
     }
 
+    [HttpGet("neo4j")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
+    [OpenApiOperation("Get a list of teams from Neo4j.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<TeamListDto>>> GetListFromNeo4j(CancellationToken cancellationToken, bool includeInactive = false)
+    {
+        var teams = await _sender.Send(new GetTeamsNeo4jQuery(includeInactive), cancellationToken);
+        return Ok(teams.OrderBy(e => e.Name));
+    }
+
     [HttpGet("{id}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Teams)]
     [OpenApiOperation("Get team details using the key.", "")]

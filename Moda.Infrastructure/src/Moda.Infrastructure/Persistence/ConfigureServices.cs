@@ -8,13 +8,15 @@ using Moda.Planning.Application.Persistence;
 using Moda.ProjectPortfolioManagement.Application;
 using Moda.StrategicManagement.Application;
 using Moda.Work.Application.Persistence;
+using Neo4j.Driver;
+using Neo4jClient;
 using Serilog;
 
 namespace Moda.Infrastructure.Persistence;
 
 internal static class ConfigureServices
 {
-    private static readonly ILogger _logger = Log.ForContext(typeof(ConfigureServices));
+    private static readonly Serilog.ILogger _logger = Log.ForContext(typeof(ConfigureServices));
 
     internal static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration config)
     {
@@ -22,6 +24,10 @@ internal static class ConfigureServices
         var databaseSettings = config.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>();
         if (databaseSettings is null)
             throw new InvalidOperationException("DatabaseSettings is not configured.");
+
+        var neo4jSettings = config.GetSection(nameof(Neo4jSettings)).Get<Neo4jSettings>();
+        if (neo4jSettings is null)
+            throw new InvalidOperationException("Neo4jSettings is not configured.");
 
         string? rootConnectionString = databaseSettings.ConnectionString;
         if (string.IsNullOrWhiteSpace(rootConnectionString))
@@ -35,6 +41,7 @@ internal static class ConfigureServices
 
         return services
             .Configure<DatabaseSettings>(config.GetSection(nameof(DatabaseSettings)))
+            .Configure<Neo4jSettings>(config.GetSection(nameof(Neo4jSettings)))
 
             .AddDbContext<ModaDbContext>(m => m.UseDatabase(dbProvider, rootConnectionString))
             .AddDomainDbContexts()
@@ -46,7 +53,20 @@ internal static class ConfigureServices
             .AddTransient<CustomSeederRunner>()
 
             .AddTransient<IConnectionStringSecurer, ConnectionStringSecurer>()
-            .AddTransient<IConnectionStringValidator, ConnectionStringValidator>();
+            .AddTransient<IConnectionStringValidator, ConnectionStringValidator>()
+
+            .AddSingleton<IGraphClient>((sp) =>
+            {
+                var client = new GraphClient(new Uri(neo4jSettings.Database), neo4jSettings.User, neo4jSettings.Password);
+                var connectTask = client.ConnectAsync();
+                connectTask.Wait();
+                if (connectTask.IsFaulted)
+                {
+                    _logger.Error("Failed to connect to Neo4j database.");
+                    throw new InvalidOperationException("Failed to connect to Neo4j database.");
+                }
+                return client;
+            });
     }
 
     internal static DbContextOptionsBuilder UseDatabase(this DbContextOptionsBuilder builder, string dbProvider, string connectionString)
