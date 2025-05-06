@@ -41,10 +41,6 @@ const PlanningIntervalObjectiveDetailsDrawer: FC<
 
   if (!objectiveDataIsLoading && !objectiveData) return null
 
-  const onEditObjectiveFormClosed = (wasSaved: boolean) => {
-    setOpenEditObjectiveForm(false)
-  }
-
   return (
     <>
       <Drawer
@@ -111,8 +107,8 @@ const PlanningIntervalObjectiveDetailsDrawer: FC<
           showForm={openEditObjectiveForm}
           objectiveKey={props.objectiveKey}
           planningIntervalKey={props.planningIntervalKey}
-          onFormSave={() => onEditObjectiveFormClosed(true)}
-          onFormCancel={() => onEditObjectiveFormClosed(false)}
+          onFormSave={() => setOpenEditObjectiveForm(false)}
+          onFormCancel={() => setOpenEditObjectiveForm(false)}
         />
       )}
     </>
