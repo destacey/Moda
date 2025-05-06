@@ -4480,10 +4480,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "guid",
-                  "nullable": false,
-                  "example": "00000000-0000-0000-0000-000000000000"
+                  "$ref": "#/components/schemas/ObjectIdAndKey"
                 }
               }
             }
@@ -4610,7 +4607,7 @@
         ]
       }
     },
-    "/api/planning/planning-intervals/{id}/predictability": {
+    "/api/planning/planning-intervals/{idOrKey}/predictability": {
       "get": {
         "tags": [
           "PlanningIntervals"
@@ -4619,14 +4616,11 @@
         "operationId": "PlanningIntervals_GetPredictability",
         "parameters": [
           {
-            "name": "id",
+            "name": "idOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
+              "type": "string"
             },
             "x-position": 1
           }
@@ -4735,7 +4729,7 @@
         ]
       }
     },
-    "/api/planning/planning-intervals/{id}/teams": {
+    "/api/planning/planning-intervals/{idOrKey}/teams": {
       "get": {
         "tags": [
           "PlanningIntervals"
@@ -4744,14 +4738,11 @@
         "operationId": "PlanningIntervals_GetTeams",
         "parameters": [
           {
-            "name": "id",
+            "name": "idOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
+              "type": "string"
             },
             "x-position": 1
           }
@@ -4786,62 +4777,9 @@
             "Bearer": []
           }
         ]
-      },
-      "post": {
-        "tags": [
-          "PlanningIntervals"
-        ],
-        "summary": "Manage planning interval teams.",
-        "operationId": "PlanningIntervals_ManageTeams",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManagePlanningIntervalTeamsRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
       }
     },
-    "/api/planning/planning-intervals/{id}/teams/{teamId}/predictability": {
+    "/api/planning/planning-intervals/{idOrKey}/teams/{teamId}/predictability": {
       "get": {
         "tags": [
           "PlanningIntervals"
@@ -4850,14 +4788,11 @@
         "operationId": "PlanningIntervals_GetTeamPredictability",
         "parameters": [
           {
-            "name": "id",
+            "name": "idOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
+              "type": "string"
             },
             "x-position": 1
           },
@@ -4932,6 +4867,61 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ManagePlanningIntervalDatesRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/planning-intervals/{id}/teams": {
+      "post": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Manage planning interval teams.",
+        "operationId": "PlanningIntervals_ManageTeams",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagePlanningIntervalTeamsRequest"
               }
             }
           },
@@ -5049,7 +5039,7 @@
         ]
       }
     },
-    "/api/planning/planning-intervals/{id}/objectives": {
+    "/api/planning/planning-intervals/{idOrKey}/objectives": {
       "get": {
         "tags": [
           "PlanningIntervals"
@@ -5058,14 +5048,11 @@
         "operationId": "PlanningIntervals_GetObjectives",
         "parameters": [
           {
-            "name": "id",
+            "name": "idOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
+              "type": "string"
             },
             "x-position": 1
           },
@@ -5111,7 +5098,75 @@
             "Bearer": []
           }
         ]
-      },
+      }
+    },
+    "/api/planning/planning-intervals/{idOrKey}/objectives/{objectiveIdOrKey}": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get a planning interval objective.",
+        "operationId": "PlanningIntervals_GetObjective",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "objectiveIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningIntervalObjectiveDetailsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/planning-intervals/{id}/objectives": {
       "post": {
         "tags": [
           "PlanningIntervals"
@@ -5150,8 +5205,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "integer",
-                  "format": "int32"
+                  "$ref": "#/components/schemas/ObjectIdAndKey"
                 }
               }
             }
@@ -5195,76 +5249,6 @@
       }
     },
     "/api/planning/planning-intervals/{id}/objectives/{objectiveId}": {
-      "get": {
-        "tags": [
-          "PlanningIntervals"
-        ],
-        "summary": "Get a planning interval objective.",
-        "operationId": "PlanningIntervals_GetObjectiveById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "objectiveId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlanningIntervalObjectiveDetailsDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      },
       "put": {
         "tags": [
           "PlanningIntervals"
@@ -5387,74 +5371,6 @@
             "description": ""
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      }
-    },
-    "/api/planning/planning-intervals/key/{id}/objectives/{objectiveId}": {
-      "get": {
-        "tags": [
-          "PlanningIntervals"
-        ],
-        "summary": "Get a planning interval objective using the PI and Objective keys.",
-        "operationId": "PlanningIntervals_GetObjectiveByKey",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "objectiveId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlanningIntervalObjectiveDetailsDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
             "description": "",
             "content": {
               "application/json": {
@@ -5608,7 +5524,7 @@
         ]
       }
     },
-    "/api/planning/planning-intervals/{id}/objectives/{objectiveId}/work-items": {
+    "/api/planning/planning-intervals/{idOrKey}/objectives/{objectiveIdOrKey}/work-items": {
       "get": {
         "tags": [
           "PlanningIntervals"
@@ -5617,26 +5533,20 @@
         "operationId": "PlanningIntervals_GetObjectiveWorkItems",
         "parameters": [
           {
-            "name": "id",
+            "name": "idOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
+              "type": "string"
             },
             "x-position": 1
           },
           {
-            "name": "objectiveId",
+            "name": "objectiveIdOrKey",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
+              "type": "string"
             },
             "x-position": 2
           }
@@ -5678,7 +5588,78 @@
             "Bearer": []
           }
         ]
-      },
+      }
+    },
+    "/api/planning/planning-intervals/{idOrKey}/objectives/{objectiveIdOrKey}/work-items/metrics": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get metrics for the work items linked to an objective.",
+        "operationId": "PlanningIntervals_GetObjectiveWorkItemMetrics",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "objectiveIdOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkItemProgressDailyRollupDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/planning/planning-intervals/{id}/objectives/{objectiveId}/work-items": {
       "post": {
         "tags": [
           "PlanningIntervals"
@@ -5753,81 +5734,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      }
-    },
-    "/api/planning/planning-intervals/{id}/objectives/{objectiveId}/work-items/metrics": {
-      "get": {
-        "tags": [
-          "PlanningIntervals"
-        ],
-        "summary": "Get metrics for the work items linked to an objective.",
-        "operationId": "PlanningIntervals_GetObjectiveWorkItemMetrics",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "objectiveId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": false,
-              "example": "00000000-0000-0000-0000-000000000000"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WorkItemProgressDailyRollupDto"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }

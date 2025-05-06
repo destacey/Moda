@@ -9,7 +9,7 @@ import { getSortedNames } from '@/src/utils'
 import { getDrawerWidthPercentage } from '@/src/utils/window-utils'
 import { Descriptions, Drawer, Flex, Spin } from 'antd'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo } from 'react'
+import { FC, useCallback, useEffect, useMemo } from 'react'
 
 const { Item } = Descriptions
 
@@ -19,9 +19,7 @@ export interface ProjectDrawerProps {
   onDrawerClose: () => void
 }
 
-const ProjectDrawer: React.FC<ProjectDrawerProps> = (
-  props: ProjectDrawerProps,
-) => {
+const ProjectDrawer: FC<ProjectDrawerProps> = (props: ProjectDrawerProps) => {
   const messageApi = useMessage()
 
   const {

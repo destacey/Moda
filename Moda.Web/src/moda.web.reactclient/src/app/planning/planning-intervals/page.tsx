@@ -3,29 +3,38 @@
 import ModaGrid from '@/src/components/common/moda-grid'
 import PageTitle from '@/src/components/common/page-title'
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDocumentTitle } from '../../../hooks/use-document-title'
 import dayjs from 'dayjs'
 import { CreatePlanningIntervalForm } from './_components'
 import useAuth from '../../../components/contexts/auth'
 import { Button } from 'antd'
-import { useGetPlanningIntervals } from '@/src/services/queries/planning-queries'
 import { authorizePage } from '../../../components/hoc'
+import { useGetPlanningIntervalsQuery } from '@/src/store/features/planning/planning-interval-api'
+import { PlanningIntervalListDto } from '@/src/services/moda-api'
 
 const PlanningIntervalLinkCellRenderer = ({ value, data }) => {
   return <Link href={`/planning/planning-intervals/${data.key}`}>{value}</Link>
 }
 
+const stateOrder = ['Active', 'Future', 'Completed']
+
 const PlanningIntervalListPage = () => {
   useDocumentTitle('Planning Intervals')
+
+  const [data, setData] = useState<PlanningIntervalListDto[]>([])
   const [openCreatePlanningIntervalForm, setOpenCreatePlanningIntervalForm] =
     useState<boolean>(false)
 
-  const { data, isLoading, refetch } = useGetPlanningIntervals()
+  const {
+    data: piData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetPlanningIntervalsQuery()
 
-  const { hasClaim } = useAuth()
-  const canCreatePlanningInterval = hasClaim(
-    'Permission',
+  const { hasPermissionClaim } = useAuth()
+  const canCreatePlanningInterval = hasPermissionClaim(
     'Permissions.PlanningIntervals.Create',
   )
   const showActions = canCreatePlanningInterval
@@ -54,6 +63,22 @@ const PlanningIntervalListPage = () => {
   const refresh = useCallback(async () => {
     refetch()
   }, [refetch])
+
+  useEffect(() => {
+    if (!piData) return
+
+    const sortedData = piData.slice().sort((a, b) => {
+      const aStateIndex = stateOrder.indexOf(a.state)
+      const bStateIndex = stateOrder.indexOf(b.state)
+      if (aStateIndex !== bStateIndex) {
+        return aStateIndex - bStateIndex
+      } else {
+        return dayjs(b.start).unix() - dayjs(a.start).unix()
+      }
+    })
+
+    setData(sortedData)
+  }, [piData])
 
   const onCreatePlanningIntervalFormClosed = (wasCreated: boolean) => {
     setOpenCreatePlanningIntervalForm(false)

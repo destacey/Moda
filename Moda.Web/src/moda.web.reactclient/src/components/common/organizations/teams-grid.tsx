@@ -1,6 +1,5 @@
-import { useCallback, useMemo } from 'react'
+import { FC, useCallback, useMemo } from 'react'
 import ModaGrid from '../moda-grid'
-import { UseQueryResult } from 'react-query'
 import { PlanningIntervalTeamResponse } from '@/src/services/moda-api'
 import {
   NestedTeamOfTeamsNameLinkCellRenderer,
@@ -9,14 +8,13 @@ import {
 import { ColDef } from 'ag-grid-community'
 
 export interface TeamsGridProps {
-  teamsQuery: UseQueryResult<PlanningIntervalTeamResponse[], unknown>
+  teams: PlanningIntervalTeamResponse[]
+  isLoading: boolean
+  refetch: () => void
 }
 
-const TeamsGrid = ({ teamsQuery }: TeamsGridProps) => {
-  const refresh = useCallback(async () => {
-    teamsQuery.refetch()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+const TeamsGrid: FC<TeamsGridProps> = (props) => {
+  const { refetch } = props
 
   const columnDefs = useMemo<ColDef<PlanningIntervalTeamResponse>[]>(
     () => [
@@ -37,15 +35,19 @@ const TeamsGrid = ({ teamsQuery }: TeamsGridProps) => {
     [],
   )
 
+  const refresh = useCallback(async () => {
+    refetch()
+  }, [refetch])
+
   return (
     <>
       {/* TODO:  setup dynamic height */}
       <ModaGrid
         height={550}
         columnDefs={columnDefs}
-        rowData={teamsQuery.data}
+        rowData={props.teams}
         loadData={refresh}
-        loading={teamsQuery.isLoading}
+        loading={props.isLoading}
       />
     </>
   )

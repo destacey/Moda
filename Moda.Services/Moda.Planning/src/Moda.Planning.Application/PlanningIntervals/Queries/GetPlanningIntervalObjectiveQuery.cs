@@ -1,5 +1,8 @@
-﻿using MediatR;
+﻿using System.Linq;
+using System.Linq.Expressions;
+using MediatR;
 using Moda.Common.Application.Dtos;
+using Moda.Common.Application.Models;
 using Moda.Goals.Application.Objectives.Queries;
 using Moda.Planning.Application.PlanningIntervals.Dtos;
 
@@ -7,72 +10,46 @@ namespace Moda.Planning.Application.PlanningIntervals.Queries;
 
 public sealed record GetPlanningIntervalObjectiveQuery : IQuery<PlanningIntervalObjectiveDetailsDto?>
 {
-    public GetPlanningIntervalObjectiveQuery(Guid id, Guid objectiveId)
+    public GetPlanningIntervalObjectiveQuery(IdOrKey idOrKey, IdOrKey objectiveIdOrKey)
     {
-        Id = id;
-        ObjectiveId = objectiveId;
+        PlanningIntervalIdOrKeyFilter = idOrKey.CreateFilter<PlanningInterval>();
+        ObjectiveIdOrKeyFilter = objectiveIdOrKey.CreateFilter<PlanningIntervalObjective>();
+        ObjectiveIdOrKey = objectiveIdOrKey;
     }
 
-    public GetPlanningIntervalObjectiveQuery(int key, int objectiveKey)
-    {
-        Key = key;
-        ObjectiveKey = objectiveKey;
-    }
+    public Expression<Func<PlanningInterval, bool>> PlanningIntervalIdOrKeyFilter { get; }
+    public Expression<Func<PlanningIntervalObjective, bool>> ObjectiveIdOrKeyFilter { get; }
 
-    public Guid? Id { get; set; }
-    public Guid? ObjectiveId { get; }
-    public int? Key { get; set; }
-    public int? ObjectiveKey { get; }
+    public IdOrKey ObjectiveIdOrKey { get; }
 }
 
-internal sealed class GetPlanningIntervalObjectiveQueryHandler : IQueryHandler<GetPlanningIntervalObjectiveQuery, PlanningIntervalObjectiveDetailsDto?>
+internal sealed class GetPlanningIntervalObjectiveQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalObjectiveQueryHandler> logger, ISender sender, IDateTimeProvider dateTimeProvider) : IQueryHandler<GetPlanningIntervalObjectiveQuery, PlanningIntervalObjectiveDetailsDto?>
 {
-    private readonly IPlanningDbContext _planningDbContext;
-    private readonly ILogger<GetPlanningIntervalObjectiveQueryHandler> _logger;
-    private readonly ISender _sender;
-    private readonly IDateTimeProvider _dateTimeProvider;
-
-    public GetPlanningIntervalObjectiveQueryHandler(IPlanningDbContext planningDbContext, ILogger<GetPlanningIntervalObjectiveQueryHandler> logger, ISender sender, IDateTimeProvider dateTimeProvider)
-    {
-        _planningDbContext = planningDbContext;
-        _logger = logger;
-        _sender = sender;
-        _dateTimeProvider = dateTimeProvider;
-    }
+    private readonly IPlanningDbContext _planningDbContext = planningDbContext;
+    private readonly ILogger<GetPlanningIntervalObjectiveQueryHandler> _logger = logger;
+    private readonly ISender _sender = sender;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<PlanningIntervalObjectiveDetailsDto?> Handle(GetPlanningIntervalObjectiveQuery request, CancellationToken cancellationToken)
     {
-        var query = _planningDbContext.PlanningIntervals.AsQueryable();
-
-        if (request.Id.HasValue && request.ObjectiveId.HasValue)
+        Guid? objectiveId = request.ObjectiveIdOrKey.AsId;
+        if (objectiveId is null)
         {
-            query = query
-                .Include(p => p.Objectives.Where(o => o.Id == request.ObjectiveId.Value))
-                    .ThenInclude(o => o.Team)
-                .Include(p => p.Objectives.Where(o => o.Id == request.ObjectiveId.Value))
-                    .ThenInclude(o => o.HealthCheck)
-                .Where(p => p.Id == request.Id.Value);
-        }
-        else if (request.Key.HasValue && request.ObjectiveKey.HasValue)
-        {
-            query = query
-                .Include(p => p.Objectives.Where(o => o.Key == request.ObjectiveKey.Value))
-                    .ThenInclude(o => o.Team)
-                .Include(p => p.Objectives.Where(o => o.Key == request.ObjectiveKey.Value))
-                    .ThenInclude(o => o.HealthCheck)
-                .Where(p => p.Key == request.Key.Value);
-        }
-        else
-        {
-            ThrowAndLogException(request, "No planning interval id or local id provided.");
+            objectiveId = await GetObjectiveId(request, cancellationToken);
+            if (objectiveId == Guid.Empty)
+                return null;
         }
 
-        var planningInterval = await query
-            .AsNoTrackingWithIdentityResolution()
-            .FirstOrDefaultAsync(cancellationToken);
+        var planningInterval = await _planningDbContext.PlanningIntervals
+        .Include(p => p.Objectives.Where(o => o.Id == objectiveId.Value))
+            .ThenInclude(o => o.Team)
+        .Include(p => p.Objectives.Where(o => o.Id == objectiveId.Value))
+            .ThenInclude(o => o.HealthCheck)
+        .Where(request.PlanningIntervalIdOrKeyFilter)
+        .AsNoTrackingWithIdentityResolution()
+        .FirstOrDefaultAsync(cancellationToken);
         if (planningInterval is null || planningInterval.Objectives.Count != 1
-            || (request.ObjectiveId.HasValue && planningInterval.Objectives.First().Id != request.ObjectiveId)
-            || (request.ObjectiveKey.HasValue && planningInterval.Objectives.First().Key != request.ObjectiveKey))
+            || planningInterval.Objectives.First().Id != objectiveId.Value)
             return null;
 
         // call the objective query handler
@@ -85,12 +62,14 @@ internal sealed class GetPlanningIntervalObjectiveQueryHandler : IQueryHandler<G
         return PlanningIntervalObjectiveDetailsDto.Create(planningInterval.Objectives.First(), objective, piNavigation, _dateTimeProvider.Now);
     }
 
-    private void ThrowAndLogException(GetPlanningIntervalObjectiveQuery request, string message)
+    // TODO: move this to a repository
+    private async Task<Guid?> GetObjectiveId(GetPlanningIntervalObjectiveQuery request, CancellationToken cancellationToken)
     {
-        var requestName = request.GetType().Name;
-        var exception = new InternalServerException(message);
-
-        _logger.LogError(exception, "Moda Request: Exception for Request {Name} {@Request}. {Message}", requestName, request, message);
-        throw exception;
+        return await _planningDbContext.PlanningIntervals
+            .Where(request.PlanningIntervalIdOrKeyFilter)
+            .SelectMany(p => p.Objectives)
+            .Where(request.ObjectiveIdOrKeyFilter)
+            .Select(o => o.Id) // returns empty guid if no match
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

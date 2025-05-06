@@ -2,11 +2,6 @@
 
 import PlanningIntervalObjectivesGrid from '@/src/components/common/planning/planning-interval-objectives-grid'
 import { useDocumentTitle } from '@/src/hooks'
-import {
-  useGetPlanningInterval,
-  useGetPlanningIntervalCalendar,
-  useGetPlanningIntervalTeams,
-} from '@/src/services/queries/planning-queries'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'
 import { use, useCallback, useMemo, useState } from 'react'
@@ -19,7 +14,12 @@ import { notFound } from 'next/navigation'
 import { Button } from 'antd'
 import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
-import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
+import {
+  useGetPlanningIntervalCalendarQuery,
+  useGetPlanningIntervalObjectivesQuery,
+  useGetPlanningIntervalQuery,
+  useGetPlanningIntervalTeamsQuery,
+} from '@/src/store/features/planning/planning-interval-api'
 
 const viewSelectorOptions: SegmentedLabeledOption[] = [
   {
@@ -35,42 +35,31 @@ const viewSelectorOptions: SegmentedLabeledOption[] = [
 const PlanningIntervalObjectivesPage = (props: {
   params: Promise<{ key: number }>
 }) => {
-  const { key } = use(props.params)
+  const { key: piKey } = use(props.params)
 
   useDocumentTitle('PI Objectives')
   const [currentView, setCurrentView] = useState<string | number>('List')
   const [openCreateObjectiveForm, setOpenCreateObjectiveForm] =
     useState<boolean>(false)
 
-  const {
-    data: planningIntervalData,
-    isLoading,
-    isFetching,
-    refetch: refetchPlanningInterval,
-  } = useGetPlanningInterval(key.toString())
+  const { data: planningIntervalData, isLoading } =
+    useGetPlanningIntervalQuery(piKey)
 
   const {
     data: objectivesData,
     isLoading: isLoadingObjectives,
     refetch: refectObjectives,
-  } = useGetPlanningIntervalObjectivesQuery(
-    {
-      planningIntervalId: planningIntervalData?.id,
-      teamId: null,
-    },
-    { skip: !planningIntervalData?.id },
-  )
+  } = useGetPlanningIntervalObjectivesQuery({
+    planningIntervalKey: piKey,
+    teamId: null,
+  })
 
-  const calendarQuery = useGetPlanningIntervalCalendar(planningIntervalData?.id)
+  const { data: calendarData } = useGetPlanningIntervalCalendarQuery(piKey)
 
-  const { data: teamData } = useGetPlanningIntervalTeams(
-    planningIntervalData?.id,
-    true,
-  )
+  const { data: teamData } = useGetPlanningIntervalTeamsQuery(piKey)
 
-  const { hasClaim } = useAuth()
-  const canManageObjectives = hasClaim(
-    'Permission',
+  const { hasPermissionClaim } = useAuth()
+  const canManageObjectives = hasPermissionClaim(
     'Permissions.PlanningIntervalObjectives.Manage',
   )
   const canCreateObjectives =
@@ -91,7 +80,7 @@ const PlanningIntervalObjectivesPage = (props: {
     [currentView],
   )
 
-  if (!isLoading && !isFetching && !planningIntervalData) {
+  if (!isLoading && !planningIntervalData) {
     notFound()
   }
 
@@ -123,7 +112,7 @@ const PlanningIntervalObjectivesPage = (props: {
           objectivesData={objectivesData}
           isLoading={isLoadingObjectives}
           refreshObjectives={refectObjectives}
-          planningIntervalId={planningIntervalData?.id}
+          planningIntervalKey={piKey}
           hidePlanningIntervalColumn={true}
           hideTeamColumn={false}
           viewSelector={viewSelector}
@@ -132,7 +121,7 @@ const PlanningIntervalObjectivesPage = (props: {
       {currentView === 'Timeline' && (
         <PlanningIntervalObjectivesTimeline
           objectivesData={objectivesData}
-          planningIntervalCalendarQuery={calendarQuery}
+          planningIntervalCalendar={calendarData}
           enableGroups={true}
           teamNames={teamData
             ?.filter((t) => t.type == 'Team')
@@ -143,7 +132,7 @@ const PlanningIntervalObjectivesPage = (props: {
       {openCreateObjectiveForm && (
         <CreatePlanningIntervalObjectiveForm
           showForm={openCreateObjectiveForm}
-          planningIntervalId={planningIntervalData?.id}
+          planningIntervalKey={piKey}
           onFormCreate={() => onCreateObjectiveFormClosed(true)}
           onFormCancel={() => onCreateObjectiveFormClosed(false)}
         />

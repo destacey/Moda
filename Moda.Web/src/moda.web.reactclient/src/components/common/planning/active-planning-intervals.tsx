@@ -1,9 +1,8 @@
 import { useMemo } from 'react'
-import PageTitle from '../page-title'
-import { Col, Divider, Row, Space, Typography } from 'antd'
+import { Col, Row, Space, Typography } from 'antd'
 import PlanningIntervalCard from './planning-interval-card'
 import dayjs from 'dayjs'
-import { useGetPlanningIntervals } from '@/src/services/queries/planning-queries'
+import { useGetPlanningIntervalsQuery } from '@/src/store/features/planning/planning-interval-api'
 
 const { Title } = Typography
 
@@ -15,7 +14,7 @@ const isWithinTwoWeeks = (date: Date) => {
 }
 
 const ActivePlanningIntervals = () => {
-  const { data: piData } = useGetPlanningIntervals()
+  const { data: piData } = useGetPlanningIntervalsQuery()
 
   const activePlanningIntervals = useMemo(() => {
     return (

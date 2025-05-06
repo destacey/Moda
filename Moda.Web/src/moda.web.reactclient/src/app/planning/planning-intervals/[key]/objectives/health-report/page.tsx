@@ -4,10 +4,7 @@ import PageTitle from '@/src/components/common/page-title'
 import { use, useCallback, useMemo } from 'react'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import { authorizePage } from '@/src/components/hoc'
-import {
-  useGetPlanningInterval,
-  useGetPlanningIntervalObjectivesHealthReport,
-} from '@/src/services/queries/planning-queries'
+import { useGetPlanningIntervalObjectivesHealthReport } from '@/src/services/queries/planning-queries'
 import { notFound } from 'next/navigation'
 import {
   MarkdownCellRenderer,
@@ -43,13 +40,6 @@ const ObjectiveHealthReportPage = (props: {
   const { key } = use(props.params)
 
   useDocumentTitle('PI Objectives Health Report')
-
-  const {
-    data: piData,
-    isLoading: piIsLoading,
-    isFetching: piIsFetching,
-    refetch: refetchPlanningInterval,
-  } = useGetPlanningInterval(key.toString())
 
   const {
     data: healthReport,
@@ -115,7 +105,7 @@ const ObjectiveHealthReportPage = (props: {
     refetch()
   }, [refetch])
 
-  if (!piIsLoading && !isLoading && !isFetching && !healthReport) {
+  if (!isLoading && !isFetching && !healthReport) {
     notFound()
   }
 

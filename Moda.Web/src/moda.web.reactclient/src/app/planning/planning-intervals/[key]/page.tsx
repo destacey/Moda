@@ -15,10 +15,6 @@ import TeamsGrid, {
 } from '@/src/components/common/organizations/teams-grid'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
-import {
-  useGetPlanningInterval,
-  useGetPlanningIntervalTeams,
-} from '@/src/services/queries/planning-queries'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import { useAppDispatch } from '@/src/hooks'
@@ -32,6 +28,10 @@ import {
   ManagePlanningIntervalTeamsForm,
   PlanningIntervalDetails,
 } from '../_components'
+import {
+  useGetPlanningIntervalQuery,
+  useGetPlanningIntervalTeamsQuery,
+} from '@/src/store/features/planning/planning-interval-api'
 
 enum PlanningIntervalTabs {
   Details = 'details',
@@ -41,7 +41,7 @@ enum PlanningIntervalTabs {
 const PlanningIntervalDetailsPage = (props: {
   params: Promise<{ key: number }>
 }) => {
-  const { key } = use(props.params)
+  const { key: piKey } = use(props.params)
 
   useDocumentTitle('PI Details')
 
@@ -58,23 +58,25 @@ const PlanningIntervalDetailsPage = (props: {
   const pathname = usePathname()
   const dispatch = useAppDispatch()
 
-  const { hasClaim } = useAuth()
-  const canUpdatePlanningInterval = hasClaim(
-    'Permission',
+  const { hasPermissionClaim } = useAuth()
+  const canUpdatePlanningInterval = hasPermissionClaim(
     'Permissions.PlanningIntervals.Update',
   )
 
   const {
     data: planningIntervalData,
     isLoading,
-    isFetching,
+    error,
     refetch: refetchPlanningInterval,
-  } = useGetPlanningInterval(key.toString())
+  } = useGetPlanningIntervalQuery(+piKey)
 
-  const teamsQuery = useGetPlanningIntervalTeams(
-    planningIntervalData?.id,
-    teamsQueryEnabled,
-  )
+  const {
+    data: teamsData,
+    isLoading: teamsIsLoading,
+    refetch: refetchTeams,
+  } = useGetPlanningIntervalTeamsQuery(+piKey, {
+    skip: !teamsQueryEnabled,
+  })
 
   const actionsMenuItems = useMemo(() => {
     const items = [] as ItemType[]
@@ -112,7 +114,9 @@ const PlanningIntervalDetailsPage = (props: {
       key: PlanningIntervalTabs.Teams,
       tab: 'Teams',
       content: createElement(TeamsGrid, {
-        teamsQuery: teamsQuery,
+        teams: teamsData,
+        isLoading: teamsIsLoading,
+        refetch: refetchTeams,
       } as TeamsGridProps),
     },
   ]
@@ -167,7 +171,7 @@ const PlanningIntervalDetailsPage = (props: {
     return <PlanningIntervalDetailsLoading />
   }
 
-  if (!isLoading && !isFetching && !planningIntervalData) {
+  if (!isLoading && !planningIntervalData) {
     notFound()
   }
 
@@ -188,7 +192,7 @@ const PlanningIntervalDetailsPage = (props: {
       {openEditPlanningIntervalForm && (
         <EditPlanningIntervalForm
           showForm={openEditPlanningIntervalForm}
-          id={planningIntervalData?.id}
+          planningIntervalKey={piKey}
           onFormUpdate={() => onEditFormClosed(true)}
           onFormCancel={() => onEditFormClosed(false)}
         />
@@ -197,6 +201,7 @@ const PlanningIntervalDetailsPage = (props: {
         <ManagePlanningIntervalDatesForm
           showForm={openManagePlanningIntervalDatesForm}
           id={planningIntervalData?.id}
+          planningIntervalKey={piKey}
           onFormSave={() => onManagePlanningIntervalDatesFormClosed(true)}
           onFormCancel={() => onManagePlanningIntervalDatesFormClosed(false)}
         />

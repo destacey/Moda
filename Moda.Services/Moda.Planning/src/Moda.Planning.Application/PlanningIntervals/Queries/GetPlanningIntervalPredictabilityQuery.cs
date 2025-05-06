@@ -1,9 +1,19 @@
-﻿using Moda.Common.Domain.Enums.Organization;
+﻿using Moda.Common.Application.Models;
+using System.Linq.Expressions;
+using Moda.Common.Domain.Enums.Organization;
 using Moda.Planning.Application.Models;
 using Moda.Planning.Domain.Enums;
 
 namespace Moda.Planning.Application.PlanningIntervals.Queries;
-public sealed record GetPlanningIntervalPredictabilityQuery(Guid Id) : IQuery<PlanningIntervalPredictabilityDto?>;
+public sealed record GetPlanningIntervalPredictabilityQuery : IQuery<PlanningIntervalPredictabilityDto?>
+{
+    public GetPlanningIntervalPredictabilityQuery(IdOrKey idOrKey)
+    {
+        IdOrKeyFilter = idOrKey.CreateFilter<PlanningInterval>();
+    }
+
+    public Expression<Func<PlanningInterval, bool>> IdOrKeyFilter { get; }
+}
 
 internal sealed class GetPlanningIntervalPredictabilityQueryHandler : IQueryHandler<GetPlanningIntervalPredictabilityQuery, PlanningIntervalPredictabilityDto?>
 {
@@ -26,7 +36,7 @@ internal sealed class GetPlanningIntervalPredictabilityQueryHandler : IQueryHand
                 .ThenInclude(t => t.Team)
             .Include(p => p.Objectives.Where(o => o.Type == PlanningIntervalObjectiveType.Team))
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
+            .FirstOrDefaultAsync(request.IdOrKeyFilter, cancellationToken);
 
         if (planningInterval is null)
             return null;

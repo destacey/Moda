@@ -1,7 +1,8 @@
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { RoadmapMilestoneDetailsDto } from '@/src/services/moda-api'
-import { Descriptions, Space } from 'antd'
+import { Descriptions, Flex, Space } from 'antd'
 import dayjs from 'dayjs'
+import { FC } from 'react'
 
 const { Item: DescriptionsItem } = Descriptions
 
@@ -10,14 +11,14 @@ interface RoadmapMilestoneDrawerItemProps {
   openRoadmapItemDrawer: (itemId: string) => void
 }
 
-const RoadmapMilestoneDrawerItem: React.FC<RoadmapMilestoneDrawerItemProps> = (
+const RoadmapMilestoneDrawerItem: FC<RoadmapMilestoneDrawerItemProps> = (
   props: RoadmapMilestoneDrawerItemProps,
 ) => {
   const { milestone } = props
 
   return (
-    <Space direction="vertical">
-      <Descriptions column={1}>
+    <Flex vertical gap="middle">
+      <Descriptions column={1} size="small">
         <DescriptionsItem label="Name">{milestone.name}</DescriptionsItem>
         <DescriptionsItem label="Type">{milestone.type.name}</DescriptionsItem>
         <DescriptionsItem label="Parent">
@@ -33,12 +34,12 @@ const RoadmapMilestoneDrawerItem: React.FC<RoadmapMilestoneDrawerItemProps> = (
           {dayjs(milestone.date).format('MMM D, YYYY')}
         </DescriptionsItem>
       </Descriptions>
-      <Descriptions column={1} layout="vertical" style={{ paddingTop: 8 }}>
+      <Descriptions column={1} layout="vertical" size="small">
         <DescriptionsItem label="Description">
           <MarkdownRenderer markdown={milestone?.description} />
         </DescriptionsItem>
       </Descriptions>
-    </Space>
+    </Flex>
   )
 }
 

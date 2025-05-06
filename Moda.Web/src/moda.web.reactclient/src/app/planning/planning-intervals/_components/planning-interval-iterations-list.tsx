@@ -1,20 +1,25 @@
 'use client'
 
 import ModaDateRange from '@/src/components/common/moda-date-range'
-import { useGetPlanningIntervalIterations } from '@/src/services/queries/planning-queries'
+import { useGetPlanningIntervalIterationsQuery } from '@/src/store/features/planning/planning-interval-api'
 import { Card, List } from 'antd'
+import { FC } from 'react'
 
 const { Item } = List
 const { Meta } = Item
 
 interface PlanningIntervalIterationsListProps {
-  id: string
+  planningIntervalKey: number
 }
 
-const PlanningIntervalIterationsList = ({
-  id,
-}: PlanningIntervalIterationsListProps) => {
-  const { data: iterations } = useGetPlanningIntervalIterations(id)
+const PlanningIntervalIterationsList: FC<
+  PlanningIntervalIterationsListProps
+> = (props) => {
+  const { planningIntervalKey } = props
+  const { data: iterations } = useGetPlanningIntervalIterationsQuery(
+    planningIntervalKey,
+    { skip: !planningIntervalKey },
+  )
 
   if (!iterations || iterations.length == 0) return null
   return (

@@ -2,6 +2,7 @@
 using CsvHelper;
 using Mapster;
 using Moda.Common.Application.Interfaces;
+using Moda.Common.Application.Models;
 using Moda.Common.Extensions;
 using Moda.Health.Queries;
 using Moda.Organization.Application.Teams.Queries;
@@ -77,15 +78,15 @@ public class PlanningIntervalsController : ControllerBase
             : NotFound();
     }
 
-    [HttpGet("{id}/predictability")]
+    [HttpGet("{idOrKey}/predictability")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Get the PI predictability for all teams.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<PlanningIntervalPredictabilityDto>> GetPredictability(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<PlanningIntervalPredictabilityDto>> GetPredictability(string idOrKey, CancellationToken cancellationToken)
     {
-        var predictability = await _sender.Send(new GetPlanningIntervalPredictabilityQuery(id), cancellationToken);
+        var predictability = await _sender.Send(new GetPlanningIntervalPredictabilityQuery(idOrKey), cancellationToken);
 
         return predictability is not null
             ? Ok(predictability)
@@ -95,13 +96,13 @@ public class PlanningIntervalsController : ControllerBase
     [HttpPost]
     [MustHavePermission(ApplicationAction.Create, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Create a planning interval.", "")]
-    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201Guid))]
+    [ApiConventionMethod(typeof(ModaApiConventions), nameof(ModaApiConventions.CreateReturn201IdAndKey))]
     public async Task<ActionResult> Create([FromBody] CreatePlanningIntervalRequest request, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request.ToCreatePlanningIntervalCommand(), cancellationToken);
 
         return result.IsSuccess
-            ? CreatedAtAction(nameof(GetPlanningInterval), new { idOrKey = result.Value.ToString() }, result.Value)
+            ? CreatedAtAction(nameof(GetPlanningInterval), new { idOrKey = result.Value.Id.ToString() }, result.Value)
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
@@ -123,15 +124,15 @@ public class PlanningIntervalsController : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-    [HttpGet("{id}/teams")]
+    [HttpGet("{idOrKey}/teams")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Get a list of planning interval teams.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<PlanningIntervalTeamResponse>>> GetTeams(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<PlanningIntervalTeamResponse>>> GetTeams(string idOrKey, CancellationToken cancellationToken)
     {
-        List<PlanningIntervalTeamResponse> piTeams = new();
-        var teamIds = await _sender.Send(new GetPlanningIntervalTeamsQuery(id), cancellationToken);
+        List<PlanningIntervalTeamResponse> piTeams = [];
+        var teamIds = await _sender.Send(new GetPlanningIntervalTeamsQuery(idOrKey), cancellationToken);
 
         if (teamIds.Any())
         {
@@ -145,14 +146,14 @@ public class PlanningIntervalsController : ControllerBase
         return Ok(piTeams);
     }
 
-    [HttpGet("{id}/teams/{teamId}/predictability")]
+    [HttpGet("{idOrKey}/teams/{teamId}/predictability")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Get the PI predictability for a team.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<double?>> GetTeamPredictability(Guid id, Guid teamId, CancellationToken cancellationToken)
+    public async Task<ActionResult<double?>> GetTeamPredictability(string idOrKey, Guid teamId, CancellationToken cancellationToken)
     {
-        var predictability = await _sender.Send(new GetTeamPlanningIntervalPredictabilityQuery(id, teamId), cancellationToken);
+        var predictability = await _sender.Send(new GetTeamPlanningIntervalPredictabilityQuery(idOrKey, teamId), cancellationToken);
 
         return Ok(predictability);
     }
@@ -220,42 +221,27 @@ public class PlanningIntervalsController : ControllerBase
 
     #region Objectives
 
-    [HttpGet("{id}/objectives")]
+    [HttpGet("{idOrKey}/objectives")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
     [OpenApiOperation("Get a list of planning interval teams.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<PlanningIntervalObjectiveListDto>>> GetObjectives(Guid id, Guid? teamId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<PlanningIntervalObjectiveListDto>>> GetObjectives(string idOrKey, Guid? teamId, CancellationToken cancellationToken)
     {
-        var objectives = await _sender.Send(new GetPlanningIntervalObjectivesQuery(id, teamId), cancellationToken);
+        var objectives = await _sender.Send(new GetPlanningIntervalObjectivesQuery(idOrKey, teamId), cancellationToken);
 
         return Ok(objectives);
     }
 
-    [HttpGet("{id}/objectives/{objectiveId}")]
+    [HttpGet("{idOrKey}/objectives/{objectiveIdOrKey}")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
     [OpenApiOperation("Get a planning interval objective.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PlanningIntervalObjectiveDetailsDto>> GetObjectiveById(Guid id, Guid objectiveId, CancellationToken cancellationToken)
+    public async Task<ActionResult<PlanningIntervalObjectiveDetailsDto>> GetObjective(string idOrKey, string objectiveIdOrKey, CancellationToken cancellationToken)
     {
-        var objective = await _sender.Send(new GetPlanningIntervalObjectiveQuery(id, objectiveId), cancellationToken);
-
-        return objective is not null
-            ? Ok(objective)
-            : NotFound();
-    }
-
-    [HttpGet("key/{id}/objectives/{objectiveId}")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
-    [OpenApiOperation("Get a planning interval objective using the PI and Objective keys.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PlanningIntervalObjectiveDetailsDto>> GetObjectiveByKey(int id, int objectiveId, CancellationToken cancellationToken)
-    {
-        var objective = await _sender.Send(new GetPlanningIntervalObjectiveQuery(id, objectiveId), cancellationToken);
+        var objective = await _sender.Send(new GetPlanningIntervalObjectiveQuery(idOrKey, objectiveIdOrKey), cancellationToken);
 
         return objective is not null
             ? Ok(objective)
@@ -265,7 +251,7 @@ public class PlanningIntervalsController : ControllerBase
     [HttpPost("{id}/objectives")]
     [MustHavePermission(ApplicationAction.Manage, ApplicationResource.PlanningIntervalObjectives)]
     [OpenApiOperation("Create a planning interval objective.", "")]
-    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ObjectIdAndKey), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
@@ -277,7 +263,7 @@ public class PlanningIntervalsController : ControllerBase
         var result = await _sender.Send(request.ToCreatePlanningIntervalObjectiveCommand(), cancellationToken);
 
         return result.IsSuccess
-            ? CreatedAtAction(nameof(GetObjectiveByKey), new { id, objectiveId = result.Value }, result.Value)
+            ? CreatedAtAction(nameof(GetObjective), new { idOrKey = id, objectiveIdOrKey = result.Value.Id.ToString() }, result.Value)
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
@@ -360,19 +346,19 @@ public class PlanningIntervalsController : ControllerBase
         return Ok(objectiveHealthChecks);
     }
 
-    [HttpGet("{id}/objectives/{objectiveId}/work-items")]
+    [HttpGet("{idOrKey}/objectives/{objectiveIdOrKey}/work-items")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
     [OpenApiOperation("Get work items for an objective.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<WorkItemsSummaryDto>> GetObjectiveWorkItems(Guid id, Guid objectiveId, CancellationToken cancellationToken)
+    public async Task<ActionResult<WorkItemsSummaryDto>> GetObjectiveWorkItems(string idOrKey, string objectiveIdOrKey, CancellationToken cancellationToken)
     {
-        var exists = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(id, objectiveId), cancellationToken);
-        if (!exists)
+        var objectiveId = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(idOrKey, objectiveIdOrKey), cancellationToken);
+        if (objectiveId is null)
             return NotFound();
 
-        var workItemsSummary = await _sender.Send(new GetExternalObjectWorkItemsQuery(objectiveId), cancellationToken);
+        var workItemsSummary = await _sender.Send(new GetExternalObjectWorkItemsQuery(objectiveId.Value), cancellationToken);
 
         if (workItemsSummary is null)
             return NotFound();
@@ -383,26 +369,26 @@ public class PlanningIntervalsController : ControllerBase
         return Ok(workItemsSummary);
     }
 
-    [HttpGet("{id}/objectives/{objectiveId}/work-items/metrics")]
+    [HttpGet("{idOrKey}/objectives/{objectiveIdOrKey}/work-items/metrics")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
     [OpenApiOperation("Get metrics for the work items linked to an objective.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<List<WorkItemProgressDailyRollupDto>>> GetObjectiveWorkItemMetrics(Guid id, Guid objectiveId, CancellationToken cancellationToken)
+    public async Task<ActionResult<List<WorkItemProgressDailyRollupDto>>> GetObjectiveWorkItemMetrics(string idOrKey, string objectiveIdOrKey, CancellationToken cancellationToken)
     {
-        var exists = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(id, objectiveId), cancellationToken);
-        if (!exists)
+        var objectiveId = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(idOrKey, objectiveIdOrKey), cancellationToken);
+        if (objectiveId is null)
             return NotFound();
 
-        var planningInterval = await _sender.Send(new GetPlanningIntervalQuery(id), cancellationToken);
+        var planningInterval = await _sender.Send(new GetPlanningIntervalQuery(idOrKey), cancellationToken);
 
         var today = _dateTimeProvider.Now.ToDateOnly();
         var piEnd = planningInterval!.End.ToDateOnly();
         // get the min of today and the end of the PI
         var end = today < piEnd ? today : piEnd;
 
-        var dailyRollup = await _sender.Send(new GetExternalObjectWorkItemMetricsQuery(objectiveId, planningInterval!.Start.ToDateOnly(), end), cancellationToken);
+        var dailyRollup = await _sender.Send(new GetExternalObjectWorkItemMetricsQuery(objectiveId.Value, planningInterval!.Start.ToDateOnly(), end), cancellationToken);
 
         if (dailyRollup is null)
             return NotFound();
@@ -424,8 +410,8 @@ public class PlanningIntervalsController : ControllerBase
         else if (objectiveId != request.ObjectiveId)
             return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(objectiveId), nameof(request.ObjectiveId), HttpContext));
 
-        var exists = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(id, objectiveId), cancellationToken);
-        if (!exists)
+        var confirmedObjectiveId = await _sender.Send(new CheckPlanningIntervalObjectiveExistsQuery(new IdOrKey(id), new IdOrKey(objectiveId)), cancellationToken);
+        if (confirmedObjectiveId is null)
             return NotFound();
 
         var result = await _sender.Send(request.ToManageExternalObjectWorkItemsCommand(), cancellationToken);

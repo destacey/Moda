@@ -1,5 +1,4 @@
 ﻿using Moda.Common.Application.Models;
-using Moda.Planning.Application.PlanningIntervals.Queries;
 using Moda.ProjectPortfolioManagement.Application.Projects.Commands;
 using Moda.ProjectPortfolioManagement.Application.Projects.Dtos;
 using Moda.ProjectPortfolioManagement.Application.Projects.Queries;
